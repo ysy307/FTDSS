@@ -11,6 +11,7 @@ module physics_types
     private
 
     public :: abst_physics
+    public :: type_iapws_wrapper
 
     !> @brief 物理計算の抽象基底クラス
     !> @details 水、氷、水蒸気の熱力学的物性値の参照・計算を管理します。
@@ -78,6 +79,12 @@ module physics_types
         !> 状態変数から絶対温度のみを取得する内部ヘルパー
         procedure, pass(self), private :: get_thermo_state_T
     end type abst_physics
+
+    type, extends(abst_physics) :: type_iapws_wrapper
+    contains
+        !> @brief IAPWS物質モデルの初期化
+        procedure, public :: initialize => initialize_iapws_wrapper
+    end type type_iapws_wrapper
 
 contains
 
@@ -342,5 +349,16 @@ contains
         call self%get_thermo_state_T(state, T_K)
         call self%water%calc_saturation_cp(T_K, cp)
     end subroutine calc_cp_vapor_abst_physics
+
+    !> @brief IAPWS物質モデルの初期化を行います。
+    subroutine initialize_iapws_wrapper(self, water_model, ice_model)
+        implicit none
+        class(type_iapws_wrapper), intent(inout) :: self
+        type(type_iapws97), intent(in), target :: water_model
+        type(type_iapws06), intent(in), target :: ice_model
+
+        self%water => water_model
+        self%ice => ice_model
+    end subroutine initialize_iapws_wrapper
 
 end module physics_types

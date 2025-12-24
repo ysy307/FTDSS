@@ -74,6 +74,9 @@ module physics_models_phase_change_liquid_solid_gcc
 
         !> Calculate d^2(Suction)/dT^2 [Pa/K^2] (2nd Temperature derivative)
         procedure(abst_deriv2_temp_gcc), pass(self), public, deferred :: deriv_temperature_2nd
+
+        !> Calculate dP_ice/dP_w
+        procedure(abst_deriv_pressure_ice_water), pass(self), public, deferred :: deriv_pressure_ice_water
     end type abst_gcc
 
     !---------------------------------------------------------------------------
@@ -116,6 +119,15 @@ module physics_models_phase_change_liquid_solid_gcc
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: suction_derivative
         end subroutine abst_deriv2_temp_gcc
+
+        !> @brief Calculate derivative of ice pressure w.r.t water pressure [-].
+        pure elemental subroutine abst_deriv_pressure_ice_water(self, state, deriv)
+            import :: abst_gcc, type_state, real64
+            implicit none
+            class(abst_gcc), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: deriv
+        end subroutine abst_deriv_pressure_ice_water
     end interface
 
     interface
@@ -141,6 +153,7 @@ module physics_models_phase_change_liquid_solid_gcc
         procedure, pass(self) :: deriv_temperature => deriv_temp_gcc_nonseg
         procedure, pass(self) :: deriv_pressure => deriv_pres_gcc_nonseg
         procedure, pass(self) :: deriv_temperature_2nd => deriv2_temp_gcc_nonseg
+        procedure, pass(self) :: deriv_pressure_ice_water => deriv_pressure_ice_water_nonseg
     end type type_gcc_non_segregation
 
 !>
@@ -152,6 +165,7 @@ module physics_models_phase_change_liquid_solid_gcc
         procedure, pass(self) :: deriv_temperature => deriv_temp_gcc_seg
         procedure, pass(self) :: deriv_pressure => deriv_pres_gcc_seg
         procedure, pass(self) :: deriv_temperature_2nd => deriv2_temp_gcc_seg
+        procedure, pass(self) :: deriv_pressure_ice_water => deriv_pressure_ice_water_seg
     end type type_gcc_segregation
 
     !---------------------------------------------------------------------------
@@ -209,6 +223,14 @@ module physics_models_phase_change_liquid_solid_gcc
             real(real64), intent(inout) :: suction_derivative
         end subroutine deriv2_temp_gcc_nonseg
 
+        module pure elemental subroutine deriv_pressure_ice_water_nonseg(self, state, deriv)
+            implicit none
+            class(type_gcc_non_segregation), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: deriv
+
+        end subroutine deriv_pressure_ice_water_nonseg
+
         ! --- Segregation methods ---
         module pure elemental subroutine calc_gcc_seg(self, state, suction)
             implicit none
@@ -237,6 +259,14 @@ module physics_models_phase_change_liquid_solid_gcc
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: suction_derivative
         end subroutine deriv2_temp_gcc_seg
+
+        module pure elemental subroutine deriv_pressure_ice_water_seg(self, state, deriv)
+            implicit none
+            class(type_gcc_segregation), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: deriv
+
+        end subroutine deriv_pressure_ice_water_seg
     end interface
 
 end module physics_models_phase_change_liquid_solid_gcc

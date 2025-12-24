@@ -28,6 +28,9 @@ module module_physics_models
         procedure, public :: calc_KlT
         procedure, public :: calc_Kvh
         procedure, public :: calc_KvT
+        procedure, public :: calc_latent_heat_fusion
+        procedure, public :: calc_latent_heat_vaporization
+        procedure, public :: calc_pressure_ice_water_derivative
     end type type_models_manager
 
 contains
@@ -100,5 +103,32 @@ contains
 
         call self%hcf%p%calc_KvT(state, KvT)
     end subroutine calc_KvT
+
+    pure elemental subroutine calc_latent_heat_fusion(self, state, L_fusion)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: L_fusion
+
+        call self%phase_manager%calc_latent_heat_fusion(state, L_fusion)
+    end subroutine calc_latent_heat_fusion
+
+    pure elemental subroutine calc_latent_heat_vaporization(self, state, L_vaporization)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: L_vaporization
+
+        call self%phase_manager%calc_latent_heat_vaporization(state, L_vaporization)
+    end subroutine calc_latent_heat_vaporization
+
+    pure elemental subroutine calc_pressure_ice_water_derivative(self, state, deriv)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: deriv
+
+        call self%phase_manager%deriv_pressure_ice_water(state, deriv)
+    end subroutine calc_pressure_ice_water_derivative
 
 end module module_physics_models

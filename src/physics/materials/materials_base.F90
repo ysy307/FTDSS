@@ -18,6 +18,7 @@ module physics_materials_base
     contains
         procedure, pass(self), public :: initialize => initialize_abst_material
         procedure, pass(self), public :: get_phi => get_material_phi
+        procedure, pass(self), public :: get_solid => get_solid_abst_material
         procedure, pass(self), public :: calc_water_density => calc_water_density_abst_material
         procedure, pass(self), public :: calc_ice_density => calc_ice_density_abst_material
         procedure, pass(self), public :: calc_vapor_density => calc_vapor_density_abst_material
@@ -69,6 +70,15 @@ contains
         if (present(phi4)) phi4 = 1.0d0 - phi1 - phi2 - phi3
 
     end subroutine get_material_phi
+
+    pure elemental subroutine get_solid_abst_material(self, solid)
+        implicit none
+        class(abst_material), intent(in) :: self
+        real(real64), intent(inout) :: solid
+
+        solid = self%material1
+
+    end subroutine get_solid_abst_material
 
     pure elemental subroutine calc_water_density_abst_material(self, state, density)
         implicit none

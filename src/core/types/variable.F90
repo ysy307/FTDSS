@@ -29,10 +29,14 @@ module core_types_variable
         real(real64), allocatable :: old(:, :)
         !> The time derivative of the variable (e.g., du/dt).
         real(real64), allocatable :: dif(:)
+        !> The spatial derivative of the variable (e.g., grad u).
+        real(real64), allocatable :: grad(:)
     contains
         procedure, pass(self) :: initialize => initialize_type_variable
         procedure, pass(self) :: shift => type_variable_shift
         procedure, pass(self) :: set => type_variable_set
+        ! ▼ 追加: 時間微分計算ルーチン
+        procedure, pass(self) :: compute_derivative => type_variable_compute_derivative
     end type type_variable
 
 contains
@@ -55,11 +59,13 @@ contains
         call allocate_array(self%pre, length)
         call allocate_array(self%old, length, self%rank + 1_int32)
         call allocate_array(self%dif, length)
+        call allocate_array(self%grad, length)
 
         self%new(:) = 0.0d0
         self%pre(:) = 0.0d0
         self%old(:, :) = 0.0d0
         self%dif(:) = 0.0d0
+        self%grad(:) = 0.0d0
 
     end subroutine initialize_type_variable
 
@@ -134,5 +140,54 @@ contains
         self%dif(:) = 0.0d0
 
     end subroutine type_variable_set
+
+    !>
+    !> Calculates the time derivative using provided BDF coefficients.
+    !> Formula: du/dt = sum( coeffs(j) * u_{n+1-j} )
+    !> Note: 'coeffs' must include the 1/dt scaling factor.
+    !>
+    subroutine type_variable_compute_derivative(self, coeffs)
+        implicit none
+        !> The variable object to update.
+        class(type_variable), intent(inout) :: self
+        !> The BDF coefficients array (already scaled by 1/dt).
+        !> Assumed mapping:
+        !>  coeffs(1) -> t_{n+1} (self%new)
+        !>  coeffs(2) -> t_{n}   (self%pre)
+        !>  coeffs(3) -> t_{n-1} (self%old(:,1))
+        !>  ...
+        real(real64), intent(in) :: coeffs(:)
+
+        integer(int32) :: i, hist_idx
+        integer(int32) :: num_coeffs
+
+        num_coeffs = size(coeffs)
+
+        ! 1. Term for t_{n+1} (Current/New)
+        if (num_coeffs >= 1) then
+            self%dif(:) = coeffs(1) * self%new(:)
+        else
+            self%dif(:) = 0.0d0
+        end if
+
+        ! 2. Term for t_{n} (Previous)
+        if (num_coeffs >= 2) then
+            self%dif(:) = self%dif(:) + coeffs(2) * self%pre(:)
+        end if
+
+        ! 3. Terms for t_{n-1}, t_{n-2}... (History)
+        ! coeffs(3) corresponds to old(:, 1)
+        if (num_coeffs >= 3) then
+            do i = 3, num_coeffs
+                hist_idx = i - 2
+                ! Boundary check to avoid accessing unallocated history
+                ! Also ensures we don't exceed the configured rank
+                if (hist_idx > size(self%old, 2)) exit
+
+                self%dif(:) = self%dif(:) + coeffs(i) * self%old(:, hist_idx)
+            end do
+        end if
+
+    end subroutine type_variable_compute_derivative
 
 end module core_types_variable

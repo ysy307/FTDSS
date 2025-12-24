@@ -27,7 +27,7 @@ module control_time
         character(20) :: label = ''
         real(real64) :: total_time = 0.0d0
         real(real64) :: start_time = 0.0d0
-        integer(int32) :: call_count = 0 ! 呼び出し回数も記録すると便利
+        integer(int32) :: call_count = 0
     end type type_profiler_section
 
     type :: type_time
@@ -35,20 +35,22 @@ module control_time
         ! --- Time Stepping State ---
         real(real64) :: start_time = 0.0d0
         real(real64) :: end_time = 0.0d0
-        real(real64) :: current_time = 0.0d0 ! 変数名を time -> current_time に明確化
+        real(real64) :: current_time = 0.0d0
         real(real64) :: time_old = 0.0d0
 
         real(real64) :: dt = 0.0d0
-        real(real64), allocatable :: dt_old(:) ! History of dt
+        real(real64), allocatable :: dt_history(:) ! dtの履歴 (dt_{n}, dt_{n-1}, ...)
         real(real64) :: dt_min = 0.0d0
         real(real64) :: dt_max = 0.0d0
 
-        real(real64) :: time_conversion = 1.0d0 ! Unit conversion factor
+        real(real64) :: time_conversion = 1.0d0 ! 表示用の単位変換係数
 
         ! --- BDF Coefficients ---
-        real(real64) :: alpha(0:MAX_BDF_ORDER) = 0.0d0
-        real(real64) :: beta = 0.0d0
-        integer(int32) :: bdf_order = 1
+        ! 方程式: dy/dt = sum( coeffs(j) * y_{n-j} )
+        ! coeffsは 1/dt の次元を持つ (dtによる除算を含む)
+        real(real64) :: coeffs(0:MAX_BDF_ORDER) = 0.0d0
+        integer(int32) :: target_bdf_order = 1 ! 設定された目標次数
+        integer(int32) :: current_bdf_order = 1 ! 現在利用可能な次数（起動直後など）
 
         ! --- Records ---
         type(type_time_record) :: record_start
@@ -62,7 +64,7 @@ module control_time
         procedure, public, pass(self) :: initialize => initialize_type_time
         procedure, public, pass(self) :: record => record_timestamp
 
-        ! Profiler (Overloaded for String and ID)
+        ! Profiler
         procedure, public, pass(self) :: get_profiler_id
         procedure, public, pass(self) :: profile_start_by_name
         procedure, public, pass(self) :: profile_start_by_id
@@ -73,18 +75,17 @@ module control_time
         generic, public :: profile_stop => profile_stop_by_name, profile_stop_by_id
 
         ! Time Management
-        procedure, public, pass(self) :: update_bdf_coefficients => update_bdf_coefficients_wrapper
+        procedure, public, pass(self) :: update_bdf_coefficients
         procedure, public, pass(self) :: get_record
         procedure, public, pass(self) :: get_time
         procedure, public, pass(self) :: get_dt
         procedure, public, pass(self) :: get_bdf_order
-        procedure, public, pass(self) :: get_bdf_alpha
-        procedure, public, pass(self) :: get_bdf_beta
+        procedure, public, pass(self) :: get_bdf_coeffs
         procedure, public, pass(self) :: shift => shift_time
         procedure, public, pass(self) :: display => display_status
 
         ! --- Private Procedures ---
-        procedure, private, pass(self) :: compute_bdf_coefficients
+        procedure, private, pass(self) :: compute_variable_step_coeffs
         procedure, public, nopass :: convert_time_unit
     end type type_time
 
@@ -104,11 +105,12 @@ contains
 
         if (present(input)) then
             ! --- BDF設定 ---
-            self%bdf_order = input%basic%solver_settings%bdf_order
-            if (self%bdf_order > MAX_BDF_ORDER) then
-                self%bdf_order = MAX_BDF_ORDER
-                ! 警告を出しても良い箇所
+            self%target_bdf_order = input%basic%solver_settings%bdf_order
+            if (self%target_bdf_order > MAX_BDF_ORDER) then
+                self%target_bdf_order = MAX_BDF_ORDER
             end if
+            ! 初期状態では履歴がないため1次からスタート
+            self%current_bdf_order = 1
 
             ! --- 時間単位変換係数の取得 ---
             time_conv_coeff = convert_time_unit(input%conditions%time_control%time_stepping%unit, &
@@ -119,17 +121,16 @@ contains
             self%dt_max = input%conditions%time_control%time_stepping%max_step * time_conv_coeff
             self%dt_min = input%conditions%time_control%time_stepping%min_step * time_conv_coeff
 
-            ! --- 配列確保 ---
-            if (allocated(self%dt_old)) deallocate (self%dt_old)
-            allocate (self%dt_old(MAX_BDF_ORDER), stat=istat)
-            if (istat /= 0) call error_message(ERR_TIME_INIT, c_opt="Failed allocating dt_old")
+            ! --- 履歴配列確保 ---
+            if (allocated(self%dt_history)) deallocate (self%dt_history)
+            allocate (self%dt_history(MAX_BDF_ORDER), stat=istat)
+            if (istat /= 0) call error_message(ERR_TIME_INIT, c_opt="Failed allocating dt_history")
 
-            self%dt_old = 0.0_real64
-            self%alpha = 0.0_real64
-            self%beta = 0.0_real64
+            self%dt_history = 0.0_real64
+            self%dt_history(1) = self%dt ! 現在のdtを入れておく
 
             ! --- 初期係数計算 (1次精度) ---
-            call self%compute_bdf_coefficients(1)
+            call self%compute_variable_step_coeffs()
 
             ! --- シミュレーション期間 ---
             if (input%output_settings%field_output%file_format /= "none") then
@@ -167,136 +168,111 @@ contains
     ! ==========================================================================
     ! Time Stepping & BDF
     ! ==========================================================================
-    subroutine shift_time(self, reverse)
+    subroutine shift_time(self)
         implicit none
         class(type_time), intent(inout) :: self
-        logical, intent(in), optional :: reverse
-
         integer(int32) :: n
-        logical :: do_reverse
 
-        do_reverse = .false.
-        if (present(reverse)) do_reverse = reverse
+        if (.not. allocated(self%dt_history)) return
+        n = size(self%dt_history)
 
-        if (.not. allocated(self%dt_old)) return
-        n = size(self%dt_old)
+        ! 時間更新
+        self%time_old = self%current_time
+        self%current_time = self%current_time + self%dt
 
-        if (do_reverse) then
-            self%current_time = self%time_old
-            ! 履歴の復元（完全には不可能だが，逆操作として近似）
-            if (n > 0) self%dt = self%dt_old(1)
-            if (n > 1) self%dt_old(1:n - 1) = self%dt_old(2:n)
-            if (n > 0) self%dt_old(n) = 0.0d0
-        else
-            self%time_old = self%current_time
-            self%current_time = self%current_time + self%dt
+        ! 履歴のシフト (dt_history(1) が最新のステップ幅になるようにする)
+        ! dt_history(1) = dt_{n}
+        ! dt_history(2) = dt_{n-1} ...
+        if (n > 1) self%dt_history(2:n) = self%dt_history(1:n - 1)
+        self%dt_history(1) = self%dt
 
-            ! 履歴の更新 (シフト)
-            if (n > 1) self%dt_old(2:n) = self%dt_old(1:n - 1)
-            if (n > 0) self%dt_old(1) = self%dt
+        ! 利用可能な次数の更新（履歴が溜まるまでは次数を下げる）
+        if (self%current_bdf_order < self%target_bdf_order) then
+            self%current_bdf_order = self%current_bdf_order + 1
         end if
+
+        ! 係数の再計算
+        call self%compute_variable_step_coeffs()
+
     end subroutine shift_time
 
-    subroutine update_bdf_coefficients_wrapper(self, order)
+    subroutine update_bdf_coefficients(self)
         implicit none
         class(type_time), intent(inout) :: self
-        integer(int32), intent(in) :: order
+        ! 外部からdtなどを変更した後に手動で呼び出す場合
+        call self%compute_variable_step_coeffs()
+    end subroutine update_bdf_coefficients
 
-        integer(int32) :: i, effective_order, order_to_use
-        real(real64), parameter :: DT_TOL = 1.0d-15
-
-        if (order < 1) call error_message(ERR_TIME_INIT, c_opt="Invalid BDF order requested")
-        if (.not. allocated(self%dt_old)) call error_message(ERR_TIME_INIT, c_opt="dt_old not allocated")
-
-        ! --- 利用可能な履歴の長さを確認 ---
-        effective_order = 0
-        do i = 1, min(size(self%dt_old), MAX_BDF_ORDER)
-            if (self%dt_old(i) <= DT_TOL) exit
-            effective_order = i
-        end do
-
-        order_to_use = min(order, effective_order)
-        if (order_to_use < 1) order_to_use = 1 ! 最低でも1次（Backward Euler）
-
-        call self%compute_bdf_coefficients(order_to_use)
-    end subroutine update_bdf_coefficients_wrapper
-
-    subroutine compute_bdf_coefficients(self, order)
+    ! --------------------------------------------------------------------------
+    ! 可変刻み幅BDF係数の計算
+    ! 定義: dy/dt|_{t_n} approx sum_{j=0}^{k} coeffs(j) * y_{n-j}
+    ! coeffsには 1/dt のスケーリングが含まれていることに注意．
+    ! --------------------------------------------------------------------------
+    subroutine compute_variable_step_coeffs(self)
         implicit none
         class(type_time), intent(inout) :: self
-        integer(int32), intent(in) :: order
 
-        integer(int32) :: j, m, n
-        ! 自動配列を使用 (allocate オーバーヘッドを回避)
-        real(real64) :: tau(0:MAX_BDF_ORDER)
-        real(real64) :: num, denom, dLj, Lj
-        real(real64), parameter :: eps = 1.0d-15
+        integer(int32) :: k, j, m
+        real(real64) :: tau(0:MAX_BDF_ORDER) ! 現在時刻 t_n からの相対時間差
+        real(real64) :: prod_term, denom_term
 
-        if (self%dt <= 0.0d0) call error_message(ERR_TIME_INIT, c_opt="Current dt is nonpositive")
-        if (order > MAX_BDF_ORDER) call error_message(ERR_TIME_INIT, c_opt="Order exceeds MAX_BDF_ORDER")
+        k = self%current_bdf_order
 
-        ! --- BDF1 (Backward Euler) Optimization ---
-        if (order == 1) then
-            self%alpha(0) = 1.0d0
-            self%alpha(1) = -1.0d0
-            self%alpha(2:MAX_BDF_ORDER) = 0.0d0
-            self%beta = 1.0d0
-            self%bdf_order = 1
+        ! 0. dtが不正でないかチェック
+        if (self%dt <= 1.0d-16) then
+            ! dtが極小の場合は警告あるいはエラーだが，ここでは安全のためBackward Euler係数をセットして戻る
+            self%coeffs = 0.0d0
+            if (self%dt > 0.0d0) then
+                self%coeffs(0) = 1.0d0 / self%dt
+                self%coeffs(1) = -1.0d0 / self%dt
+            end if
             return
         end if
 
-        ! --- Initialize Tau ---
-        ! tau_j = (t_{n-j} - t_n) / dt
+        ! 1. 相対時間 tau の計算
+        ! tau(j) = t_n - t_{n-j}
+        ! tau(0) = 0
+        ! tau(1) = dt_n
+        ! tau(2) = dt_n + dt_{n-1} ...
         tau(0) = 0.0d0
-        do j = 1, order
-            tau(j) = tau(j - 1) - (self%dt_old(j) / self%dt)
+        do j = 1, k
+            tau(j) = tau(j - 1) + self%dt_history(j)
         end do
 
-        ! --- Compute Coefficients (alpha) ---
-        do j = 0, order
-            dLj = 0.0d0
-            do m = 0, order
+        self%coeffs = 0.0d0
+
+        ! 2. ラグランジュ補間多項式の微分値 (t=t_n) を計算
+        ! L_j(t) = prod_{m!=j} (t - t_{n-m}) / (t_{n-j} - t_{n-m})
+        ! dL_j/dt (t_n) を求める．
+
+        ! (A) j = 0 の場合 (現在のステップ y_n に対する係数)
+        ! L_0(t) = prod_{m=1}^k (t - t_{n-m}) / (t_n - t_{n-m})
+        ! L_0'(t_n) = sum_{m=1}^k [ 1 / (t_n - t_{n-m}) * prod_{p!=m, p!=0} ... ]
+        ! t=t_n を代入すると，(t_n - t_{n-m}) が約分されるため，
+        ! L_0'(t_n) = sum_{m=1}^k (1 / tau(m)) となる．
+        do m = 1, k
+            self%coeffs(0) = self%coeffs(0) + (1.0d0 / tau(m))
+        end do
+
+        ! (B) j > 0 の場合 (過去のステップ y_{n-j} に対する係数)
+        ! L_j(t) = (t - t_n)/(t_{n-j} - t_n) * prod_{m!=0, j} ...
+        ! t=t_n で微分すると，(t - t_n) の微分の項（=1）だけが残り，他は (t-t_n) が掛かって消える．
+        ! Coeff_j = (1 / (t_{n-j} - t_n)) * prod_{m!=0, j} (t_n - t_{n-m}) / (t_{n-j} - t_{n-m})
+        !         = (1 / -tau(j)) * prod_{m!=0, j} (tau(m) / (tau(m) - tau(j)))
+        do j = 1, k
+            prod_term = 1.0d0
+            do m = 1, k
                 if (m == j) cycle
-                num = 1.0d0
-                denom = 1.0d0
-                do n = 0, order
-                    if (n == j .or. n == m) cycle
-                    num = num * (-tau(n))
-                    denom = denom * (tau(j) - tau(n))
-                end do
-
-                if (abs(denom) < eps) then
-                    ! 分母が極端に小さい場合は安全策としてBDF1にフォールバックなどを検討すべきだが，
-                    ! ここではエラーとして停止させる
-                    call error_message(ERR_TIME_INIT, c_opt="Small denominator in BDF calc")
-                end if
-
-                dLj = dLj + (num / denom) / (tau(j) - tau(m))
+                prod_term = prod_term * (tau(m) / (tau(m) - tau(j)))
             end do
-            self%alpha(j) = dLj
+            self%coeffs(j) = (-1.0d0 / tau(j)) * prod_term
         end do
 
-        ! unused alpha should be zero
-        if (order < MAX_BDF_ORDER) self%alpha(order + 1:) = 0.0d0
-
-        ! --- Compute Beta ---
-        self%beta = 0.0d0
-        do j = 0, order
-            Lj = 1.0d0
-            do m = 0, order
-                if (m == j) cycle
-                Lj = Lj * (-tau(m)) / (tau(j) - tau(m))
-            end do
-            self%beta = self%beta + Lj
-        end do
-
-        self%bdf_order = order
-    end subroutine compute_bdf_coefficients
+    end subroutine compute_variable_step_coeffs
 
     ! ==========================================================================
     ! Profiler Logic
     ! ==========================================================================
-    ! IDを取得する関数（文字列比較をここだけに集約）
     function get_profiler_id(self, label) result(id)
         implicit none
         class(type_time), intent(in) :: self
@@ -314,7 +290,6 @@ contains
         end if
     end function get_profiler_id
 
-    ! 文字列でスタート（従来の互換性）
     subroutine profile_start_by_name(self, label)
         implicit none
         class(type_time), intent(inout) :: self
@@ -329,7 +304,6 @@ contains
         end if
     end subroutine profile_start_by_name
 
-    ! IDでスタート（高速版）
     subroutine profile_start_by_id(self, id)
         implicit none
         class(type_time), intent(inout) :: self
@@ -429,36 +403,35 @@ contains
         end select
     end function get_record
 
-    ! Getters for private components
+    ! Getters
     pure function get_time(self) result(t)
+        implicit none
         class(type_time), intent(in) :: self
         real(real64) :: t
         t = self%current_time * self%time_conversion
     end function get_time
 
     pure function get_dt(self) result(val)
+        implicit none
         class(type_time), intent(in) :: self
         real(real64) :: val
         val = self%dt
     end function get_dt
 
     pure function get_bdf_order(self) result(val)
+        implicit none
         class(type_time), intent(in) :: self
         integer(int32) :: val
-        val = self%bdf_order
+        val = self%current_bdf_order
     end function get_bdf_order
 
-    pure function get_bdf_alpha(self) result(val)
+    pure function get_bdf_coeffs(self) result(val)
+        implicit none
         class(type_time), intent(in) :: self
         real(real64), allocatable :: val(:)
-        val = self%alpha(0:self%bdf_order)
-    end function get_bdf_alpha
-
-    pure function get_bdf_beta(self) result(val)
-        class(type_time), intent(in) :: self
-        real(real64) :: val
-        val = self%beta
-    end function get_bdf_beta
+        ! 呼び出し側には現在有効な次数分だけ渡す
+        val = self%coeffs(0:self%current_bdf_order)
+    end function get_bdf_coeffs
 
     pure function convert_time_unit(source_unit, target_unit) result(coefficient)
         implicit none
@@ -466,8 +439,6 @@ contains
         real(real64) :: coefficient
         real(real64) :: to_seconds_factor(5)
 
-        ! Table based conversion might be cleaner but select case is fine.
-        ! Simply defined relative to seconds.
         ! 1:sec, 2:min, 3:hour, 4:day, 5:year
         to_seconds_factor = [1.0d0, 60.0d0, 3600.0d0, 86400.0d0, 31557600.0d0]
 
@@ -488,14 +459,14 @@ contains
         write (*, *)
 
         write (*, '(a)') "### Simulation Period"
-        write (*, '(" - Start Time      : ", ES12.5)') self%start_time
-        write (*, '(" - End Time        : ", ES12.5)') self%end_time
+        write (*, '(" - Start Time       : ", ES12.5)') self%start_time
+        write (*, '(" - End Time         : ", ES12.5)') self%end_time
         write (*, *)
 
         write (*, '(a)') "### Current Time Step"
-        write (*, '(" - Current Time    : ", ES12.5)') self%current_time
-        write (*, '(" - Current dt      : ", ES12.5)') self%dt
-        write (*, '(" - BDF Order       : ", I0)') self%bdf_order
+        write (*, '(" - Current Time     : ", ES12.5)') self%current_time
+        write (*, '(" - Current dt       : ", ES12.5)') self%dt
+        write (*, '(" - BDF Order        : ", I0)') self%current_bdf_order
         write (*, *)
 
         if (allocated(self%sections)) then

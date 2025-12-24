@@ -6,6 +6,7 @@ module physics_models_phase_systems
     use, intrinsic :: iso_fortran_env
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core, only:type_state
+    use :: physics_constants, only:latent_heat_fusion_water_0C
     use :: physics_models_phase_change_liquid_solid_gcc, only:abst_gcc
     use :: physics_models_wrf, only:abst_wrf
     use :: physics_models_phase_change_liquid_solid_fusion, only:type_fusion
@@ -25,6 +26,9 @@ module physics_models_phase_systems
     contains
         procedure, public :: initialize
         procedure, public :: update_water_phases
+        procedure, public :: calc_latent_heat_fusion
+        procedure, public :: calc_latent_heat_vaporization
+        procedure, public :: deriv_pressure_ice_water
         ! procedure, public :: update_phases_array ! 必要に応じて実装
     end type type_phase_manager
 
@@ -89,5 +93,40 @@ contains
         call state%dQv_dT%set(dQv_dT)
 
     end subroutine update_water_phases
+
+    pure elemental subroutine calc_latent_heat_fusion(self, state, Lf)
+        implicit none
+        class(type_phase_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: Lf
+
+        Lf = latent_heat_fusion_water_0C
+
+    end subroutine calc_latent_heat_fusion
+
+    pure elemental subroutine calc_latent_heat_vaporization(self, state, Lv)
+        implicit none
+        class(type_phase_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: Lv
+
+        real(real64) :: temperature, temperature_K
+
+        call state%temperature%get(temperature)
+        call self%evap%shift_temperature_absolute(temperature, temperature_K)
+
+        call self%evap%calc_latent_heat_vaporization(temperature_K, Lv)
+
+    end subroutine calc_latent_heat_vaporization
+
+    pure elemental subroutine deriv_pressure_ice_water(self, state, deriv)
+        implicit none
+        class(type_phase_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: deriv
+
+        call self%fusion%deriv_pressure_ice_water(state, deriv)
+
+    end subroutine deriv_pressure_ice_water
 
 end module physics_models_phase_systems

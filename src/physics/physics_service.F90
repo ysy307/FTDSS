@@ -2,6 +2,7 @@ module physics_service
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core
+    use :: physics_types, only:type_iapws_wrapper
     use :: module_physics_materials, only:type_material_manager, type_thc_dispersity
     use :: module_physics_models, only:type_models_manager, type_wrf_params, type_hcf_params
     implicit none
@@ -15,6 +16,7 @@ module physics_service
         private
         type(type_iapws97) :: water
         type(type_iapws06) :: ice
+        type(type_iapws_wrapper) :: iapws_wrapper
         type(type_material_manager), allocatable :: materials(:)
         type(type_models_manager), allocatable :: models(:)
         integer(int32), allocatable :: materials_id_map(:)
@@ -24,14 +26,26 @@ module physics_service
         procedure, private :: set_map => set_map_materials
 
         procedure, public :: calc_density
+        procedure, public :: get_density_solid
+        procedure, public :: calc_density_water
+        procedure, public :: calc_density_ice
+        procedure, public :: calc_density_vapor
         procedure, public :: calc_density_water_derivatives
         procedure, public :: calc_density_ice_derivatives
         procedure, public :: calc_density_vapor_derivatives
         procedure, public :: calc_specific_heat
+        procedure, public :: get_specific_heat_solid
+        procedure, public :: calc_specific_heat_water
+        procedure, public :: calc_specific_heat_ice
+        procedure, public :: calc_specific_heat_vapor
         procedure, private :: calc_thermal_conductivity_nondispersity
         procedure, private :: calc_thermal_conductivity_dispersity
-        generic, public :: calc_thermal_conductivity => calc_thermal_conductivity_nondispersity, calc_thermal_conductivity_dispersity
+        generic, public :: calc_thermal_conductivity &
+            => calc_thermal_conductivity_nondispersity, calc_thermal_conductivity_dispersity
         procedure, public :: calc_vol_heat_capacity
+        procedure, public :: calc_latent_heat_fusion
+        procedure, public :: calc_latent_heat_vaporization
+        procedure, public :: calc_pressure_ice_water_derivative
 
         procedure, public :: update_water_phases
         procedure, public :: calc_Kflh
@@ -69,6 +83,7 @@ contains
         call self%ice%initialize()
 
         call self%set_map(unique_material_ids)
+        call self%iapws_wrapper%initialize(self%water, self%ice)
         allocate (self%materials(self%num_materials), stat=stat)
         if (stat /= 0) then
             error stop "Error in properties_manager%initialize: Failed to allocate materials array."
@@ -130,6 +145,46 @@ contains
 
     end subroutine calc_density
 
+    pure elemental subroutine get_density_solid(self, material_id, density_solid)
+        implicit none
+        class(type_physics_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        real(real64), intent(inout) :: density_solid
+
+        call self%materials(self%materials_id_map(material_id))%get_density_solid(density_solid)
+
+    end subroutine get_density_solid
+
+    pure elemental subroutine calc_density_water(self, state, density_water)
+        implicit none
+        class(type_physics_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: density_water
+
+        call self%iapws_wrapper%calc_rho_water(state, density_water)
+
+    end subroutine calc_density_water
+
+    pure elemental subroutine calc_density_ice(self, state, density_ice)
+        implicit none
+        class(type_physics_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: density_ice
+
+        call self%iapws_wrapper%calc_rho_ice(state, density_ice)
+
+    end subroutine calc_density_ice
+
+    pure elemental subroutine calc_density_vapor(self, state, density_vapor)
+        implicit none
+        class(type_physics_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: density_vapor
+
+        call self%iapws_wrapper%calc_rho_vapor(state, density_vapor)
+
+    end subroutine calc_density_vapor
+
     pure elemental subroutine calc_density_water_derivatives(self, material_id, state, dden_dT, dden_dP)
         implicit none
         class(type_physics_manager), intent(in) :: self
@@ -175,6 +230,46 @@ contains
 
     end subroutine calc_specific_heat
 
+    pure elemental subroutine get_specific_heat_solid(self, material_id, cp)
+        implicit none
+        class(type_physics_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        real(real64), intent(inout) :: cp
+
+        call self%materials(self%materials_id_map(material_id))%get_specific_heat_solid(cp)
+
+    end subroutine get_specific_heat_solid
+
+    pure elemental subroutine calc_specific_heat_water(self, state, specific_heat_water)
+        implicit none
+        class(type_physics_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: specific_heat_water
+
+        call self%iapws_wrapper%calc_cp_water(state, specific_heat_water)
+
+    end subroutine calc_specific_heat_water
+
+    pure elemental subroutine calc_specific_heat_ice(self, state, specific_heat_ice)
+        implicit none
+        class(type_physics_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: specific_heat_ice
+
+        call self%iapws_wrapper%calc_cp_ice(state, specific_heat_ice)
+
+    end subroutine calc_specific_heat_ice
+
+    pure elemental subroutine calc_specific_heat_vapor(self, state, specific_heat_vapor)
+        implicit none
+        class(type_physics_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: specific_heat_vapor
+
+        call self%iapws_wrapper%calc_cp_vapor(state, specific_heat_vapor)
+
+    end subroutine calc_specific_heat_vapor
+
     pure elemental subroutine calc_thermal_conductivity_nondispersity(self, material_id, state, thermal_conductivity)
         implicit none
         class(type_physics_manager), intent(in) :: self
@@ -208,9 +303,39 @@ contains
 
     end subroutine calc_vol_heat_capacity
 
+    pure elemental subroutine calc_latent_heat_fusion(self, material_id, state, latent_heat_fusion)
+        implicit none
+        class(type_physics_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: latent_heat_fusion
+
+        call self%models(self%materials_id_map(material_id))%calc_latent_heat_fusion(state, latent_heat_fusion)
+    end subroutine calc_latent_heat_fusion
+
+    pure elemental subroutine calc_latent_heat_vaporization(self, material_id, state, latent_heat_vaporization)
+        implicit none
+        class(type_physics_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: latent_heat_vaporization
+
+        call self%models(self%materials_id_map(material_id))%calc_latent_heat_vaporization(state, latent_heat_vaporization)
+    end subroutine calc_latent_heat_vaporization
+
+    pure elemental subroutine calc_pressure_ice_water_derivative(self, material_id, state, deriv)
+        implicit none
+        class(type_physics_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: deriv
+
+        call self%models(self%materials_id_map(material_id))%calc_pressure_ice_water_derivative(state, deriv)
+    end subroutine calc_pressure_ice_water_derivative
+
     pure elemental subroutine update_water_phases(self, material_id, state)
         implicit none
-        class(type_physics_manager), intent(inout) :: self
+        class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(inout) :: state
 

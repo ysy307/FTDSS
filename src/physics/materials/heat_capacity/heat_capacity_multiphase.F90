@@ -85,7 +85,8 @@ contains
 
         vhc_water = density_water * sph_water
         vhc_ice = density_ice * sph_ice
-        vhc_vapor = density_vapor * sph_vapor
+        ! Qvは液状水換算水分量なので、密度は水のまま計算する
+        vhc_vapor = density_water * sph_vapor
 
         call state%latent_heat_fusion%get(latent_heat_fusion)
         call state%dQw_dT%get(dQw_dT)

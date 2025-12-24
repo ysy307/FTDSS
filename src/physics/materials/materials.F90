@@ -22,6 +22,8 @@ module module_physics_materials
     contains
         procedure, public :: initialize
         procedure, public :: calc_density
+        procedure, public :: get_density_solid
+        procedure, public :: get_specific_heat_solid
         procedure, public :: calc_density_water_derivatives
         procedure, public :: calc_density_ice_derivatives
         procedure, public :: calc_density_vapor_derivatives
@@ -89,6 +91,24 @@ contains
         call self%den%p%calc(state, density)
 
     end subroutine calc_density
+
+    pure elemental subroutine get_density_solid(self, density_solid)
+        implicit none
+        class(type_material_manager), intent(in) :: self
+        real(real64), intent(inout) :: density_solid
+
+        call self%den%p%get_solid(density_solid)
+
+    end subroutine get_density_solid
+
+    pure elemental subroutine get_specific_heat_solid(self, cp)
+        implicit none
+        class(type_material_manager), intent(in) :: self
+        real(real64), intent(inout) :: cp
+
+        call self%sph%p%get_solid(cp)
+
+    end subroutine get_specific_heat_solid
 
     pure elemental subroutine calc_density_water_derivatives(self, state, dden_dT, dden_dP)
         implicit none

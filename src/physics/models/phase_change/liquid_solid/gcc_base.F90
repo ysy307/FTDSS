@@ -161,6 +161,16 @@ contains
         end if
     end subroutine deriv2_temp_gcc_nonseg
 
+    module pure elemental subroutine deriv_pressure_ice_water_nonseg(self, state, deriv)
+        implicit none
+        class(type_gcc_non_segregation), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: deriv
+
+        ! Non-segregation model: dP_ice/dP_w = 0
+        deriv = 0.0d0
+    end subroutine deriv_pressure_ice_water_nonseg
+
     ! ==========================================================================
     ! Segregation Implementation
     ! ==========================================================================
@@ -249,5 +259,27 @@ contains
             suction_derivative = 0.0d0
         end if
     end subroutine deriv2_temp_gcc_seg
+
+    module pure elemental subroutine deriv_pressure_ice_water_seg(self, state, deriv)
+        implicit none
+        class(type_gcc_segregation), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: deriv
+
+        real(real64) :: temperature
+        real(real64) :: rho_water, rho_ice
+
+        call state%temperature%get(temperature)
+
+        ! 凍結状態でのみ値を持ちます（非凍結時はサクション0固定のため微分0）
+        if (temperature <= Tf0) then
+            call self%calc_rho_water(state, rho_water)
+            call self%calc_rho_ice(state, rho_ice)
+            ! dP_ice/dP_w = rho_ice / rho_water
+            deriv = rho_ice / rho_water
+        else
+            deriv = 0.0d0
+        end if
+    end subroutine deriv_pressure_ice_water_seg
 
 end submodule gcc_base

@@ -89,7 +89,7 @@ contains
         !> The FE manager object
         class(type_fe_manager), intent(in), target :: self
         !> The ID of the FE object
-        integer, intent(in) :: fe_id
+        integer(int32), intent(in) :: fe_id
         !> Pointer to the requested FE object
         class(abst_fe), pointer :: fe
 

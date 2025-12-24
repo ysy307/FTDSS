@@ -61,12 +61,18 @@ module core_types_physics
         type(type_field_dp) :: dQa_dP ! d(theta_air)/dP
         type(type_field_dp) :: dQi_dP ! d(theta_ice)/dP
 
+        type(type_field_dp) :: dot_T ! Temperature change rate [K/s]
+        type(type_field_dp) :: dot_P ! Pressure change rate [Pa/s]
+        type(type_field_coord) :: grad_T ! Temperature gradient [K/m]
+        type(type_field_coord) :: grad_P ! Pressure gradient [Pa/m]
+
         ! --- Other ---
         type(type_field_dp) :: relative_humidity ! [-]
         type(type_field_dp) :: mass_fraction_clay ! [-]
 
         ! --- Vectors ---
         type(type_field_coord) :: water_flux ! Water flux vector [m/s]
+        type(type_field_coord) :: vapor_flux ! Vapor flux vector [m/s]
 
     contains
         ! Bulk Setter (Optional arguments)
@@ -175,8 +181,9 @@ contains
                              vapor_content, air_content, porosity, &
                              latent_heat_fusion, latent_heat_vaporization, &
                              dQw_dT, dQv_dT, dQa_dT, dQi_dT, dQw_dP, dQv_dP, dQa_dP, dQi_dP, &
+                             dot_T, dot_P, grad_T, grad_P, &
                              relative_humidity, mass_fraction_clay, &
-                             water_flux)
+                             water_flux, vapor_flux)
         implicit none
         class(type_state), intent(inout) :: self
 
@@ -187,8 +194,10 @@ contains
         real(real64), intent(in), optional :: latent_heat_fusion, latent_heat_vaporization
         real(real64), intent(in), optional :: dQw_dT, dQv_dT, dQa_dT, dQi_dT
         real(real64), intent(in), optional :: dQw_dP, dQv_dP, dQa_dP, dQi_dP
+        real(real64), intent(in), optional :: dot_T, dot_P
+        type(type_coordinate_dp), intent(in), optional :: grad_T, grad_P
         real(real64), intent(in), optional :: relative_humidity, mass_fraction_clay
-        type(type_coordinate_dp), intent(in), optional :: water_flux
+        type(type_coordinate_dp), intent(in), optional :: water_flux, vapor_flux
 
         if (present(temperature)) then
             call self%temperature%set(temperature)
@@ -243,6 +252,18 @@ contains
         if (present(dQi_dP)) then
             call self%dQi_dP%set(dQi_dP)
         end if
+        if (present(dot_T)) then
+            call self%dot_T%set(dot_T)
+        end if
+        if (present(dot_P)) then
+            call self%dot_P%set(dot_P)
+        end if
+        if (present(grad_T)) then
+            call self%grad_T%set(grad_T)
+        end if
+        if (present(grad_P)) then
+            call self%grad_P%set(grad_P)
+        end if
 
         if (present(relative_humidity)) then
             call self%relative_humidity%set(relative_humidity)
@@ -252,6 +273,9 @@ contains
         end if
         if (present(water_flux)) then
             call self%water_flux%set(water_flux)
+        end if
+        if (present(vapor_flux)) then
+            call self%vapor_flux%set(vapor_flux)
         end if
 
     end subroutine state_set_all
@@ -278,9 +302,14 @@ contains
         call self%dQv_dP%reset()
         call self%dQa_dP%reset()
         call self%dQi_dP%reset()
+        call self%dot_T%reset()
+        call self%dot_P%reset()
+        call self%grad_T%reset()
+        call self%grad_P%reset()
         call self%relative_humidity%reset()
         call self%mass_fraction_clay%reset()
         call self%water_flux%reset()
+        call self%vapor_flux%reset()
     end subroutine state_reset_all
 
     ! ==================================================================

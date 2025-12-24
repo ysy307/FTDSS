@@ -23,6 +23,7 @@ module physics_models_phase_change_liquid_solid_fusion
         procedure, pass(self), public :: calc_ice_content_derivatives
         procedure, pass(self), public :: calc_water_content
         procedure, pass(self), public :: calc_water_content_derivatives
+        procedure, pass(self), public :: deriv_pressure_ice_water
 
     end type type_fusion
 
@@ -263,5 +264,18 @@ contains
         dwater_dT = d_theta_liquid_dPress * (-d_psi_eff_dT)
 
     end subroutine calc_water_content_derivatives
+
+    !>
+    !> @brief Calculate derivative of ice pressure w.r.t water pressure.
+    !>
+    pure elemental subroutine deriv_pressure_ice_water(self, state, deriv)
+        implicit none
+        class(type_fusion), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: deriv
+
+        call self%gcc%deriv_pressure_ice_water(state, deriv)
+
+    end subroutine deriv_pressure_ice_water
 
 end module physics_models_phase_change_liquid_solid_fusion

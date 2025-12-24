@@ -4,6 +4,8 @@ program test_main
     use :: mpi_f08
 #endif
     use :: module_ftdss
+    use :: module_domain
+
     implicit none
 
     integer(int32) :: ierr
@@ -28,6 +30,14 @@ contains
         type(type_ftdss) :: ftdss
 
         call ftdss%initialize()
+
+        block
+            class(abst_fe), pointer :: fe
+
+            fe => ftdss%domain%elements%fe_manager%get_fe(1)
+
+            call fe%display()
+        end block
 
     end subroutine run_test_ftdss
 
