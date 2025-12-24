@@ -9,10 +9,10 @@
 # --- Thermal Solver Library ---
 # This library contains the specific implementation for the thermal solve.
 set(APP_THERMAL_SOURCES
-    thermal_workspace.F90
-    thermal_assemble.F90
+    # thermal_workspace.F90
+    # thermal_assemble.F90
     thermal_interface.F90
-    thermal_crs.F90
+    # thermal_crs.F90
     thermal.F90
 )
 add_library(App_Thermal STATIC ${APP_THERMAL_SOURCES})

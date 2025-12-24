@@ -3,92 +3,71 @@
 ! Purpose: Manages all initial condition objects.
 ! =============================================================================
 module conditions_initial_manager
-    use :: module_core, only:type_variable
+    use, intrinsic :: iso_fortran_env
+    use :: module_core
     use :: module_domain, only:type_domain
     use :: module_input, only:type_input
-    use :: conditions_initial, only:abst_ic, type_ic_uniform, type_ic_laplace
+    use :: conditions_initial, only:abst_ic, type_ic_uniform, holder_ics
     implicit none
     private
 
-    public :: type_ic
+    public :: type_ic_manager
 
-    type :: type_ic
-        class(abst_ic), allocatable :: t
-        class(abst_ic), allocatable :: h
-        class(abst_ic), allocatable :: p
+    type :: type_ic_manager
+        type(holder_ics) :: list(NUM_IC_TARGETS)
     contains
-        procedure :: initialize => initialize_type_ic
+        procedure :: initialize => initialize_type_ic_manager
         procedure :: apply
-    end type type_ic
+    end type type_ic_manager
 
 contains
 
-    !
     ! Sets up the manager by creating the correct IC objects based on input.
-    !
-    subroutine initialize_type_ic(self, input)
+    subroutine initialize_type_ic_manager(self, input)
         implicit none
-        class(type_ic), intent(inout) :: self
+        class(type_ic_manager), intent(inout) :: self
         type(type_input), intent(in) :: input
 
-        if (input%basic%analysis_controls%calculate_thermal) then
-            select case (trim(adjustl(input%conditions%initial_conditions%thermal%type)))
-            case ("uniform")
-                allocate (type_ic_uniform :: self%t)
-            case ("laplace")
-                allocate (type_ic_laplace :: self%t)
-            case ("file")
-                !     allocate (IC_File :: self%T)
+        integer(int32) :: i, ic_method
+        integer(int32) :: target_ic_id
+        character(:), allocatable :: target_str
+
+        do i = 1, NUM_IC_TARGETS
+            ! Skip if analysis is not active (except Porosity which might always be needed)
+            if (.not. input%basic%analysis_controls%is_active(i) .and. i /= IC_TARGET_POROSITY) cycle
+
+            ic_method = input%conditions%initial_conditions%physics(i)%type
+
+            select case (ic_method)
+            case (IC_METHOD_UNIFORM)
+                allocate (type_ic_uniform :: self%list(i)%ic)
+                ! case (IC_METHOD_LAPLACE)
+                !     allocate (type_ic_laplace :: self%list(i)%ic)
+            case default
+                ! Future: Handle IC_METHOD_FROM_FILE or others
             end select
-            call self%t%initialize(input, 'thermal')
-        end if
 
-        if (input%basic%analysis_controls%calculate_hydraulic) then
-            select case (trim(adjustl(input%conditions%initial_conditions%hydraulic%type)))
-            case ("uniform")
-                allocate (type_ic_uniform :: self%h)
-            case ("laplace")
-                allocate (type_ic_laplace :: self%h)
-            case ("file")
-                !     allocate (IC_File :: self%T)
-            end select
-            call self%t%initialize(input, 'hydraulic')
-        end if
+            if (allocated(self%list(i)%ic)) then
+                call self%list(i)%ic%initialize(input, i)
+            end if
+        end do
 
-        select case (trim(adjustl(input%conditions%initial_conditions%porosity%type)))
-        case ("uniform")
-            allocate (type_ic_uniform :: self%p)
-        case ("laplace")
-            allocate (type_ic_laplace :: self%p)
-        case ("file")
-            !     allocate (IC_File :: self%T)
-        end select
-        call self%p%initialize(input, 'porosity')
+    end subroutine initialize_type_ic_manager
 
-    end subroutine initialize_type_ic
-
-    subroutine apply(self, initial_target, domain, variable)
-        class(type_ic), intent(in) :: self
-        character(*), intent(in) :: initial_target
+    subroutine apply(self, initial_target_id, domain, variable)
+        implicit none
+        class(type_ic_manager), intent(in) :: self
+        integer(int32), intent(in) :: initial_target_id
         type(type_domain), intent(in) :: domain
         type(type_variable), intent(inout) :: variable
 
-        select case (trim(adjustl(initial_target)))
-        case ("thermal")
-            if (allocated(self%T)) then
-                call self%t%apply(domain, variable)
+        integer(int32) :: id
+
+        if (initial_target_id > 0 .and. initial_target_id <= NUM_IC_TARGETS) then
+            if (allocated(self%list(initial_target_id)%ic)) then
+                call self%list(initial_target_id)%ic%apply(domain, variable)
             end if
-        case ("hydraulic")
-            if (allocated(self%H)) then
-                call self%h%apply(domain, variable)
-            end if
-        case ("porosity")
-            if (allocated(self%P)) then
-                call self%p%apply(domain, variable)
-            end if
-        case default
-            ! Error or no action
-        end select
+        end if
     end subroutine apply
 
 end module conditions_initial_manager

@@ -1,92 +1,63 @@
-# CMakeLists.txt for test
-# Defines test executables for various modules in the Solver library.
-#
-if(TEST_NAME STREQUAL "core")
-    add_executable(test_core test_core.F90)
-    set_target_properties(test_core PROPERTIES LINKER_LANGUAGE Fortran)
-    target_link_libraries(test_core PRIVATE
-        Solver::Core
-    )
-    add_test(NAME test_core COMMAND $<TARGET_FILE:test_core>)
-elseif(TEST_NAME STREQUAL "input")
-    add_executable(test_input test_input.F90)
-    set_target_properties(test_input PROPERTIES LINKER_LANGUAGE Fortran)
-    target_link_libraries(test_input PRIVATE
-        Solver::Core
-        Solver::Input
-    )
-    add_test(NAME test_input COMMAND $<TARGET_FILE:test_input>)
-elseif(TEST_NAME STREQUAL "linalg")
-    add_executable(test_linalg test_linalg.F90)
-    set_target_properties(test_linalg PROPERTIES LINKER_LANGUAGE Fortran)
-    target_link_libraries(test_linalg PRIVATE
-        Solver::Core
-        Solver::Linalg
-    )
-    add_test(NAME test_linalg COMMAND $<TARGET_FILE:test_linalg>)
-elseif(TEST_NAME STREQUAL "physics")
-    add_executable(test_physics test_physics.F90)
-    enable_build_flags(test_physics)
-    enable_thirdparty(test_physics)
-    set_target_properties(test_physics PROPERTIES LINKER_LANGUAGE Fortran)
-    target_link_libraries(test_physics PRIVATE
-        Solver::Core
-        Solver::Physics
-    )
-    add_test(NAME test_physics COMMAND $<TARGET_FILE:test_physics>)
-elseif(TEST_NAME STREQUAL "solver")
-    add_executable(test_solver test_solver.F90)
-    set_target_properties(test_solver PROPERTIES LINKER_LANGUAGE Fortran)
-    target_link_libraries(test_solver PRIVATE
-        Solver::Core
-        Solver::Linalg
-        Solver::Solver
-    )
-    add_test(NAME test_solver COMMAND $<TARGET_FILE:test_solver>)
+# ====================================================================
+# Helper Function: Create Solver Test
+# ====================================================================
+function(create_solver_test test_name dependencies)
+    set(target_name "test_${test_name}")
 
-elseif(TEST_NAME STREQUAL "control")
-    add_executable(test_control test_control.F90)
-    set_target_properties(test_control PROPERTIES LINKER_LANGUAGE Fortran)
-    target_link_libraries(test_control PRIVATE
-        Solver::Core
-        Solver::Input
-        Solver::Linalg
-        Solver::Control
-    )
-    add_test(NAME test_control COMMAND $<TARGET_FILE:test_control>)
-elseif(TEST_NAME STREQUAL "domain")
-    add_executable(test_domain test_domain.F90)
-    set_target_properties(test_domain PROPERTIES LINKER_LANGUAGE Fortran)
-    target_link_libraries(test_domain PRIVATE
-        Solver::Core
-        Solver::Input
-        Solver::Linalg
-        Solver::Control
-        Solver::Conditions
-        Solver::Domain
-    )
-    add_test(NAME test_domain COMMAND $<TARGET_FILE:test_domain>)
-elseif(TEST_NAME STREQUAL "field")
-    add_executable(test_field test_field.F90)
-    set_target_properties(test_field PROPERTIES LINKER_LANGUAGE Fortran)
-    target_link_libraries(test_field PRIVATE
-        Solver::Core
-        Solver::Input
-        Solver::Linalg
-        Solver::Control
-        Solver::Conditions
-        Solver::Domain
-        Solver::Field
-    )
-    add_test(NAME test_field COMMAND $<TARGET_FILE:test_field>)
-elseif(TEST_NAME STREQUAL "parallel")
-    add_executable(test_parallel test_parallel.F90)
-    set_target_properties(test_parallel PROPERTIES LINKER_LANGUAGE Fortran)
-    target_link_libraries(test_parallel PRIVATE
-        Solver::Core
-        Solver::Input
-        Solver::Parallel
-    )
-    add_test(NAME test_parallel COMMAND $<TARGET_FILE:test_parallel>)
-    
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${target_name}.F90")
+        message(FATAL_ERROR "Test source file not found: ${target_name}.F90")
+    endif()
+
+    # 実行ファイル作成
+    add_executable(${target_name} ${target_name}.F90)
+    set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE Fortran)
+
+    # 依存ライブラリのリンク自動化 (例: core -> Solver::Core)
+    foreach(dep ${dependencies})
+        string(SUBSTRING ${dep} 0 1 FIRST_CHAR)
+        string(TOUPPER ${FIRST_CHAR} FIRST_CHAR)
+        string(SUBSTRING ${dep} 1 -1 REMAINDER)
+        target_link_libraries(${target_name} PRIVATE "Solver::${FIRST_CHAR}${REMAINDER}")
+    endforeach()
+
+    # 個別のビルドフラグや設定が必要な場合のフック (physics等)
+    if(test_name STREQUAL "physics")
+        if(COMMAND enable_build_flags)
+             enable_build_flags(${target_name})
+        endif()
+        if(COMMAND enable_thirdparty)
+             enable_thirdparty(${target_name})
+        endif()
+    endif()
+
+    # CTest登録
+    add_test(NAME ${target_name} COMMAND $<TARGET_FILE:${target_name}>)
+
+    # カスタム実行ターゲット (run_xxx)
+    if(ENABLE_MPI)
+        add_custom_target(run_${test_name}
+            COMMAND mpirun -np 4 $<TARGET_FILE:${target_name}> >| log/output_${test_name}.md
+            DEPENDS ${target_name}
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+        )
+    else()
+        add_custom_target(run_${test_name}
+            COMMAND OMP_NUM_THREADS=4 $<TARGET_FILE:${target_name}> >| log/output_${test_name}.md
+            DEPENDS ${target_name}
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+        )
+    endif()
+
+endfunction()
+
+# ====================================================================
+# Define Test Target
+# ====================================================================
+
+# 親のCMakeLists.txtで定義された依存関係リスト(DEPS_xxx)を利用してテストを生成
+if(DEFINED DEPS_${TEST_NAME})
+    message(STATUS "Creating test target: test_${TEST_NAME}")
+    create_solver_test(${TEST_NAME} "${DEPS_${TEST_NAME}}")
+else()
+    message(WARNING "No dependencies defined for test: ${TEST_NAME}. Test target skipped.")
 endif()

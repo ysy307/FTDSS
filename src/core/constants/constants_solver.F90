@@ -119,6 +119,12 @@ module core_constants_solver
     integer(int32), parameter, public :: IC_TARGET_POROSITY = 4
     !> Total number of initial condition targets
     integer(int32), parameter, public :: NUM_IC_TARGETS = 4
+    !> Defines the application priority for initial conditions.
+    integer(int32), parameter, public :: IC_TARGET_SEQUENCE(NUM_IC_TARGETS) = [ &
+                                         IC_TARGET_THERMAL, &
+                                         IC_TARGET_HYDRAULIC, &
+                                         IC_TARGET_MECHANICAL, &
+                                         IC_TARGET_POROSITY]
     ! --- Method for setting the initial condition ---
     !> Set a uniform value across the domain
     integer(int32), parameter, public :: IC_METHOD_UNIFORM = 1
@@ -126,6 +132,12 @@ module core_constants_solver
     integer(int32), parameter, public :: IC_METHOD_LAPLACE = 2
     !> Read values from an input file
     integer(int32), parameter, public :: IC_METHOD_FROM_FILE = 3
+    !> Total number of initial condition methods
+    integer(int32), parameter, public :: NUM_IC_METHODS = 3
+    integer(int32), parameter, public :: IC_METHOD_SEQUENCE(NUM_IC_METHODS) = [ &
+                                         IC_METHOD_UNIFORM, &
+                                         IC_METHOD_LAPLACE, &
+                                         IC_METHOD_FROM_FILE]
 
     ! ==========================================================
     ! Nonlinear Solver Settings

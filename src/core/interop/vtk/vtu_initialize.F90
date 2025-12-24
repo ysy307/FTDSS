@@ -177,31 +177,6 @@ contains
             end do
         end if
 
-        !----------------------------------------------------------------!
-        ! 5. 全体情報の集計 (MPI)
-        !----------------------------------------------------------------!
-        ! ◆修正: コネクティビティをグローバルIDに変換する処理を削除
-        ! NOTE: このブロックは、効率的なローカルインデックスを意図的に非効率な
-        !       グローバルIDに変換していました。この変換を行わないことで、
-        !       アプリケーション全体で高速なローカルインデックスが維持されます。
-        !
-        ! if (allocated(self%global_node_ids)) then
-        !     if (size(self%global_node_ids) > 0) then
-        !         local_max_node_id = maxval(self%global_node_ids)
-        !     else
-        !         local_max_node_id = 0
-        !     end if
-        !     call MPI_Allreduce(local_max_node_id, global_max_node_id, 1, MPI_INTEGER4, MPI_MAX, MPI_COMM_WORLD, ierr)
-        !     self%global_num_points = global_max_node_id
-        !
-        !     if (self%num_total_cells > 0 .and. self%num_points > 0) then
-        !         do i = 1, self%num_total_cells
-        !             self%cells(i)%connectivity(:) = self%global_node_ids(self%cells(i)%connectivity(:))
-        !         end do
-        !     end if
-        ! end if
-
-        ! 全体の節点数と要素数の集計は、情報として有用なため残す
         if (allocated(self%global_node_ids)) then
             if (size(self%global_node_ids) > 0) then
                 local_max_node_id = maxval(self%global_node_ids)

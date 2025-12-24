@@ -6,12 +6,12 @@ module physics_service
     use :: module_physics_models, only:type_models_manager, type_wrf_params, type_hcf_params
     implicit none
     private
-    public :: type_properties_manager
+    public :: type_physics_manager
 
     !-------------------------------------------------------------------------------------------------------------------------------
     ! Main Derived Type with Generic Type-Bound Procedures
     !-------------------------------------------------------------------------------------------------------------------------------
-    type :: type_properties_manager
+    type :: type_physics_manager
         private
         type(type_iapws97) :: water
         type(type_iapws06) :: ice
@@ -20,7 +20,7 @@ module physics_service
         integer(int32), allocatable :: materials_id_map(:)
         integer(int32) :: num_materials
     contains
-        procedure, public :: initialize => initialize_properties_manager
+        procedure, public :: initialize => initialize_physics_manager
         procedure, private :: set_map => set_map_materials
 
         procedure, public :: calc_density
@@ -39,18 +39,18 @@ module physics_service
         procedure, public :: calc_Kvh
         procedure, public :: calc_KvT
 
-    end type type_properties_manager
+    end type type_physics_manager
 
 contains
 
     !-------------------------------------------------------------------------------------------------------------------------------
     ! Initialization
     !-------------------------------------------------------------------------------------------------------------------------------
-    subroutine initialize_properties_manager(self, unique_material_ids, density_info, &
-                                             specific_heat_info, heat_capacity_info, thermal_conductivity_info, &
-                                             wrf_ids, wrf_model_info, hcf_ids, hcf_model_info, gcc_model_ids)
+    subroutine initialize_physics_manager(self, unique_material_ids, density_info, &
+                                          specific_heat_info, heat_capacity_info, thermal_conductivity_info, &
+                                          wrf_ids, wrf_model_info, hcf_ids, hcf_model_info, gcc_model_ids)
         implicit none
-        class(type_properties_manager), intent(inout) :: self
+        class(type_physics_manager), intent(inout) :: self
         integer(int32), intent(in) :: unique_material_ids(:)
         type(type_physics_info), intent(in), optional :: density_info(:)
         type(type_physics_info), intent(in), optional :: specific_heat_info(:)
@@ -96,11 +96,11 @@ contains
                 water=self%water, ice=self%ice)
         end do
 
-    end subroutine initialize_properties_manager
+    end subroutine initialize_physics_manager
 
     subroutine set_map_materials(self, unique_material_ids)
         implicit none
-        class(type_properties_manager), intent(inout) :: self
+        class(type_physics_manager), intent(inout) :: self
         integer(int32), intent(in) :: unique_material_ids(:)
 
         integer(int32) :: max_region_id
@@ -121,7 +121,7 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     pure elemental subroutine calc_density(self, material_id, state, density)
         implicit none
-        class(type_properties_manager), intent(in) :: self
+        class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: density
@@ -132,7 +132,7 @@ contains
 
     pure elemental subroutine calc_density_water_derivatives(self, material_id, state, dden_dT, dden_dP)
         implicit none
-        class(type_properties_manager), intent(in) :: self
+        class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(in) :: state
         real(real64), intent(inout), optional :: dden_dT
@@ -143,7 +143,7 @@ contains
 
     pure elemental subroutine calc_density_ice_derivatives(self, material_id, state, dden_dT, dden_dP)
         implicit none
-        class(type_properties_manager), intent(in) :: self
+        class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(in) :: state
         real(real64), intent(inout), optional :: dden_dT
@@ -155,7 +155,7 @@ contains
     pure elemental subroutine calc_density_vapor_derivatives(self, material_id, state, dden_dT, dden_dP)
 
         implicit none
-        class(type_properties_manager), intent(in) :: self
+        class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(in) :: state
         real(real64), intent(inout), optional :: dden_dT
@@ -166,7 +166,7 @@ contains
 
     pure elemental subroutine calc_specific_heat(self, material_id, state, specific_heat)
         implicit none
-        class(type_properties_manager), intent(in) :: self
+        class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: specific_heat
@@ -177,7 +177,7 @@ contains
 
     pure elemental subroutine calc_thermal_conductivity_nondispersity(self, material_id, state, thermal_conductivity)
         implicit none
-        class(type_properties_manager), intent(in) :: self
+        class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: thermal_conductivity
@@ -188,7 +188,7 @@ contains
 
     pure elemental subroutine calc_thermal_conductivity_dispersity(self, material_id, state, thermal_conductivity)
         implicit none
-        class(type_properties_manager), intent(in) :: self
+        class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(in) :: state
         type(type_thc_dispersity), intent(inout) :: thermal_conductivity
@@ -199,7 +199,7 @@ contains
 
     pure elemental subroutine calc_vol_heat_capacity(self, material_id, state, vol_heat_capacity)
         implicit none
-        class(type_properties_manager), intent(in) :: self
+        class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: vol_heat_capacity
@@ -210,7 +210,7 @@ contains
 
     pure elemental subroutine update_water_phases(self, material_id, state)
         implicit none
-        class(type_properties_manager), intent(inout) :: self
+        class(type_physics_manager), intent(inout) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(inout) :: state
 
@@ -219,7 +219,7 @@ contains
 
     pure elemental subroutine calc_Kflh(self, material_id, state, Kflh)
         implicit none
-        class(type_properties_manager), intent(in) :: self
+        class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: Kflh
@@ -229,7 +229,7 @@ contains
 
     pure elemental subroutine calc_KlT(self, material_id, state, KlT)
         implicit none
-        class(type_properties_manager), intent(in) :: self
+        class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: KlT
@@ -239,7 +239,7 @@ contains
 
     pure elemental subroutine calc_Kvh(self, material_id, state, Kvh)
         implicit none
-        class(type_properties_manager), intent(in) :: self
+        class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: Kvh
@@ -249,7 +249,7 @@ contains
 
     pure elemental subroutine calc_KvT(self, material_id, state, KvT)
         implicit none
-        class(type_properties_manager), intent(in) :: self
+        class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: KvT

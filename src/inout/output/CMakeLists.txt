@@ -1,5 +1,4 @@
 # src/output/CMakeLists.txt
-
 set(INOUT_OUTPUT_SOURCES
     output_interface.F90
     output_base.F90
@@ -15,7 +14,6 @@ target_include_directories(Output_Main PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 # Outputは、データを書き出すためにCore, Domain, Physics等を知る必要がある
 target_link_libraries(Output_Main PUBLIC
-
     Solver::Core
     Solver::Input
     Solver::Domain

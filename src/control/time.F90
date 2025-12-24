@@ -1,6 +1,7 @@
 module control_time
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: omp_lib
+    use :: stdlib_strings, only:strip
     use :: module_core
     use :: module_input, only:type_input
 

@@ -205,39 +205,29 @@ contains
                             is_required=.true., valid_range=[0.0d0, huge(0.0d0)])
 
         select case (self%materials(i_material)%hydraulic%model_number)
-        case (1)
-            buffer(3) = impedance_factor
-            buffer(4) = ""
-            call get_json_value(json, join(buffer), self%materials(i_material)%hydraulic%impedance_factor, &
-                                is_required=.true., valid_range=[0.0d0, huge(0.0d0)])
-
-        case (2)
+        case (HCF_BASE)
             buffer(3) = water_retention_model
             buffer(4) = ""
             call read_parameters_materials_wrf(self%materials(i_material)%hydraulic%hcf, json, buffer, 3)
-        case (3)
-            buffer(3) = water_viscosity_model
-            call get_json_value(json, join(buffer), self%materials(i_material)%hydraulic%water_viscosity_model, &
-                                is_required=.true., valid_range=[0, 2])
-        case (4)
+        case (HCF_IMPEDANCE)
             buffer(3) = impedance_factor
             buffer(4) = ""
             call get_json_value(json, join(buffer), self%materials(i_material)%hydraulic%impedance_factor, &
                                 is_required=.true., valid_range=[0.0d0, huge(0.0d0)])
-
+        case (HCF_VISCOSITY)
+            buffer(3) = water_viscosity_model
+            call get_json_value(json, join(buffer), self%materials(i_material)%hydraulic%water_viscosity_model, &
+                                is_required=.true., valid_range=[0, 2])
+        case (HCF_BASE_IMPEDANCE)
             buffer(3) = water_retention_model
             buffer(4) = ""
             call read_parameters_materials_wrf(self%materials(i_material)%hydraulic%hcf, json, buffer, 3)
-        case (5)
+
             buffer(3) = impedance_factor
             buffer(4) = ""
             call get_json_value(json, join(buffer), self%materials(i_material)%hydraulic%impedance_factor, &
                                 is_required=.true., valid_range=[0.0d0, huge(0.0d0)])
-
-            buffer(3) = water_viscosity_model
-            call get_json_value(json, join(buffer), self%materials(i_material)%hydraulic%water_viscosity_model, &
-                                is_required=.true., valid_range=[0, 2])
-        case (6)
+        case (HCF_BASE_VISCOSITY)
             buffer(3) = water_retention_model
             buffer(4) = ""
             call read_parameters_materials_wrf(self%materials(i_material)%hydraulic%hcf, json, buffer, 3)
@@ -245,14 +235,24 @@ contains
             buffer(3) = water_viscosity_model
             call get_json_value(json, join(buffer), self%materials(i_material)%hydraulic%water_viscosity_model, &
                                 is_required=.true., valid_range=[0, 2])
-        case (7)
+        case (HCF_IMPEDANCE_VISCOSITY)
             buffer(3) = impedance_factor
             buffer(4) = ""
             call get_json_value(json, join(buffer), self%materials(i_material)%hydraulic%impedance_factor, &
                                 is_required=.true., valid_range=[0.0d0, huge(0.0d0)])
 
+            buffer(3) = water_viscosity_model
+            call get_json_value(json, join(buffer), self%materials(i_material)%hydraulic%water_viscosity_model, &
+                                is_required=.true., valid_range=[0, 2])
+
+        case (HCF_BASE_IMPEDANCE_VISCOSITY)
             buffer(3) = water_retention_model
             call read_parameters_materials_wrf(self%materials(i_material)%hydraulic%hcf, json, buffer, 3)
+
+            buffer(3) = impedance_factor
+            buffer(4) = ""
+            call get_json_value(json, join(buffer), self%materials(i_material)%hydraulic%impedance_factor, &
+                                is_required=.true., valid_range=[0.0d0, huge(0.0d0)])
 
             buffer(3) = water_viscosity_model
             call get_json_value(json, join(buffer), self%materials(i_material)%hydraulic%water_viscosity_model, &
@@ -269,6 +269,7 @@ contains
         integer(int32), intent(in) :: end_index
 
         character(len=256), allocatable :: local_buffer(:)
+        integer(int32) :: last_index
 
         if (size(buffer) > end_index) then
             allocate (local_buffer(size(buffer)))
@@ -276,49 +277,49 @@ contains
             allocate (local_buffer(size(buffer) + 1))
         end if
         local_buffer(1:end_index) = buffer(1:end_index)
+        last_index = end_index + 1
 
-        local_buffer(end_index + 1) = model_number
-        call get_json_value(json, join(local_buffer), wrf%model_number, is_required=.true., valid_range=[1, 6])
+        local_buffer(last_index) = model_number
+        call get_json_value(json, join(local_buffer(1:last_index)), wrf%model_number, is_required=.true., valid_range=[1, 6])
 
-        local_buffer(end_index + 1) = theta_s
-        call get_json_value(json, join(local_buffer), wrf%theta_s, is_required=.true., valid_range=[0.0d0, 1.0d0])
+        local_buffer(last_index) = theta_s
+        call get_json_value(json, join(local_buffer(1:last_index)), wrf%theta_s, is_required=.true., valid_range=[0.0d0, 1.0d0])
 
-        local_buffer(end_index + 1) = theta_r
-        call get_json_value(json, join(local_buffer), wrf%theta_r, is_required=.true., valid_range=[0.0d0, 1.0d0])
+        local_buffer(last_index) = theta_r
+        call get_json_value(json, join(local_buffer(1:last_index)), wrf%theta_r, is_required=.true., valid_range=[0.0d0, 1.0d0])
 
-        local_buffer(end_index + 1) = alpha1
-        call get_json_value(json, join(local_buffer), wrf%alpha1, is_required=.true.)
+        local_buffer(last_index) = alpha1
+        call get_json_value(json, join(local_buffer(1:last_index)), wrf%alpha1, is_required=.true.)
 
-        local_buffer(end_index + 1) = n1
-        call get_json_value(json, join(local_buffer), wrf%n1, is_required=.true.)
+        local_buffer(last_index) = n1
+        call get_json_value(json, join(local_buffer(1:last_index)), wrf%n1, is_required=.true.)
 
         wrf%m1 = 1.0d0 - 1.0d0 / wrf%n1
 
         select case (wrf%model_number)
         case (4)
-            local_buffer(end_index + 1) = h_crit
-            call get_json_value(json, join(local_buffer), wrf%h_crit, is_required=.true., valid_range=[-huge(0.0d0), 0.0d0])
+            local_buffer(last_index) = h_crit
+            call get_json_value(json, join(local_buffer(1:last_index)), wrf%h_crit, is_required=.true., valid_range=[-huge(0.0d0), 0.0d0])
         case (5)
-            local_buffer(end_index + 1) = alpha2
-            call get_json_value(json, join(local_buffer), wrf%alpha2, is_required=.true.)
+            local_buffer(last_index) = alpha2
+            call get_json_value(json, join(local_buffer(1:last_index)), wrf%alpha2, is_required=.true.)
 
-            local_buffer(end_index + 1) = n2
-            call get_json_value(json, join(local_buffer), wrf%n2, is_required=.true.)
+            local_buffer(last_index) = n2
+            call get_json_value(json, join(local_buffer(1:last_index)), wrf%n2, is_required=.true.)
             wrf%m2 = 1.0d0 - 1.0d0 / wrf%n2
 
-            local_buffer(end_index + 1) = w1
-            call get_json_value(json, join(local_buffer), wrf%w1, is_required=.true., valid_range=[0.0d0, 1.0d0])
+            local_buffer(last_index) = w1
+            call get_json_value(json, join(local_buffer(1:last_index)), wrf%w1, is_required=.true., valid_range=[0.0d0, 1.0d0])
             wrf%w2 = 1.0d0 - wrf%w1
         case (6)
-            local_buffer(end_index + 1) = alpha2
-            call get_json_value(json, join(local_buffer), wrf%alpha2, is_required=.true.)
-
-            local_buffer(end_index + 1) = n2
-            call get_json_value(json, join(local_buffer), wrf%n2, is_required=.true.)
+            local_buffer(last_index) = alpha2
+            call get_json_value(json, join(local_buffer(1:last_index)), wrf%alpha2, is_required=.true.)
+            local_buffer(last_index) = n2
+            call get_json_value(json, join(local_buffer(1:last_index)), wrf%n2, is_required=.true.)
             wrf%m2 = 1.0d0 - 1.0d0 / wrf%n2
 
-            local_buffer(end_index + 1) = w1
-            call get_json_value(json, join(local_buffer), wrf%w1, is_required=.true., valid_range=[0.0d0, 1.0d0])
+            local_buffer(last_index) = w1
+            call get_json_value(json, join(local_buffer(1:last_index)), wrf%w1, is_required=.true., valid_range=[0.0d0, 1.0d0])
             wrf%w2 = 1.0d0 - wrf%w1
         end select
 
@@ -327,12 +328,14 @@ contains
         ! ----------------------------------------------------------------
         select type (wrf)
         type is (type_materials_hcf)
-            local_buffer(end_index + 1) = l
-            call get_json_value(json, join(local_buffer), wrf%l, is_required=.true., valid_range=[0.0d0, huge(0.0d0)])
+            local_buffer(last_index) = l
+            call get_json_value(json, join(local_buffer(1:last_index)), wrf%l, is_required=.true., valid_range=[0.0d0, huge(0.0d0)])
 
         class default
             ! do nothing
         end select
+
+        if (allocated(local_buffer)) deallocate (local_buffer)
 
     end subroutine read_parameters_materials_wrf
 

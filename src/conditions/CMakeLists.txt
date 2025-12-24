@@ -27,27 +27,27 @@ target_link_libraries(Conditions_Boundary PUBLIC
 )
 enable_build_flags(Conditions_Boundary)
 
-# # --- Initial Condition Library ---
-# set(CONDITIONS_INITIAL_SOURCES
-#     initial/initial_interface.F90
-#     initial/initial_uniform.F90
-#     initial/initial_laplace.F90
-#     initial/initial_manager.F90
-#     initial/initial.F90
-# )
-# add_library(Conditions_Initial STATIC ${CONDITIONS_INITIAL_SOURCES})
-# target_include_directories(Conditions_Initial PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+# --- Initial Condition Library ---
+set(CONDITIONS_INITIAL_SOURCES
+    initial/initial_interface.F90
+    initial/initial_uniform.F90
+    # initial/initial_laplace.F90
+    initial/initial_manager.F90
+    initial/initial.F90
+)
+add_library(Conditions_Initial STATIC ${CONDITIONS_INITIAL_SOURCES})
+target_include_directories(Conditions_Initial PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
-# # Initial conditions depend on Boundary conditions, plus other modules.
-# target_link_libraries(Conditions_Initial PUBLIC
-#     Conditions_Boundary
-#     Solver::Core
-#     Solver::Domain
-#     Solver::Input
-#     Solver::Control
-#     Solver::Field
-# )
-# enable_build_flags(Conditions_Initial)
+# Initial conditions depend on Boundary conditions, plus other modules.
+target_link_libraries(Conditions_Initial PUBLIC
+    # Conditions_Boundary
+    Solver::Core
+    Solver::Domain
+    Solver::Input
+    Solver::Control
+    # Solver::Field
+)
+enable_build_flags(Conditions_Initial)
 
 
 # ====================================================================
@@ -58,7 +58,7 @@ add_library(Conditions_Interface INTERFACE)
 # Link both component libraries to the interface.
 target_link_libraries(Conditions_Interface INTERFACE
     Conditions_Boundary
-    # Conditions_Initial
+    Conditions_Initial
 )
 
 # Create a clean, namespaced ALIAS for other directories to use.

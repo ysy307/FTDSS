@@ -4,61 +4,17 @@ cmake_minimum_required(VERSION 3.20)
 # 1. Options and Toolchain Setup
 # ====================================================================
 
-# --------------------------------------------------------------------
-# ★ ビルド目的を決定する変数
-# --------------------------------------------------------------------
-# 1. ビルドするアプリケーションを選択 ('ysy_fc' または 'test')
-set(BUILD_APP "ysy_fc" CACHE STRING "Select the application to build: ysy_fc or test")
+# 1. ビルドするアプリケーションを選択 ('ftdss' または 'test')
+set(BUILD_APP "ftdss" CACHE STRING "Select the application to build: ftdss or test")
 
 # 2. 'test' をビルドする場合、どのテストを実行するか指定
 set(TEST_NAME "input" CACHE STRING "Specify the test name (e.g., input, domain)")
-# --------------------------------------------------------------------
 
-# その他のオプション
+# オプション定義
 option(ENABLE_OPENMP "Enable OpenMP support" ON)
 option(ENABLE_MKL    "Enable MKL support"    ON)
 option(ENABLE_MPI    "Enable MPI support"    ON)
 option(ENABLE_DEBUG  "Enable debug flags"    ON)
-
-# ビルドするモジュールのリストを準備
-set(REQUIRED_MODULES "")
-
-if(BUILD_APP STREQUAL "ysy_fc")
-    # --- アプリケーションビルドモード ---
-    message(STATUS "Build mode: Main application (ysy_fc)")
-    list(APPEND REQUIRED_MODULES "core" "inout" "linalg" "control" "conditions" "domain" "physics" "parallel" "solver" "field")
-
-elseif(BUILD_APP STREQUAL "test")
-    # --- テストビルドモード ---
-    message(STATUS "Build mode: Test (selected test: ${TEST_NAME})")
-
-    if(TEST_NAME STREQUAL "core")
-        list(APPEND REQUIRED_MODULES "core")
-    elseif(TEST_NAME STREQUAL "input")
-        list(APPEND REQUIRED_MODULES "core" "inout")
-    elseif(TEST_NAME STREQUAL "linalg")
-        list(APPEND REQUIRED_MODULES "core" "linalg")
-    elseif(TEST_NAME STREQUAL "physics")
-        list(APPEND REQUIRED_MODULES "core" "physics")
-    elseif(TEST_NAME STREQUAL "solver")
-        list(APPEND REQUIRED_MODULES "core" "linalg" "solver")
-    elseif(TEST_NAME STREQUAL "control")
-        list(APPEND REQUIRED_MODULES "core" "inout" "linalg" "control")
-    elseif(TEST_NAME STREQUAL "domain")
-        list(APPEND REQUIRED_MODULES "core" "inout" "linalg" "control" "conditions" "domain")
-    elseif(TEST_NAME STREQUAL "parallel")
-        list(APPEND REQUIRED_MODULES "core" "inout" "parallel")
-    elseif(TEST_NAME STREQUAL "field")
-        list(APPEND REQUIRED_MODULES "core" "inout" "linalg" "control" "conditions" "domain" "field")
-    
-    else()
-        message(WARNING "Unknown TEST_NAME: ${TEST_NAME}. No specific modules required.")
-    endif()
-
-else()
-    message(FATAL_ERROR "Invalid BUILD_APP value: ${BUILD_APP}. Choose 'ysy_fc' or 'test'.")
-endif()
-
 
 # コンパイラ設定
 if(ENABLE_MPI)
@@ -73,10 +29,7 @@ else()
     set(CMAKE_C_COMPILER     icx  CACHE STRING "C Compiler" FORCE)
 endif()
 
-# Project Name and Language
-project(YSY_FC LANGUAGES Fortran C CXX)
-
-# CTestを有効化
+project(FTDSS LANGUAGES Fortran C CXX)
 enable_testing()
 
 # Build Type
@@ -90,94 +43,152 @@ set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/.mod)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
-# Include custom CMake modules
+# Include custom CMake modules if exists
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(Toolchain)
 
+# ====================================================================
+# 2. Module Dependencies Definition (構成定義)
+# ====================================================================
+
+# ★ IOモジュールの管理
+# output モジュールを有効化
+# set(MODULES_IO input output) 
+set(MODULES_IO input) 
+
+# 各テスト・モードが必要とするモジュール構成
+# 依存順序を気にする必要はありません（後のALL_MODULES順でaddされます）
+set(DEPS_core       core)
+set(DEPS_input      core input)
+# set(DEPS_output     core output)
+
+set(DEPS_linalg     core linalg)
+set(DEPS_physics    core physics)
+set(DEPS_solver     core linalg solver)
+set(DEPS_control    core ${MODULES_IO} linalg control)
+set(DEPS_conditions core ${MODULES_IO} linalg control conditions)
+set(DEPS_domain     core ${MODULES_IO} linalg control conditions domain)
+set(DEPS_field      core ${MODULES_IO} linalg control conditions domain field)
+set(DEPS_parallel   core ${MODULES_IO} parallel)
+# hydraulicを追加
+set(DEPS_main       core ${MODULES_IO} linalg control conditions domain physics parallel solver field thermal ftdss)
+
+# アプリケーション本体用
+set(DEPS_ftdss     ${DEPS_main}) 
 
 # ====================================================================
-# 2. Source Tree Definition
+# 3. Resolve Required Modules (ビルド対象の決定)
 # ====================================================================
 
-# REQUIRED_MODULESリストに含まれているモジュールだけをビルド対象にする関数
+set(REQUIRED_MODULES "")
+
+if(BUILD_APP STREQUAL "ftdss")
+    message(STATUS "Build mode: Main application (ftdss)")
+    list(APPEND REQUIRED_MODULES ${DEPS_ftdss})
+
+elseif(BUILD_APP STREQUAL "test")
+    message(STATUS "Build mode: Test (selected test: ${TEST_NAME})")
+    
+    if(DEFINED DEPS_${TEST_NAME})
+        list(APPEND REQUIRED_MODULES ${DEPS_${TEST_NAME}})
+    else()
+        message(FATAL_ERROR "Unknown TEST_NAME: ${TEST_NAME}. Please define DEPS_${TEST_NAME} in CMakeLists.txt.")
+    endif()
+    
+else()
+    message(FATAL_ERROR "Invalid BUILD_APP value: ${BUILD_APP}. Choose 'ftdss' or 'test'.")
+endif()
+
+# 重複削除
+list(REMOVE_DUPLICATES REQUIRED_MODULES)
+
+
+# ====================================================================
+# 4. Source Tree Definition (サブディレクトリ追加)
+# ====================================================================
+
+# ★ディレクトリパスのカスタム設定
+# 標準の "src/モジュール名" 以外の場所にある場合はここで定義します
+set(PATH_input      "src/inout/input")
+# set(PATH_output     "src/inout/output")
+set(PATH_thermal    "src/main/thermal")
+# set(PATH_hydraulic  "src/main/hydraulic")
+set(PATH_ftdss      "src/main/ftdss")
+
+# 指定されたモジュールが REQUIRED_MODULES に含まれる場合のみ追加する関数
 function(add_required_subdirectory module_name)
     list(FIND REQUIRED_MODULES "${module_name}" _index)
     if(NOT _index EQUAL -1)
         message(STATUS "Including module: ${module_name}")
-        add_subdirectory("src/${module_name}")
+        
+        # カスタムパスが定義されているか確認
+        if(DEFINED PATH_${module_name})
+            add_subdirectory("${PATH_${module_name}}" "${CMAKE_BINARY_DIR}/src/${module_name}")
+        else()
+            add_subdirectory("src/${module_name}")
+        endif()
+        
     else()
-        message(STATUS "Skipping module: ${module_name}")
+        # message(STATUS "Skipping module: ${module_name}")
     endif()
 endfunction()
 
-# この関数を使って各モジュールを追加
-add_required_subdirectory(core)
-add_required_subdirectory(inout)
-add_required_subdirectory(linalg)
-add_required_subdirectory(control)
-add_required_subdirectory(conditions)
-add_required_subdirectory(domain)
-add_required_subdirectory(physics)
-add_required_subdirectory(parallel)
-add_required_subdirectory(solver)
-add_required_subdirectory(field)
+# ★ 全モジュールのリスト
+# ここは論理的なモジュール名（input, output等）のままでOKです
+set(ALL_MODULES 
+    core 
+    input 
+    # output
+    linalg 
+    control 
+    conditions 
+    domain 
+    physics 
+    parallel 
+    solver 
+    field 
+    thermal
+    # hydraulic
+    ftdss
+)
 
+foreach(mod ${ALL_MODULES})
+    add_required_subdirectory(${mod})
+endforeach()
 
 # ====================================================================
-# 3. Build Targets
+# 5. Build Targets (メインアプリまたはテスト)
 # ====================================================================
 
-if(BUILD_APP STREQUAL "ysy_fc")
-    # アプリケーションをビルド
-    add_executable(ysy_fc app/ysy_fc.F90)
+if(BUILD_APP STREQUAL "ftdss")
+    # --- アプリケーションビルド ---
+    # パスを src/main/ftdss/ftdss.F90 に変更
+    add_executable(ftdss src/main/ftdss/ftdss.F90)
     
-    target_link_libraries(ysy_fc PRIVATE
-        Solver::Core
-        Solver::Input
-        # ... アプリケーションに必要な全てのライブラリ ...
+    # 依存ライブラリのリンク自動化
+    foreach(mod ${DEPS_ftdss})
+        string(SUBSTRING ${mod} 0 1 FIRST_CHAR)
+        string(TOUPPER ${FIRST_CHAR} FIRST_CHAR)
+        string(SUBSTRING ${mod} 1 -1 REMAINDER)
+        target_link_libraries(ftdss PRIVATE "Solver::${FIRST_CHAR}${REMAINDER}")
+    endforeach()
+
+    # run ターゲット設定
+    if(ENABLE_MPI)
+        set(RUN_CMD mpirun -np 4)
+        set(RUN_ENV "")
+    else()
+        set(RUN_CMD "")
+        set(RUN_ENV "OMP_NUM_THREADS=4")
+    endif()
+    
+    add_custom_target(run
+        COMMAND ${RUN_ENV} ${RUN_CMD} $<TARGET_FILE:ftdss>
+        DEPENDS ftdss
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     )
 
 elseif(BUILD_APP STREQUAL "test")
+    # --- テストビルド ---
     add_subdirectory(test)
-endif()
-
-
-# ====================================================================
-# 4. Custom Targets
-# ====================================================================
-if(BUILD_APP STREQUAL "ysy_fc" AND TARGET ysy_fc)
-    # --- メインアプリ実行 ---
-    if(ENABLE_MPI)
-        add_custom_target(run
-            COMMAND mpirun -np 4 $<TARGET_FILE:ysy_fc>
-            DEPENDS ysy_fc
-            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-        )
-    else()
-        add_custom_target(run
-            COMMAND OMP_NUM_THREADS=4 $<TARGET_FILE:ysy_fc>
-            DEPENDS ysy_fc
-            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-        )
-    endif()
-elseif(BUILD_APP STREQUAL "test")
-    # --- テスト実行 ---
-    set(TEST_EXE "test_${TEST_NAME}")
-    if(TARGET ${TEST_EXE})
-        if(ENABLE_MPI)
-            add_custom_target(run_${TEST_NAME}
-                COMMAND mpirun -np 4 $<TARGET_FILE:${TEST_EXE}> >| log/output_${TEST_NAME}.md
-                DEPENDS ${TEST_EXE}
-                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-            )
-        else()
-            add_custom_target(run_${TEST_NAME}
-                COMMAND OMP_NUM_THREADS=4 $<TARGET_FILE:${TEST_EXE}> >| log/output_${TEST_NAME}.md
-                DEPENDS ${TEST_EXE}
-                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-            )
-        endif()
-    else()
-        message(WARNING "Test target '${TEST_EXE}' not found. No run target created.")
-    endif()
 endif()
