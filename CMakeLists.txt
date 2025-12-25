@@ -65,13 +65,12 @@ set(DEPS_input      core input)
 set(DEPS_linalg     core linalg)
 set(DEPS_physics    core physics)
 set(DEPS_solver     core linalg solver)
-set(DEPS_control    core ${MODULES_IO} linalg control)
-set(DEPS_conditions core ${MODULES_IO} linalg control conditions)
-set(DEPS_domain     core ${MODULES_IO} linalg control conditions domain)
-set(DEPS_field      core ${MODULES_IO} linalg control conditions domain field)
-set(DEPS_parallel   core ${MODULES_IO} parallel)
-# hydraulicを追加
-set(DEPS_main       core ${MODULES_IO} linalg control conditions domain physics parallel solver field thermal ftdss)
+set(DEPS_control    core input linalg control)
+set(DEPS_conditions core input linalg control conditions)
+set(DEPS_domain     core input linalg control conditions domain)
+set(DEPS_field      core input linalg control conditions domain field)
+set(DEPS_parallel   core input parallel)
+set(DEPS_main       core ${MODULES_IO} linalg control conditions domain physics parallel solver field thermal hydraulic ftdss)
 
 # アプリケーション本体用
 set(DEPS_ftdss     ${DEPS_main}) 
@@ -112,7 +111,7 @@ list(REMOVE_DUPLICATES REQUIRED_MODULES)
 set(PATH_input      "src/inout/input")
 # set(PATH_output     "src/inout/output")
 set(PATH_thermal    "src/main/thermal")
-# set(PATH_hydraulic  "src/main/hydraulic")
+set(PATH_hydraulic  "src/main/hydraulic")
 set(PATH_ftdss      "src/main/ftdss")
 
 # 指定されたモジュールが REQUIRED_MODULES に含まれる場合のみ追加する関数
@@ -134,7 +133,6 @@ function(add_required_subdirectory module_name)
 endfunction()
 
 # ★ 全モジュールのリスト
-# ここは論理的なモジュール名（input, output等）のままでOKです
 set(ALL_MODULES 
     core 
     input 
@@ -148,7 +146,7 @@ set(ALL_MODULES
     solver 
     field 
     thermal
-    # hydraulic
+    hydraulic
     ftdss
 )
 

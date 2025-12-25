@@ -13,7 +13,7 @@ module module_ftdss
     use :: module_field, only:type_jacobian_matrix, type_residual_vector
 
     use :: module_thermal, only:type_thermal
-    ! use :: module_hydraulic
+    use :: module_hydraulic, only:type_hydraulic
     implicit none
 
     type :: type_ftdss
@@ -32,6 +32,7 @@ module module_ftdss
         type(type_residual_vector) :: R
 
         type(type_thermal) :: thermal
+        type(type_hydraulic) :: hydraulic
 
         ! class(abst_thermal), allocatable :: thermal
         ! class(abst_hydraulic), allocatable :: hydraulic

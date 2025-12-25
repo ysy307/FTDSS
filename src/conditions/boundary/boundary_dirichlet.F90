@@ -24,9 +24,8 @@ contains
             if (allocated(this%time_points)) deallocate (this%time_points)
             if (allocated(input%conditions%time_control%boundary_time_points)) then
                 allocate (this%time_points, source=input%conditions%time_control%boundary_time_points)
-                time_conv = controls%time%convert_time_unit( &
-                            input%conditions%time_control%simulation_period%unit, &
-                            TIME_UNIT_SECONDS)
+                call controls%time%convert_time_unit(input%conditions%time_control%simulation_period%unit, &
+                                                     TIME_UNIT_SECONDS, time_conv)
                 this%time_points = this%time_points * time_conv
             else
                 allocate (this%time_points(1))

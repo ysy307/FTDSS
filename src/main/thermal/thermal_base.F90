@@ -368,19 +368,19 @@ contains
     !>
     !> Calculates the components of the thermal residual.
     !>
-    !> R_C_T (Scalar): Storage/Capacity term (Time derivative part)
+    !> R_T_C (Scalar): Storage/Capacity term (Time derivative part)
     !>        = C_TT * dT/dt + C_TH * dP/dt
     !>
-    !> R_D_T (Vector): Energy Flux term
+    !> R_T_D (Vector): Energy Flux term
     !>        = -lambda.grad(T) + (c_w*rho_w*q_w + c_v*rho_w*q_v)*T + rho_w*Lv*q_v
     !>
-    module pure subroutine compute_R_T(self, target_id, state, R_C_T, R_D_T)
+    module pure subroutine compute_R_T(self, target_id, state, R_T_C, R_T_D)
         implicit none
         class(type_thermal), intent(in) :: self
         integer(int32), intent(in) :: target_id
         type(type_state), intent(inout) :: state
-        real(real64), intent(inout) :: R_C_T ! Scalar: Capacity/Storage term
-        real(real64), intent(inout) :: R_D_T(:) ! Vector: Energy Flux term (j_E)
+        real(real64), intent(inout) :: R_T_C ! Scalar: Capacity/Storage term
+        real(real64), intent(inout) :: R_T_D(:) ! Vector: Energy Flux term (j_E)
 
         ! --- Local Variables ---
         ! For Capacity Term
@@ -401,7 +401,7 @@ contains
         integer(int32) :: i
 
         ! ======================================================================
-        ! 1. Calculate Storage Term (R_C_T)
+        ! 1. Calculate Storage Term (R_T_C)
         ! ======================================================================
 
         ! 1.1 Get Time Derivatives (provided by BDF/Time Integrator)
@@ -413,10 +413,10 @@ contains
         call self%compute_C_T(target_id, state, C_TT, C_TH)
 
         ! 1.3 Compute Scalar Residual Component
-        R_C_T = C_TT * dot_T + C_TH * dot_P
+        R_T_C = C_TT * dot_T + C_TH * dot_P
 
         ! ======================================================================
-        ! 2. Calculate Flux Term (R_D_T = j_E)
+        ! 2. Calculate Flux Term (R_T_D = j_E)
         ! ======================================================================
 
         ! 2.1 Get State and Properties
@@ -485,15 +485,15 @@ contains
         end select
 
         ! 2.3 Sum components to get Total Energy Flux Vector
-        ! R_D_T corresponds to j_E
-        R_D_T(:) = 0.0d0 ! Safety clear
+        ! R_T_D corresponds to j_E
+        R_T_D(:) = 0.0d0 ! Safety clear
         do i = 1, self%computation_dimension
-            R_D_T(i) = term_conduction(i) + term_adv_sensible(i) + term_adv_latent(i)
+            R_T_D(i) = term_conduction(i) + term_adv_sensible(i) + term_adv_latent(i)
         end do
 
         ! Store calculated flux back to state for visualization or post-processing
         ! Assuming state%energy_flux%set accepts an array or components
-        ! call state%energy_flux%set(R_D_T)
+        ! call state%energy_flux%set(R_T_D)
 
     end subroutine compute_R_T
 end submodule thermal_base
