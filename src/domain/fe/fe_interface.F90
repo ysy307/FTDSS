@@ -145,7 +145,7 @@ contains
         class(abst_fe), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
+        integer(int32), intent(in) :: connectivity(:) ! このルーチン内の計算では実質使いません
 
         !> Shape function values [num_nodes]
         real(real64), intent(inout) :: psi_vec(:)
@@ -167,18 +167,22 @@ contains
         end do
 
         ! 2. Compute Jacobian Matrix (Isoparametric formulation)
-        ! We calculate it explicitly here to reuse it for both det and inv.
-        ! Note: Using self%jacobian() is also possible if it's optimized.
         jac = 0.0d0
         do i = 1, nn
             do j = 1, dim
                 call self%dpsi(i, j, r, dpsi_dxi(j))
-                ! J_jk = sum( d_psi_i/dxi_j * x_k )
-                ! Here we assume node_coords is (3, num_nodes) or (dim, num_nodes)
-                ! jac(row=j, col=1..dim) corresponding to d/dxi_j
-                jac(j, 1) = jac(j, 1) + dpsi_dxi(j) * node_coords(1, connectivity(i))
-                if (dim >= 2) jac(j, 2) = jac(j, 2) + dpsi_dxi(j) * node_coords(2, connectivity(i))
-                if (dim >= 3) jac(j, 3) = jac(j, 3) + dpsi_dxi(j) * node_coords(3, connectivity(i))
+
+                ! [修正箇所]
+                ! node_coords は (dim, num_nodes) のサイズで渡されており、
+                ! 列の順番はローカルな節点番号(1..nn)に対応しています。
+                ! connectivity(i) (グローバルID) を使うと範囲外参照になります。
+
+                ! OLD (Error): node_coords(1, connectivity(i))
+                ! NEW (Fixed): node_coords(1, i)
+
+                jac(j, 1) = jac(j, 1) + dpsi_dxi(j) * node_coords(1, i)
+                if (dim >= 2) jac(j, 2) = jac(j, 2) + dpsi_dxi(j) * node_coords(2, i)
+                if (dim >= 3) jac(j, 3) = jac(j, 3) + dpsi_dxi(j) * node_coords(3, i)
             end do
         end do
 
@@ -186,10 +190,9 @@ contains
         call calc_inverse_matrix(dim, jac(1:dim, 1:dim), det_j, inv_jac(1:dim, 1:dim))
 
         ! 4. Compute Global Gradients: nabla_x psi = J^(-T) * nabla_xi psi
-        ! dpsi_dx_mat(i, :) represents nabla psi_i
         dpsi_dx_mat = 0.0d0
         do i = 1, nn
-            ! Get local gradients again (or could store them in step 2)
+            ! Get local gradients again
             do j = 1, dim
                 call self%dpsi(i, j, r, dpsi_dxi(j))
             end do
@@ -198,8 +201,6 @@ contains
             if (dim == 1) then
                 dpsi_dx_mat(i, 1) = dpsi_dxi(1) * inv_jac(1, 1)
             else if (dim == 2) then
-                ! [dpsi/dx, dpsi/dy] = [dpsi/dxi, dpsi/deta] * [invJ]
-                ! dpsi/dx = dpsi/dxi * invJ_11 + dpsi/deta * invJ_21
                 dpsi_dx_mat(i, 1) = dpsi_dxi(1) * inv_jac(1, 1) + dpsi_dxi(2) * inv_jac(2, 1)
                 dpsi_dx_mat(i, 2) = dpsi_dxi(1) * inv_jac(1, 2) + dpsi_dxi(2) * inv_jac(2, 2)
             else if (dim == 3) then
@@ -210,7 +211,6 @@ contains
         end do
 
     end subroutine calc_shape_data
-
     !>
     !> Helper to calculate determinant and inverse of a small matrix (1x1 to 3x3).
     !>

@@ -5,6 +5,7 @@
 module core_types_variable
     use, intrinsic :: iso_fortran_env, only: real64, int32
     use :: core_allocate, only:allocate_array
+    use :: core_types_coordinate_array, only:type_coordinate_array_dp
     implicit none
     private
 
@@ -30,7 +31,7 @@ module core_types_variable
         !> The time derivative of the variable (e.g., du/dt).
         real(real64), allocatable :: dif(:)
         !> The spatial derivative of the variable (e.g., grad u).
-        real(real64), allocatable :: grad(:)
+        type(type_coordinate_array_dp) :: grad
     contains
         procedure, pass(self) :: initialize => initialize_type_variable
         procedure, pass(self) :: shift => type_variable_shift
@@ -59,13 +60,12 @@ contains
         call allocate_array(self%pre, length)
         call allocate_array(self%old, length, self%rank + 1_int32)
         call allocate_array(self%dif, length)
-        call allocate_array(self%grad, length)
+        call self%grad%initialize(length, 0.0d0)
 
         self%new(:) = 0.0d0
         self%pre(:) = 0.0d0
         self%old(:, :) = 0.0d0
         self%dif(:) = 0.0d0
-        self%grad(:) = 0.0d0
 
     end subroutine initialize_type_variable
 

@@ -9,7 +9,7 @@ module domain_manager
     use :: module_core
     use :: module_input, only:type_input
     use :: module_control, only:type_controls
-    use :: module_fe, only:type_fe_manager
+    use :: module_fe, only:type_fe_manager, abst_fe
     use :: module_boundary
     use :: domain_multicoloring, only:type_coloring
     use :: domain_adjacency, only:type_node_adjacency, type_map_node_to_element
@@ -177,6 +177,8 @@ module domain_manager
         procedure, public, pass(self) :: get_computation_type => get_computation_type_domain
         procedure, public, pass(self) :: get_coupling_mode => get_coupling_mode_domain
         procedure, public, pass(self) :: get_node_adjacency => get_node_adjacency_domain
+        procedure, public, pass(self) :: get_element => get_element_domain
+        procedure, public, pass(self) :: get_connectivity => get_connectivity_domain
         procedure, public, pass(self) :: display => display_domain
     end type type_domain
 
@@ -763,6 +765,61 @@ contains
             call self%node_adjacency%get_csr(row, col)
         end select
     end subroutine get_node_adjacency_domain
+
+    subroutine get_element_domain(self, elem_id, element)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(in) :: elem_id
+        class(abst_fe), pointer, intent(inout) :: element
+
+        integer(int32) :: type_id
+
+        ! 1. Validate the element ID
+        if (elem_id < 1 .or. elem_id > self%elements%num_elements) then
+            ! Invalid ID: return null pointer
+            element => null()
+            return
+        end if
+
+        ! 2. Get the finite element type ID for this specific element
+        !    (fe_types maps Element Index -> Type ID)
+        type_id = self%elements%fe_types(elem_id)
+
+        ! 3. Retrieve the FE object pointer from the FE manager
+        !    (Delegate the lookup to fe_manager)
+        element => self%elements%fe_manager%get_fe(type_id)
+
+    end subroutine get_element_domain
+
+    !>
+    !> 指定された要素IDに対応するコネクティビティ（節点番号リスト）へのポインタを返す。
+    !> データのコピーを行わず、内部配列を直接参照するため高速である。
+    !>
+    subroutine get_connectivity_domain(self, elem_id, conn)
+        implicit none
+        !> ポインタ結合を行うため、selfにはtarget属性が必要
+        class(type_domain), intent(in), target :: self
+        integer(int32), intent(in) :: elem_id
+        !> 結果を格納するポインタ配列
+        integer(int32), pointer, intent(inout) :: conn(:)
+
+        integer(int32) :: istart, iend
+
+        ! 1. IDの範囲チェック
+        if (elem_id < 1 .or. elem_id > self%elements%num_elements) then
+            conn => null()
+            return
+        end if
+
+        ! 2. CSR形式から開始位置と終了位置を取得
+        !    ind(i) が開始インデックス、ind(i+1)-1 が終了インデックス
+        istart = self%elements%connectivity%ind(elem_id)
+        iend = self%elements%connectivity%ind(elem_id + 1) - 1
+
+        ! 3. 内部配列へのポインタ結合 (データのコピーは発生しない)
+        conn => self%elements%connectivity%val(istart:iend)
+
+    end subroutine get_connectivity_domain
 
     ! --------------------------------------------------------------------------
     ! Display Procedures for Debugging

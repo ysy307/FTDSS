@@ -31,6 +31,7 @@ module core_types_coordinate_array
         procedure, pass(self) :: destroy => destroy_type_coordinate_array_dp
         procedure, pass(self) :: is_initialized => is_initialized_type_coordinate_array_dp
         procedure, pass(self) :: get_length => get_length_type_coordinate_array_dp
+        procedure, pass(self) :: zero => zero_type_coordinate_array_dp
     end type
 
     !>
@@ -52,6 +53,7 @@ module core_types_coordinate_array
         procedure, pass(self) :: destroy => destroy_type_coordinate_array_int
         procedure, pass(self) :: is_initialized => is_initialized_type_coordinate_array_int
         procedure, pass(self) :: get_length => get_length_type_coordinate_array_int
+        procedure, pass(self) :: zero => zero_type_coordinate_array_int
     end type
 
 contains
@@ -139,6 +141,21 @@ contains
         end if
     end function get_length_type_coordinate_array_dp
 
+    !>
+    !> Sets all coordinate components to zero.
+    !>
+    subroutine zero_type_coordinate_array_dp(self)
+        implicit none
+        !> The coordinate array object to zero.
+        class(type_coordinate_array_dp), intent(inout) :: self
+
+        if (self%is_allocated) then
+            self%x(:) = 0.0d0
+            self%y(:) = 0.0d0
+            self%z(:) = 0.0d0
+        end if
+    end subroutine zero_type_coordinate_array_dp
+
     ! ==========================================================
     ! Integer Coordinate Array Procedures
     ! ==========================================================
@@ -164,9 +181,9 @@ contains
             self%y(:) = initialize_value
             self%z(:) = initialize_value
         else
-            self%x(:) = 0_int32
-            self%y(:) = 0_int32
-            self%z(:) = 0_int32
+            self%x(:) = 0
+            self%y(:) = 0
+            self%z(:) = 0
         end if
 
         self%length = length
@@ -222,4 +239,18 @@ contains
         end if
     end function get_length_type_coordinate_array_int
 
+    !>
+    !> Sets all coordinate components to zero.
+    !>
+    subroutine zero_type_coordinate_array_int(self)
+        implicit none
+        !> The coordinate array object to zero.
+        class(type_coordinate_array_int), intent(inout) :: self
+
+        if (self%is_allocated) then
+            self%x(:) = 0
+            self%y(:) = 0
+            self%z(:) = 0
+        end if
+    end subroutine zero_type_coordinate_array_int
 end module core_types_coordinate_array

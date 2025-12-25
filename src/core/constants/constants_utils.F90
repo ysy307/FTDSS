@@ -338,11 +338,11 @@ contains
         integer(int32) :: val
 
         select case (strip(to_lower(key)))
-        case ("Uniform")
+        case ("uniform")
             val = IC_METHOD_UNIFORM
-        case ("Laplace")
+        case ("laplace")
             val = IC_METHOD_LAPLACE
-        case ("File")
+        case ("file")
             val = IC_METHOD_FROM_FILE
         end select
     end function get_initial_condition_type
