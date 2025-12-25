@@ -55,6 +55,32 @@
 - **1行の長さ**: 1行の最大文字数は **132文字** とします．これを超える場合は適切に改行してください．
 - **インデント**: 半角スペース4つによるインデントを推奨します．タブ文字の使用は避けてください．
 
+### 変数属性の並び順
+
+```fortran
+[ real | integer | logical | character | type(type_name) | class(class_name) ],
+    [ parameter | intent(in | inout) ],
+    [ value | optional ],
+    [ public | private | protected ],
+    [ allocatable | pointer ],
+    [ contiguous ],
+    [ save | target ],
+    [ dimension(:) ],
+    [ volatile ]
+:: 変数名
+```
+
+### 型束縛手続きの属性の並び順
+```fortran
+    procedure,
+        [generic | operator | assignment | final],
+        public | private,
+        pass | nopass,
+        deferred | non_overridable
+    :: binding_name [=> procedure_name]
+```
+
+
 ---
 
 ## 4. 言語機能の利用方針 🛠️

@@ -17,7 +17,7 @@ module conditions_initial_manager
         type(holder_ics) :: list(NUM_IC_TARGETS)
     contains
         procedure :: initialize => initialize_type_ic_manager
-        procedure :: apply
+        procedure :: apply => apply_ic_manager
     end type type_ic_manager
 
 contains
@@ -54,7 +54,7 @@ contains
 
     end subroutine initialize_type_ic_manager
 
-    subroutine apply(self, initial_target_id, domain, variable)
+    subroutine apply_ic_manager(self, initial_target_id, domain, variable)
         implicit none
         class(type_ic_manager), intent(in) :: self
         integer(int32), intent(in) :: initial_target_id
@@ -68,6 +68,6 @@ contains
                 call self%list(initial_target_id)%ic%apply(domain, variable)
             end if
         end if
-    end subroutine apply
+    end subroutine apply_ic_manager
 
 end module conditions_initial_manager
