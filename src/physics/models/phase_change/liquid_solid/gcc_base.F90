@@ -86,6 +86,8 @@ contains
         self%material_id = material_id
         self%water => water
         self%ice => ice
+
+        self%initialized = .true.
     end subroutine initialize_abst_gcc
 
     ! ==========================================================================

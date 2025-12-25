@@ -112,6 +112,7 @@ contains
         call input%geometry%vtk%get_active_region_info(active_region_ids, target_dim=self%domain%get_computation_dimension())
 
         call self%thermal%initialize(input, active_region_ids)
+        call self%hydraulic%initialize(input, active_region_ids)
 
         ! self%thermal = type_thermal_crs(input, self%coordinate, self%domain)
 

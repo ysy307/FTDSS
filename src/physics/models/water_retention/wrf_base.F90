@@ -129,6 +129,16 @@ contains
         call self%params%copy(params)
         call self%params%convert(params%unit_id)
 
+        self%initialized = .true.
     end subroutine initialize_abst_wrf
+
+    module pure function is_initialized_wrf(self) result(initialized)
+        implicit none
+        class(abst_wrf), intent(in) :: self
+        logical :: initialized
+
+        initialized = self%initialized
+
+    end function is_initialized_wrf
 
 end submodule calculate_wrf_Base

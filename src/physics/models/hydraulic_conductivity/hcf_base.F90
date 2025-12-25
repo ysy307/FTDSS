@@ -203,7 +203,16 @@ contains
 
         self%water => water
 
+        self%initialized = .true.
     end subroutine initialize_abst_hcf
+
+    module pure function is_initialized_hcf(self) result(initialized)
+        implicit none
+        class(abst_hcf), intent(in) :: self
+        logical :: initialized
+
+        initialized = self%initialized
+    end function is_initialized_hcf
 
     module pure elemental subroutine calc_kflh_base(self, state, kflh)
         implicit none

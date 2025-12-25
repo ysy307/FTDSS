@@ -32,33 +32,33 @@ module main_hydraulic
 
         end subroutine initialize_type_hydraulic
 
-        module pure elemental subroutine compute_C_H(self, target_id, state, C_HT, C_HH)
+        module pure elemental subroutine compute_C_H(self, target_id, state, C_HH, C_HT)
             implicit none
             class(type_hydraulic), intent(in) :: self
             integer(int32), intent(in) :: target_id
             type(type_state), intent(inout) :: state
-            real(real64), intent(inout), optional :: C_HT
             real(real64), intent(inout), optional :: C_HH
+            real(real64), intent(inout), optional :: C_HT
 
         end subroutine compute_C_H
 
-        module pure subroutine compute_D_H(self, target_id, state, D_HT, D_HH)
+        module pure subroutine compute_D_H(self, target_id, state, D_HH, D_HT)
             implicit none
             class(type_hydraulic), intent(in) :: self
             integer(int32), intent(in) :: target_id
             type(type_state), intent(inout) :: state
-            real(real64), intent(inout), optional :: D_HT(:, :)
             real(real64), intent(inout), optional :: D_HH(:, :)
+            real(real64), intent(inout), optional :: D_HT(:, :)
 
         end subroutine compute_D_H
 
-        module pure subroutine compute_V_H(self, target_id, state, V_HT, V_HH)
+        module pure subroutine compute_V_H(self, target_id, state, V_HH, V_HT)
             implicit none
             class(type_hydraulic), intent(in) :: self
             integer(int32), intent(in) :: target_id
             type(type_state), intent(inout) :: state
-            real(real64), intent(inout), optional :: V_HT(:)
             real(real64), intent(inout), optional :: V_HH(:)
+            real(real64), intent(inout), optional :: V_HT(:)
 
         end subroutine compute_V_H
 

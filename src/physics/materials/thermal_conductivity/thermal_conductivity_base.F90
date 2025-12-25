@@ -28,6 +28,7 @@ contains
         self%water => water
         self%ice => ice
 
+        self%initialized = .true.
     end subroutine initialize_abst_thc
 
     module subroutine initialize_holder_thcs(self, material_id, physics_info, water, ice)

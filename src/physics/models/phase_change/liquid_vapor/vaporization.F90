@@ -42,6 +42,8 @@ contains
         type(type_iapws97), intent(in), target, optional :: water
 
         if (present(water)) self%water => water
+
+        self%initialized = .true.
     end subroutine initialize_evaporation_model
 
     pure subroutine calc_latent_heat_vaporization(self, temperature, latent_heat)

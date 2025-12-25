@@ -57,7 +57,11 @@ contains
             call self%gcc%initialize(material_id, gcc_id, water, ice)
         end if
 
-        call self%phase_manager%initialize(self%gcc%p, self%wrf%p, water, ice)
+        if (allocated(self%wrf%p) .and. allocated(self%gcc%p)) then
+            if (self%wrf%p%is_initialized() .and. self%gcc%p%is_initialized()) then
+                call self%phase_manager%initialize(self%gcc%p, self%wrf%p, water, ice)
+            end if
+        end if
     end subroutine initialize
 
     pure elemental subroutine update_water_phases(self, state)

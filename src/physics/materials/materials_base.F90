@@ -47,6 +47,7 @@ contains
         self%water => water
         self%ice => ice
 
+        self%initialized = .true.
     end subroutine initialize_abst_material
 
     pure elemental subroutine get_material_phi(self, state, phi1, phi2, phi3, phi4)

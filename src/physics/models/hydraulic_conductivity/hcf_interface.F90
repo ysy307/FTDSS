@@ -142,6 +142,7 @@ module physics_models_hcf
 
     type, abstract :: abst_hcf
         private
+        logical :: initialized = .false.
         type(type_hcf_params) :: params
         class(abst_hcf_base), allocatable :: base
         class(abst_hcf_impedance), allocatable :: impedance
@@ -154,6 +155,7 @@ module physics_models_hcf
         procedure, pass(self), public :: calc_KlT => calc_KlT_hcf
         procedure, pass(self), public :: calc_Kvh => calc_Kvh_hcf
         procedure, pass(self), public :: calc_KvT => calc_KvT_hcf
+        procedure, pass(self), public :: is_initialized => is_initialized_hcf
     end type abst_hcf
 
     interface
@@ -189,6 +191,13 @@ module physics_models_hcf
             real(real64), intent(inout) :: KvT
 
         end subroutine calc_KvT_hcf
+
+        module pure function is_initialized_hcf(self) result(initialized)
+            implicit none
+            class(abst_hcf), intent(in) :: self
+            logical :: initialized
+
+        end function is_initialized_hcf
     end interface
 
     abstract interface

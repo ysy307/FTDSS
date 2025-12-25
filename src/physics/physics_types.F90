@@ -20,6 +20,8 @@ module physics_types
         type(type_iapws97), pointer :: water => null()
         !> IAPWS-06 氷物性計算オブジェクトへのポインタ
         type(type_iapws06), pointer :: ice => null()
+        !> 初期化済みフラグ
+        logical :: initialized = .false.
     contains
         !-----------------------------------------------------------------------
         ! Helper Procedures (Converters)
@@ -78,6 +80,9 @@ module physics_types
         procedure, pass(self), private :: get_thermo_state_TP
         !> 状態変数から絶対温度のみを取得する内部ヘルパー
         procedure, pass(self), private :: get_thermo_state_T
+
+        !>
+        procedure, pass(self), public :: is_initialized => is_initialized_abst_physics
     end type abst_physics
 
     type, extends(abst_physics) :: type_iapws_wrapper
@@ -360,5 +365,14 @@ contains
         self%water => water_model
         self%ice => ice_model
     end subroutine initialize_iapws_wrapper
+
+    pure function is_initialized_abst_physics(self) result(initialized)
+        implicit none
+        class(abst_physics), intent(in) :: self
+        logical :: initialized
+
+        initialized = self%initialized
+
+    end function is_initialized_abst_physics
 
 end module physics_types

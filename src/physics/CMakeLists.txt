@@ -103,7 +103,7 @@ enable_build_flags(Physics_Models)
 
 set(PHYSICS_SERVICE_SOURCES
     # physics_registry.F90
-    physics_service.F90
+    physics_manager.F90
     physics.F90
 )
 

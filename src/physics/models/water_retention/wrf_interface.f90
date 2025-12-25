@@ -80,11 +80,13 @@ module physics_models_wrf
     end interface
 
     type, abstract :: abst_wrf
+        logical :: initialized = .false.
         type(type_wrf_params) :: params
     contains
         procedure, pass(self), public :: initialize => initialize_abst_wrf
         procedure(abst_calc_wrf), pass(self), public, deferred :: calc
         procedure(abst_calc_wrf_derivative), pass(self), public, deferred :: deriv
+        procedure, pass(self), public :: is_initialized => is_initialized_wrf
     end type abst_wrf
 
     abstract interface
@@ -112,6 +114,13 @@ module physics_models_wrf
             type(type_wrf_params), intent(in) :: params
 
         end subroutine initialize_abst_wrf
+
+        module pure function is_initialized_wrf(self) result(initialized)
+            implicit none
+            class(abst_wrf), intent(in) :: self
+            logical :: initialized
+
+        end function is_initialized_wrf
     end interface
 
     type, extends(abst_wrf) :: type_wrf_bc

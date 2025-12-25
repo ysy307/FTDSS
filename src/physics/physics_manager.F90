@@ -93,23 +93,75 @@ contains
             error stop "Error in properties_manager%initialize: Failed to allocate models array."
         end if
 
-        do model_idx = 1, self%num_materials
-            current_material_id = self%materials_id_map(model_idx)
+        ! Density
+        if (present(density_info)) then
+            do model_idx = 1, self%num_materials
+                current_material_id = unique_material_ids(model_idx)
+                call self%materials(model_idx)%initialize(material_id=current_material_id, &
+                                                          den_info=density_info(model_idx), &
+                                                          water=self%water, ice=self%ice)
+            end do
+        end if
 
-            call self%materials(model_idx)%initialize( &
-                material_id=current_material_id, &
-                den_info=density_info(model_idx), &
-                sph_info=specific_heat_info(model_idx), &
-                vhc_info=heat_capacity_info(model_idx), &
-                thc_info=thermal_conductivity_info(model_idx), &
-                water=self%water, ice=self%ice)
-            call self%models(model_idx)%initialize( &
-                material_id=current_material_id, &
-                wrf_id=wrf_ids(model_idx), wrf_params=wrf_model_info(model_idx), &
-                hcf_id=hcf_ids(model_idx), hcf_params=hcf_model_info(model_idx), &
-                gcc_id=gcc_model_ids(model_idx), &
-                water=self%water, ice=self%ice)
-        end do
+        ! Specific Heat
+        if (present(specific_heat_info)) then
+            do model_idx = 1, self%num_materials
+                current_material_id = unique_material_ids(model_idx)
+                call self%materials(model_idx)%initialize(material_id=current_material_id, &
+                                                          sph_info=specific_heat_info(model_idx), &
+                                                          water=self%water, ice=self%ice)
+            end do
+        end if
+
+        ! Volumetric Heat Capacity
+        if (present(heat_capacity_info)) then
+            do model_idx = 1, self%num_materials
+                current_material_id = unique_material_ids(model_idx)
+                call self%materials(model_idx)%initialize(material_id=current_material_id, &
+                                                          vhc_info=heat_capacity_info(model_idx), &
+                                                          water=self%water, ice=self%ice)
+            end do
+        end if
+
+        ! Thermal Conductivity
+        if (present(thermal_conductivity_info)) then
+            do model_idx = 1, self%num_materials
+                current_material_id = unique_material_ids(model_idx)
+                call self%materials(model_idx)%initialize(material_id=current_material_id, &
+                                                          thc_info=thermal_conductivity_info(model_idx), &
+                                                          water=self%water, ice=self%ice)
+            end do
+        end if
+
+        ! WRF Model
+        if (present(wrf_ids) .and. present(wrf_model_info)) then
+            do model_idx = 1, self%num_materials
+                current_material_id = unique_material_ids(model_idx)
+                call self%models(model_idx)%initialize(material_id=current_material_id, &
+                                                       wrf_id=wrf_ids(model_idx), wrf_params=wrf_model_info(model_idx), &
+                                                       water=self%water, ice=self%ice)
+            end do
+        end if
+
+        ! HCF Model
+        if (present(hcf_ids) .and. present(hcf_model_info)) then
+            do model_idx = 1, self%num_materials
+                current_material_id = unique_material_ids(model_idx)
+                call self%models(model_idx)%initialize(material_id=current_material_id, &
+                                                       hcf_id=hcf_ids(model_idx), hcf_params=hcf_model_info(model_idx), &
+                                                       water=self%water, ice=self%ice)
+            end do
+        end if
+
+        ! GCC Model
+        if (present(gcc_model_ids)) then
+            do model_idx = 1, self%num_materials
+                current_material_id = unique_material_ids(model_idx)
+                call self%models(model_idx)%initialize(material_id=current_material_id, &
+                                                       gcc_id=gcc_model_ids(model_idx), &
+                                                       water=self%water, ice=self%ice)
+            end do
+        end if
 
     end subroutine initialize_physics_manager
 
