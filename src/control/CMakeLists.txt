@@ -10,6 +10,7 @@
 # This library contains all core control logic.
 set(CONTROL_SOURCES
     time.F90
+    time_profiler.F90
     iteration.F90
     openmp.F90
     control.F90

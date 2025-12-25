@@ -5,5 +5,6 @@ module core_constants
     use :: core_constants_physical
 
     implicit none
+    public
 
 end module core_constants

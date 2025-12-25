@@ -15,21 +15,6 @@ module control_time
     integer(int32), parameter :: ERR_TIME_INIT = 981
     integer(int32), parameter :: ERR_PROFILER = 982
 
-    ! --- Types ---
-    type :: type_time_record
-        character(20) :: label = ''
-        character(10) :: date = ''
-        character(10) :: time = ''
-        character(10) :: zone = ''
-    end type type_time_record
-
-    type :: type_profiler_section
-        character(20) :: label = ''
-        real(real64) :: total_time = 0.0d0
-        real(real64) :: start_time = 0.0d0
-        integer(int32) :: call_count = 0
-    end type type_profiler_section
-
     type :: type_time
         private
         ! --- Time Stepping State ---
@@ -51,32 +36,10 @@ module control_time
         real(real64) :: coeffs(0:MAX_BDF_ORDER) = 0.0d0
         integer(int32) :: target_bdf_order = 1 ! 設定された目標次数
         integer(int32) :: current_bdf_order = 1 ! 現在利用可能な次数（起動直後など）
-
-        ! --- Records ---
-        type(type_time_record) :: record_start
-        type(type_time_record) :: record_end
-
-        ! --- Profiler ---
-        type(type_profiler_section), allocatable :: sections(:)
-
     contains
         ! --- Public Interfaces ---
         procedure, public, pass(self) :: initialize => initialize_type_time
-        procedure, public, pass(self) :: record => record_timestamp
-
-        ! Profiler
-        procedure, public, pass(self) :: get_profiler_id
-        procedure, public, pass(self) :: profile_start_by_name
-        procedure, public, pass(self) :: profile_start_by_id
-        generic, public :: profile_start => profile_start_by_name, profile_start_by_id
-
-        procedure, public, pass(self) :: profile_stop_by_name
-        procedure, public, pass(self) :: profile_stop_by_id
-        generic, public :: profile_stop => profile_stop_by_name, profile_stop_by_id
-
-        ! Time Management
         procedure, public, pass(self) :: update_bdf_coefficients
-        procedure, public, pass(self) :: get_record
         procedure, public, pass(self) :: get_time
         procedure, public, pass(self) :: get_dt
         procedure, public, pass(self) :: get_bdf_order
@@ -85,8 +48,8 @@ module control_time
         procedure, public, pass(self) :: display => display_status
 
         ! --- Private Procedures ---
-        procedure, private, pass(self) :: compute_variable_step_coeffs
-        procedure, public, nopass :: convert_time_unit
+        procedure, private, pass(self) :: compute_bdf_coefficients
+        procedure, public, pass(self) :: convert_time_unit
     end type type_time
 
 contains
@@ -94,74 +57,56 @@ contains
     ! ==========================================================================
     ! Initialization
     ! ==========================================================================
-    subroutine initialize_type_time(self, input, profiler_sections)
+    subroutine initialize_type_time(self, input)
         implicit none
         class(type_time), intent(inout) :: self
-        type(type_input), intent(in), optional :: input
-        character(*), intent(in), optional :: profiler_sections(:)
+        type(type_input), intent(in) :: input
 
         integer(int32) :: i, istat
         real(real64) :: time_conv_coeff
 
-        if (present(input)) then
-            ! --- BDF設定 ---
-            self%target_bdf_order = input%basic%solver_settings%bdf_order
-            if (self%target_bdf_order > MAX_BDF_ORDER) then
-                self%target_bdf_order = MAX_BDF_ORDER
-            end if
-            ! 初期状態では履歴がないため1次からスタート
-            self%current_bdf_order = 1
+        ! --- BDF設定 ---
+        self%target_bdf_order = input%basic%solver_settings%bdf_order
+        if (self%target_bdf_order > MAX_BDF_ORDER) then
+            self%target_bdf_order = MAX_BDF_ORDER
+        end if
+        ! 初期状態では履歴がないため1次からスタート
+        self%current_bdf_order = 1
 
-            ! --- 時間単位変換係数の取得 ---
-            time_conv_coeff = convert_time_unit(input%conditions%time_control%time_stepping%unit, &
-                                                TIME_UNIT_SECONDS)
+        ! --- 時間単位変換係数の取得 ---
+        associate (time_control => input%conditions%time_control)
+            call self%convert_time_unit(time_control%time_stepping%unit, TIME_UNIT_SECONDS, time_conv_coeff)
 
             ! --- dt 設定 ---
-            self%dt = input%conditions%time_control%time_stepping%initial_step * time_conv_coeff
-            self%dt_max = input%conditions%time_control%time_stepping%max_step * time_conv_coeff
-            self%dt_min = input%conditions%time_control%time_stepping%min_step * time_conv_coeff
+            self%dt = time_control%time_stepping%initial_step * time_conv_coeff
+            self%dt_max = time_control%time_stepping%max_step * time_conv_coeff
+            self%dt_min = time_control%time_stepping%min_step * time_conv_coeff
 
             ! --- 履歴配列確保 ---
-            if (allocated(self%dt_history)) deallocate (self%dt_history)
-            allocate (self%dt_history(MAX_BDF_ORDER), stat=istat)
-            if (istat /= 0) call error_message(ERR_TIME_INIT, c_opt="Failed allocating dt_history")
+            call deallocate_array(self%dt_history)
+            call allocate_array(self%dt_history, self%target_bdf_order)
 
-            self%dt_history = 0.0_real64
-            self%dt_history(1) = self%dt ! 現在のdtを入れておく
+            self%dt_history(:) = 0.0d0
+            self%dt_history(1) = self%dt
 
             ! --- 初期係数計算 (1次精度) ---
-            call self%compute_variable_step_coeffs()
+            call self%compute_bdf_coefficients()
 
             ! --- シミュレーション期間 ---
             if (input%output_settings%field_output%file_format /= "none") then
-                time_conv_coeff = convert_time_unit(input%conditions%time_control%simulation_period%unit, &
-                                                    TIME_UNIT_SECONDS)
-                self%start_time = input%conditions%time_control%simulation_period%start * time_conv_coeff
-                self%end_time = input%conditions%time_control%simulation_period%end * time_conv_coeff
+                call self%convert_time_unit(time_control%simulation_period%unit, TIME_UNIT_SECONDS, time_conv_coeff)
+                self%start_time = time_control%simulation_period%start * time_conv_coeff
+                self%end_time = time_control%simulation_period%end * time_conv_coeff
 
-                self%time_conversion = convert_time_unit(input%output_settings%field_output%output_interval_unit, &
-                                                         input%conditions%time_control%simulation_period%unit)
+                call self%convert_time_unit(input%output_settings%field_output%output_interval_unit, &
+                                            time_control%simulation_period%unit, &
+                                            self%time_conversion)
             end if
 
             ! 初期時間をセット
             self%current_time = self%start_time
-        end if
 
-        ! --- Profiler Sections Initialization ---
-        if (present(profiler_sections)) then
-            if (allocated(self%sections)) deallocate (self%sections)
-            if (size(profiler_sections) > 0) then
-                allocate (self%sections(size(profiler_sections)), stat=istat)
-                if (istat /= 0) call error_message(ERR_TIME_INIT, c_opt="Failed allocating sections")
-
-                do i = 1, size(profiler_sections)
-                    self%sections(i)%label = trim(profiler_sections(i))
-                    self%sections(i)%total_time = 0.0_real64
-                    self%sections(i)%start_time = 0.0_real64
-                    self%sections(i)%call_count = 0
-                end do
-            end if
-        end if
+        end associate
 
     end subroutine initialize_type_time
 
@@ -192,7 +137,7 @@ contains
         end if
 
         ! 係数の再計算
-        call self%compute_variable_step_coeffs()
+        call self%compute_bdf_coefficients()
 
     end subroutine shift_time
 
@@ -200,7 +145,7 @@ contains
         implicit none
         class(type_time), intent(inout) :: self
         ! 外部からdtなどを変更した後に手動で呼び出す場合
-        call self%compute_variable_step_coeffs()
+        call self%compute_bdf_coefficients()
     end subroutine update_bdf_coefficients
 
     ! --------------------------------------------------------------------------
@@ -208,12 +153,12 @@ contains
     ! 定義: dy/dt|_{t_n} approx sum_{j=0}^{k} coeffs(j) * y_{n-j}
     ! coeffsには 1/dt のスケーリングが含まれていることに注意．
     ! --------------------------------------------------------------------------
-    subroutine compute_variable_step_coeffs(self)
+    subroutine compute_bdf_coefficients(self)
         implicit none
         class(type_time), intent(inout) :: self
 
         integer(int32) :: k, j, m
-        real(real64) :: tau(0:MAX_BDF_ORDER) ! 現在時刻 t_n からの相対時間差
+        real(real64) :: tau(0:self%current_bdf_order)
         real(real64) :: prod_term, denom_term
 
         k = self%current_bdf_order
@@ -268,175 +213,46 @@ contains
             self%coeffs(j) = (-1.0d0 / tau(j)) * prod_term
         end do
 
-    end subroutine compute_variable_step_coeffs
-
-    ! ==========================================================================
-    ! Profiler Logic
-    ! ==========================================================================
-    function get_profiler_id(self, label) result(id)
-        implicit none
-        class(type_time), intent(in) :: self
-        character(len=*), intent(in) :: label
-        integer(int32) :: id, i
-
-        id = -1
-        if (allocated(self%sections)) then
-            do i = 1, size(self%sections)
-                if (trim(self%sections(i)%label) == trim(label)) then
-                    id = i
-                    return
-                end if
-            end do
-        end if
-    end function get_profiler_id
-
-    subroutine profile_start_by_name(self, label)
-        implicit none
-        class(type_time), intent(inout) :: self
-        character(len=*), intent(in) :: label
-        integer(int32) :: id
-
-        id = self%get_profiler_id(label)
-        if (id > 0) then
-            call self%profile_start_by_id(id)
-        else
-            call error_message(ERR_PROFILER, c_opt="Unknown label: "//trim(label))
-        end if
-    end subroutine profile_start_by_name
-
-    subroutine profile_start_by_id(self, id)
-        implicit none
-        class(type_time), intent(inout) :: self
-        integer(int32), intent(in) :: id
-
-        if (allocated(self%sections)) then
-            if (id >= 1 .and. id <= size(self%sections)) then
-                self%sections(id)%start_time = get_current_wall_time()
-                self%sections(id)%call_count = self%sections(id)%call_count + 1
-            end if
-        end if
-    end subroutine profile_start_by_id
-
-    subroutine profile_stop_by_name(self, label)
-        implicit none
-        class(type_time), intent(inout) :: self
-        character(len=*), intent(in) :: label
-        integer(int32) :: id
-
-        id = self%get_profiler_id(label)
-        if (id > 0) then
-            call self%profile_stop_by_id(id)
-        else
-            call error_message(ERR_PROFILER, c_opt="Unknown label: "//trim(label))
-        end if
-    end subroutine profile_stop_by_name
-
-    subroutine profile_stop_by_id(self, id)
-        implicit none
-        class(type_time), intent(inout) :: self
-        integer(int32), intent(in) :: id
-        real(real64) :: end_time
-
-        if (allocated(self%sections)) then
-            if (id >= 1 .and. id <= size(self%sections)) then
-                end_time = get_current_wall_time()
-                self%sections(id)%total_time = self%sections(id)%total_time + &
-                                               (end_time - self%sections(id)%start_time)
-                self%sections(id)%start_time = 0.0d0
-            end if
-        end if
-    end subroutine profile_stop_by_id
-
-    function get_current_wall_time() result(current_time)
-        implicit none
-        real(real64) :: current_time
-        integer(int32) :: count, rate
-#ifdef _OPENMP
-        current_time = omp_get_wtime()
-#else
-        call system_clock(count=count, count_rate=rate)
-        current_time = real(count, kind=real64) / real(rate, kind=real64)
-#endif
-    end function get_current_wall_time
-
-    ! ==========================================================================
-    ! Utility & Display
-    ! ==========================================================================
-    subroutine record_timestamp(self, label)
-        implicit none
-        class(type_time), intent(inout) :: self
-        integer(int32), intent(in) :: label
-
-        select case (label)
-        case (TIME_RECORD_START)
-            call date_and_time(date=self%record_start%date, time=self%record_start%time, &
-                               zone=self%record_start%zone)
-            self%record_start%label = get_time_record_string(label)
-        case (TIME_RECORD_END)
-            call date_and_time(date=self%record_end%date, time=self%record_end%time, &
-                               zone=self%record_end%zone)
-            self%record_end%label = get_time_record_string(label)
-        end select
-    end subroutine record_timestamp
-
-    pure function get_record(self, label) result(record)
-        implicit none
-        class(type_time), intent(in) :: self
-        integer(int32), intent(in) :: label
-        character(:), allocatable :: record
-
-        select case (label)
-        case (TIME_RECORD_START)
-            record = trim(self%record_start%label)//" Time : "// &
-                     self%record_start%date(1:4)//"-"//self%record_start%date(5:6)//"-"// &
-                     self%record_start%date(7:8)//"T"// &
-                     self%record_start%time(1:2)//":"//self%record_start%time(3:4)//":"// &
-                     self%record_start%time(5:6)//trim(self%record_start%zone)
-        case (TIME_RECORD_END)
-            record = trim(self%record_end%label)//" Time : "// &
-                     self%record_end%date(1:4)//"-"//self%record_end%date(5:6)//"-"// &
-                     self%record_end%date(7:8)//"T"// &
-                     self%record_end%time(1:2)//":"//self%record_end%time(3:4)//":"// &
-                     self%record_end%time(5:6)//trim(self%record_end%zone)
-        case default
-            record = "Unknown Record"
-        end select
-    end function get_record
+    end subroutine compute_bdf_coefficients
 
     ! Getters
-    pure function get_time(self) result(t)
+    subroutine get_time(self, current_time)
         implicit none
         class(type_time), intent(in) :: self
-        real(real64) :: t
-        t = self%current_time * self%time_conversion
-    end function get_time
+        real(real64), intent(inout) :: current_time
 
-    pure function get_dt(self) result(val)
+        current_time = self%current_time * self%time_conversion
+    end subroutine get_time
+
+    subroutine get_dt(self, dt)
         implicit none
         class(type_time), intent(in) :: self
-        real(real64) :: val
-        val = self%dt
-    end function get_dt
+        real(real64), intent(inout) :: dt
 
-    pure function get_bdf_order(self) result(val)
+        dt = self%dt
+    end subroutine get_dt
+
+    subroutine get_bdf_order(self, bdf_order)
         implicit none
         class(type_time), intent(in) :: self
-        integer(int32) :: val
-        val = self%current_bdf_order
-    end function get_bdf_order
+        integer(int32), intent(inout) :: bdf_order
 
-    pure function get_bdf_coeffs(self) result(val)
+        bdf_order = self%current_bdf_order
+    end subroutine get_bdf_order
+
+    subroutine get_bdf_coeffs(self, coeffs)
+        implicit none
+        class(type_time), intent(in), target :: self
+        real(real64), intent(inout), pointer, dimension(:) :: coeffs
+
+        coeffs => self%coeffs(0:self%current_bdf_order)
+    end subroutine get_bdf_coeffs
+
+    pure subroutine convert_time_unit(self, source_unit, target_unit, coefficient)
         implicit none
         class(type_time), intent(in) :: self
-        real(real64), allocatable :: val(:)
-        ! 呼び出し側には現在有効な次数分だけ渡す
-        val = self%coeffs(0:self%current_bdf_order)
-    end function get_bdf_coeffs
-
-    pure function convert_time_unit(source_unit, target_unit) result(coefficient)
-        implicit none
         integer(int32), intent(in) :: source_unit, target_unit
-        real(real64) :: coefficient
+        real(real64), intent(inout) :: coefficient
         real(real64) :: to_seconds_factor(5)
 
         ! 1:sec, 2:min, 3:hour, 4:day, 5:year
@@ -447,7 +263,7 @@ contains
         else
             coefficient = to_seconds_factor(source_unit) / to_seconds_factor(target_unit)
         end if
-    end function convert_time_unit
+    end subroutine convert_time_unit
 
     subroutine display_status(self)
         implicit none
@@ -469,18 +285,6 @@ contains
         write (*, '(" - BDF Order        : ", I0)') self%current_bdf_order
         write (*, *)
 
-        if (allocated(self%sections)) then
-            if (size(self%sections) > 0) then
-                write (*, '(a)') "### Profiler Results"
-                write (*, '(a)') "| Section            | Time (s)    | Calls |"
-                write (*, '(a)') "|:-------------------|:-----------:|:-----:|"
-                do i = 1, size(self%sections)
-                    write (*, '("| ", A18, " | ", ES10.3, " | ", I5, " |")') &
-                        trim(self%sections(i)%label), self%sections(i)%total_time, self%sections(i)%call_count
-                end do
-                write (*, *)
-            end if
-        end if
     end subroutine display_status
 
 end module control_time

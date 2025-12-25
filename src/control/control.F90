@@ -3,6 +3,7 @@ module module_control
     use :: module_core
     use :: module_input, only:type_input
     use :: control_time, only:type_time
+    use :: control_time_profiler, only:type_profiler
     use :: control_iteration, only:type_iteration
     use :: control_openmp, only:initialize_openmp
     implicit none
@@ -13,6 +14,7 @@ module module_control
     public :: type_controls
 
     type :: type_controls
+        private
         logical :: is_active(NUM_PHYSICS_TYPES) = .false.
         integer(int32) :: coupling_mode
         ! --- マテリアルごとのフラグ ---
@@ -20,11 +22,14 @@ module module_control
         logical, allocatable :: hydraulic(:)
         logical, allocatable :: mechanical(:)
 
-        type(type_iteration) :: iteration
-        type(type_time) :: time
+        type(type_iteration), public :: iteration
+        type(type_time), public :: time
+        type(type_profiler), public :: profiler
     contains
-        procedure :: initialize => initialize_type_controls
-        procedure :: is_target => should_calculate_target
+        procedure, pass(self), public :: initialize => initialize_type_controls
+        procedure, pass(self), public :: is_physics_active => is_physics_active_control
+        procedure, pass(self), public :: is_target => should_calculate_target
+        procedure, pass(self), public :: get_coupling_mode => get_coupling_mode_control
         procedure, pass(self) :: display => display_controls
     end type type_controls
 
@@ -95,15 +100,10 @@ contains
 
             self%coupling_mode = input%basic%analysis_controls%coupling_mode
 
-            call self%time%initialize(input=input)
+            call self%time%initialize(input)
             call self%iteration%initialize(input)
             call initialize_openmp(input)
-        else
-            profiler_labels = [character(len=10) :: "IO", "Setup", "Assemble", "Solve", "Total"]
-            call self%time%initialize(profiler_sections=profiler_labels)
-            call self%time%Record(TIME_RECORD_START)
-            call self%time%Profile_Start("Total")
-            call self%time%Profile_Start("IO")
+
         end if
 
         call deallocate_array(unique_material_ids)
@@ -164,6 +164,27 @@ contains
             end if
         end select
     end function should_calculate_target
+
+    pure function is_physics_active_control(self, physics_type) result(is_active)
+        implicit none
+        class(type_controls), intent(in) :: self
+        integer, intent(in) :: physics_type
+        logical :: is_active
+
+        if (physics_type < 1 .or. physics_type > NUM_PHYSICS_TYPES) then
+            is_active = .false.
+        else
+            is_active = self%is_active(physics_type)
+        end if
+    end function is_physics_active_control
+
+    pure subroutine get_coupling_mode_control(self, coupling_mode)
+        implicit none
+        class(type_controls), intent(in) :: self
+        integer(int32), intent(inout) :: coupling_mode
+
+        coupling_mode = self%coupling_mode
+    end subroutine get_coupling_mode_control
 
     subroutine display_controls(self)
         implicit none

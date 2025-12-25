@@ -59,8 +59,13 @@ contains
         integer(int32), allocatable :: active_region_ids(:)
         integer(int32) :: ierr
         integer(int32) :: num_nodes
+        character(len=10), allocatable :: profiler_labels(:)
 
-        call self%controls%initialize()
+        profiler_labels = [character(len=10) :: "IO", "Setup", "Assemble", "Solve", "Total"]
+        call self%controls%profiler%initialize(profiler_labels)
+        call self%controls%profiler%record(TIME_RECORD_START)
+        call self%controls%profiler%start("Total")
+        call self%controls%profiler%start("IO")
 
         call setup_handler()
 
@@ -88,12 +93,12 @@ contains
         call self%porosity%initialize(num_nodes, max_bdf_order)
         call ic%apply(IC_TARGET_POROSITY, self%domain, self%porosity)
 
-        if (self%controls%is_active(PHYSICS_TYPE_THERMAL)) then
+        if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
             call self%temperature%initialize(num_nodes, max_bdf_order)
             call ic%apply(IC_TARGET_THERMAL, self%domain, self%temperature)
         end if
 
-        if (self%controls%is_active(PHYSICS_TYPE_HYDRAULIC)) then
+        if (self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) then
             call self%pressure%initialize(num_nodes, max_bdf_order)
             call ic%apply(IC_TARGET_HYDRAULIC, self%domain, self%pressure)
         end if
@@ -115,7 +120,7 @@ contains
 
         ! call self%output%output_coloring(self%domain)
 
-        call self%controls%time%profile_stop("IO")
+        call self%controls%profiler%stop("IO")
         call global_logger%log_information(message="FTDSS module initialized successfully.")
     end subroutine initialize_type_ftdss
 

@@ -1,8 +1,11 @@
 module control_time_profiler
-    use, intrinsic :: iso_fortran_env, only: int32, real64
+    use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
     use :: stdlib_strings, only:strip
     use :: module_core
     implicit none
+    private
+
+    public :: type_profiler
 
     ! integer(int32), parameter :: MAX_BDF_ORDER = 6
     ! integer(int32), parameter :: ERR_TIME_INIT = 981
@@ -27,28 +30,52 @@ module control_time_profiler
         procedure, pass(self), public :: get_log => get_log_formatted
     end type type_time_record
 
-! 名前案: type_profiler, type_stopwatch, type_benchmarker
     type :: type_profiler
         private
         type(type_time_record) :: record_start
         type(type_time_record) :: record_end
         type(type_profiler_section), allocatable :: sections(:)
     contains
+        procedure, pass(self), public :: initialize => initialize_profiler
         procedure, pass(self), private :: start_profile_by_name
         procedure, pass(self), private :: start_profile_by_id
-        generic, public :: start_profile => start_profile_by_name, start_profile_by_id
+        generic, public :: start => start_profile_by_name, start_profile_by_id
         procedure, pass(self), private :: stop_profile_by_name
         procedure, pass(self), private :: stop_profile_by_id
-        generic, public :: stop_profile => stop_profile_by_name, stop_profile_by_id
+        generic, public :: stop => stop_profile_by_name, stop_profile_by_id
         procedure, pass(self), private :: get_current_wall_time
         procedure, pass(self), private :: get_profiler_id
 
         procedure, pass(self), public :: record => record_profiler
         procedure, pass(self), public :: get_record => get_record_profiler
 
+        procedure, pass(self), public :: display => display_profiler
+
     end type type_profiler
 
 contains
+
+    subroutine initialize_profiler(self, labels)
+        implicit none
+        class(type_profiler), intent(inout) :: self
+        character(len=10), intent(in) :: labels(:)
+
+        integer(int32) :: i
+
+        ! --- Profiler Sections Initialization ---
+        if (allocated(self%sections)) deallocate (self%sections)
+        if (size(labels) > 0) then
+            allocate (self%sections(size(labels)))
+
+            do i = 1, size(labels)
+                self%sections(i)%label = trim(labels(i))
+                self%sections(i)%total_time = 0.0_real64
+                self%sections(i)%start_time = 0.0_real64
+                self%sections(i)%call_count = 0
+            end do
+        end if
+
+    end subroutine initialize_profiler
 
     subroutine format_profiler_section(self, formated_string)
         implicit none
@@ -205,5 +232,79 @@ contains
             call self%record_end%get_log(record)
         end select
     end subroutine get_record_profiler
+
+    subroutine display_profiler(self, unit)
+        implicit none
+        class(type_profiler), intent(in) :: self
+        integer(int32), intent(in), optional :: unit
+
+        integer(int32) :: i, out_unit
+        character(:), allocatable :: str_start, str_end
+
+        logical :: is_opened
+        character(20) :: write_action
+
+        ! --- 出力先の設定と検証 ---
+        out_unit = output_unit ! デフォルト設定
+        if (present(unit)) then
+            if (unit /= output_unit) then
+                ! 1. ユニットが開かれているか (opened)
+                ! 2. 書き込み可能か (write) -> 'YES', 'NO', 'UNKNOWN'
+                inquire (unit=unit, opened=is_opened, write=write_action)
+
+                if (is_opened .and. strip(write_action) == 'YES') then
+                    out_unit = unit
+                else
+                    ! 書き込めない場合は警告を出して標準出力に戻す
+                    out_unit = output_unit
+                end if
+            else
+                ! 指定が output_unit そのものだった場合
+                out_unit = unit
+            end if
+        end if
+        ! --- 日時文字列の取得 ---
+        ! type_time_record の format 手続き (intent(inout) allocatable) を使用
+        call self%record_start%format(str_start)
+        call self%record_end%format(str_end)
+
+        ! --- Markdown形式で出力 ---
+        write (out_unit, '(a)') "## Time Profiler Results"
+        write (out_unit, '(a)') ""
+        ! Start/End 時間の表示 (未割り付け時のガード付き)
+        if (allocated(str_start)) then
+            write (out_unit, '(a, a)') "- **Start:** ", str_start
+        else
+            write (out_unit, '(a)') "- **Start:** (Not recorded)"
+        end if
+
+        if (allocated(str_end)) then
+            write (out_unit, '(a, a)') "- **End:** ", str_end
+        else
+            write (out_unit, '(a)') "- **End:** (Not recorded)"
+        end if
+
+        write (out_unit, '(a)') ""
+
+        ! --- セクションテーブルの表示 ---
+        if (allocated(self%sections)) then
+            if (size(self%sections) > 0) then
+                write (out_unit, '(a)') "| Section            | Time (s)    | Calls |"
+                write (out_unit, '(a)') "|:-------------------|:-----------:|:-----:|"
+
+                do i = 1, size(self%sections)
+                    write (out_unit, '("| ", a18, " | ", es10.3, " | ", i5, " |")') &
+                        self%sections(i)%label, &
+                        self%sections(i)%total_time, &
+                        self%sections(i)%call_count
+                end do
+            else
+                write (out_unit, '(a)') "(No sections recorded)"
+            end if
+        end if
+
+        write (out_unit, '(a)') ""
+
+    end subroutine display_profiler
 
 end module control_time_profiler
