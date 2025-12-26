@@ -8,6 +8,8 @@ module core_types
         create_matrix, type_matrix_info
     use :: module_type_vector, only:type_vector_dp, type_vector_int
     use :: core_types_graph, only:type_graph
+    use :: core_types_datetime, only:type_datetime
+    use :: core_types_solar, only:type_solar_system
     implicit none
 
 end module core_types

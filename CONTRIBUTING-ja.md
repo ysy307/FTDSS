@@ -70,6 +70,7 @@
 :: variable_name
 ```
 ここで`dimension(:)`は配列ポインタを指し示すときにのみ使い，動的割当配列には用いません．動的割当配列の場合は，変数名の後ろに`variable_name(:)`とかっこを付け，合わせて`allocatable`を指定してください．
+`intent(out)`は基本的には使用しない．
 
 ### 型束縛手続きの属性の並び順
 ```fortran
@@ -80,6 +81,9 @@
         deferred | non_overridable
     :: binding_name [=> procedure_name]
 ```
+
+### 暗黙の型使用について
+すべてのFortranコードにおいて，暗黙の型定義は禁止します．すべてのモジュール，サブルーチン，関数の頭には必ず`implicit none`を付けてください．
 
 
 ---

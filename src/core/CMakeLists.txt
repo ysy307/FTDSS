@@ -64,6 +64,8 @@ set(CORE_TYPES_SOURCES
     types/variable.F90
     types/physics.F90
     types/graph.F90
+    types/datetime.F90
+    types/solar.F90
     types/matrix/matrix_interface.F90
     types/matrix/matrix_dense.F90
     types/matrix/matrix_coo.F90
