@@ -67,8 +67,9 @@
     [ save | target ],
     [ dimension(:) ],
     [ volatile ]
-:: 変数名
+:: variable_name
 ```
+ここで`dimension(:)`は配列ポインタを指し示すときにのみ使い，動的割当配列には用いません．動的割当配列の場合は，変数名の後ろに`variable_name(:)`とかっこを付け，合わせて`allocatable`を指定してください．
 
 ### 型束縛手続きの属性の並び順
 ```fortran

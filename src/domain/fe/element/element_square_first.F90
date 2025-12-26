@@ -147,9 +147,8 @@ contains
 
         jac = 0.0d0
         do k = 1, 4
-            nid = connectivity(k)
-            xk = node_coords(1, nid)
-            yk = node_coords(2, nid)
+            xk = node_coords(1, k)
+            yk = node_coords(2, k)
 
             call self%dpsi(k, 1, r, dpsi_xi)
             call self%dpsi(k, 2, r, dpsi_eta)
@@ -205,10 +204,9 @@ contains
         do iter = 1, max_iter
             call interpolated_pos%set(0.0d0, 0.0d0, 0.0d0)
             do i = 1, nn
-                node_id = connectivity(i)
                 call self%psi(i, r, psi_val)
-                interpolated_pos%x = interpolated_pos%x + psi_val * node_coords(1, node_id)
-                interpolated_pos%y = interpolated_pos%y + psi_val * node_coords(2, node_id)
+                interpolated_pos%x = interpolated_pos%x + psi_val * node_coords(1, i)
+                interpolated_pos%y = interpolated_pos%y + psi_val * node_coords(2, i)
             end do
 
             dx = cartesian%x - interpolated_pos%x

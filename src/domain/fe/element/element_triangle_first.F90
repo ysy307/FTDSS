@@ -66,9 +66,8 @@ contains
         integer(int32) :: nid
 
         do i = 1, 3
-            nid = connectivity(i)
-            x(i) = node_coords(1, nid)
-            y(i) = node_coords(2, nid)
+            x(i) = node_coords(1, i)
+            y(i) = node_coords(2, i)
         end do
 
         geometry = 0.5d0 * abs(x(1) * (y(2) - y(3)) + x(2) * (y(3) - y(1)) + x(3) * (y(1) - y(2)))
@@ -189,9 +188,8 @@ contains
         real(real64), parameter :: tol = 1.0e-9
 
         do i = 1, 3
-            nid = connectivity(i)
-            x(i) = node_coords(1, nid)
-            y(i) = node_coords(2, nid)
+            x(i) = node_coords(1, i)
+            y(i) = node_coords(2, i)
         end do
 
         det_T = (x(2) - x(1)) * (y(3) - y(1)) - (x(3) - x(1)) * (y(2) - y(1))

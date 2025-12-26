@@ -54,13 +54,13 @@ include(Toolchain)
 # ★ IOモジュールの管理
 # output モジュールを有効化
 # set(MODULES_IO input output) 
-set(MODULES_IO input) 
+set(MODULES_IO input output) 
 
 # 各テスト・モードが必要とするモジュール構成
 # 依存順序を気にする必要はありません（後のALL_MODULES順でaddされます）
 set(DEPS_core       core)
 set(DEPS_input      core input)
-# set(DEPS_output     core output)
+
 
 set(DEPS_linalg     core linalg)
 set(DEPS_physics    core physics)
@@ -70,9 +70,8 @@ set(DEPS_conditions core input linalg control conditions)
 set(DEPS_domain     core input linalg control conditions domain)
 set(DEPS_field      core input linalg control conditions domain field)
 set(DEPS_parallel   core input parallel)
-set(DEPS_main       core ${MODULES_IO} linalg control conditions domain physics parallel solver field thermal hydraulic ftdss)
-
-# アプリケーション本体用
+set(DEPS_output     core input domain physics output)
+set(DEPS_main       core input output linalg control conditions domain physics parallel solver field thermal hydraulic ftdss)
 set(DEPS_ftdss     ${DEPS_main}) 
 
 # ====================================================================
@@ -109,7 +108,7 @@ list(REMOVE_DUPLICATES REQUIRED_MODULES)
 # ★ディレクトリパスのカスタム設定
 # 標準の "src/モジュール名" 以外の場所にある場合はここで定義します
 set(PATH_input      "src/inout/input")
-# set(PATH_output     "src/inout/output")
+set(PATH_output     "src/inout/output")
 set(PATH_thermal    "src/main/thermal")
 set(PATH_hydraulic  "src/main/hydraulic")
 set(PATH_ftdss      "src/main/ftdss")
@@ -136,7 +135,7 @@ endfunction()
 set(ALL_MODULES 
     core 
     input 
-    # output
+    output
     linalg 
     control 
     conditions 

@@ -14,7 +14,7 @@ target_link_libraries(MAIN_FTDSS PUBLIC
     Solver::Control 
     Solver::Input
     Solver::Conditions
-    # Solver::Output
+    Solver::Output
 )
 enable_build_flags(MAIN_FTDSS)
 

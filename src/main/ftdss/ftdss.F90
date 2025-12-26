@@ -4,6 +4,8 @@ module module_ftdss
     use :: stdlib_logger
     use :: module_core
     use :: module_input, only:type_input
+    use :: module_output, only:type_output
+
     use :: module_control, only:type_controls
     ! use :: module_output, only:type_output
     use :: module_domain, only:type_domain, abst_fe
@@ -37,14 +39,10 @@ module module_ftdss
         type(type_thermal) :: thermal
         type(type_hydraulic) :: hydraulic
 
-        ! class(abst_thermal), allocatable :: thermal
-        ! class(abst_hydraulic), allocatable :: hydraulic
-
-        ! type(type_properties_manager) :: property
         ! type(type_bc) :: bc
 
         type(type_controls) :: controls
-        ! type(type_output) :: output
+        type(type_output) :: output
 
     contains
         procedure, pass(self) :: initialize => initialize_type_ftdss
@@ -65,6 +63,8 @@ contains
         integer(int32) :: ierr
         integer(int32) :: num_nodes
         character(len=10), allocatable :: profiler_labels(:)
+        integer(int32), allocatable :: matrix_ptr(:), matrix_ind(:)
+        real(real64) :: current_time
 
         profiler_labels = [character(len=10) :: "IO", "Setup", "Assemble", "Solve", "Total"]
         call self%controls%profiler%initialize(profiler_labels)
@@ -94,6 +94,9 @@ contains
         num_nodes = input%geometry%vtk%num_points
         call self%domain%initialize(input, self%controls)
 
+        call self%J%initialize(self%domain)
+        call self%R%initialize(self%domain)
+
         max_bdf_order = input%basic%solver_settings%bdf_order
         call self%porosity%initialize(num_nodes, max_bdf_order)
         call ic%apply(IC_TARGET_POROSITY, self%domain, self%porosity)
@@ -118,13 +121,13 @@ contains
         call self%thermal%initialize(input, active_region_ids)
         call self%hydraulic%initialize(input, active_region_ids)
 
-        ! self%thermal = type_thermal_crs(input, self%coordinate, self%domain)
+        call self%output%initialize(input, self%controls, self%domain)
 
-        ! call self%property%initialize(input, ierr)
-
-        ! call self%output%initialize(input, self%domain, self%coordinate)
-
-        ! call self%output%output_coloring(self%domain)
+        call self%output%output_fields(0, self%domain, self%porosity%pre, &
+                                       self%temperature%pre, self%Qw%pre, self%pressure%pre)
+        call self%controls%time%get_time(current_time)
+        call self%output%output_history(current_time, self%domain, self%porosity%pre, &
+                                        self%temperature%pre, self%pressure%pre)
 
         call self%controls%profiler%stop("IO")
         call global_logger%log_information(message="FTDSS module initialized successfully.")

@@ -1,6 +1,5 @@
 !>
 !> Implements the procedures for the second-order quadrilateral (8-node) finite element.
-!> Corrected to use subroutine calls.
 !>
 submodule(domain_fe_element) domain_fe_element_square_second
     use :: domain_fe_integration, only:get_integration_rule
@@ -145,19 +144,17 @@ contains
         real(real64), intent(inout) :: jac(:, :)
 
         integer(int32) :: k
-        integer(int32) :: nid
         real(real64) :: dpsi_xi
         real(real64) :: dpsi_eta
 
         jac = 0.0d0
         do k = 1, 8
-            nid = connectivity(k)
             call self%dpsi(k, 1, r, dpsi_xi)
             call self%dpsi(k, 2, r, dpsi_eta)
-            jac(1, 1) = jac(1, 1) + dpsi_xi * node_coords(1, nid)
-            jac(1, 2) = jac(1, 2) + dpsi_xi * node_coords(2, nid)
-            jac(2, 1) = jac(2, 1) + dpsi_eta * node_coords(1, nid)
-            jac(2, 2) = jac(2, 2) + dpsi_eta * node_coords(2, nid)
+            jac(1, 1) = jac(1, 1) + dpsi_xi * node_coords(1, k)
+            jac(1, 2) = jac(1, 2) + dpsi_xi * node_coords(2, k)
+            jac(2, 1) = jac(2, 1) + dpsi_eta * node_coords(1, k)
+            jac(2, 2) = jac(2, 2) + dpsi_eta * node_coords(2, k)
         end do
     end subroutine jacobian_square_second
 
@@ -191,44 +188,97 @@ contains
         real(real64) :: jac(2, 2)
         integer(int32) :: iter
         integer(int32) :: i
-        integer(int32) :: nid
         integer(int32) :: nn
         logical :: converged
-        real(real64), parameter :: tol = 1.0e-9
-        integer(int32), parameter :: max_iter = 10
+
+        real(real64), parameter :: tol = 1.0e-5
+        real(real64), parameter :: bbox_margin = 1.0e-3
+        integer(int32), parameter :: max_iter = 100 ! 反復回数を増加
         real(real64) :: psi_val
+        real(real64) :: inv_det
+        real(real64) :: dr_x, dr_y
+        real(real64) :: min_coord(2), max_coord(2)
+        real(real64) :: init_guesses(9, 2) ! 9点試行
+        integer(int32) :: ig
 
-        call r%set(0.0d0, 0.0d0, 0.0d0)
+        ! 1. バウンディングボックスによる早期判定
+        min_coord(1) = minval(node_coords(1, :))
+        max_coord(1) = maxval(node_coords(1, :))
+        min_coord(2) = minval(node_coords(2, :))
+        max_coord(2) = maxval(node_coords(2, :))
+
+        if (cartesian%x < min_coord(1) - bbox_margin .or. cartesian%x > max_coord(1) + bbox_margin .or. &
+            cartesian%y < min_coord(2) - bbox_margin .or. cartesian%y > max_coord(2) + bbox_margin) then
+            is_in = .false.
+            return
+        end if
+
         call self%get_num_nodes(nn)
-        converged = .false.
+        is_in = .false.
 
-        do iter = 1, max_iter
-            call pos%set(0.0d0, 0.0d0, 0.0d0)
-            do i = 1, nn
-                nid = connectivity(i)
-                call self%psi(i, r, psi_val)
-                pos%x = pos%x + psi_val * node_coords(1, nid)
-                pos%y = pos%y + psi_val * node_coords(2, nid)
-            end do
+        ! 2. 複数の初期値でニュートン法を試行 (中心 + 四隅 + 辺中点)
+        init_guesses(1, :) = [0.0d0, 0.0d0]
+        init_guesses(2, :) = [0.9d0, 0.9d0]
+        init_guesses(3, :) = [-0.9d0, 0.9d0]
+        init_guesses(4, :) = [-0.9d0, -0.9d0]
+        init_guesses(5, :) = [0.9d0, -0.9d0]
+        init_guesses(6, :) = [0.9d0, 0.0d0]
+        init_guesses(7, :) = [0.0d0, 0.9d0]
+        init_guesses(8, :) = [-0.9d0, 0.0d0]
+        init_guesses(9, :) = [0.0d0, -0.9d0]
 
-            dx = cartesian%x - pos%x
-            dy = cartesian%y - pos%y
-            if (sqrt(dx**2 + dy**2) < tol) then
-                converged = .true.
-                exit
+        guess_loop: do ig = 1, 9
+            call r%set(init_guesses(ig, 1), init_guesses(ig, 2), 0.0d0)
+            converged = .false.
+
+            newton_loop: do iter = 1, max_iter
+                call pos%set(0.0d0, 0.0d0, 0.0d0)
+                do i = 1, nn
+                    call self%psi(i, r, psi_val)
+                    pos%x = pos%x + psi_val * node_coords(1, i)
+                    pos%y = pos%y + psi_val * node_coords(2, i)
+                end do
+
+                dx = cartesian%x - pos%x
+                dy = cartesian%y - pos%y
+
+                ! 残差チェック
+                if (sqrt(dx**2 + dy**2) < 1.0e-9) then
+                    if (abs(r%x) <= 1.0d0 + 1.0e-4 .and. abs(r%y) <= 1.0d0 + 1.0e-4) then
+                        is_in = .true.
+                        normalized = r
+                        return
+                    end if
+                    exit newton_loop
+                end if
+
+                call self%jacobian_det(r, node_coords, connectivity, det_j)
+                ! 特異点の場合は次の初期値へ(cycleでなくexit newton_loopで次のguessへ)
+                if (abs(det_j) < 1.0e-12) exit newton_loop
+
+                call self%jacobian(r, node_coords, connectivity, jac)
+
+                inv_det = 1.0d0 / det_j
+                dr_x = (jac(2, 2) * dx - jac(2, 1) * dy) * inv_det
+                dr_y = (-jac(1, 2) * dx + jac(1, 1) * dy) * inv_det
+
+                r%x = r%x + dr_x
+                r%y = r%y + dr_y
+
+                ! 発散チェック (範囲外に大きく飛び出したらこの初期値は諦める)
+                if (abs(r%x) > 3.0d0 .or. abs(r%y) > 3.0d0) exit newton_loop
+            end do newton_loop
+
+            ! 反復回数切れでも残差が十分小さければ採用
+            if (.not. is_in .and. sqrt(dx**2 + dy**2) < tol) then
+                if (abs(r%x) <= 1.0d0 + 1.0e-4 .and. abs(r%y) <= 1.0d0 + 1.0e-4) then
+                    is_in = .true.
+                    normalized = r
+                    return
+                end if
             end if
+        end do guess_loop
 
-            call self%jacobian_det(r, node_coords, connectivity, det_j)
-            if (abs(det_j) < epsilon(det_j)) exit
-
-            call self%jacobian(r, node_coords, connectivity, jac)
-
-            r%x = r%x + (jac(2, 2) * dx - jac(1, 2) * dy) / det_j
-            r%y = r%y + (-jac(2, 1) * dx + jac(1, 1) * dy) / det_j
-        end do
-
-        is_in = converged .and. (abs(r%x) <= 1.0d0 + tol) .and. (abs(r%y) <= 1.0d0 + tol)
-        if (is_in) normalized = r
     end subroutine is_in_square_second
 
 end submodule domain_fe_element_square_second

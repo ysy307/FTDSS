@@ -81,11 +81,10 @@ contains
         call self%get_num_nodes(nn)
 
         do i = 1, nn
-            node_id = connectivity(i)
             call self%dpsi(i, 1, r, dpsi_val)
-            tangent_vec(1) = tangent_vec(1) + dpsi_val * node_coords(1, node_id)
-            tangent_vec(2) = tangent_vec(2) + dpsi_val * node_coords(2, node_id)
-            tangent_vec(3) = tangent_vec(3) + dpsi_val * node_coords(3, node_id)
+            tangent_vec(1) = tangent_vec(1) + dpsi_val * node_coords(1, i)
+            tangent_vec(2) = tangent_vec(2) + dpsi_val * node_coords(2, i)
+            tangent_vec(3) = tangent_vec(3) + dpsi_val * node_coords(3, i)
         end do
     end subroutine compute_tangent_vector_side_second
 
@@ -237,11 +236,10 @@ contains
         do iter = 1, max_iter
             call pos_guess%set(0.0d0, 0.0d0, 0.0d0)
             do i = 1, nn
-                node_id = connectivity(i)
                 call self%psi(i, r_local, psi_val)
-                pos_guess%x = pos_guess%x + psi_val * node_coords(1, node_id)
-                pos_guess%y = pos_guess%y + psi_val * node_coords(2, node_id)
-                pos_guess%z = pos_guess%z + psi_val * node_coords(3, node_id)
+                pos_guess%x = pos_guess%x + psi_val * node_coords(1, i)
+                pos_guess%y = pos_guess%y + psi_val * node_coords(2, i)
+                pos_guess%z = pos_guess%z + psi_val * node_coords(3, i)
             end do
 
             residual_vec%x = cartesian%x - pos_guess%x

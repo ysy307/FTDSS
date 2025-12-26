@@ -32,17 +32,15 @@ contains
         call ftdss%initialize()
         call ftdss%calc_gradient(ftdss%temperature%pre, ftdss%temperature%grad)
 
-        block
-            integer(int32) :: i
-            print *, "Gradient of temperature variable:"
-            do i = 1, 100
-                print '(a,i3,a,3(es16.8,a),es16.8)', "Node ", i, ": (", &
-                    ftdss%temperature%grad%x(i), ", ", &
-                    ftdss%temperature%grad%y(i), ", ", &
-                    ftdss%temperature%grad%z(i), ") at temperature ", &
-                    ftdss%temperature%pre(i)
-            end do
-        end block
+        ! block
+        !     class(abst_fe), pointer :: fe
+        !     ! real(real64) :: noord()
+
+        !     call ftdss%domain%get_element(1, fe)
+
+        !     call fe%is_inside()
+        !     ! print *, "Element 1 VTK Type: ", fe%get_type()
+        ! end block
 
     end subroutine run_test_ftdss
 

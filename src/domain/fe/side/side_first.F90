@@ -61,12 +61,9 @@ contains
         real(real64) :: dy
         real(real64) :: dz
 
-        node1_id = connectivity(1)
-        node2_id = connectivity(2)
-
-        dx = node_coords(1, node2_id) - node_coords(1, node1_id)
-        dy = node_coords(2, node2_id) - node_coords(2, node1_id)
-        dz = node_coords(3, node2_id) - node_coords(3, node1_id)
+        dx = node_coords(1, 2) - node_coords(1, 1)
+        dy = node_coords(2, 2) - node_coords(2, 1)
+        dz = node_coords(3, 2) - node_coords(3, 1)
 
         geometry = sqrt(dx**2 + dy**2 + dz**2)
     end subroutine get_length_side_first
@@ -133,11 +130,10 @@ contains
         call self%get_num_nodes(nn)
 
         do i = 1, nn
-            node_id = connectivity(i)
             call self%dpsi(i, 1, r, dpsi_val)
-            tangent_vec(1) = tangent_vec(1) + dpsi_val * node_coords(1, node_id)
-            tangent_vec(2) = tangent_vec(2) + dpsi_val * node_coords(2, node_id)
-            tangent_vec(3) = tangent_vec(3) + dpsi_val * node_coords(3, node_id)
+            tangent_vec(1) = tangent_vec(1) + dpsi_val * node_coords(1, i)
+            tangent_vec(2) = tangent_vec(2) + dpsi_val * node_coords(2, i)
+            tangent_vec(3) = tangent_vec(3) + dpsi_val * node_coords(3, i)
         end do
     end subroutine compute_tangent_vector_side_first
 
