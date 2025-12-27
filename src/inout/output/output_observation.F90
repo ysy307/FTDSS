@@ -19,7 +19,7 @@ contains
         logical :: inside
 
         class(abst_fe), pointer :: fe
-        integer(int32), pointer :: conn(:)
+        integer(int32), pointer, contiguous :: conn(:)
         real(real64), allocatable :: ele_coords(:, :)
 
         ! --- 設定の取得 ---
@@ -76,13 +76,9 @@ contains
                 do iElem = 1, num_elements
                     call domain%get_element(iElem, fe)
                     if (.not. associated(fe)) cycle
-                    call domain%get_connectivity(iElem, conn)
+                    call domain%get_element_connectivity(iElem, conn)
                     if (.not. associated(conn)) cycle
-
-                    if (allocated(ele_coords)) deallocate (ele_coords)
-                    allocate (ele_coords(comp_dim, size(conn)))
-
-                    ele_coords = domain%nodes%coordinates(1:comp_dim, conn)
+                    call domain%get_element_coordinate(iElem, ele_coords)
 
                     ! 包含判定
                     call fe%is_inside(cartesian, normalized, ele_coords, conn, inside)
@@ -319,7 +315,7 @@ contains
         real(real64), intent(in), optional :: nodal_pw(:)
 
         integer(int32) :: iObs, elem_id
-        integer(int32), pointer :: p_conn(:)
+        integer(int32), pointer, contiguous :: p_conn(:)
         class(abst_fe), pointer :: fe
         real(real64) :: val
 
@@ -332,7 +328,7 @@ contains
                 elem_id = self%element_ids(iObs)
                 if (elem_id > 0) then
                     call domain%get_element(elem_id, fe)
-                    call domain%get_connectivity(elem_id, p_conn)
+                    call domain%get_element_connectivity(elem_id, p_conn)
 
                     if (associated(fe) .and. associated(p_conn)) then
                         call fe%lerp(self%coordinate_normalized(iObs), nodal_temperature, p_conn, val)
@@ -378,7 +374,7 @@ contains
         real(real64), intent(in), optional :: nodal_pw(:)
 
         integer(int32) :: iObs, elem_id
-        integer(int32), pointer :: p_conn(:)
+        integer(int32), pointer, contiguous :: p_conn(:)
         class(abst_fe), pointer :: fe
         real(real64) :: val_T, val_phi
 
@@ -391,7 +387,7 @@ contains
                 elem_id = self%element_ids(iObs)
                 if (elem_id > 0) then
                     call domain%get_element(elem_id, fe)
-                    call domain%get_connectivity(elem_id, p_conn)
+                    call domain%get_element_connectivity(elem_id, p_conn)
                     if (associated(fe) .and. associated(p_conn)) then
                         call fe%lerp(self%coordinate_normalized(iObs), nodal_temperature, p_conn, val_T)
                         call fe%lerp(self%coordinate_normalized(iObs), nodal_porosity, p_conn, val_phi)
@@ -473,7 +469,7 @@ contains
         real(real64), intent(in), optional :: nodal_pw(:)
 
         integer(int32) :: iObs, elem_id
-        integer(int32), pointer :: p_conn(:)
+        integer(int32), pointer, contiguous :: p_conn(:)
         class(abst_fe), pointer :: fe
         real(real64) :: val
 
@@ -486,7 +482,7 @@ contains
                 elem_id = self%element_ids(iObs)
                 if (elem_id > 0) then
                     call domain%get_element(elem_id, fe)
-                    call domain%get_connectivity(elem_id, p_conn)
+                    call domain%get_element_connectivity(elem_id, p_conn)
                     if (associated(fe) .and. associated(p_conn)) then
                         call fe%lerp(self%coordinate_normalized(iObs), nodal_pw, p_conn, val)
                         obs_values(iObs) = val

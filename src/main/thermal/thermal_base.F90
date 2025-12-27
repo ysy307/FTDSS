@@ -54,21 +54,24 @@ contains
                         if (num_phases >= 1) then
                             density_info(i)%solid = material%thermal%density(1)
                             specific_heat_info(i)%solid = material%thermal%specific_heat(1)
-                            heat_capacity_info(i)%solid = material%thermal%density(1) * material%thermal%specific_heat(1)
+                            heat_capacity_info(i)%solid = material%thermal%density(1) &
+                                                          * material%thermal%specific_heat(1)
                             thermal_conductivity_info(i)%solid = material%thermal%thermal_conductivity(1)
                         end if
 
                         if (num_phases >= 2) then
                             density_info(i)%water = material%thermal%density(2)
                             specific_heat_info(i)%water = material%thermal%specific_heat(2)
-                            heat_capacity_info(i)%water = material%thermal%density(2) * material%thermal%specific_heat(2)
+                            heat_capacity_info(i)%water = material%thermal%density(2) &
+                                                          * material%thermal%specific_heat(2)
                             thermal_conductivity_info(i)%water = material%thermal%thermal_conductivity(2)
                         end if
 
                         if (num_phases >= 3) then
                             density_info(i)%ice = material%thermal%density(3)
                             specific_heat_info(i)%ice = material%thermal%specific_heat(3)
-                            heat_capacity_info(i)%ice = material%thermal%density(3) * material%thermal%specific_heat(3)
+                            heat_capacity_info(i)%ice = material%thermal%density(3) &
+                                                        * material%thermal%specific_heat(3)
                             thermal_conductivity_info(i)%ice = material%thermal%thermal_conductivity(3)
                             if (allocated(material%thermal%thermal_conductivity_dispersity)) then
                                 call allocate_array(thermal_conductivity_info(i)%dispersity, &
@@ -496,4 +499,13 @@ contains
         ! call state%energy_flux%set(R_T_D)
 
     end subroutine compute_R_T
+
+    module subroutine destroy_type_thermal(self)
+        implicit none
+        class(type_thermal), intent(inout) :: self
+
+        self%computation_dimension = 0
+        self%computation_type = 0
+
+    end subroutine destroy_type_thermal
 end submodule thermal_base

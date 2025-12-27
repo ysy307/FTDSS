@@ -4,26 +4,21 @@ cmake_minimum_required(VERSION 3.20)
 # 1. Options and Toolchain Setup
 # ====================================================================
 
-# 1. ビルドするアプリケーションを選択 ('ftdss' または 'test')
 set(BUILD_APP "ftdss" CACHE STRING "Select the application to build: ftdss or test")
-
-# 2. 'test' をビルドする場合、どのテストを実行するか指定
 set(TEST_NAME "input" CACHE STRING "Specify the test name (e.g., input, domain)")
 
-# オプション定義
 option(ENABLE_OPENMP "Enable OpenMP support" ON)
 option(ENABLE_MKL    "Enable MKL support"    ON)
 option(ENABLE_MPI    "Enable MPI support"    ON)
 option(ENABLE_DEBUG  "Enable debug flags"    ON)
 
-# コンパイラ設定
 if(ENABLE_MPI)
-    message(STATUS "MPI support is ON. Setting compiler to MPI wrappers.")
+    message(STATUS "MPI support is ON.")
     set(CMAKE_Fortran_COMPILER mpiifx CACHE STRING "MPI Fortran Compiler" FORCE)
     set(CMAKE_CXX_COMPILER   mpiicpx CACHE STRING "MPI CXX Compiler" FORCE)
     set(CMAKE_C_COMPILER     mpiicx  CACHE STRING "MPI C Compiler" FORCE)
 else()
-    message(STATUS "MPI support is OFF. Setting compiler to standard Intel compilers.")
+    message(STATUS "MPI support is OFF.")
     set(CMAKE_Fortran_COMPILER ifx CACHE STRING "Fortran Compiler" FORCE)
     set(CMAKE_CXX_COMPILER   icpx CACHE STRING "CXX Compiler" FORCE)
     set(CMAKE_C_COMPILER     icx  CACHE STRING "C Compiler" FORCE)
@@ -32,36 +27,25 @@ endif()
 project(FTDSS LANGUAGES Fortran C CXX)
 enable_testing()
 
-# Build Type
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build: Debug or Release" FORCE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build" FORCE)
 endif()
-message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-# Output Directories
 set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/.mod)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
-# Include custom CMake modules if exists
+# ★Toolchainの読み込み（修正箇所）
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(Toolchain)
 
 # ====================================================================
-# 2. Module Dependencies Definition (構成定義)
+# 2. Module Dependencies Definition
 # ====================================================================
 
-# ★ IOモジュールの管理
-# output モジュールを有効化
-# set(MODULES_IO input output) 
-set(MODULES_IO input output) 
-
-# 各テスト・モードが必要とするモジュール構成
-# 依存順序を気にする必要はありません（後のALL_MODULES順でaddされます）
+# モジュール依存関係 (論理名)
 set(DEPS_core       core)
 set(DEPS_input      core input)
-
-
 set(DEPS_linalg     core linalg)
 set(DEPS_physics    core physics)
 set(DEPS_solver     core linalg solver)
@@ -71,67 +55,61 @@ set(DEPS_domain     core input linalg control conditions domain)
 set(DEPS_field      core input linalg control conditions domain field)
 set(DEPS_parallel   core input parallel)
 set(DEPS_output     core input domain physics output)
+
+# アプリケーションライブラリ (src/main以下にあるもの)
 set(DEPS_main       core input output linalg control conditions domain physics parallel solver field thermal hydraulic ftdss)
 set(DEPS_ftdss     ${DEPS_main}) 
 
 # ====================================================================
-# 3. Resolve Required Modules (ビルド対象の決定)
+# 3. Resolve Required Modules
 # ====================================================================
 
 set(REQUIRED_MODULES "")
 
 if(BUILD_APP STREQUAL "ftdss")
-    message(STATUS "Build mode: Main application (ftdss)")
     list(APPEND REQUIRED_MODULES ${DEPS_ftdss})
-
 elseif(BUILD_APP STREQUAL "test")
-    message(STATUS "Build mode: Test (selected test: ${TEST_NAME})")
-    
     if(DEFINED DEPS_${TEST_NAME})
         list(APPEND REQUIRED_MODULES ${DEPS_${TEST_NAME}})
     else()
-        message(FATAL_ERROR "Unknown TEST_NAME: ${TEST_NAME}. Please define DEPS_${TEST_NAME} in CMakeLists.txt.")
+        message(FATAL_ERROR "Unknown TEST_NAME: ${TEST_NAME}")
     endif()
-    
 else()
-    message(FATAL_ERROR "Invalid BUILD_APP value: ${BUILD_APP}. Choose 'ftdss' or 'test'.")
+    message(FATAL_ERROR "Invalid BUILD_APP value")
 endif()
 
-# 重複削除
 list(REMOVE_DUPLICATES REQUIRED_MODULES)
 
+# ★ディレクトリ集約ロジック
+# thermal, hydraulic, ftdss (ライブラリ) は 'src/main' にまとまっているので
+# これらが必要な場合は 'main_libs' (src/main) をビルド対象に加え、個別の名前はリストから外す
+if("thermal" IN_LIST REQUIRED_MODULES OR "hydraulic" IN_LIST REQUIRED_MODULES OR "ftdss" IN_LIST REQUIRED_MODULES)
+    list(APPEND REQUIRED_MODULES main_libs)
+    list(REMOVE_ITEM REQUIRED_MODULES thermal hydraulic ftdss)
+endif()
+list(REMOVE_DUPLICATES REQUIRED_MODULES)
 
 # ====================================================================
-# 4. Source Tree Definition (サブディレクトリ追加)
+# 4. Source Tree Definition
 # ====================================================================
 
-# ★ディレクトリパスのカスタム設定
-# 標準の "src/モジュール名" 以外の場所にある場合はここで定義します
-set(PATH_input      "src/inout/input")
-set(PATH_output     "src/inout/output")
-set(PATH_thermal    "src/main/thermal")
-set(PATH_hydraulic  "src/main/hydraulic")
-set(PATH_ftdss      "src/main/ftdss")
+# ★ディレクトリ構造へのマッピング
+set(PATH_input      "src/inout/input")   # input は src/inout/input
+set(PATH_output     "src/inout/output")  # output は src/inout/output
+set(PATH_main_libs  "src/main")          # thermal/hydraulic/ftdss は src/main
 
-# 指定されたモジュールが REQUIRED_MODULES に含まれる場合のみ追加する関数
 function(add_required_subdirectory module_name)
     list(FIND REQUIRED_MODULES "${module_name}" _index)
     if(NOT _index EQUAL -1)
-        message(STATUS "Including module: ${module_name}")
-        
-        # カスタムパスが定義されているか確認
         if(DEFINED PATH_${module_name})
             add_subdirectory("${PATH_${module_name}}" "${CMAKE_BINARY_DIR}/src/${module_name}")
         else()
             add_subdirectory("src/${module_name}")
         endif()
-        
-    else()
-        # message(STATUS "Skipping module: ${module_name}")
     endif()
 endfunction()
 
-# ★ 全モジュールのリスト
+# ビルド順序
 set(ALL_MODULES 
     core 
     input 
@@ -144,9 +122,7 @@ set(ALL_MODULES
     parallel 
     solver 
     field 
-    thermal
-    hydraulic
-    ftdss
+    main_libs 
 )
 
 foreach(mod ${ALL_MODULES})
@@ -154,38 +130,31 @@ foreach(mod ${ALL_MODULES})
 endforeach()
 
 # ====================================================================
-# 5. Build Targets (メインアプリまたはテスト)
+# 5. Build Targets
 # ====================================================================
 
 if(BUILD_APP STREQUAL "ftdss")
-    # --- アプリケーションビルド ---
-    # パスを src/main/ftdss/ftdss.F90 に変更
-    add_executable(ftdss src/main/ftdss/ftdss.F90)
+    # 実行ファイルのエントリーポイントは app/ftdss.f90
+    add_executable(ftdss app/ftdss.f90)
     
-    # 依存ライブラリのリンク自動化
+    # 依存ライブラリのリンク
     foreach(mod ${DEPS_ftdss})
         string(SUBSTRING ${mod} 0 1 FIRST_CHAR)
         string(TOUPPER ${FIRST_CHAR} FIRST_CHAR)
         string(SUBSTRING ${mod} 1 -1 REMAINDER)
-        target_link_libraries(ftdss PRIVATE "Solver::${FIRST_CHAR}${REMAINDER}")
+        
+        if(TARGET "Solver::${FIRST_CHAR}${REMAINDER}")
+            target_link_libraries(ftdss PRIVATE "Solver::${FIRST_CHAR}${REMAINDER}")
+        endif()
     endforeach()
 
-    # run ターゲット設定
+    # Runターゲット
     if(ENABLE_MPI)
-        set(RUN_CMD mpirun -np 4)
-        set(RUN_ENV "")
+        add_custom_target(run COMMAND mpirun -np 4 $<TARGET_FILE:ftdss> DEPENDS ftdss WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
     else()
-        set(RUN_CMD "")
-        set(RUN_ENV "OMP_NUM_THREADS=4")
+        add_custom_target(run COMMAND ${CMAKE_COMMAND} -E env OMP_NUM_THREADS=4 $<TARGET_FILE:ftdss> DEPENDS ftdss WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
     endif()
-    
-    add_custom_target(run
-        COMMAND ${RUN_ENV} ${RUN_CMD} $<TARGET_FILE:ftdss>
-        DEPENDS ftdss
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-    )
 
 elseif(BUILD_APP STREQUAL "test")
-    # --- テストビルド ---
     add_subdirectory(test)
 endif()

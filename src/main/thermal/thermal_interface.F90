@@ -3,6 +3,7 @@ module main_thermal
     use :: module_core
     use :: module_input, only:type_input
     use :: module_physics, only:type_physics_manager, type_wrf_params, type_hcf_params, type_thc_dispersity
+    use :: module_field, only:type_jacobian_matrix, type_residual_vector
     implicit none
     private
 
@@ -19,6 +20,8 @@ module main_thermal
         procedure, pass(self), public :: compute_D_T => compute_D_T
         procedure, pass(self), public :: compute_V_T => compute_V_T
         procedure, pass(self), public :: compute_R_T => compute_R_T
+        ! procedure, pass(self), public :: assemble_local => assemble_local_thermal
+        procedure, pass(self), public :: destroy => destroy_type_thermal
     end type type_thermal
 
     !! 一通り計算するのに必要なのが，T, P, dT/dt, dP/dt, grad_T, q_w, q_v
@@ -71,6 +74,18 @@ module main_thermal
             real(real64), intent(inout) :: R_T_D(:)
 
         end subroutine compute_R_T
+
+        ! module subroutine assemble_local_thermal(self, J, R,)
+        !     implicit none
+        !     class(type_thermal), intent(inout) :: self
+
+        ! end subroutine assemble_local_thermal
+
+        module subroutine destroy_type_thermal(self)
+            implicit none
+            class(type_thermal), intent(inout) :: self
+
+        end subroutine destroy_type_thermal
     end interface
 
 contains

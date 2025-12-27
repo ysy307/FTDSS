@@ -35,7 +35,9 @@ contains
         ! Rank 0 reads the environment variable
         if (my_rank == 0) then
             call get_environment_variable(env_var_name, buffer, status=status)
-            if (status /= 0) buffer = ''
+            if (status /= 0) then
+                error stop 'Error retrieving environment variable: '//trim(env_var_name)
+            end if
         end if
 
         ! Broadcast the result to all ranks

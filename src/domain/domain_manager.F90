@@ -178,7 +178,8 @@ module domain_manager
         procedure, public, pass(self) :: get_coupling_mode => get_coupling_mode_domain
         procedure, public, pass(self) :: get_node_adjacency => get_node_adjacency_domain
         procedure, public, pass(self) :: get_element => get_element_domain
-        procedure, public, pass(self) :: get_connectivity => get_connectivity_domain
+        procedure, public, pass(self) :: get_element_connectivity => get_element_connectivity_domain
+        procedure, public, pass(self) :: get_element_coordinate => get_element_coordinate_domain
         procedure, public, pass(self) :: display => display_domain
     end type type_domain
 
@@ -795,31 +796,72 @@ contains
     !> 指定された要素IDに対応するコネクティビティ（節点番号リスト）へのポインタを返す。
     !> データのコピーを行わず、内部配列を直接参照するため高速である。
     !>
-    subroutine get_connectivity_domain(self, elem_id, conn)
+    subroutine get_element_connectivity_domain(self, element_id, connectivity)
         implicit none
-        !> ポインタ結合を行うため、selfにはtarget属性が必要
         class(type_domain), intent(in), target :: self
-        integer(int32), intent(in) :: elem_id
-        !> 結果を格納するポインタ配列
-        integer(int32), pointer, intent(inout) :: conn(:)
+        integer(int32), intent(in) :: element_id
+        integer(int32), intent(inout), pointer, contiguous, dimension(:) :: connectivity
 
         integer(int32) :: istart, iend
 
         ! 1. IDの範囲チェック
-        if (elem_id < 1 .or. elem_id > self%elements%num_elements) then
-            conn => null()
+        if (element_id < 1 .or. element_id > self%elements%num_elements) then
+            connectivity => null()
             return
         end if
 
         ! 2. CSR形式から開始位置と終了位置を取得
         !    ind(i) が開始インデックス、ind(i+1)-1 が終了インデックス
-        istart = self%elements%connectivity%ind(elem_id)
-        iend = self%elements%connectivity%ind(elem_id + 1) - 1
+        istart = self%elements%connectivity%ind(element_id)
+        iend = self%elements%connectivity%ind(element_id + 1) - 1
 
         ! 3. 内部配列へのポインタ結合 (データのコピーは発生しない)
-        conn => self%elements%connectivity%val(istart:iend)
+        connectivity => self%elements%connectivity%val(istart:iend)
 
-    end subroutine get_connectivity_domain
+    end subroutine get_element_connectivity_domain
+
+    subroutine get_element_coordinate_domain(self, element_id, coordinates)
+        implicit none
+        class(type_domain), intent(in), target :: self
+        integer(int32), intent(in) :: element_id
+        ! ルール通り intent(inout) を使用
+        real(real64), intent(inout), allocatable :: coordinates(:, :)
+
+        integer(int32), pointer, contiguous :: connectivity(:)
+        integer(int32) :: num_nodes, n_dim
+        logical :: need_reallocate
+
+        ! 1. コネクティビティを取得
+        call self%get_element_connectivity(element_id, connectivity)
+
+        if (.not. associated(connectivity)) then
+            ! エラー処理: 必要であれば deallocate するか、そのまま戻る
+            return
+        end if
+
+        ! 2. 必要なサイズを計算
+        num_nodes = size(connectivity)
+        n_dim = size(self%nodes%coordinates, 1) ! 空間次元数(2 or 3)
+
+        ! 3. メモリ再利用の判定 (Smart Allocation)
+        need_reallocate = .true.
+
+        if (allocated(coordinates)) then
+            ! サイズがぴったり同じなら再利用する (再確保コストをカット)
+            if (size(coordinates, 1) == n_dim .and. size(coordinates, 2) == num_nodes) then
+                need_reallocate = .false.
+            end if
+        end if
+
+        if (need_reallocate) then
+            if (allocated(coordinates)) deallocate (coordinates)
+            allocate (coordinates(n_dim, num_nodes))
+        end if
+
+        ! 4. データのコピー (ベクトル添字使用)
+        coordinates = self%nodes%coordinates(:, connectivity)
+
+    end subroutine get_element_coordinate_domain
 
     ! --------------------------------------------------------------------------
     ! Display Procedures for Debugging
