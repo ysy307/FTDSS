@@ -21,26 +21,61 @@ module conditions_boundary
     ! --- Public Interfaces ---
     public :: construct_type_bc_thermal_dirichlet
     public :: construct_type_bc_thermal_adiabatic
-    public :: calculate_time_coefficient
+    ! public :: calculate_time_coefficient
 
     ! ==========================================================================
     ! Abstract Base Class
     ! ==========================================================================
     type, abstract :: abst_bc
-        integer(int32) :: boundary_id = -1
+        integer(int32), private :: boundary_id = -1
+        integer(int32), private :: physics_type = -1
+        real(real64), private, allocatable :: time_points(:)
+        real(real64), private, allocatable :: values(:, :)
+        integer(int32), private :: num_time_points = 0
+        integer(int32), private :: num_variables = 0
+        logical, private :: is_allocated = .false.
     contains
+        ! procedure, public, pass(self) :: initizialize => initialize_bc
+        procedure, private, pass(self) :: calc_time_coefficient => calc_time_coefficient_bc
+        procedure, private, pass(self) :: calc_value_at_time => calc_value_at_time_bc
+        procedure, public, pass(self) :: destroy => destroy_bc
         ! 必要に応じて共通メソッド定義
     end type abst_bc
+
+    interface
+        module subroutine calc_time_coefficient_bc(self, current_time, coef, idx)
+            implicit none
+            class(abst_bc), intent(in) :: self
+            real(real64), intent(in) :: current_time
+            real(real64), intent(inout) :: coef
+            integer(int32), intent(inout) :: idx
+
+        end subroutine calc_time_coefficient_bc
+
+        module subroutine calc_value_at_time_bc(self, current_time, values)
+            implicit none
+            class(abst_bc), intent(in) :: self
+            real(real64), intent(in) :: current_time
+            real(real64), intent(inout) :: values(:)
+
+        end subroutine calc_value_at_time_bc
+
+        module subroutine destroy_bc(self)
+            implicit none
+            class(abst_bc), intent(inout) :: self
+
+        end subroutine destroy_bc
+    end interface
 
     ! ==========================================================================
     ! Derived Classes
     ! ==========================================================================
     ! --- Dirichlet (温度固定) ---
     type, extends(abst_bc) :: type_bc_thermal_dirichlet
-        real(real64), allocatable :: time_points(:)
-        real(real64), allocatable :: values(:)
+        ! real(real64), allocatable :: time_points(:)
+        ! real(real64), allocatable :: values(:)
     contains
-        procedure, public :: get_value => get_dirichlet_value_at_time
+        ! procedure, public :: get_value => get_dirichlet_value_at_time
     end type type_bc_thermal_dirichlet
 
     ! --- Adiabatic (断熱) ---
@@ -49,8 +84,8 @@ module conditions_boundary
 
     ! --- Neumann (熱流束固定) ---
     type, extends(abst_bc) :: type_bc_thermal_neumann
-        real(real64), allocatable :: time_points(:)
-        real(real64), allocatable :: values(:)
+        ! real(real64), allocatable :: time_points(:)
+        ! real(real64), allocatable :: values(:)
     end type type_bc_thermal_neumann
 
     ! --- Robin (熱伝達) ---
@@ -79,44 +114,7 @@ module conditions_boundary
         end function construct_type_bc_thermal_adiabatic
 
         ! 共通ユーティリティ（boundary_baseで実装）
-        module subroutine calculate_time_coefficient(current_time, time_points, coef, idx)
-            real(real64), intent(in) :: current_time
-            real(real64), intent(in) :: time_points(:)
-            real(real64), intent(inout) :: coef
-            integer(int32), intent(inout) :: idx
-        end subroutine calculate_time_coefficient
+
     end interface
-
-contains
-
-    ! 型に紐づく手続き（Type-bound procedures）はここに記述
-    ! ※これらはインスタンスメソッドであり，サブモジュールには分離しにくい（Fortranの仕様）ためここに書きます．
-    !   ただし，処理が複雑な場合は別途 helper 関数をサブモジュールに切り出してここで呼ぶ形にします．
-
-    function get_dirichlet_value_at_time(self, current_time) result(val)
-        implicit none
-        class(type_bc_thermal_dirichlet), intent(in) :: self
-        real(real64), intent(in) :: current_time
-        real(real64) :: val
-
-        real(real64) :: coef
-        integer(int32) :: idx
-
-        idx = 1
-        coef = 0.0d0
-
-        if (allocated(self%time_points) .and. allocated(self%values)) then
-            ! ここで呼ぶ calculate_time_coefficient は，interface経由で boundary_base の実装がリンクされる
-            call calculate_time_coefficient(current_time, self%time_points, coef, idx)
-
-            if (idx < size(self%values)) then
-                val = self%values(idx) + coef * (self%values(idx + 1) - self%values(idx))
-            else
-                val = self%values(size(self%values))
-            end if
-        else
-            val = 0.0d0
-        end if
-    end function get_dirichlet_value_at_time
 
 end module conditions_boundary

@@ -59,6 +59,7 @@
 
 ```fortran
 [ real | integer | logical | character | type(type_name) | class(class_name) ],
+    [ public | private | protected ],
     [ parameter | intent(in | inout) ],
     [ value | optional ],
     [ public | private | protected ],
