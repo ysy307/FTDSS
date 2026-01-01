@@ -47,6 +47,7 @@ module module_ftdss
 
         ! --- Boundary Condition Procedures ---
         procedure, public, pass(self) :: apply_bc => apply_bc_ftdss
+        procedure, private, pass(self) :: prescribe_essential_bc_generic
         procedure, private, pass(self) :: apply_natural_bc_generic
         procedure, private, pass(self) :: apply_essential_bc_generic
     end type type_ftdss
@@ -118,6 +119,7 @@ contains
         call self%thermal%initialize(input, active_region_ids)
         call self%hydraulic%initialize(input, active_region_ids)
 
+        ! 初期化時にBCを適用（Dirichlet値をフィールドに設定）
         call self%apply_bc()
 
         call self%output%initialize(input, self%controls, self%domain)
@@ -185,10 +187,13 @@ contains
             call fe%get_weight(fe_weights)
             call fe%get_gauss(fe_gauss_pts)
 
+            ! 作業用配列の再確保 (allocatableは自動再割り当てされる場合もあるが明示的に管理)
             if (allocated(elem_u)) deallocate (elem_u)
-            if (allocated(node_coords)) deallocate (node_coords)
             if (allocated(psi)) deallocate (psi)
             if (allocated(dpsi_dx)) deallocate (dpsi_dx)
+            ! node_coordsは get_element_coordinate 内で handle されるためここでは deallocate しない方が安全だが、
+            ! エラー回避のために明示的に ensure することも可能。
+            ! ここでは元のコードの意図通り get_element_coordinate に任せる。
 
             allocate (elem_u(n_nodes_elem))
             allocate (psi(n_nodes_elem))
@@ -196,6 +201,7 @@ contains
 
             elem_u(:) = values_vec(p_conn(:))
 
+            ! 座標取得 (allocatable引数)
             call self%domain%get_element_coordinate(i, node_coords)
 
             do p = 1, n_gauss
@@ -255,9 +261,9 @@ contains
     end subroutine shift_type_ftdss
 
     !>
-!> Applies all boundary conditions for active physics.
-!> Order: Natural BCs (Flux integration) -> Essential BCs (Dirichlet constraints)
-!>
+    !> Applies all boundary conditions for active physics.
+    !> Order: Prescribe (Step 0) -> Natural (Step 1) -> Essential (Step 2)
+    !>
     subroutine apply_bc_ftdss(self)
         implicit none
         class(type_ftdss), intent(inout) :: self
@@ -267,53 +273,85 @@ contains
         call self%controls%time%get_time(current_time)
 
         ! ----------------------------------------------------------------------
-        ! Step 1: Apply Natural BCs (Neumann, Robin, etc.)
-        !         -> Add contributions to Residual and Jacobian
+        ! Step 0: Prescribe Dirichlet Values (Update Field Variables directly)
         ! ----------------------------------------------------------------------
-
-        ! Thermal Physics
         if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
-            ! ドメインのDOFマップから、Thermal変数の開始インデックス(1-based)を取得
-            dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPE_THERMAL)
+            call self%prescribe_essential_bc_generic(PHYSICS_TYPE_THERMAL, current_time, self%temperature)
+        end if
 
+        if (self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) then
+            call self%prescribe_essential_bc_generic(PHYSICS_TYPE_HYDRAULIC, current_time, self%pressure)
+        end if
+
+        ! ----------------------------------------------------------------------
+        ! Step 1: Apply Natural BCs (Neumann, Robin, etc.)
+        ! ----------------------------------------------------------------------
+        if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
+            dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPE_THERMAL)
             call self%apply_natural_bc_generic(PHYSICS_TYPE_THERMAL, current_time, &
                                                self%temperature, dof_offset)
         end if
 
-        ! Hydraulic Physics
         if (self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) then
             dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPE_HYDRAULIC)
-
             call self%apply_natural_bc_generic(PHYSICS_TYPE_HYDRAULIC, current_time, &
                                                self%pressure, dof_offset)
         end if
 
         ! ----------------------------------------------------------------------
-        ! Step 2: Apply Essential BCs (Dirichlet)
-        !         -> Modify Matrix rows/cols and Residual vector
+        ! Step 2: Apply Essential BCs (Dirichlet Constraints)
         ! ----------------------------------------------------------------------
-
-        ! Thermal Physics
         if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
             dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPE_THERMAL)
-
             call self%apply_essential_bc_generic(PHYSICS_TYPE_THERMAL, current_time, &
                                                  self%temperature, dof_offset)
         end if
 
-        ! Hydraulic Physics
         if (self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) then
             dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPE_HYDRAULIC)
-
             call self%apply_essential_bc_generic(PHYSICS_TYPE_HYDRAULIC, current_time, &
                                                  self%pressure, dof_offset)
         end if
 
     end subroutine apply_bc_ftdss
 
-!>
-!> Generic routine to integrate and assemble Natural BCs (Fluxes).
-!>
+    !>
+    !> Enforces Dirichlet values directly into the solution vector.
+    !>
+    subroutine prescribe_essential_bc_generic(self, physics_type, current_time, variable)
+        implicit none
+        class(type_ftdss), intent(inout), target :: self
+        integer(int32), intent(in) :: physics_type
+        real(real64), intent(in) :: current_time
+        type(type_variable), intent(inout) :: variable
+
+        integer(int32) :: i_patch, i, glob_node_id
+        real(real64) :: val_fixed
+        logical :: is_active
+        class(abst_bc), pointer :: bc_obj
+
+        associate (phys_mgr => self%domain%boundaries%physics(physics_type))
+            do i_patch = 1, phys_mgr%num_bcs
+                bc_obj => phys_mgr%bcs(i_patch)%condition
+
+                call bc_obj%get_dirichlet_value(current_time, val_fixed, is_active)
+                if (.not. is_active) cycle
+
+                associate (patch => phys_mgr%bcs(i_patch))
+                    do i = 1, size(patch%connectivity%val)
+                        glob_node_id = patch%connectivity%val(i)
+                        ! 現在の変数値をBC値に上書き
+                        variable%pre(glob_node_id) = val_fixed
+                        variable%new(glob_node_id) = val_fixed
+                    end do
+                end associate
+            end do
+        end associate
+    end subroutine prescribe_essential_bc_generic
+
+    !>
+    !> Generic routine to integrate and assemble Natural BCs (Fluxes).
+    !>
     subroutine apply_natural_bc_generic(self, physics_type, current_time, variable, dof_offset)
         implicit none
         class(type_ftdss), intent(inout), target :: self
@@ -329,7 +367,6 @@ contains
 
         real(real64) :: u_curr, q_flux, dq_du, w_vol, det_j
 
-        ! FE関連配列
         real(real64), allocatable :: psi(:)
         real(real64), allocatable :: dpsi_dx(:, :)
         real(real64), allocatable :: node_coords(:, :)
@@ -351,6 +388,9 @@ contains
                 end select
 
                 associate (patch => phys_mgr%bcs(i_patch))
+                    ! パッチ内の全ての境界要素についてFEタイプは同一と仮定して代表を取得 (index=1)
+                    fe => patch%fe_manager%get_fe(1)
+
                     do i_elem = 1, patch%num_elements
 
                         ! コネクティビティ取得
@@ -360,22 +400,16 @@ contains
                         if (.not. associated(connectivity)) cycle
                         num_nodes_loc = size(connectivity)
 
-                        ! FEオブジェクト取得
-                        ! print *, patch%element_types(i_elem)
-                        fe => patch%fe_manager%get_fe(1)
-
-                        ! 座標取得
+                        ! 座標取得 (境界要素に対応するノード群)
                         if (allocated(node_coords)) deallocate (node_coords)
                         allocate (node_coords(self%domain%computation_dimension, num_nodes_loc))
-                        ! 境界要素を構成するノードの座標を取得
                         node_coords = self%domain%nodes%coordinates(:, connectivity)
 
-                        ! ガウス積分情報の取得
+                        ! ガウス積分情報
                         call fe%get_num_gauss(num_gp)
                         call fe%get_weight(fe_weights)
                         call fe%get_gauss(fe_gauss_pts)
 
-                        ! 作業用配列確保
                         if (allocated(psi)) deallocate (psi)
                         if (allocated(dpsi_dx)) deallocate (dpsi_dx)
                         allocate (psi(num_nodes_loc))
@@ -384,12 +418,9 @@ contains
                         do k_gp = 1, num_gp
                             r = fe_gauss_pts(k_gp)
 
-                            ! 形状関数・Jacobian計算
                             call fe%calc_shape_data(r, node_coords, connectivity, psi, dpsi_dx, det_j)
-
                             w_vol = fe_weights(k_gp) * det_j
 
-                            ! 現在の変数値 u を補間
                             u_curr = 0.0d0
                             do i = 1, num_nodes_loc
                                 u_curr = u_curr + psi(i) * variable%pre(connectivity(i))
@@ -397,24 +428,21 @@ contains
 
                             call bc_obj%get_flux_and_derivative(current_time, u_curr, q_flux, dq_du)
 
-                            ! アセンブル
                             do i = 1, num_nodes_loc
-                                ! Residual: R += ∫ N * q dS
-                                ! add(row_dof, global_node_index, value)
+                                ! Residual: add(row_dof, global_node_index, value)
                                 call self%R%add(dof_offset, connectivity(i), psi(i) * q_flux * w_vol)
 
                                 do j = 1, num_nodes_loc
-                                    ! Jacobian: J += ∫ N_i * (dq/du) * N_j dS
-                                    ! add(row_dof, col_dof, row_node, col_node, value)
+                                    ! Jacobian: add(row_dof, col_dof, row_node, col_node, value)
                                     call self%J%add(dof_offset, dof_offset, &
                                                     connectivity(i), connectivity(j), &
                                                     psi(i) * dq_du * psi(j) * w_vol)
                                 end do
                             end do
-                        end do ! Gauss Point Loop
-                    end do ! Element Loop
+                        end do
+                    end do
                 end associate
-            end do ! Patch Loop
+            end do
         end associate
 
     end subroutine apply_natural_bc_generic
@@ -446,21 +474,15 @@ contains
                     do i = 1, size(patch%connectivity%val)
                         glob_node_id = patch%connectivity%val(i)
 
-                        ! 現在の変数値
                         val_curr = variable%pre(glob_node_id)
 
-                        ! --- 行列・残差の修正 ---
-
-                        ! 1. Jacobianの行をゼロ化
-                        !    field_jacobian_matrix の zero(row_node, row_block) を使用
+                        ! 1. Jacobianの行をゼロ化 (zero_row使用)
                         call self%J%zero(glob_node_id, dof_offset)
 
                         !    対角成分に1.0をセット
-                        !    set(row_dof, col_dof, row_node, col_node, val)
                         call self%J%set(dof_offset, dof_offset, glob_node_id, glob_node_id, 1.0d0)
 
-                        ! 2. 残差ベクトルを上書き
-                        !    set(row_dof, global_index, val)
+                        ! 2. 残差ベクトルを上書き (set使用)
                         call self%R%set(dof_offset, glob_node_id, val_curr - val_fixed)
                     end do
                 end associate
@@ -468,4 +490,5 @@ contains
         end associate
 
     end subroutine apply_essential_bc_generic
+
 end module module_ftdss
