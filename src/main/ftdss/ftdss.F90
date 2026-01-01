@@ -264,23 +264,34 @@ contains
     !> Applies all boundary conditions for active physics.
     !> Order: Prescribe (Step 0) -> Natural (Step 1) -> Essential (Step 2)
     !>
-    subroutine apply_bc_ftdss(self)
+    subroutine apply_bc_ftdss(self, prescribed)
         implicit none
         class(type_ftdss), intent(inout) :: self
+        logical, intent(in), optional :: prescribed
         real(real64) :: current_time
         integer(int32) :: dof_offset
 
+        logical :: prescribe_essential
+
         call self%controls%time%get_time(current_time)
+
+        if (.not. present(prescribed)) then
+            prescribe_essential = .true.
+        else
+            prescribe_essential = prescribed
+        end if
 
         ! ----------------------------------------------------------------------
         ! Step 0: Prescribe Dirichlet Values (Update Field Variables directly)
         ! ----------------------------------------------------------------------
-        if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
-            call self%prescribe_essential_bc_generic(PHYSICS_TYPE_THERMAL, current_time, self%temperature)
-        end if
+        if (prescribe_essential) then
+            if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
+                call self%prescribe_essential_bc_generic(PHYSICS_TYPE_THERMAL, current_time, self%temperature)
+            end if
 
-        if (self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) then
-            call self%prescribe_essential_bc_generic(PHYSICS_TYPE_HYDRAULIC, current_time, self%pressure)
+            if (self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) then
+                call self%prescribe_essential_bc_generic(PHYSICS_TYPE_HYDRAULIC, current_time, self%pressure)
+            end if
         end if
 
         ! ----------------------------------------------------------------------
