@@ -245,12 +245,29 @@ contains
     !>
     !> Sets all entries in the matrix to zero.
     !>
-    module subroutine zero_dense(self)
+    module subroutine zero_all_dense(self)
         implicit none
         class(type_matrix_dense), intent(inout) :: self
         if (allocated(self%val)) self%val = 0.0d0
         self%status = MATRIX_STATUS_SUCCESS
-    end subroutine zero_dense
+    end subroutine zero_all_dense
+
+    !> Sets all values in a specified row of the dense matrix to zero.
+    !>
+    module subroutine zero_row_dense(self, row, row_block)
+        implicit none
+        class(type_matrix_dense), intent(inout) :: self
+        integer(int32), intent(in) :: row
+        integer(int32), intent(in), optional :: row_block
+
+        if (.not. value_in_range(row, 1, self%num_rows)) then
+            self%status = MATRIX_STATUS_OUT_OF_MEMORY
+            return
+        end if
+
+        self%val(row, :) = 0.0d0
+        self%status = MATRIX_STATUS_SUCCESS
+    end subroutine zero_row_dense
 
     !>
     !> Finds the storage index of a matrix entry.

@@ -56,8 +56,8 @@ contains
 
             ! Validate indices
             if (u < 1 .or. u > num_nodes .or. v < 1 .or. v > num_nodes) cycle
-            ! Skip self-loops
-            if (u == v) cycle
+            ! ! Skip self-loops
+            ! if (u == v) cycle
 
             ! Add (u, v) - packing: (u << 32) | v
             count = count + 1

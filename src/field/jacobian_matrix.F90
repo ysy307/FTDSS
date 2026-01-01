@@ -39,7 +39,9 @@ module field_jacobian_matrix
         generic, public :: set => set_value_local
         generic, public :: add => add_value_local, add_local_matrix
 
-        procedure, public, pass(self) :: zero => zero_jacobian_matrix
+        procedure, private, pass(self) :: zero_all => zero_all_jacobian_matrix
+        procedure, private, pass(self) :: zero_row => zero_row_jacobian_matrix
+        generic, public :: zero => zero_all, zero_row
         procedure, public, pass(self) :: display => display_jacobian_matrix
     end type type_jacobian_matrix
 
@@ -185,11 +187,27 @@ contains
     ! -------------------------------------------------------------------
     !  Operations
     ! -------------------------------------------------------------------
-    subroutine zero_jacobian_matrix(self)
+    subroutine zero_all_jacobian_matrix(self)
         implicit none
         class(type_jacobian_matrix), intent(inout) :: self
+
         if (allocated(self%matrix)) call self%matrix%zero()
-    end subroutine zero_jacobian_matrix
+    end subroutine zero_all_jacobian_matrix
+
+    subroutine zero_row_jacobian_matrix(self, row_node, row_block)
+        implicit none
+        class(type_jacobian_matrix), intent(inout) :: self
+        integer(int32), intent(in) :: row_node
+        integer(int32), intent(in), optional :: row_block
+
+        if (allocated(self%matrix)) then
+            if (present(row_block)) then
+                call self%matrix%zero(row_node, row_block)
+            else
+                call self%matrix%zero(row_node)
+            end if
+        end if
+    end subroutine zero_row_jacobian_matrix
 
     subroutine display_jacobian_matrix(self)
         implicit none

@@ -69,7 +69,10 @@ module core_types_matrix
                                   set_all !&
 
         procedure(abst_scale),           public,  pass(self), deferred :: scale !&
-        procedure(abst_zero),            public,  pass(self), deferred :: zero !&
+        procedure(abst_zero_all),        public,  pass(self), deferred :: zero_all !&
+        procedure(abst_zero_row),        public,  pass(self), deferred :: zero_row !&
+        generic, public :: zero => zero_all, & !&
+                                   zero_row !&
         procedure(abst_find),            private, pass(self), deferred :: find !&
         procedure, public, pass(self) :: check => check_matrix_status
         procedure(abst_display),         public,  pass(self), deferred :: display !&
@@ -197,12 +200,25 @@ module core_types_matrix
 
         !>
         !> Sets all stored entries in the matrix to zero.
-        subroutine abst_zero(self)
+        subroutine abst_zero_all(self)
             import :: abst_matrix
             implicit none
             !> The matrix object.
             class(abst_matrix), intent(inout) :: self
-        end subroutine abst_zero
+        end subroutine abst_zero_all
+
+        !>
+        !> Sets all entries in a specified row to zero.
+        subroutine abst_zero_row(self, row, row_block)
+            import :: abst_matrix, int32
+            implicit none
+            !> The matrix object.
+            class(abst_matrix), intent(inout) :: self
+            !> The 1-based node index for the row.
+            integer(int32), intent(in) :: row
+            !> The block row index.
+            integer(int32), intent(in), optional :: row_block
+        end subroutine abst_zero_row
 
         !> Finds the storage index of a matrix entry.
         pure function abst_find(self, row, col) result(index)
@@ -258,7 +274,8 @@ module core_types_matrix
         procedure, pass(self) :: set_all => set_all_dense
         procedure, pass(self) :: scale => scale_dense
         procedure, pass(self) :: find => find_dense
-        procedure, pass(self) :: zero => zero_dense
+        procedure, pass(self) :: zero_all => zero_all_dense
+        procedure, pass(self) :: zero_row => zero_row_dense
         procedure, pass(self) :: display => display_dense
     end type type_matrix_dense
 
@@ -347,10 +364,18 @@ module core_types_matrix
         end subroutine scale_dense
 
         !> Sets all values in the dense matrix to zero.
-        module subroutine zero_dense(self)
+        module subroutine zero_all_dense(self)
             implicit none
             class(type_matrix_dense), intent(inout) :: self
-        end subroutine zero_dense
+        end subroutine zero_all_dense
+
+        !> Sets all values in a specified row of the dense matrix to zero.
+        module subroutine zero_row_dense(self, row, row_block)
+            implicit none
+            class(type_matrix_dense), intent(inout) :: self
+            integer(int32), intent(in) :: row
+            integer(int32), intent(in), optional :: row_block
+        end subroutine zero_row_dense
 
         !> Finds the storage index of a matrix entry.
         module pure function find_dense(self, row, col) result(index)
@@ -400,7 +425,8 @@ module core_types_matrix
         procedure, pass(self) :: set_row => set_row_csr
         procedure, pass(self) :: set_all => set_all_csr
         procedure, pass(self) :: scale => scale_csr
-        procedure, pass(self) :: zero => zero_csr
+        procedure, pass(self) :: zero_all => zero_all_csr
+        procedure, pass(self) :: zero_row => zero_row_csr
         procedure, pass(self), private :: find => find_csr
         procedure, pass(self) :: display => display_csr
     end type type_matrix_csr
@@ -512,10 +538,18 @@ module core_types_matrix
         end subroutine scale_csr
 
         !> Sets all stored matrix values to zero.
-        module subroutine zero_csr(self)
+        module subroutine zero_all_csr(self)
             implicit none
             class(type_matrix_csr), intent(inout) :: self
-        end subroutine zero_csr
+        end subroutine zero_all_csr
+
+        !> Sets all values in a specified row to zero.
+        module subroutine zero_row_csr(self, row, row_block)
+            implicit none
+            class(type_matrix_csr), intent(inout) :: self
+            integer(int32), intent(in) :: row
+            integer(int32), intent(in), optional :: row_block
+        end subroutine zero_row_csr
 
         !> Displays the matrix contents.
         module subroutine display_csr(self)
@@ -557,7 +591,8 @@ module core_types_matrix
         procedure, pass(self) :: set_row => set_row_coo
         procedure, pass(self) :: set_all => set_all_coo
         procedure, pass(self) :: scale => scale_coo
-        procedure, pass(self) :: zero => zero_coo
+        procedure, pass(self) :: zero_all => zero_all_coo
+        procedure, pass(self) :: zero_row => zero_row_coo
         procedure, private, pass(self) :: find => find_coo
         procedure, pass(self) :: display => display_coo
     end type type_matrix_coo
@@ -669,10 +704,18 @@ module core_types_matrix
         end subroutine scale_coo
 
         !> Sets all stored matrix values to zero.
-        module subroutine zero_coo(self)
+        module subroutine zero_all_coo(self)
             implicit none
             class(type_matrix_coo), intent(inout) :: self
-        end subroutine zero_coo
+        end subroutine zero_all_coo
+
+        !> Sets all values in a specified row to zero.
+        module subroutine zero_row_coo(self, row, row_block)
+            implicit none
+            class(type_matrix_coo), intent(inout) :: self
+            integer(int32), intent(in) :: row
+            integer(int32), intent(in), optional :: row_block
+        end subroutine zero_row_coo
 
         !> Displays the matrix contents.
         module subroutine display_coo(self)
@@ -714,7 +757,8 @@ module core_types_matrix
         procedure, pass(self) :: set_row => set_row_bsr
         procedure, pass(self) :: set_all => set_all_bsr
         procedure, pass(self) :: scale => scale_bsr
-        procedure, pass(self) :: zero => zero_bsr
+        procedure, pass(self) :: zero_all => zero_all_bsr
+        procedure, pass(self) :: zero_row => zero_row_bsr
         procedure, pass(self), private :: find => find_bsr
         procedure, pass(self) :: display => display_bsr
     end type type_matrix_bsr
@@ -821,10 +865,17 @@ module core_types_matrix
             type(type_vector_dp), intent(in) :: alpha
         end subroutine scale_bsr
 
-        module subroutine zero_bsr(self)
+        module subroutine zero_all_bsr(self)
             implicit none
             class(type_matrix_bsr), intent(inout) :: self
-        end subroutine zero_bsr
+        end subroutine zero_all_bsr
+
+        module subroutine zero_row_bsr(self, row, row_block)
+            implicit none
+            class(type_matrix_bsr), intent(inout) :: self
+            integer(int32), intent(in) :: row
+            integer(int32), intent(in), optional :: row_block
+        end subroutine zero_row_bsr
 
         module subroutine display_bsr(self)
             implicit none

@@ -5,7 +5,7 @@
 module conditions_initial
     use, intrinsic :: iso_fortran_env
     use :: module_core
-    use :: module_domain, only:type_domain
+    ! use :: module_domain, only:d
     use :: module_input, only:type_input
     implicit none
     private
@@ -50,11 +50,10 @@ module conditions_initial
             integer(int32), intent(in) :: initial_target_id
         end subroutine abst_ic_initialize
 
-        subroutine abst_ic_apply(self, domain, variable)
-            import :: abst_ic, type_domain, type_variable
+        subroutine abst_ic_apply(self, variable)
+            import :: abst_ic, type_variable
             implicit none
             class(abst_ic), intent(in) :: self
-            type(type_domain), intent(in) :: domain
             type(type_variable), intent(inout) :: variable
         end subroutine abst_ic_apply
     end interface
@@ -67,10 +66,9 @@ module conditions_initial
             integer(int32), intent(in) :: initial_target_id
         end subroutine
 
-        module subroutine apply_uniform(self, domain, variable)
+        module subroutine apply_uniform(self, variable)
             implicit none
             class(type_ic_uniform), intent(in) :: self
-            type(type_domain), intent(in) :: domain
             type(type_variable), intent(inout) :: variable
         end subroutine
 
@@ -85,7 +83,7 @@ module conditions_initial
         ! module subroutine apply_laplace(self, domain, variable)
         !     implicit none
         !     class(type_ic_laplace), intent(in) :: self
-        !     type(type_domain), intent(in) :: domain
+        !     type(d), intent(in) :: domain
         !     type(type_variable), intent(inout) :: variable
         ! end subroutine
     end interface

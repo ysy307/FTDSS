@@ -47,7 +47,7 @@ module core_types_datetime
 contains
 
     !> Manually sets the date and time.
-    subroutine set_datetime(self, year, month, day, hour, minute, second, ms, tz_off)
+    subroutine set_datetime(self, year, month, day, hour, minute, second, millisecond, timezone_offset)
         implicit none
         !> The type_datetime instance
         class(type_datetime), intent(inout) :: self
@@ -64,9 +64,9 @@ contains
         !> Second
         integer(int32), intent(in), optional :: second
         !> Millisecond
-        integer(int32), intent(in), optional :: ms
+        integer(int32), intent(in), optional :: millisecond
         !> Timezone offset in minutes
-        integer(int32), intent(in), optional :: tz_off
+        integer(int32), intent(in), optional :: timezone_offset
 
         self%year = year
         self%month = month
@@ -74,8 +74,8 @@ contains
         if (present(hour)) self%hour = hour
         if (present(minute)) self%minute = minute
         if (present(second)) self%second = second
-        if (present(ms)) self%millisecond = ms
-        if (present(tz_off)) self%timezone_offset = tz_off
+        if (present(millisecond)) self%millisecond = millisecond
+        if (present(timezone_offset)) self%timezone_offset = timezone_offset
     end subroutine set_datetime
 
     !> Sets the date and time from an ISO 8601 string.
@@ -138,7 +138,7 @@ contains
         !> Array to hold date_and_time output
         integer(int32) :: values(8)
 
-        ! date_and_time returns: [year, month, day, diff(min), hour, min, sec, ms]
+        ! date_and_time returns: [year, month, day, diff(min), hour, min, sec, millisecond]
         call date_and_time(values=values)
 
         self%year = values(1)

@@ -327,125 +327,30 @@ contains
     !>
     !> Sets all stored values in the matrix to zero.
     !>
-    module subroutine zero_csr(self)
+    module subroutine zero_all_csr(self)
         implicit none
         !> The csr matrix object.
         class(type_matrix_csr), intent(inout) :: self
 
         self%val = 0.0d0
-    end subroutine zero_csr
+    end subroutine zero_all_csr
 
-!     !>
-!     !> Adds a value to a specific entry in the sparse matrix.
-!     !>
-!     module subroutine add_value_csr(self, row, col, value)
-!         implicit none
-!         !> The csr matrix object.
-!         class(type_matrix_csr), intent(inout) :: self
-!         !> The 1-based node index for the row.
-!         integer(int32), intent(in) :: row
-!         !> The 1-based node index for the column.
-!         integer(int32), intent(in) :: col
-!         !> The value to add to the specified entry.
-!         real(real64), intent(in) :: value
+    !> Sets all stored values in a specific row to zero.
+    module subroutine zero_row_csr(self, row, row_block)
+        implicit none
+        !> The csr matrix object.
+        class(type_matrix_csr), intent(inout) :: self
+        !> The 1-based node index for the row.
+        integer(int32), intent(in) :: row
+        !> The block row index.
+        integer(int32), intent(in), optional :: row_block
 
-!         integer(int32) :: index
+        integer(int32) :: is, ie
+        is = self%ptr(row)
+        ie = self%ptr(row + 1) - 1
 
-!         index = self%find(row, col)
-! #ifdef USE_DEBUG
-!         if (index > 0) then
-! #endif
-!             self%val(index) = self%val(index) + value
-! #ifdef USE_DEBUG
-!         else
-!             print *, "Warning(add_value_csr): Element not in sparsity pattern.", row, col
-!         end if
-! #endif
-!     end subroutine add_value_csr
-
-!     !>
-!     !> Adds the values from another csr matrix to this matrix.
-!     !> This simplified version requires both matrices to have identical sparsity patterns.
-!     module subroutine add_values_csr(self, indices, values)
-!         implicit none
-!         !> The csr matrix object to modify (self).
-!         class(type_matrix_csr), intent(inout) :: self
-!         !> The 1-based node indices specifying which rows and columns to update.
-!         integer(int32), intent(in) :: indices(:)
-!         !> The abstract matrix containing values to add (must be of type_matrix_csr).
-!         class(abst_matrix), intent(in) :: values
-
-!         integer(int32) :: i, j, n
-
-!         select type (matrix => values)
-!         type is (type_dense)
-!             n = size(indices)
-!             do i = 1, n
-!                 do j = 1, n
-!                     call self%add(indices(i), indices(j), matrix%val(i, j))
-!                 end do
-!             end do
-!         end select
-!     end subroutine add_values_csr
-!     !>
-!     !> Performs the matrix operation \( C = \alpha*A + B \), where A is self.
-!     !> This simplified version requires all matrices to have identical sparsity patterns.
-!     !>
-!     module subroutine add_matrix_csr(self, alpha, B, C)
-!         implicit none
-!         !> The csr matrix object (A).
-!         class(type_matrix_csr), intent(in) :: self
-!         !> The scalar multiplier alpha.
-!         real(real64), intent(in) :: alpha
-!         !> The abstract matrix B (must be of type_matrix_csr).
-!         class(abst_matrix), intent(in) :: B
-!         !> The abstract matrix C to store the result (must be of type_matrix_csr).
-!         class(abst_matrix), intent(inout) :: C
-
-!         select type (B_csr => B)
-!         type is (type_matrix_csr)
-!             select type (C_csr => C)
-!             type is (type_matrix_csr)
-!                 if (self%nnz /= B_csr%nnz .or. self%nnz /= C_csr%nnz) then
-!                     print *, "ERROR(add_matrix_csr): In this simplified version, NNZ must be identical."
-!                     stop
-!                 end if
-!                 C_csr%val = alpha * self%val + B_csr%val
-!             end select
-!         end select
-!     end subroutine add_matrix_csr
-
-!     !>
-!     !> Performs a sparse matrix-vector multiplication (GEMV): y = alpha*A*x + beta*y.
-!     !>
-!     module subroutine gemv_csr(self, alpha, x, beta, y)
-!         implicit none
-!         !> The csr matrix object (A).
-!         class(type_matrix_csr), intent(in) :: self
-!         !> The scalar multiplier alpha.
-!         real(real64), intent(in) :: alpha
-!         !> The input vector x.
-!         real(real64), intent(in) :: x(:)
-!         !> The scalar multiplier beta.
-!         real(real64), intent(in) :: beta
-!         !> The input/output vector y.
-!         real(real64), intent(inout) :: y(:)
-
-!         integer(int32) :: i, j, is, ie
-!         real(real64) :: sum
-
-!         !$omp parallel do private(i, j, is, ie, sum)
-!         do i = 1, self%num_row
-!             sum = 0.0d0
-!             is = self%ptr(i)
-!             ie = self%ptr(i + 1) - 1
-!             do j = is, ie
-!                 sum = sum + self%val(j) * x(self%ind(j))
-!             end do
-!             y(i) = alpha * sum + beta * y(i)
-!         end do
-!         !$omp end parallel do
-!     end subroutine gemv_csr
+        self%val(is:ie) = 0.0d0
+    end subroutine zero_row_csr
 
     !>
     !> Finds the 1-based index in the `val` and `ind` arrays corresponding to a specific matrix entry.

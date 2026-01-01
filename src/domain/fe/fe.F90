@@ -62,6 +62,7 @@ contains
         integer(int32), allocatable :: unique_ids(:)
         integer(int32) :: i
 
+
         if (allocated(self%fe_list)) then
             deallocate (self%fe_list)
         end if
@@ -92,6 +93,17 @@ contains
         integer(int32), intent(in) :: fe_id
         !> Pointer to the requested FE object
         class(abst_fe), pointer :: fe
+
+#ifdef USE_DEBUG
+        ! if (.not. associated(self%fe_list(self%fe_map(fe_id)%fe))) then
+        !     error stop "Error: FE ID not found in FE manager."
+        ! end if
+
+        ! if (fe_id < 1 .or. fe_id > maxval(self%fe_map)) then
+        !     print *, self%fe_map
+        !     error stop "Error: FE ID mapping out of bounds."
+        ! end if
+#endif
 
         fe => self%fe_list(self%fe_map(fe_id))%fe
     end function get_fe

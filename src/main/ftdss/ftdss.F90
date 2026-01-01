@@ -7,10 +7,8 @@ module module_ftdss
     use :: module_output, only:type_output
 
     use :: module_control, only:type_controls
-    ! use :: module_output, only:type_output
     use :: module_domain, only:type_domain, abst_fe
-    ! use :: module_properties, only:type_properties_manager
-    ! use :: module_boundary, only:type_bc
+    use :: module_boundary, only:abst_bc, type_bc_dirichlet
     use :: module_initial, only:type_ic_manager
     use :: module_field, only:type_jacobian_matrix, type_residual_vector
 
@@ -39,18 +37,22 @@ module module_ftdss
         type(type_thermal) :: thermal
         type(type_hydraulic) :: hydraulic
 
-        ! type(type_bc) :: bc
-
         type(type_controls) :: controls
         type(type_output) :: output
 
     contains
-        procedure, pass(self) :: initialize => initialize_type_ftdss
-        procedure, pass(self) :: shift => shift_type_ftdss
-        procedure, pass(self) :: calc_gradient => calc_gradient_ftdss
+        procedure, public, pass(self) :: initialize => initialize_type_ftdss
+        procedure, public, pass(self) :: shift => shift_type_ftdss
+        procedure, public, pass(self) :: calc_gradient => calc_gradient_ftdss
+
+        ! --- Boundary Condition Procedures ---
+        procedure, public, pass(self) :: apply_bc => apply_bc_ftdss
+        procedure, private, pass(self) :: apply_natural_bc_generic
+        procedure, private, pass(self) :: apply_essential_bc_generic
     end type type_ftdss
 
 contains
+
     subroutine initialize_type_ftdss(self)
         implicit none
         class(type_ftdss), intent(inout) :: self
@@ -60,10 +62,8 @@ contains
 
         integer(int32) :: max_bdf_order
         integer(int32), allocatable :: active_region_ids(:)
-        integer(int32) :: ierr
         integer(int32) :: num_nodes
         character(len=10), allocatable :: profiler_labels(:)
-        integer(int32), allocatable :: matrix_ptr(:), matrix_ind(:)
         real(real64) :: current_time
 
         profiler_labels = [character(len=10) :: "IO", "Setup", "Assemble", "Solve", "Total"]
@@ -88,9 +88,6 @@ contains
                                          max_width=0)
         end if
 
-        !---------------------------------------------------------------------------------------------------------------------------
-        !
-        !---------------------------------------------------------------------------------------------------------------------------
         num_nodes = input%geometry%vtk%num_points
         call self%domain%initialize(input, self%controls)
 
@@ -99,16 +96,16 @@ contains
 
         max_bdf_order = input%basic%solver_settings%bdf_order
         call self%porosity%initialize(num_nodes, max_bdf_order)
-        call ic%apply(IC_TARGET_POROSITY, self%domain, self%porosity)
+        call ic%apply(IC_TARGET_POROSITY, self%porosity)
 
         if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
             call self%temperature%initialize(num_nodes, max_bdf_order)
-            call ic%apply(IC_TARGET_THERMAL, self%domain, self%temperature)
+            call ic%apply(IC_TARGET_THERMAL, self%temperature)
         end if
 
         if (self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) then
             call self%pressure%initialize(num_nodes, max_bdf_order)
-            call ic%apply(IC_TARGET_HYDRAULIC, self%domain, self%pressure)
+            call ic%apply(IC_TARGET_HYDRAULIC, self%pressure)
         end if
 
         call self%Qw%initialize(num_nodes, max_bdf_order)
@@ -120,6 +117,8 @@ contains
 
         call self%thermal%initialize(input, active_region_ids)
         call self%hydraulic%initialize(input, active_region_ids)
+
+        call self%apply_bc()
 
         call self%output%initialize(input, self%controls, self%domain)
 
@@ -135,7 +134,6 @@ contains
 
     !>
     !> 節点上の物理量勾配を計算する（L2射影 / Lumped Mass法）
-    !> Private成分へのアクセスをGetter経由に修正
     !>
     subroutine calc_gradient_ftdss(self, values_vec, grad)
         implicit none
@@ -144,7 +142,7 @@ contains
         type(type_coordinate_array_dp), intent(inout) :: grad
 
         class(abst_fe), pointer :: fe
-        integer(int32), dimension(:), pointer :: p_conn
+        integer(int32), dimension(:), pointer, contiguous :: p_conn
 
         ! 要素データ用配列
         real(real64), allocatable :: elem_u(:)
@@ -152,7 +150,7 @@ contains
         real(real64), allocatable :: psi(:)
         real(real64), allocatable :: dpsi_dx(:, :)
 
-        ! [追加] FE情報キャッシュ用（Getterで取得するため）
+        ! FE情報キャッシュ用
         real(real64), allocatable :: fe_weights(:)
         type(type_coordinate_dp), allocatable :: fe_gauss_pts(:)
 
@@ -171,66 +169,46 @@ contains
         num_total_nodes = self%domain%get_num_nodes()
         dim = self%domain%get_computation_dimension()
 
-        ! 初期化
         call grad%zero()
 
         if (allocated(nodal_vol)) deallocate (nodal_vol)
         allocate (nodal_vol(num_total_nodes))
         nodal_vol(:) = 0.0d0
 
-        !-----------------------------------------------------------------------
-        ! 全要素ループ
-        !-----------------------------------------------------------------------
         do i = 1, num_elements
             call self%domain%get_element(i, fe)
-            call self%domain%get_connectivity(i, p_conn)
+            call self%domain%get_element_connectivity(i, p_conn)
 
             call fe%get_num_nodes(n_nodes_elem)
             call fe%get_num_gauss(n_gauss)
 
-            ! -----------------------------------------------------------
-            ! [修正] Getterを使ってガウス点と重みの配列を取得する
-            ! -----------------------------------------------------------
-            ! ※ get_weight, get_gauss は allocatable 配列を受け取り、そこに値をセットする仕様
             call fe%get_weight(fe_weights)
             call fe%get_gauss(fe_gauss_pts)
 
-            ! 作業配列確保
             if (allocated(elem_u)) deallocate (elem_u)
             if (allocated(node_coords)) deallocate (node_coords)
             if (allocated(psi)) deallocate (psi)
             if (allocated(dpsi_dx)) deallocate (dpsi_dx)
 
             allocate (elem_u(n_nodes_elem))
-            allocate (node_coords(dim, n_nodes_elem))
             allocate (psi(n_nodes_elem))
             allocate (dpsi_dx(n_nodes_elem, dim))
 
-            ! 要素データの収集
             elem_u(:) = values_vec(p_conn(:))
-            do k = 1, n_nodes_elem
-                node_coords(:, k) = self%domain%nodes%coordinates(:, p_conn(k))
-            end do
 
-            !-------------------------------------------------------------------
-            ! ガウス積分点ループ
-            !-------------------------------------------------------------------
+            call self%domain%get_element_coordinate(i, node_coords)
+
             do p = 1, n_gauss
-                ! [修正] キャッシュした配列から値を取得
                 r = fe_gauss_pts(p)
 
                 call fe%calc_shape_data(r, node_coords, p_conn, psi, dpsi_dx, det_j)
-
-                ! [修正] キャッシュした配列から値を取得
                 w_vol = fe_weights(p) * det_j
 
-                ! 勾配計算
                 gauss_grad = 0.0d0
                 do d = 1, dim
                     gauss_grad(d) = dot_product(elem_u, dpsi_dx(:, d))
                 end do
 
-                ! 節点への分配
                 do k = 1, n_nodes_elem
                     global_nid = p_conn(k)
                     shape_weight = psi(k) * w_vol
@@ -248,7 +226,6 @@ contains
             end do
         end do
 
-        ! 正規化
         do k = 1, num_total_nodes
             if (nodal_vol(k) > epsilon(1.0d0)) then
                 if (allocated(grad%x)) grad%x(k) = grad%x(k) / nodal_vol(k)
@@ -261,13 +238,11 @@ contains
             end if
         end do
 
-        ! 後始末
         if (allocated(elem_u)) deallocate (elem_u)
         if (allocated(node_coords)) deallocate (node_coords)
         if (allocated(psi)) deallocate (psi)
         if (allocated(dpsi_dx)) deallocate (dpsi_dx)
         if (allocated(nodal_vol)) deallocate (nodal_vol)
-        ! キャッシュの解放
         if (allocated(fe_weights)) deallocate (fe_weights)
         if (allocated(fe_gauss_pts)) deallocate (fe_gauss_pts)
 
@@ -276,13 +251,221 @@ contains
     subroutine shift_type_ftdss(self)
         implicit none
         class(type_ftdss), intent(inout) :: self
-
-        ! call self%phi%shift()
-        ! if (self%controls%calculate_thermal) then
-        !     call self%T%shift()
-        !     call self%thermal%shift()
-        ! end if
-
+        ! 必要なShift処理があればここに記述
     end subroutine shift_type_ftdss
 
+    !>
+!> Applies all boundary conditions for active physics.
+!> Order: Natural BCs (Flux integration) -> Essential BCs (Dirichlet constraints)
+!>
+    subroutine apply_bc_ftdss(self)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+        real(real64) :: current_time
+        integer(int32) :: dof_offset
+
+        call self%controls%time%get_time(current_time)
+
+        ! ----------------------------------------------------------------------
+        ! Step 1: Apply Natural BCs (Neumann, Robin, etc.)
+        !         -> Add contributions to Residual and Jacobian
+        ! ----------------------------------------------------------------------
+
+        ! Thermal Physics
+        if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
+            ! ドメインのDOFマップから、Thermal変数の開始インデックス(1-based)を取得
+            dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPE_THERMAL)
+
+            call self%apply_natural_bc_generic(PHYSICS_TYPE_THERMAL, current_time, &
+                                               self%temperature, dof_offset)
+        end if
+
+        ! Hydraulic Physics
+        if (self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) then
+            dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPE_HYDRAULIC)
+
+            call self%apply_natural_bc_generic(PHYSICS_TYPE_HYDRAULIC, current_time, &
+                                               self%pressure, dof_offset)
+        end if
+
+        ! ----------------------------------------------------------------------
+        ! Step 2: Apply Essential BCs (Dirichlet)
+        !         -> Modify Matrix rows/cols and Residual vector
+        ! ----------------------------------------------------------------------
+
+        ! Thermal Physics
+        if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
+            dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPE_THERMAL)
+
+            call self%apply_essential_bc_generic(PHYSICS_TYPE_THERMAL, current_time, &
+                                                 self%temperature, dof_offset)
+        end if
+
+        ! Hydraulic Physics
+        if (self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) then
+            dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPE_HYDRAULIC)
+
+            call self%apply_essential_bc_generic(PHYSICS_TYPE_HYDRAULIC, current_time, &
+                                                 self%pressure, dof_offset)
+        end if
+
+    end subroutine apply_bc_ftdss
+
+!>
+!> Generic routine to integrate and assemble Natural BCs (Fluxes).
+!>
+    subroutine apply_natural_bc_generic(self, physics_type, current_time, variable, dof_offset)
+        implicit none
+        class(type_ftdss), intent(inout), target :: self
+        integer(int32), intent(in) :: physics_type
+        real(real64), intent(in) :: current_time
+        type(type_variable), intent(in) :: variable
+        integer(int32), intent(in) :: dof_offset
+
+        integer(int32) :: i_patch, i_elem, k_gp
+        integer(int32) :: num_nodes_loc
+        integer(int32) :: i, j
+        integer(int32) :: num_gp
+
+        real(real64) :: u_curr, q_flux, dq_du, w_vol, det_j
+
+        ! FE関連配列
+        real(real64), allocatable :: psi(:)
+        real(real64), allocatable :: dpsi_dx(:, :)
+        real(real64), allocatable :: node_coords(:, :)
+        real(real64), allocatable :: fe_weights(:)
+        type(type_coordinate_dp), allocatable :: fe_gauss_pts(:)
+        type(type_coordinate_dp) :: r
+
+        integer(int32), pointer, contiguous, dimension(:) :: connectivity
+        class(abst_bc), pointer :: bc_obj
+        class(abst_fe), pointer :: fe
+
+        associate (phys_mgr => self%domain%boundaries%physics(physics_type))
+            do i_patch = 1, phys_mgr%num_bcs
+                bc_obj => phys_mgr%bcs(i_patch)%condition
+
+                select type (bc_obj)
+                type is (type_bc_dirichlet)
+                    cycle
+                end select
+
+                associate (patch => phys_mgr%bcs(i_patch))
+                    do i_elem = 1, patch%num_elements
+
+                        ! コネクティビティ取得
+                        call self%domain%get_element_connectivity( &
+                            patch%connectivity%val(patch%connectivity%ind(i_elem)), connectivity)
+
+                        if (.not. associated(connectivity)) cycle
+                        num_nodes_loc = size(connectivity)
+
+                        ! FEオブジェクト取得
+                        ! print *, patch%element_types(i_elem)
+                        fe => patch%fe_manager%get_fe(1)
+
+                        ! 座標取得
+                        if (allocated(node_coords)) deallocate (node_coords)
+                        allocate (node_coords(self%domain%computation_dimension, num_nodes_loc))
+                        ! 境界要素を構成するノードの座標を取得
+                        node_coords = self%domain%nodes%coordinates(:, connectivity)
+
+                        ! ガウス積分情報の取得
+                        call fe%get_num_gauss(num_gp)
+                        call fe%get_weight(fe_weights)
+                        call fe%get_gauss(fe_gauss_pts)
+
+                        ! 作業用配列確保
+                        if (allocated(psi)) deallocate (psi)
+                        if (allocated(dpsi_dx)) deallocate (dpsi_dx)
+                        allocate (psi(num_nodes_loc))
+                        allocate (dpsi_dx(num_nodes_loc, self%domain%computation_dimension))
+
+                        do k_gp = 1, num_gp
+                            r = fe_gauss_pts(k_gp)
+
+                            ! 形状関数・Jacobian計算
+                            call fe%calc_shape_data(r, node_coords, connectivity, psi, dpsi_dx, det_j)
+
+                            w_vol = fe_weights(k_gp) * det_j
+
+                            ! 現在の変数値 u を補間
+                            u_curr = 0.0d0
+                            do i = 1, num_nodes_loc
+                                u_curr = u_curr + psi(i) * variable%pre(connectivity(i))
+                            end do
+
+                            call bc_obj%get_flux_and_derivative(current_time, u_curr, q_flux, dq_du)
+
+                            ! アセンブル
+                            do i = 1, num_nodes_loc
+                                ! Residual: R += ∫ N * q dS
+                                ! add(row_dof, global_node_index, value)
+                                call self%R%add(dof_offset, connectivity(i), psi(i) * q_flux * w_vol)
+
+                                do j = 1, num_nodes_loc
+                                    ! Jacobian: J += ∫ N_i * (dq/du) * N_j dS
+                                    ! add(row_dof, col_dof, row_node, col_node, value)
+                                    call self%J%add(dof_offset, dof_offset, &
+                                                    connectivity(i), connectivity(j), &
+                                                    psi(i) * dq_du * psi(j) * w_vol)
+                                end do
+                            end do
+                        end do ! Gauss Point Loop
+                    end do ! Element Loop
+                end associate
+            end do ! Patch Loop
+        end associate
+
+    end subroutine apply_natural_bc_generic
+
+    !>
+    !> Generic routine to apply Essential BCs (Dirichlet Constraints).
+    !>
+    subroutine apply_essential_bc_generic(self, physics_type, current_time, variable, dof_offset)
+        implicit none
+        class(type_ftdss), intent(inout), target :: self
+        integer(int32), intent(in) :: physics_type
+        real(real64), intent(in) :: current_time
+        type(type_variable), intent(in) :: variable
+        integer(int32), intent(in) :: dof_offset
+
+        integer(int32) :: i_patch, i, glob_node_id
+        real(real64) :: val_fixed, val_curr
+        logical :: is_active
+        class(abst_bc), pointer :: bc_obj
+
+        associate (phys_mgr => self%domain%boundaries%physics(physics_type))
+            do i_patch = 1, phys_mgr%num_bcs
+                bc_obj => phys_mgr%bcs(i_patch)%condition
+
+                call bc_obj%get_dirichlet_value(current_time, val_fixed, is_active)
+                if (.not. is_active) cycle
+
+                associate (patch => phys_mgr%bcs(i_patch))
+                    do i = 1, size(patch%connectivity%val)
+                        glob_node_id = patch%connectivity%val(i)
+
+                        ! 現在の変数値
+                        val_curr = variable%pre(glob_node_id)
+
+                        ! --- 行列・残差の修正 ---
+
+                        ! 1. Jacobianの行をゼロ化
+                        !    field_jacobian_matrix の zero(row_node, row_block) を使用
+                        call self%J%zero(glob_node_id, dof_offset)
+
+                        !    対角成分に1.0をセット
+                        !    set(row_dof, col_dof, row_node, col_node, val)
+                        call self%J%set(dof_offset, dof_offset, glob_node_id, glob_node_id, 1.0d0)
+
+                        ! 2. 残差ベクトルを上書き
+                        !    set(row_dof, global_index, val)
+                        call self%R%set(dof_offset, glob_node_id, val_curr - val_fixed)
+                    end do
+                end associate
+            end do
+        end associate
+
+    end subroutine apply_essential_bc_generic
 end module module_ftdss

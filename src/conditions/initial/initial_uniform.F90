@@ -22,10 +22,9 @@ contains
         end if
     end subroutine initialize_type_ic_uniform
 
-    module subroutine apply_uniform(self, domain, variable)
+    module subroutine apply_uniform(self, variable)
         implicit none
         class(type_ic_uniform), intent(in) :: self
-        type(type_domain), intent(in) :: domain
         type(type_variable), intent(inout) :: variable
 
         variable%new(:) = self%value

@@ -318,127 +318,33 @@ contains
     !>
     !> Sets all stored values in the matrix to zero.
     !>
-    module subroutine zero_coo(self)
+    module subroutine zero_all_coo(self)
         implicit none
         !> The COO matrix object.
         class(type_matrix_coo), intent(inout) :: self
 
         self%val = 0.0d0
-    end subroutine zero_coo
+    end subroutine zero_all_coo
 
-!     !>
-!     !> Adds a value to a single entry in the matrix.
-!     !>
-!     module subroutine add_value_coo(self, row, col, value)
-!         implicit none
-!         !> The COO matrix object.
-!         class(type_matrix_coo), intent(inout) :: self
-!         !> The 1-based node index for the row.
-!         integer(int32), intent(in) :: row
-!         !> The 1-based node index for the column.
-!         integer(int32), intent(in) :: col
-!         !> The value to add to the specified entry.
-!         real(real64), intent(in) :: value
+    !>
+    !> Returns the 1-based storage index for a specific matrix entry.
+    module subroutine zero_row_coo(self, row, row_block)
+        implicit none
+        !> The COO matrix object.
+        class(type_matrix_coo), intent(inout) :: self
+        !> The 1-based node index for the row.
+        integer(int32), intent(in) :: row
+        !> The block row index.
+        integer(int32), intent(in), optional :: row_block
 
-!         integer(int32) :: index
+        integer(int32) :: i
+        do i = 1, self%nnz
+            if (self%row(i) == row) then
+                self%val(i) = 0.0d0
+            end if
+        end do
 
-!         index = self%find(row, col)
-
-! #ifdef USE_DEBUG
-!         if (index > 0) then
-! #endif
-!             self%val(index) = self%val(index) + value
-! #ifdef USE_DEBUG
-!         else
-!             print *, "Warning(add_value_coo): Element not in sparsity pattern.", row, col
-!         end if
-! #endif
-!     end subroutine add_value_coo
-
-!     module subroutine add_values_coo(self, indices, values)
-!         implicit none
-!         class(type_matrix_coo), intent(inout) :: self
-!         integer(int32), intent(in) :: indices(:)
-!         class(abst_matrix), intent(in) :: values
-
-!         integer(int32) :: n, i, j
-!         class(type_dense), pointer :: matrix
-
-!         n = size(indices)
-!         select type (matrix => values)
-!         type is (type_dense)
-!             do i = 1, n
-!                 do j = 1, n
-!                     call self%add(indices(i), indices(j), matrix%val(i, j))
-!                 end do
-!             end do
-!         end select
-!     end subroutine add_values_coo
-
-!     !>
-!     !> Performs the matrix operation C = alpha*A + B, where A is `self`.
-!     !> This simplified version requires all matrices to have identical sparsity patterns.
-!     !>
-!     module subroutine add_matrix_coo(self, alpha, B, C)
-!         implicit none
-!         !> The COO matrix object (A).
-!         class(type_matrix_coo), intent(in) :: self
-!         !> The scalar multiplier alpha.
-!         real(real64), intent(in) :: alpha
-!         !> The abstract matrix B (must be of type_matrix_coo).
-!         class(abst_matrix), intent(in) :: B
-!         !> The abstract matrix C to store the result (must be of type_matrix_coo).
-!         class(abst_matrix), intent(inout) :: C
-
-!         select type (B_coo => B)
-!         type is (type_matrix_coo)
-!             select type (C_coo => C)
-!             type is (type_matrix_coo)
-!                 if (self%nnz /= B_coo%nnz .or. self%nnz /= C_coo%nnz) then
-!                     print *, "ERROR(add_matrix_coo): In this simplified version, NNZ must be identical."
-!                     stop
-!                 end if
-!                 C_coo%val = alpha * self%val + B_coo%val
-!             end select
-!         end select
-!     end subroutine add_matrix_coo
-
-!     !>
-!     !> Performs a general matrix-vector multiplication: y = alpha*A*x + beta*y.
-!     !> This implementation is parallelized with OpenMP atomics to handle potential
-!     !> race conditions when multiple threads write to the same element of `y`.
-!     !>
-!     module subroutine gemv_coo(self, alpha, x, beta, y)
-!         implicit none
-!         !> The COO matrix object (A).
-!         class(type_matrix_coo), intent(in) :: self
-!         !> The scalar multiplier alpha.
-!         real(real64), intent(in) :: alpha
-!         !> The input vector x.
-!         real(real64), intent(in) :: x(:)
-!         !> The scalar multiplier beta.
-!         real(real64), intent(in) :: beta
-!         !> The input/output vector y.
-!         real(real64), intent(inout) :: y(:)
-!         integer(int32) :: i
-
-!         ! First, scale the entire y vector by beta to avoid repeated multiplications inside the loop.
-!         if (beta == 0.0d0) then
-!             y = 0.0d0
-!         else
-!             y = beta * y
-!         end if
-
-!         ! Add the contribution of each non-zero element.
-!         ! Atomic updates are required as multiple non-zero entries may share the same row.
-!         !$omp parallel do
-!         do i = 1, self%nnz
-!             !$omp atomic update
-!             y(self%row(i)) = y(self%row(i)) + alpha * self%val(i) * x(self%col(i))
-!         end do
-!         !$omp end parallel do
-
-!     end subroutine gemv_coo
+    end subroutine zero_row_coo
 
     !>
     !> Finds the 1-based storage index for a specific matrix entry using a linear search.

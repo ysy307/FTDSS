@@ -54,18 +54,17 @@ contains
 
     end subroutine initialize_type_ic_manager
 
-    subroutine apply_ic_manager(self, initial_target_id, domain, variable)
+    subroutine apply_ic_manager(self, initial_target_id, variable)
         implicit none
         class(type_ic_manager), intent(in) :: self
         integer(int32), intent(in) :: initial_target_id
-        type(type_domain), intent(in) :: domain
         type(type_variable), intent(inout) :: variable
 
         integer(int32) :: id
 
         if (initial_target_id > 0 .and. initial_target_id <= NUM_IC_TARGETS) then
             if (allocated(self%list(initial_target_id)%ic)) then
-                call self%list(initial_target_id)%ic%apply(domain, variable)
+                call self%list(initial_target_id)%ic%apply(variable)
             end if
         end if
     end subroutine apply_ic_manager

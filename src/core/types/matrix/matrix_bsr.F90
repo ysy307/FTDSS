@@ -428,13 +428,52 @@ contains
     !>
     !> Zero out the matrix.
     !>
-    module subroutine zero_bsr(self)
+    module subroutine zero_all_bsr(self)
         implicit none
         class(type_matrix_bsr), intent(inout) :: self
 
         self%val = 0.0d0
         self%status = MATRIX_STATUS_SUCCESS
-    end subroutine zero_bsr
+    end subroutine zero_all_bsr
+
+    !> Sets all values in a specified row of the bsr matrix to zero.
+    module subroutine zero_row_bsr(self, row, row_block)
+        implicit none
+        class(type_matrix_bsr), intent(inout) :: self
+        integer(int32), intent(in) :: row
+        integer(int32), intent(in), optional :: row_block
+
+        integer(int32) :: is, ie, k, r_start, r_end, r
+        ! 範囲チェック
+        if (.not. value_in_range(row, 1, self%num_rows)) then
+            self%status = MATRIX_STATUS_OUT_OF_MEMORY
+            return
+        end if
+
+        is = self%ptr(row)
+        ie = self%ptr(row + 1) - 1
+
+        if (present(row_block)) then
+            if (row_block < 1 .or. row_block > self%num_block_rows) then
+                self%status = MATRIX_STATUS_OUT_OF_MEMORY
+                return
+            end if
+            r_start = row_block
+            r_end = row_block
+        else
+            r_start = 1
+            r_end = self%num_block_rows
+        end if
+
+        do k = is, ie
+            ! Access val(row_in_block, col_in_block, block_index)
+            do r = r_start, r_end
+                self%val(r, :, k) = 0.0d0
+            end do
+        end do
+
+        self%status = MATRIX_STATUS_SUCCESS
+    end subroutine zero_row_bsr
 
     !>
     !> Find index.

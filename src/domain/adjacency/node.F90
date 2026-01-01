@@ -19,15 +19,11 @@ module domain_adjacency_node
     type, extends(type_graph) :: type_node_adjacency
     contains
         ! メッシュデータからの初期化メソッド
-        procedure, pass(self), public :: initialize => initialize_from_connectivity
+        procedure, public, pass(self) :: initialize => initialize_from_connectivity
 
-        ! 既存APIとの互換性のためのラッパー（親クラスのメソッドをそのまま使う場合も明示可能）
-        procedure, pass(self), public :: get_nnz => get_nnz_csr
-        procedure, pass(self), public :: get_coo => reconstruct_coo
-        procedure, pass(self), public :: get_csr => export_csr
-
-        ! ※注意: COOポインタ取得はデータ構造変更によりサポート不可のため削除、
-        ! またはCSRポインタ取得へ誘導します。
+        procedure, public, pass(self) :: get_nnz => get_nnz_csr
+        procedure, public, pass(self) :: get_coo => reconstruct_coo
+        procedure, public, pass(self) :: get_csr => export_csr
     end type type_node_adjacency
 
 contains
@@ -37,6 +33,7 @@ contains
     !> Converts connectivity to edge pairs and delegates construction to type_graph.
     !>
     subroutine initialize_from_connectivity(self, num_all_nodes, conn_ind, conn_val)
+        implicit none
         class(type_node_adjacency), intent(inout) :: self
         integer(int32), intent(in) :: num_all_nodes
         integer(int32), intent(in) :: conn_ind(:)
@@ -148,15 +145,16 @@ contains
     end function estimate_edges_count
 
     subroutine expand_connectivity_to_pairs(conn_ind, conn_val, pairs, count)
+        implicit none
         integer(int32), intent(in) :: conn_ind(:)
         integer(int32), intent(in) :: conn_val(:)
-        integer(int32), intent(out) :: pairs(:, :)
-        integer(int32), intent(out) :: count
+        integer(int32), intent(inout) :: pairs(:, :)
+        integer(int32), intent(inout) :: count
 
         integer(int32) :: i, j, k, n_elem, start_idx, end_idx, n_nodes
 
         n_elem = size(conn_ind) - 1
-        count = 0
+        count = 1
 
         do i = 1, n_elem
             start_idx = conn_ind(i)
@@ -165,14 +163,14 @@ contains
             if (n_nodes <= 0) cycle
 
             ! Element内の全ペアを列挙
-            do j = 0, n_nodes - 1
-                do k = 0, n_nodes - 1
+            do j = 1, n_nodes
+                do k = 1, n_nodes
+                    ! 【修正】インデックスがずれないように -1 する
+                    pairs(1, count) = conn_val(start_idx + j - 1)
+                    pairs(2, count) = conn_val(start_idx + k - 1)
                     count = count + 1
-                    pairs(1, count) = conn_val(start_idx + j)
-                    pairs(2, count) = conn_val(start_idx + k)
                 end do
             end do
         end do
     end subroutine expand_connectivity_to_pairs
-
 end module domain_adjacency_node

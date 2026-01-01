@@ -180,6 +180,7 @@ module domain_manager
         procedure, public, pass(self) :: get_element => get_element_domain
         procedure, public, pass(self) :: get_element_connectivity => get_element_connectivity_domain
         procedure, public, pass(self) :: get_element_coordinate => get_element_coordinate_domain
+        procedure, public, pass(self) :: get_target_dof => get_target_dof_domain
         procedure, public, pass(self) :: display => display_domain
     end type type_domain
 
@@ -594,7 +595,7 @@ contains
             ! [修正] original_input_idx ではなく bc_id を渡す
             bcs(i)%condition = create_boundary_conditions(bc_type, bc_id, input, controls)
 
-            call bcs(i)%fe_manager%initialize(input, 1, group_cell_types(i:i))
+            call bcs(i)%fe_manager%initialize(input, 1, group_cell_types)
         end do
     end subroutine create_bc_instances
 
@@ -862,6 +863,18 @@ contains
         coordinates = self%nodes%coordinates(:, connectivity)
 
     end subroutine get_element_coordinate_domain
+
+    subroutine get_target_dof_domain(self, physics_type_id, target_dof)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(in) :: physics_type_id
+        integer(int32), intent(inout) :: target_dof
+
+        ! select case (physics_type_id)
+        ! case (PHYSICS_TYPE_THERMAL)
+        target_dof = self%dof_map%num_dof_of_physics(physics_type_id)
+
+    end subroutine get_target_dof_domain
 
     ! --------------------------------------------------------------------------
     ! Display Procedures for Debugging
