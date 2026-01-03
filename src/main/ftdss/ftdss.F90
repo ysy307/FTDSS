@@ -11,9 +11,12 @@ module module_ftdss
     use :: module_boundary, only:abst_bc, type_bc_dirichlet
     use :: module_initial, only:type_ic_manager
     use :: module_field, only:type_jacobian_matrix, type_residual_vector
+    use :: module_physics, only:g => gravity_acceleration
 
     use :: module_thermal, only:type_thermal
     use :: module_hydraulic, only:type_hydraulic
+
+    use :: module_solver
     implicit none
 
     type :: type_ftdss
@@ -23,8 +26,8 @@ module module_ftdss
         type(type_variable) :: temperature
         type(type_variable) :: pressure
 
-        type(type_coordinate_array_dp) :: water_flux
-        type(type_coordinate_array_dp) :: vapor_flux
+        ! type(type_coordinate_array_dp) :: water_flux
+        ! type(type_coordinate_array_dp) :: vapor_flux
 
         type(type_variable) :: Qw
         type(type_variable) :: Qi
@@ -33,23 +36,37 @@ module module_ftdss
 
         type(type_jacobian_matrix) :: J
         type(type_residual_vector) :: R
+        type(type_residual_vector) :: delta
 
         type(type_thermal) :: thermal
         type(type_hydraulic) :: hydraulic
+
+        class(abst_solver), allocatable :: solver
 
         type(type_controls) :: controls
         type(type_output) :: output
 
     contains
         procedure, public, pass(self) :: initialize => initialize_type_ftdss
-        procedure, public, pass(self) :: shift => shift_type_ftdss
+        procedure, public, pass(self) :: shift => shift_ftdss
+
         procedure, public, pass(self) :: calc_gradient => calc_gradient_ftdss
+        procedure, public, pass(self) :: calc_gradient_temperature => calc_gradient_temperature_ftdss
+        procedure, public, pass(self) :: calc_gradient_pressure => calc_gradient_pressure_ftdss
+
+        procedure, public, pass(self) :: calc_water_flux => calc_water_flux_ftdss
+        procedure, public, pass(self) :: calc_vapor_flux => calc_vapor_flux_ftdss
 
         ! --- Boundary Condition Procedures ---
         procedure, public, pass(self) :: apply_bc => apply_bc_ftdss
         procedure, private, pass(self) :: prescribe_essential_bc_generic
         procedure, private, pass(self) :: apply_natural_bc_generic
         procedure, private, pass(self) :: apply_essential_bc_generic
+
+        !> ソルバー呼び出しルーチン
+        procedure, public, pass(self) :: solve => solve_ftdss
+
+        procedure, public, pass(self) :: set_state => set_state_ftdss
     end type type_ftdss
 
 contains
@@ -66,6 +83,11 @@ contains
         integer(int32) :: num_nodes
         character(len=10), allocatable :: profiler_labels(:)
         real(real64) :: current_time
+        integer(int32) :: num_total_dofs
+        integer(int32) :: ierr
+
+        type(type_solver_settings) :: matrix_info
+        type(type_preconditioner_settings) :: pc_info
 
         profiler_labels = [character(len=10) :: "IO", "Setup", "Assemble", "Solve", "Total"]
         call self%controls%profiler%initialize(profiler_labels)
@@ -91,9 +113,11 @@ contains
 
         num_nodes = input%geometry%vtk%num_points
         call self%domain%initialize(input, self%controls)
+        num_total_dofs = self%domain%get_total_dofs()
 
         call self%J%initialize(self%domain)
         call self%R%initialize(self%domain)
+        call self%delta%initialize(self%domain)
 
         max_bdf_order = input%basic%solver_settings%bdf_order
         call self%porosity%initialize(num_nodes, max_bdf_order)
@@ -118,6 +142,17 @@ contains
 
         call self%thermal%initialize(input, active_region_ids)
         call self%hydraulic%initialize(input, active_region_ids)
+
+        ! ソルバーの初期化
+        associate (solver_settings => input%basic%solver_settings%linear_solver)
+            call matrix_info%set(solver_settings%solver_type, &
+                                 num_total_dofs, &
+                                 solver_settings%tolerance, &
+                                 solver_settings%max_iterations, &
+                                 solver_settings%m_restarts)
+            call pc_info%set(solver_settings%preconditioner_type, num_total_dofs)
+            call create_solver(self%solver, matrix_info, pc_info, ierr)
+        end associate
 
         ! 初期化時にBCを適用（Dirichlet値をフィールドに設定）
         call self%apply_bc()
@@ -254,11 +289,165 @@ contains
 
     end subroutine calc_gradient_ftdss
 
-    subroutine shift_type_ftdss(self)
+    subroutine calc_gradient_temperature_ftdss(self)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+
+        call self%calc_gradient(self%temperature%new, self%temperature%grad)
+
+    end subroutine calc_gradient_temperature_ftdss
+
+    subroutine calc_gradient_pressure_ftdss(self)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+
+        call self%calc_gradient(self%pressure%new, self%pressure%grad)
+
+    end subroutine calc_gradient_pressure_ftdss
+
+    subroutine calc_water_flux_ftdss(self, material_id, state, grad_T, grad_P, water_flux)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        type(type_coordinate_dp), intent(in) :: grad_T, grad_P
+        type(type_coordinate_dp), intent(inout) :: water_flux
+
+        integer(int32) :: computation_type
+
+        real(real64) :: K_wT, K_wP
+        real(real64) :: rho_w, gravity_term
+
+        computation_type = self%domain%get_computation_type()
+
+        call self%hydraulic%calc_K_wT(material_id, state, K_wT)
+        call self%hydraulic%calc_K_wP(material_id, state, K_wP)
+
+        ! --- 重力項の計算 ---
+        ! K_wP は K/(rho*g) なので，重力項(透水係数 K そのもの)を復元する
+        ! gravity_term = K = K_wP * rho * g
+        call self%thermal%calc_density_water(state, rho_w)
+        gravity_term = K_wP * rho_w * g
+
+        ! --- 流束の計算 (Darcy則: q = -K_wT*grad_T - K_wP*grad_P - K*grad_z) ---
+        select case (computation_type)
+        case (COMP_TYPE_2D_XY)
+            water_flux%x = -K_wT * grad_T%x - K_wP * grad_P%x
+            water_flux%y = -K_wT * grad_T%y - K_wP * grad_P%y
+            water_flux%z = 0.0d0
+        case (COMP_TYPE_2D_XZ)
+            water_flux%x = -K_wT * grad_T%x - K_wP * grad_P%x
+            water_flux%y = 0.0d0
+            water_flux%z = -K_wT * grad_T%z - K_wP * grad_P%z - gravity_term ! Zを鉛直と仮定
+        case (COMP_TYPE_3D)
+            water_flux%x = -K_wT * grad_T%x - K_wP * grad_P%x
+            water_flux%y = -K_wT * grad_T%y - K_wP * grad_P%y
+            water_flux%z = -K_wT * grad_T%z - K_wP * grad_P%z - gravity_term ! Zを鉛直と仮定
+        end select
+
+    end subroutine calc_water_flux_ftdss
+
+    subroutine calc_vapor_flux_ftdss(self, material_id, state, grad_T, grad_P, water_flux)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        type(type_coordinate_dp), intent(in) :: grad_T, grad_P
+        type(type_coordinate_dp), intent(inout) :: water_flux
+
+        integer(int32) :: computation_type
+
+        real(real64) :: K_vT, K_vP
+
+        computation_type = self%domain%get_computation_type()
+
+        call self%hydraulic%calc_K_vT(material_id, state, K_vT)
+        call self%hydraulic%calc_K_vP(material_id, state, K_vP)
+
+        select case (computation_type)
+        case (COMP_TYPE_2D_XY)
+            water_flux%x = -K_vT * grad_T%x - K_vP * grad_P%x
+            water_flux%y = -K_vT * grad_T%y - K_vP * grad_P%y
+            water_flux%z = 0.0d0
+        case (COMP_TYPE_2D_XZ)
+            water_flux%x = -K_vT * grad_T%x - K_vP * grad_P%x
+            water_flux%y = 0.0d0
+            water_flux%z = -K_vT * grad_T%z - K_vP * grad_P%z
+        case (COMP_TYPE_3D)
+            water_flux%x = -K_vT * grad_T%x - K_vP * grad_P%x
+            water_flux%y = -K_vT * grad_T%y - K_vP * grad_P%y
+            water_flux%z = -K_vT * grad_T%z - K_vP * grad_P%z
+        end select
+
+    end subroutine calc_vapor_flux_ftdss
+
+    subroutine set_state_ftdss(self, node_id, element_id, state)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+        integer(int32), intent(in) :: node_id
+        integer(int32), intent(in) :: element_id
+        type(type_state), intent(inout) :: state
+
+        integer(int32) :: material_id
+        type(type_coordinate_dp) :: grad_T, grad_P
+        type(type_coordinate_dp) :: water_flux, vapor_flux
+        real(real64) :: K_wT, K_wP, K_vT, K_vP
+
+        call state%reset()
+
+        grad_T%x = self%temperature%grad%x(node_id)
+        grad_T%y = self%temperature%grad%y(node_id)
+        grad_T%z = self%temperature%grad%z(node_id)
+        grad_P%x = self%pressure%grad%x(node_id)
+        grad_P%y = self%pressure%grad%y(node_id)
+        grad_P%z = self%pressure%grad%z(node_id)
+
+        call state%set(temperature=self%temperature%new(node_id), &
+                       pressure=self%pressure%new(node_id), &
+                       porosity=self%porosity%new(node_id), &
+                       dot_T=self%temperature%dif(node_id), &
+                       dot_P=self%pressure%dif(node_id), &
+                       grad_T=grad_T, &
+                       grad_P=grad_P)
+
+        call self%domain%get_material_id(element_id, material_id)
+        if (self%controls%is_target(PHYSICS_TYPE_HYDRAULIC, material_id)) then
+            call self%calc_water_flux(material_id, state, grad_T, grad_P, water_flux)
+            call self%calc_vapor_flux(material_id, state, grad_T, grad_P, vapor_flux)
+            call state%set(water_flux=water_flux, vapor_flux=vapor_flux)
+        end if
+
+    end subroutine set_state_ftdss
+
+    subroutine shift_ftdss(self)
         implicit none
         class(type_ftdss), intent(inout) :: self
         ! 必要なShift処理があればここに記述
-    end subroutine shift_type_ftdss
+    end subroutine shift_ftdss
+
+    subroutine solve_ftdss(self)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+
+        class(abst_matrix), pointer :: J_ptr
+        type(type_vector_dp), pointer :: R_ptr
+        type(type_vector_dp), pointer :: delta_prt
+
+        call self%controls%profiler%start("Solve")
+
+        J_ptr => self%J%get_matrix()
+        R_ptr => self%R%get_vector()
+        delta_prt => self%delta%get_vector()
+
+        call self%solver%solve(J_ptr, R_ptr, delta_prt)
+        call self%solver%check()
+
+        J_ptr => null()
+        R_ptr => null()
+        delta_prt => null()
+        call self%controls%profiler%stop("Solve")
+
+    end subroutine solve_ftdss
 
     !>
     !> Applies all boundary conditions for active physics.

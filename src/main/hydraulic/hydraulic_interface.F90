@@ -2,7 +2,7 @@ module main_hydraulic
     use, intrinsic :: iso_fortran_env
     use :: module_core
     use :: module_input, only:type_input
-    use :: module_physics, only:type_physics_manager, type_wrf_params, type_hcf_params, type_thc_dispersity
+    use :: module_physics, g => gravity_acceleration
     implicit none
     private
 
@@ -19,6 +19,10 @@ module main_hydraulic
         procedure, pass(self), public :: compute_D_H => compute_D_H
         procedure, pass(self), public :: compute_V_H => compute_V_H
         procedure, pass(self), public :: compute_R_H => compute_R_H
+        procedure, pass(self), public :: calc_K_wT => calc_K_wT_hydraulic
+        procedure, pass(self), public :: calc_K_wP => calc_K_wP_hydraulic
+        procedure, pass(self), public :: calc_K_vT => calc_K_vT_hydraulic
+        procedure, pass(self), public :: calc_K_vP => calc_K_vP_hydraulic
     end type type_hydraulic
 
     !! 一通り計算するのに必要なのが，T, P, dT/dt, dP/dt, grad_H, q_w, q_v
@@ -71,6 +75,42 @@ module main_hydraulic
             real(real64), intent(inout) :: R_H_D(:)
 
         end subroutine compute_R_H
+
+        module pure elemental subroutine calc_K_wT_hydraulic(self, target_id, state, K_wT)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: target_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: K_wT
+
+        end subroutine calc_K_wT_hydraulic
+
+        module pure elemental subroutine calc_K_wP_hydraulic(self, target_id, state, K_wP)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: target_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: K_wP
+
+        end subroutine calc_K_wP_hydraulic
+
+        module pure elemental subroutine calc_K_vT_hydraulic(self, target_id, state, K_vT)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: target_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: K_vT
+
+        end subroutine calc_K_vT_hydraulic
+
+        module pure elemental subroutine calc_K_vP_hydraulic(self, target_id, state, K_vP)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: target_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: K_vP
+
+        end subroutine calc_K_vP_hydraulic
     end interface
 
 contains

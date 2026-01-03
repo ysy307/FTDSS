@@ -176,7 +176,12 @@ module inout_input_basic
     end type type_linear_solver_settings
 
     type :: type_linear_solver
-        type(type_linear_solver_settings) :: physics(NUM_PHYSICS_TYPES)
+        integer(int32) :: solver_type
+        integer(int32) :: preconditioner_type
+        integer(int32) :: max_iterations
+        real(real64) :: tolerance
+        integer(int32) :: m_restarts
+        ! type(type_linear_solver_settings) :: physics(NUM_PHYSICS_TYPES)
     end type type_linear_solver
 
     type :: type_parallel_threads

@@ -6,6 +6,8 @@
 set(Main_THERMAL_SOURCES
     thermal/thermal_interface.F90
     thermal/thermal_base.F90
+    thermal/thermal_matrix.F90
+    thermal/thermal_coefficients.F90
     # thermal/thermal_assemble.F90
     # thermal/thermal_crs.F90
     # thermal/thermal_workspace.F90
@@ -31,6 +33,8 @@ add_library(Solver::Thermal ALIAS Main_Thermal)
 set(MAIN_HYDRAULIC_SOURCES
     hydraulic/hydraulic_interface.F90
     hydraulic/hydraulic_base.F90
+    hydraulic/hydraulic_matrix.F90
+    hydraulic/hydraulic_coefficients.F90
     # hydraulic/hydraulic_assemble.F90
     # hydraulic/hydraulic_crs.F90
     hydraulic/hydraulic.F90

@@ -16,12 +16,15 @@ module main_thermal
         type(type_physics_manager) :: physics
     contains
         procedure, pass(self), public :: initialize => initialize_type_thermal
+        procedure, pass(self), public :: destroy => destroy_type_thermal
+
         procedure, pass(self), public :: compute_C_T => compute_C_T
         procedure, pass(self), public :: compute_D_T => compute_D_T
         procedure, pass(self), public :: compute_V_T => compute_V_T
         procedure, pass(self), public :: compute_R_T => compute_R_T
         ! procedure, pass(self), public :: assemble_local => assemble_local_thermal
-        procedure, pass(self), public :: destroy => destroy_type_thermal
+
+        procedure, pass(self), public :: calc_density_water => calc_density_water_thermal
     end type type_thermal
 
     !! 一通り計算するのに必要なのが，T, P, dT/dt, dP/dt, grad_T, q_w, q_v
@@ -34,6 +37,12 @@ module main_thermal
             integer(int32), intent(in) :: active_region_ids(:)
 
         end subroutine initialize_type_thermal
+
+        module subroutine destroy_type_thermal(self)
+            implicit none
+            class(type_thermal), intent(inout) :: self
+
+        end subroutine destroy_type_thermal
 
         module pure elemental subroutine compute_C_T(self, target_id, state, C_TT, C_TH)
             implicit none
@@ -75,17 +84,20 @@ module main_thermal
 
         end subroutine compute_R_T
 
+        module pure elemental subroutine calc_density_water_thermal(self, state, rho_water)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: rho_water
+
+        end subroutine calc_density_water_thermal
+
         ! module subroutine assemble_local_thermal(self, J, R,)
         !     implicit none
         !     class(type_thermal), intent(inout) :: self
 
         ! end subroutine assemble_local_thermal
 
-        module subroutine destroy_type_thermal(self)
-            implicit none
-            class(type_thermal), intent(inout) :: self
-
-        end subroutine destroy_type_thermal
     end interface
 
 contains

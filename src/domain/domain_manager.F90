@@ -181,6 +181,7 @@ module domain_manager
         procedure, public, pass(self) :: get_element_connectivity => get_element_connectivity_domain
         procedure, public, pass(self) :: get_element_coordinate => get_element_coordinate_domain
         procedure, public, pass(self) :: get_target_dof => get_target_dof_domain
+        procedure, public, pass(self) :: get_material_id => get_material_id_domain
         procedure, public, pass(self) :: display => display_domain
     end type type_domain
 
@@ -875,6 +876,15 @@ contains
         target_dof = self%dof_map%num_dof_of_physics(physics_type_id)
 
     end subroutine get_target_dof_domain
+
+    subroutine get_material_id_domain(self, element_id, material_id)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(in) :: element_id
+        integer(int32), intent(inout) :: material_id
+
+        material_id = self%elements%fe_material_ids(element_id)
+    end subroutine get_material_id_domain
 
     ! --------------------------------------------------------------------------
     ! Display Procedures for Debugging

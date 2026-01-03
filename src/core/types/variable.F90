@@ -36,7 +36,6 @@ module core_types_variable
         procedure, pass(self) :: initialize => initialize_type_variable
         procedure, pass(self) :: shift => type_variable_shift
         procedure, pass(self) :: set => type_variable_set
-        ! ▼ 追加: 時間微分計算ルーチン
         procedure, pass(self) :: compute_derivative => type_variable_compute_derivative
     end type type_variable
 

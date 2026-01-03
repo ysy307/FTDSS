@@ -195,62 +195,75 @@ contains
 
         buffer(1) = solver_settings
         buffer(2) = linear_solver
+        buffer(3) = solver_type
 
-        target_id = get_physics_type(thermal)
-        if (self%analysis_controls%is_active(target_id)) then
-            buffer(3) = thermal
-            call read_parameters_solver_settings_linear_local(self%solver_settings%linear_solver%physics(target_id), &
-                                                              json, buffer, 3)
-        end if
+        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%solver_type, &
+                            is_required=.true., default_value=4, valid_range=[1, 10])
+        buffer(3) = preconditioner_type
+        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%preconditioner_type, &
+                            is_required=.true., default_value=1, valid_range=[1, 10])
+        buffer(3) = max_iterations
+        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%max_iterations, &
+                            is_required=.true., default_value=10000, valid_range=[1, huge(1)])
+        buffer(3) = tolerance
+        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%tolerance, &
+                            is_required=.true., default_value=1.0d-6, valid_range=[0.0d0, huge(0.0d0)])
 
-        target_id = get_physics_type(hydraulic)
-        if (self%analysis_controls%is_active(target_id)) then
-            buffer(3) = hydraulic
-            call read_parameters_solver_settings_linear_local(self%solver_settings%linear_solver%physics(target_id), &
-                                                              json, buffer, 3)
-        end if
+        ! target_id = get_physics_type(thermal)
+        ! if (self%analysis_controls%is_active(target_id)) then
+        !     buffer(3) = thermal
+        !     call read_parameters_solver_settings_linear_local(self%solver_settings%linear_solver%physics(target_id), &
+        !                                                       json, buffer, 3)
+        ! end if
 
-        target_id = get_physics_type(mechanical)
-        if (self%analysis_controls%is_active(target_id)) then
-            buffer(3) = mechanical
-            call read_parameters_solver_settings_linear_local(self%solver_settings%linear_solver%physics(target_id), &
-                                                              json, buffer, 3)
-        end if
+        ! target_id = get_physics_type(hydraulic)
+        ! if (self%analysis_controls%is_active(target_id)) then
+        !     buffer(3) = hydraulic
+        !     call read_parameters_solver_settings_linear_local(self%solver_settings%linear_solver%physics(target_id), &
+        !                                                       json, buffer, 3)
+        ! end if
+
+        ! target_id = get_physics_type(mechanical)
+        ! if (self%analysis_controls%is_active(target_id)) then
+        !     buffer(3) = mechanical
+        !     call read_parameters_solver_settings_linear_local(self%solver_settings%linear_solver%physics(target_id), &
+        !                                                       json, buffer, 3)
+        ! end if
     end subroutine read_parameters_solver_settings_linear
 
-    subroutine read_parameters_solver_settings_linear_local(solver_setting, json, buffer, end_index)
-        !> Reads linear solver settings for a specific physics.
-        implicit none
-        type(type_linear_solver_settings), intent(inout) :: solver_setting
-        type(json_file), intent(inout) :: json
-        character(*), intent(in) :: buffer(:)
-        integer(int32), intent(in) :: end_index
-        character(len=256), allocatable :: local_buffer(:)
+    ! subroutine read_parameters_solver_settings_linear_local(solver_setting, json, buffer, end_index)
+    !     !> Reads linear solver settings for a specific physics.
+    !     implicit none
+    !     type(type_linear_solver_settings), intent(inout) :: solver_setting
+    !     type(json_file), intent(inout) :: json
+    !     character(*), intent(in) :: buffer(:)
+    !     integer(int32), intent(in) :: end_index
+    !     character(len=256), allocatable :: local_buffer(:)
 
-        allocate (local_buffer(size(buffer) + 2))
-        local_buffer(1:end_index) = buffer(1:end_index)
+    !     allocate (local_buffer(size(buffer) + 2))
+    !     local_buffer(1:end_index) = buffer(1:end_index)
 
-        local_buffer(end_index + 1) = method
-        call get_json_value(json, join(local_buffer(1:end_index + 1)), solver_setting%method, &
-                            is_required=.true., valid_list=valid_linear_solver_methods)
+    !     local_buffer(end_index + 1) = method
+    !     call get_json_value(json, join(local_buffer(1:end_index + 1)), solver_setting%method, &
+    !                         is_required=.true., valid_list=valid_linear_solver_methods)
 
-        if (solver_setting%method == LINEAR_METHOD_ITERATIVE) then
-            local_buffer(end_index + 1) = iterative_solver
+    !     if (solver_setting%method == LINEAR_METHOD_ITERATIVE) then
+    !         local_buffer(end_index + 1) = iterative_solver
 
-            local_buffer(end_index + 2) = solver_type
-            call get_json_value(json, join(local_buffer), solver_setting%iterative_solver%solver_type, is_required=.true.)
-            local_buffer(end_index + 2) = preconditioner_type
-            call get_json_value(json, join(local_buffer), solver_setting%iterative_solver%preconditioner_type, is_required=.true.)
-            local_buffer(end_index + 2) = max_iterations
-            call get_json_value(json, join(local_buffer), solver_setting%iterative_solver%max_iterations, &
-                                is_required=.true., default_value=10000, valid_range=[1, huge(1)])
-            local_buffer(end_index + 2) = tolerance
-            call get_json_value(json, join(local_buffer), solver_setting%iterative_solver%tolerance, &
-                                is_required=.true., default_value=1.0d-6, valid_range=[0.0d0, huge(0.0d0)])
-        end if
+    !         local_buffer(end_index + 2) = solver_type
+    !         call get_json_value(json, join(local_buffer), solver_setting%iterative_solver%solver_type, is_required=.true.)
+    !         local_buffer(end_index + 2) = preconditioner_type
+    !         call get_json_value(json, join(local_buffer), solver_setting%iterative_solver%preconditioner_type, is_required=.true.)
+    !         local_buffer(end_index + 2) = max_iterations
+    !         call get_json_value(json, join(local_buffer), solver_setting%iterative_solver%max_iterations, &
+    !                             is_required=.true., default_value=10000, valid_range=[1, huge(1)])
+    !         local_buffer(end_index + 2) = tolerance
+    !         call get_json_value(json, join(local_buffer), solver_setting%iterative_solver%tolerance, &
+    !                             is_required=.true., default_value=1.0d-6, valid_range=[0.0d0, huge(0.0d0)])
+    !     end if
 
-        if (allocated(local_buffer)) deallocate (local_buffer)
-    end subroutine read_parameters_solver_settings_linear_local
+    !     if (allocated(local_buffer)) deallocate (local_buffer)
+    ! end subroutine read_parameters_solver_settings_linear_local
 
     subroutine read_parameters_solver_parallel_settings(self, json)
         !> Reads parallel processing settings.
@@ -415,21 +428,21 @@ contains
 
         write (*, '(/a)') "  --- Linear Solver ---"
 
-        if (allocated(linear%physics(PHYSICS_TYPE_THERMAL)%method)) then
-            if (len_trim(linear%physics(PHYSICS_TYPE_THERMAL)%method) > 0) then
-                call display_solver_settings_linear_local(linear%physics(PHYSICS_TYPE_THERMAL), "    Thermal")
-            end if
-        end if
-        if (allocated(linear%physics(PHYSICS_TYPE_HYDRAULIC)%method)) then
-            if (len_trim(linear%physics(PHYSICS_TYPE_HYDRAULIC)%method) > 0) then
-                call display_solver_settings_linear_local(linear%physics(PHYSICS_TYPE_HYDRAULIC), "    Hydraulic")
-            end if
-        end if
-        if (allocated(linear%physics(PHYSICS_TYPE_MECHANICAL)%method)) then
-            if (len_trim(linear%physics(PHYSICS_TYPE_MECHANICAL)%method) > 0) then
-                call display_solver_settings_linear_local(linear%physics(PHYSICS_TYPE_MECHANICAL), "    Mechanical")
-            end if
-        end if
+        ! if (allocated(linear%physics(PHYSICS_TYPE_THERMAL)%method)) then
+        !     if (len_trim(linear%physics(PHYSICS_TYPE_THERMAL)%method) > 0) then
+        !         call display_solver_settings_linear_local(linear%physics(PHYSICS_TYPE_THERMAL), "    Thermal")
+        !     end if
+        ! end if
+        ! if (allocated(linear%physics(PHYSICS_TYPE_HYDRAULIC)%method)) then
+        !     if (len_trim(linear%physics(PHYSICS_TYPE_HYDRAULIC)%method) > 0) then
+        !         call display_solver_settings_linear_local(linear%physics(PHYSICS_TYPE_HYDRAULIC), "    Hydraulic")
+        !     end if
+        ! end if
+        ! if (allocated(linear%physics(PHYSICS_TYPE_MECHANICAL)%method)) then
+        !     if (len_trim(linear%physics(PHYSICS_TYPE_MECHANICAL)%method) > 0) then
+        !         call display_solver_settings_linear_local(linear%physics(PHYSICS_TYPE_MECHANICAL), "    Mechanical")
+        !     end if
+        ! end if
     end subroutine display_solver_settings_linear
 
     subroutine display_solver_settings_linear_local(local_solver, title)

@@ -2,10 +2,8 @@ module solver_solve
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
 !$  use omp_lib
     use :: stdlib_strings, only:strip
-    ! use :: module_input, only:type_input
     use :: module_core
     use :: module_linalg
-    ! use :: module_field
     use :: solver_preconditioner
     implicit none
     private

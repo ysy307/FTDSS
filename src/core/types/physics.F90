@@ -76,9 +76,9 @@ module core_types_physics
 
     contains
         ! Bulk Setter (Optional arguments)
-        procedure, public :: set => state_set_all
+        procedure, public, pass(self) :: set => state_set_all
         ! Reset All (Pure Elemental)
-        procedure, public :: reset => state_reset_all
+        procedure, public, pass(self) :: reset => state_reset_all
     end type type_state
 
     type :: type_physics_info
