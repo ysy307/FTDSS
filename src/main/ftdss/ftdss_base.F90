@@ -100,4 +100,232 @@ contains
         call global_logger%log_information(message="FTDSS module initialized successfully.")
     end subroutine initialize_type_ftdss
 
+    module subroutine set_state_ftdss(self, node_id, element_id, state)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+        integer(int32), intent(in) :: node_id
+        integer(int32), intent(in) :: element_id
+        type(type_state), intent(inout) :: state
+
+        integer(int32) :: material_id
+        type(type_coordinate_dp) :: grad_T, grad_P
+        type(type_coordinate_dp) :: water_flux, vapor_flux
+        real(real64) :: K_wT, K_wP, K_vT, K_vP
+
+        call self%controls%profiler%start("Setup")
+
+        call state%reset()
+
+        grad_T%x = self%temperature%grad%x(node_id)
+        grad_T%y = self%temperature%grad%y(node_id)
+        grad_T%z = self%temperature%grad%z(node_id)
+        grad_P%x = self%pressure%grad%x(node_id)
+        grad_P%y = self%pressure%grad%y(node_id)
+        grad_P%z = self%pressure%grad%z(node_id)
+
+        call state%set(temperature=self%temperature%new(node_id), &
+                       pressure=self%pressure%new(node_id), &
+                       porosity=self%porosity%new(node_id), &
+                       dot_T=self%temperature%dif(node_id), &
+                       dot_P=self%pressure%dif(node_id), &
+                       grad_T=grad_T, &
+                       grad_P=grad_P)
+
+        call self%domain%get_material_id(element_id, material_id)
+        if (self%controls%is_target(PHYSICS_TYPE_HYDRAULIC, material_id)) then
+            call self%calc_water_flux(material_id, state, grad_T, grad_P, water_flux)
+            call self%calc_vapor_flux(material_id, state, grad_T, grad_P, vapor_flux)
+            call state%set(water_flux=water_flux, vapor_flux=vapor_flux)
+        end if
+
+        call self%thermal%update_water_phases(material_id, state)
+
+        call self%controls%profiler%stop("Setup")
+
+    end subroutine set_state_ftdss
+
+    module subroutine shift_ftdss(self)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+
+        call self%controls%profiler%start("Setup")
+
+        if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
+            call self%temperature%shift()
+        end if
+
+        if (self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) then
+            call self%pressure%shift()
+        end if
+
+        call self%porosity%shift()
+        call self%Qw%shift()
+        call self%Qi%shift()
+        call self%Qa%shift()
+        call self%Qv%shift()
+
+        call self%controls%profiler%stop("Setup")
+    end subroutine shift_ftdss
+
+    module subroutine reflect_variables_ftdss(self)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+
+        type(type_vector_dp), pointer :: delta_prt => null()
+        real(real64), pointer, dimension(:) :: data => null()
+        integer(int32) :: target_dof
+        integer(int32) :: start_idx, end_idx, num_nondes, num_dofs_per_nonde
+        real(real64), pointer, dimension(:) :: time_coef => null()
+
+        call self%controls%profiler%start("Setup")
+
+        delta_prt => self%delta%get_vector()
+        data => delta_prt%get_data()
+
+        num_nondes = self%domain%get_num_nodes()
+        num_dofs_per_nonde = self%domain%get_num_dofs_per_node()
+
+        call self%controls%time%get_bdf_coeffs(time_coef)
+
+        if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
+            call self%domain%get_target_dof(PHYSICS_TYPE_THERMAL, target_dof)
+            start_idx = target_dof
+            end_idx = num_dofs_per_nonde * (num_nondes - 1) + target_dof
+            self%temperature%new(:) = self%temperature%new(:) + data(start_idx:end_idx:num_dofs_per_nonde)
+            call self%calc_gradient_temperature()
+            call self%temperature%compute_derivative(time_coef)
+        end if
+
+        if (self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) then
+            call self%domain%get_target_dof(PHYSICS_TYPE_HYDRAULIC, target_dof)
+            start_idx = target_dof
+            end_idx = num_dofs_per_nonde * (num_nondes - 1) + target_dof
+            self%pressure%new(:) = self%pressure%new(:) + data(start_idx:end_idx:num_dofs_per_nonde)
+            call self%calc_gradient_pressure()
+            call self%pressure%compute_derivative(time_coef)
+        end if
+
+        call self%controls%profiler%stop("Setup")
+
+    end subroutine reflect_variables_ftdss
+
+    ! --------------------------------------------------------------------------
+    ! 機能: 要素ごとの計算値（水分量や流束）を節点値にスムージングする
+    ! 手法: 体積重み付き平均 (Lumped Mass Matrix的なアプローチ)
+    ! --------------------------------------------------------------------------
+! --------------------------------------------------------------------------
+    ! 処理: 要素ごとの状態量を節点値へスムージング（体積平均）する
+    ! --------------------------------------------------------------------------
+    module subroutine update_variables_ftdss(self)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+
+        integer(int32) :: i_node, i_elem, j
+        integer(int32) :: num_nodes, num_neighbors, material_id
+        integer(int32), pointer, contiguous :: element_list(:) => null()
+
+        ! 状態量計算用のワーク変数
+        type(type_state) :: state
+
+        ! 値の一時保管用
+        real(real64) :: elem_qw, elem_qi, elem_qa, elem_qv
+        real(real64) :: elem_vol
+
+        ! 累積計算用 (Volume Weighted Sum)
+        real(real64) :: sum_vol
+        real(real64) :: sum_qw_vol, sum_qi_vol, sum_qa_vol, sum_qv_vol
+
+        call self%controls%profiler%start("update_variables")
+
+        num_nodes = self%domain%get_num_nodes()
+
+        ! ----------------------------------------------------------------------
+        ! 節点ループ
+        ! ----------------------------------------------------------------------
+        do i_node = 1, num_nodes
+
+            ! 1. 隣接要素リストの取得
+            call self%domain%element_adjacency%get_list(i_node, element_list)
+
+            ! 初期化
+            sum_vol = 0.0d0
+            sum_qw_vol = 0.0d0
+            sum_qi_vol = 0.0d0
+            sum_qa_vol = 0.0d0
+            sum_qv_vol = 0.0d0
+
+            if (associated(element_list)) then
+                num_neighbors = size(element_list)
+
+                ! 2. 隣接要素ループ
+                do j = 1, num_neighbors
+                    i_elem = element_list(j)
+
+                    ! 要素体積の取得 (これが抜けると重み付けできません)
+                    call self%domain%get_geometry(i_elem, elem_vol)
+
+                    ! 状態変数の更新と取得
+                    call self%domain%get_material_id(i_elem, material_id)
+                    call self%set_state(i_node, i_elem, state)
+
+                    ! Stateから各相の体積含水率などを取得
+                    call state%water_content%get(elem_qw)
+                    call state%ice_content%get(elem_qi)
+                    call state%air_content%get(elem_qa)
+                    call state%vapor_content%get(elem_qv)
+
+                    ! 重み付き加算
+                    sum_vol = sum_vol + elem_vol
+                    sum_qw_vol = sum_qw_vol + (elem_qw * elem_vol)
+                    sum_qi_vol = sum_qi_vol + (elem_qi * elem_vol)
+                    sum_qa_vol = sum_qa_vol + (elem_qa * elem_vol)
+                    sum_qv_vol = sum_qv_vol + (elem_qv * elem_vol)
+                end do
+            end if
+
+            ! 3. 正規化して節点へ格納
+            if (sum_vol > 1.0d-12) then
+                self%Qw%new(i_node) = sum_qw_vol / sum_vol
+                self%Qi%new(i_node) = sum_qi_vol / sum_vol
+                self%Qa%new(i_node) = sum_qa_vol / sum_vol
+                self%Qv%new(i_node) = sum_qv_vol / sum_vol
+            else
+                ! 孤立節点等の処理
+                self%Qw%new(i_node) = 0.0d0
+                self%Qi%new(i_node) = 0.0d0
+                self%Qa%new(i_node) = 0.0d0
+                self%Qv%new(i_node) = 0.0d0
+            end if
+
+        end do
+
+        call self%controls%profiler%stop("Setup")
+
+    end subroutine update_variables_ftdss
+
+    module subroutine solve_ftdss(self)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+
+        class(abst_matrix), pointer :: J_ptr => null()
+        type(type_vector_dp), pointer :: R_ptr => null()
+        type(type_vector_dp), pointer :: delta_prt => null()
+
+        call self%controls%profiler%start("Solve")
+
+        J_ptr => self%J%get_matrix()
+        R_ptr => self%R%get_vector()
+        delta_prt => self%delta%get_vector()
+
+        call self%solver%solve(J_ptr, R_ptr, delta_prt)
+        call self%solver%check()
+
+        J_ptr => null()
+        R_ptr => null()
+        delta_prt => null()
+
+        call self%controls%profiler%stop("Solve")
+
+    end subroutine solve_ftdss
+
 end submodule ftdss_base

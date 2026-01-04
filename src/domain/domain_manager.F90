@@ -180,6 +180,7 @@ module domain_manager
         procedure, public, pass(self) :: get_element => get_element_domain
         procedure, public, pass(self) :: get_element_connectivity => get_element_connectivity_domain
         procedure, public, pass(self) :: get_element_coordinate => get_element_coordinate_domain
+        procedure, public, pass(self) :: get_geometry => get_geometry_domain
         procedure, public, pass(self) :: get_target_dof => get_target_dof_domain
         procedure, public, pass(self) :: get_material_id => get_material_id_domain
         procedure, public, pass(self) :: display => display_domain
@@ -885,6 +886,24 @@ contains
 
         material_id = self%elements%fe_material_ids(element_id)
     end subroutine get_material_id_domain
+
+    subroutine get_geometry_domain(self, element_id, geometry)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(in) :: element_id
+        real(real64), intent(inout) :: geometry
+
+        class(abst_fe), pointer :: fe
+        real(real64), allocatable :: coordinates(:, :)
+        integer(int32), pointer, contiguous, dimension(:) :: connectivity
+
+        call self%get_element(element_id, fe)
+        call self%get_element_coordinate(element_id, coordinates)
+        call self%get_element_connectivity(element_id, connectivity)
+
+        call fe%get_geometry(coordinates, connectivity, geometry)
+
+    end subroutine get_geometry_domain
 
     ! --------------------------------------------------------------------------
     ! Display Procedures for Debugging

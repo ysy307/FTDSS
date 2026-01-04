@@ -107,13 +107,14 @@ contains
     !> Returns the list of element IDs for a specific node.
     !>
     subroutine get_element_list(self, node_id, element_list)
-        class(type_map_node_to_element), intent(in) :: self
+        implicit none
+        class(type_map_node_to_element), intent(in), target :: self
         integer(int32), intent(in) :: node_id
-        integer(int32), allocatable, intent(out) :: element_list(:)
+        integer(int32), intent(inout), pointer, contiguous, dimension(:) :: element_list
         integer(int32) :: start_idx, end_idx, n
 
         if (node_id < 1 .or. node_id > self%num_nodes) then
-            allocate (element_list(0))
+            element_list => null()
             return
         end if
 
@@ -122,10 +123,9 @@ contains
         n = end_idx - start_idx + 1
 
         if (n > 0) then
-            allocate (element_list(n))
-            element_list = self%ind(start_idx:end_idx)
+            element_list => self%ind(start_idx:end_idx)
         else
-            allocate (element_list(0))
+            element_list => null()
         end if
     end subroutine get_element_list
 

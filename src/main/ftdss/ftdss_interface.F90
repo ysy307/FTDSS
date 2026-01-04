@@ -26,9 +26,6 @@ module main_ftdss
         type(type_variable) :: temperature
         type(type_variable) :: pressure
 
-        ! type(type_coordinate_array_dp) :: water_flux
-        ! type(type_coordinate_array_dp) :: vapor_flux
-
         type(type_variable) :: Qw
         type(type_variable) :: Qi
         type(type_variable) :: Qa
@@ -67,6 +64,8 @@ module main_ftdss
         procedure, public, pass(self) :: solve => solve_ftdss
 
         procedure, public, pass(self) :: set_state => set_state_ftdss
+
+        procedure, public, pass(self) :: reflect_variables => reflect_variables_ftdss
     end type type_ftdss
 
     interface
@@ -111,6 +110,39 @@ module main_ftdss
             logical, intent(in), optional :: prescribed
 
         end subroutine apply_bc_ftdss
+
+        module subroutine solve_ftdss(self)
+            implicit none
+            class(type_ftdss), intent(inout) :: self
+
+        end subroutine solve_ftdss
+
+        module subroutine set_state_ftdss(self, node_id, element_id, state)
+            implicit none
+            class(type_ftdss), intent(inout) :: self
+            integer(int32), intent(in) :: node_id
+            integer(int32), intent(in) :: element_id
+            type(type_state), intent(inout) :: state
+
+        end subroutine set_state_ftdss
+
+        module subroutine shift_ftdss(self)
+            implicit none
+            class(type_ftdss), intent(inout) :: self
+
+        end subroutine shift_ftdss
+
+        module subroutine update_variables_ftdss(self)
+            implicit none
+            class(type_ftdss), intent(inout) :: self
+
+        end subroutine update_variables_ftdss
+
+        module subroutine reflect_variables_ftdss(self)
+            implicit none
+            class(type_ftdss), intent(inout) :: self
+
+        end subroutine reflect_variables_ftdss
     end interface
 
 contains
@@ -326,75 +358,5 @@ contains
         end select
 
     end subroutine calc_vapor_flux_ftdss
-
-    subroutine set_state_ftdss(self, node_id, element_id, state)
-        implicit none
-        class(type_ftdss), intent(inout) :: self
-        integer(int32), intent(in) :: node_id
-        integer(int32), intent(in) :: element_id
-        type(type_state), intent(inout) :: state
-
-        integer(int32) :: material_id
-        type(type_coordinate_dp) :: grad_T, grad_P
-        type(type_coordinate_dp) :: water_flux, vapor_flux
-        real(real64) :: K_wT, K_wP, K_vT, K_vP
-
-        call state%reset()
-
-        grad_T%x = self%temperature%grad%x(node_id)
-        grad_T%y = self%temperature%grad%y(node_id)
-        grad_T%z = self%temperature%grad%z(node_id)
-        grad_P%x = self%pressure%grad%x(node_id)
-        grad_P%y = self%pressure%grad%y(node_id)
-        grad_P%z = self%pressure%grad%z(node_id)
-
-        call state%set(temperature=self%temperature%new(node_id), &
-                       pressure=self%pressure%new(node_id), &
-                       porosity=self%porosity%new(node_id), &
-                       dot_T=self%temperature%dif(node_id), &
-                       dot_P=self%pressure%dif(node_id), &
-                       grad_T=grad_T, &
-                       grad_P=grad_P)
-
-        call self%domain%get_material_id(element_id, material_id)
-        if (self%controls%is_target(PHYSICS_TYPE_HYDRAULIC, material_id)) then
-            call self%calc_water_flux(material_id, state, grad_T, grad_P, water_flux)
-            call self%calc_vapor_flux(material_id, state, grad_T, grad_P, vapor_flux)
-            call state%set(water_flux=water_flux, vapor_flux=vapor_flux)
-        end if
-
-        call self%thermal%update_water_phases(material_id, state)
-
-    end subroutine set_state_ftdss
-
-    subroutine shift_ftdss(self)
-        implicit none
-        class(type_ftdss), intent(inout) :: self
-        ! 必要なShift処理があればここに記述
-    end subroutine shift_ftdss
-
-    subroutine solve_ftdss(self)
-        implicit none
-        class(type_ftdss), intent(inout) :: self
-
-        class(abst_matrix), pointer :: J_ptr
-        type(type_vector_dp), pointer :: R_ptr
-        type(type_vector_dp), pointer :: delta_prt
-
-        call self%controls%profiler%start("Solve")
-
-        J_ptr => self%J%get_matrix()
-        R_ptr => self%R%get_vector()
-        delta_prt => self%delta%get_vector()
-
-        call self%solver%solve(J_ptr, R_ptr, delta_prt)
-        call self%solver%check()
-
-        J_ptr => null()
-        R_ptr => null()
-        delta_prt => null()
-        call self%controls%profiler%stop("Solve")
-
-    end subroutine solve_ftdss
 
 end module main_ftdss
