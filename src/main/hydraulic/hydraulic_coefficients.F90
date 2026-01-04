@@ -20,12 +20,7 @@ contains
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: K_wP
 
-        real(real64) :: rho_water
-
         call self%physics%calc_Kflh(target_id, state, K_wP)
-        call self%physics%calc_density_water(state, rho_water)
-
-        K_wP = K_wP / (rho_water * g)
 
     end subroutine calc_K_wP_hydraulic
 
@@ -47,12 +42,7 @@ contains
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: K_vP
 
-        real(real64) :: rho_water
-
         call self%physics%calc_Kvh(target_id, state, K_vP)
-        call self%physics%calc_density_water(state, rho_water)
-
-        K_vP = K_vP / (rho_water * g)
 
     end subroutine calc_K_vP_hydraulic
 

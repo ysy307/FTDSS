@@ -48,7 +48,10 @@ module domain_fe
         procedure, pass(self), public :: get_num_gauss
         procedure, pass(self), public :: get_weight
         procedure, pass(self), public :: get_gauss
-        procedure, pass(self), public :: lerp
+        procedure, pass(self), private :: lerp_1d
+        procedure, pass(self), private :: lerp_2d
+        procedure, pass(self), private :: lerp_3d
+        generic, public :: lerp => lerp_1d, lerp_2d, lerp_3d
         procedure, pass(self), public :: dlerp
         procedure, pass(self), public :: display
 
@@ -348,12 +351,11 @@ contains
         val = self%gauss
     end subroutine get_gauss
 
-    pure subroutine lerp(self, r, global_values, connectivity, val)
+    pure subroutine lerp_1d(self, r, global_values, val)
         implicit none
         class(abst_fe), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
         real(real64), intent(in) :: global_values(:)
-        integer(int32), intent(in) :: connectivity(:)
         real(real64), intent(inout) :: val
         integer(int32) :: i
         real(real64) :: psi_i
@@ -361,16 +363,47 @@ contains
         val = 0.0d0
         do i = 1, self%num_nodes
             call self%psi(i, r, psi_i)
-            val = val + psi_i * global_values(connectivity(i))
+            val = val + psi_i * global_values(i)
         end do
-    end subroutine lerp
+    end subroutine
 
-    pure subroutine dlerp(self, r, global_values, connectivity, val)
+    pure subroutine lerp_2d(self, r, global_values, val)
+        implicit none
+        class(abst_fe), intent(in) :: self
+        type(type_coordinate_dp), intent(in) :: r
+        real(real64), intent(in) :: global_values(:, :)
+        real(real64), intent(inout) :: val(:)
+        integer(int32) :: i
+        real(real64) :: psi_i
+
+        val = 0.0d0
+        do i = 1, self%num_nodes
+            call self%psi(i, r, psi_i)
+            val(:) = val(:) + psi_i * global_values(:, i)
+        end do
+    end subroutine lerp_2d
+
+    pure subroutine lerp_3d(self, r, global_values, val)
+        implicit none
+        class(abst_fe), intent(in) :: self
+        type(type_coordinate_dp), intent(in) :: r
+        real(real64), intent(in) :: global_values(:, :, :)
+        real(real64), intent(inout) :: val(:, :)
+        integer(int32) :: i
+        real(real64) :: psi_i
+
+        val = 0.0d0
+        do i = 1, self%num_nodes
+            call self%psi(i, r, psi_i)
+            val(:, :) = val(:, :) + psi_i * global_values(:, :, i)
+        end do
+    end subroutine lerp_3d
+
+    pure subroutine dlerp(self, r, global_values, val)
         implicit none
         class(abst_fe), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
         real(real64), intent(in) :: global_values(:)
-        integer(int32), intent(in) :: connectivity(:)
         type(type_coordinate_dp), intent(inout) :: val
         integer(int32) :: i
         real(real64) :: dpsi_i
@@ -379,15 +412,15 @@ contains
         do i = 1, self%num_nodes
             if (self%dimension >= 1) then
                 call self%dpsi(i, 1, r, dpsi_i)
-                val%x = val%x + dpsi_i * global_values(connectivity(i))
+                val%x = val%x + dpsi_i * global_values(i)
             end if
             if (self%dimension >= 2) then
                 call self%dpsi(i, 2, r, dpsi_i)
-                val%y = val%y + dpsi_i * global_values(connectivity(i))
+                val%y = val%y + dpsi_i * global_values(i)
             end if
             if (self%dimension >= 3) then
                 call self%dpsi(i, 3, r, dpsi_i)
-                val%z = val%z + dpsi_i * global_values(connectivity(i))
+                val%z = val%z + dpsi_i * global_values(i)
             end if
         end do
     end subroutine dlerp
