@@ -184,6 +184,18 @@ module main_ftdss
 
         end subroutine calc_vapor_flux_ftdss
 
+        module subroutine assemble_local_ftdss(self, element_id, local_J_TT, local_J_TH, local_J_HH, local_J_HT, local_R)
+            implicit none
+            class(type_ftdss), intent(inout) :: self
+            integer(int32), intent(in) :: element_id
+            type(type_matrix_dense), intent(inout), optional :: local_J_TT
+            type(type_matrix_dense), intent(inout), optional :: local_J_TH
+            type(type_matrix_dense), intent(inout), optional :: local_J_HH
+            type(type_matrix_dense), intent(inout), optional :: local_J_HT
+            type(type_vector_dp), intent(inout), optional :: local_R
+
+        end subroutine assemble_local_ftdss
+
     end interface
 
 end module main_ftdss

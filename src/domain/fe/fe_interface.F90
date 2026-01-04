@@ -142,13 +142,12 @@ contains
     !> Computes shape functions, their global gradients, and the Jacobian determinant.
     !> This unifies the geometric calculations required for matrix assembly.
     !>
-    pure subroutine calc_shape_data(self, r, node_coords, connectivity, &
+    pure subroutine calc_shape_data(self, r, node_coords, &
                                     psi_vec, dpsi_dx_mat, det_j)
         implicit none
         class(abst_fe), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:) ! このルーチン内の計算では実質使いません
 
         !> Shape function values [num_nodes]
         real(real64), intent(inout) :: psi_vec(:)
@@ -336,19 +335,20 @@ contains
         val = self%num_gauss
     end subroutine get_num_gauss
 
-    pure subroutine get_weight(self, val)
+    subroutine get_weight(self, val)
         implicit none
-        class(abst_fe), intent(in) :: self
-        real(real64), intent(inout), allocatable :: val(:)
-        val = self%weight
+        class(abst_fe), intent(in), target :: self
+        real(real64), intent(inout), pointer, contiguous, dimension(:) :: val
+
+        val => self%weight
     end subroutine get_weight
 
-    pure subroutine get_gauss(self, val)
+    subroutine get_gauss(self, val)
         implicit none
-        class(abst_fe), intent(in) :: self
-        type(type_coordinate_dp), intent(inout), allocatable :: val(:)
+        class(abst_fe), intent(in), target :: self
+        type(type_coordinate_dp), intent(inout), pointer, contiguous, dimension(:) :: val
 
-        val = self%gauss
+        val => self%gauss
     end subroutine get_gauss
 
     pure subroutine lerp_1d(self, r, global_values, val)
@@ -430,11 +430,10 @@ contains
     !>    K_ij = Integ { A(x) * psi_i * psi_j } dOmega
     !>    分布係数 A はスカラー (節点値 A_vec から補間)
     !>
-    subroutine compute_K1_capacity(self, nodes, conn, A_vec, elem_mat)
+    subroutine compute_K1_capacity(self, nodes, A_vec, elem_mat)
         implicit none
         class(abst_fe), intent(in) :: self
         real(real64), intent(in) :: nodes(:, :) ! 全節点座標
-        integer(int32), intent(in) :: conn(:) ! コネクティビティ
         real(real64), intent(in) :: A_vec(:) ! [num_nodes] 係数
         real(real64), intent(inout) :: elem_mat(:, :)
 
@@ -455,7 +454,7 @@ contains
             w = self%weight(p)
 
             ! 形状関数データ一括取得 (psi, nabla psi, detJ)
-            call self%calc_shape_data(r, nodes, conn, psi, dpsi_dx, det_J)
+            call self%calc_shape_data(r, nodes, psi, dpsi_dx, det_J)
 
             ! 係数 A の補間: A(r) = Sum psi_i * Ai
             A_val = dot_product(psi, A_vec)
@@ -474,11 +473,10 @@ contains
     !>    K_ij = Integ { nabla psi_i . (M(x) * nabla psi_j) } dOmega
     !>    分布係数 M はテンソル (節点値 M_vec から補間)
     !>
-    subroutine compute_K2_diffusion(self, nodes, conn, M_vec, elem_mat)
+    subroutine compute_K2_diffusion(self, nodes, M_vec, elem_mat)
         implicit none
         class(abst_fe), intent(in) :: self
         real(real64), intent(in) :: nodes(:, :)
-        integer(int32), intent(in) :: conn(:)
         real(real64), intent(in) :: M_vec(:, :, :) ! [dim, dim, num_nodes]
         real(real64), intent(inout) :: elem_mat(:, :)
 
@@ -500,7 +498,7 @@ contains
         do p = 1, num_gauss
             r = self%gauss(p)
             w = self%weight(p)
-            call self%calc_shape_data(r, nodes, conn, psi, dpsi_dx, det_J)
+            call self%calc_shape_data(r, nodes, psi, dpsi_dx, det_J)
 
             ! 係数 M の補間: M(r) = Sum psi_k * M_k
             M_val = 0.0d0
@@ -529,11 +527,10 @@ contains
     !>    (行i: 勾配，列j: 形状関数)
     !>    分布係数 V はベクトル (節点値 V_vec から補間)
     !>
-    subroutine compute_K3_mixed(self, nodes, conn, V_vec, elem_mat)
+    subroutine compute_K3_mixed(self, nodes, V_vec, elem_mat)
         implicit none
         class(abst_fe), intent(in) :: self
         real(real64), intent(in) :: nodes(:, :)
-        integer(int32), intent(in) :: conn(:)
         real(real64), intent(in) :: V_vec(:, :) ! [dim, num_nodes]
         real(real64), intent(inout) :: elem_mat(:, :)
 
@@ -555,7 +552,7 @@ contains
         do p = 1, num_gauss
             r = self%gauss(p)
             w = self%weight(p)
-            call self%calc_shape_data(r, nodes, conn, psi, dpsi_dx, det_J)
+            call self%calc_shape_data(r, nodes, psi, dpsi_dx, det_J)
 
             ! 係数 V の補間: V(r) = Sum psi_k * Vk
             V_val = 0.0d0

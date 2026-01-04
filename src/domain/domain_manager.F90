@@ -183,6 +183,11 @@ module domain_manager
         procedure, public, pass(self) :: get_geometry => get_geometry_domain
         procedure, public, pass(self) :: get_target_dof => get_target_dof_domain
         procedure, public, pass(self) :: get_material_id => get_material_id_domain
+
+        procedure, private, pass(self) :: lerp_1d_domain
+        procedure, private, pass(self) :: lerp_2d_domain
+        procedure, private, pass(self) :: lerp_3d_domain
+        generic, public :: lerp => lerp_1d_domain, lerp_2d_domain, lerp_3d_domain
         procedure, public, pass(self) :: display => display_domain
     end type type_domain
 
@@ -904,6 +909,54 @@ contains
         call fe%get_geometry(coordinates, connectivity, geometry)
 
     end subroutine get_geometry_domain
+
+    subroutine lerp_1d_domain(self, element_id, r, value, lerped_value)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(in) :: element_id
+        type(type_coordinate_dp), intent(in) :: r
+        real(real64), intent(in) :: value(:)
+        real(real64), intent(inout) :: lerped_value
+
+        class(abst_fe), pointer :: fe
+
+        call self%get_element(element_id, fe)
+
+        call fe%lerp(r, value, lerped_value)
+
+    end subroutine lerp_1d_domain
+
+    subroutine lerp_2d_domain(self, element_id, r, value, lerped_value)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(in) :: element_id
+        type(type_coordinate_dp), intent(in) :: r
+        real(real64), intent(in) :: value(:, :)
+        real(real64), intent(inout) :: lerped_value(:)
+
+        class(abst_fe), pointer :: fe
+
+        call self%get_element(element_id, fe)
+
+        call fe%lerp(r, value, lerped_value)
+
+    end subroutine lerp_2d_domain
+
+    subroutine lerp_3d_domain(self, element_id, r, value, lerped_value)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(in) :: element_id
+        type(type_coordinate_dp), intent(in) :: r
+        real(real64), intent(in) :: value(:, :, :)
+        real(real64), intent(inout) :: lerped_value(:, :)
+
+        class(abst_fe), pointer :: fe
+
+        call self%get_element(element_id, fe)
+
+        call fe%lerp(r, value, lerped_value)
+
+    end subroutine lerp_3d_domain
 
     ! --------------------------------------------------------------------------
     ! Display Procedures for Debugging

@@ -100,8 +100,8 @@ contains
 
         integer(int32) :: i
         integer(int32) :: ng
-        type(type_coordinate_dp), allocatable :: gauss_pts(:)
-        real(real64), allocatable :: weights(:)
+        type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gauss_pts
+        real(real64), pointer, contiguous, dimension(:) :: weights
         real(real64) :: det_j
 
         geometry = 0.0d0
@@ -114,8 +114,6 @@ contains
             geometry = geometry + det_j * weights(i)
         end do
 
-        if (allocated(gauss_pts)) deallocate (gauss_pts)
-        if (allocated(weights)) deallocate (weights)
     end subroutine get_length_side_second
 
     !>

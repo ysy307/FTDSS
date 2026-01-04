@@ -19,11 +19,7 @@ target_include_directories(Main_Thermal PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Main_Thermal PUBLIC
     Solver::Core
     Solver::Input
-    Solver::Domain
     Solver::Physics
-    Solver::Conditions
-    Solver::Solver
-    Solver::Field
 )
 add_library(Solver::Thermal ALIAS Main_Thermal)
 
@@ -45,11 +41,7 @@ target_include_directories(Main_Hydraulic PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Main_Hydraulic PUBLIC
     Solver::Core
     Solver::Input
-    Solver::Domain
     Solver::Physics
-    Solver::Conditions
-    Solver::Solver
-    Solver::Field
 )
 add_library(Solver::Hydraulic ALIAS Main_Hydraulic)
 

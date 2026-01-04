@@ -2,7 +2,7 @@ module main_hydraulic
     use, intrinsic :: iso_fortran_env
     use :: module_core
     use :: module_input, only:type_input
-    use :: module_physics, only:type_physics_manager
+    use :: module_physics
     implicit none
     private
 

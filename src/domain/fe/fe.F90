@@ -62,7 +62,6 @@ contains
         integer(int32), allocatable :: unique_ids(:)
         integer(int32) :: i
 
-
         if (allocated(self%fe_list)) then
             deallocate (self%fe_list)
         end if

@@ -331,7 +331,7 @@ contains
                     call domain%get_element_connectivity(elem_id, p_conn)
 
                     if (associated(fe) .and. associated(p_conn)) then
-                        call fe%lerp(self%coordinate_normalized(iObs), nodal_temperature, p_conn, val)
+                        call fe%lerp(self%coordinate_normalized(iObs), nodal_temperature(p_conn), val)
                         obs_values(iObs) = val
                     end if
                 end if
@@ -389,8 +389,8 @@ contains
                     call domain%get_element(elem_id, fe)
                     call domain%get_element_connectivity(elem_id, p_conn)
                     if (associated(fe) .and. associated(p_conn)) then
-                        call fe%lerp(self%coordinate_normalized(iObs), nodal_temperature, p_conn, val_T)
-                        call fe%lerp(self%coordinate_normalized(iObs), nodal_porosity, p_conn, val_phi)
+                        call fe%lerp(self%coordinate_normalized(iObs), nodal_temperature(p_conn), val_T)
+                        call fe%lerp(self%coordinate_normalized(iObs), nodal_porosity(p_conn), val_phi)
                         obs_values(iObs) = 0.0d0
                     end if
                 end if
@@ -484,7 +484,7 @@ contains
                     call domain%get_element(elem_id, fe)
                     call domain%get_element_connectivity(elem_id, p_conn)
                     if (associated(fe) .and. associated(p_conn)) then
-                        call fe%lerp(self%coordinate_normalized(iObs), nodal_pw, p_conn, val)
+                        call fe%lerp(self%coordinate_normalized(iObs), nodal_pw(p_conn), val)
                         obs_values(iObs) = val
                     end if
                 end if
