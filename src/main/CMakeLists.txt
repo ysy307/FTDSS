@@ -57,6 +57,9 @@ add_library(Solver::Hydraulic ALIAS Main_Hydraulic)
 # 3. FTDSS Library (High-level Logic)
 # ====================================================================
 set(MAIN_FTDSS_SOURCES
+    ftdss/ftdss_interface.F90
+    ftdss/ftdss_base.F90
+    ftdss/ftdss_boundary.F90
     ftdss/ftdss.F90
 )
 

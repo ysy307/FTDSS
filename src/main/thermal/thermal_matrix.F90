@@ -25,7 +25,6 @@ contains
         ! Get state variables
         call state%temperature%get(temperature)
         call state%porosity%get(Qn)
-        call self%physics%update_water_phases(target_id, state)
         call state%water_content%get(Qw)
         call state%ice_content%get(Qi)
         call state%vapor_content%get(Qv)

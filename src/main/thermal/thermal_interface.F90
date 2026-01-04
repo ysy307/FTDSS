@@ -25,6 +25,7 @@ module main_thermal
         ! procedure, pass(self), public :: assemble_local => assemble_local_thermal
 
         procedure, pass(self), public :: calc_density_water => calc_density_water_thermal
+        procedure, pass(self), public :: update_water_phases => update_water_phases_thermal
     end type type_thermal
 
     !! 一通り計算するのに必要なのが，T, P, dT/dt, dP/dt, grad_T, q_w, q_v
@@ -92,11 +93,13 @@ module main_thermal
 
         end subroutine calc_density_water_thermal
 
-        ! module subroutine assemble_local_thermal(self, J, R,)
-        !     implicit none
-        !     class(type_thermal), intent(inout) :: self
+        module pure elemental subroutine update_water_phases_thermal(self, material_id, state)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(inout) :: state
 
-        ! end subroutine assemble_local_thermal
+        end subroutine update_water_phases_thermal
 
     end interface
 
