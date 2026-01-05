@@ -123,8 +123,8 @@ contains
         real(real64), allocatable :: psi(:)
         real(real64), allocatable :: dpsi_dx(:, :)
         real(real64), allocatable :: node_coords(:, :)
-        real(real64), allocatable :: fe_weights(:)
-        type(type_coordinate_dp), allocatable :: fe_gauss_pts(:)
+        real(real64), pointer, contiguous, dimension(:) :: fe_weights
+        type(type_coordinate_dp), pointer, contiguous, dimension(:) :: fe_gauss_pts
         type(type_coordinate_dp) :: r
 
         integer(int32), pointer, contiguous, dimension(:) :: connectivity
@@ -171,7 +171,7 @@ contains
                         do k_gp = 1, num_gp
                             r = fe_gauss_pts(k_gp)
 
-                            call fe%calc_shape_data(r, node_coords, connectivity, psi, dpsi_dx, det_j)
+                            call fe%calc_shape_data(r, node_coords, psi, dpsi_dx, det_j)
                             w_vol = fe_weights(k_gp) * det_j
 
                             u_curr = 0.0d0
