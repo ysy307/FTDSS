@@ -55,6 +55,11 @@ contains
 
         real(real64) :: Qw_ratio
 
+        if (fc <= 0.0d0) then
+            eta = 1.0d0
+            return
+        end if
+
         Qw_ratio = Qw / Qs
 
         eta = 9.5d0 + 3.0d0 * Qw_ratio - 8.5d0 * exp(-((1.0d0 + 2.6d0 / sqrt(fc)) * Qw_ratio)**4)
@@ -80,8 +85,8 @@ contains
 
         call self%calc_diffusivity(temperature, Da)
         call self%calc_tortuosity_factor(air_content, porosity, tau)
-        call self%parent%water%calc_rho(temperature + TtoK, pressure, rho_water)
-        call self%parent%water%calc_saturation_density(temperature + TtoK, rho_vapor_sat)
+        call self%calc_rho_water(state, rho_water)
+        call self%calc_rho_vapor_saturation(state, rho_vapor_sat)
 
         Dv = Da * tau
         Kvh = Dv * rho_vapor_sat * Mw * g * rh / (Rg * (TtoK + temperature) * rho_water)
@@ -111,8 +116,8 @@ contains
         call self%calc_tortuosity_factor(air_content, porosity, tau)
         call self%calc_enhancement_factor(water_content, porosity, &
                                           mass_fraction_clay, eta)
-        call self%parent%water%calc_rho(temperature + TtoK, pressure, rho_water)
-        call self%parent%water%calc_saturation_drho_dT(temperature + TtoK, drho_vapor_sat_dT)
+        call self%calc_rho_water(state, rho_water)
+        call self%calc_drho_vapor_saturation_dT(state, drho_vapor_sat_dT)
 
         Dv = Da * tau * eta
         KvT = Dv * rh * drho_vapor_sat_dT / rho_water

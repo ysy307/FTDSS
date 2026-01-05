@@ -181,6 +181,7 @@ contains
         do model_idx = 1, self%num_materials
             self%materials_id_map(unique_material_ids(model_idx)) = model_idx
         end do
+
     end subroutine set_map_materials
 
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -385,6 +386,7 @@ contains
         call self%models(self%materials_id_map(material_id))%calc_pressure_ice_water_derivative(state, deriv)
     end subroutine calc_pressure_ice_water_derivative
 
+    ! subroutine update_water_phases(self, material_id, state)
     pure elemental subroutine update_water_phases(self, material_id, state)
         implicit none
         class(type_physics_manager), intent(in) :: self

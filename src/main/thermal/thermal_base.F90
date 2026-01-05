@@ -35,6 +35,10 @@ contains
         allocate (hcf_model_info(num_materials))
         allocate (gcc_model_ids(num_materials))
 
+        gcc_model_ids = 0 ! ID 0 は「モデルなし」として扱う
+        hcf_ids = 0 ! ID 0 は「モデルなし」として扱う
+        wrf_ids = 0
+
         do i = 1, num_materials
             do j = 1, size(active_region_ids)
                 if (input%basic%materials(i)%id == active_region_ids(j)) then
@@ -73,9 +77,11 @@ contains
                             heat_capacity_info(i)%ice = material%thermal%density(3) &
                                                         * material%thermal%specific_heat(3)
                             thermal_conductivity_info(i)%ice = material%thermal%thermal_conductivity(3)
-                            if (allocated(material%thermal%thermal_conductivity_dispersity)) then
-                                call allocate_array(thermal_conductivity_info(i)%dispersity, &
-                                                    source=material%thermal%thermal_conductivity_dispersity)
+                            if (material%is_dispersed) then
+                                if (allocated(material%thermal%thermal_conductivity_dispersity)) then
+                                    call allocate_array(thermal_conductivity_info(i)%dispersity, &
+                                                        source=material%thermal%thermal_conductivity_dispersity)
+                                end if
                             end if
                         end if
 

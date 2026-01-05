@@ -13,6 +13,7 @@ set(CONTROL_SOURCES
     time_profiler.F90
     iteration.F90
     openmp.F90
+    output.F90
     control.F90
 )
 add_library(Control_Main STATIC ${CONTROL_SOURCES})

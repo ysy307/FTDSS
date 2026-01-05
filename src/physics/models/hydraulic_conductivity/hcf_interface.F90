@@ -1,9 +1,10 @@
 module physics_models_hcf
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: iapws, only:type_iapws97
+    use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core
     use :: physics_constants, only:TtoK => celsius_to_kelvin, Mw => molar_mass_water, &
         Rg => universal_gas_constant, g => gravity_acceleration, rho_std => reference_water_density
+    use :: physics_types, only:abst_physics
     implicit none
     private
 
@@ -74,17 +75,18 @@ module physics_models_hcf
     end type holder_hcfs
 
     interface
-        module subroutine initialize_holder_hcfs(self, material_id, params, water)
+        module subroutine initialize_holder_hcfs(self, material_id, params, water, ice)
             implicit none
             class(holder_hcfs), intent(inout) :: self
             integer(int32), intent(in) :: material_id
             type(type_hcf_params), intent(in) :: params
             type(type_iapws97), intent(in), target :: water
+            type(type_iapws06), intent(in), target :: ice
 
         end subroutine initialize_holder_hcfs
     end interface
 
-    type :: type_hcf_vapor
+    type, extends(abst_physics) :: type_hcf_vapor
         private
         class(abst_hcf), pointer :: parent => null()
     contains
@@ -140,15 +142,13 @@ module physics_models_hcf
         end subroutine calc_KvT_vapor
     end interface
 
-    type, abstract :: abst_hcf
+    type, extends(abst_physics), abstract :: abst_hcf
         private
-        logical :: initialized = .false.
         type(type_hcf_params) :: params
         class(abst_hcf_base), allocatable :: base
         class(abst_hcf_impedance), allocatable :: impedance
         class(abst_hcf_viscosity), allocatable :: viscosity
         type(type_hcf_vapor) :: vapor
-        type(type_iapws97), pointer :: water => null()
     contains
         procedure, pass(self), public :: initialize => initialize_abst_hcf
         procedure(abst_calc_Kflh), pass(self), public, deferred :: calc_Kflh
@@ -159,12 +159,13 @@ module physics_models_hcf
     end type abst_hcf
 
     interface
-        module subroutine initialize_abst_hcf(self, material_id, params, water)
+        module subroutine initialize_abst_hcf(self, material_id, params, water, ice)
             implicit none
             class(abst_hcf), intent(inout), target :: self
             integer(int32), intent(in) :: material_id
             type(type_hcf_params), intent(in) :: params
             type(type_iapws97), intent(in), target :: water
+            type(type_iapws06), intent(in), target :: ice
 
         end subroutine initialize_abst_hcf
 

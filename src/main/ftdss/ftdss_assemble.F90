@@ -7,6 +7,53 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
+        type(type_matrix_dense) :: local_J_TT, local_J_TH, local_J_HH, local_J_HT
+        type(type_vector_dp) :: local_R_T, local_R_H
+
+        integer(int32) :: num_elements, num_nodes
+        integer(int32), pointer, contiguous, dimension(:) :: p_connectivity
+        integer(int32) :: i
+        integer(int32) :: thermal_dof, hydraulic_dof
+
+        call self%controls%profiler%start("Assemble")
+
+        call self%J%zero()
+        call self%R%zero()
+
+        ! 全要素数の取得
+        num_elements = self%domain%get_num_elements()
+        num_nodes = self%domain%get_num_nodes()
+
+        call local_J_HH%initialize(num_nodes)
+        call local_J_HT%initialize(num_nodes)
+        call local_J_TT%initialize(num_nodes)
+        call local_J_TH%initialize(num_nodes)
+        call local_R_T%initialize(num_nodes)
+        call local_R_H%initialize(num_nodes)
+
+        do i = 1, num_elements
+            call self%assemble_local(i, local_J_TT, local_J_TH, local_J_HH, local_J_HT, local_R_T, local_R_H)
+
+            call self%domain%get_element_connectivity(i, p_connectivity)
+            call self%domain%get_target_dof(PHYSICS_TYPE_THERMAL, thermal_dof)
+            call self%domain%get_target_dof(PHYSICS_TYPE_HYDRAULIC, hydraulic_dof)
+
+            call self%J%add(thermal_dof, thermal_dof, p_connectivity, local_J_TT)
+            ! call self%J%add(thermal_dof, hydraulic_dof, p_connectivity, local_J_TH)
+            ! call self%J%add(hydraulic_dof, hydraulic_dof, p_connectivity, local_J_HH)
+            ! call self%J%add(hydraulic_dof, thermal_dof, p_connectivity, local_J_HT)
+
+            call self%R%add(thermal_dof, p_connectivity, local_R_T)
+            ! call self%R%add(hydraulic_dof, p_connectivity, local_R_H)
+        end do
+
+        call local_J_TT%destroy()
+        call local_J_TH%destroy()
+        call local_J_HH%destroy()
+        call local_J_HT%destroy()
+
+        call self%controls%profiler%stop("Assemble")
+
     end subroutine assemble_ftdss
 
     ! ==========================================================================
@@ -33,8 +80,8 @@ contains
         real(real64), allocatable :: R_T_C(:), R_T_D(:, :), R_H_C(:), R_H_D(:, :)
 
         ! 作業用バッファ
-        real(real64), allocatable :: local_J(:, :) ! 行列用: dim x dim
-        real(real64), allocatable :: local_R(:) ! 残差用: dim (ベクトル)
+        real(real64), allocatable :: local_J(:, :) ! 行列用
+        real(real64), allocatable :: local_R(:) ! 残差用
 
         ! --- 初期化 ---
         if (present(local_J_TT)) call local_J_TT%zero()
@@ -54,8 +101,9 @@ contains
         call fe%get_num_nodes(num_nodes)
 
         ! --- 配列確保 ---
-        allocate (local_J(dim, dim))
-        allocate (local_R(dim)) ! ベクトルバッファ
+        ! [修正] 行列サイズは dim ではなく num_nodes
+        allocate (local_J(num_nodes, num_nodes))
+        allocate (local_R(num_nodes))
 
         call allocate_coefficient_arrays(dim, num_nodes, &
                                          C_TT, C_TH, C_HH, C_HT, &
@@ -112,8 +160,8 @@ contains
         call allocate_array(V_HT, dim, num_nodes)
 
         ! 残差係数
-        call allocate_array(R_T_C, num_nodes) ! スカラー項 (Capacity/Source)
-        call allocate_array(R_T_D, dim, num_nodes) ! ベクトル項 (Flux Divergence)
+        call allocate_array(R_T_C, num_nodes)
+        call allocate_array(R_T_D, dim, num_nodes)
         call allocate_array(R_H_C, num_nodes)
         call allocate_array(R_H_D, dim, num_nodes)
 
@@ -169,8 +217,10 @@ contains
         class(abst_fe), intent(in) :: fe
         real(real64), intent(in) :: coordinates(:, :)
         integer(int32), intent(in) :: dim
-        real(real64), intent(inout) :: local_J(dim, dim) ! Buffer Matrix
-        real(real64), intent(inout) :: local_R(dim) ! Buffer Vector
+
+        ! [修正] 固定サイズ (dim, dim) ではなく形状引き継ぎ配列とする
+        real(real64), intent(inout) :: local_J(:, :)
+        real(real64), intent(inout) :: local_R(:)
 
         ! Coefficients (Matrix)
         real(real64), intent(in) :: C_TT(:), C_TH(:), C_HH(:), C_HT(:)
@@ -210,9 +260,9 @@ contains
         ! ----------------------------------------------------------------------
         ! --- Residual T (Heat) ---
         if (present(local_R_T)) then
-            ! Scalar term (Source/Capacity): int(N * R_C)
+            ! Scalar term (Source/Capacity)
             call add_residual_scalar(fe, coordinates, dim, R_T_C, local_R, local_R_T)
-            ! Vector term (Flux Divergence): int(gradN * R_D)
+            ! Vector term (Flux Divergence)
             call add_residual_vector(fe, coordinates, dim, R_T_D, local_R, local_R_T)
         end if
 
@@ -227,7 +277,7 @@ contains
     end subroutine assemble_matrices
 
     ! ==========================================================================
-    ! Helper Subroutines for Matrix (Existing)
+    ! Helper Subroutines for Matrix
     ! ==========================================================================
     subroutine add_term_scalar(fe, coords, dim, coeff, buffer, target_mat)
         implicit none
@@ -237,11 +287,15 @@ contains
         real(real64), intent(in) :: coeff(:)
         real(real64), intent(inout) :: buffer(:, :)
         type(type_matrix_dense), intent(inout) :: target_mat
-        integer(int32) :: i, j
+        integer(int32) :: i, j, nd
+
+        ! [修正] バッファサイズ(=節点数)を取得してループ上限にする
+        nd = size(buffer, 1)
 
         call fe%compute_K(coords, coeff, buffer)
-        do i = 1, dim
-            do j = 1, dim
+
+        do i = 1, nd
+            do j = 1, nd
                 call target_mat%set(OP_ADD, i, j, buffer(i, j))
             end do
         end do
@@ -255,11 +309,15 @@ contains
         real(real64), intent(in) :: coeff(:, :, :)
         real(real64), intent(inout) :: buffer(:, :)
         type(type_matrix_dense), intent(inout) :: target_mat
-        integer(int32) :: i, j
+        integer(int32) :: i, j, nd
+
+        ! [修正]
+        nd = size(buffer, 1)
 
         call fe%compute_K(coords, coeff, buffer)
-        do i = 1, dim
-            do j = 1, dim
+
+        do i = 1, nd
+            do j = 1, nd
                 call target_mat%set(OP_ADD, i, j, buffer(i, j))
             end do
         end do
@@ -273,58 +331,66 @@ contains
         real(real64), intent(in) :: coeff(:, :)
         real(real64), intent(inout) :: buffer(:, :)
         type(type_matrix_dense), intent(inout) :: target_mat
-        integer(int32) :: i, j
+        integer(int32) :: i, j, nd
+
+        ! [修正]
+        nd = size(buffer, 1)
 
         call fe%compute_K(coords, coeff, buffer)
-        do i = 1, dim
-            do j = 1, dim
+
+        do i = 1, nd
+            do j = 1, nd
                 call target_mat%set(OP_ADD, i, j, buffer(i, j))
             end do
         end do
     end subroutine add_term_vector
 
     ! ==========================================================================
-    ! Helper Subroutines for Residual (New)
+    ! Helper Subroutines for Residual
     ! ==========================================================================
 
     ! --------------------------------------------------------------------------
-    ! 残差加算: スカラー係数 (Capacity / Source) -> compute_R
+    ! 残差加算: スカラー係数
     ! --------------------------------------------------------------------------
     subroutine add_residual_scalar(fe, coords, dim, coeff, buffer, target_vec)
         implicit none
         class(abst_fe), intent(in) :: fe
         real(real64), intent(in) :: coords(:, :)
         integer(int32), intent(in) :: dim
-        real(real64), intent(in) :: coeff(:) ! Nodal scalar values
-        real(real64), intent(inout) :: buffer(:) ! Vector buffer (dim)
+        real(real64), intent(in) :: coeff(:)
+        real(real64), intent(inout) :: buffer(:)
         type(type_vector_dp), intent(inout) :: target_vec
-        integer(int32) :: i
+        integer(int32) :: i, nd
 
-        ! compute_R はベクトル(dim)を返すと仮定
+        ! [修正]
+        nd = size(buffer, 1)
+
         call fe%compute_R(coords, coeff, buffer)
 
-        do i = 1, dim
+        do i = 1, nd
             call target_vec%set(OP_ADD, i, buffer(i))
         end do
     end subroutine add_residual_scalar
 
     ! --------------------------------------------------------------------------
-    ! 残差加算: ベクトル係数 (Flux / Divergence) -> compute_R
+    ! 残差加算: ベクトル係数
     ! --------------------------------------------------------------------------
     subroutine add_residual_vector(fe, coords, dim, coeff, buffer, target_vec)
         implicit none
         class(abst_fe), intent(in) :: fe
         real(real64), intent(in) :: coords(:, :)
         integer(int32), intent(in) :: dim
-        real(real64), intent(in) :: coeff(:, :) ! Nodal vector values
-        real(real64), intent(inout) :: buffer(:) ! Vector buffer (dim)
+        real(real64), intent(in) :: coeff(:, :)
+        real(real64), intent(inout) :: buffer(:)
         type(type_vector_dp), intent(inout) :: target_vec
-        integer(int32) :: i
+        integer(int32) :: i, nd
 
-        ! compute_R はベクトル(dim)を返すと仮定
+        ! [修正]
+        nd = size(buffer, 1)
+
         call fe%compute_R(coords, coeff, buffer)
 
-        do i = 1, dim
+        do i = 1, nd
             call target_vec%set(OP_ADD, i, buffer(i))
         end do
     end subroutine add_residual_vector

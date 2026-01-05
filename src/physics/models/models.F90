@@ -51,7 +51,7 @@ contains
             call self%wrf%initialize(wrf_id, wrf_params)
         end if
         if (present(hcf_id) .and. present(hcf_params) .and. present(water)) then
-            call self%hcf%initialize(hcf_id, hcf_params, water)
+            call self%hcf%initialize(hcf_id, hcf_params, water, ice)
         end if
         if (present(gcc_id) .and. present(water) .and. present(ice)) then
             call self%gcc%initialize(material_id, gcc_id, water, ice)

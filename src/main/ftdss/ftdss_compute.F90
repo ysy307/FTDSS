@@ -331,4 +331,60 @@ contains
 
     end subroutine calc_vapor_flux_ftdss
 
+    module subroutine solve_time_step_ftdss(self, is_step_converged)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+        logical, intent(inout) :: is_step_converged
+
+        ! ローカル変数の宣言（反復カウンタ，残差ノルム等）
+        integer(int32) :: iter
+        integer(int32) :: max_iter
+        ! real(real64) :: residual_norm
+
+        ! 1．初期化
+        ! 反復計算の開始前に必要な変数を初期化する．
+        is_step_converged = .false.
+
+        ! 2．非線形反復ループ（Newtonループ）開始
+        max_iter = self%controls%iteration%get_max_iterations()
+        do iter = 1, max_iter
+
+            ! 2.1．物理量の勾配計算など，アセンブル前の準備
+            ! 前の反復（またはタイムステップ）で得られた状態量から勾配等を更新する．
+            ! call self%calc_gradient_temperature()
+            ! call self%calc_gradient_pressure()
+
+            ! 2.2．大域行列（Jacobian）と残差ベクトル（Residual）のアセンブル
+            ! 各要素で局所行列を作成し，大域行列に足し合わせる．
+            call self%assemble()
+
+            ! 2.3．境界条件の適用
+            ! ディリクレ境界条件等を連立方程式に反映させる．
+            call self%apply_bc(.false.)
+
+            ! 2.4．収束判定
+            ! 残差ベクトルのノルムや解の更新量をチェックする．
+            ! 収束していればループを抜け，成功フラグを立てる．
+            ! if (check_convergence(self%R)) then
+            !     is_step_converged = .true.
+            !     exit
+            ! end if
+
+            ! 2.5．線形ソルバーの実行
+            ! J * delta = -R を解き，修正量 delta を求める．
+            call self%solve()
+
+            ! 2.6．解（主変数）の更新
+            ! Temperature, Pressure 等を delta を用いて更新する．
+            call self%reflect_variables()
+
+            is_step_converged = .true.
+            exit
+
+        end do
+
+        ! 3．ループ終了後の処理
+        ! 収束しなかった場合の警告や，収束した場合の後処理を行う．
+
+    end subroutine solve_time_step_ftdss
 end submodule ftdss_compute

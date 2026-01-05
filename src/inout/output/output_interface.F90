@@ -63,10 +63,10 @@ module inout_output
         end subroutine abst_get_values
 
         subroutine abst_write_obeservation_header(self, time_unit)
-            import :: type_output_observation
+            import :: type_output_observation, int32
             implicit none
             class(type_output_observation), intent(inout) :: self
-            character(*), intent(in) :: time_unit
+            integer(int32), intent(in) :: time_unit
         end subroutine abst_write_obeservation_header
     end interface
 

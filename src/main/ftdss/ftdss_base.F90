@@ -24,11 +24,12 @@ contains
         call self%controls%profiler%initialize(profiler_labels)
         call self%controls%profiler%record(TIME_RECORD_START)
         call self%controls%profiler%start("Total")
-        call self%controls%profiler%start("IO")
 
         call setup_handler()
 
+        call self%controls%profiler%stop("IO")
         call input%initialize()
+        call self%controls%profiler%start("IO")
         call self%controls%initialize(input)
         call ic%initialize(input)
 
@@ -89,16 +90,50 @@ contains
         call self%apply_bc()
 
         call self%output%initialize(input, self%controls, self%domain)
+        call self%output_fields()
+        call self%output_history()
 
-        call self%output%output_fields(0, self%domain, self%porosity%pre, &
-                                       self%temperature%pre, self%Qw%pre, self%pressure%pre)
-        call self%controls%time%get_time(current_time)
-        call self%output%output_history(current_time, self%domain, self%porosity%pre, &
-                                        self%temperature%pre, self%pressure%pre)
-
-        call self%controls%profiler%stop("IO")
+        !
         call global_logger%log_information(message="FTDSS module initialized successfully.")
     end subroutine initialize_type_ftdss
+
+    module subroutine output_fields_ftdss(self)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+
+        integer(int32) :: iter
+        real(real64) :: current_time
+
+        call self%controls%profiler%start("IO")
+
+        call self%controls%time%get_time(current_time)
+
+        if (self%controls%out_field%is_due(current_time)) then
+            call self%controls%out_field%get_step(iter)
+            call self%output%output_fields(iter, self%domain, self%porosity%pre, &
+                                           self%temperature%pre, self%Qw%pre, self%pressure%pre)
+        end if
+
+        call self%controls%profiler%stop("IO")
+    end subroutine output_fields_ftdss
+
+    module subroutine output_history_ftdss(self)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+
+        real(real64) :: current_time
+
+        call self%controls%profiler%start("IO")
+
+        call self%controls%time%get_time(current_time)
+
+        if (self%controls%out_history%is_due(current_time)) then
+            call self%output%output_history(current_time, self%domain, self%porosity%pre, &
+                                            self%temperature%pre, self%pressure%pre)
+        end if
+
+        call self%controls%profiler%stop("IO")
+    end subroutine output_history_ftdss
 
     module subroutine set_state_ftdss(self, node_id, element_id, state)
         implicit none
@@ -163,6 +198,8 @@ contains
         call self%Qi%shift()
         call self%Qa%shift()
         call self%Qv%shift()
+
+        call self%controls%time%shift()
 
         call self%controls%profiler%stop("Setup")
     end subroutine shift_ftdss

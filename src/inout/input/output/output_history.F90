@@ -21,6 +21,7 @@ contains
         character(256) :: buffer(3) = [character(256) :: history_output, "", ""]
         integer(int32) :: i
         logical :: found
+        character(:), allocatable :: tmp_string
 
         buffer(2) = file_format
         call get_json_value(json, join(buffer), self%history_output%file_format, &
@@ -34,8 +35,9 @@ contains
 
             buffer(2) = output_interval
             buffer(3) = unit
-            call get_json_value(json, join(buffer), self%history_output%output_interval_unit, &
+            call get_json_value(json, join(buffer), tmp_string, &
                                 is_required=.true., valid_list=valid_time_units)
+            self%field_output%output_interval_unit = get_time_unit(trim(tmp_string))
             buffer(3) = value
             call get_json_value(json, join(buffer), self%history_output%output_interval_step, is_required=.true., &
                                 valid_range=[0.0d0, huge(0.0d0)])
@@ -90,7 +92,7 @@ contains
         write (output_unit, '(A, A)') "    File Format: ", trim(self%file_format)
         select case (self%file_format)
         case (valid_history_file_formats(1), valid_history_file_formats(2)) ! "dat", "csv"
-            write (output_unit, '(A, A, F8.3)') "    Output Interval: ", trim(self%output_interval_unit), &
+            write (output_unit, '(A, A, F8.3)') "    Output Interval: ", get_time_unit_string(self%output_interval_unit), &
                 self%output_interval_step
             write (output_unit, '(A, A)') "    Observation Type: ", trim(self%observation_type)
             write (output_unit, '(A)') "    Variables:"

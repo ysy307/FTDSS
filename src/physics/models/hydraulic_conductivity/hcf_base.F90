@@ -3,12 +3,13 @@ submodule(physics_models_hcf) hcf_base
     real(real64), parameter :: gamma_0 = 71.88875d0 ! g/s^2
 contains
 
-    module subroutine initialize_holder_hcfs(self, material_id, params, water)
+    module subroutine initialize_holder_hcfs(self, material_id, params, water, ice)
         implicit none
         class(holder_hcfs), intent(inout) :: self
         integer(int32), intent(in) :: material_id
         type(type_hcf_params), intent(in) :: params
         type(type_iapws97), intent(in), target :: water
+        type(type_iapws06), intent(in), target :: ice
 
         if (allocated(self%p)) then
             deallocate (self%p)
@@ -33,7 +34,7 @@ contains
 
         call self%p%params%copy(params)
         call self%p%params%convert(params%unit_id)
-        call self%p%initialize(material_id, params, water)
+        call self%p%initialize(material_id, params, water, ice)
 
     end subroutine initialize_holder_hcfs
 
@@ -150,12 +151,13 @@ contains
 
     end subroutine copy_params_hcf
 
-    module subroutine initialize_abst_hcf(self, material_id, params, water)
+    module subroutine initialize_abst_hcf(self, material_id, params, water, ice)
         implicit none
         class(abst_hcf), intent(inout), target :: self
         integer(int32), intent(in) :: material_id
         type(type_hcf_params), intent(in) :: params
         type(type_iapws97), intent(in), target :: water
+        type(type_iapws06), intent(in), target :: ice
 
         if (params%model_number == HCF_BASE .or. &
             params%model_number == HCF_BASE_IMPEDANCE .or. &
@@ -202,6 +204,11 @@ contains
         end if
 
         self%water => water
+        self%ice => ice
+
+        self%vapor%parent => self
+        self%vapor%water => water
+        self%vapor%ice => ice
 
         self%initialized = .true.
     end subroutine initialize_abst_hcf

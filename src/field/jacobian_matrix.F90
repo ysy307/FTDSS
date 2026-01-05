@@ -162,7 +162,7 @@ contains
 
         integer(int32) :: i, j, num_local_nodes
         real(real64) :: val
-        real(real64), pointer :: dense_val(:, :)
+        real(real64), pointer, dimension(:, :) :: dense_val
 
         if (.not. allocated(self%matrix)) return
 
@@ -174,12 +174,9 @@ contains
         ! ここでは各ノードペアに対して set_value_block を呼び出す。
         do i = 1, num_local_nodes
             do j = 1, num_local_nodes
-                val = dense_val(i, j)
-                if (abs(val) > epsilon(0.0d0)) then
-                    call self%matrix%set(OP_ADD, &
-                                         global_connectivity(i), global_connectivity(j), &
-                                         row_dof, col_dof, val)
-                end if
+                call self%matrix%set(OP_ADD, &
+                                     global_connectivity(i), global_connectivity(j), &
+                                     row_dof, col_dof, dense_val(i, j))
             end do
         end do
     end subroutine add_local_jacobian_matrix

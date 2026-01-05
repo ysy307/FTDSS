@@ -22,13 +22,10 @@ module main_thermal
         procedure, pass(self), public :: compute_D_T => compute_D_T
         procedure, pass(self), public :: compute_V_T => compute_V_T
         procedure, pass(self), public :: compute_R_T => compute_R_T
-        ! procedure, pass(self), public :: assemble_local => assemble_local_thermal
 
         procedure, pass(self), public :: calc_density_water => calc_density_water_thermal
         procedure, pass(self), public :: update_water_phases => update_water_phases_thermal
     end type type_thermal
-
-    !! 一通り計算するのに必要なのが，T, P, dT/dt, dP/dt, grad_T, q_w, q_v
 
     interface
         module subroutine initialize_type_thermal(self, input, active_region_ids)

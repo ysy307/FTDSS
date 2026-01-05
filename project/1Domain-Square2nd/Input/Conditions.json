@@ -48,31 +48,9 @@
             "field_name": "Temperature"
         },
         "hydraulic": {
-            "type": "laplace",
-            "boundary_conditions": [
-                {
-                    "id": 2,
-                    "type": "impermeable"
-                },
-                {
-                    "id": 3,
-                    "type": "dirichlet",
-                    "values": [
-                        0.1
-                    ]
-                },
-                {
-                    "id": 4,
-                    "type": "impermeable"
-                },
-                {
-                    "id": 5,
-                    "type": "dirichlet",
-                    "values": [
-                        0.0
-                    ]
-                }
-            ]
+            "type": "uniform",
+            "value": 100.0,
+            "field_name": "Pressure"
         },
         "porosity": {
             "type": "uniform",

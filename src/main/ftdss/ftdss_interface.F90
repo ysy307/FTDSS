@@ -66,6 +66,16 @@ module main_ftdss
         procedure, public, pass(self) :: set_state => set_state_ftdss
 
         procedure, public, pass(self) :: reflect_variables => reflect_variables_ftdss
+
+        procedure, public, pass(self) :: update_variables => update_variables_ftdss
+        procedure, public, pass(self) :: assemble_local => assemble_local_ftdss
+        procedure, public, pass(self) :: assemble => assemble_ftdss
+
+        !> 1タイムステップ分の計算を行う（非線形反復ループを含む）
+        procedure, public, pass(self) :: solve_time_step => solve_time_step_ftdss
+
+        procedure, public, pass(self) :: output_fields => output_fields_ftdss
+        procedure, public, pass(self) :: output_history => output_history_ftdss
     end type type_ftdss
 
     interface
@@ -197,6 +207,25 @@ module main_ftdss
             class(type_ftdss), intent(inout) :: self
 
         end subroutine assemble_ftdss
+
+        module subroutine solve_time_step_ftdss(self, is_step_converged)
+            implicit none
+            class(type_ftdss), intent(inout) :: self
+            logical, intent(inout) :: is_step_converged
+
+        end subroutine solve_time_step_ftdss
+
+        module subroutine output_fields_ftdss(self)
+            implicit none
+            class(type_ftdss), intent(inout) :: self
+
+        end subroutine output_fields_ftdss
+
+        module subroutine output_history_ftdss(self)
+            implicit none
+            class(type_ftdss), intent(inout) :: self
+
+        end subroutine output_history_ftdss
 
     end interface
 

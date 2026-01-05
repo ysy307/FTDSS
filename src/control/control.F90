@@ -5,6 +5,7 @@ module module_control
     use :: control_time, only:type_time
     use :: control_time_profiler, only:type_profiler
     use :: control_iteration, only:type_iteration
+    use :: control_output, only:type_output_manager
     use :: control_openmp, only:initialize_openmp
     implicit none
     private
@@ -25,6 +26,10 @@ module module_control
         type(type_iteration), public :: iteration
         type(type_time), public :: time
         type(type_profiler), public :: profiler
+
+        type(type_output_manager), public :: out_field
+        type(type_output_manager), public :: out_history
+
     contains
         procedure, pass(self), public :: initialize => initialize_type_controls
         procedure, pass(self), public :: is_physics_active => is_physics_active_control
@@ -103,6 +108,18 @@ contains
             call self%time%initialize(input)
             call self%iteration%initialize(input)
             call initialize_openmp(input)
+
+            call self%out_field%initialize( &
+                input%output_settings%field_output%output_interval_step, &
+                input%output_settings%field_output%output_interval_unit, &
+                input%output_settings%field_output%file_format, &
+                self%time)
+
+            call self%out_history%initialize( &
+                input%output_settings%history_output%output_interval_step, &
+                input%output_settings%history_output%output_interval_unit, &
+                input%output_settings%history_output%file_format, &
+                self%time)
 
         end if
 

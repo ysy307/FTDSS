@@ -81,7 +81,8 @@ contains
     module function get_val_dense(self) result(val)
         implicit none
         class(type_matrix_dense), intent(in), target :: self
-        real(real64), dimension(:, :), pointer :: val
+        real(real64), pointer, dimension(:, :) :: val
+
         val => self%val
     end function get_val_dense
 

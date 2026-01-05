@@ -50,8 +50,10 @@ module field_residual_vector
         procedure, pass(self), private :: add_array_residual_vector
         procedure, pass(self), private :: add_value_at_index_residual_vector
         procedure, pass(self), private :: add_values_at_indices_residual_vector
+        procedure, pass(self), private :: add_values_from_vector_residual_vector
         generic, public :: add => add_value_residual_vector, add_array_residual_vector, &
-            add_value_at_index_residual_vector, add_values_at_indices_residual_vector
+            add_value_at_index_residual_vector, add_values_at_indices_residual_vector, &
+            add_values_from_vector_residual_vector
 
         procedure, pass(self), public :: zero => zero_residual_vector
         procedure, public, pass(self) :: copy => copy_residual_vector
@@ -199,6 +201,23 @@ contains
 
         call self%data%set(OP_ADD, global_indices, values, row_block=row_dof)
     end subroutine add_values_at_indices_residual_vector
+
+    subroutine add_values_from_vector_residual_vector(self, row_dof, global_indices, values)
+        implicit none
+        class(type_residual_vector), intent(inout) :: self
+        integer(int32), intent(in) :: row_dof
+        integer(int32), intent(in) :: global_indices(:)
+        type(type_vector_dp), intent(in) :: values
+
+        real(real64), pointer, dimension(:) :: vals_data
+        integer(int32) :: i
+
+        vals_data => values%get_data()
+
+        do i = 1, size(global_indices)
+            call self%data%set(OP_ADD, global_indices(i), vals_data(i), row_block=row_dof)
+        end do
+    end subroutine add_values_from_vector_residual_vector
 
     ! -------------------------------------------------------------------
     !  Operations

@@ -179,7 +179,7 @@ contains
     subroutine write_observation_header_dat(self, time_unit)
         implicit none
         class(type_output_observation), intent(inout) :: self
-        character(*), intent(in) :: time_unit
+        integer(int32), intent(in) :: time_unit
 
         integer(int32) :: iObs, num_observations, elem_id
 
@@ -213,7 +213,7 @@ contains
         end select
 
         write (self%num_unit, '(a)') "#"
-        write (self%num_unit, '(a)') "# Output Unit: Time ["//trim(adjustl(time_unit))//"], " &
+        write (self%num_unit, '(a)') "# Output Unit: Time ["//trim(get_time_unit_string(time_unit))//"], " &
             //trim(self%name)//" ["//trim(self%unit)//"]"
         write (self%num_unit, '(a)') "#"
 
@@ -232,7 +232,7 @@ contains
     subroutine write_observation_header_csv(self, time_unit)
         implicit none
         class(type_output_observation), intent(inout) :: self
-        character(*), intent(in) :: time_unit
+        integer(int32), intent(in) :: time_unit
 
         integer(int32) :: iObs, num_observations, elem_id
 
@@ -266,7 +266,7 @@ contains
         end select
 
         write (self%num_unit, '(a)') "#"
-        write (self%num_unit, '(a)') "# Output Unit: Time ["//trim(adjustl(time_unit))//"], " &
+        write (self%num_unit, '(a)') "# Output Unit: Time ["//trim(get_time_unit_string(time_unit))//"], " &
             //trim(self%name)//" ["//trim(self%unit)//"]"
         write (self%num_unit, '(a)') "#"
 
