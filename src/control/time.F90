@@ -221,7 +221,7 @@ contains
         class(type_time), intent(in) :: self
         real(real64), intent(inout) :: current_time
 
-        current_time = self%current_time * self%time_conversion
+        current_time = self%current_time
     end subroutine get_time
 
     subroutine get_dt(self, dt)

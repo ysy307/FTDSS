@@ -112,6 +112,7 @@ contains
             call self%controls%out_field%get_step(iter)
             call self%output%output_fields(iter, self%domain, self%porosity%pre, &
                                            self%temperature%pre, self%Qw%pre, self%pressure%pre)
+            call self%controls%out_field%update(current_time)
         end if
 
         call self%controls%profiler%stop("IO")
@@ -130,6 +131,7 @@ contains
         if (self%controls%out_history%is_due(current_time)) then
             call self%output%output_history(current_time, self%domain, self%porosity%pre, &
                                             self%temperature%pre, self%pressure%pre)
+            call self%controls%out_history%update(current_time)
         end if
 
         call self%controls%profiler%stop("IO")

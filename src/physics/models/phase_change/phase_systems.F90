@@ -57,31 +57,64 @@ contains
 
         real(real64) :: water_content, ice_content, air_content, vapor_content, porosity
 
+        ! Temporary raw values
+        real(real64) :: raw_water_content
+
         ! Local variables for derivatives
         real(real64) :: dQw_dP, dQw_dT
         real(real64) :: dQi_dP, dQi_dT
         real(real64) :: dQa_dP, dQa_dT
         real(real64) :: dQv_dP, dQv_dT
 
-        ! 2. 液状水分量 (theta_w) の更新
-        call self%fusion%calc_water_content(state, water_content)
-        call self%fusion%calc_water_content_derivatives(state, dQw_dP, dQw_dT)
-        call state%water_content%set(water_content)
-        call state%dQw_dP%set(dQw_dP)
-        call state%dQw_dT%set(dQw_dT)
+        ! 1. 空隙率と氷含有量 (theta_i) の取得・更新
+        !    ※ 氷は固相として優先的に占有させます
+        call state%porosity%get(porosity)
 
-        ! 3. 氷含有量 (theta_i) の更新
         call self%fusion%calc_ice_content(state, ice_content)
         call self%fusion%calc_ice_content_derivatives(state, dQi_dP, dQi_dT)
         call state%ice_content%set(ice_content)
         call state%dQi_dP%set(dQi_dP)
         call state%dQi_dT%set(dQi_dT)
 
-        ! 4. 空気相 (theta_g) の更新
-        call state%porosity%get(porosity)
-        dQa_dP = -1.0d0 * (dQw_dP + dQi_dP)
-        dQa_dT = -1.0d0 * (dQw_dT + dQi_dT)
-        call state%air_content%set(porosity - water_content - ice_content)
+        ! 2. 液状水分量 (theta_w) の仮計算
+        call self%fusion%calc_water_content(state, raw_water_content)
+        call self%fusion%calc_water_content_derivatives(state, dQw_dP, dQw_dT)
+
+        ! --- 補正ロジック: 合わせてPorosityにする ---
+        if (raw_water_content + ice_content > porosity) then
+            ! 【過飽和状態】
+            ! 物理的上限 (Porosity) に合わせるため、水分量をカットする
+            water_content = max(0.0d0, porosity - ice_content)
+
+            ! 微分も整合させる:
+            ! Qw = Porosity - Qi なので、 dQw = -dQi となる (Porosity一定と仮定)
+            dQw_dP = -1.0d0 * dQi_dP
+            dQw_dT = -1.0d0 * dQi_dT
+
+            ! 気相は完全に無し
+            air_content = 0.0d0
+            dQa_dP = 0.0d0
+            dQa_dT = 0.0d0
+        else
+            ! 【不飽和状態】
+            ! そのまま採用
+            water_content = raw_water_content
+
+            ! 気相 = 空隙 - 水 - 氷
+            air_content = porosity - water_content - ice_content
+
+            ! 気相の微分
+            dQa_dP = -1.0d0 * (dQw_dP + dQi_dP)
+            dQa_dT = -1.0d0 * (dQw_dT + dQi_dT)
+        end if
+
+        ! 水分量のセット（補正後）
+        call state%water_content%set(water_content)
+        call state%dQw_dP%set(dQw_dP)
+        call state%dQw_dT%set(dQw_dT)
+
+        ! 空気相のセット（補正後）
+        call state%air_content%set(air_content)
         call state%dQa_dP%set(dQa_dP)
         call state%dQa_dT%set(dQa_dT)
 

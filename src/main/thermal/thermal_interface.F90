@@ -3,7 +3,6 @@ module main_thermal
     use :: module_core
     use :: module_input, only:type_input
     use :: module_physics, only:type_physics_manager, type_wrf_params, type_hcf_params, type_thc_dispersity
-    use :: module_field, only:type_jacobian_matrix, type_residual_vector
     implicit none
     private
 

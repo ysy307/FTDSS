@@ -40,7 +40,7 @@ contains
         type(type_time), intent(in) :: time_manager
         integer(int32), intent(in), optional :: initial_step
 
-        real(real64) :: conv, current_t
+        real(real64) :: conv, current_time
 
         if (trim(file_format) == "none") then
             self%is_active = .false.
@@ -54,8 +54,8 @@ contains
         self%interval_seconds = interval_val * conv
 
         ! 初回出力時刻の設定
-        call time_manager%get_time(current_t)
-        self%next_output_time = current_t
+        call time_manager%get_time(current_time)
+        self%next_output_time = current_time
 
         ! ステップ数の初期化
         if (present(initial_step)) then

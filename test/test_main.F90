@@ -30,12 +30,18 @@ contains
         type(type_ftdss) :: ftdss
 
         logical :: is_step_converged
-
+        integer(int32) :: iter
         call ftdss%initialize()
 
-        call ftdss%solve_time_step(is_step_converged)
-        call ftdss%output_fields()
-        call ftdss%output_history()
+        call ftdss%controls%time%shift()
+        do iter = 1, 10
+            call ftdss%controls%iteration%increment_total()
+            call ftdss%solve_time_step(is_step_converged)
+            call ftdss%update_variables()
+            call ftdss%shift()
+            call ftdss%output_fields()
+            call ftdss%output_history()
+        end do
 
     end subroutine run_test_ftdss
 

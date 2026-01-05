@@ -114,7 +114,6 @@ contains
                 input%output_settings%field_output%output_interval_unit, &
                 input%output_settings%field_output%file_format, &
                 self%time)
-
             call self%out_history%initialize( &
                 input%output_settings%history_output%output_interval_step, &
                 input%output_settings%history_output%output_interval_unit, &
