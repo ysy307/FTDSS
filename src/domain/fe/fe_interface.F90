@@ -64,6 +64,9 @@ module domain_fe
         procedure, pass(self), private :: compute_K2_diffusion
         procedure, pass(self), private :: compute_K3_mixed
         generic, public :: compute_K => compute_K1_capacity, compute_K2_diffusion, compute_K3_mixed
+        procedure, pass(self), private :: compute_R1_source
+        procedure, pass(self), private :: compute_R2_flux
+        generic, public :: compute_R => compute_R1_source, compute_R2_flux
 
         !----------------------------------------------------------------------
         ! Abstract methods to be implemented in derived types
@@ -572,6 +575,96 @@ contains
             end do
         end do
     end subroutine compute_K3_mixed
+
+    !>
+    !> 1. スカラーソース項残差 (Source Term Residual) R1
+    !>    R_i = Integ { psi_i * S(x) } dOmega
+    !>    分布係数 S はスカラー (節点値 S_vec から補間)
+    !>
+    subroutine compute_R1_source(self, nodes, S_vec, elem_vec)
+        implicit none
+        class(abst_fe), intent(in) :: self
+        real(real64), intent(in) :: nodes(:, :) ! 全節点座標
+        real(real64), intent(in) :: S_vec(:) ! [num_nodes] スカラー係数
+        real(real64), intent(inout) :: elem_vec(:) ! [num_nodes] 残差ベクトル
+
+        integer(int32) :: p, i, k, nd, dim, num_gauss
+        real(real64) :: w, det_J, S_val
+        real(real64), allocatable :: psi(:), dpsi_dx(:, :)
+        type(type_coordinate_dp) :: r
+
+        call self%get_dimension(dim)
+        call self%get_num_nodes(nd)
+        call self%get_num_gauss(num_gauss)
+
+        allocate (psi(nd), dpsi_dx(nd, dim))
+        elem_vec = 0.0d0
+
+        do p = 1, num_gauss
+            r = self%gauss(p)
+            w = self%weight(p)
+
+            ! 形状関数データ取得
+            call self%calc_shape_data(r, nodes, psi, dpsi_dx, det_J)
+
+            ! 係数 S の補間: S(r) = Sum psi_k * S_k
+            S_val = dot_product(psi, S_vec)
+
+            ! ベクトル積算: w * detJ * S * psi_i
+            do i = 1, nd
+                elem_vec(i) = elem_vec(i) + w * det_J * S_val * psi(i)
+            end do
+        end do
+    end subroutine compute_R1_source
+
+    !>
+    !> 2. 流束項残差 (Flux Term Residual) R2
+    !>    R_i = Integ { nabla psi_i . F(x) } dOmega
+    !>    分布係数 F はベクトル (節点値 F_vec から補間)
+    !>    ※ 弱形式における拡散項の移項や、発散項の積分に対応
+    !>
+    subroutine compute_R2_flux(self, nodes, F_vec, elem_vec)
+        implicit none
+        class(abst_fe), intent(in) :: self
+        real(real64), intent(in) :: nodes(:, :)
+        real(real64), intent(in) :: F_vec(:, :) ! [dim, num_nodes] ベクトル係数
+        real(real64), intent(inout) :: elem_vec(:) ! [num_nodes] 残差ベクトル
+
+        integer(int32) :: p, i, k, nd, dim, num_gauss
+        real(real64) :: w, det_J, grad_psi_i_dot_F
+        real(real64), allocatable :: psi(:), dpsi_dx(:, :)
+        real(real64), allocatable :: F_val(:)
+        type(type_coordinate_dp) :: r
+
+        call self%get_dimension(dim)
+        call self%get_num_nodes(nd)
+        call self%get_num_gauss(num_gauss)
+
+        allocate (psi(nd), dpsi_dx(nd, dim))
+        allocate (F_val(dim))
+
+        elem_vec = 0.0d0
+
+        do p = 1, num_gauss
+            r = self%gauss(p)
+            w = self%weight(p)
+            call self%calc_shape_data(r, nodes, psi, dpsi_dx, det_J)
+
+            ! 係数 F の補間: F(r) = Sum psi_k * F_k
+            F_val = 0.0d0
+            do k = 1, nd
+                F_val = F_val + psi(k) * F_vec(:, k)
+            end do
+
+            ! ベクトル積算: w * detJ * (nabla psi_i . F)
+            do i = 1, nd
+                ! (nabla psi_i . F)
+                grad_psi_i_dot_F = dot_product(dpsi_dx(i, :), F_val)
+
+                elem_vec(i) = elem_vec(i) + w * det_J * grad_psi_i_dot_F
+            end do
+        end do
+    end subroutine compute_R2_flux
 
     subroutine display(self)
         implicit none

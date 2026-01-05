@@ -140,8 +140,8 @@ contains
         real(real64), allocatable :: dpsi_dx(:, :)
 
         ! FE情報キャッシュ用
-        real(real64), allocatable :: fe_weights(:)
-        type(type_coordinate_dp), allocatable :: fe_gauss_pts(:)
+        real(real64), pointer, contiguous, dimension(:) :: fe_weights
+        type(type_coordinate_dp), pointer, contiguous, dimension(:) :: fe_gauss_pts
 
         real(real64), allocatable :: nodal_vol(:)
 
@@ -194,7 +194,7 @@ contains
             do p = 1, n_gauss
                 r = fe_gauss_pts(p)
 
-                call fe%calc_shape_data(r, node_coords, p_conn, psi, dpsi_dx, det_j)
+                call fe%calc_shape_data(r, node_coords, psi, dpsi_dx, det_j)
                 w_vol = fe_weights(p) * det_j
 
                 gauss_grad = 0.0d0
@@ -236,8 +236,6 @@ contains
         if (allocated(psi)) deallocate (psi)
         if (allocated(dpsi_dx)) deallocate (dpsi_dx)
         if (allocated(nodal_vol)) deallocate (nodal_vol)
-        if (allocated(fe_weights)) deallocate (fe_weights)
-        if (allocated(fe_gauss_pts)) deallocate (fe_gauss_pts)
 
     end subroutine calc_gradient_ftdss
 

@@ -3,15 +3,21 @@ submodule(main_ftdss) ftdss_assemble
 
 contains
 
+    module subroutine assemble_ftdss(self)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+
+    end subroutine assemble_ftdss
+
     ! ==========================================================================
-    ! メイン: 局所行列のアセンブリ
+    ! メイン: 局所行列および残差ベクトルのアセンブリ
     ! ==========================================================================
-    module subroutine assemble_local_ftdss(self, element_id, local_J_TT, local_J_TH, local_J_HH, local_J_HT, local_R)
+    module subroutine assemble_local_ftdss(self, element_id, local_J_TT, local_J_TH, local_J_HH, local_J_HT, local_R_T, local_R_H)
         implicit none
         class(type_ftdss), intent(inout) :: self
         integer(int32), intent(in) :: element_id
         type(type_matrix_dense), intent(inout), optional :: local_J_TT, local_J_TH, local_J_HH, local_J_HT
-        type(type_vector_dp), intent(inout), optional :: local_R
+        type(type_vector_dp), intent(inout), optional :: local_R_T, local_R_H
 
         class(abst_fe), pointer :: fe
         integer(int32) :: num_nodes, num_gauss, material_id, dim
@@ -26,15 +32,17 @@ contains
         real(real64), allocatable :: V_TT(:, :), V_TH(:, :), V_HH(:, :), V_HT(:, :)
         real(real64), allocatable :: R_T_C(:), R_T_D(:, :), R_H_C(:), R_H_D(:, :)
 
-        ! 作業用バッファ (dim x dim で固定)
-        real(real64), allocatable :: local_J(:, :)
+        ! 作業用バッファ
+        real(real64), allocatable :: local_J(:, :) ! 行列用: dim x dim
+        real(real64), allocatable :: local_R(:) ! 残差用: dim (ベクトル)
 
         ! --- 初期化 ---
         if (present(local_J_TT)) call local_J_TT%zero()
         if (present(local_J_TH)) call local_J_TH%zero()
         if (present(local_J_HH)) call local_J_HH%zero()
         if (present(local_J_HT)) call local_J_HT%zero()
-        if (present(local_R)) call local_R%zero()
+        if (present(local_R_T)) call local_R_T%zero()
+        if (present(local_R_H)) call local_R_H%zero()
 
         ! --- 要素情報の取得 ---
         call self%domain%get_material_id(element_id, material_id)
@@ -46,8 +54,8 @@ contains
         call fe%get_num_nodes(num_nodes)
 
         ! --- 配列確保 ---
-        ! local_J は常に dim x dim のサイズで良い
         allocate (local_J(dim, dim))
+        allocate (local_R(dim)) ! ベクトルバッファ
 
         call allocate_coefficient_arrays(dim, num_nodes, &
                                          C_TT, C_TH, C_HH, C_HT, &
@@ -62,13 +70,14 @@ contains
                                         V_TT, V_TH, V_HH, V_HT, &
                                         R_T_C, R_T_D, R_H_C, R_H_D)
 
-        ! --- アセンブリ ---
-        ! ここですべて dim x dim として処理する
-        call assemble_matrices(fe, coordinates, dim, local_J, &
+        ! --- アセンブリ (行列 & 残差) ---
+        call assemble_matrices(fe, coordinates, dim, local_J, local_R, &
                                C_TT, C_TH, C_HH, C_HT, &
                                M_TT, M_TH, M_HH, M_HT, &
                                V_TT, V_TH, V_HH, V_HT, &
-                               local_J_TT, local_J_TH, local_J_HH, local_J_HT)
+                               R_T_C, R_T_D, R_H_C, R_H_D, &
+                               local_J_TT, local_J_TH, local_J_HH, local_J_HT, &
+                               local_R_T, local_R_H)
 
     end subroutine assemble_local_ftdss
 
@@ -102,8 +111,9 @@ contains
         call allocate_array(V_HH, dim, num_nodes)
         call allocate_array(V_HT, dim, num_nodes)
 
-        call allocate_array(R_T_C, num_nodes)
-        call allocate_array(R_T_D, dim, num_nodes)
+        ! 残差係数
+        call allocate_array(R_T_C, num_nodes) ! スカラー項 (Capacity/Source)
+        call allocate_array(R_T_D, dim, num_nodes) ! ベクトル項 (Flux Divergence)
         call allocate_array(R_H_C, num_nodes)
         call allocate_array(R_H_D, dim, num_nodes)
 
@@ -146,48 +156,79 @@ contains
     end subroutine compute_nodal_coefficients
 
     ! ==========================================================================
-    ! サブ: 行列のアセンブリ
+    ! サブ: アセンブリ (Matrix & Residual)
     ! ==========================================================================
-    subroutine assemble_matrices(fe, coordinates, dim, local_J, &
+    subroutine assemble_matrices(fe, coordinates, dim, local_J, local_R, &
                                  C_TT, C_TH, C_HH, C_HT, &
                                  M_TT, M_TH, M_HH, M_HT, &
                                  V_TT, V_TH, V_HH, V_HT, &
-                                 local_J_TT, local_J_TH, local_J_HH, local_J_HT)
+                                 R_T_C, R_T_D, R_H_C, R_H_D, &
+                                 local_J_TT, local_J_TH, local_J_HH, local_J_HT, &
+                                 local_R_T, local_R_H)
         implicit none
         class(abst_fe), intent(in) :: fe
         real(real64), intent(in) :: coordinates(:, :)
         integer(int32), intent(in) :: dim
-        real(real64), intent(inout) :: local_J(dim, dim) ! Pre-allocated dim x dim
+        real(real64), intent(inout) :: local_J(dim, dim) ! Buffer Matrix
+        real(real64), intent(inout) :: local_R(dim) ! Buffer Vector
 
+        ! Coefficients (Matrix)
         real(real64), intent(in) :: C_TT(:), C_TH(:), C_HH(:), C_HT(:)
         real(real64), intent(in) :: M_TT(:, :, :), M_TH(:, :, :), M_HH(:, :, :), M_HT(:, :, :)
         real(real64), intent(in) :: V_TT(:, :), V_TH(:, :), V_HH(:, :), V_HT(:, :)
 
-        type(type_matrix_dense), intent(inout), optional :: local_J_TT, local_J_TH, local_J_HH, local_J_HT
+        ! Coefficients (Residual)
+        real(real64), intent(in) :: R_T_C(:), R_T_D(:, :), R_H_C(:), R_H_D(:, :)
 
-        ! --- C Terms (Scalar coeff input) -> dim x dim output ---
+        ! Outputs
+        type(type_matrix_dense), intent(inout), optional :: local_J_TT, local_J_TH, local_J_HH, local_J_HT
+        type(type_vector_dp), intent(inout), optional :: local_R_T, local_R_H
+
+        ! ----------------------------------------------------------------------
+        ! 1. Matrix Assembly
+        ! ----------------------------------------------------------------------
+        ! --- C Terms ---
         if (present(local_J_TT)) call add_term_scalar(fe, coordinates, dim, C_TT, local_J, local_J_TT)
         if (present(local_J_TH)) call add_term_scalar(fe, coordinates, dim, C_TH, local_J, local_J_TH)
         if (present(local_J_HH)) call add_term_scalar(fe, coordinates, dim, C_HH, local_J, local_J_HH)
         if (present(local_J_HT)) call add_term_scalar(fe, coordinates, dim, C_HT, local_J, local_J_HT)
 
-        ! --- M Terms (Tensor coeff input) -> dim x dim output ---
+        ! --- M Terms ---
         if (present(local_J_TT)) call add_term_tensor(fe, coordinates, dim, M_TT, local_J, local_J_TT)
         if (present(local_J_TH)) call add_term_tensor(fe, coordinates, dim, M_TH, local_J, local_J_TH)
         if (present(local_J_HH)) call add_term_tensor(fe, coordinates, dim, M_HH, local_J, local_J_HH)
         if (present(local_J_HT)) call add_term_tensor(fe, coordinates, dim, M_HT, local_J, local_J_HT)
 
-        ! --- V Terms (Vector coeff input) -> dim x dim output ---
+        ! --- V Terms ---
         if (present(local_J_TT)) call add_term_vector(fe, coordinates, dim, V_TT, local_J, local_J_TT)
         if (present(local_J_TH)) call add_term_vector(fe, coordinates, dim, V_TH, local_J, local_J_TH)
         if (present(local_J_HH)) call add_term_vector(fe, coordinates, dim, V_HH, local_J, local_J_HH)
         if (present(local_J_HT)) call add_term_vector(fe, coordinates, dim, V_HT, local_J, local_J_HT)
 
+        ! ----------------------------------------------------------------------
+        ! 2. Residual Assembly
+        ! ----------------------------------------------------------------------
+        ! --- Residual T (Heat) ---
+        if (present(local_R_T)) then
+            ! Scalar term (Source/Capacity): int(N * R_C)
+            call add_residual_scalar(fe, coordinates, dim, R_T_C, local_R, local_R_T)
+            ! Vector term (Flux Divergence): int(gradN * R_D)
+            call add_residual_vector(fe, coordinates, dim, R_T_D, local_R, local_R_T)
+        end if
+
+        ! --- Residual H (Hydraulic) ---
+        if (present(local_R_H)) then
+            ! Scalar term
+            call add_residual_scalar(fe, coordinates, dim, R_H_C, local_R, local_R_H)
+            ! Vector term
+            call add_residual_vector(fe, coordinates, dim, R_H_D, local_R, local_R_H)
+        end if
+
     end subroutine assemble_matrices
 
-    ! --------------------------------------------------------------------------
-    ! ヘルパー: スカラー係数行列の加算
-    ! --------------------------------------------------------------------------
+    ! ==========================================================================
+    ! Helper Subroutines for Matrix (Existing)
+    ! ==========================================================================
     subroutine add_term_scalar(fe, coords, dim, coeff, buffer, target_mat)
         implicit none
         class(abst_fe), intent(in) :: fe
@@ -199,7 +240,6 @@ contains
         integer(int32) :: i, j
 
         call fe%compute_K(coords, coeff, buffer)
-
         do i = 1, dim
             do j = 1, dim
                 call target_mat%set(OP_ADD, i, j, buffer(i, j))
@@ -207,9 +247,6 @@ contains
         end do
     end subroutine add_term_scalar
 
-    ! --------------------------------------------------------------------------
-    ! ヘルパー: テンソル係数行列の加算
-    ! --------------------------------------------------------------------------
     subroutine add_term_tensor(fe, coords, dim, coeff, buffer, target_mat)
         implicit none
         class(abst_fe), intent(in) :: fe
@@ -221,7 +258,6 @@ contains
         integer(int32) :: i, j
 
         call fe%compute_K(coords, coeff, buffer)
-
         do i = 1, dim
             do j = 1, dim
                 call target_mat%set(OP_ADD, i, j, buffer(i, j))
@@ -229,9 +265,6 @@ contains
         end do
     end subroutine add_term_tensor
 
-    ! --------------------------------------------------------------------------
-    ! ヘルパー: ベクトル係数行列の加算
-    ! --------------------------------------------------------------------------
     subroutine add_term_vector(fe, coords, dim, coeff, buffer, target_mat)
         implicit none
         class(abst_fe), intent(in) :: fe
@@ -243,12 +276,57 @@ contains
         integer(int32) :: i, j
 
         call fe%compute_K(coords, coeff, buffer)
-
         do i = 1, dim
             do j = 1, dim
                 call target_mat%set(OP_ADD, i, j, buffer(i, j))
             end do
         end do
     end subroutine add_term_vector
+
+    ! ==========================================================================
+    ! Helper Subroutines for Residual (New)
+    ! ==========================================================================
+
+    ! --------------------------------------------------------------------------
+    ! 残差加算: スカラー係数 (Capacity / Source) -> compute_R
+    ! --------------------------------------------------------------------------
+    subroutine add_residual_scalar(fe, coords, dim, coeff, buffer, target_vec)
+        implicit none
+        class(abst_fe), intent(in) :: fe
+        real(real64), intent(in) :: coords(:, :)
+        integer(int32), intent(in) :: dim
+        real(real64), intent(in) :: coeff(:) ! Nodal scalar values
+        real(real64), intent(inout) :: buffer(:) ! Vector buffer (dim)
+        type(type_vector_dp), intent(inout) :: target_vec
+        integer(int32) :: i
+
+        ! compute_R はベクトル(dim)を返すと仮定
+        call fe%compute_R(coords, coeff, buffer)
+
+        do i = 1, dim
+            call target_vec%set(OP_ADD, i, buffer(i))
+        end do
+    end subroutine add_residual_scalar
+
+    ! --------------------------------------------------------------------------
+    ! 残差加算: ベクトル係数 (Flux / Divergence) -> compute_R
+    ! --------------------------------------------------------------------------
+    subroutine add_residual_vector(fe, coords, dim, coeff, buffer, target_vec)
+        implicit none
+        class(abst_fe), intent(in) :: fe
+        real(real64), intent(in) :: coords(:, :)
+        integer(int32), intent(in) :: dim
+        real(real64), intent(in) :: coeff(:, :) ! Nodal vector values
+        real(real64), intent(inout) :: buffer(:) ! Vector buffer (dim)
+        type(type_vector_dp), intent(inout) :: target_vec
+        integer(int32) :: i
+
+        ! compute_R はベクトル(dim)を返すと仮定
+        call fe%compute_R(coords, coeff, buffer)
+
+        do i = 1, dim
+            call target_vec%set(OP_ADD, i, buffer(i))
+        end do
+    end subroutine add_residual_vector
 
 end submodule ftdss_assemble

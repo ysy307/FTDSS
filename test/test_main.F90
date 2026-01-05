@@ -32,7 +32,18 @@ contains
         call ftdss%initialize()
         call ftdss%calc_gradient(ftdss%temperature%pre, ftdss%temperature%grad)
 
-        ! block
+        block
+            integer(int32) :: i
+
+            if (ftdss%domain%my_rank == 0) then
+                print *, "--- [FTDSS] Gradient Calculation Test ---"
+                do i = 1, 1000
+                    print *, " Node ", i, ": T = ", ftdss%temperature%pre(i), &
+                        ", Grad_T = (", ftdss%temperature%grad%x(i), ", ", &
+                        ftdss%temperature%grad%y(i), ", ", ftdss%temperature%grad%z(i), ")"
+                end do
+            end if
+        end block
         !     class(abst_fe), pointer :: fe
         !     ! real(real64) :: noord()
 
