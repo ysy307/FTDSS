@@ -104,7 +104,7 @@ contains
             end if
 
             ! 初期時間をセット
-            self%current_time = self%start_time
+            self%current_time = self%start_time + self%dt
 
         end associate
 

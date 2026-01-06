@@ -351,8 +351,8 @@ contains
 
             ! 2.1．物理量の勾配計算など，アセンブル前の準備
             ! 前の反復（またはタイムステップ）で得られた状態量から勾配等を更新する．
-            ! call self%calc_gradient_temperature()
-            ! call self%calc_gradient_pressure()
+            call self%calc_gradient_temperature()
+            call self%calc_gradient_pressure()
 
             ! 2.2．大域行列（Jacobian）と残差ベクトル（Residual）のアセンブル
             ! 各要素で局所行列を作成し，大域行列に足し合わせる．
@@ -365,17 +365,6 @@ contains
             else
                 call self%apply_bc(.false.)
             end if
-
-            block
-                integer(int32) :: unit
-                open (newunit=unit, file='jacobian.txt', status='replace', action='write')
-                call self%J%display(unit)
-                close (unit)
-                open (newunit=unit, file='residual.txt', status='replace', action='write')
-                call self%R%display(unit)
-                close (unit)
-            end block
-            stop
 
             ! 2.4．収束判定
             ! 残差ベクトルのノルムや解の更新量をチェックする．

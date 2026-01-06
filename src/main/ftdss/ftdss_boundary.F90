@@ -228,10 +228,6 @@ contains
                         glob_node_id = patch%connectivity%val(i)
 
                         val_curr = variable%new(glob_node_id)
-                        print *, "BC_DEBUG: Node=", glob_node_id, &
-                            " Curr=", val_curr, &
-                            " Fixed=", val_fixed, &
-                            " Diff(R)=", val_curr - val_fixed
 
                         ! 1. Jacobianの行をゼロ化 (zero_row使用)
                         call self%J%zero(glob_node_id, dof_offset)

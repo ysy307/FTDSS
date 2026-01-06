@@ -127,6 +127,7 @@ contains
         ! --- Get BDF Coefficient ---
         ! self%coeffs(0) corresponds to time_coef(1) due to pointer association.
         call self%controls%time%get_bdf_coeffs(time_coef)
+        print *, "Time Coefficients:", time_coef
         if (associated(time_coef)) then
             bdf_coeff = time_coef(1)
         else

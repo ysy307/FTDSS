@@ -33,7 +33,6 @@ contains
         integer(int32) :: iter
         call ftdss%initialize()
 
-        call ftdss%controls%time%shift()
         do iter = 1, 10
             call ftdss%controls%iteration%increment_total()
             call ftdss%solve_time_step(is_step_converged)
