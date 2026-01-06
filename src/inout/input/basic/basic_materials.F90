@@ -133,54 +133,53 @@ contains
         character(256) :: buffer(5) = [character(256) :: "", "", "", "", ""]
 
         buffer(1) = materials//"("//to_string(i_material)//")"
-        buffer(2) = thermal
 
-        buffer(3) = density
-        buffer(4) = value
+        buffer(2) = density
+        buffer(3) = value
         call get_json_value(json, join(buffer(1:4)), self%materials(i_material)%density%value, &
                             is_required=.true., valid_range=[0.0d0, huge(0.0d0)], array_size=self%materials(i_material)%phase)
 
-        buffer(3) = specific_heat
-        buffer(4) = value
+        buffer(2) = specific_heat
+        buffer(3) = value
         call get_json_value(json, join(buffer(1:4)), self%materials(i_material)%specific_heat%value, &
                             is_required=.true., valid_range=[0.0d0, huge(0.0d0)], array_size=self%materials(i_material)%phase)
 
-        buffer(3) = volumetric_heat_capacity
-        buffer(4) = value
+        buffer(2) = volumetric_heat_capacity
+        buffer(3) = value
         call get_json_value(json, join(buffer(1:4)), self%materials(i_material)%volumetric_heat_capacity%value, &
                             is_required=.true., valid_range=[0.0d0, huge(0.0d0)], array_size=self%materials(i_material)%phase)
 
         if (self%materials(i_material)%phase > 3) then
-            buffer(4) = params
+            buffer(3) = params
             call get_json_value(json, join(buffer(1:4)), self%materials(i_material)%volumetric_heat_capacity%value, &
                                 is_required=.true., valid_range=[0.0d0, huge(0.0d0)], array_size=self%materials(i_material)%phase)
         end if
 
-        buffer(3) = thermal_conductivity
-        buffer(4) = value
+        buffer(2) = thermal_conductivity
+        buffer(3) = value
         call get_json_value(json, join(buffer(1:4)), self%materials(i_material)%thermal_conductivity%value, &
                             is_required=.true., valid_range=[0.0d0, huge(0.0d0)], array_size=self%materials(i_material)%phase)
 
-        buffer(4) = is_dispersed
+        buffer(3) = is_dispersed
         call get_json_value(json, join(buffer(1:4)), self%materials(i_material)%thermal_conductivity%is_dispersed, &
                             is_required=.false., default_value=.false.)
 
         if (self%materials(i_material)%thermal_conductivity%is_dispersed) then
-            buffer(4) = dispersivity
+            buffer(3) = dispersivity
             call get_json_value(json, join(buffer(1:4)), self%materials(i_material)%thermal_conductivity%dispersivity, &
                                 is_required=.true., valid_range=[0.0d0, huge(0.0d0)], array_size=2)
         end if
 
         if (self%materials(i_material)%phase > 3) then
-            buffer(4) = params
+            buffer(3) = params
             call get_json_value(json, join(buffer(1:4)), self%materials(i_material)%thermal_conductivity%params, &
                                 is_required=.true., valid_range=[0.0d0, huge(0.0d0)], array_size=self%materials(i_material)%phase)
         end if
 
         if (self%materials(i_material)%phase > 2) then
-            buffer(3) = phase_change
-            buffer(4) = equilibrium_model
-            buffer(5) = segregation
+            buffer(2) = phase_change
+            buffer(3) = equilibrium_model
+            buffer(4) = segregation
             call get_json_value(json, join(buffer), self%materials(i_material)%phase_change%equilibrium_model%segregation, &
                                 is_required=.true., default_value=.false.)
 
