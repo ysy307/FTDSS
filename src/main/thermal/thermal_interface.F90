@@ -2,7 +2,7 @@ module main_thermal
     use, intrinsic :: iso_fortran_env
     use :: module_core
     use :: module_input, only:type_input
-    use :: module_physics, only:type_physics_manager, type_wrf_params, type_hcf_params, type_thc_dispersity
+    use :: module_physics, only:type_physics_manager, type_wrf_params, type_hcf_params, type_thc_dispersivity
     implicit none
     private
 

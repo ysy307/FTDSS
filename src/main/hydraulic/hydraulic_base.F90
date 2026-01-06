@@ -56,14 +56,4 @@ contains
 
     end subroutine initialize_type_hydraulic
 
-    module pure elemental subroutine update_water_phases_hydraulic(self, material_id, state)
-        implicit none
-        class(type_hydraulic), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_state), intent(inout) :: state
-
-        call self%physics%update_water_phases(material_id, state)
-
-    end subroutine update_water_phases_hydraulic
-
 end submodule hydraulic_base

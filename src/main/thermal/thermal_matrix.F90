@@ -97,7 +97,7 @@ contains
         real(real64) :: K_vT, K_vP ! Vapor:  Thermal-diffusion, Pressure-diffusion
 
         ! Thermal conductivity tensor
-        type(type_thc_dispersity) :: lambda
+        type(type_thc_dispersivity) :: lambda
         ! real(real64), allocatable :: lambda(:, :)
 
         ! Intermediate coefficients
@@ -254,7 +254,7 @@ contains
         real(real64) :: temperature
         type(type_coordinate_dp) :: grad_T
         type(type_coordinate_dp) :: water_flux, vapor_flux
-        type(type_thc_dispersity) :: lambda
+        type(type_thc_dispersivity) :: lambda
 
         real(real64) :: rho_w, c_w, c_v, Lv
         real(real64) :: term_adv_sensible(3) ! 顕熱移流

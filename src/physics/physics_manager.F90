@@ -3,7 +3,7 @@ module physics_service
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core
     use :: physics_types, only:type_iapws_wrapper
-    use :: module_physics_materials, only:type_material_manager, type_thc_dispersity
+    use :: module_physics_materials, only:type_material_manager, type_thc_dispersivity
     use :: module_physics_models, only:type_models_manager, type_wrf_params, type_hcf_params
     implicit none
     private
@@ -38,10 +38,10 @@ module physics_service
         procedure, public :: calc_specific_heat_water
         procedure, public :: calc_specific_heat_ice
         procedure, public :: calc_specific_heat_vapor
-        procedure, private :: calc_thermal_conductivity_nondispersity
-        procedure, private :: calc_thermal_conductivity_dispersity
+        procedure, private :: calc_thermal_conductivity_nondispersivity
+        procedure, private :: calc_thermal_conductivity_dispersivity
         generic, public :: calc_thermal_conductivity &
-            => calc_thermal_conductivity_nondispersity, calc_thermal_conductivity_dispersity
+            => calc_thermal_conductivity_nondispersivity, calc_thermal_conductivity_dispersivity
         procedure, public :: calc_vol_heat_capacity
         procedure, public :: calc_latent_heat_fusion
         procedure, public :: calc_latent_heat_vaporization
@@ -323,7 +323,7 @@ contains
 
     end subroutine calc_specific_heat_vapor
 
-    pure elemental subroutine calc_thermal_conductivity_nondispersity(self, material_id, state, thermal_conductivity)
+    pure elemental subroutine calc_thermal_conductivity_nondispersivity(self, material_id, state, thermal_conductivity)
         implicit none
         class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
@@ -332,18 +332,18 @@ contains
 
         call self%materials(self%materials_id_map(material_id))%calc_thermal_conductivity(state, thermal_conductivity)
 
-    end subroutine calc_thermal_conductivity_nondispersity
+    end subroutine calc_thermal_conductivity_nondispersivity
 
-    pure elemental subroutine calc_thermal_conductivity_dispersity(self, material_id, state, thermal_conductivity)
+    pure elemental subroutine calc_thermal_conductivity_dispersivity(self, material_id, state, thermal_conductivity)
         implicit none
         class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(in) :: state
-        type(type_thc_dispersity), intent(inout) :: thermal_conductivity
+        type(type_thc_dispersivity), intent(inout) :: thermal_conductivity
 
         call self%materials(self%materials_id_map(material_id))%calc_thermal_conductivity(state, thermal_conductivity)
 
-    end subroutine calc_thermal_conductivity_dispersity
+    end subroutine calc_thermal_conductivity_dispersivity
 
     pure elemental subroutine calc_vol_heat_capacity(self, material_id, state, vol_heat_capacity)
         implicit none

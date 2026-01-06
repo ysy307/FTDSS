@@ -11,7 +11,7 @@ module module_physics_materials
     private
 
     public :: type_material_manager
-    public :: type_thc_dispersity
+    public :: type_thc_dispersivity
 
     type :: type_material_manager
         private
@@ -28,9 +28,9 @@ module module_physics_materials
         procedure, public :: calc_density_ice_derivatives
         procedure, public :: calc_density_vapor_derivatives
         procedure, public :: calc_specific_heat
-        procedure, private :: calc_thermal_conductivity_nondispersity
-        procedure, private :: calc_thermal_conductivity_dispersity
-        generic, public :: calc_thermal_conductivity => calc_thermal_conductivity_nondispersity, calc_thermal_conductivity_dispersity
+        procedure, private :: calc_thermal_conductivity_nondispersivity
+        procedure, private :: calc_thermal_conductivity_dispersivity
+        generic, public :: calc_thermal_conductivity => calc_thermal_conductivity_nondispersivity, calc_thermal_conductivity_dispersivity
         procedure, public :: calc_vol_heat_capacity
     end type type_material_manager
 
@@ -168,7 +168,7 @@ contains
 
     end subroutine calc_specific_heat
 
-    pure elemental subroutine calc_thermal_conductivity_nondispersity(self, state, lambda)
+    pure elemental subroutine calc_thermal_conductivity_nondispersivity(self, state, lambda)
         implicit none
         class(type_material_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -176,17 +176,17 @@ contains
 
         call self%thc%p%calc(state, lambda)
 
-    end subroutine calc_thermal_conductivity_nondispersity
+    end subroutine calc_thermal_conductivity_nondispersivity
 
-    pure elemental subroutine calc_thermal_conductivity_dispersity(self, state, lambda)
+    pure elemental subroutine calc_thermal_conductivity_dispersivity(self, state, lambda)
         implicit none
         class(type_material_manager), intent(in) :: self
         type(type_state), intent(in) :: state
-        type(type_thc_dispersity), intent(inout) :: lambda
+        type(type_thc_dispersivity), intent(inout) :: lambda
 
         call self%thc%p%calc(state, lambda)
 
-    end subroutine calc_thermal_conductivity_dispersity
+    end subroutine calc_thermal_conductivity_dispersivity
 
     pure elemental subroutine calc_vol_heat_capacity(self, state, vhc)
         implicit none
