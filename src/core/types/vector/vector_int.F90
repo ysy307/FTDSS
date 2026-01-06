@@ -259,22 +259,26 @@ contains
     !>
     !> Display with block awareness.
     !>
-    module subroutine display_vector_int(self)
+    module subroutine display_vector_int(self, unit_in)
         implicit none
         class(type_vector_int), intent(in) :: self
+        integer(int32), intent(in), optional :: unit_in
+
         integer(int32) :: i, b, idx
+        integer(int32) :: unit
+
+        unit = optval(unit_in, output_unit)
 
         if (.not. self%is_initialized_vector) then
-            write (*, *) "Vector not initialized."
+            write (unit, '(a)') "Vector not initialized."
             return
         end if
 
-        write (*, *) "Vector(Int) Size:", self%num_nodes, " Blocks:", self%num_blocks
-
+        write (unit, '(a,i0,a,i0)') "Vector(Int) Size:", self%num_nodes, " Blocks:", self%num_blocks
         do i = 1, self%num_nodes
             do b = 1, self%num_blocks
                 idx = (i - 1) * self%num_blocks + b
-                write (*, '(A,I0,A,I0,A,I12)') &
+                write (unit, '(A,I0,A,I0,A,I12)') &
                     "Node ", i, " Block ", b, ": ", self%val(idx)
             end do
         end do

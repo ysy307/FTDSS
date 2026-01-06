@@ -117,7 +117,7 @@ contains
         logical, intent(inout), optional :: is_set
 
         if (.not. self%is_set) then
-            value = 0.0d0
+            value = huge(0.0d0)
             if (present(is_set)) is_set = .false.
             return
         end if
@@ -156,7 +156,7 @@ contains
             val = self%value
             if (present(is_set)) is_set = self%is_set
         else
-            val = type_coordinate_dp(0.0d0, 0.0d0, 0.0d0)
+            val = type_coordinate_dp(huge(0.0d0), huge(0.0d0), huge(0.0d0))
             if (present(is_set)) is_set = .false.
         end if
     end subroutine get_field_coord

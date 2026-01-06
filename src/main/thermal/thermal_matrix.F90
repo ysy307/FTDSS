@@ -51,7 +51,7 @@ contains
 
         if (present(C_TT)) then
             ! Calculate C_TT
-            C_TT = c_s * rho_s * Qn &
+            C_TT = c_s * rho_s * (1.0d0 - Qn) &
                    + c_w * rho_w * Qw + c_w * Qw * temperature * drho_w_dT + c_w * rho_w * temperature * dQw_dT &
                    + c_i * rho_i * Qi + c_i * Qi * temperature * drho_ice_dT + c_i * rho_i * temperature * dQi_dT &
                    + c_v * rho_w * Qv + c_v * Qv * temperature * drho_w_dT + c_v * rho_w * temperature * dQv_dT &

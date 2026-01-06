@@ -292,19 +292,24 @@ contains
     !>
     !> Prints the contents of the dense matrix to standard output.
     !>
-    module subroutine display_dense(self)
+    module subroutine display_dense(self, unit_in)
         implicit none
         class(type_matrix_dense), intent(in) :: self
+        integer(int32), intent(in), optional :: unit_in
         integer(int32) :: i, j
 
+        integer(int32) :: unit
+
+        unit = optval(unit_in, output_unit)
+
         if (.not. self%is_initialized()) then
-            print *, "Matrix is not initialized."
+            write (unit, '(a)') "Matrix is not initialized."
             return
         end if
 
-        write (*, '("Matrix (", i0, "x", i0, "):")') self%num_rows, self%num_cols
+        write (unit, '("Matrix (", i0, "x", i0, "):")') self%num_rows, self%num_cols
         do i = 1, self%num_rows
-            write (*, '(10(es12.4e2))') (self%val(i, j), j=1, self%num_cols)
+            write (unit, '(10(es16.8e3))') (self%val(i, j), j=1, self%num_cols)
         end do
     end subroutine display_dense
 

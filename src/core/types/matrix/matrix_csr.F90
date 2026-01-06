@@ -386,18 +386,23 @@ contains
     !>
     !> Prints the non-zero contents of the sparse matrix to standard output.
     !>
-    module subroutine display_csr(self)
+    module subroutine display_csr(self, unit_in)
         implicit none
         !> The csr matrix object to display.
         class(type_matrix_csr), intent(in) :: self
-        integer(int32) :: i, r, row_start, row_end
+        integer(int32), intent(in), optional :: unit_in
 
-        write (*, '(a,i0,2x,a,i0,a)') "csr Matrix (dims= ", self%num_rows, ", nnz= ", self%nnz, ")"
+        integer(int32) :: i, r, row_start, row_end
+        integer(int32) :: unit
+
+        unit = optval(unit_in, output_unit)
+
+        write (unit, '(a,i0,2x,a,i0,a)') "csr Matrix (dims= ", self%num_rows, ", nnz= ", self%nnz, ")"
         do r = 1, self%num_rows
             row_start = self%ptr(r)
             row_end = self%ptr(r + 1) - 1
             do i = row_start, row_end
-                write (*, '(2(i0, ", "), es16.8)') r, self%ind(i), self%val(i)
+                write (unit, '(2(i0, ", "), es16.8e3)') r, self%ind(i), self%val(i)
             end do
         end do
     end subroutine display_csr

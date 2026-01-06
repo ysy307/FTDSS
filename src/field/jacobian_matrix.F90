@@ -1,5 +1,6 @@
 module field_jacobian_matrix
     use, intrinsic :: iso_fortran_env
+    use :: stdlib_optval, only:optval
     use :: module_core
     use :: module_domain, only:type_domain
     use :: module_linalg
@@ -206,18 +207,23 @@ contains
         end if
     end subroutine zero_row_jacobian_matrix
 
-    subroutine display_jacobian_matrix(self)
+    subroutine display_jacobian_matrix(self, unit_in)
         implicit none
         class(type_jacobian_matrix), intent(in) :: self
+        integer(int32), intent(in), optional :: unit_in
 
-        write (*, '(A)') '--- Jacobian Matrix (BSR based) ---'
-        write (*, '(A, I0)') 'Num DOFs per Node: ', self%num_dofs_per_node
+        integer(int32) :: unit
+
+        unit = optval(unit_in, output_unit)
+
+        write (unit, '(A)') '--- Jacobian Matrix (BSR based) ---'
+        write (unit, '(A, I0)') 'Num DOFs per Node: ', self%num_dofs_per_node
         if (allocated(self%matrix)) then
-            call self%matrix%display()
+            call self%matrix%display(unit)
         else
-            write (*, '(A)') 'Matrix not allocated.'
+            write (unit, '(A)') 'Matrix not allocated.'
         end if
-        write (*, '(A)') '-----------------------------------'
+        write (unit, '(A)') '-----------------------------------'
     end subroutine display_jacobian_matrix
 
 end module field_jacobian_matrix

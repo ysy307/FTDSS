@@ -20,7 +20,7 @@
         {
             "id": 2,
             "calculate_thermal": true,
-            "calculate_hydraulic": false,
+            "calculate_hydraulic": true,
             "calculate_mechanical": false,
             "thermal": {
                 "type": "dirichlet",
@@ -29,15 +29,21 @@
                     -20.0,
                     -20.0
                 ]
+            },
+            "hydraulic": {
+                "type": "impermeable"
             }
         },
         {
             "id": 3,
             "calculate_thermal": true,
-            "calculate_hydraulic": false,
+            "calculate_hydraulic": true,
             "calculate_mechanical": false,
             "thermal": {
                 "type": "adiabatic"
+            },
+            "hydraulic": {
+                "type": "impermeable"
             }
         }
     ],

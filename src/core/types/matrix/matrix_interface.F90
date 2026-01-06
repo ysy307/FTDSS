@@ -5,6 +5,7 @@
 module core_types_matrix
     use, intrinsic :: iso_fortran_env
 !$  use :: omp_lib
+    use :: stdlib_optval, only:optval
     use :: core_constants
     use :: core_allocate, only:allocate_array
     use :: core_deallocate, only:deallocate_array
@@ -231,11 +232,13 @@ module core_types_matrix
 
         !>
         !> Prints the matrix contents to standard output for debugging.
-        subroutine abst_display(self)
-            import :: abst_matrix
+        subroutine abst_display(self, unit_in)
+            import :: abst_matrix, int32
             implicit none
             !> The matrix object.
             class(abst_matrix), intent(in) :: self
+            !> The output unit.
+            integer(int32), intent(in), optional :: unit_in
         end subroutine abst_display
 
         !>
@@ -386,9 +389,10 @@ module core_types_matrix
         end function find_dense
 
         !> Displays the contents of the dense matrix.
-        module subroutine display_dense(self)
+        module subroutine display_dense(self, unit_in)
             implicit none
             class(type_matrix_dense), intent(in) :: self
+            integer(int32), intent(in), optional :: unit_in
         end subroutine display_dense
     end interface
 
@@ -552,9 +556,10 @@ module core_types_matrix
         end subroutine zero_row_csr
 
         !> Displays the matrix contents.
-        module subroutine display_csr(self)
+        module subroutine display_csr(self, unit_in)
             implicit none
             class(type_matrix_csr), intent(in) :: self
+            integer(int32), intent(in), optional :: unit_in
         end subroutine display_csr
     end interface
 
@@ -718,9 +723,10 @@ module core_types_matrix
         end subroutine zero_row_coo
 
         !> Displays the matrix contents.
-        module subroutine display_coo(self)
+        module subroutine display_coo(self, unit_in)
             implicit none
             class(type_matrix_coo), intent(in) :: self
+            integer(int32), intent(in), optional :: unit_in
         end subroutine display_coo
     end interface
 
@@ -877,9 +883,10 @@ module core_types_matrix
             integer(int32), intent(in), optional :: row_block
         end subroutine zero_row_bsr
 
-        module subroutine display_bsr(self)
+        module subroutine display_bsr(self, unit_in)
             implicit none
             class(type_matrix_bsr), intent(in) :: self
+            integer(int32), intent(in), optional :: unit_in
         end subroutine display_bsr
     end interface
 

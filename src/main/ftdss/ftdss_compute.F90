@@ -28,7 +28,7 @@ contains
         real(real64) :: sum_vol
         real(real64) :: sum_qw_vol, sum_qi_vol, sum_qa_vol, sum_qv_vol
 
-        call self%controls%profiler%start("update_variables")
+        call self%controls%profiler%start("Setup")
 
         num_nodes = self%domain%get_num_nodes()
 
@@ -360,7 +360,22 @@ contains
 
             ! 2.3．境界条件の適用
             ! ディリクレ境界条件等を連立方程式に反映させる．
-            call self%apply_bc(.false.)
+            if (iter == 1) then
+                call self%apply_bc(.true.) ! 初回のみプリザーブド値を使用
+            else
+                call self%apply_bc(.false.)
+            end if
+
+            block
+                integer(int32) :: unit
+                open (newunit=unit, file='jacobian.txt', status='replace', action='write')
+                call self%J%display(unit)
+                close (unit)
+                open (newunit=unit, file='residual.txt', status='replace', action='write')
+                call self%R%display(unit)
+                close (unit)
+            end block
+            stop
 
             ! 2.4．収束判定
             ! 残差ベクトルのノルムや解の更新量をチェックする．

@@ -5,6 +5,7 @@
 !>
 module field_residual_vector
     use, intrinsic :: iso_fortran_env
+    use :: stdlib_optval, only:optval
     use :: module_core
     use :: module_domain, only:type_domain
     use :: module_linalg
@@ -19,8 +20,7 @@ module field_residual_vector
         integer(int32) :: num_dofs_per_node = 0
         integer(int32) :: size = 0
 
-        ! 以前の配列 data(:) を廃止し、単一のベクトルオブジェクトで管理
-        ! num_blocks = num_dofs_per_node として初期化される
+        ! 内部データとして type_vector_dp を保持
         type(type_vector_dp) :: data
     contains
         ! --- initialize/destroy ---
@@ -34,7 +34,7 @@ module field_residual_vector
         procedure, pass(self), public :: get_size => get_size_residual_vector
         procedure, pass(self), public :: get_num_dofs_per_node => get_num_dofs_per_node_residual_vector
 
-        ! DOFごとの取得(get_data)は廃止し、全体のベクトルオブジェクトへのアクセサを提供
+        ! 内部ベクトルへのアクセサ
         procedure, public, pass(self) :: get_vector => get_underlying_vector
 
         ! --- setter ---
@@ -71,8 +71,8 @@ contains
         self%size = domain%get_total_dofs()
         self%num_dofs_per_node = domain%get_num_dofs_per_node()
 
-        ! ブロック付きベクトルとして初期化 (num_blocks = num_dofs)
-        call self%data%initialize(domain%get_num_nodes(), self%num_dofs_per_node)
+        ! num_blocks = num_dofs_per_node として初期化
+        call self%data%initialize(domain%get_num_nodes(), num_blocks=self%num_dofs_per_node)
 
     end subroutine initialize_residual_vector_from_domain
 
@@ -85,7 +85,7 @@ contains
         self%size = num_nodes * num_dofs_per_node
         self%num_dofs_per_node = num_dofs_per_node
 
-        call self%data%initialize(num_nodes, num_dofs_per_node)
+        call self%data%initialize(num_nodes, num_blocks=num_dofs_per_node)
 
     end subroutine initialize_residual_vector_from_values
 
@@ -103,10 +103,6 @@ contains
         num_dofs_per_node = self%num_dofs_per_node
     end function get_num_dofs_per_node_residual_vector
 
-    !>
-    !> 内部のベクトルオブジェクトを取得する
-    !> ソルバー等で全体のノルム計算や内積計算を行う際に使用
-    !>
     function get_underlying_vector(self) result(vec)
         implicit none
         class(type_residual_vector), intent(in), target :: self
@@ -124,8 +120,6 @@ contains
         integer(int32), intent(in) :: row_dof
         real(real64), intent(in) :: value
 
-        ! type_vector_dp の set_scalar は row_block を指定することで
-        ! 指定したブロック(DOF)の全要素に値をセットする
         call self%data%set(OP_INS, value, row_block=row_dof)
     end subroutine set_scalar_residual_vector
 
@@ -135,8 +129,6 @@ contains
         integer(int32), intent(in) :: row_dof
         real(real64), intent(in) :: values(:)
 
-        ! type_vector_dp の set_array はストライドアクセスを行い、
-        ! 指定したブロック(DOF)位置に値をセットする
         call self%data%set(OP_INS, values, row_block=row_dof)
     end subroutine set_array_residual_vector
 
@@ -214,6 +206,7 @@ contains
 
         vals_data => values%get_data()
 
+        ! ループ処理で値を加算
         do i = 1, size(global_indices)
             call self%data%set(OP_ADD, global_indices(i), vals_data(i), row_block=row_dof)
         end do
@@ -227,20 +220,13 @@ contains
         implicit none
         class(type_residual_vector), intent(inout) :: self
         real(real64), intent(in) :: alpha
-        ! type_vector_dpのscaleインターフェースがベクトル同士のスケーリングを
-        ! 想定している場合（OP_SCALE_...）、スカラー倍は別途実装が必要かもしれません。
-        ! ここでは単純に全要素をスカラー倍すると仮定しますが、
-        ! vector_dpの実装(scale_vector_dp)を見ると alpha は type_vector_dp を受け取るようになっています。
-        ! したがって、単純なスカラー倍を行うには、vector_dp側に機能を追加するか、
-        ! ここでループを回すか、あるいはダミーのベクトルを作る必要があります。
-        ! 現状の vector_dp 実装にはスカラー倍( alpha * vec )の機能が見当たらないため、
-        ! 暫定的に非公開の val 配列へのポインタ経由で操作するか、機能追加を推奨します。
-        ! 今回はポインタ経由で操作する形をとります。
 
         real(real64), pointer :: raw_data(:)
 
         if (.not. self%data%is_initialized()) return
 
+        ! type_vector_dp にスカラー倍のインターフェースがないため、
+        ! 生データポインタ経由で計算を行う
         raw_data => self%data%get_data()
         raw_data = raw_data * alpha
     end subroutine scale_residual_vector
@@ -269,20 +255,24 @@ contains
         self%num_dofs_per_node = 0
     end subroutine destroy_residual_vector
 
-    subroutine display_residual_vector(self)
+    subroutine display_residual_vector(self, unit_in)
         implicit none
         class(type_residual_vector), intent(in) :: self
+        integer(int32), intent(in), optional :: unit_in
+        integer(int32) :: unit
 
-        write (*, '(A)') '--- Residual Vector (Blocked) ---'
-        write (*, '(A, I0)') 'Size (total DOFs): ', self%size
-        write (*, '(A, I0)') 'Number of DOFs per Node: ', self%num_dofs_per_node
+        unit = optval(unit_in, output_unit)
+
+        write (unit, '(A)') '--- Residual Vector (Blocked) ---'
+        write (unit, '(A, I0)') 'Size (total DOFs): ', self%size
+        write (unit, '(A, I0)') 'Number of DOFs per Node: ', self%num_dofs_per_node
 
         if (self%data%is_initialized()) then
-            call self%data%display()
+            call self%data%display(unit)
         else
-            write (*, '(A)') '  [Not initialized]'
+            write (unit, '(A)') '  [Not initialized]'
         end if
-        write (*, '(A)') '---------------------------------'
+        write (unit, '(A)') '---------------------------------'
     end subroutine display_residual_vector
 
 end module field_residual_vector

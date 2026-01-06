@@ -169,13 +169,13 @@ contains
                        grad_P=grad_P)
 
         call self%domain%get_material_id(element_id, material_id)
+        call self%thermal%update_water_phases(material_id, state)
+
         if (self%controls%is_target(PHYSICS_TYPE_HYDRAULIC, material_id)) then
             call self%calc_water_flux(material_id, state, grad_T, grad_P, water_flux)
             call self%calc_vapor_flux(material_id, state, grad_T, grad_P, vapor_flux)
             call state%set(water_flux=water_flux, vapor_flux=vapor_flux)
         end if
-
-        call self%thermal%update_water_phases(material_id, state)
 
         call self%controls%profiler%stop("Setup")
 
@@ -213,7 +213,8 @@ contains
         type(type_vector_dp), pointer :: delta_prt => null()
         real(real64), pointer, dimension(:) :: data => null()
         integer(int32) :: target_dof
-        integer(int32) :: start_idx, end_idx, num_nondes, num_dofs_per_nonde
+        ! [修正] タイポを修正 (nondes -> nodes)
+        integer(int32) :: start_idx, end_idx, num_nodes, num_dofs_per_node
         real(real64), pointer, dimension(:) :: time_coef => null()
 
         call self%controls%profiler%start("Setup")
@@ -221,28 +222,38 @@ contains
         delta_prt => self%delta%get_vector()
         data => delta_prt%get_data()
 
-        num_nondes = self%domain%get_num_nodes()
-        num_dofs_per_nonde = self%domain%get_num_dofs_per_node()
+        num_nodes = self%domain%get_num_nodes()
+        num_dofs_per_node = self%domain%get_num_dofs_per_node()
 
         call self%controls%time%get_bdf_coeffs(time_coef)
 
+        ! --- Thermal Update ---
         if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
             call self%domain%get_target_dof(PHYSICS_TYPE_THERMAL, target_dof)
+
             start_idx = target_dof
-            end_idx = num_dofs_per_nonde * (num_nondes - 1) + target_dof
-            self%temperature%new(:) = self%temperature%new(:) + data(start_idx:end_idx:num_dofs_per_nonde)
+            end_idx = num_dofs_per_node * (num_nodes - 1) + target_dof
+
+            ! ストライドアクセスで更新 (T1, T2, T3...)
+            self%temperature%new(:) = self%temperature%new(:) + data(start_idx:end_idx:num_dofs_per_node)
+
             call self%calc_gradient_temperature()
             call self%temperature%compute_derivative(time_coef)
         end if
 
-        if (self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) then
-            call self%domain%get_target_dof(PHYSICS_TYPE_HYDRAULIC, target_dof)
-            start_idx = target_dof
-            end_idx = num_dofs_per_nonde * (num_nondes - 1) + target_dof
-            self%pressure%new(:) = self%pressure%new(:) + data(start_idx:end_idx:num_dofs_per_nonde)
-            call self%calc_gradient_pressure()
-            call self%pressure%compute_derivative(time_coef)
-        end if
+        ! ! --- Hydraulic Update ---
+        ! if (self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) then
+        !     call self%domain%get_target_dof(PHYSICS_TYPE_HYDRAULIC, target_dof)
+
+        !     start_idx = target_dof
+        !     end_idx = num_dofs_per_node * (num_nodes - 1) + target_dof
+
+        !     self%pressure%new(:) = self%pressure%new(:) + data(start_idx:end_idx:num_dofs_per_node)
+
+        !     call self%calc_gradient_pressure()
+        !     ! [修正] コピペミスを修正 (temperature -> pressure)
+        !     call self%pressure%compute_derivative(time_coef)
+        ! end if
 
         call self%controls%profiler%stop("Setup")
 

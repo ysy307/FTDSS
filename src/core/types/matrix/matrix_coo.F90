@@ -377,16 +377,20 @@ contains
     !>
     !> Prints the non-zero entries of the COO matrix to standard output.
     !>
-    module subroutine display_coo(self)
+    module subroutine display_coo(self, unit_in)
         implicit none
         !> The COO matrix object to display.
         class(type_matrix_coo), intent(in) :: self
+        integer(int32), intent(in), optional :: unit_in
 
         integer(int32) :: i
+        integer(int32) :: unit
 
-        print *, "COO Matrix (max_dims=", self%num_rows, "x", self%num_cols, ", nnz=", self%nnz, ")"
+        unit = optval(unit_in, output_unit)
+
+        write (unit, '(a,i0,a,i0,a,i0,a)') "COO Matrix (max_dims=", self%num_rows, "x", self%num_cols, ", nnz=", self%nnz, ")"
         do i = 1, self%nnz
-            write (*, '(2(i8, ", "), es16.8)') self%row(i), self%col(i), self%val(i)
+            write (unit, '(2(i8, ", "), es16.8e3)') self%row(i), self%col(i), self%val(i)
         end do
     end subroutine display_coo
 

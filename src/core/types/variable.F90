@@ -6,6 +6,7 @@ module core_types_variable
     use, intrinsic :: iso_fortran_env, only: real64, int32
     use :: core_allocate, only:allocate_array
     use :: core_types_coordinate_array, only:type_coordinate_array_dp
+    use :: core_types_physics, only:type_state
     implicit none
     private
 
@@ -34,9 +35,9 @@ module core_types_variable
         type(type_coordinate_array_dp) :: grad
     contains
         procedure, pass(self) :: initialize => initialize_type_variable
-        procedure, pass(self) :: shift => type_variable_shift
-        procedure, pass(self) :: set => type_variable_set
-        procedure, pass(self) :: compute_derivative => type_variable_compute_derivative
+        procedure, pass(self) :: shift => shift_variable
+        procedure, pass(self) :: set => set_variable
+        procedure, pass(self) :: compute_derivative => compute_derivative_variable
     end type type_variable
 
 contains
@@ -73,7 +74,7 @@ contains
     !> In a forward step, 'new' becomes 'pre', and 'pre' moves into the 'old' history.
     !> A reverse step can be used to undo this operation.
     !>
-    subroutine type_variable_shift(self, reverse)
+    subroutine shift_variable(self, reverse)
         !> The variable object whose history is to be shifted.
         class(type_variable), intent(inout) :: self
         !> If present and true, performs a reverse shift to restore the previous state.
@@ -109,14 +110,14 @@ contains
             end if
         end if
 
-    end subroutine type_variable_shift
+    end subroutine shift_variable
 
     !>
     !> Sets all states (new, pre, and all historical values) to a specified value.
     !> This is typically used to set initial conditions for a simulation. The time
     !> derivative term is reset to zero.
     !>
-    subroutine type_variable_set(self, value)
+    subroutine set_variable(self, value)
         implicit none
         !> The variable object to set.
         class(type_variable), intent(inout) :: self
@@ -138,14 +139,14 @@ contains
         ! Initialize the time derivative to zero
         self%dif(:) = 0.0d0
 
-    end subroutine type_variable_set
+    end subroutine set_variable
 
     !>
     !> Calculates the time derivative using provided BDF coefficients.
     !> Formula: du/dt = sum( coeffs(j) * u_{n+1-j} )
     !> Note: 'coeffs' must include the 1/dt scaling factor.
     !>
-    subroutine type_variable_compute_derivative(self, coeffs)
+    subroutine compute_derivative_variable(self, coeffs)
         implicit none
         !> The variable object to update.
         class(type_variable), intent(inout) :: self
@@ -187,6 +188,6 @@ contains
             end do
         end if
 
-    end subroutine type_variable_compute_derivative
+    end subroutine compute_derivative_variable
 
 end module core_types_variable

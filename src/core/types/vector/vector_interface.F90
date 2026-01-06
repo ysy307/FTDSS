@@ -1,6 +1,7 @@
 module core_types_vector
     use, intrinsic :: iso_fortran_env
 !$  use :: omp_lib
+    use :: stdlib_optval, only:optval
     use :: core_constants
     use :: core_check_length, only:check_match_length
     use :: core_check_range, only:value_in_range
@@ -165,9 +166,10 @@ module core_types_vector
             class(type_vector_dp), intent(inout) :: self
         end subroutine zero_vector_dp
 
-        module subroutine display_vector_dp(self)
+        module subroutine display_vector_dp(self, unit_in)
             implicit none
             class(type_vector_dp), intent(in) :: self
+            integer(int32), intent(in), optional :: unit_in
         end subroutine display_vector_dp
 
         module subroutine check_vector_dp(self)
@@ -256,9 +258,10 @@ module core_types_vector
             class(type_vector_int), intent(inout) :: self
         end subroutine zero_vector_int
 
-        module subroutine display_vector_int(self)
+        module subroutine display_vector_int(self, unit_in)
             implicit none
             class(type_vector_int), intent(in) :: self
+            integer(int32), intent(in), optional :: unit_in
         end subroutine display_vector_int
 
         module subroutine check_vector_int(self)

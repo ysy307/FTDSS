@@ -502,17 +502,21 @@ contains
     !>
     !> Display.
     !>
-    module subroutine display_bsr(self)
+    module subroutine display_bsr(self, unit_in)
         implicit none
         class(type_matrix_bsr), intent(in) :: self
+        integer(int32), intent(in), optional :: unit_in
         integer(int32) :: i, r, row_start, row_end, rb, cb
+        integer(int32) :: unit
+
+        unit = optval(unit_in, output_unit)
 
         if (.not. self%is_initialized()) then
-            print *, "Matrix is not initialized."
+            write (unit, '(a)') "Matrix is not initialized."
             return
         end if
 
-        write (*, '(a,i0,2x,a,i0,a)') "bsr Matrix (Nodes= ", self%num_nodes, ", nnz= ", self%nnz, ")"
+        write (unit, '(a,i0,2x,a,i0,a)') "bsr Matrix (Nodes= ", self%num_nodes, ", nnz= ", self%nnz, ")"
         do r = 1, self%num_nodes
             row_start = self%ptr(r)
             row_end = self%ptr(r + 1) - 1
@@ -520,7 +524,7 @@ contains
                 do rb = 1, self%num_block_rows
                     do cb = 1, self%num_block_cols
                         ! Access val(row_in_block, col_in_block, block_index)
-                        write (*, '(a,i0,a,i0,a, i0,a,i0,a, es16.8)') &
+                        write (unit, '(a,i0,a,i0,a, i0,a,i0,a, es16.8e3)') &
                             "Node(", r, ",", self%ind(i), ") Block(", rb, ",", cb, "): ", &
                             self%val(rb, cb, i)
                     end do

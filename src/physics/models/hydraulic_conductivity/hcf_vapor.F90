@@ -35,6 +35,11 @@ contains
         !> Tortuosity factor [-]
         real(real64), intent(inout) :: tau
 
+        if (Qa <= 0.0d0 .or. Qs <= epsilon(0.0d0)) then
+            tau = 0.0d0
+            return
+        end if
+
         tau = Qa**(10.0d0 / 3.0d0) / Qs**2.0d0
 
     end subroutine calc_tortuosity_factor_vapor
@@ -55,7 +60,7 @@ contains
 
         real(real64) :: Qw_ratio
 
-        if (fc <= 0.0d0) then
+        if (fc <= 0.0d0 .or. Qs <= epsilon(0.0d0)) then
             eta = 1.0d0
             return
         end if
@@ -77,10 +82,16 @@ contains
         real(real64) :: rho_water, rho_vapor_sat
         real(real64) :: temperature, pressure, air_content, porosity, rh
 
-        call state%temperature%get(temperature)
-        call state%pressure%get(pressure)
         call state%air_content%get(air_content)
         call state%porosity%get(porosity)
+
+        if (air_content <= 0.0d0 .or. porosity <= 0.0d0) then
+            Kvh = 0.0d0
+            return
+        end if
+
+        call state%temperature%get(temperature)
+        call state%pressure%get(pressure)
         call state%relative_humidity%get(rh)
 
         call self%calc_diffusivity(temperature, Da)
@@ -104,10 +115,16 @@ contains
         real(real64) :: rho_water, drho_vapor_sat_dT
         real(real64) :: temperature, pressure, air_content, porosity, water_content, mass_fraction_clay, rh
 
-        call state%temperature%get(temperature)
-        call state%pressure%get(pressure)
         call state%air_content%get(air_content)
         call state%porosity%get(porosity)
+
+        if (air_content <= 0.0d0 .or. porosity <= 0.0d0) then
+            KvT = 0.0d0
+            return
+        end if
+
+        call state%temperature%get(temperature)
+        call state%pressure%get(pressure)
         call state%water_content%get(water_content)
         call state%relative_humidity%get(rh)
         call state%mass_fraction_clay%get(mass_fraction_clay)
