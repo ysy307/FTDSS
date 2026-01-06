@@ -606,13 +606,12 @@ contains
     end function get_time_record_string
 
     !> 文字列からSWCCモデルタイプIDを取得する
-    function get_swcc_model_type(key) result(val)
+    pure function get_swcc_model_type(key) result(val)
         implicit none
         character(len=*), intent(in) :: key
         integer(int32) :: val
 
         val = -1
-        print *, "SWCC key:", key
         select case (strip(to_lower(key)))
         case ("brooks_corey", "bc")
             val = SWCC_BC
