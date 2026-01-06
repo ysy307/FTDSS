@@ -23,7 +23,7 @@ submodule(inout_input_basic) inout_input_basic_materials
     character(*), parameter :: latent_heat = "latent_heat"
     character(*), parameter :: fusion = "fusion"
     character(*), parameter :: freezing_temperature = "freezing_temperature"
-    character(*), parameter :: unfrozen_water_model = "unfrozen_water_model"
+    character(*), parameter :: water_characteristic_curve = "water_characteristic_curve"
     character(*), parameter :: model_number = "model_number"
     character(*), parameter :: model = "model"
     character(*), parameter :: theta_s = "theta_s"
@@ -183,6 +183,7 @@ contains
             call get_json_value(json, join(buffer), self%materials(i_material)%phase_change%equilibrium_model%segregation, &
                                 is_required=.true., default_value=.false.)
 
+            call read_parameters_materials_swcc(self, json, i_material)
             call read_parameters_materials_hydraulic_model(self, json, i_material)
         end if
 
@@ -223,79 +224,72 @@ contains
         end associate
     end subroutine read_parameters_materials_hydraulic_model
 
-    subroutine read_parameters_materials_swcc(swcc, json, buffer, end_index)
+    subroutine read_parameters_materials_swcc(self, json, i_material)
         implicit none
-        type(type_materials_water_characteristic_curve), intent(inout) :: swcc
-        type(json_file), intent(inout) :: json
-        character(*), intent(in) :: buffer(:)
-        integer(int32), intent(in) :: end_index
+        class(type_input_basic), intent(inout) :: self
+        type(json_file), intent(inout) :: json !! JSON parser
+        integer(int32), intent(in) :: i_material !! Material index
 
-        character(len=256), allocatable :: local_buffer(:)
-        integer(int32) :: last_index
+        character(256) :: buffer(3) = [character(256) :: "", "", ""]
+
         character(:), allocatable :: tmp_strings
 
-        if (size(buffer) > end_index) then
-            allocate (local_buffer(size(buffer)))
-        else
-            allocate (local_buffer(size(buffer) + 1))
-        end if
-        local_buffer(1:end_index) = buffer(1:end_index)
-        last_index = end_index + 1
+        buffer(1) = materials//"("//to_string(i_material)//")"
+        buffer(2) = water_characteristic_curve
 
-        local_buffer(last_index) = model
-        call get_json_value(json, join(local_buffer(1:last_index)), tmp_strings, is_required=.true.)
-        swcc%model_number = get_swcc_model_type(tmp_strings)
+        associate (swcc => self%materials(i_material)%water_characteristic_curve)
+            buffer(3) = model
+            call get_json_value(json, join(buffer(1:3)), tmp_strings, is_required=.true.)
+            swcc%model_number = get_swcc_model_type(tmp_strings)
 
-        local_buffer(last_index) = unit
-        call get_json_value(json, join(local_buffer(1:last_index)), tmp_strings, is_required=.true., valid_list=valid_units)
-        swcc%unit = get_physics_unit(tmp_strings)
+            buffer(3) = unit
+            call get_json_value(json, join(buffer(1:3)), tmp_strings, is_required=.true., valid_list=valid_units)
+            swcc%unit = get_physics_unit(tmp_strings)
 
-        local_buffer(last_index) = theta_s
-        call get_json_value(json, join(local_buffer(1:last_index)), swcc%theta_s, is_required=.true., valid_range=[0.0d0, 1.0d0])
+            buffer(3) = theta_s
+            call get_json_value(json, join(buffer(1:3)), swcc%theta_s, is_required=.true., valid_range=[0.0d0, 1.0d0])
+            buffer(3) = theta_r
+            call get_json_value(json, join(buffer(1:3)), swcc%theta_r, is_required=.true., valid_range=[0.0d0, 1.0d0])
 
-        local_buffer(last_index) = theta_r
-        call get_json_value(json, join(local_buffer(1:last_index)), swcc%theta_r, is_required=.true., valid_range=[0.0d0, 1.0d0])
+            buffer(3) = alpha1
+            call get_json_value(json, join(buffer(1:3)), swcc%alpha1, is_required=.true.)
 
-        local_buffer(last_index) = alpha1
-        call get_json_value(json, join(local_buffer(1:last_index)), swcc%alpha1, is_required=.true.)
+            buffer(3) = n1
+            call get_json_value(json, join(buffer(1:3)), swcc%n1, is_required=.true.)
 
-        local_buffer(last_index) = n1
-        call get_json_value(json, join(local_buffer(1:last_index)), swcc%n1, is_required=.true.)
+            swcc%m1 = 1.0d0 - 1.0d0 / swcc%n1
 
-        swcc%m1 = 1.0d0 - 1.0d0 / swcc%n1
+            select case (swcc%model_number)
+            case (4)
+                buffer(3) = h_crit
+                call get_json_value(json, join(buffer(1:3)), swcc%h_crit, &
+                                    is_required=.true., valid_range=[-huge(0.0d0), 0.0d0])
+            case (5)
+                buffer(3) = alpha2
+                call get_json_value(json, join(buffer(1:3)), swcc%alpha2, is_required=.true.)
+                buffer(3) = n2
+                call get_json_value(json, join(buffer(1:3)), swcc%n2, is_required=.true.)
+                swcc%m2 = 1.0d0 - 1.0d0 / swcc%n2
 
-        select case (swcc%model_number)
-        case (4)
-            local_buffer(last_index) = h_crit
-            call get_json_value(json, join(local_buffer(1:last_index)), swcc%h_crit, &
-                                is_required=.true., valid_range=[-huge(0.0d0), 0.0d0])
-        case (5)
-            local_buffer(last_index) = alpha2
-            call get_json_value(json, join(local_buffer(1:last_index)), swcc%alpha2, is_required=.true.)
+                buffer(3) = w1
+                call get_json_value(json, join(buffer(1:3)), swcc%w1, is_required=.true., valid_range=[0.0d0, 1.0d0])
+                swcc%w2 = 1.0d0 - swcc%w1
+            case (6)
+                buffer(3) = alpha2
+                call get_json_value(json, join(buffer(1:3)), swcc%alpha2, is_required=.true.)
+                buffer(3) = n2
+                call get_json_value(json, join(buffer(1:3)), swcc%n2, is_required=.true.)
+                swcc%m2 = 1.0d0 - 1.0d0 / swcc%n2
 
-            local_buffer(last_index) = n2
-            call get_json_value(json, join(local_buffer(1:last_index)), swcc%n2, is_required=.true.)
-            swcc%m2 = 1.0d0 - 1.0d0 / swcc%n2
+                buffer(3) = w1
+                call get_json_value(json, join(buffer(1:3)), swcc%w1, is_required=.true., valid_range=[0.0d0, 1.0d0])
+                swcc%w2 = 1.0d0 - swcc%w1
+            end select
 
-            local_buffer(last_index) = w1
-            call get_json_value(json, join(local_buffer(1:last_index)), swcc%w1, is_required=.true., valid_range=[0.0d0, 1.0d0])
-            swcc%w2 = 1.0d0 - swcc%w1
-        case (6)
-            local_buffer(last_index) = alpha2
-            call get_json_value(json, join(local_buffer(1:last_index)), swcc%alpha2, is_required=.true.)
-            local_buffer(last_index) = n2
-            call get_json_value(json, join(local_buffer(1:last_index)), swcc%n2, is_required=.true.)
-            swcc%m2 = 1.0d0 - 1.0d0 / swcc%n2
+            buffer(3) = l
+            call get_json_value(json, join(buffer(1:3)), swcc%l, is_required=.true., valid_range=[0.0d0, huge(0.0d0)])
 
-            local_buffer(last_index) = w1
-            call get_json_value(json, join(local_buffer(1:last_index)), swcc%w1, is_required=.true., valid_range=[0.0d0, 1.0d0])
-            swcc%w2 = 1.0d0 - swcc%w1
-        end select
-
-        local_buffer(last_index) = l
-        call get_json_value(json, join(local_buffer(1:last_index)), swcc%l, is_required=.true., valid_range=[0.0d0, huge(0.0d0)])
-
-        if (allocated(local_buffer)) deallocate (local_buffer)
+        end associate
 
     end subroutine read_parameters_materials_swcc
 
