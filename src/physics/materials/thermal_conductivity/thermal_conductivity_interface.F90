@@ -13,7 +13,7 @@ module physics_materials_thermal_conductivity
     public :: type_thc_2phase
     public :: type_thc_3phase
     public :: type_thc_4phase
-    public :: type_thc_dispersity
+    public :: type_thc_dispersivity
 
     type :: holder_thcs
         class(abst_thc), allocatable :: p
@@ -33,7 +33,7 @@ module physics_materials_thermal_conductivity
         end subroutine initialize_holder_thcs
     end interface
 
-    type :: type_thc_dispersity
+    type :: type_thc_dispersivity
         real(real64) :: lambda_xx = 0.0d0
         real(real64) :: lambda_yy = 0.0d0
         real(real64) :: lambda_zz = 0.0d0
@@ -41,26 +41,26 @@ module physics_materials_thermal_conductivity
         real(real64) :: lambda_yz = 0.0d0
         real(real64) :: lambda_zx = 0.0d0
     contains
-        procedure, pass(self), public :: reset => reset_thc_dispersity
-    end type type_thc_dispersity
+        procedure, pass(self), public :: reset => reset_thc_dispersivity
+    end type type_thc_dispersivity
 
     interface
-        module pure elemental subroutine reset_thc_dispersity(self)
+        module pure elemental subroutine reset_thc_dispersivity(self)
             implicit none
-            class(type_thc_dispersity), intent(inout) :: self
-        end subroutine reset_thc_dispersity
+            class(type_thc_dispersivity), intent(inout) :: self
+        end subroutine reset_thc_dispersivity
     end interface
 
     type, extends(abst_material), abstract :: abst_thc
-        real(real64), allocatable :: dispersity(:)
-        logical :: use_dispersity = .false.
+        real(real64), allocatable :: dispersivity(:)
+        logical :: use_dispersivity = .false.
         real(real64), allocatable :: params(:)
     contains
         procedure, pass(self), public :: initialize => initialize_abst_thc
-        procedure, pass(self) :: calc_lambda_dispersity => calc_lambda_dispersity_abst_thc
+        procedure, pass(self) :: calc_lambda_dispersivity => calc_lambda_dispersivity_abst_thc
         procedure(abst_calc_thc_gp), pass(self), public, deferred :: calc_lambda_0_gp
-        procedure(abst_calc_thc_dispersity_gp), pass(self), public, deferred :: calc_lambda_dispersity_gp
-        generic, public :: calc => calc_lambda_0_gp, calc_lambda_dispersity_gp
+        procedure(abst_calc_thc_dispersivity_gp), pass(self), public, deferred :: calc_lambda_dispersivity_gp
+        generic, public :: calc => calc_lambda_0_gp, calc_lambda_dispersivity_gp
     end type abst_thc
 
     abstract interface
@@ -73,14 +73,14 @@ module physics_materials_thermal_conductivity
 
         end subroutine abst_calc_thc_gp
 
-        pure elemental subroutine abst_calc_thc_dispersity_gp(self, state, lambda)
-            import :: abst_thc, type_state, type_thc_dispersity
+        pure elemental subroutine abst_calc_thc_dispersivity_gp(self, state, lambda)
+            import :: abst_thc, type_state, type_thc_dispersivity
             implicit none
             class(abst_thc), intent(in) :: self
             type(type_state), intent(in) :: state
-            type(type_thc_dispersity), intent(inout) :: lambda
+            type(type_thc_dispersivity), intent(inout) :: lambda
 
-        end subroutine abst_calc_thc_dispersity_gp
+        end subroutine abst_calc_thc_dispersivity_gp
     end interface
 
     interface
@@ -100,7 +100,7 @@ module physics_materials_thermal_conductivity
     type, extends(abst_thc) :: type_thc_1phase
     contains
         procedure, pass(self) :: calc_lambda_0_gp => calc_thc_gp_1phase
-        procedure, pass(self) :: calc_lambda_dispersity_gp => calc_thc_dispersity_gp_1phase
+        procedure, pass(self) :: calc_lambda_dispersivity_gp => calc_thc_dispersivity_gp_1phase
     end type type_thc_1phase
 
     interface
@@ -112,19 +112,19 @@ module physics_materials_thermal_conductivity
 
         end subroutine calc_thc_gp_1phase
 
-        module pure elemental subroutine calc_thc_dispersity_gp_1phase(self, state, lambda)
+        module pure elemental subroutine calc_thc_dispersivity_gp_1phase(self, state, lambda)
             implicit none
             class(type_thc_1phase), intent(in) :: self
             type(type_state), intent(in) :: state
-            type(type_thc_dispersity), intent(inout) :: lambda
+            type(type_thc_dispersivity), intent(inout) :: lambda
 
-        end subroutine calc_thc_dispersity_gp_1phase
+        end subroutine calc_thc_dispersivity_gp_1phase
     end interface
 
     type, extends(abst_thc) :: type_thc_2phase
     contains
         procedure, pass(self) :: calc_lambda_0_gp => calc_thc_gp_2phase
-        procedure, pass(self) :: calc_lambda_dispersity_gp => calc_thc_dispersity_gp_2phase
+        procedure, pass(self) :: calc_lambda_dispersivity_gp => calc_thc_dispersivity_gp_2phase
     end type type_thc_2phase
 
     interface
@@ -136,19 +136,19 @@ module physics_materials_thermal_conductivity
 
         end subroutine calc_thc_gp_2phase
 
-        module pure elemental subroutine calc_thc_dispersity_gp_2phase(self, state, lambda)
+        module pure elemental subroutine calc_thc_dispersivity_gp_2phase(self, state, lambda)
             implicit none
             class(type_thc_2phase), intent(in) :: self
             type(type_state), intent(in) :: state
-            type(type_thc_dispersity), intent(inout) :: lambda
+            type(type_thc_dispersivity), intent(inout) :: lambda
 
-        end subroutine calc_thc_dispersity_gp_2phase
+        end subroutine calc_thc_dispersivity_gp_2phase
     end interface
 
     type, extends(abst_thc) :: type_thc_3phase
     contains
         procedure, pass(self) :: calc_lambda_0_gp => calc_thc_gp_3phase
-        procedure, pass(self) :: calc_lambda_dispersity_gp => calc_thc_dispersity_gp_3phase
+        procedure, pass(self) :: calc_lambda_dispersivity_gp => calc_thc_dispersivity_gp_3phase
     end type type_thc_3phase
 
     interface
@@ -160,19 +160,19 @@ module physics_materials_thermal_conductivity
 
         end subroutine calc_thc_gp_3phase
 
-        module pure elemental subroutine calc_thc_dispersity_gp_3phase(self, state, lambda)
+        module pure elemental subroutine calc_thc_dispersivity_gp_3phase(self, state, lambda)
             implicit none
             class(type_thc_3phase), intent(in) :: self
             type(type_state), intent(in) :: state
-            type(type_thc_dispersity), intent(inout) :: lambda
+            type(type_thc_dispersivity), intent(inout) :: lambda
 
-        end subroutine calc_thc_dispersity_gp_3phase
+        end subroutine calc_thc_dispersivity_gp_3phase
     end interface
 
     type, extends(abst_thc) :: type_thc_4phase
     contains
         procedure, pass(self) :: calc_lambda_0_gp => calc_thc_gp_4phase
-        procedure, pass(self) :: calc_lambda_dispersity_gp => calc_thc_dispersity_gp_4phase
+        procedure, pass(self) :: calc_lambda_dispersivity_gp => calc_thc_dispersivity_gp_4phase
     end type type_thc_4phase
 
     interface
@@ -184,13 +184,13 @@ module physics_materials_thermal_conductivity
 
         end subroutine calc_thc_gp_4phase
 
-        module pure elemental subroutine calc_thc_dispersity_gp_4phase(self, state, lambda)
+        module pure elemental subroutine calc_thc_dispersivity_gp_4phase(self, state, lambda)
             implicit none
             class(type_thc_4phase), intent(in) :: self
             type(type_state), intent(in) :: state
-            type(type_thc_dispersity), intent(inout) :: lambda
+            type(type_thc_dispersivity), intent(inout) :: lambda
 
-        end subroutine calc_thc_dispersity_gp_4phase
+        end subroutine calc_thc_dispersivity_gp_4phase
     end interface
 
     interface
@@ -245,7 +245,7 @@ module physics_materials_thermal_conductivity
 
         end subroutine calc_thc_4_vadoze
 
-        module pure elemental subroutine calc_lambda_dispersity_abst_thc(self, lambda_0, htc_water, q_x, q_y, q_z, lambda)
+        module pure elemental subroutine calc_lambda_dispersivity_abst_thc(self, lambda_0, htc_water, q_x, q_y, q_z, lambda)
             implicit none
             class(abst_thc), intent(in) :: self
             real(real64), intent(in) :: lambda_0
@@ -253,9 +253,9 @@ module physics_materials_thermal_conductivity
             real(real64), intent(in) :: q_x
             real(real64), intent(in) :: q_y
             real(real64), intent(in) :: q_z
-            type(type_thc_dispersity), intent(inout) :: lambda
+            type(type_thc_dispersivity), intent(inout) :: lambda
 
-        end subroutine calc_lambda_dispersity_abst_thc
+        end subroutine calc_lambda_dispersivity_abst_thc
     end interface
 
 end module physics_materials_thermal_conductivity

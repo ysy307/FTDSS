@@ -16,9 +16,9 @@ contains
         self%material3 = physics_info%ice
         self%material4 = physics_info%vapor
 
-        if (allocated(physics_info%dispersity)) then
-            call allocate_array(self%dispersity, source=physics_info%dispersity)
-            self%use_dispersity = .true.
+        if (allocated(physics_info%dispersivity)) then
+            call allocate_array(self%dispersivity, source=physics_info%dispersivity)
+            self%use_dispersivity = .true.
         end if
 
         if (allocated(physics_info%params)) then
@@ -56,9 +56,9 @@ contains
 
     end subroutine initialize_holder_thcs
 
-    module pure elemental subroutine reset_thc_dispersity(self)
+    module pure elemental subroutine reset_thc_dispersivity(self)
         implicit none
-        class(type_thc_dispersity), intent(inout) :: self
+        class(type_thc_dispersivity), intent(inout) :: self
 
         self%lambda_xx = 0.0d0
         self%lambda_yy = 0.0d0
@@ -67,7 +67,7 @@ contains
         self%lambda_yz = 0.0d0
         self%lambda_zx = 0.0d0
 
-    end subroutine reset_thc_dispersity
+    end subroutine reset_thc_dispersivity
 
     module pure elemental subroutine calc_thc_2(lambda_soil, phi_soil, &
                                                 lambda_water, phi_water, lambda)
@@ -140,7 +140,7 @@ contains
 
     end subroutine calc_thc_4_vadoze
 
-    module pure elemental subroutine calc_lambda_dispersity_abst_thc(self, lambda_0, htc_water, q_x, q_y, q_z, lambda)
+    module pure elemental subroutine calc_lambda_dispersivity_abst_thc(self, lambda_0, htc_water, q_x, q_y, q_z, lambda)
         implicit none
         class(abst_thc), intent(in) :: self
         real(real64), intent(in) :: lambda_0
@@ -148,7 +148,7 @@ contains
         real(real64), intent(in) :: q_x
         real(real64), intent(in) :: q_y
         real(real64), intent(in) :: q_z
-        type(type_thc_dispersity), intent(inout) :: lambda
+        type(type_thc_dispersivity), intent(inout) :: lambda
 
         real(real64) :: lambda_L, lambda_T
         real(real64) :: q_norm, inv_q_norm
@@ -156,10 +156,10 @@ contains
 
         call lambda%reset()
 
-        if (self%use_dispersity) then
+        if (self%use_dispersivity) then
 
-            lambda_L = self%dispersity(1)
-            lambda_T = self%dispersity(2)
+            lambda_L = self%dispersivity(1)
+            lambda_T = self%dispersivity(2)
 
             q_norm = sqrt(q_x**2 + q_y**2 + q_z**2)
 
@@ -189,6 +189,6 @@ contains
             lambda%lambda_zz = lambda_0
         end if
 
-    end subroutine calc_lambda_dispersity_abst_thc
+    end subroutine calc_lambda_dispersivity_abst_thc
 
 end submodule thermal_conductivity_base
