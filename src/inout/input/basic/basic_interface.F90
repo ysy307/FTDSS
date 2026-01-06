@@ -7,6 +7,7 @@ module inout_input_basic
     use :: json_module, only:json_file
     use :: module_core
     use :: inout_input_base, only:get_json_value, abst_input
+    use :: module_physics
     implicit none
     private
 
@@ -89,6 +90,39 @@ module inout_input_basic
         real(real64) :: w2
     end type type_materials_wrf
 
+    type :: type_materials_water_characteristic_curve
+        integer(int32) :: model_number
+        integer(int32) :: unit
+        real(real64) :: theta_s
+        real(real64) :: theta_r
+        real(real64) :: alpha1
+        real(real64) :: n1
+        real(real64) :: m1
+        real(real64) :: w1
+        real(real64) :: h_crit
+        real(real64) :: alpha2
+        real(real64) :: n2
+        real(real64) :: m2
+        real(real64) :: w2
+        real(real64) :: l
+    end type type_materials_water_characteristic_curve
+
+    type :: type_equilibrium_model
+        logical :: segregation
+    end type type_equilibrium_model
+
+    type :: type_phase_change
+        type(type_equilibrium_model) :: equilibrium_model
+    end type type_phase_change
+
+    type :: type_hydraulic_conductivity_model
+        integer(int32) :: model_number
+        real(real64) :: saturated_conductivity
+        real(real64) :: impedance_factor
+        integer(int32) :: water_viscosity_model
+        real(real64) :: gain_factor
+    end type type_hydraulic_conductivity_model
+
     type :: type_materials_gcc
         logical :: is_segregation
         character(:), allocatable :: unit
@@ -121,17 +155,48 @@ module inout_input_basic
         integer(int32) :: water_viscosity_model
     end type type_materials_hydraulic
 
+    type :: type_materials_density
+        real(real64), allocatable :: value(:)
+    end type type_materials_density
+
+    type :: type_materials_specific_heat
+        real(real64), allocatable :: value(:)
+    end type type_materials_specific_heat
+
+    type :: type_materials_volumetric_heat_capacity
+        real(real64), allocatable :: value(:)
+        real(real64), allocatable :: params(:)
+    end type type_materials_volumetric_heat_capacity
+
+    type :: type_materials_thermal_conductivity
+        real(real64), allocatable :: value(:)
+        logical :: is_dispersed
+        real(real64), allocatable :: dispersivity(:)
+        real(real64), allocatable :: params(:)
+    end type type_materials_thermal_conductivity
+
     type :: type_material_settings
         integer(int32) :: id
         character(:), allocatable :: name
-        integer(int32) :: phase
-        logical :: is_frozen
-        logical :: is_dispersed
         logical :: is_active(NUM_PHYSICS_TYPES)
-        type(type_materials_thermal) :: thermal
-        type(type_materials_hydraulic) :: hydraulic
+        integer(int32) :: phase
+        type(type_materials_density) :: density
+        type(type_materials_specific_heat) :: specific_heat
+        type(type_materials_volumetric_heat_capacity) :: volumetric_heat_capacity
+        type(type_materials_thermal_conductivity) :: thermal_conductivity
+
+        type(type_materials_water_characteristic_curve) :: water_characteristic_curve
+        type(type_phase_change) :: phase_change
+        type(type_hydraulic_conductivity_model) :: hydraulic_conductivity_model
     contains
         procedure, pass(self) :: display => display_material_settings
+        procedure, pass(self) :: get_density_info => get_density_info_material_settings
+        procedure, pass(self) :: get_specific_heat_info => get_specific_heat_info_material_settings
+        procedure, pass(self) :: get_volumetric_heat_capacity_info => get_volumetric_heat_capacity_info_material_settings
+        procedure, pass(self) :: get_thermal_conductivity_info => get_thermal_conductivity_info_material_settings
+        procedure, pass(self) :: get_wrf_info => get_wrf_info_material_settings
+        procedure, pass(self) :: get_gcc_info => get_gcc_info_material_settings
+        procedure, pass(self) :: get_hcf_info => get_hcf_info_material_settings
     end type type_material_settings
 
     interface
@@ -139,6 +204,54 @@ module inout_input_basic
             implicit none
             class(type_material_settings), intent(in) :: self
         end subroutine display_material_settings
+
+        module subroutine get_density_info_material_settings(self, density_info)
+            implicit none
+            class(type_material_settings), intent(in) :: self
+            type(type_physics_info), intent(inout) :: density_info
+        end subroutine get_density_info_material_settings
+
+        module subroutine get_specific_heat_info_material_settings(self, specific_heat_info)
+            implicit none
+            class(type_material_settings), intent(in) :: self
+            type(type_physics_info), intent(inout) :: specific_heat_info
+
+        end subroutine get_specific_heat_info_material_settings
+
+        module subroutine get_volumetric_heat_capacity_info_material_settings(self, volumetric_heat_capacity_info)
+            implicit none
+            class(type_material_settings), intent(in) :: self
+            type(type_physics_info), intent(inout) :: volumetric_heat_capacity_info
+
+        end subroutine get_volumetric_heat_capacity_info_material_settings
+
+        module subroutine get_thermal_conductivity_info_material_settings(self, thermal_conductivity_info)
+            implicit none
+            class(type_material_settings), intent(in) :: self
+            type(type_physics_info), intent(inout) :: thermal_conductivity_info
+
+        end subroutine get_thermal_conductivity_info_material_settings
+
+        module subroutine get_wrf_info_material_settings(self, wrf_info)
+            implicit none
+            class(type_material_settings), intent(in) :: self
+            type(type_wrf_params), intent(inout) :: wrf_info
+
+        end subroutine get_wrf_info_material_settings
+
+        module subroutine get_gcc_info_material_settings(self, gcc_info)
+            implicit none
+            class(type_material_settings), intent(in) :: self
+            integer(int32), intent(inout) :: gcc_info
+
+        end subroutine get_gcc_info_material_settings
+
+        module subroutine get_hcf_info_material_settings(self, hcf_info)
+            implicit none
+            class(type_material_settings), intent(in) :: self
+            type(type_hcf_params), intent(inout) :: hcf_info
+
+        end subroutine get_hcf_info_material_settings
     end interface
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_convergence_criteria

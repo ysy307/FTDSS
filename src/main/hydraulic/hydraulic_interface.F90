@@ -23,6 +23,9 @@ module main_hydraulic
         procedure, pass(self), public :: calc_K_wP => calc_K_wP_hydraulic
         procedure, pass(self), public :: calc_K_vT => calc_K_vT_hydraulic
         procedure, pass(self), public :: calc_K_vP => calc_K_vP_hydraulic
+
+        procedure, pass(self), public :: update_water_phases => update_water_phases_hydraulic
+        procedure, pass(self), public :: calc_effective_density => calc_effective_density_hydraulic
     end type type_hydraulic
 
     !! 一通り計算するのに必要なのが，T, P, dT/dt, dP/dt, grad_H, q_w, q_v
@@ -66,11 +69,12 @@ module main_hydraulic
 
         end subroutine compute_V_H
 
-        module pure subroutine compute_R_H(self, target_id, state, R_H_C, R_H_D)
+        module pure subroutine compute_R_H(self, target_id, state, bdf_coeffs, R_H_C, R_H_D)
             implicit none
             class(type_hydraulic), intent(in) :: self
             integer(int32), intent(in) :: target_id
             type(type_state), intent(inout) :: state
+            real(real64), intent(in) :: bdf_coeffs(:)
             real(real64), intent(inout) :: R_H_C
             real(real64), intent(inout) :: R_H_D(:)
 
@@ -111,6 +115,25 @@ module main_hydraulic
             real(real64), intent(inout) :: K_vP
 
         end subroutine calc_K_vP_hydraulic
+
+        module pure elemental subroutine update_water_phases_hydraulic(self, material_id, state)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(inout) :: state
+
+        end subroutine update_water_phases_hydraulic
+
+        module pure subroutine calc_effective_density_hydraulic(self, material_id, state, bdf_coeffs, drho_dt)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(in) :: bdf_coeffs(:)
+            real(real64), intent(inout) :: drho_dt
+
+        end subroutine calc_effective_density_hydraulic
+
     end interface
 
 contains

@@ -23,6 +23,7 @@ module main_thermal
         procedure, pass(self), public :: compute_R_T => compute_R_T
 
         procedure, pass(self), public :: calc_density_water => calc_density_water_thermal
+        procedure, pass(self), public :: calc_inner_heat_capacity => calc_inner_heat_capacity_thermal
         procedure, pass(self), public :: update_water_phases => update_water_phases_thermal
     end type type_thermal
 
@@ -71,13 +72,14 @@ module main_thermal
 
         end subroutine compute_V_T
 
-        module pure subroutine compute_R_T(self, target_id, state, R_T_C, R_T_D)
+        module pure subroutine compute_R_T(self, target_id, state, bdf_coeffs, R_T_C, R_T_D)
             implicit none
             class(type_thermal), intent(in) :: self
             integer(int32), intent(in) :: target_id
             type(type_state), intent(inout) :: state
-            real(real64), intent(inout) :: R_T_C
-            real(real64), intent(inout) :: R_T_D(:)
+            real(real64), intent(in) :: bdf_coeffs(:)
+            real(real64), intent(inout) :: R_T_C ! Scalar: Capacity/Storage term
+            real(real64), intent(inout) :: R_T_D(:) ! Vector: Energy Flux term (j_E)
 
         end subroutine compute_R_T
 
@@ -96,6 +98,16 @@ module main_thermal
             type(type_state), intent(inout) :: state
 
         end subroutine update_water_phases_thermal
+
+        module pure subroutine calc_inner_heat_capacity_thermal(self, material_id, state, bdf_coeffs, dU_dt)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(in) :: bdf_coeffs(:)
+            real(real64), intent(inout) :: dU_dt
+
+        end subroutine calc_inner_heat_capacity_thermal
 
     end interface
 

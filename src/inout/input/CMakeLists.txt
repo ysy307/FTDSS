@@ -28,6 +28,7 @@ target_include_directories(Input_Main PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(Input_Main PUBLIC
     Solver::Core
+    Solver::Physics
 )
 enable_build_flags(Input_Main)
 enable_thirdparty (Input_Main)

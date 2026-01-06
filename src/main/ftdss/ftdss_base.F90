@@ -145,26 +145,29 @@ contains
         type(type_state), intent(inout) :: state
 
         integer(int32) :: material_id
+        real(real64) :: temperature, pressure, porosity
         type(type_coordinate_dp) :: grad_T, grad_P
         type(type_coordinate_dp) :: water_flux, vapor_flux
         real(real64) :: K_wT, K_wP, K_vT, K_vP
+        real(real64) :: temperature_history(8), pressure_history(8)
 
         call self%controls%profiler%start("Setup")
 
         call state%reset()
 
-        grad_T%x = self%temperature%grad%x(node_id)
-        grad_T%y = self%temperature%grad%y(node_id)
-        grad_T%z = self%temperature%grad%z(node_id)
-        grad_P%x = self%pressure%grad%x(node_id)
-        grad_P%y = self%pressure%grad%y(node_id)
-        grad_P%z = self%pressure%grad%z(node_id)
+        call self%temperature%get_current(node_id, temperature)
+        call self%pressure%get_current(node_id, pressure)
+        call self%porosity%get_current(node_id, porosity)
+        call self%temperature%get_current_gradient(node_id, grad_T)
+        call self%pressure%get_current_gradient(node_id, grad_P)
+        call self%temperature%get_history(node_id, temperature_history)
+        call self%pressure%get_history(node_id, pressure_history)
 
-        call state%set(temperature=self%temperature%new(node_id), &
-                       pressure=self%pressure%new(node_id), &
-                       porosity=self%porosity%new(node_id), &
-                       dot_T=self%temperature%dif(node_id), &
-                       dot_P=self%pressure%dif(node_id), &
+        call state%set(temperature=temperature, &
+                       pressure=pressure, &
+                       porosity=porosity, &
+                       temperature_history=temperature_history, &
+                       pressure_history=pressure_history, &
                        grad_T=grad_T, &
                        grad_P=grad_P)
 

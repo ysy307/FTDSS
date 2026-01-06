@@ -234,18 +234,21 @@ contains
     !> R_T_D (Vector): Energy Flux term
     !>        = -lambda.grad(T) + (c_w*rho_w*q_w + c_v*rho_w*q_v)*T + rho_w*Lv*q_v
     !>
-    module pure subroutine compute_R_T(self, target_id, state, R_T_C, R_T_D)
+    module pure subroutine compute_R_T(self, target_id, state, bdf_coeffs, R_T_C, R_T_D)
         implicit none
         class(type_thermal), intent(in) :: self
         integer(int32), intent(in) :: target_id
         type(type_state), intent(inout) :: state
+        real(real64), intent(in) :: bdf_coeffs(:)
         real(real64), intent(inout) :: R_T_C ! Scalar: Capacity/Storage term
         real(real64), intent(inout) :: R_T_D(:) ! Vector: Energy Flux term (j_E)
 
         ! --- Local Variables ---
         ! For Capacity Term
         real(real64) :: C_TT, C_TH
-        real(real64) :: dot_T, dot_P
+        real(real64), allocatable :: temperature_history(:)
+        real(real64), allocatable :: pressure_history(:)
+        ! real(real64) :: dot_T, dot_P
 
         ! For Flux Term
         real(real64) :: temperature
@@ -264,16 +267,7 @@ contains
         ! 1. Calculate Storage Term (R_T_C)
         ! ======================================================================
 
-        ! 1.1 Get Time Derivatives (provided by BDF/Time Integrator)
-        call state%dot_T%get(dot_T)
-        call state%dot_P%get(dot_P)
-
-        ! 1.2 Calculate Capacities (C_TT, C_TH)
-        !     Re-use the existing compute_C_T subroutine
-        call self%compute_C_T(target_id, state, C_TT, C_TH)
-
-        ! 1.3 Compute Scalar Residual Component
-        R_T_C = C_TT * dot_T + C_TH * dot_P
+        call self%calc_inner_heat_capacity(target_id, state, bdf_coeffs, R_T_C)
 
         ! ======================================================================
         ! 2. Calculate Flux Term (R_T_D = j_E)

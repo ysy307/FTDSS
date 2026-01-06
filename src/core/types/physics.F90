@@ -1,6 +1,7 @@
 module core_types_physics
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: core_types_coordinate, only:type_coordinate_dp
+
     use :: core_deallocate, only:deallocate_array
     implicit none
     private
@@ -8,7 +9,7 @@ module core_types_physics
     public :: type_state
     public :: type_physics_info
 
-! ------------------------------------------------------------------
+    ! ------------------------------------------------------------------
     ! 1. Real(real64) Wrapper Type
     ! ------------------------------------------------------------------
     type :: type_field_dp
@@ -22,7 +23,19 @@ module core_types_physics
     end type type_field_dp
 
     ! ------------------------------------------------------------------
-    ! 2. Coordinate Wrapper Type
+    ! 2. Real(real64) allocatable Wrapper Type
+    ! ------------------------------------------------------------------
+    type :: type_field_array_dp
+        private
+        real(real64), allocatable :: value(:)
+        logical :: is_set = .false.
+    contains
+        procedure, pass(self), public :: set => set_field_array_dp
+        procedure, pass(self), public :: get => get_field_array_dp
+        procedure, pass(self), private :: reset => reset_field_array_dp
+    end type type_field_array_dp
+    ! ------------------------------------------------------------------
+    ! 3. Coordinate Wrapper Type
     ! ------------------------------------------------------------------
     type :: type_field_coord
         private
@@ -47,6 +60,9 @@ module core_types_physics
         type(type_field_dp) :: air_content ! Air content [-]
         type(type_field_dp) :: porosity ! Porosity [-]
 
+        type(type_field_array_dp) :: temperature_history ! Temperature history [-]
+        type(type_field_array_dp) :: pressure_history ! Pressure history [-]
+
         ! --- Thermal Properties ---
         type(type_field_dp) :: latent_heat_fusion ! [J/kg]
         type(type_field_dp) :: latent_heat_vaporization ! [J/kg]
@@ -61,8 +77,8 @@ module core_types_physics
         type(type_field_dp) :: dQa_dP ! d(theta_air)/dP
         type(type_field_dp) :: dQi_dP ! d(theta_ice)/dP
 
-        type(type_field_dp) :: dot_T ! Temperature change rate [K/s]
-        type(type_field_dp) :: dot_P ! Pressure change rate [Pa/s]
+        ! type(type_field_dp) :: dot_T ! Temperature change rate [K/s]
+        ! type(type_field_dp) :: dot_P ! Pressure change rate [Pa/s]
         type(type_field_coord) :: grad_T ! Temperature gradient [K/m]
         type(type_field_coord) :: grad_P ! Pressure gradient [Pa/m]
 
@@ -76,9 +92,11 @@ module core_types_physics
 
     contains
         ! Bulk Setter (Optional arguments)
-        procedure, public, pass(self) :: set => state_set_all
+        procedure, public, pass(self) :: set => set_all_state
         ! Reset All (Pure Elemental)
-        procedure, public, pass(self) :: reset => state_reset_all
+        procedure, public, pass(self) :: reset => reset_all_state
+        !> Copy
+        procedure, public, pass(self) :: copy => copy_state
     end type type_state
 
     type :: type_physics_info
@@ -87,7 +105,7 @@ module core_types_physics
         real(real64) :: water = 0.0d0
         real(real64) :: ice = 0.0d0
         real(real64) :: vapor = 0.0d0
-        real(real64), allocatable :: dispersity(:)
+        real(real64), allocatable :: dispersivity(:)
         real(real64), allocatable :: params(:)
     contains
         procedure, pass(self), public :: reset => reset_physics_info
@@ -136,6 +154,56 @@ contains
         self%is_set = .false.
     end subroutine reset_field_dp
 
+    ! ==================================================================
+    ! Implementation: Real64 Array Field
+    ! ==================================================================
+
+    pure subroutine set_field_array_dp(self, value)
+        implicit none
+        class(type_field_array_dp), intent(inout) :: self
+        real(real64), intent(in) :: value(:)
+
+        if (allocated(self%value)) then
+            deallocate (self%value)
+        end if
+        allocate (self%value(size(value)))
+        self%value = value
+        self%is_set = .true.
+    end subroutine set_field_array_dp
+
+    pure subroutine get_field_array_dp(self, value, is_set)
+        implicit none
+        class(type_field_array_dp), intent(in) :: self
+        real(real64), allocatable, intent(inout) :: value(:)
+        logical, intent(inout), optional :: is_set
+
+        if (.not. self%is_set) then
+            if (allocated(value)) then
+                deallocate (value)
+            end if
+            if (present(is_set)) is_set = .false.
+            return
+        end if
+
+        if (allocated(value)) then
+            deallocate (value)
+        end if
+        allocate (value(size(self%value)))
+        value = self%value
+        if (present(is_set)) is_set = self%is_set
+
+    end subroutine get_field_array_dp
+
+    pure subroutine reset_field_array_dp(self)
+        implicit none
+        class(type_field_array_dp), intent(inout) :: self
+
+        if (allocated(self%value)) then
+            deallocate (self%value)
+        end if
+        self%is_set = .false.
+    end subroutine reset_field_array_dp
+
     ! Setter
     pure elemental subroutine field_coord_set(self, value)
         class(type_field_coord), intent(inout) :: self
@@ -177,11 +245,13 @@ contains
     ! Bulk Setter
     ! Pure Elemental には引数制限やコンパイラ依存があるため、
     ! ここでは通常の Subroutine として実装します（安全策）。
-    subroutine state_set_all(self, temperature, pressure, water_content, ice_content, &
+    subroutine set_all_state(self, temperature, pressure, water_content, ice_content, &
                              vapor_content, air_content, porosity, &
+                             temperature_history, pressure_history, &
                              latent_heat_fusion, latent_heat_vaporization, &
                              dQw_dT, dQv_dT, dQa_dT, dQi_dT, dQw_dP, dQv_dP, dQa_dP, dQi_dP, &
-                             dot_T, dot_P, grad_T, grad_P, &
+                             !  dot_T, dot_P, &
+                             grad_T, grad_P, &
                              relative_humidity, mass_fraction_clay, &
                              water_flux, vapor_flux)
         implicit none
@@ -191,10 +261,12 @@ contains
         real(real64), intent(in), optional :: water_content, ice_content
         real(real64), intent(in), optional :: vapor_content, air_content
         real(real64), intent(in), optional :: porosity
+        real(real64), intent(in), optional :: temperature_history(:)
+        real(real64), intent(in), optional :: pressure_history(:)
         real(real64), intent(in), optional :: latent_heat_fusion, latent_heat_vaporization
         real(real64), intent(in), optional :: dQw_dT, dQv_dT, dQa_dT, dQi_dT
         real(real64), intent(in), optional :: dQw_dP, dQv_dP, dQa_dP, dQi_dP
-        real(real64), intent(in), optional :: dot_T, dot_P
+        ! real(real64), intent(in), optional :: dot_T, dot_P
         type(type_coordinate_dp), intent(in), optional :: grad_T, grad_P
         real(real64), intent(in), optional :: relative_humidity, mass_fraction_clay
         type(type_coordinate_dp), intent(in), optional :: water_flux, vapor_flux
@@ -219,6 +291,14 @@ contains
         end if
         if (present(porosity)) then
             call self%porosity%set(porosity)
+        end if
+
+        if (present(temperature_history)) then
+            call self%temperature_history%set(temperature_history)
+        end if
+
+        if (present(pressure_history)) then
+            call self%pressure_history%set(pressure_history)
         end if
 
         if (present(latent_heat_fusion)) then
@@ -252,12 +332,12 @@ contains
         if (present(dQi_dP)) then
             call self%dQi_dP%set(dQi_dP)
         end if
-        if (present(dot_T)) then
-            call self%dot_T%set(dot_T)
-        end if
-        if (present(dot_P)) then
-            call self%dot_P%set(dot_P)
-        end if
+        ! if (present(dot_T)) then
+        !     call self%dot_T%set(dot_T)
+        ! end if
+        ! if (present(dot_P)) then
+        !     call self%dot_P%set(dot_P)
+        ! end if
         if (present(grad_T)) then
             call self%grad_T%set(grad_T)
         end if
@@ -278,10 +358,10 @@ contains
             call self%vapor_flux%set(vapor_flux)
         end if
 
-    end subroutine state_set_all
+    end subroutine set_all_state
 
     ! Reset All (Pure Elemental)
-    pure elemental subroutine state_reset_all(self)
+    pure elemental subroutine reset_all_state(self)
         implicit none
         class(type_state), intent(inout) :: self
 
@@ -292,6 +372,8 @@ contains
         call self%vapor_content%reset()
         call self%air_content%reset()
         call self%porosity%reset()
+        call self%temperature_history%reset()
+        call self%pressure_history%reset()
         call self%latent_heat_fusion%reset()
         call self%latent_heat_vaporization%reset()
         call self%dQw_dT%reset()
@@ -302,17 +384,52 @@ contains
         call self%dQv_dP%reset()
         call self%dQa_dP%reset()
         call self%dQi_dP%reset()
-        call self%dot_T%reset()
-        call self%dot_P%reset()
+        ! call self%dot_T%reset()
+        ! call self%dot_P%reset()
         call self%grad_T%reset()
         call self%grad_P%reset()
         call self%relative_humidity%reset()
         call self%mass_fraction_clay%reset()
         call self%water_flux%reset()
         call self%vapor_flux%reset()
-    end subroutine state_reset_all
+    end subroutine reset_all_state
 
-    ! ==================================================================
+    pure subroutine copy_state(self, source)
+        implicit none
+        class(type_state), intent(inout) :: self
+        class(type_state), intent(in) :: source
+
+        call self%temperature%set(source%temperature%value)
+        call self%pressure%set(source%pressure%value)
+        call self%water_content%set(source%water_content%value)
+        call self%ice_content%set(source%ice_content%value)
+        call self%vapor_content%set(source%vapor_content%value)
+        call self%air_content%set(source%air_content%value)
+        call self%porosity%set(source%porosity%value)
+        call self%temperature_history%set(source%temperature_history%value)
+        call self%pressure_history%set(source%pressure_history%value)
+        call self%latent_heat_fusion%set(source%latent_heat_fusion%value)
+        call self%latent_heat_vaporization%set(source%latent_heat_vaporization%value)
+        call self%dQw_dT%set(source%dQw_dT%value)
+        call self%dQv_dT%set(source%dQv_dT%value)
+        call self%dQa_dT%set(source%dQa_dT%value)
+        call self%dQi_dT%set(source%dQi_dT%value)
+        call self%dQw_dP%set(source%dQw_dP%value)
+        call self%dQv_dP%set(source%dQv_dP%value)
+        call self%dQa_dP%set(source%dQa_dP%value)
+        call self%dQi_dP%set(source%dQi_dP%value)
+        ! call self%dot_T%set(source%dot_T%value)
+        ! call self%dot_P%set(source%dot_P%value)
+        call self%grad_T%set(source%grad_T%value)
+        call self%grad_P%set(source%grad_P%value)
+        call self%relative_humidity%set(source%relative_humidity%value)
+        call self%mass_fraction_clay%set(source%mass_fraction_clay%value)
+        call self%water_flux%set(source%water_flux%value)
+        call self%mass_fraction_clay%set(source%mass_fraction_clay%value)
+
+    end subroutine copy_state
+
+    ! ============================copy_state======================================
     ! Implementation: Physics Info Methods
     ! ==================================================================
 
@@ -326,7 +443,7 @@ contains
         self%ice = 0.0d0
         self%vapor = 0.0d0
 
-        call deallocate_array(self%dispersity)
+        call deallocate_array(self%dispersivity)
         call deallocate_array(self%params)
 
     end subroutine reset_physics_info

@@ -208,17 +208,20 @@ contains
         real(real64), intent(inout) :: R_T_C(:), R_T_D(:, :), R_H_C(:), R_H_D(:, :)
         integer(int32) :: i
         type(type_state) :: state
+        real(real64), pointer, contiguous, dimension(:) :: bdf_coeffs
+
+        call self%controls%time%get_bdf_coeffs(bdf_coeffs)
 
         do i = 1, num_nodes
             call self%set_state(connectivity(i), element_id, state)
             call self%thermal%compute_C_T(material_id, state, C_TT(i), C_TH(i))
             call self%thermal%compute_D_T(material_id, state, M_TT(:, :, i), M_TH(:, :, i))
             call self%thermal%compute_V_T(material_id, state, V_TT(:, i), V_TH(:, i))
-            call self%thermal%compute_R_T(material_id, state, R_T_C(i), R_T_D(:, i))
+            call self%thermal%compute_R_T(material_id, state, bdf_coeffs, R_T_C(i), R_T_D(:, i))
             call self%hydraulic%compute_C_H(material_id, state, C_HH(i), C_HT(i))
             call self%hydraulic%compute_D_H(material_id, state, M_HH(:, :, i), M_HT(:, :, i))
             call self%hydraulic%compute_V_H(material_id, state, V_HH(:, i), V_HT(:, i))
-            call self%hydraulic%compute_R_H(material_id, state, R_H_C(i), R_H_D(:, i))
+            call self%hydraulic%compute_R_H(material_id, state, bdf_coeffs, R_H_C(i), R_H_D(:, i))
         end do
     end subroutine compute_nodal_coefficients
 
@@ -246,11 +249,10 @@ contains
         type(type_vector_dp), intent(inout), optional :: local_R_T, local_R_H
 
         ! ! --- C Terms (Already Scaled) ---
-        ! 準ニュートン法対応のためコメントアウト
-        ! if (present(local_J_TT)) call add_term_scalar(fe, coordinates, dim, C_TT, local_J, local_J_TT)
-        ! if (present(local_J_TH)) call add_term_scalar(fe, coordinates, dim, C_TH, local_J, local_J_TH)
-        ! if (present(local_J_HH)) call add_term_scalar(fe, coordinates, dim, C_HH, local_J, local_J_HH)
-        ! if (present(local_J_HT)) call add_term_scalar(fe, coordinates, dim, C_HT, local_J, local_J_HT)
+        if (present(local_J_TT)) call add_term_scalar(fe, coordinates, dim, C_TT, local_J, local_J_TT)
+        if (present(local_J_TH)) call add_term_scalar(fe, coordinates, dim, C_TH, local_J, local_J_TH)
+        if (present(local_J_HH)) call add_term_scalar(fe, coordinates, dim, C_HH, local_J, local_J_HH)
+        if (present(local_J_HT)) call add_term_scalar(fe, coordinates, dim, C_HT, local_J, local_J_HT)
 
         ! --- M Terms ---
         if (present(local_J_TT)) call add_term_tensor(fe, coordinates, dim, M_TT, local_J, local_J_TT)

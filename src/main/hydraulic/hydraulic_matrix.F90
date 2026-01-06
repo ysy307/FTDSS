@@ -243,30 +243,22 @@ contains
 
     end subroutine compute_V_H
 
-    module pure subroutine compute_R_H(self, target_id, state, R_H_C, R_H_D)
+    module pure subroutine compute_R_H(self, target_id, state, bdf_coeffs, R_H_C, R_H_D)
         implicit none
         class(type_hydraulic), intent(in) :: self
         integer(int32), intent(in) :: target_id
         type(type_state), intent(inout) :: state
+        real(real64), intent(in) :: bdf_coeffs(:)
         real(real64), intent(inout) :: R_H_C
         real(real64), intent(inout) :: R_H_D(:)
 
-        real(real64) :: dot_P, dot_T
-        real(real64) :: C_HH, C_HT
         real(real64) :: rho_w
         type(type_coordinate_dp) :: water_flux, vapor_flux
 
-        ! 1. Calculate Storage Term (R_H_C)
-        ! R_H_C = C_HH * dP/dt + C_HT * dT/dt
-        call state%dot_P%get(dot_P)
-        call state%dot_T%get(dot_T)
+        ! --- Storage term (BDF, not dot_P/dot_T) ---
+        call self%calc_effective_density(target_id, state, bdf_coeffs, R_H_C)
 
-        call self%compute_C_H(target_id, state, C_HH, C_HT)
-
-        R_H_C = C_HH * dot_P + C_HT * dot_T
-
-        ! 2. Calculate Flux Term (R_H_D)
-        ! R_H_D = Mass Flux = rho_w * (q_liquid + q_vapor)
+        ! --- Flux term ---
         call state%water_flux%get(water_flux)
         call state%vapor_flux%get(vapor_flux)
         call self%physics%calc_density_water(state, rho_w)
@@ -284,7 +276,6 @@ contains
             R_H_D(2) = rho_w * (water_flux%y + vapor_flux%y)
             R_H_D(3) = rho_w * (water_flux%z + vapor_flux%z)
         end select
-
     end subroutine compute_R_H
 
 end submodule hydraulic_matrix

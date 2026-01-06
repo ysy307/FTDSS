@@ -4,6 +4,7 @@ module core_constants_utils
     use :: stdlib_ascii, only:to_lower
     use :: core_constants_solver
     use :: core_constants_parallel
+    use :: core_constants_physical
     implicit none
     private
 
@@ -23,6 +24,8 @@ module core_constants_utils
     public :: get_nonlinear_logic
     public :: get_time_unit
     public :: get_time_record
+    public :: get_swcc_model_type
+    public :: get_physics_unit
 
     ! String getter functions
     public :: get_string
@@ -41,6 +44,9 @@ module core_constants_utils
     public :: get_nonlinear_logic_string
     public :: get_time_unit_string
     public :: get_time_record_string
+    public :: get_swcc_model_type_string
+
+    public :: get_physics_unit_string
 
     interface
         pure function get_value(key) result(val)
@@ -598,5 +604,83 @@ contains
             key = "Unknown"
         end select
     end function get_time_record_string
+
+    !> 文字列からSWCCモデルタイプIDを取得する
+    pure function get_swcc_model_type(key) result(val)
+        implicit none
+        character(len=*), intent(in) :: key
+        integer(int32) :: val
+
+        select case (strip(to_lower(key)))
+        case ("brooks_corey", "bc")
+            val = SWCC_BC
+        case ("van_genuchten", "vg")
+            val = SWCC_VG
+        case ("kosugi", "ko")
+            val = SWCC_KO
+        case ("modified_van_genuchten", "mvg")
+            val = SWCC_MVG
+        case ("durner")
+            val = SWCC_DURNER
+        case ("dvgch")
+            val = SWCC_DVGCH
+        end select
+    end function get_swcc_model_type
+
+    pure function get_swcc_model_type_string(val) result(key)
+        implicit none
+        integer(int32), intent(in) :: val
+        character(:), allocatable :: key
+
+        select case (val)
+        case (SWCC_BC)
+            key = "Brooks-Corey"
+        case (SWCC_VG)
+            key = "van-Genuchten"
+        case (SWCC_KO)
+            key = "Kosugi"
+        case (SWCC_MVG)
+            key = "Modified van-Genuchten"
+        case (SWCC_DURNER)
+            key = "Durner"
+        case (SWCC_DVGCH)
+            key = "DVGCH"
+        case default
+            key = "Unknown"
+        end select
+    end function get_swcc_model_type_string
+
+    !> Physics unit in systems
+    pure function get_physics_unit(key) result(val)
+        implicit none
+        character(len=*), intent(in) :: key
+        integer(int32) :: val
+
+        select case (strip(to_lower(key)))
+        case ("m")
+            val = PHYSICS_UNIT_M
+        case ("cm")
+            val = PHYSICS_UNIT_CM
+        case ("pa")
+            val = PHYSICS_UNIT_PA
+        end select
+    end function get_physics_unit
+
+    pure function get_physics_unit_string(val) result(key)
+        implicit none
+        integer(int32), intent(in) :: val
+        character(:), allocatable :: key
+
+        select case (val)
+        case (PHYSICS_UNIT_M)
+            key = "m"
+        case (PHYSICS_UNIT_CM)
+            key = "cm"
+        case (PHYSICS_UNIT_PA)
+            key = "Pa"
+        case default
+            key = "unknown"
+        end select
+    end function get_physics_unit_string
 
 end module core_constants_utils

@@ -34,20 +34,35 @@
             "calculate_hydraulic": true,
             "calculate_mechanical": false,
             "phase": 3,
-            "is_frozen": true,
-            "is_dispersed": false,
-            "thermal": {
-                "density": [
+            "density": {
+                "value": [
                     2800.0,
                     1000.0,
                     917.0
-                ],
-                "specific_heat": [
+                ]
+            },
+            "specific_heat": {
+                "value": [
                     912.0,
                     4180.0,
                     2100.0
+                ]
+            },
+            "volumetric_heat_capacity": {
+                "value": [
+                    2.5536e6,
+                    4.18e6,
+                    1.9257e6
                 ],
-                "thermal_conductivity": [
+                "params": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "thermal_conductivity": {
+                "is_dispersed": false,
+                "value": [
                     3.78,
                     0.6,
                     2.2
@@ -56,47 +71,39 @@
                     1.0,
                     0.1
                 ],
-                "phase_change": {
-                    "latent_heat": {
-                        "fusion": 334560.0
-                    },
-                    "freezing_temperature": 0.0,
-                    "unfrozen_water_model": {
-                        "model_number": 2,
-                        "theta_s": 0.3,
-                        "theta_r": 0.0,
-                        "alpha1": 0.2,
-                        "n1": 1.8,
-                        "alpha2": 0.2,
-                        "n2": 1.8,
-                        "h_crit": -10.0,
-                        "w1": 0.4
-                    },
-                    "equilibrium_model": {
-                        "segregation": false,
-                        "unit": "m"
-                    }
+                "params": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    0.5
+                ]
+            },
+            "phase_change": {
+                "equilibrium_model": {
+                    "segregation": false
                 }
             },
-            "hydraulic": {
-                "hydraulic_conductivity_model": {
-                    "model_number": 2,
-                    "saturated_conductivity": 1.96e-07
-                },
+            "water_characteristic_curve": {
+                "model": "VG",
+                "unit": "m",
+                "theta_s": 0.3,
+                "theta_r": 0.0,
+                "alpha1": 0.2,
+                "n1": 1.8,
+                "alpha2": 0.2,
+                "n2": 1.8,
+                "h_crit": -10.0,
+                "w1": 0.4,
+                "l": 0.5
+            },
+            "hydraulic_conductivity_model": {
+                "model_number": 2,
+                "saturated_conductivity": 1.96e-07,
                 "impedance_factor": 10,
-                "water_retention_model": {
-                    "model_number": 2,
-                    "theta_s": 0.3,
-                    "theta_r": 0.0,
-                    "alpha1": 0.2,
-                    "n1": 1.8,
-                    "alpha2": 0.2,
-                    "n2": 1.8,
-                    "h_crit": -10.0,
-                    "w1": 0.4,
-                    "l": 0.5
-                },
-                "water_viscosity_model": 0
+                "water_viscosity_model": 0,
+                "gain_factor": 1.0
             }
         }
     ],

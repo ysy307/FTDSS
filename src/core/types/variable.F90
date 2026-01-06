@@ -6,6 +6,7 @@ module core_types_variable
     use, intrinsic :: iso_fortran_env, only: real64, int32
     use :: core_allocate, only:allocate_array
     use :: core_types_coordinate_array, only:type_coordinate_array_dp
+    use :: core_types_coordinate, only:type_coordinate_dp
     use :: core_types_physics, only:type_state
     implicit none
     private
@@ -34,10 +35,15 @@ module core_types_variable
         !> The spatial derivative of the variable (e.g., grad u).
         type(type_coordinate_array_dp) :: grad
     contains
-        procedure, pass(self) :: initialize => initialize_type_variable
-        procedure, pass(self) :: shift => shift_variable
-        procedure, pass(self) :: set => set_variable
-        procedure, pass(self) :: compute_derivative => compute_derivative_variable
+        procedure, public, pass(self) :: initialize => initialize_type_variable
+        procedure, public, pass(self) :: shift => shift_variable
+        procedure, public, pass(self) :: set => set_variable
+        procedure, private, pass(self) :: get_current_value_variable
+        procedure, private, pass(self) :: get_current_values_variable
+        generic, public :: get_current => get_current_value_variable, get_current_values_variable
+        procedure, public, pass(self) :: get_current_gradient => get_current_gradient_variable
+        procedure, public, pass(self) :: get_history => get_history_variable
+        procedure, public, pass(self) :: compute_derivative => compute_derivative_variable
     end type type_variable
 
 contains
@@ -58,7 +64,7 @@ contains
 
         call allocate_array(self%new, length)
         call allocate_array(self%pre, length)
-        call allocate_array(self%old, length, self%rank + 1_int32)
+        call allocate_array(self%old, length, self%rank)
         call allocate_array(self%dif, length)
         call self%grad%initialize(length, 0.0d0)
 
@@ -140,6 +146,71 @@ contains
         self%dif(:) = 0.0d0
 
     end subroutine set_variable
+
+    subroutine get_current_values_variable(self, current_values)
+        implicit none
+        !> The variable object to query.
+        class(type_variable), intent(in), target :: self
+        !> The array to hold the current value of the variable.
+        real(real64), intent(inout), pointer, contiguous, dimension(:) :: current_values
+
+        current_values => self%new
+
+    end subroutine get_current_values_variable
+
+    subroutine get_current_value_variable(self, node_id, current_value)
+        implicit none
+        !> The variable object to query.
+        class(type_variable), intent(in) :: self
+        !> The node index to retrieve the current value for.
+        integer(int32), intent(in) :: node_id
+        !> The array to hold the current value of the variable.
+        real(real64), intent(inout) :: current_value
+
+        current_value = self%new(node_id)
+    end subroutine get_current_value_variable
+
+    subroutine get_current_gradient_variable(self, node_id, current_gradient)
+        implicit none
+        !> The variable object to query.
+        class(type_variable), intent(in) :: self
+        !> The node index to retrieve the current gradient for.
+        integer(int32), intent(in) :: node_id
+        !> The array to hold the current gradient of the variable.
+        type(type_coordinate_dp), intent(inout) :: current_gradient
+
+        current_gradient%x = self%grad%x(node_id)
+        current_gradient%y = self%grad%y(node_id)
+        current_gradient%z = self%grad%z(node_id)
+
+    end subroutine get_current_gradient_variable
+
+    subroutine get_history_variable(self, node_id, history_values)
+        implicit none
+        !> The variable object to query.
+        class(type_variable), intent(in) :: self
+        !> The node index to retrieve the history for.
+        integer(int32), intent(in) :: node_id
+        !> The array to hold the historical values of the variable.
+        real(real64), intent(inout) :: history_values(:)
+
+        integer(int32) :: i, num_history
+
+        num_history = min(size(history_values), self%rank + 2)
+        if (num_history < 2) then
+            error stop "Error in get_history_variable: history_values size is out of bounds."
+        end if
+
+        history_values(1) = self%new(node_id)
+        history_values(2) = self%pre(node_id)
+
+        if (num_history > 2) then
+            do i = 1, num_history - 2
+                history_values(i) = self%old(node_id, i)
+            end do
+        end if
+
+    end subroutine get_history_variable
 
     !>
     !> Calculates the time derivative using provided BDF coefficients.
