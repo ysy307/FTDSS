@@ -305,33 +305,38 @@ contains
         implicit none
         class(type_iteration), intent(in) :: self
         logical :: continue_flag
+
         continue_flag = (.not. self%is_converged) .and. &
                         (self%nonlinear_iter < self%config%max_iterations)
     end function should_continue
 
-    pure function get_nonlinear_iter(self) result(val)
+    pure subroutine get_nonlinear_iter(self, nonlinear_iter)
         class(type_iteration), intent(in) :: self
-        integer(int32) :: val
-        val = self%nonlinear_iter
-    end function get_nonlinear_iter
+        integer(int32), intent(inout) :: nonlinear_iter
 
-    pure function get_total_iter(self) result(val)
+        nonlinear_iter = self%nonlinear_iter
+    end subroutine get_nonlinear_iter
+
+    pure subroutine get_total_iter(self, total_iter)
         class(type_iteration), intent(in) :: self
-        integer(int32) :: val
-        val = self%total_iter
-    end function get_total_iter
+        integer(int32), intent(inout) :: total_iter
+
+        total_iter = self%total_iter
+    end subroutine get_total_iter
 
     pure function has_converged(self) result(val)
         class(type_iteration), intent(in) :: self
         logical :: val
+
         val = self%is_converged
     end function has_converged
 
-    pure function get_max_iterations(self) result(val)
+    pure subroutine get_max_iterations(self, max_iterations)
         class(type_iteration), intent(in) :: self
-        integer(int32) :: val
-        val = self%config%max_iterations
-    end function get_max_iterations
+        integer(int32), intent(inout) :: max_iterations
+
+        max_iterations = self%config%max_iterations
+    end subroutine get_max_iterations
 
     ! ==========================================================================
     ! Display Status

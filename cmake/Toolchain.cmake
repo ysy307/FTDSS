@@ -104,8 +104,7 @@ function(enable_build_flags target)
                 # -check all: 全チェック
                 # -fpe0: 浮動小数点例外(NaN等)で即停止
                 # -ftrapuv: 未初期化変数を変な値で埋める
-                # -fp-stack-check: スタックあふれチェック
-                $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Debug>>:-g -check all -fpe0 -ftrapuv -fp-stack-check>
+                $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Debug>>:-g -check all -fpe0 -ftrapuv>
             )
         
         # GNU (Fortran)

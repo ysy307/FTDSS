@@ -3,7 +3,7 @@ set -e
 set -o pipefail
 
 # スクリプト終了時に必ず実行
-trap '/usr/bin/python3 /workspaces/FTDSS/scripts/check.py' EXIT
+trap '/usr/bin/python3 /workspaces/FTDSS/scripts/check_log.py' EXIT
 
 cmake -S . -B CMakeBuild \
     -DBUILD_APP=test \

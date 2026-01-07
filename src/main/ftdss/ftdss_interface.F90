@@ -73,6 +73,8 @@ module main_ftdss
 
         !> 1タイムステップ分の計算を行う（非線形反復ループを含む）
         procedure, public, pass(self) :: solve_time_step => solve_time_step_ftdss
+        procedure, public, pass(self) :: solve_time_step_initial_setup => solve_time_step_initial_setup_ftdss
+        procedure, public, pass(self) :: solve_time_step_setup => solve_time_step_setup_ftdss
 
         procedure, public, pass(self) :: output_fields => output_fields_ftdss
         procedure, public, pass(self) :: output_history => output_history_ftdss
@@ -208,6 +210,19 @@ module main_ftdss
             class(type_ftdss), intent(inout) :: self
 
         end subroutine assemble_ftdss
+
+        module subroutine solve_time_step_initial_setup_ftdss(self)
+            implicit none
+            class(type_ftdss), intent(inout) :: self
+
+        end subroutine solve_time_step_initial_setup_ftdss
+
+        module subroutine solve_time_step_setup_ftdss(self, prescribe_bc)
+            implicit none
+            class(type_ftdss), intent(inout) :: self
+            logical, intent(inout) :: prescribe_bc
+
+        end subroutine solve_time_step_setup_ftdss
 
         module subroutine solve_time_step_ftdss(self, is_step_converged)
             implicit none
