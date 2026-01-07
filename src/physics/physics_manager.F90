@@ -30,6 +30,7 @@ module physics_service
         procedure, public :: calc_density_water
         procedure, public :: calc_density_ice
         procedure, public :: calc_density_vapor
+        procedure, public :: calc_density_vapor_saturation
         procedure, public :: calc_density_water_derivatives
         procedure, public :: calc_density_ice_derivatives
         procedure, public :: calc_density_vapor_derivatives
@@ -237,6 +238,16 @@ contains
         call self%iapws_wrapper%calc_rho_vapor(state, density_vapor)
 
     end subroutine calc_density_vapor
+
+    pure elemental subroutine calc_density_vapor_saturation(self, state, density_vapor_saturation)
+        implicit none
+        class(type_physics_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: density_vapor_saturation
+
+        call self%iapws_wrapper%calc_rho_vapor_saturation(state, density_vapor_saturation)
+
+    end subroutine calc_density_vapor_saturation
 
     pure elemental subroutine calc_density_water_derivatives(self, material_id, state, dden_dT, dden_dP)
         implicit none

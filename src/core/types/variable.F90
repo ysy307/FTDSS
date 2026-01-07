@@ -158,7 +158,7 @@ contains
 
     end subroutine get_current_values_variable
 
-    subroutine get_current_value_variable(self, node_id, current_value)
+    pure subroutine get_current_value_variable(self, node_id, current_value)
         implicit none
         !> The variable object to query.
         class(type_variable), intent(in) :: self
@@ -170,7 +170,7 @@ contains
         current_value = self%new(node_id)
     end subroutine get_current_value_variable
 
-    subroutine get_current_gradient_variable(self, node_id, current_gradient)
+    pure subroutine get_current_gradient_variable(self, node_id, current_gradient)
         implicit none
         !> The variable object to query.
         class(type_variable), intent(in) :: self
@@ -185,7 +185,7 @@ contains
 
     end subroutine get_current_gradient_variable
 
-    subroutine get_history_variable(self, node_id, history_values)
+    pure subroutine get_history_variable(self, node_id, history_values)
         implicit none
         !> The variable object to query.
         class(type_variable), intent(in) :: self
@@ -206,7 +206,7 @@ contains
 
         if (num_history > 2) then
             do i = 1, num_history - 2
-                history_values(i) = self%old(node_id, i)
+                history_values(i + 2) = self%old(node_id, i)
             end do
         end if
 

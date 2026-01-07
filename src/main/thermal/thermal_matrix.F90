@@ -296,8 +296,8 @@ contains
         select case (self%computation_type)
         case (COMP_TYPE_2D_XY)
             ! --- Conduction: -lambda * grad T ---
-            term_conduction(1) = -(lambda%lambda_xx * grad_T%x + lambda%lambda_xy * grad_T%y)
-            term_conduction(2) = -(lambda%lambda_xy * grad_T%x + lambda%lambda_yy * grad_T%y)
+            term_conduction(1) = (lambda%lambda_xx * grad_T%x + lambda%lambda_xy * grad_T%y)
+            term_conduction(2) = (lambda%lambda_xy * grad_T%x + lambda%lambda_yy * grad_T%y)
 
             ! --- Sensible Heat Advection: rho_w * (c_w*q_w + c_v*q_v) * T ---
             term_adv_sensible(1) = rho_w * (c_w * water_flux%x + c_v * vapor_flux%x) * temperature
@@ -309,8 +309,8 @@ contains
 
         case (COMP_TYPE_2D_XZ)
             ! --- Conduction ---
-            term_conduction(1) = -(lambda%lambda_xx * grad_T%x + lambda%lambda_zx * grad_T%z)
-            term_conduction(2) = -(lambda%lambda_zx * grad_T%x + lambda%lambda_zz * grad_T%z)
+            term_conduction(1) = (lambda%lambda_xx * grad_T%x + lambda%lambda_zx * grad_T%z)
+            term_conduction(2) = (lambda%lambda_zx * grad_T%x + lambda%lambda_zz * grad_T%z)
 
             ! --- Sensible Heat Advection ---
             term_adv_sensible(1) = rho_w * (c_w * water_flux%x + c_v * vapor_flux%x) * temperature
@@ -322,9 +322,9 @@ contains
 
         case (COMP_TYPE_3D)
             ! --- Conduction ---
-            term_conduction(1) = -(lambda%lambda_xx * grad_T%x + lambda%lambda_xy * grad_T%y + lambda%lambda_zx * grad_T%z)
-            term_conduction(2) = -(lambda%lambda_xy * grad_T%x + lambda%lambda_yy * grad_T%y + lambda%lambda_yz * grad_T%z)
-            term_conduction(3) = -(lambda%lambda_zx * grad_T%x + lambda%lambda_yz * grad_T%y + lambda%lambda_zz * grad_T%z)
+            term_conduction(1) = (lambda%lambda_xx * grad_T%x + lambda%lambda_xy * grad_T%y + lambda%lambda_zx * grad_T%z)
+            term_conduction(2) = (lambda%lambda_xy * grad_T%x + lambda%lambda_yy * grad_T%y + lambda%lambda_yz * grad_T%z)
+            term_conduction(3) = (lambda%lambda_zx * grad_T%x + lambda%lambda_yz * grad_T%y + lambda%lambda_zz * grad_T%z)
 
             ! --- Sensible Heat Advection ---
             term_adv_sensible(1) = rho_w * (c_w * water_flux%x + c_v * vapor_flux%x) * temperature

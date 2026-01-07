@@ -23,6 +23,8 @@ module main_thermal
         procedure, pass(self), public :: compute_R_T => compute_R_T
 
         procedure, pass(self), public :: calc_density_water => calc_density_water_thermal
+        procedure, pass(self), public :: calc_density_ice => calc_density_ice_thermal
+        procedure, pass(self), public :: calc_density_vapor_saturation => calc_density_vapor_saturation_thermal
         procedure, pass(self), public :: calc_inner_heat_capacity => calc_inner_heat_capacity_thermal
         procedure, pass(self), public :: update_water_phases => update_water_phases_thermal
     end type type_thermal
@@ -90,6 +92,22 @@ module main_thermal
             real(real64), intent(inout) :: rho_water
 
         end subroutine calc_density_water_thermal
+
+        module pure elemental subroutine calc_density_ice_thermal(self, state, rho_ice)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: rho_ice
+
+        end subroutine calc_density_ice_thermal
+
+        module pure elemental subroutine calc_density_vapor_saturation_thermal(self, state, rho_vapor_sat)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: rho_vapor_sat
+
+        end subroutine calc_density_vapor_saturation_thermal
 
         module pure elemental subroutine update_water_phases_thermal(self, material_id, state)
             implicit none

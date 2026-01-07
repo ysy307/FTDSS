@@ -12,6 +12,26 @@ contains
 
     end subroutine calc_density_water_thermal
 
+    module pure elemental subroutine calc_density_ice_thermal(self, state, rho_ice)
+        implicit none
+        class(type_thermal), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: rho_ice
+
+        call self%physics%calc_density_ice(state, rho_ice)
+
+    end subroutine calc_density_ice_thermal
+
+    module pure elemental subroutine calc_density_vapor_saturation_thermal(self, state, rho_vapor_sat)
+        implicit none
+        class(type_thermal), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: rho_vapor_sat
+
+        call self%physics%calc_density_vapor_saturation(state, rho_vapor_sat)
+
+    end subroutine calc_density_vapor_saturation_thermal
+
     module pure elemental subroutine update_water_phases_thermal(self, material_id, state)
         implicit none
         class(type_thermal), intent(in) :: self
@@ -52,6 +72,9 @@ contains
         do j = 1, n
             call local_state%temperature%set(temperature_history(j))
             call local_state%pressure%set(pressure_history(j))
+            if (temperature_history(j) < -40.0d0 .or. pressure_history(j) < 0.0d0) then
+                error stop "Error: Sub-zero temperature or pressure in thermal heat capacity calculation."
+            end if
 
             call self%update_water_phases(material_id, local_state)
 

@@ -173,6 +173,21 @@ contains
 
         call self%domain%get_material_id(element_id, material_id)
         call self%thermal%update_water_phases(material_id, state)
+        ! block
+        !     real(real64) :: Qw, Qi, Qa, Qv
+        !     real(real64) :: saturation_density, rho_water, rho_ice
+        !     call state%water_content%get(Qw)
+        !     call state%ice_content%get(Qi)
+        !     call state%air_content%get(Qa)
+        !     call state%vapor_content%get(Qv)
+        !     write (*, '(A,i5, a,i5, a,F8.3, a,F8.3, a,F8.3, a,F8.3, a,F8.3, a,F8.3)') &
+        !         "Node:", node_id, ", Mat:", material_id, ", T:", temperature, ", P:", pressure, &
+        !         ", Qw:", Qw, ", Qi:", Qi, ", Qa:", Qa, ", Qv:", Qv
+        !     call self%thermal%calc_density_water(state, rho_water)
+        !     call self%thermal%calc_density_ice(state, rho_ice)
+        !     call self%thermal%calc_density_vapor_saturation(state, saturation_density)
+        !     write (*, '(A,F8.3, a,F8.3, a,F8.3)') "  rho_w:", rho_water, ", rho_sat:", saturation_density, ", rho_i:", rho_ice
+        ! end block
 
         if (self%controls%is_target(PHYSICS_TYPE_HYDRAULIC, material_id)) then
             call self%calc_water_flux(material_id, state, grad_T, grad_P, water_flux)

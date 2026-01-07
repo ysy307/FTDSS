@@ -77,7 +77,7 @@ contains
             end if
 
             ! 3. 正規化して節点へ格納
-            if (sum_vol > 1.0d-12) then
+            if (abs(sum_vol) > epsilon(1.0d0)) then
                 self%Qw%new(i_node) = sum_qw_vol / sum_vol
                 self%Qi%new(i_node) = sum_qi_vol / sum_vol
                 self%Qa%new(i_node) = sum_qa_vol / sum_vol
@@ -382,8 +382,12 @@ contains
             ! Temperature, Pressure 等を delta を用いて更新する．
             call self%reflect_variables()
 
-            is_step_converged = .true.
-            exit
+            print *, iter
+
+            if (iter == 2) then
+                is_step_converged = .true.
+                exit
+            end if
 
         end do
 

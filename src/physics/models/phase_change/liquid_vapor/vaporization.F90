@@ -146,10 +146,7 @@ contains
 
         real(real64) :: relative_humidity
         real(real64) :: saturation_density, water_density
-        real(real64) :: pressure
         real(real64) :: air_content
-
-        call state%pressure%get(pressure)
 
         call self%calc_relative_humidity(state, relative_humidity)
         call self%calc_rho_vapor_saturation(state, saturation_density)

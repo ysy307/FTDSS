@@ -91,30 +91,40 @@ function(enable_build_flags target)
         # ---------------------------------------------------------
         # Fortran Compile Options
         # ---------------------------------------------------------
-        # Basic Options
-        target_compile_options(${target} ${KEYWORD} 
-            $<$<COMPILE_LANGUAGE:Fortran>:-stand f2018 -fpp -traceback>
-        )
-
-        # Intel / IntelLLVM (Fortran)
+# Intel / IntelLLVM (Fortran)
         if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel|IntelLLVM")
             target_compile_options(${target} ${KEYWORD} 
+                # Common for Intel (Standard, Preprocessor, Traceback)
+                $<$<COMPILE_LANGUAGE:Fortran>:-stand f18 -fpp -traceback>
+
                 # Release: Fortran Only
                 $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Release>>:-O3 -xHost>
-                # Debug: Fortran Only (-check all, -fpe0 は C++ に渡さない)
-                $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Debug>>:-g -check all -fpe0>
+                
+                # Debug: Fortran Only 
+                # -check all: 全チェック
+                # -fpe0: 浮動小数点例外(NaN等)で即停止
+                # -ftrapuv: 未初期化変数を変な値で埋める
+                # -fp-stack-check: スタックあふれチェック
+                $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Debug>>:-g -check all -fpe0 -ftrapuv -fp-stack-check>
             )
         
         # GNU (Fortran)
         elseif(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
             target_compile_options(${target} ${KEYWORD} 
+                # Common for GNU (Standard, Preprocessor)
+                $<$<COMPILE_LANGUAGE:Fortran>:-std=f2018 -cpp>
+
                 # Release: Fortran Only
                 $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Release>>:-O3 -march=native>
+                
                 # Debug: Fortran Only
-                $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Debug>>:-g -fcheck=all -ffpe-trap=invalid,zero,overflow>
+                # -fbacktrace: 行番号を表示
+                # -fcheck=all: 全チェック（配列外参照など）
+                # -ffpe-trap=...: NaNやゼロ除算で即停止
+                # -finit-real=snan: 実数をNaNで初期化（未初期化変数対策）
+                $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Debug>>:-g -fbacktrace -fcheck=all -ffpe-trap=invalid,zero,overflow -finit-real=snan -finit-integer=-9999999>
             )
         endif()
-
         # ---------------------------------------------------------
         # C++ Compile Options
         # ---------------------------------------------------------

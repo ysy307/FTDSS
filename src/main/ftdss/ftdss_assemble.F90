@@ -5,6 +5,7 @@ contains
 
     !> Perform the global assembly for the FTDSS solver.
     module subroutine assemble_ftdss(self)
+        ! (変更なし)
         implicit none
         class(type_ftdss), intent(inout) :: self
 
@@ -55,6 +56,7 @@ contains
     !> Compute local matrices and residual vectors for a specific element.
     module subroutine assemble_local_ftdss(self, element_id, local_J_TT, local_J_TH, &
                                            local_J_HH, local_J_HT, local_R_T, local_R_H)
+        ! (変更なし)
         implicit none
         class(type_ftdss), intent(inout) :: self
         integer(int32), intent(in) :: element_id
@@ -92,7 +94,6 @@ contains
         call fe%get_num_nodes(num_nodes)
 
         ! --- Initialize Matrices/Vectors (Ensure Allocation) ---
-        ! ※ initializeの引数は num_nodes 1つのみ
         if (present(local_J_TT)) call local_J_TT%initialize(num_nodes)
         if (present(local_J_TH)) call local_J_TH%initialize(num_nodes)
         if (present(local_J_HH)) call local_J_HH%initialize(num_nodes)
@@ -125,9 +126,7 @@ contains
                                         R_T_C, R_T_D, R_H_C, R_H_D)
 
         ! --- Get BDF Coefficient ---
-        ! self%coeffs(0) corresponds to time_coef(1) due to pointer association.
         call self%controls%time%get_bdf_coeffs(time_coef)
-        print *, "Time Coefficients:", time_coef
         if (associated(time_coef)) then
             bdf_coeff = time_coef(1)
         else
@@ -135,7 +134,6 @@ contains
         end if
 
         ! --- Apply Scaling (Time & Sign) ---
-        ! 1. Capacity Terms (C * bdf_coeff)
         if (abs(bdf_coeff) > epsilon(0.0d0)) then
             C_TT = C_TT * bdf_coeff
             C_TH = C_TH * bdf_coeff
@@ -143,7 +141,6 @@ contains
             C_HT = C_HT * bdf_coeff
         end if
 
-        ! 2. Flux Terms (Sign Inversion for Weak Form: -Integral(gradN . Flux))
         R_T_D = R_T_D * (-1.0d0)
         R_H_D = R_H_D * (-1.0d0)
 
@@ -159,13 +156,14 @@ contains
     end subroutine assemble_local_ftdss
 
     ! ==========================================================================
-    ! Subroutines for Allocation & Computation (No changes in arguments)
+    ! Subroutines for Allocation & Computation (No changes)
     ! ==========================================================================
     subroutine allocate_coefficient_arrays(dim, num_nodes, &
                                            C_TT, C_TH, C_HH, C_HT, &
                                            M_TT, M_TH, M_HH, M_HT, &
                                            V_TT, V_TH, V_HH, V_HT, &
                                            R_T_C, R_T_D, R_H_C, R_H_D)
+        ! (変更なし)
         implicit none
         integer(int32), intent(in) :: dim, num_nodes
         real(real64), allocatable, intent(inout) :: C_TT(:), C_TH(:), C_HH(:), C_HT(:)
@@ -199,6 +197,7 @@ contains
                                           M_TT, M_TH, M_HH, M_HT, &
                                           V_TT, V_TH, V_HH, V_HT, &
                                           R_T_C, R_T_D, R_H_C, R_H_D)
+        ! (変更なし)
         implicit none
         class(type_ftdss), intent(inout) :: self
         integer(int32), intent(in) :: element_id, material_id, num_nodes
@@ -227,7 +226,7 @@ contains
     end subroutine compute_nodal_coefficients
 
     ! ==========================================================================
-    ! Assemble Matrices (No changes in arguments)
+    ! Assemble Matrices (Modified for Mass Lumping)
     ! ==========================================================================
     subroutine assemble_matrices(fe, coordinates, dim, local_J, local_R, &
                                  C_TT, C_TH, C_HH, C_HT, &
@@ -249,26 +248,29 @@ contains
         type(type_matrix_dense), intent(inout), optional :: local_J_TT, local_J_TH, local_J_HH, local_J_HT
         type(type_vector_dp), intent(inout), optional :: local_R_T, local_R_H
 
-        ! ! --- C Terms (Already Scaled) ---
-        if (present(local_J_TT)) call add_term_scalar(fe, coordinates, dim, C_TT, local_J, local_J_TT)
-        if (present(local_J_TH)) call add_term_scalar(fe, coordinates, dim, C_TH, local_J, local_J_TH)
-        if (present(local_J_HH)) call add_term_scalar(fe, coordinates, dim, C_HH, local_J, local_J_HH)
-        if (present(local_J_HT)) call add_term_scalar(fe, coordinates, dim, C_HT, local_J, local_J_HT)
+        ! --- C Terms (Capacity/Mass Matrix) -> Apply Lumped Mass ---
+        ! 数値振動を抑えるため、集中化（add_term_scalar_lumped）を使用
+        if (present(local_J_TT)) call add_term_scalar_lumped(fe, coordinates, dim, C_TT, local_J, local_J_TT)
+        if (present(local_J_TH)) call add_term_scalar_lumped(fe, coordinates, dim, C_TH, local_J, local_J_TH)
+        if (present(local_J_HH)) call add_term_scalar_lumped(fe, coordinates, dim, C_HH, local_J, local_J_HH)
+        if (present(local_J_HT)) call add_term_scalar_lumped(fe, coordinates, dim, C_HT, local_J, local_J_HT)
 
-        ! --- M Terms ---
+        ! --- M Terms (Diffusion/Stiffness Matrix) -> Standard Consistent ---
         if (present(local_J_TT)) call add_term_tensor(fe, coordinates, dim, M_TT, local_J, local_J_TT)
         if (present(local_J_TH)) call add_term_tensor(fe, coordinates, dim, M_TH, local_J, local_J_TH)
         if (present(local_J_HH)) call add_term_tensor(fe, coordinates, dim, M_HH, local_J, local_J_HH)
         if (present(local_J_HT)) call add_term_tensor(fe, coordinates, dim, M_HT, local_J, local_J_HT)
 
-        ! --- V Terms ---
+        ! --- V Terms (Advection Matrix) -> Standard Consistent ---
         if (present(local_J_TT)) call add_term_vector(fe, coordinates, dim, V_TT, local_J, local_J_TT)
         if (present(local_J_TH)) call add_term_vector(fe, coordinates, dim, V_TH, local_J, local_J_TH)
         if (present(local_J_HH)) call add_term_vector(fe, coordinates, dim, V_HH, local_J, local_J_HH)
         if (present(local_J_HT)) call add_term_vector(fe, coordinates, dim, V_HT, local_J, local_J_HT)
 
-        ! --- Residuals (Flux terms already sign-inverted) ---
+        ! --- Residuals (Already sign-inverted) ---
         if (present(local_R_T)) then
+            ! 残差計算用の容量項もLumpedにするか、あるいは整合のままでも良いが、
+            ! 通常は左辺(Jacobian)と合わせる方が収束性が良い。ここでは既存の関数を使う。
             call add_residual_scalar(fe, coordinates, dim, R_T_C, local_R, local_R_T)
             call add_residual_vector(fe, coordinates, dim, R_T_D, local_R, local_R_T)
         end if
@@ -279,8 +281,48 @@ contains
     end subroutine assemble_matrices
 
     ! ==========================================================================
-    ! Helper Subroutines (No changes)
+    ! Helper Subroutines
     ! ==========================================================================
+
+    !> Adds a scalar coefficient term with Mass Lumping (Row-sum).
+    !> Used for Capacity/Storage terms to prevent numerical oscillations.
+    subroutine add_term_scalar_lumped(fe, coords, dim, coeff, buffer, target_mat)
+        implicit none
+        class(abst_fe), intent(in) :: fe
+        real(real64), intent(in) :: coords(:, :)
+        integer(int32), intent(in) :: dim
+        real(real64), intent(in) :: coeff(:)
+        real(real64), intent(inout) :: buffer(:, :)
+        type(type_matrix_dense), intent(inout) :: target_mat
+        integer(int32) :: i, nd
+        real(real64) :: row_sum
+
+        nd = size(buffer, 1)
+
+        ! 1. Compute Consistent Mass Matrix (M_consistent)
+        call fe%compute_K(coords, coeff, buffer)
+
+        ! 2. Perform Row-Sum Lumping
+        do i = 1, nd
+            ! Calculate row sum
+            row_sum = sum(buffer(i, :))
+
+            ! Zero out the row (optional if we only use buffer(i,i) below,
+            ! but cleaner to conceptually zero it)
+            buffer(i, :) = 0.0d0
+
+            ! Place sum on diagonal
+            buffer(i, i) = row_sum
+        end do
+
+        ! 3. Add Lumped Matrix to Target
+        do i = 1, nd
+            ! Only add diagonal terms since off-diagonals are zero
+            call target_mat%set(OP_ADD, i, i, buffer(i, i))
+        end do
+    end subroutine add_term_scalar_lumped
+
+    ! (以下の既存サブルーチンは変更なし)
     subroutine add_term_scalar(fe, coords, dim, coeff, buffer, target_mat)
         implicit none
         class(abst_fe), intent(in) :: fe
