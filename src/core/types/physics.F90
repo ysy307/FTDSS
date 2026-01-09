@@ -62,6 +62,7 @@ module core_types_physics
 
         type(type_field_array_dp) :: temperature_history ! Temperature history [-]
         type(type_field_array_dp) :: pressure_history ! Pressure history [-]
+        type(type_field_array_dp) :: porosity_history ! Porosity history [-]
 
         ! --- Thermal Properties ---
         type(type_field_dp) :: latent_heat_fusion ! [J/kg]
@@ -247,7 +248,7 @@ contains
     ! ここでは通常の Subroutine として実装します（安全策）。
     subroutine set_all_state(self, temperature, pressure, water_content, ice_content, &
                              vapor_content, air_content, porosity, &
-                             temperature_history, pressure_history, &
+                             temperature_history, pressure_history, porosity_history, &
                              latent_heat_fusion, latent_heat_vaporization, &
                              dQw_dT, dQv_dT, dQa_dT, dQi_dT, dQw_dP, dQv_dP, dQa_dP, dQi_dP, &
                              !  dot_T, dot_P, &
@@ -263,10 +264,10 @@ contains
         real(real64), intent(in), optional :: porosity
         real(real64), intent(in), optional :: temperature_history(:)
         real(real64), intent(in), optional :: pressure_history(:)
+        real(real64), intent(in), optional :: porosity_history(:)
         real(real64), intent(in), optional :: latent_heat_fusion, latent_heat_vaporization
         real(real64), intent(in), optional :: dQw_dT, dQv_dT, dQa_dT, dQi_dT
         real(real64), intent(in), optional :: dQw_dP, dQv_dP, dQa_dP, dQi_dP
-        ! real(real64), intent(in), optional :: dot_T, dot_P
         type(type_coordinate_dp), intent(in), optional :: grad_T, grad_P
         real(real64), intent(in), optional :: relative_humidity, mass_fraction_clay
         type(type_coordinate_dp), intent(in), optional :: water_flux, vapor_flux
@@ -301,6 +302,10 @@ contains
             call self%pressure_history%set(pressure_history)
         end if
 
+        if (present(porosity_history)) then
+            call self%porosity_history%set(porosity_history)
+        end if
+
         if (present(latent_heat_fusion)) then
             call self%latent_heat_fusion%set(latent_heat_fusion)
         end if
@@ -332,12 +337,7 @@ contains
         if (present(dQi_dP)) then
             call self%dQi_dP%set(dQi_dP)
         end if
-        ! if (present(dot_T)) then
-        !     call self%dot_T%set(dot_T)
-        ! end if
-        ! if (present(dot_P)) then
-        !     call self%dot_P%set(dot_P)
-        ! end if
+
         if (present(grad_T)) then
             call self%grad_T%set(grad_T)
         end if
@@ -374,6 +374,7 @@ contains
         call self%porosity%reset()
         call self%temperature_history%reset()
         call self%pressure_history%reset()
+        call self%porosity_history%reset()
         call self%latent_heat_fusion%reset()
         call self%latent_heat_vaporization%reset()
         call self%dQw_dT%reset()
@@ -384,8 +385,6 @@ contains
         call self%dQv_dP%reset()
         call self%dQa_dP%reset()
         call self%dQi_dP%reset()
-        ! call self%dot_T%reset()
-        ! call self%dot_P%reset()
         call self%grad_T%reset()
         call self%grad_P%reset()
         call self%relative_humidity%reset()
@@ -418,8 +417,6 @@ contains
         call self%dQv_dP%set(source%dQv_dP%value)
         call self%dQa_dP%set(source%dQa_dP%value)
         call self%dQi_dP%set(source%dQi_dP%value)
-        ! call self%dot_T%set(source%dot_T%value)
-        ! call self%dot_P%set(source%dot_P%value)
         call self%grad_T%set(source%grad_T%value)
         call self%grad_P%set(source%grad_P%value)
         call self%relative_humidity%set(source%relative_humidity%value)

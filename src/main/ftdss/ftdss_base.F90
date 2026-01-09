@@ -104,15 +104,28 @@ contains
         integer(int32) :: iter
         real(real64) :: current_time
 
+        real(real64), pointer, contiguous, dimension(:) :: porosity => null()
+        real(real64), pointer, contiguous, dimension(:) :: temperature => null()
+        real(real64), pointer, contiguous, dimension(:) :: pressure => null()
+        real(real64), pointer, contiguous, dimension(:) :: ice_content => null()
+
         call self%controls%profiler%start("IO")
 
         call self%controls%time%get_time(current_time)
 
         if (self%controls%out_field%is_due(current_time)) then
             call self%controls%out_field%get_step(iter)
-            call self%output%output_fields(iter, self%domain, self%porosity%pre, &
-                                           self%temperature%pre, self%Qw%pre, self%pressure%pre)
+            call self%porosity%get_previous(porosity)
+            call self%temperature%get_previous(temperature)
+            call self%pressure%get_previous(pressure)
+            call self%Qi%get_previous(ice_content)
+            call self%output%output_fields(iter, self%domain, porosity, &
+                                           temperature, ice_content, pressure)
             call self%controls%out_field%update(current_time)
+            porosity => null()
+            temperature => null()
+            pressure => null()
+            ice_content => null()
         end if
 
         call self%controls%profiler%stop("IO")
@@ -123,15 +136,25 @@ contains
         class(type_ftdss), intent(inout) :: self
 
         real(real64) :: current_time
+        real(real64), pointer, contiguous, dimension(:) :: porosity => null()
+        real(real64), pointer, contiguous, dimension(:) :: temperature => null()
+        real(real64), pointer, contiguous, dimension(:) :: pressure => null()
 
         call self%controls%profiler%start("IO")
 
         call self%controls%time%get_time(current_time)
 
         if (self%controls%out_history%is_due(current_time)) then
-            call self%output%output_history(current_time, self%domain, self%porosity%pre, &
-                                            self%temperature%pre, self%pressure%pre)
+            call self%porosity%get_previous(porosity)
+            call self%temperature%get_previous(temperature)
+            call self%pressure%get_previous(pressure)
+            call self%output%output_history(current_time, self%domain, porosity, &
+                                            temperature, pressure)
             call self%controls%out_history%update(current_time)
+
+            porosity => null()
+            temperature => null()
+            pressure => null()
         end if
 
         call self%controls%profiler%stop("IO")
@@ -149,25 +172,27 @@ contains
         type(type_coordinate_dp) :: grad_T, grad_P
         type(type_coordinate_dp) :: water_flux, vapor_flux
         real(real64) :: K_wT, K_wP, K_vT, K_vP
-        real(real64) :: temperature_history(8), pressure_history(8)
+        real(real64) :: temperature_history(8), pressure_history(8), porosity_history(8)
 
         call self%controls%profiler%start("Setup")
 
         call state%reset()
 
         call self%temperature%get_current(node_id, temperature)
-        call self%pressure%get_current(node_id, pressure)
-        call self%porosity%get_current(node_id, porosity)
-        call self%temperature%get_current_gradient(node_id, grad_T)
-        call self%pressure%get_current_gradient(node_id, grad_P)
+        call self%temperature%get_current(node_id, grad_T)
         call self%temperature%get_history(node_id, temperature_history)
+        call self%pressure%get_current(node_id, pressure)
+        call self%pressure%get_current(node_id, grad_P)
         call self%pressure%get_history(node_id, pressure_history)
+        call self%porosity%get_current(node_id, porosity)
+        call self%porosity%get_history(node_id, porosity_history)
 
         call state%set(temperature=temperature, &
                        pressure=pressure, &
                        porosity=porosity, &
                        temperature_history=temperature_history, &
                        pressure_history=pressure_history, &
+                       porosity_history=porosity_history, &
                        grad_T=grad_T, &
                        grad_P=grad_P)
 
@@ -192,9 +217,12 @@ contains
         if (self%controls%is_target(PHYSICS_TYPE_HYDRAULIC, material_id)) then
             call self%calc_water_flux(material_id, state, grad_T, grad_P, water_flux)
             call self%calc_vapor_flux(material_id, state, grad_T, grad_P, vapor_flux)
-            call state%set(water_flux=water_flux, vapor_flux=vapor_flux)
+        else
+            call water_flux%set(0.0d0, 0.0d0, 0.0d0)
+            call vapor_flux%set(0.0d0, 0.0d0, 0.0d0)
         end if
 
+        call state%set(water_flux=water_flux, vapor_flux=vapor_flux)
         call self%controls%profiler%stop("Setup")
 
     end subroutine set_state_ftdss
@@ -206,18 +234,18 @@ contains
         call self%controls%profiler%start("Setup")
 
         if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
-            call self%temperature%shift()
+            call self%temperature%advance()
         end if
 
         if (self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) then
-            call self%pressure%shift()
+            call self%pressure%advance()
         end if
 
-        call self%porosity%shift()
-        call self%Qw%shift()
-        call self%Qi%shift()
-        call self%Qa%shift()
-        call self%Qv%shift()
+        call self%porosity%advance()
+        call self%Qw%advance()
+        call self%Qi%advance()
+        call self%Qa%advance()
+        call self%Qv%advance()
 
         call self%controls%time%shift()
 
@@ -228,22 +256,31 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
-        type(type_vector_dp), pointer :: delta_prt => null()
-        real(real64), pointer, dimension(:) :: data => null()
+        real(real64), pointer, contiguous, dimension(:) :: delta => null()
         integer(int32) :: target_dof
         ! [修正] タイポを修正 (nondes -> nodes)
         integer(int32) :: start_idx, end_idx, num_nodes, num_dofs_per_node
-        real(real64), pointer, dimension(:) :: time_coef => null()
+        integer(int32) :: iter
+        real(real64) :: dumping_ratio
+        real(real64), pointer, dimension(:) :: bdf_coeffs => null()
+        integer(int32) :: bdf_order
+        real(real64), pointer, contiguous, dimension(:) :: temperature => null()
 
         call self%controls%profiler%start("Setup")
 
-        delta_prt => self%delta%get_vector()
-        data => delta_prt%get_data()
+        delta => self%delta%get_data()
+        call self%controls%iteration%get_nonlinear_iter(iter)
+        ! if (iter <= 3) then
+        !     dumping_ratio = 0.2d0
+        ! else
+        !     dumping_ratio = 1.0d0
+        ! end if
 
         num_nodes = self%domain%get_num_nodes()
         num_dofs_per_node = self%domain%get_num_dofs_per_node()
 
-        call self%controls%time%get_bdf_coeffs(time_coef)
+        call self%controls%time%get_bdf_coeffs(bdf_coeffs)
+        call self%controls%time%get_bdf_order(bdf_order)
 
         ! --- Thermal Update ---
         if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
@@ -252,26 +289,14 @@ contains
             start_idx = target_dof
             end_idx = num_dofs_per_node * (num_nodes - 1) + target_dof
 
-            ! ストライドアクセスで更新 (T1, T2, T3...)
-            self%temperature%new(:) = self%temperature%new(:) + data(start_idx:end_idx:num_dofs_per_node)
+            call self%temperature%get_current(temperature)
+            if (associated(temperature)) then
+                temperature(:) = temperature(:) + delta(start_idx:end_idx:num_dofs_per_node)
+            end if
 
             call self%calc_gradient_temperature()
-            call self%temperature%compute_derivative(time_coef)
+            call self%temperature%compute_time_derivative(bdf_coeffs(1:bdf_order + 1))
         end if
-
-        ! ! --- Hydraulic Update ---
-        ! if (self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) then
-        !     call self%domain%get_target_dof(PHYSICS_TYPE_HYDRAULIC, target_dof)
-
-        !     start_idx = target_dof
-        !     end_idx = num_dofs_per_node * (num_nodes - 1) + target_dof
-
-        !     self%pressure%new(:) = self%pressure%new(:) + data(start_idx:end_idx:num_dofs_per_node)
-
-        !     call self%calc_gradient_pressure()
-        !     ! [修正] コピペミスを修正 (temperature -> pressure)
-        !     call self%pressure%compute_derivative(time_coef)
-        ! end if
 
         call self%controls%profiler%stop("Setup")
 

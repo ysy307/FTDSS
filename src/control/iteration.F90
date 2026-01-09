@@ -256,12 +256,12 @@ contains
             init_norm = init_norm_l2
         end if
 
+        print *, current_norm, init_norm
+
         ! 2. 相対誤差の計算（ゼロ除算防止）
         if (init_norm > TINY_NORM) then
             rel_val = current_norm / init_norm
         else
-            ! 初期ノルムが極小の場合，相対誤差判定は危険なため 0 (OK判定寄り) または Huge (NG判定寄り) にする．
-            ! ここでは，絶対誤差判定が主になると想定し，相対誤差は 0 として扱う．
             rel_val = 0.0d0
         end if
 
@@ -271,17 +271,14 @@ contains
         ! 3. 判定
         select case (criteria)
         case (NONLINEAR_CRITERIA_NONE)
-            ! 基準なし = 常にOK
             is_ok = .true.
         case (NONLINEAR_CRITERIA_ABSOLUTE)
-            ! NOTE: 定数が定義されていると仮定．なければ NONE のフォールバックロジックを確認推奨
             is_ok = abs_ok
         case (NONLINEAR_CRITERIA_RELATIVE)
             is_ok = rel_ok
         case (NONLINEAR_CRITERIA_BOTH)
             is_ok = abs_ok .and. rel_ok
         case default
-            ! デフォルトは絶対誤差とするか，エラーとするか．ここでは安全側に倒して絶対誤差．
             is_ok = abs_ok
         end select
     end function check_single_criterion

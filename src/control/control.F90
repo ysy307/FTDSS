@@ -33,7 +33,7 @@ module module_control
     contains
         procedure, pass(self), public :: initialize => initialize_type_controls
         procedure, pass(self), public :: is_physics_active => is_physics_active_control
-        procedure, pass(self), public :: is_target => should_calculate_target
+        procedure, pass(self), public :: is_target => is_target_control
         procedure, pass(self), public :: get_coupling_mode => get_coupling_mode_control
         procedure, pass(self) :: display => display_controls
     end type type_controls
@@ -129,57 +129,43 @@ contains
     ! -----------------------------------------------------------------
     ! 指定された物理現象と材料IDが計算対象かどうかを判定する
     ! -----------------------------------------------------------------
-    pure function should_calculate_target(self, target_id, i_material) result(is_active)
+    pure function is_target_control(self, target_physics, material_id) result(is_active)
         implicit none
         class(type_controls), intent(in) :: self
-        integer, intent(in) :: target_id
-        integer(int32), intent(in) :: i_material
+        integer, intent(in) :: target_physics
+        integer(int32), intent(in) :: material_id
         logical :: is_active
 
-        ! [修正] まず全体フラグをチェックし、falseなら即座にリターン
-        if (.not. self%is_active(target_id)) then
+        if (.not. self%is_active(target_physics)) then
             is_active = .false.
             return
         end if
 
         is_active = .false.
 
-        ! [修正] PHYSICS_TYPE_* 定数を使用
-        select case (target_id)
+        select case (target_physics)
         case (PHYSICS_TYPE_THERMAL)
             if (allocated(self%thermal)) then
-#ifdef USE_DEBUG
-                if (i_material <= ubound(self%thermal, 1)) then
-#endif
-                    is_active = self%thermal(i_material)
-#ifdef USE_DEBUG
+                if (material_id <= ubound(self%thermal, 1)) then
+                    is_active = self%thermal(material_id)
                 end if
-#endif
             end if
 
         case (PHYSICS_TYPE_HYDRAULIC)
             if (allocated(self%hydraulic)) then
-#ifdef USE_DEBUG
-                if (i_material <= ubound(self%hydraulic, 1)) then
-#endif
-                    is_active = self%hydraulic(i_material)
-#ifdef USE_DEBUG
+                if (material_id <= ubound(self%hydraulic, 1)) then
+                    is_active = self%hydraulic(material_id)
                 end if
-#endif
             end if
 
         case (PHYSICS_TYPE_MECHANICAL)
             if (allocated(self%mechanical)) then
-#ifdef USE_DEBUG
-                if (i_material <= ubound(self%mechanical, 1)) then
-#endif
-                    is_active = self%mechanical(i_material)
-#ifdef USE_DEBUG
+                if (material_id <= ubound(self%mechanical, 1)) then
+                    is_active = self%mechanical(material_id)
                 end if
-#endif
             end if
         end select
-    end function should_calculate_target
+    end function is_target_control
 
     pure function is_physics_active_control(self, physics_type) result(is_active)
         implicit none

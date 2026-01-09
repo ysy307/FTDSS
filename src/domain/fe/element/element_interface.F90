@@ -123,14 +123,12 @@ module domain_fe_element
 
         ! --- Triangle First Order ---
         !> Calculates the area of a first-order triangular element.
-        module subroutine get_area_triangle_first(self, node_coords, connectivity, geometry)
+        module subroutine get_area_triangle_first(self, node_coords, geometry)
             implicit none
             !> The element instance.
             class(type_triangle_first), intent(in) :: self
             !> Global coordinates of the nodes.
             real(real64), intent(in) :: node_coords(:, :)
-            !> Connectivity of the element.
-            integer(int32), intent(in) :: connectivity(:)
             !> Calculated geometry (area).
             real(real64), intent(inout) :: geometry
         end subroutine get_area_triangle_first
@@ -164,7 +162,7 @@ module domain_fe_element
         end subroutine dpsi_triangle_first
 
         !> Calculates the Jacobian matrix.
-        pure module subroutine jacobian_triangle_first(self, r, node_coords, connectivity, jac)
+        pure module subroutine jacobian_triangle_first(self, r, node_coords, jac)
             implicit none
             !> The element instance.
             class(type_triangle_first), intent(in) :: self
@@ -172,14 +170,12 @@ module domain_fe_element
             type(type_coordinate_dp), intent(in) :: r
             !> Global coordinates of the nodes.
             real(real64), intent(in) :: node_coords(:, :)
-            !> Connectivity of the element.
-            integer(int32), intent(in) :: connectivity(:)
             !> Output Jacobian matrix.
             real(real64), intent(inout) :: jac(:, :)
         end subroutine jacobian_triangle_first
 
         !> Calculates the Jacobian determinant.
-        pure module subroutine jacobian_det_triangle_first(self, r, node_coords, connectivity, det_j)
+        pure module subroutine jacobian_det_triangle_first(self, r, node_coords, det_j)
             implicit none
             !> The element instance.
             class(type_triangle_first), intent(in) :: self
@@ -187,14 +183,12 @@ module domain_fe_element
             type(type_coordinate_dp), intent(in) :: r
             !> Global coordinates of the nodes.
             real(real64), intent(in) :: node_coords(:, :)
-            !> Connectivity of the element.
-            integer(int32), intent(in) :: connectivity(:)
             !> Output Jacobian determinant.
             real(real64), intent(inout) :: det_j
         end subroutine jacobian_det_triangle_first
 
         !> Checks if a point is inside the element.
-        module subroutine is_in_triangle_first(self, cartesian, normalized, node_coords, connectivity, is_in)
+        module subroutine is_in_triangle_first(self, cartesian, normalized, node_coords, is_in)
             implicit none
             !> The element instance.
             class(type_triangle_first), intent(in) :: self
@@ -204,22 +198,18 @@ module domain_fe_element
             type(type_coordinate_dp), intent(inout) :: normalized
             !> Global coordinates of the nodes.
             real(real64), intent(in) :: node_coords(:, :)
-            !> Connectivity of the element.
-            integer(int32), intent(in) :: connectivity(:)
             !> Output flag.
             logical, intent(inout) :: is_in
         end subroutine is_in_triangle_first
 
         ! --- Square First Order ---
         !> Calculates the area of a first-order square element.
-        module subroutine get_area_square_first(self, node_coords, connectivity, geometry)
+        module subroutine get_area_square_first(self, node_coords, geometry)
             implicit none
             !> The element instance.
             class(type_square_first), intent(in) :: self
             !> Global coordinates of the nodes.
             real(real64), intent(in) :: node_coords(:, :)
-            !> Connectivity of the element.
-            integer(int32), intent(in) :: connectivity(:)
             !> Output area.
             real(real64), intent(inout) :: geometry
         end subroutine get_area_square_first
@@ -253,7 +243,7 @@ module domain_fe_element
         end subroutine dpsi_square_first
 
         !> Calculates the Jacobian matrix.
-        pure module subroutine jacobian_square_first(self, r, node_coords, connectivity, jac)
+        pure module subroutine jacobian_square_first(self, r, node_coords, jac)
             implicit none
             !> The element instance.
             class(type_square_first), intent(in) :: self
@@ -261,14 +251,12 @@ module domain_fe_element
             type(type_coordinate_dp), intent(in) :: r
             !> Global coordinates of the nodes.
             real(real64), intent(in) :: node_coords(:, :)
-            !> Connectivity of the element.
-            integer(int32), intent(in) :: connectivity(:)
             !> Output Jacobian matrix.
             real(real64), intent(inout) :: jac(:, :)
         end subroutine jacobian_square_first
 
         !> Calculates the Jacobian determinant.
-        pure module subroutine jacobian_det_square_first(self, r, node_coords, connectivity, det_j)
+        pure module subroutine jacobian_det_square_first(self, r, node_coords, det_j)
             implicit none
             !> The element instance.
             class(type_square_first), intent(in) :: self
@@ -276,14 +264,12 @@ module domain_fe_element
             type(type_coordinate_dp), intent(in) :: r
             !> Global coordinates of the nodes.
             real(real64), intent(in) :: node_coords(:, :)
-            !> Connectivity of the element.
-            integer(int32), intent(in) :: connectivity(:)
             !> Output Jacobian determinant.
             real(real64), intent(inout) :: det_j
         end subroutine jacobian_det_square_first
 
         !> Checks if a point is inside the element.
-        module subroutine is_in_square_first(self, cartesian, normalized, node_coords, connectivity, is_in)
+        module subroutine is_in_square_first(self, cartesian, normalized, node_coords, is_in)
             implicit none
             !> The element instance.
             class(type_square_first), intent(in) :: self
@@ -293,22 +279,18 @@ module domain_fe_element
             type(type_coordinate_dp), intent(inout) :: normalized
             !> Global coordinates of the nodes.
             real(real64), intent(in) :: node_coords(:, :)
-            !> Connectivity of the element.
-            integer(int32), intent(in) :: connectivity(:)
             !> Output flag.
             logical, intent(inout) :: is_in
         end subroutine is_in_square_first
 
         ! --- Triangle Second Order ---
         !> Calculates the area of a second-order triangular element.
-        module subroutine get_area_triangle_second(self, node_coords, connectivity, geometry)
+        module subroutine get_area_triangle_second(self, node_coords, geometry)
             implicit none
             !> The element instance.
             class(type_triangle_second), intent(in) :: self
             !> Global coordinates of the nodes.
             real(real64), intent(in) :: node_coords(:, :)
-            !> Connectivity of the element.
-            integer(int32), intent(in) :: connectivity(:)
             !> Output area.
             real(real64), intent(inout) :: geometry
         end subroutine get_area_triangle_second
@@ -342,7 +324,7 @@ module domain_fe_element
         end subroutine dpsi_triangle_second
 
         !> Calculates the Jacobian matrix.
-        pure module subroutine jacobian_triangle_second(self, r, node_coords, connectivity, jac)
+        pure module subroutine jacobian_triangle_second(self, r, node_coords, jac)
             implicit none
             !> The element instance.
             class(type_triangle_second), intent(in) :: self
@@ -350,14 +332,12 @@ module domain_fe_element
             type(type_coordinate_dp), intent(in) :: r
             !> Global coordinates of the nodes.
             real(real64), intent(in) :: node_coords(:, :)
-            !> Connectivity of the element.
-            integer(int32), intent(in) :: connectivity(:)
             !> Output Jacobian matrix.
             real(real64), intent(inout) :: jac(:, :)
         end subroutine jacobian_triangle_second
 
         !> Calculates the Jacobian determinant.
-        pure module subroutine jacobian_det_triangle_second(self, r, node_coords, connectivity, det_j)
+        pure module subroutine jacobian_det_triangle_second(self, r, node_coords, det_j)
             implicit none
             !> The element instance.
             class(type_triangle_second), intent(in) :: self
@@ -365,14 +345,12 @@ module domain_fe_element
             type(type_coordinate_dp), intent(in) :: r
             !> Global coordinates of the nodes.
             real(real64), intent(in) :: node_coords(:, :)
-            !> Connectivity of the element.
-            integer(int32), intent(in) :: connectivity(:)
             !> Output Jacobian determinant.
             real(real64), intent(inout) :: det_j
         end subroutine jacobian_det_triangle_second
 
         !> Checks if a point is inside the element.
-        module subroutine is_in_triangle_second(self, cartesian, normalized, node_coords, connectivity, is_in)
+        module subroutine is_in_triangle_second(self, cartesian, normalized, node_coords, is_in)
             implicit none
             !> The element instance.
             class(type_triangle_second), intent(in) :: self
@@ -382,22 +360,18 @@ module domain_fe_element
             type(type_coordinate_dp), intent(inout) :: normalized
             !> Global coordinates of the nodes.
             real(real64), intent(in) :: node_coords(:, :)
-            !> Connectivity of the element.
-            integer(int32), intent(in) :: connectivity(:)
             !> Output flag.
             logical, intent(inout) :: is_in
         end subroutine is_in_triangle_second
 
         ! --- Square Second Order ---
         !> Calculates the area of a second-order square element.
-        module subroutine get_area_square_second(self, node_coords, connectivity, geometry)
+        module subroutine get_area_square_second(self, node_coords, geometry)
             implicit none
             !> The element instance.
             class(type_square_second), intent(in) :: self
             !> Global coordinates of the nodes.
             real(real64), intent(in) :: node_coords(:, :)
-            !> Connectivity of the element.
-            integer(int32), intent(in) :: connectivity(:)
             !> Output area.
             real(real64), intent(inout) :: geometry
         end subroutine get_area_square_second
@@ -431,7 +405,7 @@ module domain_fe_element
         end subroutine dpsi_square_second
 
         !> Calculates the Jacobian matrix.
-        pure module subroutine jacobian_square_second(self, r, node_coords, connectivity, jac)
+        pure module subroutine jacobian_square_second(self, r, node_coords, jac)
             implicit none
             !> The element instance.
             class(type_square_second), intent(in) :: self
@@ -439,14 +413,12 @@ module domain_fe_element
             type(type_coordinate_dp), intent(in) :: r
             !> Global coordinates of the nodes.
             real(real64), intent(in) :: node_coords(:, :)
-            !> Connectivity of the element.
-            integer(int32), intent(in) :: connectivity(:)
             !> Output Jacobian matrix.
             real(real64), intent(inout) :: jac(:, :)
         end subroutine jacobian_square_second
 
         !> Calculates the Jacobian determinant.
-        pure module subroutine jacobian_det_square_second(self, r, node_coords, connectivity, det_j)
+        pure module subroutine jacobian_det_square_second(self, r, node_coords, det_j)
             implicit none
             !> The element instance.
             class(type_square_second), intent(in) :: self
@@ -454,14 +426,12 @@ module domain_fe_element
             type(type_coordinate_dp), intent(in) :: r
             !> Global coordinates of the nodes.
             real(real64), intent(in) :: node_coords(:, :)
-            !> Connectivity of the element.
-            integer(int32), intent(in) :: connectivity(:)
             !> Output Jacobian determinant.
             real(real64), intent(inout) :: det_j
         end subroutine jacobian_det_square_second
 
         !> Checks if a point is inside the element.
-        module subroutine is_in_square_second(self, cartesian, normalized, node_coords, connectivity, is_in)
+        module subroutine is_in_square_second(self, cartesian, normalized, node_coords, is_in)
             implicit none
             !> The element instance.
             class(type_square_second), intent(in) :: self
@@ -471,8 +441,6 @@ module domain_fe_element
             type(type_coordinate_dp), intent(inout) :: normalized
             !> Global coordinates of the nodes.
             real(real64), intent(in) :: node_coords(:, :)
-            !> Connectivity of the element.
-            integer(int32), intent(in) :: connectivity(:)
             !> Output flag.
             logical, intent(inout) :: is_in
         end subroutine is_in_square_second

@@ -45,11 +45,10 @@ contains
         if (allocated(gauss)) call deallocate_array(gauss)
     end function construct_square_first
 
-    module subroutine get_area_square_first(self, node_coords, connectivity, geometry)
+    module subroutine get_area_square_first(self, node_coords, geometry)
         implicit none
         class(type_square_first), intent(in) :: self
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         real(real64), intent(inout) :: geometry
 
         integer(int32) :: i
@@ -66,7 +65,7 @@ contains
 
         do i = 1, ng
             r = gauss_pts(i)
-            call self%jacobian_det(r, node_coords, connectivity, det_j)
+            call self%jacobian_det(r, node_coords, det_j)
             geometry = geometry + det_j * weights(i)
         end do
 
@@ -128,12 +127,11 @@ contains
         end select
     end subroutine dpsi_square_first
 
-    pure module subroutine jacobian_square_first(self, r, node_coords, connectivity, jac)
+    pure module subroutine jacobian_square_first(self, r, node_coords, jac)
         implicit none
         class(type_square_first), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         real(real64), intent(inout) :: jac(:, :)
 
         integer(int32) :: k
@@ -158,26 +156,24 @@ contains
         end do
     end subroutine jacobian_square_first
 
-    pure module subroutine jacobian_det_square_first(self, r, node_coords, connectivity, det_j)
+    pure module subroutine jacobian_det_square_first(self, r, node_coords, det_j)
         implicit none
         class(type_square_first), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         real(real64), intent(inout) :: det_j
 
         real(real64) :: jac(2, 2)
-        call self%jacobian(r, node_coords, connectivity, jac)
+        call self%jacobian(r, node_coords, jac)
         det_j = jac(1, 1) * jac(2, 2) - jac(1, 2) * jac(2, 1)
     end subroutine jacobian_det_square_first
 
-    module subroutine is_in_square_first(self, cartesian, normalized, node_coords, connectivity, is_in)
+    module subroutine is_in_square_first(self, cartesian, normalized, node_coords, is_in)
         implicit none
         class(type_square_first), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: cartesian
         type(type_coordinate_dp), intent(inout) :: normalized
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         logical, intent(inout) :: is_in
 
         type(type_coordinate_dp) :: r
@@ -214,10 +210,10 @@ contains
                 exit
             end if
 
-            call self%jacobian_det(r, node_coords, connectivity, det_j)
+            call self%jacobian_det(r, node_coords, det_j)
             if (abs(det_j) < epsilon(det_j)) exit
 
-            call self%jacobian(r, node_coords, connectivity, jac)
+            call self%jacobian(r, node_coords, jac)
 
             r%x = r%x + (jac(2, 2) * dx - jac(1, 2) * dy) / det_j
             r%y = r%y + (-jac(2, 1) * dx + jac(1, 1) * dy) / det_j

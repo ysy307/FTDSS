@@ -94,8 +94,9 @@ contains
                     do i = 1, size(patch%connectivity%val)
                         glob_node_id = patch%connectivity%val(i)
                         ! 現在の変数値をBC値に上書き
-                        variable%pre(glob_node_id) = val_fixed
-                        variable%new(glob_node_id) = val_fixed
+                        call variable%set_current(glob_node_id, val_fixed)
+                        ! 以前の変数値もBC値に上書き
+                        call variable%set_previous(glob_node_id, val_fixed)
                     end do
                 end associate
             end do
@@ -126,6 +127,8 @@ contains
         real(real64), pointer, contiguous, dimension(:) :: fe_weights
         type(type_coordinate_dp), pointer, contiguous, dimension(:) :: fe_gauss_pts
         type(type_coordinate_dp) :: r
+
+        real(real64) :: val
 
         integer(int32), pointer, contiguous, dimension(:) :: connectivity
         class(abst_bc), pointer :: bc_obj
@@ -176,7 +179,8 @@ contains
 
                             u_curr = 0.0d0
                             do i = 1, num_nodes_loc
-                                u_curr = u_curr + psi(i) * variable%pre(connectivity(i))
+                                call variable%get_current(connectivity(i), val)
+                                u_curr = u_curr + psi(i) * val
                             end do
 
                             call bc_obj%get_flux_and_derivative(current_time, u_curr, q_flux, dq_du)
@@ -227,7 +231,7 @@ contains
                     do i = 1, size(patch%connectivity%val)
                         glob_node_id = patch%connectivity%val(i)
 
-                        val_curr = variable%new(glob_node_id)
+                        call variable%get_current(glob_node_id, val_curr)
 
                         ! 1. Jacobianの行をゼロ化 (zero_row使用)
                         call self%J%zero(glob_node_id, dof_offset)

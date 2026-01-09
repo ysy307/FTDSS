@@ -68,11 +68,10 @@ module domain_fe_side
         end function construct_side_first
 
         !> Calculates the length of a first-order side element.
-        module subroutine get_length_side_first(self, node_coords, connectivity, geometry)
+        module subroutine get_length_side_first(self, node_coords, geometry)
             implicit none
             class(type_side_first), intent(in) :: self
             real(real64), intent(in) :: node_coords(:, :)
-            integer(int32), intent(in) :: connectivity(:)
             real(real64), intent(inout) :: geometry
         end subroutine get_length_side_first
 
@@ -96,43 +95,39 @@ module domain_fe_side
         end subroutine dpsi_side_first
 
         !> Calculates the Jacobian matrix.
-        pure module subroutine jacobian_side_first(self, r, node_coords, connectivity, jac)
+        pure module subroutine jacobian_side_first(self, r, node_coords, jac)
             implicit none
             class(type_side_first), intent(in) :: self
             type(type_coordinate_dp), intent(in) :: r
             real(real64), intent(in) :: node_coords(:, :)
-            integer(int32), intent(in) :: connectivity(:)
             real(real64), intent(inout) :: jac(:, :)
         end subroutine jacobian_side_first
 
         !> Calculates the Jacobian determinant (dL).
-        pure module subroutine jacobian_det_side_first(self, r, node_coords, connectivity, det_j)
+        pure module subroutine jacobian_det_side_first(self, r, node_coords, det_j)
             implicit none
             class(type_side_first), intent(in) :: self
             type(type_coordinate_dp), intent(in) :: r
             real(real64), intent(in) :: node_coords(:, :)
-            integer(int32), intent(in) :: connectivity(:)
             real(real64), intent(inout) :: det_j
         end subroutine jacobian_det_side_first
 
         !> Checks if a given Cartesian coordinate is on the element.
-        module subroutine is_in_side_first(self, cartesian, normalized, node_coords, connectivity, is_in)
+        module subroutine is_in_side_first(self, cartesian, normalized, node_coords, is_in)
             implicit none
             class(type_side_first), intent(in) :: self
             type(type_coordinate_dp), intent(in) :: cartesian
             type(type_coordinate_dp), intent(inout) :: normalized
             real(real64), intent(in) :: node_coords(:, :)
-            integer(int32), intent(in) :: connectivity(:)
             logical, intent(inout) :: is_in
         end subroutine is_in_side_first
 
         !> Computes the tangent vector at a point.
-        pure module subroutine compute_tangent_vector_side_first(self, r, node_coords, connectivity, tangent_vec)
+        pure module subroutine compute_tangent_vector_side_first(self, r, node_coords, tangent_vec)
             implicit none
             class(type_side_first), intent(in) :: self
             type(type_coordinate_dp), intent(in) :: r
             real(real64), intent(in) :: node_coords(:, :)
-            integer(int32), intent(in) :: connectivity(:)
             real(real64), intent(inout) :: tangent_vec(:)
         end subroutine compute_tangent_vector_side_first
 
@@ -148,11 +143,10 @@ module domain_fe_side
         end function construct_side_second
 
         !> Calculates the length of a second-order side element.
-        module subroutine get_length_side_second(self, node_coords, connectivity, geometry)
+        module subroutine get_length_side_second(self, node_coords, geometry)
             implicit none
             class(type_side_second), intent(in) :: self
             real(real64), intent(in) :: node_coords(:, :)
-            integer(int32), intent(in) :: connectivity(:)
             real(real64), intent(inout) :: geometry
         end subroutine get_length_side_second
 
@@ -176,43 +170,39 @@ module domain_fe_side
         end subroutine dpsi_side_second
 
         !> Calculates the Jacobian matrix.
-        pure module subroutine jacobian_side_second(self, r, node_coords, connectivity, jac)
+        pure module subroutine jacobian_side_second(self, r, node_coords, jac)
             implicit none
             class(type_side_second), intent(in) :: self
             type(type_coordinate_dp), intent(in) :: r
             real(real64), intent(in) :: node_coords(:, :)
-            integer(int32), intent(in) :: connectivity(:)
             real(real64), intent(inout) :: jac(:, :)
         end subroutine jacobian_side_second
 
         !> Calculates the Jacobian determinant (dL).
-        pure module subroutine jacobian_det_side_second(self, r, node_coords, connectivity, det_j)
+        pure module subroutine jacobian_det_side_second(self, r, node_coords, det_j)
             implicit none
             class(type_side_second), intent(in) :: self
             type(type_coordinate_dp), intent(in) :: r
             real(real64), intent(in) :: node_coords(:, :)
-            integer(int32), intent(in) :: connectivity(:)
             real(real64), intent(inout) :: det_j
         end subroutine jacobian_det_side_second
 
         !> Checks if a given Cartesian coordinate is on the element.
-        module subroutine is_in_side_second(self, cartesian, normalized, node_coords, connectivity, is_in)
+        module subroutine is_in_side_second(self, cartesian, normalized, node_coords, is_in)
             implicit none
             class(type_side_second), intent(in) :: self
             type(type_coordinate_dp), intent(in) :: cartesian
             type(type_coordinate_dp), intent(inout) :: normalized
             real(real64), intent(in) :: node_coords(:, :)
-            integer(int32), intent(in) :: connectivity(:)
             logical, intent(inout) :: is_in
         end subroutine is_in_side_second
 
         !> Computes the tangent vector at a point.
-        pure module subroutine compute_tangent_vector_side_second(self, r, node_coords, connectivity, tangent_vec)
+        pure module subroutine compute_tangent_vector_side_second(self, r, node_coords, tangent_vec)
             implicit none
             class(type_side_second), intent(in) :: self
             type(type_coordinate_dp), intent(in) :: r
             real(real64), intent(in) :: node_coords(:, :)
-            integer(int32), intent(in) :: connectivity(:)
             real(real64), intent(inout) :: tangent_vec(:)
         end subroutine compute_tangent_vector_side_second
 

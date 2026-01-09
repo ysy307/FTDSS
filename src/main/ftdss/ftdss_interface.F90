@@ -15,6 +15,7 @@ module main_ftdss
 
     use :: module_thermal, only:type_thermal
     use :: module_hydraulic, only:type_hydraulic
+    use :: main_base, only:type_assemble_workspace
 
     use :: module_solver
     implicit none
@@ -73,8 +74,9 @@ module main_ftdss
 
         !> 1タイムステップ分の計算を行う（非線形反復ループを含む）
         procedure, public, pass(self) :: solve_time_step => solve_time_step_ftdss
-        procedure, public, pass(self) :: solve_time_step_initial_setup => solve_time_step_initial_setup_ftdss
-        procedure, public, pass(self) :: solve_time_step_setup => solve_time_step_setup_ftdss
+        procedure, private, pass(self) :: solve_time_step_initial_setup => solve_time_step_initial_setup_ftdss
+        procedure, private, pass(self) :: solve_time_step_setup => solve_time_step_setup_ftdss
+        procedure, private, pass(self) :: solve_time_step_check_convergence => solve_time_step_check_convergence_ftdss
 
         procedure, public, pass(self) :: output_fields => output_fields_ftdss
         procedure, public, pass(self) :: output_history => output_history_ftdss
@@ -223,6 +225,12 @@ module main_ftdss
             logical, intent(inout) :: prescribe_bc
 
         end subroutine solve_time_step_setup_ftdss
+
+        module subroutine solve_time_step_check_convergence_ftdss(self)
+            implicit none
+            class(type_ftdss), intent(inout), target :: self
+
+        end subroutine solve_time_step_check_convergence_ftdss
 
         module subroutine solve_time_step_ftdss(self, is_step_converged)
             implicit none

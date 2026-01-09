@@ -53,11 +53,10 @@ contains
     !>
     !> Calculates the area of the element.
     !>
-    module subroutine get_area_triangle_first(self, node_coords, connectivity, geometry)
+    module subroutine get_area_triangle_first(self, node_coords, geometry)
         implicit none
         class(type_triangle_first), intent(in) :: self
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         real(real64), intent(inout) :: geometry
 
         real(real64) :: x(3)
@@ -121,12 +120,11 @@ contains
     !>
     !> Calculates the Jacobian matrix.
     !>
-    pure module subroutine jacobian_triangle_first(self, r, node_coords, connectivity, jac)
+    pure module subroutine jacobian_triangle_first(self, r, node_coords, jac)
         implicit none
         class(type_triangle_first), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         real(real64), intent(inout) :: jac(:, :)
 
         real(real64) :: x(3)
@@ -135,9 +133,8 @@ contains
         integer(int32) :: nid
 
         do k = 1, 3
-            nid = connectivity(k)
-            x(k) = node_coords(1, nid)
-            y(k) = node_coords(2, nid)
+            x(k) = node_coords(1, k)
+            y(k) = node_coords(2, k)
         end do
 
         jac = 0.0d0
@@ -150,30 +147,28 @@ contains
     !>
     !> Calculates the Jacobian determinant.
     !>
-    pure module subroutine jacobian_det_triangle_first(self, r, node_coords, connectivity, det_j)
+    pure module subroutine jacobian_det_triangle_first(self, r, node_coords, det_j)
         implicit none
         class(type_triangle_first), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         real(real64), intent(inout) :: det_j
 
         real(real64) :: jac(2, 2)
 
-        call self%jacobian(r, node_coords, connectivity, jac)
+        call self%jacobian(r, node_coords, jac)
         det_j = jac(1, 1) * jac(2, 2) - jac(1, 2) * jac(2, 1)
     end subroutine jacobian_det_triangle_first
 
     !>
     !> Checks if point is inside using analytical Barycentric coordinates.
     !>
-    module subroutine is_in_triangle_first(self, cartesian, normalized, node_coords, connectivity, is_in)
+    module subroutine is_in_triangle_first(self, cartesian, normalized, node_coords, is_in)
         implicit none
         class(type_triangle_first), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: cartesian
         type(type_coordinate_dp), intent(inout) :: normalized
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         logical, intent(inout) :: is_in
 
         real(real64) :: x(3)

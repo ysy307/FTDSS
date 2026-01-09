@@ -58,6 +58,7 @@ contains
         real(real64) :: water_content, ice_content, air_content, vapor_content, porosity
 
         ! Temporary raw values
+        real(real64) :: raw_ice_content
         real(real64) :: raw_water_content
 
         ! Local variables for derivatives
@@ -66,61 +67,92 @@ contains
         real(real64) :: dQa_dP, dQa_dT
         real(real64) :: dQv_dP, dQv_dT
 
-        ! 1. 空隙率と氷含有量 (theta_i) の取得・更新
-        !    ※ 氷は固相として優先的に占有させます
+        ! 1. 空隙率の取得
         call state%porosity%get(porosity)
 
-        call self%fusion%calc_ice_content(state, ice_content)
+        ! 2. 氷含有量 (theta_i) の仮計算
+        call self%fusion%calc_ice_content(state, raw_ice_content)
         call self%fusion%calc_ice_content_derivatives(state, dQi_dP, dQi_dT)
-        call state%ice_content%set(ice_content)
-        call state%dQi_dP%set(dQi_dP)
-        call state%dQi_dT%set(dQi_dT)
 
-        ! 2. 液状水分量 (theta_w) の仮計算
-        call self%fusion%calc_water_content(state, raw_water_content)
-        call self%fusion%calc_water_content_derivatives(state, dQw_dP, dQw_dT)
+        ! --- 氷の物理的上限チェック (Ice Cap) ---
+        if (raw_ice_content > porosity) then
+            ! [氷過剰] 空隙すべてが氷
+            ice_content = porosity
 
-        ! --- 補正ロジック: 合わせてPorosityにする ---
-        if (raw_water_content + ice_content > porosity) then
-            ! 【過飽和状態】
-            ! 物理的上限 (Porosity) に合わせるため、水分量をカットする
-            water_content = max(0.0d0, porosity - ice_content)
+            ! 上限に張り付いているため、微分は0とする（これ以上増えない）
+            dQi_dP = 0.0d0
+            dQi_dT = 0.0d0
 
-            ! 微分も整合させる:
-            ! Qw = Porosity - Qi なので、 dQw = -dQi となる (Porosity一定と仮定)
-            dQw_dP = -1.0d0 * dQi_dP
-            dQw_dT = -1.0d0 * dQi_dT
+            ! 水・空気は存在できない
+            water_content = 0.0d0
+            dQw_dP = 0.0d0
+            dQw_dT = 0.0d0
 
-            ! 気相は完全に無し
             air_content = 0.0d0
             dQa_dP = 0.0d0
             dQa_dT = 0.0d0
         else
-            ! 【不飽和状態】
-            ! そのまま採用
-            water_content = raw_water_content
+            ! [通常] 氷は計算値通り
+            ice_content = raw_ice_content
+            ! 微分係数はそのまま使用 (dQi_dP, dQi_dT)
 
-            ! 気相 = 空隙 - 水 - 氷
-            air_content = porosity - water_content - ice_content
+            ! 3. 液状水分量 (theta_w) の仮計算
+            call self%fusion%calc_water_content(state, raw_water_content)
+            call self%fusion%calc_water_content_derivatives(state, dQw_dP, dQw_dT)
 
-            ! 気相の微分
-            dQa_dP = -1.0d0 * (dQw_dP + dQi_dP)
-            dQa_dT = -1.0d0 * (dQw_dT + dQi_dT)
+            ! --- 水の物理的上限チェック (Water Cap) ---
+            if (raw_water_content + ice_content > porosity) then
+                ! [過飽和] 氷以外の残りの空隙を水が埋める
+                water_content = max(0.0d0, porosity - ice_content)
+
+                ! 水分量は (Porosity - Ice) に従属するため、微分は氷の逆符号になる
+                dQw_dP = -1.0d0 * dQi_dP
+                dQw_dT = -1.0d0 * dQi_dT
+
+                ! 気相は無し
+                air_content = 0.0d0
+                dQa_dP = 0.0d0
+                dQa_dT = 0.0d0
+            else
+                ! [不飽和] 計算値通り
+                water_content = raw_water_content
+                ! 微分係数はそのまま使用 (dQw_dP, dQw_dT)
+
+                ! 気相 = 空隙 - 水 - 氷
+                air_content = porosity - water_content - ice_content
+
+                ! 気相の微分 (保存則より)
+                dQa_dP = -1.0d0 * (dQw_dP + dQi_dP)
+                dQa_dT = -1.0d0 * (dQw_dT + dQi_dT)
+            end if
         end if
 
-        ! 水分量のセット（補正後）
+        ! 4. 値のセット（整合性確保済み）
+        call state%ice_content%set(ice_content)
+        call state%dQi_dP%set(dQi_dP)
+        call state%dQi_dT%set(dQi_dT)
+
         call state%water_content%set(water_content)
         call state%dQw_dP%set(dQw_dP)
         call state%dQw_dT%set(dQw_dT)
 
-        ! 空気相のセット（補正後）
         call state%air_content%set(air_content)
         call state%dQa_dP%set(dQa_dP)
         call state%dQa_dT%set(dQa_dT)
 
         ! 5. 蒸気量 (theta_v) の更新
+        !    ※ 蒸気は気相体積に依存するモデルの場合、air_content=0なら蒸気も0になるロジックが
+        !       evap内部に含まれている必要がありますが、ここでは独立として呼び出します。
         call self%evap%calc_vapor_content(state, vapor_content)
         call self%evap%calc_vapor_content_derivatives(state, dQv_dP, dQv_dT)
+
+        ! air_contentが0なら物理的に蒸気も存在できないため、ここでガードしても良い
+        if (air_content <= epsilon(0.0d0)) then
+            vapor_content = 0.0d0
+            dQv_dP = 0.0d0
+            dQv_dT = 0.0d0
+        end if
+
         call state%vapor_content%set(vapor_content)
         call state%dQv_dP%set(dQv_dP)
         call state%dQv_dT%set(dQv_dT)

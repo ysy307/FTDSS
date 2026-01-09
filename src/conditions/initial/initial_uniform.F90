@@ -27,8 +27,8 @@ contains
         class(type_ic_uniform), intent(in) :: self
         type(type_variable), intent(inout) :: variable
 
-        variable%new(:) = self%value
-        variable%pre(:) = self%value
+        call variable%set_current(self%value)
+        call variable%set_previous(self%value)
     end subroutine
 
 end submodule conditions_initial_uniform

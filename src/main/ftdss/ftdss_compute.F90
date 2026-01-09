@@ -1,12 +1,7 @@
 submodule(main_ftdss) ftdss_compute
     implicit none
 contains
-
     ! --------------------------------------------------------------------------
-    ! 機能: 要素ごとの計算値（水分量や流束）を節点値にスムージングする
-    ! 手法: 体積重み付き平均 (Lumped Mass Matrix的なアプローチ)
-    ! --------------------------------------------------------------------------
-! --------------------------------------------------------------------------
     ! 処理: 要素ごとの状態量を節点値へスムージング（体積平均）する
     ! --------------------------------------------------------------------------
     module subroutine update_variables_ftdss(self)
@@ -78,16 +73,16 @@ contains
 
             ! 3. 正規化して節点へ格納
             if (abs(sum_vol) > epsilon(1.0d0)) then
-                self%Qw%new(i_node) = sum_qw_vol / sum_vol
-                self%Qi%new(i_node) = sum_qi_vol / sum_vol
-                self%Qa%new(i_node) = sum_qa_vol / sum_vol
-                self%Qv%new(i_node) = sum_qv_vol / sum_vol
+                call self%Qw%set_current(i_node, sum_qw_vol / sum_vol)
+                call self%Qi%set_current(i_node, sum_qi_vol / sum_vol)
+                call self%Qa%set_current(i_node, sum_qa_vol / sum_vol)
+                call self%Qv%set_current(i_node, sum_qv_vol / sum_vol)
             else
                 ! 孤立節点等の処理
-                self%Qw%new(i_node) = 0.0d0
-                self%Qi%new(i_node) = 0.0d0
-                self%Qa%new(i_node) = 0.0d0
-                self%Qv%new(i_node) = 0.0d0
+                call self%Qw%set_current(i_node, 0.0d0)
+                call self%Qi%set_current(i_node, 0.0d0)
+                call self%Qa%set_current(i_node, 0.0d0)
+                call self%Qv%set_current(i_node, 0.0d0)
             end if
 
         end do
@@ -243,7 +238,13 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
-        call self%calc_gradient(self%temperature%new, self%temperature%grad)
+        real(real64), pointer, contiguous, dimension(:) :: temperature => null()
+
+        if (.not. self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) return
+
+        call self%temperature%get_current(temperature)
+        call self%calc_gradient(temperature, self%temperature%grad)
+        nullify (temperature)
 
     end subroutine calc_gradient_temperature_ftdss
 
@@ -251,7 +252,14 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
-        call self%calc_gradient(self%pressure%new, self%pressure%grad)
+        real(real64), pointer, contiguous, dimension(:) :: pressure => null()
+
+        if (.not. self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) return
+
+        call self%pressure%get_current(pressure)
+        call self%calc_gradient(pressure, self%pressure%grad)
+
+        nullify (pressure)
 
     end subroutine calc_gradient_pressure_ftdss
 
@@ -335,6 +343,7 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
+        call self%controls%iteration%increment_total()
         call self%controls%iteration%reset_nonlinear()
 
     end subroutine solve_time_step_initial_setup_ftdss
@@ -346,66 +355,83 @@ contains
 
         integer(int32) :: iter
 
+        call self%controls%iteration%increment_nonlinear()
         call self%controls%iteration%get_nonlinear_iter(iter)
 
+        print *, iter
         if (iter == 1) then
             prescribe_bc = .true.
         else
             prescribe_bc = .false.
         end if
 
-        ! 2.1．物理量の勾配計算など，アセンブル前の準備
-        ! 前の反復（またはタイムステップ）で得られた状態量から勾配等を更新する．
         call self%calc_gradient_temperature()
         call self%calc_gradient_pressure()
 
     end subroutine solve_time_step_setup_ftdss
 
+    module subroutine solve_time_step_check_convergence_ftdss(self)
+        implicit none
+        class(type_ftdss), intent(inout), target :: self
+
+        integer(int32) :: iter
+
+        real(real64), pointer, contiguous, dimension(:) :: R_values => null()
+        real(real64), pointer, contiguous, dimension(:) :: delta_values => null()
+
+        R_values => self%R%get_data()
+        delta_values => self%delta%get_data()
+
+        call self%controls%iteration%get_nonlinear_iter(iter)
+
+        if (iter == 1) then
+            call self%controls%iteration%set_initial_norms(R_values, delta_values)
+        else
+            call self%controls%iteration%check_convergence(R_values, delta_values)
+        end if
+
+        nullify (R_values)
+        nullify (delta_values)
+
+    end subroutine solve_time_step_check_convergence_ftdss
+
     module subroutine solve_time_step_ftdss(self, is_step_converged)
         implicit none
         class(type_ftdss), intent(inout) :: self
         logical, intent(inout) :: is_step_converged
-
         logical :: prescribe_bc
 
-        ! 1．初期化
-        ! 反復計算の開始前に必要な変数を初期化する．
+        ! 1. 初期化
         is_step_converged = .false.
         call self%solve_time_step_initial_setup()
 
-        ! 2．非線形反復ループ（Newtonループ）開始
+        ! 2. 非線形反復ループ（Newtonループ）
+        !    収束判定は check_convergence で状態を更新し、ここ(should_continue)で抜ける
         do while (self%controls%iteration%should_continue())
 
+            ! 2.1 セットアップ (iter更新, BCフラグ設定, 勾配計算など)
             call self%solve_time_step_setup(prescribe_bc)
 
-            ! 2.2．大域行列（Jacobian）と残差ベクトル（Residual）のアセンブル
-            ! 各要素で局所行列を作成し，大域行列に足し合わせる．
+            ! 2.2 行列・残差のアセンブル
             call self%assemble()
 
-            ! 2.3．境界条件の適用
-            ! ディリクレ境界条件等を連立方程式に反映させる．
+            ! 2.3 境界条件の適用
             call self%apply_bc(prescribe_bc)
 
-            ! 2.4．収束判定
-            ! 残差ベクトルのノルムや解の更新量をチェックする．
-            ! 収束していればループを抜け，成功フラグを立てる．
-            ! if (check_convergence(self%R)) then
-            !     is_step_converged = .true.
-            !     exit
-            ! end if
-
-            ! 2.5．線形ソルバーの実行
-            ! J * delta = -R を解き，修正量 delta を求める．
+            ! 2.4 線形ソルバー (J * delta = -R)
             call self%solve()
 
-            ! 2.6．解（主変数）の更新
-            ! Temperature, Pressure 等を delta を用いて更新する．
+            ! 2.5 収束判定 (Rとdeltaをチェックして、内部状態を更新するだけ)
+            !     ※ここで収束フラグが立てば、次の do while でループを抜けます
+            call self%solve_time_step_check_convergence()
+
+            ! 2.6 解の更新 (U <= U + delta)
             call self%reflect_variables()
 
         end do
 
-        ! 3．ループ終了後の処理
-        ! 収束しなかった場合の警告や，収束した場合の後処理を行う．
+        ! 3. 最終的な収束状態を取得して返す
+        is_step_converged = self%controls%iteration%has_converged()
 
     end subroutine solve_time_step_ftdss
 end submodule ftdss_compute

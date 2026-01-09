@@ -68,7 +68,7 @@ contains
     module function get_data_vector_int(self) result(data)
         implicit none
         class(type_vector_int), intent(in), target :: self
-        integer(int32), pointer, dimension(:) :: data
+        integer(int32), pointer, contiguous, dimension(:) :: data
 
         data => self%val
     end function get_data_vector_int

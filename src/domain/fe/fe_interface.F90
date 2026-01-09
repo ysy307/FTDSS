@@ -1,6 +1,7 @@
 !>
 !> Defines the abstract interface and common functionalities for finite elements.
-!> Refactored to provide high-level geometric shape data calculation.
+!> Refactored to perform numerical integration using coefficients evaluated
+!> directly at Gauss quadrature points, rather than interpolating nodal coefficients.
 !>
 module domain_fe
     use, intrinsic :: iso_fortran_env, only: int32, real64
@@ -48,22 +49,31 @@ module domain_fe
         procedure, pass(self), public :: get_num_gauss
         procedure, pass(self), public :: get_weight
         procedure, pass(self), public :: get_gauss
+
+        !> State interpolation methods (used by assembler to get T/P at Gauss points)
         procedure, pass(self), private :: lerp_1d
         procedure, pass(self), private :: lerp_2d
         procedure, pass(self), private :: lerp_3d
         generic, public :: lerp => lerp_1d, lerp_2d, lerp_3d
-        procedure, pass(self), public :: dlerp
+
+        procedure, pass(self), private :: dlerp_1d
+        generic, public :: dlerp => dlerp_1d
+
         procedure, pass(self), public :: display
 
         !>
         !> Calculates shape functions, physical gradients, and Jacobian determinant
-        !> at a given local coordinate. This acts as a high-level API for assemblers.
+        !> at a given local coordinate.
         !>
         procedure, pass(self), public :: calc_shape_data
-        procedure, pass(self), private :: compute_K1_capacity
+
+        !> Integration routines taking Gauss-point values
+        procedure, pass(self), public :: compute_K1 => compute_K1_capacity
         procedure, pass(self), private :: compute_K2_diffusion
-        procedure, pass(self), private :: compute_K3_mixed
-        generic, public :: compute_K => compute_K1_capacity, compute_K2_diffusion, compute_K3_mixed
+        procedure, pass(self), private :: compute_K2_diffusion_scalar
+        generic, public :: compute_K2 => compute_K2_diffusion, compute_K2_diffusion_scalar
+        procedure, pass(self), public :: compute_K3 => compute_K3_mixed
+
         procedure, pass(self), private :: compute_R1_source
         procedure, pass(self), private :: compute_R2_flux
         generic, public :: compute_R => compute_R1_source, compute_R2_flux
@@ -80,11 +90,10 @@ module domain_fe
     end type
 
     abstract interface
-        subroutine abst_get_geometry(self, node_coords, connectivity, geometry)
+        subroutine abst_get_geometry(self, node_coords, geometry)
             import :: abst_fe, int32, real64
             class(abst_fe), intent(in) :: self
             real(real64), intent(in) :: node_coords(:, :)
-            integer(int32), intent(in) :: connectivity(:)
             real(real64), intent(inout) :: geometry
         end subroutine abst_get_geometry
 
@@ -105,31 +114,28 @@ module domain_fe
             real(real64), intent(inout) :: dpsi_val
         end subroutine abst_dpsi
 
-        pure subroutine abst_jacobian(self, r, node_coords, connectivity, jac)
+        pure subroutine abst_jacobian(self, r, node_coords, jac)
             import :: abst_fe, type_coordinate_dp, int32, real64
             class(abst_fe), intent(in) :: self
             type(type_coordinate_dp), intent(in) :: r
             real(real64), intent(in) :: node_coords(:, :)
-            integer(int32), intent(in) :: connectivity(:)
-            real(real64), intent(inout) :: jac(:, :) ! dimension x dimension
+            real(real64), intent(inout) :: jac(:, :)
         end subroutine abst_jacobian
 
-        pure subroutine abst_jacobian_det(self, r, node_coords, connectivity, det_j)
+        pure subroutine abst_jacobian_det(self, r, node_coords, det_j)
             import :: abst_fe, type_coordinate_dp, int32, real64
             class(abst_fe), intent(in) :: self
             type(type_coordinate_dp), intent(in) :: r
             real(real64), intent(in) :: node_coords(:, :)
-            integer(int32), intent(in) :: connectivity(:)
             real(real64), intent(inout) :: det_j
         end subroutine abst_jacobian_det
 
-        subroutine abst_is_inside(self, cartesian, normalized, node_coords, connectivity, is_in)
+        subroutine abst_is_inside(self, cartesian, normalized, node_coords, is_in)
             import abst_fe, type_coordinate_dp, int32, real64
             class(abst_fe), intent(in) :: self
             type(type_coordinate_dp), intent(in) :: cartesian
             type(type_coordinate_dp), intent(inout) :: normalized
             real(real64), intent(in) :: node_coords(:, :)
-            integer(int32), intent(in) :: connectivity(:)
             logical, intent(inout) :: is_in
         end subroutine abst_is_inside
     end interface
@@ -143,21 +149,16 @@ contains
 
     !>
     !> Computes shape functions, their global gradients, and the Jacobian determinant.
-    !> This unifies the geometric calculations required for matrix assembly.
     !>
-    pure subroutine calc_shape_data(self, r, node_coords, &
-                                    psi_vec, dpsi_dx_mat, det_j)
+    pure subroutine calc_shape_data(self, r, node_coords, psi, dpsi_dx, det_j)
         implicit none
         class(abst_fe), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
         real(real64), intent(in) :: node_coords(:, :)
 
-        !> Shape function values [num_nodes]
-        real(real64), intent(inout) :: psi_vec(:)
-        !> Global gradients of shape functions [num_nodes, dimension]
-        real(real64), intent(inout) :: dpsi_dx_mat(:, :)
-        !> Determinant of the Jacobian matrix
-        real(real64), intent(inout) :: det_j
+        real(real64), intent(inout), optional :: psi(:)
+        real(real64), intent(inout), optional :: dpsi_dx(:, :)
+        real(real64), intent(inout), optional :: det_j
 
         integer(int32) :: i, j, dim, nn
         real(real64) :: jac(3, 3), inv_jac(3, 3)
@@ -167,58 +168,50 @@ contains
         nn = self%num_nodes
 
         ! 1. Evaluate Shape Functions
-        do i = 1, nn
-            call self%psi(i, r, psi_vec(i))
-        end do
+        if (present(psi)) then
+            psi(:) = 0.0d0
+            do i = 1, nn
+                call self%psi(i, r, psi(i))
+            end do
+        end if
+
+        if (present(dpsi_dx)) then
+            dpsi_dx(:, :) = 0.0d0
+            ! We need local gradients to compute Jacobian
+        end if
 
         ! 2. Compute Jacobian Matrix (Isoparametric formulation)
         jac = 0.0d0
-        do i = 1, nn
-            do j = 1, dim
-                call self%dpsi(i, j, r, dpsi_dxi(j))
-
-                ! [修正箇所]
-                ! node_coords は (dim, num_nodes) のサイズで渡されており、
-                ! 列の順番はローカルな節点番号(1..nn)に対応しています。
-                ! connectivity(i) (グローバルID) を使うと範囲外参照になります。
-
-                ! OLD (Error): node_coords(1, connectivity(i))
-                ! NEW (Fixed): node_coords(1, i)
-
-                jac(j, 1) = jac(j, 1) + dpsi_dxi(j) * node_coords(1, i)
-                if (dim >= 2) jac(j, 2) = jac(j, 2) + dpsi_dxi(j) * node_coords(2, i)
-                if (dim >= 3) jac(j, 3) = jac(j, 3) + dpsi_dxi(j) * node_coords(3, i)
-            end do
-        end do
+        call self%jacobian(r, node_coords, jac)
+        call self%jacobian_det(r, node_coords, det_j)
 
         ! 3. Compute Determinant and Inverse Jacobian
         call calc_inverse_matrix(dim, jac(1:dim, 1:dim), det_j, inv_jac(1:dim, 1:dim))
 
-        ! 4. Compute Global Gradients: nabla_x psi = J^(-T) * nabla_xi psi
-        dpsi_dx_mat = 0.0d0
-        do i = 1, nn
-            ! Get local gradients again
-            do j = 1, dim
-                call self%dpsi(i, j, r, dpsi_dxi(j))
-            end do
+        ! 4. Compute Global Gradients if requested
+        if (present(dpsi_dx)) then
+            do i = 1, nn
+                ! Get local gradients again (or optimize to reuse)
+                do j = 1, dim
+                    call self%dpsi(i, j, r, dpsi_dxi(j))
+                end do
 
-            ! Transform to global coordinates
-            if (dim == 1) then
-                dpsi_dx_mat(i, 1) = dpsi_dxi(1) * inv_jac(1, 1)
-            else if (dim == 2) then
-                dpsi_dx_mat(i, 1) = dpsi_dxi(1) * inv_jac(1, 1) + dpsi_dxi(2) * inv_jac(2, 1)
-                dpsi_dx_mat(i, 2) = dpsi_dxi(1) * inv_jac(1, 2) + dpsi_dxi(2) * inv_jac(2, 2)
-            else if (dim == 3) then
-                dpsi_dx_mat(i, 1) = dot_product(dpsi_dxi, inv_jac(:, 1))
-                dpsi_dx_mat(i, 2) = dot_product(dpsi_dxi, inv_jac(:, 2))
-                dpsi_dx_mat(i, 3) = dot_product(dpsi_dxi, inv_jac(:, 3))
-            end if
-        end do
+                ! Transform to global coordinates
+                if (dim == 1) then
+                    dpsi_dx(i, 1) = dpsi_dxi(1) * inv_jac(1, 1)
+                else if (dim == 2) then
+                    dpsi_dx(i, 1) = dpsi_dxi(1) * inv_jac(1, 1) + dpsi_dxi(2) * inv_jac(2, 1)
+                    dpsi_dx(i, 2) = dpsi_dxi(1) * inv_jac(1, 2) + dpsi_dxi(2) * inv_jac(2, 2)
+                else if (dim == 3) then
+                    dpsi_dx(i, 1) = dot_product(dpsi_dxi, inv_jac(:, 1))
+                    dpsi_dx(i, 2) = dot_product(dpsi_dxi, inv_jac(:, 2))
+                    dpsi_dx(i, 3) = dot_product(dpsi_dxi, inv_jac(:, 3))
+                end if
+            end do
+        end if
 
     end subroutine calc_shape_data
-    !>
-    !> Helper to calculate determinant and inverse of a small matrix (1x1 to 3x3).
-    !>
+
     pure subroutine calc_inverse_matrix(dim, A, det, A_inv)
         implicit none
         integer(int32), intent(in) :: dim
@@ -235,7 +228,6 @@ contains
             else
                 A_inv(1, 1) = 0.0d0
             end if
-
         case (2)
             det = A(1, 1) * A(2, 2) - A(1, 2) * A(2, 1)
             if (abs(det) > epsilon(det)) then
@@ -247,7 +239,6 @@ contains
             else
                 A_inv = 0.0d0
             end if
-
         case (3)
             det = A(1, 1) * (A(2, 2) * A(3, 3) - A(2, 3) * A(3, 2)) &
                   - A(1, 2) * (A(2, 1) * A(3, 3) - A(2, 3) * A(3, 1)) &
@@ -277,6 +268,7 @@ contains
     !--------------------------------------------------------------------------
 
     subroutine initialize_abst_fe(self, type, dimension, order, num_nodes, num_gauss, weight, gauss)
+        ! (No changes)
         implicit none
         class(abst_fe), intent(inout) :: self
         integer(int32), intent(in) :: type
@@ -303,292 +295,463 @@ contains
         end do
     end subroutine initialize_abst_fe
 
-    pure elemental subroutine get_type(self, val)
+    ! (Getters and Lerp functions remain the same to support state interpolation)
+    pure elemental subroutine get_type(self, type)
         implicit none
         class(abst_fe), intent(in) :: self
-        integer(int32), intent(inout) :: val
-        val = self%type
+        integer(int32), intent(inout) :: type
+        type = self%type
     end subroutine get_type
 
-    pure elemental subroutine get_num_nodes(self, val)
+    pure elemental subroutine get_num_nodes(self, num_nodes)
         implicit none
         class(abst_fe), intent(in) :: self
-        integer(int32), intent(inout) :: val
-        val = self%num_nodes
+        integer(int32), intent(inout) :: num_nodes
+        num_nodes = self%num_nodes
     end subroutine get_num_nodes
 
-    pure elemental subroutine get_dimension(self, val)
+    pure elemental subroutine get_dimension(self, dimension)
         implicit none
         class(abst_fe), intent(in) :: self
-        integer(int32), intent(inout) :: val
-        val = self%dimension
+        integer(int32), intent(inout) :: dimension
+        dimension = self%dimension
     end subroutine get_dimension
 
-    pure elemental subroutine get_order(self, val)
+    pure elemental subroutine get_order(self, order)
         implicit none
         class(abst_fe), intent(in) :: self
-        integer(int32), intent(inout) :: val
-        val = self%order
+        integer(int32), intent(inout) :: order
+        order = self%order
     end subroutine get_order
 
-    pure elemental subroutine get_num_gauss(self, val)
+    pure elemental subroutine get_num_gauss(self, num_gauss)
         implicit none
         class(abst_fe), intent(in) :: self
-        integer(int32), intent(inout) :: val
-        val = self%num_gauss
+        integer(int32), intent(inout) :: num_gauss
+        num_gauss = self%num_gauss
     end subroutine get_num_gauss
 
-    subroutine get_weight(self, val)
+    subroutine get_weight(self, weight)
         implicit none
         class(abst_fe), intent(in), target :: self
-        real(real64), intent(inout), pointer, contiguous, dimension(:) :: val
-
-        val => self%weight
+        real(real64), intent(inout), pointer, contiguous, dimension(:) :: weight
+        weight => self%weight
     end subroutine get_weight
 
-    subroutine get_gauss(self, val)
+    subroutine get_gauss(self, gauss)
         implicit none
         class(abst_fe), intent(in), target :: self
-        type(type_coordinate_dp), intent(inout), pointer, contiguous, dimension(:) :: val
-
-        val => self%gauss
+        type(type_coordinate_dp), intent(inout), pointer, contiguous, dimension(:) :: gauss
+        gauss => self%gauss
     end subroutine get_gauss
 
-    pure subroutine lerp_1d(self, r, global_values, val)
+    pure subroutine lerp_1d(self, r, values, lerped_value)
+        ! (No changes - needed for State variable interpolation)
         implicit none
         class(abst_fe), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
-        real(real64), intent(in) :: global_values(:)
-        real(real64), intent(inout) :: val
+        real(real64), intent(in) :: values(:)
+        real(real64), intent(inout) :: lerped_value
         integer(int32) :: i
         real(real64) :: psi_i
 
-        val = 0.0d0
+        lerped_value = 0.0d0
         do i = 1, self%num_nodes
             call self%psi(i, r, psi_i)
-            val = val + psi_i * global_values(i)
+            lerped_value = lerped_value + psi_i * values(i)
         end do
     end subroutine
 
-    pure subroutine lerp_2d(self, r, global_values, val)
+    pure subroutine lerp_2d(self, r, values, lerped_values)
         implicit none
         class(abst_fe), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
-        real(real64), intent(in) :: global_values(:, :)
-        real(real64), intent(inout) :: val(:)
+        real(real64), intent(in) :: values(:, :)
+        real(real64), intent(inout) :: lerped_values(:)
         integer(int32) :: i
         real(real64) :: psi_i
 
-        val = 0.0d0
+        lerped_values(:) = 0.0d0
         do i = 1, self%num_nodes
             call self%psi(i, r, psi_i)
-            val(:) = val(:) + psi_i * global_values(:, i)
+            lerped_values(:) = lerped_values(:) + psi_i * values(:, i)
         end do
     end subroutine lerp_2d
 
-    pure subroutine lerp_3d(self, r, global_values, val)
+    pure subroutine lerp_3d(self, r, values, lerped_values)
         implicit none
         class(abst_fe), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
-        real(real64), intent(in) :: global_values(:, :, :)
-        real(real64), intent(inout) :: val(:, :)
+        real(real64), intent(in) :: values(:, :, :)
+        real(real64), intent(inout) :: lerped_values(:, :)
         integer(int32) :: i
         real(real64) :: psi_i
 
-        val = 0.0d0
+        lerped_values = 0.0d0
         do i = 1, self%num_nodes
             call self%psi(i, r, psi_i)
-            val(:, :) = val(:, :) + psi_i * global_values(:, :, i)
+            lerped_values(:, :) = lerped_values(:, :) + psi_i * values(:, :, i)
         end do
     end subroutine lerp_3d
 
-    pure subroutine dlerp(self, r, global_values, val)
+    pure subroutine dlerp_1d(self, r, values, dlerped_value)
         implicit none
         class(abst_fe), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
-        real(real64), intent(in) :: global_values(:)
-        type(type_coordinate_dp), intent(inout) :: val
+        real(real64), intent(in) :: values(:)
+        type(type_coordinate_dp), intent(inout) :: dlerped_value
         integer(int32) :: i
         real(real64) :: dpsi_i
 
-        val%x = 0.0d0; val%y = 0.0d0; val%z = 0.0d0
+        dlerped_value%x = 0.0d0; dlerped_value%y = 0.0d0; dlerped_value%z = 0.0d0
         do i = 1, self%num_nodes
             if (self%dimension >= 1) then
                 call self%dpsi(i, 1, r, dpsi_i)
-                val%x = val%x + dpsi_i * global_values(i)
+                dlerped_value%x = dlerped_value%x + dpsi_i * values(i)
             end if
             if (self%dimension >= 2) then
                 call self%dpsi(i, 2, r, dpsi_i)
-                val%y = val%y + dpsi_i * global_values(i)
+                dlerped_value%y = dlerped_value%y + dpsi_i * values(i)
+                dlerped_value%z = dlerped_value%z + dpsi_i * values(i)
             end if
             if (self%dimension >= 3) then
                 call self%dpsi(i, 3, r, dpsi_i)
-                val%z = val%z + dpsi_i * global_values(i)
+                dlerped_value%z = dlerped_value%z + dpsi_i * values(i)
             end if
         end do
-    end subroutine dlerp
+    end subroutine dlerp_1d
 
-    !>
-    !> 1. 容量型行列 (Capacity Matrix) K1
+    !==========================================================================
+    ! Integration Matrices using Coefficients at Gauss Points (A_gp, M_gp, etc.)
+    !==========================================================================
+!>
+    !> 1. Capacity Matrix K1
     !>    K_ij = Integ { A(x) * psi_i * psi_j } dOmega
-    !>    分布係数 A はスカラー (節点値 A_vec から補間)
+    !>    A_gp: Coefficients evaluated directly at Gauss points [num_gauss]
+    !>    work_psi, work_dpsi_dx: (Optional) Pre-allocated workspace to avoid repeated allocation.
     !>
-    subroutine compute_K1_capacity(self, nodes, A_vec, elem_mat)
-        implicit none
-        class(abst_fe), intent(in) :: self
-        real(real64), intent(in) :: nodes(:, :) ! 全節点座標
-        real(real64), intent(in) :: A_vec(:) ! [num_nodes] 係数
-        real(real64), intent(inout) :: elem_mat(:, :)
-
-        integer(int32) :: p, i, j, nd, dim, num_gauss
-        real(real64) :: w, det_J, A_val
-        real(real64), allocatable :: psi(:), dpsi_dx(:, :)
-        type(type_coordinate_dp) :: r
-
-        call self%get_dimension(dim)
-        call self%get_num_nodes(nd)
-        call self%get_num_gauss(num_gauss)
-
-        allocate (psi(nd), dpsi_dx(nd, dim))
-        elem_mat = 0.0d0
-
-        do p = 1, num_gauss
-            r = self%gauss(p)
-            w = self%weight(p)
-
-            ! 形状関数データ一括取得 (psi, nabla psi, detJ)
-            call self%calc_shape_data(r, nodes, psi, dpsi_dx, det_J)
-
-            ! 係数 A の補間: A(r) = Sum psi_i * Ai
-            A_val = dot_product(psi, A_vec)
-
-            ! 行列積算: w * detJ * A * psi_i * psi_j
-            do j = 1, nd
-                do i = 1, nd
-                    elem_mat(i, j) = elem_mat(i, j) + w * det_J * A_val * psi(i) * psi(j)
-                end do
-            end do
-        end do
-    end subroutine compute_K1_capacity
-
-    !>
-    !> 2. 拡散型行列 (Diffusion Matrix) K2
-    !>    K_ij = Integ { nabla psi_i . (M(x) * nabla psi_j) } dOmega
-    !>    分布係数 M はテンソル (節点値 M_vec から補間)
-    !>
-    subroutine compute_K2_diffusion(self, nodes, M_vec, elem_mat)
+    subroutine compute_K1_capacity(self, nodes, A_gp, elem_mat, work_psi)
         implicit none
         class(abst_fe), intent(in) :: self
         real(real64), intent(in) :: nodes(:, :)
-        real(real64), intent(in) :: M_vec(:, :, :) ! [dim, dim, num_nodes]
+        real(real64), intent(in) :: A_gp(:)
         real(real64), intent(inout) :: elem_mat(:, :)
+        real(real64), intent(inout), optional, target :: work_psi(:)
 
-        integer(int32) :: p, i, j, k, nd, dim, num_gauss
-        real(real64) :: w, det_J
-        real(real64), allocatable :: psi(:), dpsi_dx(:, :)
-        real(real64), allocatable :: M_val(:, :), M_grad_psi_j(:)
+        integer(int32) :: p, i, j, nd, dim, num_gauss
+        real(real64) :: w, det_J, A_val
         type(type_coordinate_dp) :: r
+
+        real(real64), pointer :: p_psi(:) => null()
+        real(real64), allocatable, target :: local_psi(:)
+
+        ! --- 1. 次元情報の取得 ---
+        call self%get_dimension(dim)
+        call self%get_num_nodes(nd)
+        call self%get_num_gauss(num_gauss)
+
+        ! --- 2. ワークスペースのセットアップ（ポインタエイリアシング） ---
+        ! psi のセットアップ
+        if (present(work_psi)) then
+            p_psi => work_psi
+        else
+            call allocate_array(local_psi, nd)
+            p_psi => local_psi
+        end if
+
+        elem_mat(:, :) = 0.0d0
+        p_psi(:) = 0.0d0
+
+        ! --- 3. 数値積分ループ ---
+        do p = 1, num_gauss
+            r = self%gauss(p)
+            w = self%weight(p)
+
+            ! 形状関数とヤコビアン行列式の計算
+            call self%calc_shape_data(r, nodes, psi=p_psi, det_j=det_J)
+            A_val = A_gp(p)
+
+            ! 行列積算
+            do j = 1, nd
+                do i = 1, nd
+                    ! p_psi ポインタ経由でアクセス
+                    elem_mat(i, j) = elem_mat(i, j) + w * det_J * A_val * p_psi(i) * p_psi(j)
+                end do
+            end do
+        end do
+
+        ! --- 4. クリーンアップ ---
+        ! 自分で確保したローカル配列のみ解放する
+        nullify (p_psi)
+        if (.not. present(work_psi)) then
+            call deallocate_array(local_psi)
+        end if
+    end subroutine compute_K1_capacity
+
+    !>
+    !> 2. Diffusion Matrix K2
+    !>    K_ij = Integ { nabla psi_i . (M(x) * nabla psi_j) } dOmega
+    !>    M_gp: Tensor coefficients evaluated at Gauss points [dim, dim, num_gauss]
+    !>
+    subroutine compute_K2_diffusion(self, nodes, M_gp, elem_mat, &
+                                    work_psi, work_dpsi_dx, work_vec)
+        implicit none
+        class(abst_fe), intent(in) :: self
+        real(real64), intent(in) :: nodes(:, :)
+        real(real64), intent(in) :: M_gp(:, :, :)
+        real(real64), intent(inout) :: elem_mat(:, :)
+        !> Optional workspace
+        real(real64), intent(inout), optional, target :: work_psi(:)
+        real(real64), intent(inout), optional, target :: work_dpsi_dx(:, :)
+        real(real64), intent(inout), optional, target :: work_vec(:) ! For M_grad_psi_j [dim]
+
+        integer(int32) :: p, i, j, nd, dim, num_gauss
+        real(real64) :: w, det_J
+        type(type_coordinate_dp) :: r
+
+        !> Pointers for alias
+        real(real64), pointer :: p_psi(:) => null()
+        real(real64), pointer :: p_dpsi_dx(:, :) => null()
+        real(real64), pointer :: p_M_grad_psi_j(:) => null()
+
+        !> Local allocatables (fallback)
+        real(real64), allocatable, target :: local_psi(:)
+        real(real64), allocatable, target :: local_dpsi_dx(:, :)
+        real(real64), allocatable, target :: local_vec_dim(:)
 
         call self%get_dimension(dim)
         call self%get_num_nodes(nd)
         call self%get_num_gauss(num_gauss)
 
-        allocate (psi(nd), dpsi_dx(nd, dim))
-        allocate (M_val(dim, dim), M_grad_psi_j(dim))
+        ! --- Workspace Setup ---
+        if (present(work_psi)) then
+            p_psi => work_psi
+        else
+            call allocate_array(local_psi, nd)
+            p_psi => local_psi
+        end if
+
+        if (present(work_dpsi_dx)) then
+            p_dpsi_dx => work_dpsi_dx
+        else
+            call allocate_array(local_dpsi_dx, nd, dim)
+            p_dpsi_dx => local_dpsi_dx
+        end if
+
+        if (present(work_vec)) then
+            p_M_grad_psi_j => work_vec
+        else
+            call allocate_array(local_vec_dim, dim)
+            p_M_grad_psi_j => local_vec_dim
+        end if
 
         elem_mat = 0.0d0
+        p_psi(:) = 0.0d0
+        p_dpsi_dx(:, :) = 0.0d0
+        p_M_grad_psi_j(:) = 0.0d0
 
+        ! --- Integration Loop ---
         do p = 1, num_gauss
             r = self%gauss(p)
             w = self%weight(p)
-            call self%calc_shape_data(r, nodes, psi, dpsi_dx, det_J)
 
-            ! 係数 M の補間: M(r) = Sum psi_k * M_k
-            M_val = 0.0d0
-            do k = 1, nd
-                M_val = M_val + psi(k) * M_vec(:, :, k)
-            end do
+            call self%calc_shape_data(r, nodes, psi=p_psi, dpsi_dx=p_dpsi_dx, det_j=det_J)
 
-            ! 行列積算: w * detJ * (nabla psi_i)^T * M * nabla psi_j
+            ! Compute term: M * nabla psi_j
             do j = 1, nd
-                ! M * nabla psi_j を先に計算
-                ! dpsi_dx(j, :) は nabla psi_j (ベクトル)
-                M_grad_psi_j = matmul(M_val, dpsi_dx(j, :)) ! (dim)
+                ! Matrix-Vector multiplication using pointers
+                ! M_gp(:, :, p) is [dim x dim], p_dpsi_dx(j, :) is [dim]
+                p_M_grad_psi_j = matmul(M_gp(:, :, p), p_dpsi_dx(j, :))
 
                 do i = 1, nd
                     ! nabla psi_i . (M * nabla psi_j)
                     elem_mat(i, j) = elem_mat(i, j) + &
-                                     w * det_J * dot_product(dpsi_dx(i, :), M_grad_psi_j)
+                                     w * det_J * dot_product(p_dpsi_dx(i, :), p_M_grad_psi_j)
                 end do
             end do
         end do
+
+        ! --- Cleanup ---
+        if (allocated(local_psi)) call deallocate_array(local_psi)
+        if (allocated(local_dpsi_dx)) call deallocate_array(local_dpsi_dx)
+        if (allocated(local_vec_dim)) call deallocate_array(local_vec_dim)
+
+        nullify (p_psi)
+        nullify (p_dpsi_dx)
+        nullify (p_M_grad_psi_j)
+
     end subroutine compute_K2_diffusion
 
     !>
-    !> 3. 混合型行列 (Mixed Matrix) K3
-    !>    K_ij = Integ { (nabla psi_i . V(x)) * psi_j } dOmega
-    !>    (行i: 勾配，列j: 形状関数)
-    !>    分布係数 V はベクトル (節点値 V_vec から補間)
+    !> 2. Diffusion Matrix K2 (Scalar Version)
+    !>    K_ij = Integ { M(x) * (nabla psi_i . nabla psi_j) } dOmega
+    !>    M_gp: Scalar coefficients evaluated at Gauss points [num_gauss]
     !>
-    subroutine compute_K3_mixed(self, nodes, V_vec, elem_mat)
+    subroutine compute_K2_diffusion_scalar(self, nodes, M_gp, elem_mat, &
+                                           work_psi, work_dpsi_dx)
         implicit none
         class(abst_fe), intent(in) :: self
         real(real64), intent(in) :: nodes(:, :)
-        real(real64), intent(in) :: V_vec(:, :) ! [dim, num_nodes]
+        !> Scalar coefficient at Gauss points
+        real(real64), intent(in) :: M_gp(:)
         real(real64), intent(inout) :: elem_mat(:, :)
+        !> Optional workspace
+        real(real64), intent(inout), optional, target :: work_psi(:)
+        real(real64), intent(inout), optional, target :: work_dpsi_dx(:, :)
 
-        integer(int32) :: p, i, j, k, nd, dim, num_gauss
-        real(real64) :: w, det_J, grad_psi_i_dot_V
-        real(real64), allocatable :: psi(:), dpsi_dx(:, :)
-        real(real64), allocatable :: V_val(:)
+        integer(int32) :: p, i, j, nd, dim, num_gauss
+        real(real64) :: w, det_J, M_val, grad_dot
         type(type_coordinate_dp) :: r
+
+        !> Pointers for alias
+        real(real64), pointer :: p_psi(:) => null()
+        real(real64), pointer :: p_dpsi_dx(:, :) => null()
+
+        !> Local allocatables (fallback)
+        real(real64), allocatable, target :: local_psi(:)
+        real(real64), allocatable, target :: local_dpsi_dx(:, :)
 
         call self%get_dimension(dim)
         call self%get_num_nodes(nd)
         call self%get_num_gauss(num_gauss)
 
-        allocate (psi(nd), dpsi_dx(nd, dim))
-        allocate (V_val(dim))
+        ! --- Workspace Setup ---
+        if (present(work_psi)) then
+            p_psi => work_psi
+        else
+            call allocate_array(local_psi, nd)
+            p_psi => local_psi
+        end if
+
+        if (present(work_dpsi_dx)) then
+            p_dpsi_dx => work_dpsi_dx
+        else
+            call allocate_array(local_dpsi_dx, nd, dim)
+            p_dpsi_dx => local_dpsi_dx
+        end if
 
         elem_mat = 0.0d0
 
+        ! --- Integration Loop ---
         do p = 1, num_gauss
             r = self%gauss(p)
             w = self%weight(p)
-            call self%calc_shape_data(r, nodes, psi, dpsi_dx, det_J)
 
-            ! 係数 V の補間: V(r) = Sum psi_k * Vk
-            V_val = 0.0d0
-            do k = 1, nd
-                V_val = V_val + psi(k) * V_vec(:, k)
-            end do
+            call self%calc_shape_data(r, nodes, psi=p_psi, dpsi_dx=p_dpsi_dx, det_j=det_J)
 
-            ! 行列積算: w * detJ * (nabla psi_i . V) * psi_j
-            do i = 1, nd
-                ! (nabla psi_i . V)
-                grad_psi_i_dot_V = dot_product(dpsi_dx(i, :), V_val)
+            ! Direct evaluation at Gauss point (Scalar)
+            M_val = M_gp(p)
 
-                do j = 1, nd
+            do j = 1, nd
+                do i = 1, nd
+                    ! nabla psi_i . nabla psi_j (Simple dot product)
+                    grad_dot = dot_product(p_dpsi_dx(i, :), p_dpsi_dx(j, :))
+
                     elem_mat(i, j) = elem_mat(i, j) + &
-                                     w * det_J * grad_psi_i_dot_V * psi(j)
+                                     w * det_J * M_val * grad_dot
                 end do
             end do
         end do
+
+        ! --- Cleanup ---
+        if (allocated(local_psi)) call deallocate_array(local_psi)
+        if (allocated(local_dpsi_dx)) call deallocate_array(local_dpsi_dx)
+
+        nullify (p_psi)
+        nullify (p_dpsi_dx)
+
+    end subroutine compute_K2_diffusion_scalar
+
+    !>
+    !> 3. Mixed Matrix K3 (Advection/Convection)
+    !>    K_ij = Integ { (nabla psi_i . V(x)) * psi_j } dOmega
+    !>    V_gp: Vector coefficients evaluated at Gauss points [dim, num_gauss]
+    !>
+    subroutine compute_K3_mixed(self, nodes, V_gp, elem_mat, work_psi, work_dpsi_dx)
+        implicit none
+        class(abst_fe), intent(in) :: self
+        real(real64), intent(in) :: nodes(:, :)
+        real(real64), intent(in) :: V_gp(:, :)
+        real(real64), intent(inout) :: elem_mat(:, :)
+        !> Optional workspace
+        real(real64), intent(inout), optional, target :: work_psi(:)
+        real(real64), intent(inout), optional, target :: work_dpsi_dx(:, :)
+
+        integer(int32) :: p, i, j, nd, dim, num_gauss
+        real(real64) :: w, det_J, grad_psi_i_dot_V
+        type(type_coordinate_dp) :: r
+
+        !> Pointers for alias
+        real(real64), pointer :: p_psi(:) => null()
+        real(real64), pointer :: p_dpsi_dx(:, :) => null()
+
+        !> Local allocatables (fallback)
+        real(real64), allocatable, target :: local_psi(:)
+        real(real64), allocatable, target :: local_dpsi_dx(:, :)
+
+        call self%get_dimension(dim)
+        call self%get_num_nodes(nd)
+        call self%get_num_gauss(num_gauss)
+
+        ! --- Workspace Setup ---
+        if (present(work_psi)) then
+            p_psi => work_psi
+        else
+            call allocate_array(local_psi, nd)
+            p_psi => local_psi
+        end if
+
+        if (present(work_dpsi_dx)) then
+            p_dpsi_dx => work_dpsi_dx
+        else
+            call allocate_array(local_dpsi_dx, nd, dim)
+            p_dpsi_dx => local_dpsi_dx
+        end if
+
+        elem_mat = 0.0d0
+        p_psi(:) = 0.0d0
+        p_dpsi_dx(:, :) = 0.0d0
+
+        ! --- Integration Loop ---
+        do p = 1, num_gauss
+            r = self%gauss(p)
+            w = self%weight(p)
+
+            call self%calc_shape_data(r, nodes, psi=p_psi, dpsi_dx=p_dpsi_dx, det_j=det_J)
+
+            do i = 1, nd
+                ! (nabla psi_i . V)
+                grad_psi_i_dot_V = dot_product(p_dpsi_dx(i, :), V_gp(:, p))
+
+                do j = 1, nd
+                    elem_mat(i, j) = elem_mat(i, j) + &
+                                     w * det_J * grad_psi_i_dot_V * p_psi(j)
+                end do
+            end do
+        end do
+
+        ! --- Cleanup ---
+        if (allocated(local_psi)) call deallocate_array(local_psi)
+        if (allocated(local_dpsi_dx)) call deallocate_array(local_dpsi_dx)
+
+        nullify (p_psi)
+        nullify (p_dpsi_dx)
+
     end subroutine compute_K3_mixed
 
     !>
-    !> 1. スカラーソース項残差 (Source Term Residual) R1
+    !> 1. Scalar Source Residual R1
     !>    R_i = Integ { psi_i * S(x) } dOmega
-    !>    分布係数 S はスカラー (節点値 S_vec から補間)
+    !>    S_gp: Source term evaluated at Gauss points [num_gauss]
     !>
-    subroutine compute_R1_source(self, nodes, S_vec, elem_vec)
+    subroutine compute_R1_source(self, nodes, S_gp, elem_vec)
         implicit none
         class(abst_fe), intent(in) :: self
-        real(real64), intent(in) :: nodes(:, :) ! 全節点座標
-        real(real64), intent(in) :: S_vec(:) ! [num_nodes] スカラー係数
-        real(real64), intent(inout) :: elem_vec(:) ! [num_nodes] 残差ベクトル
+        real(real64), intent(in) :: nodes(:, :)
+        real(real64), intent(in) :: S_gp(:)
+        real(real64), intent(inout) :: elem_vec(:)
 
-        integer(int32) :: p, i, k, nd, dim, num_gauss
+        integer(int32) :: p, i, nd, dim, num_gauss
         real(real64) :: w, det_J, S_val
         real(real64), allocatable :: psi(:), dpsi_dx(:, :)
         type(type_coordinate_dp) :: r
@@ -603,14 +766,10 @@ contains
         do p = 1, num_gauss
             r = self%gauss(p)
             w = self%weight(p)
-
-            ! 形状関数データ取得
             call self%calc_shape_data(r, nodes, psi, dpsi_dx, det_J)
 
-            ! 係数 S の補間: S(r) = Sum psi_k * S_k
-            S_val = dot_product(psi, S_vec)
+            S_val = S_gp(p)
 
-            ! ベクトル積算: w * detJ * S * psi_i
             do i = 1, nd
                 elem_vec(i) = elem_vec(i) + w * det_J * S_val * psi(i)
             end do
@@ -618,22 +777,20 @@ contains
     end subroutine compute_R1_source
 
     !>
-    !> 2. 流束項残差 (Flux Term Residual) R2
+    !> 2. Flux/Divergence Residual R2
     !>    R_i = Integ { nabla psi_i . F(x) } dOmega
-    !>    分布係数 F はベクトル (節点値 F_vec から補間)
-    !>    ※ 弱形式における拡散項の移項や、発散項の積分に対応
+    !>    F_gp: Flux vector evaluated at Gauss points [dim, num_gauss]
     !>
-    subroutine compute_R2_flux(self, nodes, F_vec, elem_vec)
+    subroutine compute_R2_flux(self, nodes, F_gp, elem_vec)
         implicit none
         class(abst_fe), intent(in) :: self
         real(real64), intent(in) :: nodes(:, :)
-        real(real64), intent(in) :: F_vec(:, :) ! [dim, num_nodes] ベクトル係数
-        real(real64), intent(inout) :: elem_vec(:) ! [num_nodes] 残差ベクトル
+        real(real64), intent(in) :: F_gp(:, :)
+        real(real64), intent(inout) :: elem_vec(:)
 
-        integer(int32) :: p, i, k, nd, dim, num_gauss
+        integer(int32) :: p, i, nd, dim, num_gauss
         real(real64) :: w, det_J, grad_psi_i_dot_F
         real(real64), allocatable :: psi(:), dpsi_dx(:, :)
-        real(real64), allocatable :: F_val(:)
         type(type_coordinate_dp) :: r
 
         call self%get_dimension(dim)
@@ -641,8 +798,6 @@ contains
         call self%get_num_gauss(num_gauss)
 
         allocate (psi(nd), dpsi_dx(nd, dim))
-        allocate (F_val(dim))
-
         elem_vec = 0.0d0
 
         do p = 1, num_gauss
@@ -650,16 +805,10 @@ contains
             w = self%weight(p)
             call self%calc_shape_data(r, nodes, psi, dpsi_dx, det_J)
 
-            ! 係数 F の補間: F(r) = Sum psi_k * F_k
-            F_val = 0.0d0
-            do k = 1, nd
-                F_val = F_val + psi(k) * F_vec(:, k)
-            end do
-
-            ! ベクトル積算: w * detJ * (nabla psi_i . F)
+            ! Direct evaluation: F_gp(:, p)
             do i = 1, nd
                 ! (nabla psi_i . F)
-                grad_psi_i_dot_F = dot_product(dpsi_dx(i, :), F_val)
+                grad_psi_i_dot_F = dot_product(dpsi_dx(i, :), F_gp(:, p))
 
                 elem_vec(i) = elem_vec(i) + w * det_J * grad_psi_i_dot_F
             end do

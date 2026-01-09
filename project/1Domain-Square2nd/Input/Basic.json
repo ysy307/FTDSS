@@ -5,7 +5,7 @@
     },
     "analysis_controls": {
         "calculate_thermal": true,
-        "calculate_hydraulic": true,
+        "calculate_hydraulic": false,
         "calculate_mechanical": false,
         "coupling_mode": "weak",
         "partitioning": true
@@ -31,7 +31,7 @@
             "id": 1,
             "name": "soil",
             "calculate_thermal": true,
-            "calculate_hydraulic": true,
+            "calculate_hydraulic": false,
             "calculate_mechanical": false,
             "phase": 3,
             "density": {
@@ -112,22 +112,22 @@
         "nonlinear_solver": {
             "method": "newton",
             "update_frequency": 5,
-            "max_iterations": 100,
+            "max_iterations": 3,
             "convergence": {
                 "use_criteria": "both",
-                "norm_type": "l2",
+                "norm_type": "linf",
                 "logic_between_criteria": "and",
                 "residual": {
                     "criteria": "both",
                     "logic": "or",
-                    "absolute_tolerance": 1e-08,
-                    "relative_tolerance": 1e-06
+                    "absolute_tolerance": 1e-03,
+                    "relative_tolerance": 1e-03
                 },
                 "update": {
                     "criteria": "both",
                     "logic": "or",
-                    "absolute_tolerance": 1e-09,
-                    "relative_tolerance": 1e-07
+                    "absolute_tolerance": 1e-03,
+                    "relative_tolerance": 1e-03
                 }
             }
         },
@@ -135,25 +135,7 @@
             "type": 4,
             "preconditioner_type": 1,
             "max_iterations": 50000,
-            "tolerance": 1e-10,
-            "thermal": {
-                "method": "direct",
-                "iterative_solver": {
-                    "solver_type": 4,
-                    "preconditioner_type": 1,
-                    "max_iterations": 50000,
-                    "tolerance": 1e-10
-                }
-            },
-            "hydraulic": {
-                "method": "direct",
-                "algorithm": {
-                    "solver_type": 4,
-                    "preconditioner_type": 1,
-                    "max_iterations": 50000,
-                    "tolerance": 1e-10
-                }
-            }
+            "tolerance": 1e-10
         },
         "parallel_settings": {
             "threads": {

@@ -44,11 +44,10 @@ contains
         if (allocated(gauss)) call deallocate_array(gauss)
     end function construct_square_second
 
-    module subroutine get_area_square_second(self, node_coords, connectivity, geometry)
+    module subroutine get_area_square_second(self, node_coords, geometry)
         implicit none
         class(type_square_second), intent(in) :: self
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         real(real64), intent(inout) :: geometry
 
         integer(int32) :: i
@@ -63,7 +62,7 @@ contains
         call self%get_num_gauss(ng)
 
         do i = 1, ng
-            call self%jacobian_det(gauss_pts(i), node_coords, connectivity, det_j)
+            call self%jacobian_det(gauss_pts(i), node_coords, det_j)
             geometry = geometry + det_j * weights(i)
         end do
 
@@ -133,12 +132,11 @@ contains
         end if
     end subroutine dpsi_square_second
 
-    pure module subroutine jacobian_square_second(self, r, node_coords, connectivity, jac)
+    pure module subroutine jacobian_square_second(self, r, node_coords, jac)
         implicit none
         class(type_square_second), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         real(real64), intent(inout) :: jac(:, :)
 
         integer(int32) :: k
@@ -156,26 +154,24 @@ contains
         end do
     end subroutine jacobian_square_second
 
-    pure module subroutine jacobian_det_square_second(self, r, node_coords, connectivity, det_j)
+    pure module subroutine jacobian_det_square_second(self, r, node_coords, det_j)
         implicit none
         class(type_square_second), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         real(real64), intent(inout) :: det_j
 
         real(real64) :: jac(2, 2)
-        call self%jacobian(r, node_coords, connectivity, jac)
+        call self%jacobian(r, node_coords, jac)
         det_j = jac(1, 1) * jac(2, 2) - jac(1, 2) * jac(2, 1)
     end subroutine jacobian_det_square_second
 
-    module subroutine is_in_square_second(self, cartesian, normalized, node_coords, connectivity, is_in)
+    module subroutine is_in_square_second(self, cartesian, normalized, node_coords, is_in)
         implicit none
         class(type_square_second), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: cartesian
         type(type_coordinate_dp), intent(inout) :: normalized
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         logical, intent(inout) :: is_in
 
         type(type_coordinate_dp) :: r
@@ -250,11 +246,11 @@ contains
                     exit newton_loop
                 end if
 
-                call self%jacobian_det(r, node_coords, connectivity, det_j)
+                call self%jacobian_det(r, node_coords, det_j)
                 ! 特異点の場合は次の初期値へ(cycleでなくexit newton_loopで次のguessへ)
                 if (abs(det_j) < 1.0e-12) exit newton_loop
 
-                call self%jacobian(r, node_coords, connectivity, jac)
+                call self%jacobian(r, node_coords, jac)
 
                 inv_det = 1.0d0 / det_j
                 dr_x = (jac(2, 2) * dx - jac(2, 1) * dy) * inv_det

@@ -64,12 +64,11 @@ contains
     !>
     !> Computes the tangent vector at a specified local coordinate.
     !>
-    pure module subroutine compute_tangent_vector_side_second(self, r, node_coords, connectivity, tangent_vec)
+    pure module subroutine compute_tangent_vector_side_second(self, r, node_coords, tangent_vec)
         implicit none
         class(type_side_second), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         real(real64), intent(inout) :: tangent_vec(:)
 
         integer(int32) :: i
@@ -91,11 +90,10 @@ contains
     !>
     !> Calculates the curved length of the element using Gauss quadrature.
     !>
-    module subroutine get_length_side_second(self, node_coords, connectivity, geometry)
+    module subroutine get_length_side_second(self, node_coords, geometry)
         implicit none
         class(type_side_second), intent(in) :: self
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         real(real64), intent(inout) :: geometry
 
         integer(int32) :: i
@@ -110,7 +108,7 @@ contains
         call self%get_num_gauss(ng)
 
         do i = 1, ng
-            call self%jacobian_det(gauss_pts(i), node_coords, connectivity, det_j)
+            call self%jacobian_det(gauss_pts(i), node_coords, det_j)
             geometry = geometry + det_j * weights(i)
         end do
 
@@ -169,47 +167,44 @@ contains
     !>
     !> Calculates the Jacobian matrix.
     !>
-    pure module subroutine jacobian_side_second(self, r, node_coords, connectivity, jac)
+    pure module subroutine jacobian_side_second(self, r, node_coords, jac)
         implicit none
         class(type_side_second), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         real(real64), intent(inout) :: jac(:, :)
 
         real(real64) :: tangent_vec(3)
 
-        call self%compute_tangent_vector(r, node_coords, connectivity, tangent_vec)
+        call self%compute_tangent_vector(r, node_coords, tangent_vec)
         jac(1, 1) = sqrt(sum(tangent_vec**2))
     end subroutine jacobian_side_second
 
     !>
     !> Calculates the Jacobian determinant.
     !>
-    pure module subroutine jacobian_det_side_second(self, r, node_coords, connectivity, det_j)
+    pure module subroutine jacobian_det_side_second(self, r, node_coords, det_j)
         implicit none
         class(type_side_second), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         real(real64), intent(inout) :: det_j
 
         real(real64) :: jac(1, 1)
 
-        call self%jacobian(r, node_coords, connectivity, jac)
+        call self%jacobian(r, node_coords, jac)
         det_j = jac(1, 1)
     end subroutine jacobian_det_side_second
 
     !>
     !> Checks if point is inside using Newton-Raphson.
     !>
-    module subroutine is_in_side_second(self, cartesian, normalized, node_coords, connectivity, is_in)
+    module subroutine is_in_side_second(self, cartesian, normalized, node_coords, is_in)
         implicit none
         class(type_side_second), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: cartesian
         type(type_coordinate_dp), intent(inout) :: normalized
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         logical, intent(inout) :: is_in
 
         type(type_coordinate_dp) :: r_local
@@ -250,7 +245,7 @@ contains
                 exit
             end if
 
-            call self%compute_tangent_vector(r_local, node_coords, connectivity, tangent_vec)
+            call self%compute_tangent_vector(r_local, node_coords, tangent_vec)
             tangent_dot_tangent = tangent_vec(1)**2 + tangent_vec(2)**2 + tangent_vec(3)**2
 
             if (tangent_dot_tangent < epsilon(tangent_dot_tangent)) then

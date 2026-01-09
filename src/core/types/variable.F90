@@ -1,264 +1,451 @@
 !>
-!> Defines a derived type for managing a physical variable and its history
-!> over time, which is essential for time-dependent simulations.
+!> 時間依存シミュレーションにおける物理変数の状態と履歴を管理するクラス
 !>
 module core_types_variable
     use, intrinsic :: iso_fortran_env, only: real64, int32
     use :: core_allocate, only:allocate_array
+    use :: core_deallocate, only:deallocate_array
     use :: core_types_coordinate_array, only:type_coordinate_array_dp
     use :: core_types_coordinate, only:type_coordinate_dp
-    use :: core_types_physics, only:type_state
     implicit none
     private
 
     public :: type_variable
 
     !>
-    !> Encapsulates a variable's state at different time steps.
-    !> This type stores the current value, previous value, historical values,
-    !> and the time derivative. It is designed to support time integration
-    !> schemes like Backward Differentiation Formulas (BDF).
+    !> 変数の時間発展状態をカプセル化する構造体．
+    !> Newton-Raphson法などの非線形反復計算や，BDF法による時間積分をサポートする．
     !>
     type :: type_variable
-        !> The order of the time integration scheme (number of historical steps to store).
-        integer(int32) :: rank
-        !> The number of degrees of freedom for this variable.
-        integer(int32) :: length
-        !> The current, most up-to-date value of the variable (time t_{n+1}).
-        real(real64), allocatable :: new(:)
-        !> The value from the previous time step (time t_n).
-        real(real64), allocatable :: pre(:)
-        !> A history of values from older time steps (t_{n-1}, t_{n-2}, ...).
-        real(real64), allocatable :: old(:, :)
-        !> The time derivative of the variable (e.g., du/dt).
-        real(real64), allocatable :: dif(:)
-        !> The spatial derivative of the variable (e.g., grad u).
+        !> 初期化済みフラグ
+        logical, private :: is_initialized = .false.
+
+        !> 履歴として保持する過去のステップ数（BDFの次数に対応）
+        integer(int32), private :: num_history_steps
+
+        !> 変数の自由度（配列サイズ）
+        integer(int32), private :: num_dof
+
+        !> [t_{n+1}] 計算用現在値．
+        !> Newton-Raphson法などの反復計算中は，収束前の「未確定値」が格納される．
+        real(real64), allocatable :: current(:)
+
+        !> [t_n] 確定した直前のタイムステップでの値
+        real(real64), allocatable :: previous(:)
+
+        !> [t_{n-1}, t_{n-2}, ...] さらに過去の履歴値
+        !> 第2次元が古い順に並ぶ (:, 1) -> t_{n-1}, (:, 2) -> t_{n-2}
+        real(real64), allocatable :: history(:, :)
+
+        !> [du/dt] 時間微分値（currentの変化に伴い更新される）
+        real(real64), allocatable :: diff(:)
+
+        !> [grad u] 空間勾配
         type(type_coordinate_array_dp) :: grad
+
     contains
+        !> 初期化・破棄
         procedure, public, pass(self) :: initialize => initialize_type_variable
-        procedure, public, pass(self) :: shift => shift_variable
-        procedure, public, pass(self) :: set => set_variable
-        procedure, private, pass(self) :: get_current_value_variable
-        procedure, private, pass(self) :: get_current_values_variable
-        generic, public :: get_current => get_current_value_variable, get_current_values_variable
-        procedure, public, pass(self) :: get_current_gradient => get_current_gradient_variable
-        procedure, public, pass(self) :: get_history => get_history_variable
-        procedure, public, pass(self) :: compute_derivative => compute_derivative_variable
+        procedure, public, pass(self) :: destroy => destroy_type_variable
+
+        !> 状態操作
+        procedure, public, pass(self) :: advance => advance_time_step_variable
+        procedure, public, pass(self) :: restore => restore_previous_step_variable
+        procedure, public, pass(self) :: reset => reset_all_states_variable
+
+        !> 値の設定（Setter）
+        procedure, private, pass(self) :: set_current_array_variable
+        procedure, private, pass(self) :: set_current_scalar_variable
+        procedure, private, pass(self) :: set_current_scalar_all_variable
+        generic, public :: set_current => set_current_array_variable, set_current_scalar_variable, set_current_scalar_all_variable
+        procedure, private, pass(self) :: set_previous_array_variable
+        procedure, private, pass(self) :: set_previous_scalar_variable
+        procedure, private, pass(self) :: set_previous_scalar_all_variable
+        generic, public :: set_previous => set_previous_array_variable, set_previous_scalar_variable, set_previous_scalar_all_variable
+
+        !> 値の取得（Getter）
+        procedure, private, pass(self) :: get_current_array_variable
+        procedure, private, pass(self) :: get_current_scalar_variable
+        procedure, private, pass(self) :: get_current_gradient_variable
+        generic, public :: get_current => get_current_array_variable, get_current_scalar_variable, get_current_gradient_variable
+
+        procedure, private, pass(self) :: get_previous_array
+        procedure, private, pass(self) :: get_previous_scalar
+        generic, public :: get_previous => get_previous_array, get_previous_scalar
+
+        procedure, public, pass(self) :: get_history => get_history_values_variable
+
+        !> 計算処理
+        procedure, public, pass(self) :: compute_time_derivative => compute_time_derivative_variable
     end type type_variable
 
 contains
 
     !>
-    !> Allocates and initializes the arrays for the variable's state and history.
+    !> 変数管理配列のメモリ確保と初期化を行う．
     !>
-    subroutine initialize_type_variable(self, length, rank)
-        !> The variable object to initialize.
+    subroutine initialize_type_variable(self, num_dof, num_history_steps)
+        implicit none
         class(type_variable), intent(inout) :: self
-        !> The number of degrees of freedom for the variable.
-        integer(int32), intent(in) :: length
-        !> The number of historical time steps to store.
-        integer(int32), intent(in) :: rank
+        integer(int32), intent(in) :: num_dof
+        integer(int32), intent(in) :: num_history_steps
 
-        self%rank = rank
-        self%length = length
+        self%num_dof = num_dof
+        self%num_history_steps = num_history_steps
 
-        call allocate_array(self%new, length)
-        call allocate_array(self%pre, length)
-        call allocate_array(self%old, length, self%rank)
-        call allocate_array(self%dif, length)
-        call self%grad%initialize(length, 0.0d0)
+        call allocate_array(self%current, num_dof)
+        call allocate_array(self%previous, num_dof)
+        call allocate_array(self%history, num_dof, self%num_history_steps)
+        call allocate_array(self%diff, num_dof)
 
-        self%new(:) = 0.0d0
-        self%pre(:) = 0.0d0
-        self%old(:, :) = 0.0d0
-        self%dif(:) = 0.0d0
+        call self%grad%initialize(num_dof, 0.0d0)
 
+        ! ゼロクリア
+        self%current(:) = 0.0d0
+        self%previous(:) = 0.0d0
+        self%history(:, :) = 0.0d0
+        self%diff(:) = 0.0d0
+
+        self%is_initialized = .true.
     end subroutine initialize_type_variable
 
     !>
-    !> Updates the variable's history by shifting values between time steps.
-    !> In a forward step, 'new' becomes 'pre', and 'pre' moves into the 'old' history.
-    !> A reverse step can be used to undo this operation.
+    !> 変数に関連付けられたメモリを解放する．
     !>
-    subroutine shift_variable(self, reverse)
-        !> The variable object whose history is to be shifted.
-        class(type_variable), intent(inout) :: self
-        !> If present and true, performs a reverse shift to restore the previous state.
-        logical, intent(in), optional :: reverse
-        logical :: do_reverse
-
-        do_reverse = .false.
-        if (present(reverse)) then
-            do_reverse = reverse
-        end if
-
-        if (do_reverse) then
-            ! --- Reverse Shift: Restore state from history ---
-            if (self%rank > 0) then
-                self%pre(:) = self%old(:, 1)
-                ! Shift history to the left (old(:,1) <-- old(:,2), etc.)
-                if (self%rank > 1) then
-                    self%old(:, 1:self%rank - 1) = self%old(:, 2:self%rank)
-                end if
-                ! Clear the now-vacant last history entry
-                self%old(:, self%rank) = 0.0d0
-            end if
-
-        else
-            ! --- Forward Shift: Advance time step ---
-            self%pre(:) = self%new(:)
-            if (self%rank > 0) then
-                ! Shift history to the right (old(:,2) <-- old(:,1), etc.)
-                if (self%rank > 1) then
-                    self%old(:, 2:self%rank) = self%old(:, 1:self%rank - 1)
-                end if
-                self%old(:, 1) = self%pre(:)
-            end if
-        end if
-
-    end subroutine shift_variable
-
-    !>
-    !> Sets all states (new, pre, and all historical values) to a specified value.
-    !> This is typically used to set initial conditions for a simulation. The time
-    !> derivative term is reset to zero.
-    !>
-    subroutine set_variable(self, value)
+    subroutine destroy_type_variable(self)
         implicit none
-        !> The variable object to set.
         class(type_variable), intent(inout) :: self
-        !> The array of values to assign to all states.
-        real(real64), intent(in) :: value(:)
+
+        if (self%is_initialized) then
+            call deallocate_array(self%current)
+            call deallocate_array(self%previous)
+            call deallocate_array(self%history)
+            call deallocate_array(self%diff)
+            call self%grad%destroy()
+            self%is_initialized = .false.
+        end if
+    end subroutine destroy_type_variable
+
+    !>
+    !> 時間ステップを進める（Update）．
+    !> 計算が収束し，現在の反復値(current)を次のステップの確定値として保存する場合に呼ぶ．
+    !>
+    subroutine advance_time_step_variable(self)
+        implicit none
+        class(type_variable), intent(inout) :: self
+
+        if (.not. self%is_initialized) return
+
+        ! 履歴のシフト (古い方へ順送り)
+        if (self%num_history_steps > 1) then
+            self%history(:, 2:self%num_history_steps) = self%history(:, 1:self%num_history_steps - 1)
+        end if
+
+        ! 直前の値を履歴の先頭(t_{n-1})へ
+        if (self%num_history_steps > 0) then
+            self%history(:, 1) = self%previous(:)
+        end if
+
+        ! 現在の反復値を直前の値(t_n)として確定
+        self%previous(:) = self%current(:)
+
+    end subroutine advance_time_step_variable
+
+    !>
+    !> 時間ステップを巻き戻す．
+    !>
+    subroutine restore_previous_step_variable(self)
+        implicit none
+        class(type_variable), intent(inout) :: self
+
+        if (.not. self%is_initialized) return
+
+        if (self%num_history_steps > 0) then
+            ! 履歴の先頭から直前値を復元
+            self%previous(:) = self%history(:, 1)
+
+            ! 履歴を逆シフト
+            if (self%num_history_steps > 1) then
+                self%history(:, 1:self%num_history_steps - 1) = self%history(:, 2:self%num_history_steps)
+            end if
+
+            self%history(:, self%num_history_steps) = 0.0d0
+        end if
+
+    end subroutine restore_previous_step_variable
+
+    !>
+    !> 全ての時刻の状態を指定した値でリセットする（初期条件設定用）．
+    !>
+    subroutine reset_all_states_variable(self, initial_value)
+        implicit none
+        class(type_variable), intent(inout) :: self
+        real(real64), intent(in) :: initial_value(:)
         integer(int32) :: i
 
-        ! Set current and previous states
-        self%new(:) = value(:)
-        self%pre(:) = value(:)
+        if (.not. self%is_initialized) then
+            error stop "Error: Variable not initialized in reset_all_states_variable."
+        end if
 
-        ! Set all historical states
-        if (self%rank > 0) then
-            do i = 1, self%rank
-                self%old(:, i) = value(:)
+        self%current(:) = initial_value(:)
+        self%previous(:) = initial_value(:)
+
+        if (self%num_history_steps > 0) then
+            do i = 1, self%num_history_steps
+                self%history(:, i) = initial_value(:)
             end do
         end if
 
-        ! Initialize the time derivative to zero
-        self%dif(:) = 0.0d0
+        self%diff(:) = 0.0d0
 
-    end subroutine set_variable
+    end subroutine reset_all_states_variable
 
-    subroutine get_current_values_variable(self, current_values)
+    !>
+    !> 現在値(current)を配列全体で設定する．
+    !>
+    subroutine set_current_array_variable(self, values)
         implicit none
-        !> The variable object to query.
+        class(type_variable), intent(inout) :: self
+        real(real64), intent(in) :: values(:)
+
+        if (.not. self%is_initialized) return
+
+        if (size(values) /= self%num_dof) then
+            error stop "Error: Dimension mismatch in set_current (array)."
+        end if
+
+        self%current(:) = values(:)
+    end subroutine set_current_array_variable
+
+    !>
+    !> 特定の節点における現在値(current)を設定する．
+    !>
+    subroutine set_current_scalar_variable(self, node_id, value)
+        implicit none
+        class(type_variable), intent(inout) :: self
+        integer(int32), intent(in) :: node_id
+        real(real64), intent(in) :: value
+
+        if (.not. self%is_initialized) return
+
+        if (node_id < 1 .or. node_id > self%num_dof) then
+            error stop "Error: Index out of bounds in set_current (scalar)."
+        end if
+
+        self%current(node_id) = value
+    end subroutine set_current_scalar_variable
+
+    !> 全節点における現在値(current)を設定する．
+    !>
+    subroutine set_current_scalar_all_variable(self, value)
+        implicit none
+        class(type_variable), intent(inout) :: self
+        real(real64), intent(in) :: value
+
+        if (.not. self%is_initialized) return
+
+        self%current(:) = value
+    end subroutine set_current_scalar_all_variable
+
+    !>
+    !> 確定値(previous)を配列全体で設定する．
+    !>
+    subroutine set_previous_array_variable(self, values)
+        implicit none
+        class(type_variable), intent(inout) :: self
+        real(real64), intent(in) :: values(:)
+
+        if (.not. self%is_initialized) return
+
+        if (size(values) /= self%num_dof) then
+            error stop "Error: Dimension mismatch in set_current (array)."
+        end if
+
+        self%previous(:) = values(:)
+    end subroutine set_previous_array_variable
+
+    !>
+    !> 特定の節点における確定値(previous)を設定する．
+    !>
+    subroutine set_previous_scalar_variable(self, node_id, value)
+        implicit none
+        class(type_variable), intent(inout) :: self
+        integer(int32), intent(in) :: node_id
+        real(real64), intent(in) :: value
+
+        if (.not. self%is_initialized) return
+
+        if (node_id < 1 .or. node_id > self%num_dof) then
+            error stop "Error: Index out of bounds in set_current (scalar)."
+        end if
+
+        self%previous(node_id) = value
+    end subroutine set_previous_scalar_variable
+
+    !>
+    !> 全節点における確定値(previous)を設定する．
+    !>
+    subroutine set_previous_scalar_all_variable(self, value)
+        implicit none
+        class(type_variable), intent(inout) :: self
+        real(real64), intent(in) :: value
+
+        if (.not. self%is_initialized) return
+
+        self%previous(:) = value
+    end subroutine set_previous_scalar_all_variable
+
+    !>
+    !> 計算中の現在値(配列全体)へのポインタを取得する．
+    !> Newton-Raphsonの更新などで使用．
+    !>
+    subroutine get_current_array_variable(self, ptr_values)
+        implicit none
         class(type_variable), intent(in), target :: self
-        !> The array to hold the current value of the variable.
-        real(real64), intent(inout), pointer, contiguous, dimension(:) :: current_values
+        !> ポインタ引数の宣言
+        real(real64), intent(inout), pointer, contiguous, dimension(:) :: ptr_values
 
-        current_values => self%new
+        if (self%is_initialized) then
+            ptr_values => self%current
+        else
+            ptr_values => null()
+        end if
+    end subroutine get_current_array_variable
 
-    end subroutine get_current_values_variable
-
-    pure subroutine get_current_value_variable(self, node_id, current_value)
+    !>
+    !> 特定の節点における現在値を取得する．
+    !>
+    pure subroutine get_current_scalar_variable(self, node_id, scalar_value)
         implicit none
-        !> The variable object to query.
         class(type_variable), intent(in) :: self
-        !> The node index to retrieve the current value for.
         integer(int32), intent(in) :: node_id
-        !> The array to hold the current value of the variable.
-        real(real64), intent(inout) :: current_value
+        real(real64), intent(inout) :: scalar_value
 
-        current_value = self%new(node_id)
-    end subroutine get_current_value_variable
+        if (self%is_initialized) then
+            scalar_value = self%current(node_id)
+        else
+            scalar_value = 0.0d0
+        end if
+    end subroutine get_current_scalar_variable
 
-    pure subroutine get_current_gradient_variable(self, node_id, current_gradient)
+    !>
+    !> 特定の節点における現在の勾配を取得する．
+    !>
+    pure subroutine get_current_gradient_variable(self, node_id, gradient_value)
         implicit none
-        !> The variable object to query.
         class(type_variable), intent(in) :: self
-        !> The node index to retrieve the current gradient for.
         integer(int32), intent(in) :: node_id
-        !> The array to hold the current gradient of the variable.
-        type(type_coordinate_dp), intent(inout) :: current_gradient
+        type(type_coordinate_dp), intent(inout) :: gradient_value
 
-        current_gradient%x = self%grad%x(node_id)
-        current_gradient%y = self%grad%y(node_id)
-        current_gradient%z = self%grad%z(node_id)
-
+        if (self%is_initialized) then
+            gradient_value%x = self%grad%x(node_id)
+            gradient_value%y = self%grad%y(node_id)
+            gradient_value%z = self%grad%z(node_id)
+        else
+            gradient_value%x = 0.0d0
+            gradient_value%y = 0.0d0
+            gradient_value%z = 0.0d0
+        end if
     end subroutine get_current_gradient_variable
 
-    pure subroutine get_history_variable(self, node_id, history_values)
+    !>
+    !> 特定の節点における履歴値を取得する．
+    !>
+    pure subroutine get_history_values_variable(self, node_id, output_history)
         implicit none
-        !> The variable object to query.
         class(type_variable), intent(in) :: self
-        !> The node index to retrieve the history for.
         integer(int32), intent(in) :: node_id
-        !> The array to hold the historical values of the variable.
-        real(real64), intent(inout) :: history_values(:)
+        real(real64), intent(inout) :: output_history(:)
 
-        integer(int32) :: i, num_history
+        integer(int32) :: i, num_out, max_avail
 
-        num_history = min(size(history_values), self%rank + 2)
-        if (num_history < 2) then
-            error stop "Error in get_history_variable: history_values size is out of bounds."
-        end if
+        output_history(:) = 0.0d0
+        if (.not. self%is_initialized) return
 
-        history_values(1) = self%new(node_id)
-        history_values(2) = self%pre(node_id)
+        max_avail = 2 + self%num_history_steps
+        num_out = min(size(output_history), max_avail)
 
-        if (num_history > 2) then
-            do i = 1, num_history - 2
-                history_values(i + 2) = self%old(node_id, i)
+        if (num_out >= 1) output_history(1) = self%current(node_id)
+        if (num_out >= 2) output_history(2) = self%previous(node_id)
+
+        if (num_out > 2) then
+            do i = 1, num_out - 2
+                output_history(i + 2) = self%history(node_id, i)
             end do
         end if
 
-    end subroutine get_history_variable
+    end subroutine get_history_values_variable
 
     !>
-    !> Calculates the time derivative using provided BDF coefficients.
-    !> Formula: du/dt = sum( coeffs(j) * u_{n+1-j} )
-    !> Note: 'coeffs' must include the 1/dt scaling factor.
+    !> 直前の確定値(配列全体)へのポインタを取得する．
+    !> ファイル出力や可視化などで使用．
     !>
-    subroutine compute_derivative_variable(self, coeffs)
+    subroutine get_previous_array(self, ptr_values)
         implicit none
-        !> The variable object to update.
+        class(type_variable), intent(in), target :: self
+        !> ポインタ引数の宣言
+        real(real64), intent(inout), pointer, contiguous, dimension(:) :: ptr_values
+
+        if (self%is_initialized) then
+            ptr_values => self%previous
+        else
+            ptr_values => null()
+        end if
+    end subroutine get_previous_array
+
+    !>
+    !> 特定の節点における直前の確定値を取得する．
+    !>
+    pure subroutine get_previous_scalar(self, node_id, scalar_value)
+        implicit none
+        class(type_variable), intent(in) :: self
+        integer(int32), intent(in) :: node_id
+        real(real64), intent(inout) :: scalar_value
+
+        if (self%is_initialized) then
+            scalar_value = self%previous(node_id)
+        else
+            scalar_value = 0.0d0
+        end if
+    end subroutine get_previous_scalar
+
+    !>
+    !> BDF係数を用いて時間微分(du/dt)を計算する．
+    !> 非線形反復中にcurrentが更新されるたびに再計算が必要となる．
+    !>
+    subroutine compute_time_derivative_variable(self, bdf_coeffs)
+        implicit none
         class(type_variable), intent(inout) :: self
-        !> The BDF coefficients array (already scaled by 1/dt).
-        !> Assumed mapping:
-        !>  coeffs(1) -> t_{n+1} (self%new)
-        !>  coeffs(2) -> t_{n}   (self%pre)
-        !>  coeffs(3) -> t_{n-1} (self%old(:,1))
-        !>  ...
-        real(real64), intent(in) :: coeffs(:)
+        real(real64), intent(in) :: bdf_coeffs(:)
 
         integer(int32) :: i, hist_idx
-        integer(int32) :: num_coeffs
+        integer(int32) :: n_coeffs
 
-        num_coeffs = size(coeffs)
+        if (.not. self%is_initialized) return
 
-        ! 1. Term for t_{n+1} (Current/New)
-        if (num_coeffs >= 1) then
-            self%dif(:) = coeffs(1) * self%new(:)
-        else
-            self%dif(:) = 0.0d0
+        n_coeffs = size(bdf_coeffs)
+        self%diff(:) = 0.0d0
+
+        ! 1. t_{n+1} (Current/Iterating) の項
+        if (n_coeffs >= 1) then
+            self%diff(:) = self%diff(:) + bdf_coeffs(1) * self%current(:)
         end if
 
-        ! 2. Term for t_{n} (Previous)
-        if (num_coeffs >= 2) then
-            self%dif(:) = self%dif(:) + coeffs(2) * self%pre(:)
+        ! 2. t_{n} (Previous/Fixed) の項
+        if (n_coeffs >= 2) then
+            self%diff(:) = self%diff(:) + bdf_coeffs(2) * self%previous(:)
         end if
 
-        ! 3. Terms for t_{n-1}, t_{n-2}... (History)
-        ! coeffs(3) corresponds to old(:, 1)
-        if (num_coeffs >= 3) then
-            do i = 3, num_coeffs
+        ! 3. t_{n-1}... (History/Fixed) の項
+        if (n_coeffs >= 3) then
+            do i = 3, n_coeffs
                 hist_idx = i - 2
-                ! Boundary check to avoid accessing unallocated history
-                ! Also ensures we don't exceed the configured rank
-                if (hist_idx > size(self%old, 2)) exit
+                if (hist_idx > self%num_history_steps) exit
 
-                self%dif(:) = self%dif(:) + coeffs(i) * self%old(:, hist_idx)
+                self%diff(:) = self%diff(:) + bdf_coeffs(i) * self%history(:, hist_idx)
             end do
         end if
 
-    end subroutine compute_derivative_variable
+    end subroutine compute_time_derivative_variable
 
 end module core_types_variable

@@ -36,6 +36,7 @@ module field_residual_vector
 
         ! 内部ベクトルへのアクセサ
         procedure, public, pass(self) :: get_vector => get_underlying_vector
+        procedure, public, pass(self) :: get_data => get_data_vector
 
         ! --- setter ---
         procedure, pass(self), private :: set_scalar_residual_vector
@@ -107,8 +108,17 @@ contains
         implicit none
         class(type_residual_vector), intent(in), target :: self
         class(type_vector_dp), pointer :: vec
+
         vec => self%data
     end function get_underlying_vector
+
+    function get_data_vector(self) result(data_ptr)
+        implicit none
+        class(type_residual_vector), intent(in), target :: self
+        real(real64), pointer, contiguous, dimension(:) :: data_ptr
+
+        data_ptr => self%data%get_data()
+    end function get_data_vector
 
     ! -------------------------------------------------------------------
     !  Setters (Mapping row_dof to row_block)

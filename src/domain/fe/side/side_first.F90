@@ -48,11 +48,10 @@ contains
     !>
     !> Calculates the straight-line length of the element.
     !>
-    module subroutine get_length_side_first(self, node_coords, connectivity, geometry)
+    module subroutine get_length_side_first(self, node_coords, geometry)
         implicit none
         class(type_side_first), intent(in) :: self
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         real(real64), intent(inout) :: geometry
 
         integer(int32) :: node1_id
@@ -113,12 +112,11 @@ contains
     !>
     !> Computes the tangent vector at a specified local coordinate.
     !>
-    pure module subroutine compute_tangent_vector_side_first(self, r, node_coords, connectivity, tangent_vec)
+    pure module subroutine compute_tangent_vector_side_first(self, r, node_coords, tangent_vec)
         implicit none
         class(type_side_first), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         real(real64), intent(inout) :: tangent_vec(:)
 
         integer(int32) :: i
@@ -140,47 +138,44 @@ contains
     !>
     !> Calculates the Jacobian matrix.
     !>
-    pure module subroutine jacobian_side_first(self, r, node_coords, connectivity, jac)
+    pure module subroutine jacobian_side_first(self, r, node_coords, jac)
         implicit none
         class(type_side_first), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         real(real64), intent(inout) :: jac(:, :)
 
         real(real64) :: tangent_vec(3)
 
-        call self%compute_tangent_vector(r, node_coords, connectivity, tangent_vec)
+        call self%compute_tangent_vector(r, node_coords, tangent_vec)
         jac(1, 1) = sqrt(sum(tangent_vec**2))
     end subroutine jacobian_side_first
 
     !>
     !> Calculates the Jacobian determinant.
     !>
-    pure module subroutine jacobian_det_side_first(self, r, node_coords, connectivity, det_j)
+    pure module subroutine jacobian_det_side_first(self, r, node_coords, det_j)
         implicit none
         class(type_side_first), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         real(real64), intent(inout) :: det_j
 
         real(real64) :: jac(1, 1)
 
-        call self%jacobian(r, node_coords, connectivity, jac)
+        call self%jacobian(r, node_coords, jac)
         det_j = jac(1, 1)
     end subroutine jacobian_det_side_first
 
     !>
     !> Checks if a point is on the element.
     !>
-    module subroutine is_in_side_first(self, cartesian, normalized, node_coords, connectivity, is_in)
+    module subroutine is_in_side_first(self, cartesian, normalized, node_coords, is_in)
         implicit none
         class(type_side_first), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: cartesian
         type(type_coordinate_dp), intent(inout) :: normalized
         real(real64), intent(in) :: node_coords(:, :)
-        integer(int32), intent(in) :: connectivity(:)
         logical, intent(inout) :: is_in
 
         real(real64) :: v(3)
@@ -191,18 +186,15 @@ contains
         integer(int32) :: node2_id
         real(real64), parameter :: tol = 1.0e-9
 
-        node1_id = connectivity(1)
-        node2_id = connectivity(2)
-
         ! Vector from node 1 to node 2
-        v(1) = node_coords(1, node2_id) - node_coords(1, node1_id)
-        v(2) = node_coords(2, node2_id) - node_coords(2, node1_id)
-        v(3) = node_coords(3, node2_id) - node_coords(3, node1_id)
+        v(1) = node_coords(1, 2) - node_coords(1, 1)
+        v(2) = node_coords(2, 2) - node_coords(2, 1)
+        v(3) = node_coords(3, 2) - node_coords(3, 1)
 
         ! Vector from node 1 to the point to check
-        w(1) = cartesian%x - node_coords(1, node1_id)
-        w(2) = cartesian%y - node_coords(2, node1_id)
-        w(3) = cartesian%z - node_coords(3, node1_id)
+        w(1) = cartesian%x - node_coords(1, 1)
+        w(2) = cartesian%y - node_coords(2, 1)
+        w(3) = cartesian%z - node_coords(3, 1)
 
         v_dot_v = v(1)**2 + v(2)**2 + v(3)**2
 
