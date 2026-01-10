@@ -1,6 +1,7 @@
 module control_time
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: omp_lib
+    use :: stdlib_optval, only:optval
     use :: stdlib_strings, only:strip
     use :: module_core
     use :: module_input, only:type_input
@@ -44,6 +45,7 @@ module control_time
         procedure, public, pass(self) :: get_dt
         procedure, public, pass(self) :: get_bdf_order
         procedure, public, pass(self) :: get_bdf_coeffs
+        procedure, public, pass(self) :: advance => advance_time
         procedure, public, pass(self) :: shift => shift_time
         procedure, public, pass(self) :: display => display_status
 
@@ -104,7 +106,7 @@ contains
             end if
 
             ! 初期時間をセット
-            self%current_time = self%start_time + self%dt
+            self%current_time = self%start_time
 
         end associate
 
@@ -141,10 +143,20 @@ contains
 
     end subroutine shift_time
 
+    subroutine advance_time(self, new_dt)
+        implicit none
+        class(type_time), intent(inout) :: self
+        real(real64), intent(in), optional :: new_dt
+
+        self%dt = optval(new_dt, self%dt)
+
+        self%current_time = self%current_time + self%dt
+    end subroutine advance_time
+
     subroutine update_bdf_coefficients(self)
         implicit none
         class(type_time), intent(inout) :: self
-        ! 外部からdtなどを変更した後に手動で呼び出す場合
+
         call self%compute_bdf_coefficients()
     end subroutine update_bdf_coefficients
 

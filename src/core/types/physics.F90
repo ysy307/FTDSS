@@ -30,7 +30,9 @@ module core_types_physics
         real(real64), allocatable :: value(:)
         logical :: is_set = .false.
     contains
-        procedure, pass(self), public :: set => set_field_array_dp
+        procedure, pass(self), private :: set_field_array_dp
+        procedure, pass(self), private :: set_index_field_array_dp
+        generic, public :: set => set_field_array_dp, set_index_field_array_dp
         procedure, pass(self), public :: get => get_field_array_dp
         procedure, pass(self), private :: reset => reset_field_array_dp
     end type type_field_array_dp
@@ -92,9 +94,11 @@ module core_types_physics
         type(type_field_coord) :: vapor_flux ! Vapor flux vector [m/s]
 
     contains
-        ! Bulk Setter (Optional arguments)
+        !> Bulk Setter (Optional arguments)
         procedure, public, pass(self) :: set => set_all_state
-        ! Reset All (Pure Elemental)
+        !> Bulk Getter
+        procedure, public, pass(self) :: get => get_all_state
+        !> Reset All (Pure Elemental)
         procedure, public, pass(self) :: reset => reset_all_state
         !> Copy
         procedure, public, pass(self) :: copy => copy_state
@@ -171,6 +175,16 @@ contains
         self%value = value
         self%is_set = .true.
     end subroutine set_field_array_dp
+
+    pure subroutine set_index_field_array_dp(self, index, value)
+        implicit none
+        class(type_field_array_dp), intent(inout) :: self
+        integer(int32), intent(in) :: index
+        real(real64), intent(in) :: value
+
+        if (.not. self%is_set) return
+        self%value(index) = value
+    end subroutine set_index_field_array_dp
 
     pure subroutine get_field_array_dp(self, value, is_set)
         implicit none
@@ -359,6 +373,113 @@ contains
         end if
 
     end subroutine set_all_state
+
+    ! Bulk Getter
+    subroutine get_all_state(self, temperature, pressure, water_content, ice_content, &
+                             vapor_content, air_content, porosity, &
+                             temperature_history, pressure_history, porosity_history, &
+                             latent_heat_fusion, latent_heat_vaporization, &
+                             dQw_dT, dQv_dT, dQa_dT, dQi_dT, dQw_dP, dQv_dP, dQa_dP, dQi_dP, &
+                             ! dot_T, dot_P, &
+                             grad_T, grad_P, &
+                             relative_humidity, mass_fraction_clay, &
+                             water_flux, vapor_flux)
+        implicit none
+        class(type_state), intent(in) :: self
+        real(real64), intent(inout), optional :: temperature, pressure
+        real(real64), intent(inout), optional :: water_content, ice_content
+        real(real64), intent(inout), optional :: vapor_content, air_content
+        real(real64), intent(inout), optional :: porosity
+        real(real64), allocatable, intent(inout), optional :: temperature_history(:)
+        real(real64), allocatable, intent(inout), optional :: pressure_history(:)
+        real(real64), allocatable, intent(inout), optional :: porosity_history(:)
+        real(real64), intent(inout), optional :: latent_heat_fusion, latent_heat_vaporization
+        real(real64), intent(inout), optional :: dQw_dT, dQv_dT, dQa_dT, dQi_dT
+        real(real64), intent(inout), optional :: dQw_dP, dQv_dP, dQa_dP, dQi_dP
+        type(type_coordinate_dp), intent(inout), optional :: grad_T, grad_P
+        real(real64), intent(inout), optional :: relative_humidity, mass_fraction_clay
+        type(type_coordinate_dp), intent(inout), optional :: water_flux, vapor_flux
+
+        if (present(temperature)) then
+            call self%temperature%get(temperature)
+        end if
+        if (present(pressure)) then
+            call self%pressure%get(pressure)
+        end if
+        if (present(water_content)) then
+            call self%water_content%get(water_content)
+        end if
+        if (present(ice_content)) then
+            call self%ice_content%get(ice_content)
+        end if
+        if (present(vapor_content)) then
+            call self%vapor_content%get(vapor_content)
+        end if
+
+        if (present(air_content)) then
+            call self%air_content%get(air_content)
+        end if
+        if (present(porosity)) then
+            call self%porosity%get(porosity)
+        end if
+        if (present(temperature_history)) then
+            call self%temperature_history%get(temperature_history)
+        end if
+        if (present(pressure_history)) then
+            call self%pressure_history%get(pressure_history)
+        end if
+        if (present(porosity_history)) then
+            call self%porosity_history%get(porosity_history)
+        end if
+        if (present(latent_heat_fusion)) then
+            call self%latent_heat_fusion%get(latent_heat_fusion)
+        end if
+        if (present(latent_heat_vaporization)) then
+            call self%latent_heat_vaporization%get(latent_heat_vaporization)
+        end if
+        if (present(dQw_dT)) then
+            call self%dQw_dT%get(dQw_dT)
+        end if
+        if (present(dQv_dT)) then
+            call self%dQv_dT%get(dQv_dT)
+        end if
+        if (present(dQa_dT)) then
+            call self%dQa_dT%get(dQa_dT)
+        end if
+        if (present(dQi_dT)) then
+            call self%dQi_dT%get(dQi_dT)
+        end if
+        if (present(dQw_dP)) then
+            call self%dQw_dP%get(dQw_dP)
+        end if
+        if (present(dQv_dP)) then
+            call self%dQv_dP%get(dQv_dP)
+        end if
+        if (present(dQa_dP)) then
+            call self%dQa_dP%get(dQa_dP)
+        end if
+        if (present(dQi_dP)) then
+            call self%dQi_dP%get(dQi_dP)
+        end if
+        if (present(grad_T)) then
+            call self%grad_T%get(grad_T)
+        end if
+        if (present(grad_P)) then
+            call self%grad_P%get(grad_P)
+        end if
+        if (present(relative_humidity)) then
+            call self%relative_humidity%get(relative_humidity)
+        end if
+        if (present(mass_fraction_clay)) then
+            call self%mass_fraction_clay%get(mass_fraction_clay)
+        end if
+        if (present(water_flux)) then
+            call self%water_flux%get(water_flux)
+        end if
+        if (present(vapor_flux)) then
+            call self%vapor_flux%get(vapor_flux)
+        end if
+    end subroutine get_all_state
 
     ! Reset All (Pure Elemental)
     pure elemental subroutine reset_all_state(self)

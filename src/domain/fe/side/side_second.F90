@@ -72,18 +72,28 @@ contains
         real(real64), intent(inout) :: tangent_vec(:)
 
         integer(int32) :: i
-        integer(int32) :: node_id
         integer(int32) :: nn
+        integer(int32) :: n_dim ! <--- 追加: 座標の次元数
         real(real64) :: dpsi_val
 
         tangent_vec = 0.0d0
         call self%get_num_nodes(nn)
 
+        ! node_coords の第1次元（空間次元）を取得
+        n_dim = size(node_coords, 1)
+
         do i = 1, nn
             call self%dpsi(i, 1, r, dpsi_val)
-            tangent_vec(1) = tangent_vec(1) + dpsi_val * node_coords(1, i)
-            tangent_vec(2) = tangent_vec(2) + dpsi_val * node_coords(2, i)
-            tangent_vec(3) = tangent_vec(3) + dpsi_val * node_coords(3, i)
+
+            ! tangent_vec のサイズだけでなく、node_coords の次元数もチェックする
+            if (size(tangent_vec) >= 1 .and. n_dim >= 1) &
+                tangent_vec(1) = tangent_vec(1) + dpsi_val * node_coords(1, i)
+
+            if (size(tangent_vec) >= 2 .and. n_dim >= 2) &
+                tangent_vec(2) = tangent_vec(2) + dpsi_val * node_coords(2, i)
+
+            if (size(tangent_vec) >= 3 .and. n_dim >= 3) &
+                tangent_vec(3) = tangent_vec(3) + dpsi_val * node_coords(3, i)
         end do
     end subroutine compute_tangent_vector_side_second
 

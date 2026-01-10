@@ -81,7 +81,7 @@ contains
                     call domain%get_element_coordinate(iElem, ele_coords)
 
                     ! 包含判定
-                    call fe%is_inside(cartesian, normalized, ele_coords, conn, inside)
+                    call fe%is_inside(cartesian, normalized, ele_coords, inside)
 
                     if (inside) then
                         self%element_ids(iObs) = iElem

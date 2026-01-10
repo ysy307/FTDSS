@@ -19,20 +19,21 @@ module main_thermal
         procedure, pass(self), public :: initialize => initialize_type_thermal
         procedure, pass(self), public :: destroy => destroy_type_thermal
 
-        procedure, pass(self), public :: compute_C_T => compute_C_T
-        procedure, pass(self), public :: compute_mass_term => compute_mass_term_thermal
-        procedure, pass(self), public :: compute_diffusion_term => compute_diffusion_term_thermal
-        procedure, pass(self), public :: compute_advective_term => compute_advective_term_thermal
-        procedure, pass(self), public :: compute_latent_term => compute_latent_term_thermal
+        ! procedure, pass(self), public :: compute_C_T => compute_C_T
+        procedure, pass(self), public :: assemble_local => assemble_local_thermal
+        procedure, pass(self), private :: compute_mass_term => compute_mass_term_thermal
+        procedure, pass(self), private :: compute_diffusion_term => compute_diffusion_term_thermal
+        procedure, pass(self), private :: compute_advective_term => compute_advective_term_thermal
+        procedure, pass(self), private :: compute_latent_term => compute_latent_term_thermal
+        procedure, pass(self), private :: compute_transient_term => compute_transient_term_thermal
 
-        procedure, pass(self), public :: compute_D_T => compute_D_T
-        procedure, pass(self), public :: compute_V_T => compute_V_T
-        procedure, pass(self), public :: compute_R_T => compute_R_T
+        ! procedure, pass(self), public :: compute_D_T => compute_D_T
+        ! procedure, pass(self), public :: compute_V_T => compute_V_T
+        ! procedure, pass(self), public :: compute_R_T => compute_R_T
 
         procedure, pass(self), public :: calc_density_water => calc_density_water_thermal
         procedure, pass(self), public :: calc_density_ice => calc_density_ice_thermal
         procedure, pass(self), public :: calc_density_vapor_saturation => calc_density_vapor_saturation_thermal
-        procedure, pass(self), public :: deriv_inner_heat_capacity => deriv_inner_heat_capacity_thermal
         procedure, pass(self), public :: update_water_phases => update_water_phases_thermal
     end type type_thermal
 
@@ -51,16 +52,15 @@ module main_thermal
 
         end subroutine destroy_type_thermal
 
-        module pure elemental subroutine compute_C_T(self, target_material_id, controls, state, C_TT, C_TH)
+        module subroutine assemble_local_thermal(self, controls, workspace, J_TT, J_TH, R_T)
             implicit none
             class(type_thermal), intent(in) :: self
-            integer(int32), intent(in) :: target_material_id
             type(type_controls), intent(in) :: controls
-            type(type_state), intent(inout) :: state
-            real(real64), intent(inout), optional :: C_TT
-            real(real64), intent(inout), optional :: C_TH
-
-        end subroutine compute_C_T
+            type(type_assemble_workspace), intent(inout) :: workspace
+            type(type_matrix_dense), intent(inout), optional :: J_TT
+            type(type_matrix_dense), intent(inout), optional :: J_TH
+            type(type_vector_dp), intent(inout), optional :: R_T
+        end subroutine assemble_local_thermal
 
         module subroutine compute_mass_term_thermal(self, target_material_id, state, C_TT)
             implicit none
@@ -69,17 +69,6 @@ module main_thermal
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: C_TT
         end subroutine compute_mass_term_thermal
-
-        module subroutine compute_D_T(self, target_material_id, controls, state, D_TT, D_TH)
-            implicit none
-            class(type_thermal), intent(in) :: self
-            integer(int32), intent(in) :: target_material_id
-            type(type_controls), intent(in) :: controls
-            type(type_state), intent(inout) :: state
-            real(real64), intent(inout), optional :: D_TT(:, :)
-            real(real64), intent(inout), optional :: D_TH(:, :)
-
-        end subroutine compute_D_T
 
         module subroutine compute_diffusion_term_thermal(self, target_material_id, state, D_TT)
             implicit none
@@ -108,27 +97,14 @@ module main_thermal
 
         end subroutine compute_latent_term_thermal
 
-        module subroutine compute_V_T(self, target_material_id, controls, state, V_TT, V_TH)
+        module subroutine compute_transient_term_thermal(self, material_id, state, bdf_coeffs, dU_dt)
             implicit none
             class(type_thermal), intent(in) :: self
-            integer(int32), intent(in) :: target_material_id
-            type(type_controls), intent(in) :: controls
-            type(type_state), intent(inout) :: state
-            real(real64), intent(inout), optional :: V_TT(:)
-            real(real64), intent(inout), optional :: V_TH(:)
-
-        end subroutine compute_V_T
-
-        module subroutine compute_R_T(self, target_material_id, controls, state, R_T_C, R_T_D)
-            implicit none
-            class(type_thermal), intent(in) :: self
-            integer(int32), intent(in) :: target_material_id
-            type(type_controls), intent(in) :: controls
-            type(type_state), intent(inout) :: state
-            real(real64), intent(inout) :: R_T_C
-            real(real64), intent(inout) :: R_T_D(:)
-
-        end subroutine compute_R_T
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(in) :: bdf_coeffs(:)
+            real(real64), intent(inout) :: dU_dt
+        end subroutine compute_transient_term_thermal
 
         module pure elemental subroutine calc_density_water_thermal(self, state, rho_water)
             implicit none
@@ -161,16 +137,6 @@ module main_thermal
             type(type_state), intent(inout) :: state
 
         end subroutine update_water_phases_thermal
-
-        module subroutine deriv_inner_heat_capacity_thermal(self, material_id, state, controls, dU_dt)
-            implicit none
-            class(type_thermal), intent(in) :: self
-            integer(int32), intent(in) :: material_id
-            type(type_state), intent(in) :: state
-            type(type_controls), intent(in) :: controls
-            real(real64), intent(inout) :: dU_dt
-
-        end subroutine deriv_inner_heat_capacity_thermal
 
     end interface
 

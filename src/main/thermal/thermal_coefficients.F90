@@ -42,20 +42,18 @@ contains
 
     end subroutine update_water_phases_thermal
 
-    module subroutine deriv_inner_heat_capacity_thermal(self, material_id, state, controls, dU_dt)
+    module subroutine compute_transient_term_thermal(self, material_id, state, bdf_coeffs, dU_dt)
         implicit none
         class(type_thermal), intent(in) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(in) :: state
-        type(type_controls), intent(in) :: controls
+        real(real64), intent(in) :: bdf_coeffs(:)
         real(real64), intent(inout) :: dU_dt
 
         type(type_state) :: local_state
         real(real64), allocatable :: temperature_history(:)
         real(real64), allocatable :: pressure_history(:)
-
-        real(real64), pointer, contiguous, dimension(:) :: bdf_coeffs => null()
-        integer(int32) :: bdf_order
+        real(real64), allocatable :: porosity_history(:)
 
         real(real64) :: porosity, Qw, Qi, Qv
         real(real64) :: rho_s, rho_w, rho_i
@@ -64,24 +62,23 @@ contains
         real(real64) :: T, Uj
         integer(int32) :: j, n
 
-        call state%temperature_history%get(temperature_history)
-        call state%pressure_history%get(pressure_history)
-        call state%porosity%get(porosity)
-
-        call controls%time%get_bdf_order(bdf_order)
-        call controls%time%get_bdf_coeffs(bdf_coeffs)
-        call local_state%copy(state)
+        call state%get(temperature_history=temperature_history, &
+                       pressure_history=pressure_history, &
+                       porosity_history=porosity_history)
 
         dU_dt = 0.0d0
-        do j = 1, bdf_order + 1
-            call local_state%temperature%set(temperature_history(j))
-            call local_state%pressure%set(pressure_history(j))
+        do j = 1, size(bdf_coeffs)
+            call local_state%reset()
+            call local_state%set(temperature=temperature_history(j), &
+                                 pressure=pressure_history(j), &
+                                 porosity=porosity_history(j))
             call self%update_water_phases(material_id, local_state)
 
-            call local_state%temperature%get(T)
-            call local_state%water_content%get(Qw)
-            call local_state%ice_content%get(Qi)
-            call local_state%vapor_content%get(Qv)
+            call local_state%get(temperature=T, &
+                                 porosity=porosity, &
+                                 water_content=Qw, &
+                                 ice_content=Qi, &
+                                 vapor_content=Qv)
 
             call self%physics%get_density_solid(material_id, rho_s)
             call self%physics%calc_density_water(local_state, rho_w)
@@ -105,7 +102,7 @@ contains
             dU_dt = dU_dt + bdf_coeffs(j) * Uj
         end do
 
-    end subroutine deriv_inner_heat_capacity_thermal
+    end subroutine compute_transient_term_thermal
 
     module subroutine compute_mass_term_thermal(self, target_material_id, state, C_TT)
         implicit none

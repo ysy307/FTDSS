@@ -74,9 +74,8 @@ module domain_fe
         generic, public :: compute_K2 => compute_K2_diffusion, compute_K2_diffusion_scalar
         procedure, pass(self), public :: compute_K3 => compute_K3_mixed
 
-        procedure, pass(self), private :: compute_R1_source
-        procedure, pass(self), private :: compute_R2_flux
-        generic, public :: compute_R => compute_R1_source, compute_R2_flux
+        procedure, pass(self), public :: compute_R1 => compute_R1_source
+        procedure, pass(self), public :: compute_R2 => compute_R2_flux
 
         !----------------------------------------------------------------------
         ! Abstract methods to be implemented in derived types
@@ -424,9 +423,9 @@ contains
     !==========================================================================
     ! Integration Matrices using Coefficients at Gauss Points (A_gp, M_gp, etc.)
     !==========================================================================
-!>
+    !>
     !> 1. Capacity Matrix K1
-    !>    K_ij = Integ { A(x) * psi_i * psi_j } dOmega
+    !>    K_ij = \int  A(x) * psi_i * psi_j  dOmega
     !>    A_gp: Coefficients evaluated directly at Gauss points [num_gauss]
     !>    work_psi, work_dpsi_dx: (Optional) Pre-allocated workspace to avoid repeated allocation.
     !>
@@ -490,7 +489,7 @@ contains
 
     !>
     !> 2. Diffusion Matrix K2
-    !>    K_ij = Integ { nabla psi_i . (M(x) * nabla psi_j) } dOmega
+    !>    K_ij =  \int  nabla psi_i . (M(x) * nabla psi_j)  dOmega
     !>    M_gp: Tensor coefficients evaluated at Gauss points [dim, dim, num_gauss]
     !>
     subroutine compute_K2_diffusion(self, nodes, M_gp, elem_mat, &
@@ -584,7 +583,7 @@ contains
 
     !>
     !> 2. Diffusion Matrix K2 (Scalar Version)
-    !>    K_ij = Integ { M(x) * (nabla psi_i . nabla psi_j) } dOmega
+    !>    K_ij = \int  M(x) * (nabla psi_i . nabla psi_j)  dOmega
     !>    M_gp: Scalar coefficients evaluated at Gauss points [num_gauss]
     !>
     subroutine compute_K2_diffusion_scalar(self, nodes, M_gp, elem_mat, &
@@ -664,7 +663,7 @@ contains
 
     !>
     !> 3. Mixed Matrix K3 (Advection/Convection)
-    !>    K_ij = Integ { (nabla psi_i . V(x)) * psi_j } dOmega
+    !>    K_ij = \int ((nabla psi_i . V(x)) * psi_j ) dOmega
     !>    V_gp: Vector coefficients evaluated at Gauss points [dim, num_gauss]
     !>
     subroutine compute_K3_mixed(self, nodes, V_gp, elem_mat, work_psi, work_dpsi_dx)
@@ -741,78 +740,138 @@ contains
 
     !>
     !> 1. Scalar Source Residual R1
-    !>    R_i = Integ { psi_i * S(x) } dOmega
+    !>    R_i = \int( \psi_i * S(x) ) d\Omega
     !>    S_gp: Source term evaluated at Gauss points [num_gauss]
+    !>    work_psi: (Optional) Workspace for shape functions
     !>
-    subroutine compute_R1_source(self, nodes, S_gp, elem_vec)
+    subroutine compute_R1_source(self, nodes, S_gp, elem_vec, work_psi)
         implicit none
         class(abst_fe), intent(in) :: self
         real(real64), intent(in) :: nodes(:, :)
         real(real64), intent(in) :: S_gp(:)
         real(real64), intent(inout) :: elem_vec(:)
+        !> Optional workspace
+        real(real64), intent(inout), optional, target :: work_psi(:)
 
         integer(int32) :: p, i, nd, dim, num_gauss
         real(real64) :: w, det_J, S_val
-        real(real64), allocatable :: psi(:), dpsi_dx(:, :)
         type(type_coordinate_dp) :: r
+
+        !> Pointers for alias
+        real(real64), pointer :: p_psi(:) => null()
+
+        !> Local allocatables (fallback)
+        real(real64), allocatable, target :: local_psi(:)
 
         call self%get_dimension(dim)
         call self%get_num_nodes(nd)
         call self%get_num_gauss(num_gauss)
 
-        allocate (psi(nd), dpsi_dx(nd, dim))
+        ! --- Workspace Setup ---
+        if (present(work_psi)) then
+            p_psi => work_psi
+        else
+            call allocate_array(local_psi, nd)
+            p_psi => local_psi
+        end if
+
         elem_vec = 0.0d0
 
+        ! --- Integration Loop ---
         do p = 1, num_gauss
             r = self%gauss(p)
             w = self%weight(p)
-            call self%calc_shape_data(r, nodes, psi, dpsi_dx, det_J)
+
+            ! R1では dpsi_dx は不要なので、psi のみ計算
+            call self%calc_shape_data(r, nodes, psi=p_psi, det_j=det_J)
 
             S_val = S_gp(p)
 
             do i = 1, nd
-                elem_vec(i) = elem_vec(i) + w * det_J * S_val * psi(i)
+                elem_vec(i) = elem_vec(i) + w * det_J * S_val * p_psi(i)
             end do
         end do
+
+        ! --- Cleanup ---
+        if (allocated(local_psi)) call deallocate_array(local_psi)
+        nullify (p_psi)
+
     end subroutine compute_R1_source
 
     !>
     !> 2. Flux/Divergence Residual R2
-    !>    R_i = Integ { nabla psi_i . F(x) } dOmega
+    !>    R_i = \int( \nabla \psi_i \cdot \mathbf{F}(x) ) d\Omega
     !>    F_gp: Flux vector evaluated at Gauss points [dim, num_gauss]
+    !>    work_psi, work_dpsi_dx: (Optional) Workspace
     !>
-    subroutine compute_R2_flux(self, nodes, F_gp, elem_vec)
+    subroutine compute_R2_flux(self, nodes, F_gp, elem_vec, &
+                               work_psi, work_dpsi_dx)
         implicit none
         class(abst_fe), intent(in) :: self
         real(real64), intent(in) :: nodes(:, :)
         real(real64), intent(in) :: F_gp(:, :)
         real(real64), intent(inout) :: elem_vec(:)
+        !> Optional workspace
+        real(real64), intent(inout), optional, target :: work_psi(:)
+        real(real64), intent(inout), optional, target :: work_dpsi_dx(:, :)
 
         integer(int32) :: p, i, nd, dim, num_gauss
         real(real64) :: w, det_J, grad_psi_i_dot_F
-        real(real64), allocatable :: psi(:), dpsi_dx(:, :)
         type(type_coordinate_dp) :: r
+
+        !> Pointers for alias
+        real(real64), pointer :: p_psi(:) => null()
+        real(real64), pointer :: p_dpsi_dx(:, :) => null()
+
+        !> Local allocatables (fallback)
+        real(real64), allocatable, target :: local_psi(:)
+        real(real64), allocatable, target :: local_dpsi_dx(:, :)
 
         call self%get_dimension(dim)
         call self%get_num_nodes(nd)
         call self%get_num_gauss(num_gauss)
 
-        allocate (psi(nd), dpsi_dx(nd, dim))
+        ! --- Workspace Setup ---
+        if (present(work_psi)) then
+            p_psi => work_psi
+        else
+            call allocate_array(local_psi, nd)
+            p_psi => local_psi
+        end if
+
+        if (present(work_dpsi_dx)) then
+            p_dpsi_dx => work_dpsi_dx
+        else
+            call allocate_array(local_dpsi_dx, nd, dim)
+            p_dpsi_dx => local_dpsi_dx
+        end if
+
         elem_vec = 0.0d0
 
+        ! --- Integration Loop ---
         do p = 1, num_gauss
             r = self%gauss(p)
             w = self%weight(p)
-            call self%calc_shape_data(r, nodes, psi, dpsi_dx, det_J)
+
+            ! R2では dpsi_dx が必須。psiは幾何計算(Jacobian)で内部的に使われる可能性があるため渡しておく
+            call self%calc_shape_data(r, nodes, psi=p_psi, dpsi_dx=p_dpsi_dx, det_j=det_J)
 
             ! Direct evaluation: F_gp(:, p)
             do i = 1, nd
                 ! (nabla psi_i . F)
-                grad_psi_i_dot_F = dot_product(dpsi_dx(i, :), F_gp(:, p))
+                grad_psi_i_dot_F = dot_product(p_dpsi_dx(i, :), F_gp(:, p))
 
                 elem_vec(i) = elem_vec(i) + w * det_J * grad_psi_i_dot_F
             end do
         end do
+
+        ! --- Cleanup ---
+        if (allocated(local_psi)) call deallocate_array(local_psi)
+        if (allocated(local_dpsi_dx)) call deallocate_array(local_dpsi_dx)
+
+        nullify (p_psi)
+        nullify (p_dpsi_dx)
+
     end subroutine compute_R2_flux
 
     subroutine display(self)

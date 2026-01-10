@@ -900,13 +900,11 @@ contains
 
         class(abst_fe), pointer :: fe
         real(real64), allocatable :: coordinates(:, :)
-        integer(int32), pointer, contiguous, dimension(:) :: connectivity
 
         call self%get_element(element_id, fe)
         call self%get_element_coordinate(element_id, coordinates)
-        call self%get_element_connectivity(element_id, connectivity)
 
-        call fe%get_geometry(coordinates, connectivity, geometry)
+        call fe%get_geometry(coordinates, geometry)
 
     end subroutine get_geometry_domain
 

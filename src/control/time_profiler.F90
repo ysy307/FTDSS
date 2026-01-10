@@ -8,8 +8,6 @@ module control_time_profiler
 
     public :: type_profiler
 
-    ! integer(int32), parameter :: MAX_BDF_ORDER = 6
-    ! integer(int32), parameter :: ERR_TIME_INIT = 981
     integer(int32), parameter :: ERR_PROFILER = 982
 
     type :: type_profiler_section
@@ -70,8 +68,8 @@ contains
 
             do i = 1, size(labels)
                 self%sections(i)%label = trim(labels(i))
-                self%sections(i)%total_time = 0.0_real64
-                self%sections(i)%start_time = 0.0_real64
+                self%sections(i)%total_time = 0.0d0
+                self%sections(i)%start_time = 0.0d0
                 self%sections(i)%call_count = 0
             end do
         end if
@@ -84,10 +82,8 @@ contains
         character(:), allocatable, intent(inout) :: formated_string
 
         formated_string = &
-            self%date(1:4)//"-"//self%date(5:6)//"-"//self%date(7:8)// &
-            "T"// &
-            self%time(1:2)//":"//self%time(3:4)//":"//self%time(5:6)// &
-            strip(self%zone)
+            self%date(1:4)//"-"//self%date(5:6)//"-"//self%date(7:8)//"T"// &
+            self%time(1:2)//":"//self%time(3:4)//":"//self%time(5:6)//strip(self%zone)
 
     end subroutine format_profiler_section
 

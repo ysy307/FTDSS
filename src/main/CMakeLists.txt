@@ -1,12 +1,11 @@
 # src/main/CMakeLists.txt
 
 set(Main_Base_SOURCES
-    main_base.F90
+    base.F90
 )
 add_library(Main_Base STATIC ${Main_Base_SOURCES})
 target_include_directories(Main_Base PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Main_Base PUBLIC
-    Main_Base
     Solver::Core
     Solver::Domain
 )
