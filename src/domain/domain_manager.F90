@@ -341,7 +341,7 @@ contains
             end do
         end if
 
-        call self%fe_manager%initialize(input, self%num_elements, self%fe_types)
+        call self%fe_manager%initialize(input%basic%geometry_settings%integration_order, self%num_elements, self%fe_types)
         call self%colors%initialize(input)
     end subroutine initialize_element_manager
 
@@ -602,7 +602,7 @@ contains
             ! [修正] original_input_idx ではなく bc_id を渡す
             bcs(i)%condition = create_boundary_conditions(bc_type, bc_id, input, controls)
 
-            call bcs(i)%fe_manager%initialize(input, 1, group_cell_types)
+            call bcs(i)%fe_manager%initialize(input%basic%geometry_settings%integration_order, 1, group_cell_types)
         end do
     end subroutine create_bc_instances
 

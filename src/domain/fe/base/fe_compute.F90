@@ -49,7 +49,7 @@ contains
             w = self%integration_rule%weight(p)
 
             ! 形状関数とヤコビアン行列式の計算
-            call self%calc_shape_data(r, nodes, psi=p_psi, det_j=det_J)
+            call self%calc_shape_function(r, nodes, psi=p_psi, determinant_jacobian=det_J)
             A_val = A_gp(p)
 
             ! 行列積算
@@ -137,7 +137,7 @@ contains
             r = self%integration_rule%gauss(p)
             w = self%integration_rule%weight(p)
 
-            call self%calc_shape_data(r, nodes, psi=p_psi, dpsi_dx=p_dpsi_dx, det_j=det_J)
+            call self%calc_shape_function(r, nodes, psi=p_psi, dpsi_dx=p_dpsi_dx, determinant_jacobian=det_J)
 
             ! Compute term: M * nabla psi_j
             do j = 1, nd
@@ -219,7 +219,7 @@ contains
             r = self%integration_rule%gauss(p)
             w = self%integration_rule%weight(p)
 
-            call self%calc_shape_data(r, nodes, psi=p_psi, dpsi_dx=p_dpsi_dx, det_j=det_J)
+            call self%calc_shape_function(r, nodes, psi=p_psi, dpsi_dx=p_dpsi_dx, determinant_jacobian=det_J)
 
             ! Direct evaluation at Gauss point (Scalar)
             M_val = M_gp(p)
@@ -299,7 +299,7 @@ contains
             r = self%integration_rule%gauss(p)
             w = self%integration_rule%weight(p)
 
-            call self%calc_shape_data(r, nodes, psi=p_psi, dpsi_dx=p_dpsi_dx, det_j=det_J)
+            call self%calc_shape_function(r, nodes, psi=p_psi, dpsi_dx=p_dpsi_dx, determinant_jacobian=det_J)
 
             do i = 1, nd
                 ! (nabla psi_i . V)
@@ -366,7 +366,7 @@ contains
             w = self%integration_rule%weight(p)
 
             ! R1では dpsi_dx は不要なので、psi のみ計算
-            call self%calc_shape_data(r, nodes, psi=p_psi, det_j=det_J)
+            call self%calc_shape_function(r, nodes, psi=p_psi, determinant_jacobian=det_J)
 
             S_val = S_gp(p)
 
@@ -437,7 +437,7 @@ contains
             w = self%integration_rule%weight(p)
 
             ! R2では dpsi_dx が必須。psiは幾何計算(Jacobian)で内部的に使われる可能性があるため渡しておく
-            call self%calc_shape_data(r, nodes, psi=p_psi, dpsi_dx=p_dpsi_dx, det_j=det_J)
+            call self%calc_shape_function(r, nodes, psi=p_psi, dpsi_dx=p_dpsi_dx, determinant_jacobian=det_J)
 
             ! Direct evaluation: F_gp(:, p)
             do i = 1, nd
