@@ -8,7 +8,6 @@ module domain_fe_element
     use :: stdlib_strings, only:strip
     use :: stdlib_logger
     use :: module_core
-    use :: module_input, only:type_input
     use :: domain_base_fe, only:abst_fe
     implicit none
     private
@@ -85,37 +84,37 @@ module domain_fe_element
     interface
         ! --- Constructors ---
         !> Constructs an instance of a first-order triangular element.
-        module function construct_triangle_first(input) result(fe)
+        module function construct_triangle_first(integration_order) result(fe)
             implicit none
-            !> The main input data structure.
-            type(type_input), intent(in) :: input
+            !> The integration order for the element.
+            integer(int32), intent(in) :: integration_order
             !> The newly created and allocated finite element object.
             class(abst_fe), allocatable :: fe
         end function construct_triangle_first
 
         !> Constructs an instance of a first-order quadrilateral element.
-        module function construct_square_first(input) result(fe)
+        module function construct_square_first(integration_order) result(fe)
             implicit none
-            !> The main input data structure.
-            type(type_input), intent(in) :: input
+            !> The integration order for the element.
+            integer(int32), intent(in) :: integration_order
             !> The newly created and allocated finite element object.
             class(abst_fe), allocatable :: fe
         end function construct_square_first
 
         !> Constructs an instance of a second-order triangular element.
-        module function construct_triangle_second(input) result(fe)
+        module function construct_triangle_second(integration_order) result(fe)
             implicit none
-            !> The main input data structure.
-            type(type_input), intent(in) :: input
+            !> The integration order for the element.
+            integer(int32), intent(in) :: integration_order
             !> The newly created and allocated finite element object.
             class(abst_fe), allocatable :: fe
         end function construct_triangle_second
 
         !> Constructs an instance of a second-order quadrilateral element.
-        module function construct_square_second(input) result(fe)
+        module function construct_square_second(integration_order) result(fe)
             implicit none
-            !> The main input data structure.
-            type(type_input), intent(in) :: input
+            !> The integration order for the element.
+            integer(int32), intent(in) :: integration_order
             !> The newly created and allocated finite element object.
             class(abst_fe), allocatable :: fe
         end function construct_square_second

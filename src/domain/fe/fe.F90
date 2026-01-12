@@ -2,9 +2,6 @@
 !> Module for finite element definitions and management
 !>
 module module_fe
-    use, intrinsic :: iso_fortran_env, only: int32
-    use :: module_core, only:unique
-    use :: module_input, only:type_input
     use :: domain_base_fe, only:abst_fe, holder_fes
     use :: domain_fe_side, only:type_side_first, type_side_second
     use :: domain_fe_element, only:type_triangle_first, type_triangle_second, &
@@ -18,6 +15,7 @@ module module_fe
     ! derived types
     !-------------------------------------------------------------------------------------------------------------------------------
     public :: abst_fe
+    public :: holder_fes
     public :: type_side_first
     public :: type_side_second
     public :: type_triangle_first

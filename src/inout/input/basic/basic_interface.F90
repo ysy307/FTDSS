@@ -61,6 +61,7 @@ module inout_input_basic
         character(:), allocatable :: cell_id_key
         character(:), allocatable :: rank_key
         character(:), allocatable :: color_key
+        integer(int32) :: integration_order
         character(:), allocatable :: integration_type
         real(real64), allocatable :: integration_points(:)
     contains

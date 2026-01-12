@@ -9,8 +9,12 @@
 # --- Mesh Library ---
 # This is a foundational component for the domain.
 set(DOMAIN_MESH_SOURCES
+    # base
     fe/base/fe_interface.F90
-    fe/base/fe_basee.F90
+    fe/base/fe_base.F90
+    fe/base/fe_interpolation.F90
+    fe/base/fe_compute.F90
+    fe/base/fe_coefficients.F90
     fe/element/element_interface.F90
     fe/element/element_triangle_first.F90
     fe/element/element_triangle_second.F90
@@ -30,7 +34,7 @@ target_include_directories(Domain_Mesh PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 # Mesh depends on Core for types and Input for reading geometry.
 target_link_libraries(Domain_Mesh PUBLIC
     Solver::Core
-    Solver::Input
+    Solver::Linalg
 )
 enable_build_flags(Domain_Mesh)
 enable_thirdparty(Domain_Mesh)

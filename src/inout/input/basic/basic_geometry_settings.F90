@@ -14,6 +14,7 @@ submodule(inout_input_basic) inout_input_basic_geometry_settings
     character(*), parameter :: rank_key = "rank_key"
     character(*), parameter :: color_key = "color_key"
     character(*), parameter :: integration = "integration"
+    character(*), parameter :: integration_order = "integration_order"
     character(*), parameter :: integration_type = "integration_type"
     character(*), parameter :: valid_integration_types(3) = [character(len=16) :: "full", "reduced", "free"]
     character(*), parameter :: integration_points = "integration_points"
@@ -61,15 +62,18 @@ contains
                             is_required=.true., default_value=color_key)
 
         buffer(2) = integration
-        buffer(3) = integration_type
-        call get_json_value(json, join(buffer), self%geometry_settings%integration_type, &
-                            is_required=.true., default_value="full", valid_list=valid_integration_types)
+        buffer(3) = integration_order
+        call get_json_value(json, join(buffer), self%geometry_settings%integration_order, &
+                            is_required=.true., default_value=2)
+        ! buffer(3) = integration_type
+        ! call get_json_value(json, join(buffer), self%geometry_settings%integration_type, &
+        !                     is_required=.true., default_value="full", valid_list=valid_integration_types)
 
-        if (strip(self%geometry_settings%integration_type) == "free") then
-            buffer(3) = integration_points
-            call get_json_value(json, join(buffer), self%geometry_settings%integration_points, &
-                                is_required=.true., valid_range=[0.0d0, 1.0d0])
-        end if
+        ! if (strip(self%geometry_settings%integration_type) == "free") then
+        !     buffer(3) = integration_points
+        !     call get_json_value(json, join(buffer), self%geometry_settings%integration_points, &
+        !                         is_required=.true., valid_range=[0.0d0, 1.0d0])
+        ! end if
 
     end subroutine read_parameters_geometry_settings
 

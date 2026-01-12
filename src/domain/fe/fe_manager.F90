@@ -20,12 +20,12 @@ module domain_fe_manager
 
 contains
 !> Initialize the FE manager with specified input, number of FEs, and target IDs
-    subroutine initialize_fe_manager(self, input, num_fe, target_ids)
+    subroutine initialize_fe_manager(self, integration_order, num_fe, target_ids)
         implicit none
         !> The FE manager object to initialize
         class(type_fe_manager), intent(inout) :: self
         !> Input data for FE creation
-        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: integration_order
         !> Number of FE objects to create
         integer(int32), intent(in) :: num_fe
         !> Array of FE IDs to initialize
@@ -45,7 +45,7 @@ contains
         self%fe_map = 0
 
         do i = 1, size(unique_ids)
-            self%fe_list(i)%fe = create_fe(unique_ids(i), input)
+            self%fe_list(i)%fe = create_fe(unique_ids(i), integration_order)
         end do
 
         ! Create mapping from target_ids to fe_list indices

@@ -8,7 +8,6 @@ module domain_fe_side
     use :: stdlib_logger
     use :: stdlib_strings
     use :: module_core
-    use :: module_input, only:type_input
     use :: domain_base_fe, only:abst_fe
     implicit none
     private
@@ -61,9 +60,10 @@ module domain_fe_side
         !----------------------------------------------------------------------------------
 
         !> Constructs an instance of a first-order side element.
-        module function construct_side_first(input) result(fe)
+        module function construct_side_first(integration_order) result(fe)
             implicit none
-            type(type_input), intent(in) :: input
+            !> The integration order for the element.
+            integer(int32), intent(in) :: integration_order
             class(abst_fe), allocatable :: fe
         end function construct_side_first
 
@@ -136,9 +136,10 @@ module domain_fe_side
         !----------------------------------------------------------------------------------
 
         !> Constructs an instance of a second-order side element.
-        module function construct_side_second(input) result(fe)
+        module function construct_side_second(integration_order) result(fe)
             implicit none
-            type(type_input), intent(in) :: input
+            !> The integration order for the element.
+            integer(int32), intent(in) :: integration_order
             class(abst_fe), allocatable :: fe
         end function construct_side_second
 

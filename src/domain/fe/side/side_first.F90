@@ -9,10 +9,10 @@ contains
     !>
     !> Creates and initializes a first-order side (2-node line) element object.
     !>
-    module function construct_side_first(input) result(fe)
+    module function construct_side_first(integration_order) result(fe)
         implicit none
-        !> The main input data structure.
-        type(type_input), intent(in) :: input
+        !> The integration order for the element.
+        integer(int32), intent(in) :: integration_order
         !> The newly created and allocated first-order side element object.
         class(abst_fe), allocatable :: fe
 
@@ -22,20 +22,10 @@ contains
         integer(int32) :: dimension
         integer(int32) :: order
         integer(int32) :: num_gauss
-        integer(int32) :: integration_order
 
         allocate (type_side_first :: fe)
 
         call vtk_constants%get_cell_info_from_cell_name(cell_name, vtk_type, num_nodes, dimension, order)
-
-        select case (strip(input%basic%geometry_settings%integration_type))
-        case ("full")
-            integration_order = 1
-        case ("reduced")
-            integration_order = 1
-        case default
-            integration_order = 1
-        end select
 
         call fe%initialize(type=vtk_type, dimension=dimension, order=order, num_nodes=num_nodes, &
                            integration_order=integration_order)

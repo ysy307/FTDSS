@@ -17,6 +17,16 @@ contains
         call self%integration_rule%initialize(self%type, integration_order)
     end subroutine initialize_abst_fe
 
+    module subroutine destroy_abst_fe(self)
+        implicit none
+        class(abst_fe), intent(inout) :: self
+
+        self%type = 0
+        self%num_nodes = 0
+        self%dimension = 0
+        call self%integration_rule%destroy()
+    end subroutine destroy_abst_fe
+
     module pure elemental subroutine get_type(self, type)
         implicit none
         class(abst_fe), intent(in) :: self
@@ -80,5 +90,37 @@ contains
 
         integration_rule => self%integration_rule
     end subroutine get_integration_rule
+
+    module subroutine display_abst_fe(self, unit_in)
+        implicit none
+        class(abst_fe), intent(in) :: self
+        integer(int32), intent(in), optional :: unit_in
+
+        integer(int32) :: unit
+        integer(int32) :: i
+
+        unit = optval(unit_in, output_unit)
+
+        write (unit, '(a)') "========================================================"
+        write (unit, '(a)') " Finite Element Information "
+        write (unit, '(a)') "========================================================"
+        write (unit, '(a, i0)') "Element Type       : ", self%type
+        write (unit, '(a, i0)') "Dimension          : ", self%dimension
+        write (unit, '(a, i0)') "Order              : ", self%integration_rule%order
+        write (unit, '(a, i0)') "Number of Nodes    : ", self%num_nodes
+        write (unit, '(a, i0)') "Number of Gauss Pts: ", self%integration_rule%num_gauss
+
+        if (self%integration_rule%num_gauss > 0) then
+            write (unit, '(a)') "--------------------------------------------------------"
+            write (unit, '(a)') "Gauss Quadrature Points and Weights:"
+            write (unit, '(a)') "--------------------------------------------------------"
+            do i = 1, self%integration_rule%num_gauss
+                write (unit, '(a, i2, a, 3(f12.8, a), f12.8)') "  GP ", i, ": (", &
+                    self%integration_rule%gauss(i)%x, ", ", self%integration_rule%gauss(i)%y, ", ", &
+                    self%integration_rule%gauss(i)%z, ")  Weight = ", self%integration_rule%weight(i)
+            end do
+        end if
+        write (unit, '(a)') "========================================================"
+    end subroutine display_abst_fe
 
 end submodule domain_base_fe_base

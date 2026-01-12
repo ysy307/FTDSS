@@ -6,7 +6,6 @@ module domain_fe_factory
     use :: stdlib_logger, only:global_logger
     use :: stdlib_strings, only:to_string
     use :: module_core, only:vtk_constants
-    use :: module_input, only:type_input
     use :: domain_base_fe, only:abst_fe
     use :: domain_fe_side
     use :: domain_fe_element
@@ -20,11 +19,11 @@ module domain_fe_factory
         !>
         !> Defines the interface for a finite element constructor function.
         !>
-        function abst_fe_constructor(input) result(fe)
-            import :: type_input, abst_fe
+        function abst_fe_constructor(integration_order) result(fe)
+            import :: abst_fe, int32
             implicit none
-            !> The main input data structure, containing settings required by the constructor.
-            type(type_input), intent(in) :: input
+            !> The integration order for the element.
+            integer(int32), intent(in) :: integration_order
             !> The newly created and allocated finite element object.
             class(abst_fe), allocatable :: fe
         end function abst_fe_constructor
@@ -50,14 +49,15 @@ contains
     !> This function acts as the public interface to the factory. If called for the first
     !> time, it will automatically initialize the internal constructor table.
     !>
-    function create_fe(id, input) result(fe)
+    function create_fe(id, integration_order) result(fe)
         implicit none
         !> The VTK cell type ID for the element to create.
         integer(int32), intent(in) :: id
-        !> The main input data structure, required by the element constructor.
-        class(type_input), intent(in) :: input
+        !> The integration order for the element.
+        integer(int32), intent(in) :: integration_order
         !> The newly allocated finite element object, or an unallocated object on failure.
         class(abst_fe), allocatable :: fe
+
         character(len=*), parameter :: func_name = "create_fe"
 
         ! ==========================================================
@@ -83,7 +83,7 @@ contains
         end if
 
         ! --- Construct the object ---
-        fe = fe_constructor(id)%create(input)
+        fe = fe_constructor(id)%create(integration_order)
 
     end function create_fe
 
