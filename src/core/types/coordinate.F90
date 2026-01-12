@@ -25,6 +25,7 @@ module core_types_coordinate
         procedure, private, pass(self) :: set_coordinate_dp_array
         !> Generic interface to set the coordinate's components.
         generic, public :: set => set_coordinate_dp, set_coordinate_dp_array
+        procedure, public, pass(self) :: reset => reset_coordinate_dp
     end type type_coordinate_dp
 
     !>
@@ -42,6 +43,7 @@ module core_types_coordinate
         procedure, private, pass(self) :: set_coordinate_int_array
         !> Generic interface to set the coordinate's components.
         generic, public :: set => set_coordinate_int, set_coordinate_int_array
+        procedure, public, pass(self) :: reset => reset_coordinate_int
     end type type_coordinate_int
 
 contains
@@ -84,6 +86,15 @@ contains
         self%z = value(3)
     end subroutine set_coordinate_dp_array
 
+    subroutine reset_coordinate_dp(self)
+        implicit none
+        class(type_coordinate_dp), intent(inout) :: self
+
+        self%x = 0.0d0
+        self%y = 0.0d0
+        self%z = 0.0d0
+    end subroutine reset_coordinate_dp
+
     ! ==========================================================
     ! Integer Coordinate Procedures
     ! ==========================================================
@@ -121,5 +132,14 @@ contains
         self%y = value(2)
         self%z = value(3)
     end subroutine set_coordinate_int_array
+
+    subroutine reset_coordinate_int(self)
+        implicit none
+        class(type_coordinate_int), intent(inout) :: self
+
+        self%x = 0
+        self%y = 0
+        self%z = 0
+    end subroutine reset_coordinate_int
 
 end module core_types_coordinate

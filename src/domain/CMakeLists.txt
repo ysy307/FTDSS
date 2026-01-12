@@ -9,8 +9,8 @@
 # --- Mesh Library ---
 # This is a foundational component for the domain.
 set(DOMAIN_MESH_SOURCES
-    fe/fe_interface.F90
-    fe/fe_integration.F90
+    fe/base/fe_interface.F90
+    fe/base/fe_basee.F90
     fe/element/element_interface.F90
     fe/element/element_triangle_first.F90
     fe/element/element_triangle_second.F90
@@ -21,8 +21,8 @@ set(DOMAIN_MESH_SOURCES
     fe/side/side_first.F90
     fe/side/side_second.F90
     # fe/side/side.F90
-    fe/fe_interface.F90
     fe/fe_factory.F90
+    fe/fe_manager.F90
     fe/fe.F90
 )
 add_library(Domain_Mesh STATIC ${DOMAIN_MESH_SOURCES})

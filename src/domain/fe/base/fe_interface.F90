@@ -3,7 +3,7 @@
 !> Refactored to perform numerical integration using coefficients evaluated
 !> directly at Gauss quadrature points, rather than interpolating nodal coefficients.
 !>
-module domain_fe
+module domain_base_fe
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: mpi_f08
     use :: stdlib_logger
@@ -27,28 +27,22 @@ module domain_fe
         integer(int32) :: num_nodes
         !> The geometric dimension of the element.
         integer(int32) :: dimension
-        !> The interpolation order.
-        integer(int32) :: order
-        !> The number of Gauss points.
-        integer(int32) :: num_gauss
-        !> Weights for Gauss integration points.
-        real(real64), allocatable :: weight(:)
-        !> Local coordinates of Gauss integration points.
-        type(type_coordinate_dp), allocatable :: gauss(:)
-
+        !> The gauss integration rule
+        type(type_gauss_integration_rule) :: integration_rule
     contains
         !----------------------------------------------------------------------
         ! Public methods with common implementations
         !----------------------------------------------------------------------
-        procedure, pass(self), public :: initialize => initialize_abst_fe
-        procedure, pass(self), public :: destroy => destroy_abst_fe
-        procedure, pass(self), public :: get_type
-        procedure, pass(self), public :: get_num_nodes
-        procedure, pass(self), public :: get_dimension
-        procedure, pass(self), public :: get_order
-        procedure, pass(self), public :: get_num_gauss
-        procedure, pass(self), public :: get_weight
-        procedure, pass(self), public :: get_gauss
+        procedure, public, pass(self) :: initialize => initialize_abst_fe
+        procedure, public, pass(self) :: destroy => destroy_abst_fe
+        procedure, public, pass(self) :: get_type
+        procedure, public, pass(self) :: get_num_nodes
+        procedure, public, pass(self) :: get_dimension
+        procedure, public, pass(self) :: get_order
+        procedure, public, pass(self) :: get_num_gauss
+        procedure, public, pass(self) :: get_weight
+        procedure, public, pass(self) :: get_gauss
+        procedure, public, pass(self) :: get_integration_rule
 
         !> State interpolation methods (used by assembler to get T/P at Gauss points)
         procedure, pass(self), private :: lerp_1d
@@ -59,23 +53,25 @@ module domain_fe
         procedure, pass(self), private :: dlerp_1d
         generic, public :: dlerp => dlerp_1d
 
-        procedure, pass(self), public :: display
+        procedure, public, pass(self) :: display
 
         !>
         !> Calculates shape functions, physical gradients, and Jacobian determinant
         !> at a given local coordinate.
         !>
-        procedure, pass(self), public :: calc_shape_data
+        procedure, public, pass(self) :: calc_shape_data
+        ! procedure, public,pass(self):: calc_inverse_jacobian
+        ! procedure, public,pass(self):: dpsi_dx
 
         !> Integration routines taking Gauss-point values
-        procedure, pass(self), public :: compute_K1 => compute_K1_capacity
+        procedure, public, pass(self) :: compute_K1 => compute_K1_capacity
         procedure, pass(self), private :: compute_K2_diffusion
         procedure, pass(self), private :: compute_K2_diffusion_scalar
         generic, public :: compute_K2 => compute_K2_diffusion, compute_K2_diffusion_scalar
-        procedure, pass(self), public :: compute_K3 => compute_K3_mixed
+        procedure, public, pass(self) :: compute_K3 => compute_K3_mixed
 
-        procedure, pass(self), public :: compute_R1 => compute_R1_source
-        procedure, pass(self), public :: compute_R2 => compute_R2_flux
+        procedure, public, pass(self) :: compute_R1 => compute_R1_source
+        procedure, public, pass(self) :: compute_R2 => compute_R2_flux
 
         !----------------------------------------------------------------------
         ! Abstract methods to be implemented in derived types
@@ -91,52 +87,132 @@ module domain_fe
     abstract interface
         subroutine abst_get_geometry(self, node_coords, geometry)
             import :: abst_fe, int32, real64
+            implicit none
             class(abst_fe), intent(in) :: self
             real(real64), intent(in) :: node_coords(:, :)
             real(real64), intent(inout) :: geometry
+
         end subroutine abst_get_geometry
 
         pure elemental subroutine abst_psi(self, i, r, psi_val)
             import :: abst_fe, type_coordinate_dp, int32, real64
+            implicit none
             class(abst_fe), intent(in) :: self
             integer(int32), intent(in) :: i
             type(type_coordinate_dp), intent(in) :: r
             real(real64), intent(inout) :: psi_val
+
         end subroutine abst_psi
 
         pure elemental subroutine abst_dpsi(self, i, j, r, dpsi_val)
             import :: abst_fe, type_coordinate_dp, int32, real64
+            implicit none
             class(abst_fe), intent(in) :: self
             integer(int32), intent(in) :: i
             integer(int32), intent(in) :: j
             type(type_coordinate_dp), intent(in) :: r
             real(real64), intent(inout) :: dpsi_val
+
         end subroutine abst_dpsi
 
         pure subroutine abst_jacobian(self, r, node_coords, jac)
             import :: abst_fe, type_coordinate_dp, int32, real64
+            implicit none
             class(abst_fe), intent(in) :: self
             type(type_coordinate_dp), intent(in) :: r
             real(real64), intent(in) :: node_coords(:, :)
             real(real64), intent(inout) :: jac(:, :)
+
         end subroutine abst_jacobian
 
         pure subroutine abst_jacobian_det(self, r, node_coords, det_j)
             import :: abst_fe, type_coordinate_dp, int32, real64
+            implicit none
             class(abst_fe), intent(in) :: self
             type(type_coordinate_dp), intent(in) :: r
             real(real64), intent(in) :: node_coords(:, :)
             real(real64), intent(inout) :: det_j
+
         end subroutine abst_jacobian_det
 
         subroutine abst_is_inside(self, cartesian, normalized, node_coords, is_in)
             import abst_fe, type_coordinate_dp, int32, real64
+            implicit none
             class(abst_fe), intent(in) :: self
             type(type_coordinate_dp), intent(in) :: cartesian
             type(type_coordinate_dp), intent(inout) :: normalized
             real(real64), intent(in) :: node_coords(:, :)
             logical, intent(inout) :: is_in
         end subroutine abst_is_inside
+    end interface
+
+    interface
+        module subroutine initialize_abst_fe(self, type, dimension, order, num_nodes, integration_order)
+            implicit none
+            class(abst_fe), intent(inout) :: self
+            integer(int32), intent(in) :: type
+            integer(int32), intent(in) :: dimension
+            integer(int32), intent(in) :: order
+            integer(int32), intent(in) :: num_nodes
+            integer(int32), intent(in) :: integration_order
+
+        end subroutine initialize_abst_fe
+
+        module pure elemental subroutine get_type(self, type)
+            implicit none
+            class(abst_fe), intent(in) :: self
+            integer(int32), intent(inout) :: type
+
+        end subroutine get_type
+
+        module pure elemental subroutine get_num_nodes(self, num_nodes)
+            implicit none
+            class(abst_fe), intent(in) :: self
+            integer(int32), intent(inout) :: num_nodes
+
+        end subroutine get_num_nodes
+
+        module pure elemental subroutine get_dimension(self, dimension)
+            implicit none
+            class(abst_fe), intent(in) :: self
+            integer(int32), intent(inout) :: dimension
+
+        end subroutine get_dimension
+
+        module pure elemental subroutine get_order(self, order)
+            implicit none
+            class(abst_fe), intent(in) :: self
+            integer(int32), intent(inout) :: order
+
+        end subroutine get_order
+
+        module pure elemental subroutine get_num_gauss(self, num_gauss)
+            implicit none
+            class(abst_fe), intent(in) :: self
+            integer(int32), intent(inout) :: num_gauss
+
+        end subroutine get_num_gauss
+
+        module subroutine get_weight(self, weight)
+            implicit none
+            class(abst_fe), intent(in), target :: self
+            real(real64), intent(inout), pointer, contiguous, dimension(:) :: weight
+
+        end subroutine get_weight
+
+        module subroutine get_gauss(self, gauss)
+            implicit none
+            class(abst_fe), intent(in), target :: self
+            type(type_coordinate_dp), intent(inout), pointer, contiguous, dimension(:) :: gauss
+
+        end subroutine get_gauss
+
+        module subroutine get_integration_rule(self, integration_rule)
+            implicit none
+            class(abst_fe), intent(in), target :: self
+            type(type_gauss_integration_rule), intent(inout), pointer :: integration_rule
+
+        end subroutine get_integration_rule
     end interface
 
     !> Wrapper for polymorphic FE objects
@@ -262,88 +338,6 @@ contains
         end select
     end subroutine calc_inverse_matrix
 
-    !--------------------------------------------------------------------------
-    ! Implementations of existing public methods
-    !--------------------------------------------------------------------------
-
-    subroutine initialize_abst_fe(self, type, dimension, order, num_nodes, num_gauss, weight, gauss)
-        ! (No changes)
-        implicit none
-        class(abst_fe), intent(inout) :: self
-        integer(int32), intent(in) :: type
-        integer(int32), intent(in) :: dimension
-        integer(int32), intent(in) :: order
-        integer(int32), intent(in) :: num_nodes
-        integer(int32), intent(in) :: num_gauss
-        real(real64), intent(in) :: weight(:)
-        real(real64), intent(in) :: gauss(:, :)
-        integer(int32) :: i
-
-        self%type = type
-        self%dimension = dimension
-        self%order = order
-        self%num_nodes = num_nodes
-        self%num_gauss = num_gauss
-
-        call allocate_array(self%weight, self%num_gauss)
-        self%weight(:) = weight(:)
-
-        allocate (self%gauss(self%num_gauss))
-        do i = 1, self%num_gauss
-            call self%gauss(i)%set(gauss(1, i), gauss(2, i), gauss(3, i))
-        end do
-    end subroutine initialize_abst_fe
-
-    ! (Getters and Lerp functions remain the same to support state interpolation)
-    pure elemental subroutine get_type(self, type)
-        implicit none
-        class(abst_fe), intent(in) :: self
-        integer(int32), intent(inout) :: type
-        type = self%type
-    end subroutine get_type
-
-    pure elemental subroutine get_num_nodes(self, num_nodes)
-        implicit none
-        class(abst_fe), intent(in) :: self
-        integer(int32), intent(inout) :: num_nodes
-        num_nodes = self%num_nodes
-    end subroutine get_num_nodes
-
-    pure elemental subroutine get_dimension(self, dimension)
-        implicit none
-        class(abst_fe), intent(in) :: self
-        integer(int32), intent(inout) :: dimension
-        dimension = self%dimension
-    end subroutine get_dimension
-
-    pure elemental subroutine get_order(self, order)
-        implicit none
-        class(abst_fe), intent(in) :: self
-        integer(int32), intent(inout) :: order
-        order = self%order
-    end subroutine get_order
-
-    pure elemental subroutine get_num_gauss(self, num_gauss)
-        implicit none
-        class(abst_fe), intent(in) :: self
-        integer(int32), intent(inout) :: num_gauss
-        num_gauss = self%num_gauss
-    end subroutine get_num_gauss
-
-    subroutine get_weight(self, weight)
-        implicit none
-        class(abst_fe), intent(in), target :: self
-        real(real64), intent(inout), pointer, contiguous, dimension(:) :: weight
-        weight => self%weight
-    end subroutine get_weight
-
-    subroutine get_gauss(self, gauss)
-        implicit none
-        class(abst_fe), intent(in), target :: self
-        type(type_coordinate_dp), intent(inout), pointer, contiguous, dimension(:) :: gauss
-        gauss => self%gauss
-    end subroutine get_gauss
-
     pure subroutine lerp_1d(self, r, values, lerped_value)
         ! (No changes - needed for State variable interpolation)
         implicit none
@@ -402,7 +396,10 @@ contains
         integer(int32) :: i
         real(real64) :: dpsi_i
 
-        dlerped_value%x = 0.0d0; dlerped_value%y = 0.0d0; dlerped_value%z = 0.0d0
+        dlerped_value%x = 0.0d0
+        dlerped_value%y = 0.0d0
+        dlerped_value%z = 0.0d0
+
         do i = 1, self%num_nodes
             if (self%dimension >= 1) then
                 call self%dpsi(i, 1, r, dpsi_i)
@@ -463,8 +460,8 @@ contains
 
         ! --- 3. 数値積分ループ ---
         do p = 1, num_gauss
-            r = self%gauss(p)
-            w = self%weight(p)
+            r = self%integration_rule%gauss(p)
+            w = self%integration_rule%weight(p)
 
             ! 形状関数とヤコビアン行列式の計算
             call self%calc_shape_data(r, nodes, psi=p_psi, det_j=det_J)
@@ -551,8 +548,8 @@ contains
 
         ! --- Integration Loop ---
         do p = 1, num_gauss
-            r = self%gauss(p)
-            w = self%weight(p)
+            r = self%integration_rule%gauss(p)
+            w = self%integration_rule%weight(p)
 
             call self%calc_shape_data(r, nodes, psi=p_psi, dpsi_dx=p_dpsi_dx, det_j=det_J)
 
@@ -633,8 +630,8 @@ contains
 
         ! --- Integration Loop ---
         do p = 1, num_gauss
-            r = self%gauss(p)
-            w = self%weight(p)
+            r = self%integration_rule%gauss(p)
+            w = self%integration_rule%weight(p)
 
             call self%calc_shape_data(r, nodes, psi=p_psi, dpsi_dx=p_dpsi_dx, det_j=det_J)
 
@@ -713,8 +710,8 @@ contains
 
         ! --- Integration Loop ---
         do p = 1, num_gauss
-            r = self%gauss(p)
-            w = self%weight(p)
+            r = self%integration_rule%gauss(p)
+            w = self%integration_rule%weight(p)
 
             call self%calc_shape_data(r, nodes, psi=p_psi, dpsi_dx=p_dpsi_dx, det_j=det_J)
 
@@ -779,8 +776,8 @@ contains
 
         ! --- Integration Loop ---
         do p = 1, num_gauss
-            r = self%gauss(p)
-            w = self%weight(p)
+            r = self%integration_rule%gauss(p)
+            w = self%integration_rule%weight(p)
 
             ! R1では dpsi_dx は不要なので、psi のみ計算
             call self%calc_shape_data(r, nodes, psi=p_psi, det_j=det_J)
@@ -850,8 +847,8 @@ contains
 
         ! --- Integration Loop ---
         do p = 1, num_gauss
-            r = self%gauss(p)
-            w = self%weight(p)
+            r = self%integration_rule%gauss(p)
+            w = self%integration_rule%weight(p)
 
             ! R2では dpsi_dx が必須。psiは幾何計算(Jacobian)で内部的に使われる可能性があるため渡しておく
             call self%calc_shape_data(r, nodes, psi=p_psi, dpsi_dx=p_dpsi_dx, det_j=det_J)
@@ -887,21 +884,21 @@ contains
         call global_logger%log_information(strip(msg))
         write (msg, '(a, i0)') "Dimension          : ", self%dimension
         call global_logger%log_information(strip(msg))
-        write (msg, '(a, i0)') "Order              : ", self%order
+        write (msg, '(a, i0)') "Order              : ", self%integration_rule%order
         call global_logger%log_information(strip(msg))
         write (msg, '(a, i0)') "Number of Nodes    : ", self%num_nodes
         call global_logger%log_information(strip(msg))
-        write (msg, '(a, i0)') "Number of Gauss Pts: ", self%num_gauss
+        write (msg, '(a, i0)') "Number of Gauss Pts: ", self%integration_rule%num_gauss
         call global_logger%log_information(strip(msg))
 
-        if (self%num_gauss > 0) then
+        if (self%integration_rule%num_gauss > 0) then
             call global_logger%log_information("--------------------------------------------------------")
             call global_logger%log_information("Gauss Quadrature Points and Weights:")
             call global_logger%log_information("--------------------------------------------------------")
-            do i = 1, self%num_gauss
+            do i = 1, self%integration_rule%num_gauss
                 write (msg, '(a, i2, a, 3(f12.8, a), f12.8)') "  GP ", i, ": (", &
-                    self%gauss(i)%x, ", ", self%gauss(i)%y, ", ", self%gauss(i)%z, &
-                    ")  Weight = ", self%weight(i)
+                    self%integration_rule%gauss(i)%x, ", ", self%integration_rule%gauss(i)%y, ", ", &
+                    self%integration_rule%gauss(i)%z, ")  Weight = ", self%integration_rule%weight(i)
                 call global_logger%log_information(strip(msg))
             end do
         end if
@@ -915,10 +912,7 @@ contains
         self%type = 0
         self%num_nodes = 0
         self%dimension = 0
-        self%order = 0
-        self%num_gauss = 0
-        if (allocated(self%weight)) deallocate (self%weight)
-        if (allocated(self%gauss)) deallocate (self%gauss)
+        call self%integration_rule%destroy()
     end subroutine destroy_abst_fe
 
-end module domain_fe
+end module domain_base_fe

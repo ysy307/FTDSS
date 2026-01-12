@@ -9,14 +9,78 @@ module linalg_matrix_operations
     public :: matrix_axpyz
     public :: matrix_scale
     public :: matrix_gemv
+    public :: matrix_gemm
+    public :: matrix_inverse
     public :: matvec
 
     interface matrix_gemv
+        module procedure :: gemv_matrix_real64
         module procedure :: gemv_matrix_dense
         module procedure :: gemv_matrix_coo
         module procedure :: gemv_matrix_csr
         module procedure :: gemv_matrix_bsr
     end interface
+
+    interface matrix_gemm
+        module procedure :: matrix_gemm_real64
+    end interface
+
+    interface matrix_inverse
+        module procedure :: matrix_inverse_real64
+    end interface
+
+    interface matvec
+        module procedure :: matvec_real64
+        module procedure :: matvec_matrix
+    end interface
+
+#ifdef _MKL
+    interface
+        subroutine dgemv(trans, m, n, alpha, a, lda, x, incx, beta, y, incy)
+            import :: real64
+            implicit none
+            character(len=1), intent(in) :: trans
+            integer, intent(in) :: m, n, lda, incx, incy
+            real(real64), intent(in) :: alpha, beta
+            real(real64), intent(in) :: a(lda, *), x(*), y(*)
+        end subroutine dgemv
+
+        subroutine dgemm(transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc)
+            import :: real64
+            implicit none
+            character(len=1), intent(in) :: transa, transb
+            integer, intent(in) :: m, n, k, lda, ldb, ldc
+            real(real64), intent(in) :: alpha, beta
+            real(real64), intent(in) :: a(lda, *), b(ldb, *)
+            real(real64), intent(inout) :: c(ldc, *)
+        end subroutine dgemm
+
+        ! ------------------------------------------------------------------
+        ! dgetrf: Computes the LU factorization of a general m-by-n matrix
+        ! ------------------------------------------------------------------
+        subroutine dgetrf(m, n, a, lda, ipiv, info)
+            import :: real64
+            implicit none
+            integer, intent(in) :: m, n, lda
+            real(real64), intent(inout) :: a(lda, *)
+            integer, intent(inout) :: ipiv(*)
+            integer, intent(inout) :: info
+        end subroutine dgetrf
+
+        ! ------------------------------------------------------------------
+        ! dgetri: Computes the inverse of an LU-factored general matrix
+        ! ------------------------------------------------------------------
+        subroutine dgetri(n, a, lda, ipiv, work, lwork, info)
+            import :: real64
+            implicit none
+            integer, intent(in) :: n, lda, lwork
+            real(real64), intent(inout) :: a(lda, *)
+            integer, intent(in) :: ipiv(*)
+            real(real64), intent(inout) :: work(*)
+            integer, intent(inout) :: info
+        end subroutine dgetri
+    end interface
+#endif
 
 contains
 
@@ -164,6 +228,41 @@ contains
 
     end subroutine matrix_scale
 
+    !> Perform general matrix-vector multiplication for real64 matrices.
+    !> Computes \( y = \alpha A x + \beta y \).
+    subroutine gemv_matrix_real64(alpha, A, x, beta, y, ierr)
+        implicit none
+        !> Scalar \( \alpha \)
+        real(real64), intent(in) :: alpha
+        !> Dense matrix A
+        real(real64), intent(in) :: A(:, :)
+        !> Input vector x
+        real(real64), intent(in) :: x(:)
+        !> Scalar \( \beta \)
+        real(real64), intent(in) :: beta
+        !> Input/Output vector y
+        real(real64), intent(inout) :: y(:)
+        !> Error status
+        integer(int32), intent(inout) :: ierr
+
+        integer(int32) :: i
+        integer(int32) :: num_row, num_col
+
+        num_row = size(A, 1)
+        num_col = size(A, 2)
+#ifdef _MKL
+        call dgemv('N', num_row, num_col, alpha, A, num_row, x, 1, beta, y, 1)
+#else
+        !$omp parallel do private(i)
+        do i = 1, num_row
+            y(i) = alpha * dot_product(A(i, :), x) + beta * y(i)
+        end do
+        !$omp end parallel do
+#endif
+        ierr = MATRIX_STATUS_SUCCESS
+
+    end subroutine gemv_matrix_real64
+
     !> Perform general matrix-vector multiplication for dense matrices.
     !> Computes \( y = \alpha A x + \beta y \).
     subroutine gemv_matrix_dense(alpha, A, x, beta, y, ierr)
@@ -186,17 +285,6 @@ contains
         type(type_matrix_info) :: info
 
 #ifdef _MKL
-        interface
-            subroutine dgemv(trans, m, n, alpha, a, lda, x, incx, beta, y, incy)
-                use, intrinsic :: iso_fortran_env
-                implicit none
-                character(len=1), intent(in) :: trans
-                integer, intent(in) :: m, n, lda, incx, incy
-                real(real64), intent(in) :: alpha, beta
-                real(real64), intent(in) :: a(lda, *), x(*), y(*)
-            end subroutine dgemv
-        end interface
-
         call A%get_info(info)
         if (info%num_rows /= size(x) .or. info%num_cols /= size(y)) then
             ierr = MATRIX_STATUS_ILL_OPERATIONS
@@ -381,9 +469,376 @@ contains
 
     end subroutine gemv_matrix_bsr
 
+    subroutine matrix_gemm_real64(A, B, C, ierr)
+        implicit none
+        !> Input matrix A
+        real(real64), intent(in) :: A(:, :)
+        !> Input matrix B
+        real(real64), intent(in) :: B(:, :)
+        !> Output matrix C
+        real(real64), intent(inout) :: C(:, :)
+        !> Error status
+        integer(int32), intent(inout) :: ierr
+
+#ifdef _MKL
+        integer(int32) :: m, n, k
+        m = size(A, 1)
+        k = size(A, 2)
+        n = size(B, 2)
+        call dgemm('N', 'N', m, n, k, 1.0d0, A, m, B, k, 0.0d0, C, m)
+        ierr = MATRIX_STATUS_SUCCESS
+#else
+        integer(int32) :: i, j, l
+        integer(int32) :: m, n, k
+        m = size(A, 1)
+        k = size(A, 2)
+        n = size(B, 2)
+        !$omp parallel do private(i, j, l)
+        do i = 1, m
+            do j = 1, n
+                C(i, j) = 0.0d0
+                do l = 1, k
+                    C(i, j) = C(i, j) + A(i, l) * B(l, j)
+                end do
+            end do
+        end do
+        !$omp end parallel do
+        ierr = MATRIX_STATUS_SUCCESS
+#endif
+    end subroutine matrix_gemm_real64
+
+    !> Compute the inverse of a square matrix A.
+    !> The result overwrites A (In-place).
+    !> Uses analytical formulas (Cramer's rule variant) for N <= 3.
+    !> For N > 3: Uses LAPACK (dgetrf/dgetri) if _MKL is defined, otherwise uses Gauss-Jordan elimination.
+    subroutine matrix_inverse_real64(A, ierr)
+        implicit none
+        !> Input/Output matrix A. On exit, contains the inverse.
+        real(real64), intent(inout) :: A(:, :)
+        !> Error status
+        integer(int32), intent(inout) :: ierr
+
+        integer(int32) :: n, m
+        real(real64) :: det, invDet
+        real(real64) :: T(3, 3) ! Temporary array for small matrices
+
+#ifdef _MKL
+        integer(int32), allocatable :: ipiv(:)
+        real(real64), allocatable :: work(:)
+        integer(int32) :: lwork
+        integer(int32) :: info
+        real(real64) :: work_query(1)
+#else
+        integer(int32) :: i, j, k, pivot_idx
+        real(real64) :: pivot_val, temp_val
+        real(real64), allocatable :: temp_row(:)
+#endif
+
+        n = size(A, 1)
+        m = size(A, 2)
+
+        ! Validate square matrix
+        if (n /= m) then
+            ierr = MATRIX_STATUS_ILL_OPERATIONS
+            return
+        end if
+
+        ! -----------------------------------------------------------------------
+        ! 1. Analytical Solution for Small Matrices (N <= 3)
+        !    Uses Cramer's rule (Adjugate matrix / Determinant)
+        ! -----------------------------------------------------------------------
+        if (n <= 3) then
+            ierr = MATRIX_STATUS_SUCCESS
+
+            select case (n)
+            case (1)
+                det = A(1, 1)
+                if (abs(det) < epsilon(1.0_real64)) then
+                    ierr = MATRIX_STATUS_ILL_OPERATIONS
+                    return
+                end if
+                A(1, 1) = 1.0d0 / det
+
+            case (2)
+                det = A(1, 1) * A(2, 2) - A(1, 2) * A(2, 1)
+                if (abs(det) < epsilon(1.0_real64)) then
+                    ierr = MATRIX_STATUS_ILL_OPERATIONS
+                    return
+                end if
+                invDet = 1.0d0 / det
+
+                ! Use temporary variables to allow in-place update
+                T(1, 1) = A(2, 2) * invDet
+                T(1, 2) = -A(1, 2) * invDet
+                T(2, 1) = -A(2, 1) * invDet
+                T(2, 2) = A(1, 1) * invDet
+
+                A(1:2, 1:2) = T(1:2, 1:2)
+
+            case (3)
+                ! Sarrus rule / Cofactor expansion
+                T(1:3, 1:3) = A(1:3, 1:3) ! Copy to temp to compute safely
+
+                det = T(1, 1) * (T(2, 2) * T(3, 3) - T(2, 3) * T(3, 2)) &
+                      - T(1, 2) * (T(2, 1) * T(3, 3) - T(2, 3) * T(3, 1)) &
+                      + T(1, 3) * (T(2, 1) * T(3, 2) - T(2, 2) * T(3, 1))
+
+                if (abs(det) < epsilon(1.0_real64)) then
+                    ierr = MATRIX_STATUS_ILL_OPERATIONS
+                    return
+                end if
+                invDet = 1.0d0 / det
+
+                ! Compute Adjugate Matrix * invDet
+                ! Row 1
+                A(1, 1) = (T(2, 2) * T(3, 3) - T(2, 3) * T(3, 2)) * invDet
+                A(1, 2) = (T(1, 3) * T(3, 2) - T(1, 2) * T(3, 3)) * invDet
+                A(1, 3) = (T(1, 2) * T(2, 3) - T(1, 3) * T(2, 2)) * invDet
+
+                ! Row 2
+                A(2, 1) = (T(2, 3) * T(3, 1) - T(2, 1) * T(3, 3)) * invDet
+                A(2, 2) = (T(1, 1) * T(3, 3) - T(1, 3) * T(3, 1)) * invDet
+                A(2, 3) = (T(1, 3) * T(2, 1) - T(1, 1) * T(2, 3)) * invDet
+
+                ! Row 3
+                A(3, 1) = (T(2, 1) * T(3, 2) - T(2, 2) * T(3, 1)) * invDet
+                A(3, 2) = (T(1, 2) * T(3, 1) - T(1, 1) * T(3, 2)) * invDet
+                A(3, 3) = (T(1, 1) * T(2, 2) - T(1, 2) * T(2, 1)) * invDet
+            end select
+
+            return
+        end if
+
+#ifdef _MKL
+        ! -----------------------------------------------------------------------
+        ! 2. MKL (LAPACK) Implementation for N > 3
+        ! -----------------------------------------------------------------------
+        call allocate_array(ipiv, n)
+
+        ! LU Factorization
+        call dgetrf(n, n, A, n, ipiv, info)
+
+        if (info /= 0) then
+            call deallocate_array(ipiv)
+            ierr = MATRIX_STATUS_ILL_OPERATIONS
+            return
+        end if
+
+        ! Query optimal workspace size
+        lwork = -1
+        call dgetri(n, A, n, ipiv, work_query, lwork, info)
+
+        lwork = int(work_query(1))
+        call allocate_array(work, lwork)
+
+        ! Compute inverse
+        call dgetri(n, A, n, ipiv, work, lwork, info)
+
+        if (info /= 0) then
+            ierr = MATRIX_STATUS_ILL_OPERATIONS
+        else
+            ierr = MATRIX_STATUS_SUCCESS
+        end if
+
+        call deallocate_array(ipiv)
+        call deallocate_array(work)
+
+#else
+        ! -----------------------------------------------------------------------
+        ! 3. Fallback Implementation (Gauss-Jordan) for N > 3
+        ! -----------------------------------------------------------------------
+        call allocate_array(temp_row, n)
+        ierr = MATRIX_STATUS_SUCCESS
+
+        do i = 1, n
+            ! Find pivot
+            pivot_idx = i
+            pivot_val = abs(A(i, i))
+            do k = i + 1, n
+                if (abs(A(k, i)) > pivot_val) then
+                    pivot_idx = k
+                    pivot_val = abs(A(k, i))
+                end if
+            end do
+
+            ! Check singularity
+            if (pivot_val < epsilon(1.0_real64)) then
+                ierr = MATRIX_STATUS_ILL_OPERATIONS
+                exit
+            end if
+
+            ! Swap rows if needed
+            if (pivot_idx /= i) then
+                temp_row = A(i, :)
+                A(i, :) = A(pivot_idx, :)
+                A(pivot_idx, :) = temp_row
+            end if
+
+            ! Scale pivot row
+            temp_val = 1.0d0 / A(i, i)
+            A(i, i) = 1.0d0
+            A(i, :) = A(i, :) * temp_val
+
+            ! Eliminate other rows
+            do k = 1, n
+                if (k /= i) then
+                    temp_val = A(k, i)
+                    A(k, i) = 0.0d0
+                    A(k, :) = A(k, :) - temp_val * A(i, :)
+                end if
+            end do
+        end do
+
+        call deallocate_array(temp_row)
+#endif
+
+    end subroutine matrix_inverse_real64
+
+    !> Compute the determinant of a square matrix A.
+    !> Input A is preserved (intent(in)).
+    !> Uses analytical formulas for N <= 3.
+    !> For N > 3: Uses LAPACK (dgetrf) if _MKL is defined, otherwise uses Gaussian elimination.
+    subroutine matrix_determinant_real64(A, det, ierr)
+        implicit none
+        real(real64), intent(in) :: A(:, :)
+        real(real64), intent(inout) :: det ! intent(out)禁止のためinout
+        integer(int32), intent(inout) :: ierr
+
+        integer(int32) :: n, m
+        real(real64), allocatable :: temp_A(:, :)
+
+#ifdef _MKL
+        integer(int32), allocatable :: ipiv(:)
+        integer(int32) :: info
+        integer(int32) :: i
+#else
+        integer(int32) :: i, k, pivot_idx
+        real(real64) :: pivot_val, factor
+        real(real64), allocatable :: temp_row(:)
+        real(real64) :: det_sign
+#endif
+
+        n = size(A, 1)
+        m = size(A, 2)
+
+        if (n /= m) then
+            ierr = MATRIX_STATUS_ILL_OPERATIONS
+            det = 0.0d0
+            return
+        end if
+        ierr = MATRIX_STATUS_SUCCESS
+
+        ! --- N <= 3: Analytical Solution (No allocation needed) ---
+        if (n <= 3) then
+            select case (n)
+            case (1)
+                det = A(1, 1)
+            case (2)
+                det = A(1, 1) * A(2, 2) - A(1, 2) * A(2, 1)
+            case (3)
+                det = A(1, 1) * (A(2, 2) * A(3, 3) - A(2, 3) * A(3, 2)) &
+                      - A(1, 2) * (A(2, 1) * A(3, 3) - A(2, 3) * A(3, 1)) &
+                      + A(1, 3) * (A(2, 1) * A(3, 2) - A(2, 2) * A(3, 1))
+            end select
+            return
+        end if
+
+        ! --- N > 3: LU Decomposition ---
+        ! Copy A to temp_A because LU is destructive
+        call allocate_array(temp_A, n, n)
+        temp_A = A
+
+#ifdef _MKL
+        call allocate_array(ipiv, n)
+
+        ! LU Factorization (P * A = L * U)
+        call dgetrf(n, n, temp_A, n, ipiv, info)
+
+        if (info < 0) then
+            ierr = MATRIX_STATUS_ILL_OPERATIONS
+            det = 0.0d0
+        else if (info > 0) then
+            ! Singular matrix
+            det = 0.0d0
+        else
+            ! Det = product(diag(U)) * (-1)^swaps
+            det = 1.0d0
+            do i = 1, n
+                det = det * temp_A(i, i)
+                if (ipiv(i) /= i) det = -det
+            end do
+        end if
+
+        call deallocate_array(ipiv)
+#else
+        ! Gaussian Elimination
+        call allocate_array(temp_row, n)
+        det_sign = 1.0d0
+        det = 1.0d0
+
+        do i = 1, n
+            ! Pivot search
+            pivot_idx = i
+            pivot_val = abs(temp_A(i, i))
+            do k = i + 1, n
+                if (abs(temp_A(k, i)) > pivot_val) then
+                    pivot_idx = k
+                    pivot_val = abs(temp_A(k, i))
+                end if
+            end do
+
+            if (pivot_val < epsilon(1.0_real64)) then
+                det = 0.0d0
+                exit
+            end if
+
+            ! Swap
+            if (pivot_idx /= i) then
+                temp_row = temp_A(i, :)
+                temp_A(i, :) = temp_A(pivot_idx, :)
+                temp_A(pivot_idx, :) = temp_row
+                det_sign = -det_sign
+            end if
+
+            ! Eliminate
+            do k = i + 1, n
+                factor = temp_A(k, i) / temp_A(i, i)
+                temp_A(k, i + 1:) = temp_A(k, i + 1:) - factor * temp_A(i, i + 1:)
+            end do
+
+            det = det * temp_A(i, i)
+        end do
+
+        det = det * det_sign
+        call deallocate_array(temp_row)
+#endif
+
+        call deallocate_array(temp_A)
+
+    end subroutine matrix_determinant_real64
+
     !> Compute matrix-vector multiplication \( y = A x \).
     !> Wrapper for GEMV with \( \alpha = 1, \beta = 0 \).
-    subroutine matvec(A, x, y, ierr)
+    subroutine matvec_real64(A, x, y, ierr)
+        implicit none
+        !> System matrix A
+        real(real64), intent(in) :: A(:, :)
+        !> Input vector x
+        real(real64), intent(in) :: x(:)
+        !> Output vector y
+        real(real64), intent(inout) :: y(:)
+        !> Error status
+        integer(int32), intent(inout) :: ierr
+
+        real(real64), dimension(:), pointer :: x_data
+        real(real64), dimension(:), pointer :: y_data
+
+        call gemv_matrix_real64(1.0d0, A, x, 0.0d0, y, ierr)
+    end subroutine matvec_real64
+
+    !> Compute matrix-vector multiplication \( y = A x \).
+    !> Wrapper for GEMV with \( \alpha = 1, \beta = 0 \).
+    subroutine matvec_matrix(A, x, y, ierr)
         implicit none
         !> System matrix A
         class(abst_matrix), intent(in) :: A
@@ -412,5 +867,5 @@ contains
             ierr = MATRIX_STATUS_ILL_OPERATIONS
         end select
 
-    end subroutine matvec
+    end subroutine matvec_matrix
 end module linalg_matrix_operations

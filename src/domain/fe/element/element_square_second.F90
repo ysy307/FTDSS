@@ -2,7 +2,6 @@
 !> Implements the procedures for the second-order quadrilateral (8-node) finite element.
 !>
 submodule(domain_fe_element) domain_fe_element_square_second
-    use :: domain_fe_integration, only:get_integration_rule
     implicit none
 
 contains
@@ -19,8 +18,6 @@ contains
         integer(int32) :: order
         integer(int32) :: num_gauss
         integer(int32) :: integration_order
-        real(real64), allocatable :: weight(:)
-        real(real64), allocatable :: gauss(:, :)
 
         allocate (type_square_second :: fe)
 
@@ -35,13 +32,9 @@ contains
             integration_order = 3
         end select
 
-        call get_integration_rule(cell_name, integration_order, num_gauss, weight, gauss)
-
         call fe%initialize(type=vtk_type, dimension=dimension, order=order, num_nodes=num_nodes, &
-                           num_gauss=num_gauss, weight=weight, gauss=gauss)
+                           integration_order=integration_order)
 
-        if (allocated(weight)) call deallocate_array(weight)
-        if (allocated(gauss)) call deallocate_array(gauss)
     end function construct_square_second
 
     module subroutine get_area_square_second(self, node_coords, geometry)

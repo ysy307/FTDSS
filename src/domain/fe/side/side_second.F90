@@ -4,7 +4,6 @@
 !>
 submodule(domain_fe_side) domain_fe_side_second
     implicit none
-
 contains
 
     !>
@@ -21,8 +20,7 @@ contains
         integer(int32) :: dimension
         integer(int32) :: order
         integer(int32) :: num_gauss
-        real(real64), allocatable :: weight(:)
-        real(real64), allocatable :: gauss(:, :)
+        integer(int32) :: integration_order
 
         allocate (type_side_second :: fe)
 
@@ -31,34 +29,16 @@ contains
         ! Set integration rule based on input settings
         select case (strip(input%basic%geometry_settings%integration_type))
         case ("full")
-            num_gauss = 2
-            call allocate_array(weight, num_gauss)
-            call allocate_array(gauss, 3, num_gauss)
-            weight(:) = [1.0d0, 1.0d0]
-            gauss(1, 1) = -1.0d0 / sqrt(3.0d0)
-            gauss(1, 2) = 1.0d0 / sqrt(3.0d0)
-            gauss(2:3, :) = 0.0d0
+            integration_order = 2
         case ("reduced")
-            num_gauss = 1
-            call allocate_array(weight, num_gauss)
-            call allocate_array(gauss, 3, num_gauss)
-            weight(1) = 2.0d0
-            gauss(:, 1) = 0.0d0
-        case default ! "free" defaults to full
-            num_gauss = 2
-            call allocate_array(weight, num_gauss)
-            call allocate_array(gauss, 3, num_gauss)
-            weight(:) = [1.0d0, 1.0d0]
-            gauss(1, 1) = -1.0d0 / sqrt(3.0d0)
-            gauss(1, 2) = 1.0d0 / sqrt(3.0d0)
-            gauss(2:3, :) = 0.0d0
+            integration_order = 1
+        case default
+            integration_order = 2
         end select
 
         call fe%initialize(type=vtk_type, dimension=dimension, order=order, num_nodes=num_nodes, &
-                           num_gauss=num_gauss, weight=weight, gauss=gauss)
+                           integration_order=integration_order)
 
-        call deallocate_array(weight)
-        call deallocate_array(gauss)
     end function construct_side_second
 
     !>

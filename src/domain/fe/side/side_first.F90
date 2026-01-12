@@ -4,7 +4,6 @@
 !>
 submodule(domain_fe_side) domain_fe_side_first
     implicit none
-
 contains
 
     !>
@@ -23,26 +22,24 @@ contains
         integer(int32) :: dimension
         integer(int32) :: order
         integer(int32) :: num_gauss
-        real(real64), allocatable :: weight(:)
-        real(real64), allocatable :: gauss(:, :)
+        integer(int32) :: integration_order
 
         allocate (type_side_first :: fe)
 
         call vtk_constants%get_cell_info_from_cell_name(cell_name, vtk_type, num_nodes, dimension, order)
 
-        ! Integration rule for a 1st-order element (1-point Gauss quadrature)
-        num_gauss = 1
-        call allocate_array(weight, num_gauss)
-        call allocate_array(gauss, 3, num_gauss)
-
-        weight(1) = 2.0d0
-        gauss(:, 1) = 0.0d0
+        select case (strip(input%basic%geometry_settings%integration_type))
+        case ("full")
+            integration_order = 1
+        case ("reduced")
+            integration_order = 1
+        case default
+            integration_order = 1
+        end select
 
         call fe%initialize(type=vtk_type, dimension=dimension, order=order, num_nodes=num_nodes, &
-                           num_gauss=num_gauss, weight=weight, gauss=gauss)
+                           integration_order=integration_order)
 
-        call deallocate_array(weight)
-        call deallocate_array(gauss)
     end function construct_side_first
 
     !>

@@ -148,7 +148,7 @@ contains
         type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gp => null()
         real(real64) :: lerped_value
         type(type_coordinate_dp) :: dlerped_value
-        real(real64), allocatable :: work(:)
+        real(real64), allocatable :: work_history(:)
 
         call self%fe%get_gauss(gp)
 
@@ -156,18 +156,21 @@ contains
         self%work_node(:, :) = 0.0d0
         do i = 1, self%num_fe_nodes
             call self%state(i)%get(temperature=self%T_node(i), &
-                                   temperature_history=work)
-            self%work_node(1:self%bdf_order + 1, i) = work(1:self%bdf_order + 1)
+                                   temperature_history=work_history)
+            print *, work_history
+            self%work_node(1:self%bdf_order + 1, i) = work_history(1:self%bdf_order + 1)
         end do
         do i = 1, self%num_fe_gauss
             call self%fe%lerp(gp(i), self%T_node, lerped_value)
             call self%state_gp(i)%temperature%set(lerped_value)
         end do
-        do i = 1, self%bdf_order + 1
-            do j = 1, self%num_fe_gauss
-                call self%fe%lerp(gp(j), self%work_node(i, :), lerped_value)
-                call self%state_gp(j)%temperature_history%set(i, lerped_value)
+        do j = 1, self%num_fe_gauss
+            work_history(:) = 0.0d0
+            do i = 1, self%bdf_order + 1
+                call self%fe%lerp(gp(j), self%work_node(i, :), work_history(i))
             end do
+            call self%state_gp(j)%set(temperature_history=work_history)
+
         end do
         do i = 1, self%num_fe_gauss
             call self%fe%dlerp(gp(i), self%T_node, dlerped_value)
@@ -178,18 +181,20 @@ contains
         self%work_node(:, :) = 0.0d0
         do i = 1, self%num_fe_nodes
             call self%state(i)%get(pressure=self%P_node(i), &
-                                   pressure_history=work)
-            self%work_node(1:self%bdf_order + 1, i) = work(1:self%bdf_order + 1)
+                                   pressure_history=work_history)
+            self%work_node(1:self%bdf_order + 1, i) = work_history(1:self%bdf_order + 1)
         end do
         do i = 1, self%num_fe_gauss
             call self%fe%lerp(gp(i), self%P_node, lerped_value)
             call self%state_gp(i)%pressure%set(lerped_value)
         end do
-        do i = 1, self%bdf_order + 1
-            do j = 1, self%num_fe_gauss
-                call self%fe%lerp(gp(j), self%work_node(i, :), lerped_value)
-                call self%state_gp(j)%pressure_history%set(i, lerped_value)
+
+        do j = 1, self%num_fe_gauss
+            do i = 1, self%bdf_order + 1
+                work_history(:) = 0.0d0
+                call self%fe%lerp(gp(j), self%work_node(i, :), work_history(i))
             end do
+            call self%state_gp(j)%pressure_history%set(work_history)
         end do
         do i = 1, self%num_fe_gauss
             call self%fe%dlerp(gp(i), self%P_node, dlerped_value)
@@ -200,18 +205,18 @@ contains
         self%work_node(:, :) = 0.0d0
         do i = 1, self%num_fe_nodes
             call self%state(i)%get(porosity=self%phi_node(i), &
-                                   porosity_history=work)
-            self%work_node(1:self%bdf_order + 1, i) = work(1:self%bdf_order + 1)
+                                   porosity_history=work_history)
+            self%work_node(1:self%bdf_order + 1, i) = work_history(1:self%bdf_order + 1)
         end do
         do i = 1, self%num_fe_gauss
             call self%fe%lerp(gp(i), self%phi_node, lerped_value)
             call self%state_gp(i)%porosity%set(lerped_value)
         end do
-        do i = 1, self%bdf_order + 1
-            do j = 1, self%num_fe_gauss
-                call self%fe%lerp(gp(j), self%work_node(i, :), lerped_value)
-                call self%state_gp(j)%porosity_history%set(i, lerped_value)
+        do j = 1, self%num_fe_gauss
+            do i = 1, self%bdf_order + 1
+                call self%fe%lerp(gp(j), self%work_node(i, :), work_history(i))
             end do
+            call self%state_gp(j)%porosity_history%set(work_history)
         end do
 
     end subroutine lerp_states

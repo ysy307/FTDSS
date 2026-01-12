@@ -9,7 +9,7 @@ module domain_fe_side
     use :: stdlib_strings
     use :: module_core
     use :: module_input, only:type_input
-    use :: domain_fe, only:abst_fe
+    use :: domain_base_fe, only:abst_fe
     implicit none
     private
 

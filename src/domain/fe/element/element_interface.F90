@@ -9,8 +9,7 @@ module domain_fe_element
     use :: stdlib_logger
     use :: module_core
     use :: module_input, only:type_input
-    use :: domain_fe, only:abst_fe
-    use :: domain_fe_integration, only:get_integration_rule
+    use :: domain_base_fe, only:abst_fe
     implicit none
     private
 
