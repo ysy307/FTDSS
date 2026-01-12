@@ -236,7 +236,7 @@ contains
         implicit none
         integer(int32), intent(in) :: n
         integer(int32), intent(in) :: idx
-        real(real64), intent(out) :: w, p
+        real(real64), intent(inout) :: w, p
 
         real(real64), parameter :: s3 = sqrt(1.0d0 / 3.0d0)
         real(real64), parameter :: s35 = sqrt(3.0d0 / 5.0d0)
