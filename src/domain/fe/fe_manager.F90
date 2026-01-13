@@ -1,5 +1,6 @@
 module domain_fe_manager
     use, intrinsic :: iso_fortran_env, only: int32
+    use :: module_core, only:unique
     use :: domain_base_fe, only:abst_fe, holder_fes
     use :: domain_fe_factory, only:create_fe
 

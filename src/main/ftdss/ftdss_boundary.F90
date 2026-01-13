@@ -173,8 +173,7 @@ contains
 
                         do k_gp = 1, num_gp
                             r = fe_gauss_pts(k_gp)
-
-                            call fe%calc_shape_data(r, node_coords, psi, dpsi_dx, det_j)
+                            call fe%calc_shape_function(r, node_coords, psi=psi, dpsi_dx=dpsi_dx, determinant_jacobian=det_j)
                             w_vol = fe_weights(k_gp) * det_j
 
                             u_curr = 0.0d0

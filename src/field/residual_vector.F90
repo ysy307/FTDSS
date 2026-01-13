@@ -17,6 +17,7 @@ module field_residual_vector
 
     type :: type_residual_vector
         private
+        integer(int32) :: num_nodes = 0
         integer(int32) :: num_dofs_per_node = 0
         integer(int32) :: size = 0
 
@@ -69,11 +70,12 @@ contains
         class(type_residual_vector), intent(inout) :: self
         type(type_domain), intent(in) :: domain
 
-        self%size = domain%get_total_dofs()
-        self%num_dofs_per_node = domain%get_num_dofs_per_node()
+        call domain%get_total_dofs(self%size)
+        call domain%get_num_dofs_per_node(self%num_dofs_per_node)
+        call domain%get_num_nodes(self%num_nodes)
 
         ! num_blocks = num_dofs_per_node として初期化
-        call self%data%initialize(domain%get_num_nodes(), num_blocks=self%num_dofs_per_node)
+        call self%data%initialize(self%num_nodes, num_blocks=self%num_dofs_per_node)
 
     end subroutine initialize_residual_vector_from_domain
 

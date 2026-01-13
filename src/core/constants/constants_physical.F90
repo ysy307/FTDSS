@@ -1,5 +1,6 @@
 module core_constants_physical
     use, intrinsic :: iso_fortran_env
+    use :: core_constants_base, only:type_constant_int
     implicit none
     private
 
@@ -49,98 +50,74 @@ module core_constants_physical
     integer(int32), parameter, public :: GCC_NON_SEGREGATION = 1
     integer(int32), parameter, public :: GCC_SEGREGATION = 2
 
-    !------------------------------------------------------------------------
-    ! Linear cells
-    !------------------------------------------------------------------------
-    integer(int32), parameter, public :: FE_EMPTY_CELL = 0
-    integer(int32), parameter, public :: FE_VERTEX = 1
-    integer(int32), parameter, public :: FE_POLY_VERTEX = 2
-    integer(int32), parameter, public :: FE_LINE = 3
-    integer(int32), parameter, public :: FE_POLY_LINE = 4
-    integer(int32), parameter, public :: FE_TRIANGLE = 5
-    integer(int32), parameter, public :: FE_TRIANGLE_STRIP = 6
-    integer(int32), parameter, public :: FE_POLYGON = 7
-    integer(int32), parameter, public :: FE_PIXEL = 8
-    integer(int32), parameter, public :: FE_QUAD = 9
-    integer(int32), parameter, public :: FE_TETRA = 10
-    integer(int32), parameter, public :: FE_VOXEL = 11
-    integer(int32), parameter, public :: FE_HEXAHEDRON = 12
-    integer(int32), parameter, public :: FE_WEDGE = 13
-    integer(int32), parameter, public :: FE_PYRAMID = 14
-    integer(int32), parameter, public :: FE_PENTAGONAL_PRISM = 15
-    integer(int32), parameter, public :: FE_HEXAGONAL_PRISM = 16
-    !------------------------------------------------------------------------
-    ! Quadratic, isoparametric cells
-    !------------------------------------------------------------------------
-    integer(int32), parameter, public :: FE_QUADRATIC_EDGE = 21
-    integer(int32), parameter, public :: FE_QUADRATIC_TRIANGLE = 22
-    integer(int32), parameter, public :: FE_QUADRATIC_QUAD = 23
-    integer(int32), parameter, public :: FE_QUADRATIC_POLYGON = 36
-    integer(int32), parameter, public :: FE_QUADRATIC_TETRA = 24
-    integer(int32), parameter, public :: FE_QUADRATIC_HEXAHEDRON = 25
-    integer(int32), parameter, public :: FE_QUADRATIC_WEDGE = 26
-    integer(int32), parameter, public :: FE_QUADRATIC_PYRAMID = 27
-    integer(int32), parameter, public :: FE_BIQUADRATIC_QUAD = 28
-    integer(int32), parameter, public :: FE_TRIQUADRATIC_HEXAHEDRON = 29
-    integer(int32), parameter, public :: FE_TRIQUADRATIC_PYRAMID = 37
-    integer(int32), parameter, public :: FE_QUADRATIC_LINEAR_QUAD = 30
-    integer(int32), parameter, public :: FE_QUADRATIC_LINEAR_WEDGE = 31
-    integer(int32), parameter, public :: FE_BIQUADRATIC_QUADRATIC_WEDGE = 32
-    integer(int32), parameter, public :: FE_BIQUADRATIC_QUADRATIC_HEXAHEDRON = 33
-    integer(int32), parameter, public :: FE_BIQUADRATIC_TRIANGLE = 34
-    !------------------------------------------------------------------------
-    ! Cubic, isoparametric cell
-    !------------------------------------------------------------------------
-    integer(int32), parameter, public :: FE_CUBIC_LINE = 35
-    !------------------------------------------------------------------------
-    ! Special class of cells formed by convex group of points
-    !------------------------------------------------------------------------
-    integer(int32), parameter, public :: FE_CONVEX_POINT_SET = 41
-    !------------------------------------------------------------------------
-    ! Polyhedron cell(consisting of polygonal faces)
-    !------------------------------------------------------------------------
-    integer(int32), parameter, public :: FE_POLYHEDRON = 42
-    !------------------------------------------------------------------------
-    ! Higher order cells in parametric form
-    !------------------------------------------------------------------------
-    integer(int32), parameter, public :: FE_PARAMETRIC_CURVE = 51
-    integer(int32), parameter, public :: FE_PARAMETRIC_SURFACE = 52
-    integer(int32), parameter, public :: FE_PARAMETRIC_TRI_SURFACE = 53
-    integer(int32), parameter, public :: FE_PARAMETRIC_QUAD_SURFACE = 54
-    integer(int32), parameter, public :: FE_PARAMETRIC_TETRA_REGION = 55
-    integer(int32), parameter, public :: FE_PARAMETRIC_HEX_REGION = 56
-    !------------------------------------------------------------------------
-    ! Higher order cells
-    !------------------------------------------------------------------------
-    integer(int32), parameter, public :: FE_HIGHER_ORDER_EDGE = 60
-    integer(int32), parameter, public :: FE_HIGHER_ORDER_TRIANGLE = 61
-    integer(int32), parameter, public :: FE_HIGHER_ORDER_QUAD = 62
-    integer(int32), parameter, public :: FE_HIGHER_ORDER_POLYGON = 63
-    integer(int32), parameter, public :: FE_HIGHER_ORDER_TETRAHEDRON = 64
-    integer(int32), parameter, public :: FE_HIGHER_ORDER_WEDGE = 65
-    integer(int32), parameter, public :: FE_HIGHER_ORDER_PYRAMID = 66
-    integer(int32), parameter, public :: FE_HIGHER_ORDER_HEXAHEDRON = 67
-    !------------------------------------------------------------------------
-    ! Arbitrary order Lagrange elements(formulated separated from generic
-    ! higher order cells)
-    !------------------------------------------------------------------------
-    integer(int32), parameter, public :: FE_LAGRANGE_CURVE = 68
-    integer(int32), parameter, public :: FE_LAGRANGE_TRIANGLE = 69
-    integer(int32), parameter, public :: FE_LAGRANGE_QUADRILATERAL = 70
-    integer(int32), parameter, public :: FE_LAGRANGE_TETRAHEDRON = 71
-    integer(int32), parameter, public :: FE_LAGRANGE_HEXAHEDRON = 72
-    integer(int32), parameter, public :: FE_LAGRANGE_WEDGE = 73
-    integer(int32), parameter, public :: FE_LAGRANGE_PYRAMID = 74
-    !------------------------------------------------------------------------
-    ! Arbitrary order Bezier elements(formulated separated from generic
-    ! higher order cells)
-    !------------------------------------------------------------------------
-    integer(int32), parameter, public :: FE_BEZIER_CURVE = 75
-    integer(int32), parameter, public :: FE_BEZIER_TRIANGLE = 76
-    integer(int32), parameter, public :: FE_BEZIER_QUADRILATERAL = 77
-    integer(int32), parameter, public :: FE_BEZIER_TETRAHEDRON = 78
-    integer(int32), parameter, public :: FE_BEZIER_HEXAHEDRON = 79
-    integer(int32), parameter, public :: FE_BEZIER_WEDGE = 80
-    integer(int32), parameter, public :: FE_BEZIER_PYRAMID = 81
+    type :: type_constants_fe_type
+        type(type_constant_int) :: EMPTY_CELL = type_constant_int("EMPTY_CELL", 0, "")
+        type(type_constant_int) :: VERTEX = type_constant_int("VERTEX", 1, "")
+        type(type_constant_int) :: POLY_VERTEX = type_constant_int("POLY_VERTEX", 2, "")
+        type(type_constant_int) :: LINE = type_constant_int("LINE", 3, "")
+        type(type_constant_int) :: POLY_LINE = type_constant_int("POLY_LINE", 4, "")
+        type(type_constant_int) :: TRIANGLE = type_constant_int("TRIANGLE", 5, "")
+        type(type_constant_int) :: TRIANGLE_STRIP = type_constant_int("TRIANGLE_STRIP", 6, "")
+        type(type_constant_int) :: POLYGON = type_constant_int("POLYGON", 7, "")
+        type(type_constant_int) :: PIXEL = type_constant_int("PIXEL", 8, "")
+        type(type_constant_int) :: QUAD = type_constant_int("QUAD", 9, "")
+        type(type_constant_int) :: TETRA = type_constant_int("TETRA", 10, "")
+        type(type_constant_int) :: VOXEL = type_constant_int("VOXEL", 11, "")
+        type(type_constant_int) :: HEXAHEDRON = type_constant_int("HEXAHEDRON", 12, "")
+        type(type_constant_int) :: WEDGE = type_constant_int("WEDGE", 13, "")
+        type(type_constant_int) :: PYRAMID = type_constant_int("PYRAMID", 14, "")
+        type(type_constant_int) :: PENTAGONAL_PRISM = type_constant_int("PENTAGONAL_PRISM", 15, "")
+        type(type_constant_int) :: HEXAGONAL_PRISM = type_constant_int("HEXAGONAL_PRISM", 16, "")
+        type(type_constant_int) :: QUADRATIC_EDGE = type_constant_int("QUADRATIC_EDGE", 21, "")
+        type(type_constant_int) :: QUADRATIC_TRIANGLE = type_constant_int("QUADRATIC_TRIANGLE", 22, "")
+        type(type_constant_int) :: QUADRATIC_QUAD = type_constant_int("QUADRATIC_QUAD", 23, "")
+        type(type_constant_int) :: QUADRATIC_POLYGON = type_constant_int("QUADRATIC_POLYGON", 36, "")
+        type(type_constant_int) :: QUADRATIC_TETRA = type_constant_int("QUADRATIC_TETRA", 24, "")
+        type(type_constant_int) :: QUADRATIC_HEXAHEDRON = type_constant_int("QUADRATIC_HEXAHEDRON", 25, "")
+        type(type_constant_int) :: QUADRATIC_WEDGE = type_constant_int("QUADRATIC_WEDGE", 26, "")
+        type(type_constant_int) :: QUADRATIC_PYRAMID = type_constant_int("QUADRATIC_PYRAMID", 27, "")
+        type(type_constant_int) :: BIQUADRATIC_QUAD = type_constant_int("BIQUADRATIC_QUAD", 28, "")
+        type(type_constant_int) :: TRIQUADRATIC_HEXAHEDRON = type_constant_int("TRIQUADRATIC_HEXAHEDRON", 29, "")
+        type(type_constant_int) :: TRIQUADRATIC_PYRAMID = type_constant_int("TRIQUADRATIC_PYRAMID", 37, "")
+        type(type_constant_int) :: QUADRATIC_LINEAR_QUAD = type_constant_int("QUADRATIC_LINEAR_QUAD", 30, "")
+        type(type_constant_int) :: QUADRATIC_LINEAR_WEDGE = type_constant_int("QUADRATIC_LINEAR_WEDGE", 31, "")
+        type(type_constant_int) :: BIQUADRATIC_QUADRATIC_WEDGE = type_constant_int("BIQUADRATIC_QUADRATIC_WEDGE", 32, "")
+        type(type_constant_int) :: BIQUADRATIC_QUADRATIC_HEXAHEDRON = type_constant_int("BIQUADRATIC_QUADRATIC_HEXAHEDRON", 33, "")
+        type(type_constant_int) :: BIQUADRATIC_TRIANGLE = type_constant_int("BIQUADRATIC_TRIANGLE", 34, "")
+        type(type_constant_int) :: CUBIC_LINE = type_constant_int("CUBIC_LINE", 35, "")
+        type(type_constant_int) :: CONVEX_POINT_SET = type_constant_int("CONVEX_POINT_SET", 41, "")
+        type(type_constant_int) :: POLYHEDRON = type_constant_int("POLYHEDRON", 42, "")
+        type(type_constant_int) :: PARAMETRIC_CURVE = type_constant_int("PARAMETRIC_CURVE", 51, "")
+        type(type_constant_int) :: PARAMETRIC_SURFACE = type_constant_int("PARAMETRIC_SURFACE", 52, "")
+        type(type_constant_int) :: PARAMETRIC_TRI_SURFACE = type_constant_int("PARAMETRIC_TRI_SURFACE", 53, "")
+        type(type_constant_int) :: PARAMETRIC_QUAD_SURFACE = type_constant_int("PARAMETRIC_QUAD_SURFACE", 54, "")
+        type(type_constant_int) :: PARAMETRIC_TETRA_REGION = type_constant_int("PARAMETRIC_TETRA_REGION", 55, "")
+        type(type_constant_int) :: PARAMETRIC_HEX_REGION = type_constant_int("PARAMETRIC_HEX_REGION", 56, "")
+        type(type_constant_int) :: HIGHER_ORDER_EDGE = type_constant_int("HIGHER_ORDER_EDGE", 60, "")
+        type(type_constant_int) :: HIGHER_ORDER_TRIANGLE = type_constant_int("HIGHER_ORDER_TRIANGLE", 61, "")
+        type(type_constant_int) :: HIGHER_ORDER_QUAD = type_constant_int("HIGHER_ORDER_QUAD", 62, "")
+        type(type_constant_int) :: HIGHER_ORDER_POLYGON = type_constant_int("HIGHER_ORDER_POLYGON", 63, "")
+        type(type_constant_int) :: HIGHER_ORDER_TETRAHEDRON = type_constant_int("HIGHER_ORDER_TETRAHEDRON", 64, "")
+        type(type_constant_int) :: HIGHER_ORDER_WEDGE = type_constant_int("HIGHER_ORDER_WEDGE", 65, "")
+        type(type_constant_int) :: HIGHER_ORDER_PYRAMID = type_constant_int("HIGHER_ORDER_PYRAMID", 66, "")
+        type(type_constant_int) :: HIGHER_ORDER_HEXAHEDRON = type_constant_int("HIGHER_ORDER_HEXAHEDRON", 67, "")
+        type(type_constant_int) :: LAGRANGE_CURVE = type_constant_int("LAGRANGE_CURVE", 68, "")
+        type(type_constant_int) :: LAGRANGE_TRIANGLE = type_constant_int("LAGRANGE_TRIANGLE", 69, "")
+        type(type_constant_int) :: LAGRANGE_QUADRILATERAL = type_constant_int("LAGRANGE_QUADRILATERAL", 70, "")
+        type(type_constant_int) :: LAGRANGE_TETRAHEDRON = type_constant_int("LAGRANGE_TETRAHEDRON", 71, "")
+        type(type_constant_int) :: LAGRANGE_HEXAHEDRON = type_constant_int("LAGRANGE_HEXAHEDRON", 72, "")
+        type(type_constant_int) :: LAGRANGE_WEDGE = type_constant_int("LAGRANGE_WEDGE", 73, "")
+        type(type_constant_int) :: LAGRANGE_PYRAMID = type_constant_int("LAGRANGE_PYRAMID", 74, "")
+        type(type_constant_int) :: BEZIER_CURVE = type_constant_int("BEZIER_CURVE", 75, "")
+        type(type_constant_int) :: BEZIER_TRIANGLE = type_constant_int("BEZIER_TRIANGLE", 76, "")
+        type(type_constant_int) :: BEZIER_QUADRILATERAL = type_constant_int("BEZIER_QUADRILATERAL", 77, "")
+        type(type_constant_int) :: BEZIER_TETRAHEDRON = type_constant_int("BEZIER_TETRAHEDRON", 78, "")
+        type(type_constant_int) :: BEZIER_HEXAHEDRON = type_constant_int("BEZIER_HEXAHEDRON", 79, "")
+        type(type_constant_int) :: BEZIER_WEDGE = type_constant_int("BEZIER_WEDGE", 80, "")
+        type(type_constant_int) :: BEZIER_PYRAMID = type_constant_int("BEZIER_PYRAMID", 81, "")
+        integer(int32) :: max_fe_type = 81
+    end type type_constants_fe_type
+
+    type(type_constants_fe_type), public, parameter :: FE_TYPE = type_constants_fe_type()
 
 end module core_constants_physical

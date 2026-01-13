@@ -219,28 +219,28 @@ contains
         if (present(time)) then
             select case (self%status)
             case (SOLVER_STATUS_ILL_OPTIONS)
-                write (unit, '(a,es13.4,a)'), strip(self%name), ": ", time, " Day: Solver occures ILL_OPTIONS."
+                write (unit, '(a,es13.4,a)') strip(self%name), ": ", time, " Day: Solver occures ILL_OPTIONS."
             case (SOLVER_STATUS_BREAKDOWN)
-                write (unit, '(a,es13.4,a)'), strip(self%name), ": ", time, " Day: Solver occures BREAKDOWN."
+                write (unit, '(a,es13.4,a)') strip(self%name), ": ", time, " Day: Solver occures BREAKDOWN."
             case (SOLVER_STATUS_OUT_OF_MEMORY)
-                write (unit, '(a,es13.4,a)'), strip(self%name), ": ", time, " Day: Solver occures OUT_OF_MEMORY."
+                write (unit, '(a,es13.4,a)') strip(self%name), ": ", time, " Day: Solver occures OUT_OF_MEMORY."
             case (SOLVER_STATUS_MAXITER)
-                write (unit, '(a,es13.4,a)'), strip(self%name), ": ", time, " Day: Solver occures MAXITER."
+                write (unit, '(a,es13.4,a)') strip(self%name), ": ", time, " Day: Solver occures MAXITER."
             case (SOLVER_STATUS_NOT_IMPLEMENTED)
-                write (unit, '(a,es13.4,a)'), strip(self%name), ": ", time, " Day: Solver occures NOT_IMPLEMENTED."
+                write (unit, '(a,es13.4,a)') strip(self%name), ": ", time, " Day: Solver occures NOT_IMPLEMENTED."
             end select
         else
             select case (self%status)
             case (SOLVER_STATUS_ILL_OPTIONS)
-                write (unit, '(a,a)'), strip(self%name), ": Solver occures ILL_OPTIONS."
+                write (unit, '(2a)') strip(self%name), ": Solver occures ILL_OPTIONS."
             case (SOLVER_STATUS_BREAKDOWN)
-                write (unit, '(a,a)'), strip(self%name), ": Solver occures BREAKDOWN."
+                write (unit, '(2a)') strip(self%name), ": Solver occures BREAKDOWN."
             case (SOLVER_STATUS_OUT_OF_MEMORY)
-                write (unit, '(a,a)'), strip(self%name), ": Solver occures OUT_OF_MEMORY."
+                write (unit, '(2a)') strip(self%name), ": Solver occures OUT_OF_MEMORY."
             case (SOLVER_STATUS_MAXITER)
-                write (unit, '(a,a)'), strip(self%name), ": Solver occures MAXITER."
+                write (unit, '(2a)') strip(self%name), ": Solver occures MAXITER."
             case (SOLVER_STATUS_NOT_IMPLEMENTED)
-                write (unit, '(a,a)'), strip(self%name), ": Solver occures NOT_IMPLEMENTED."
+                write (unit, '(2a)') strip(self%name), ": Solver occures NOT_IMPLEMENTED."
             end select
         end if
     end subroutine check_solver

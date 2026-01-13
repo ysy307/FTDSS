@@ -180,9 +180,9 @@ module domain_manager
         procedure, public, pass(self) :: get_element => get_element_domain
         procedure, public, pass(self) :: get_element_connectivity => get_element_connectivity_domain
         procedure, public, pass(self) :: get_element_coordinate => get_element_coordinate_domain
-        procedure, public, pass(self) :: get_measure => calc_measure_domain
         procedure, public, pass(self) :: get_target_dof => get_target_dof_domain
         procedure, public, pass(self) :: get_material_id => get_material_id_domain
+        procedure, public, pass(self) :: calc_measure => calc_measure_domain
 
         procedure, private, pass(self) :: lerp_1d_domain
         procedure, private, pass(self) :: lerp_2d_domain
@@ -711,47 +711,61 @@ contains
     ! Getter Functions
     ! --------------------------------------------------------------------------
 
-    pure function get_num_nodes_domain(self) result(num_nodes)
+    pure subroutine get_num_nodes_domain(self, num_nodes)
+        implicit none
         class(type_domain), intent(in) :: self
-        integer(int32) :: num_nodes
+        integer(int32), intent(inout) :: num_nodes
+
         num_nodes = self%nodes%num_nodes
-    end function get_num_nodes_domain
+    end subroutine get_num_nodes_domain
 
-    pure function get_num_elements_domain(self) result(num_elements)
+    pure subroutine get_num_elements_domain(self, num_elements)
+        implicit none
         class(type_domain), intent(in) :: self
-        integer(int32) :: num_elements
+        integer(int32), intent(inout) :: num_elements
+
         num_elements = self%elements%num_elements
-    end function get_num_elements_domain
+    end subroutine get_num_elements_domain
 
-    pure function get_num_dofs_per_node_domain(self) result(num_dofs_per_node)
+    pure subroutine get_num_dofs_per_node_domain(self, num_dofs_per_node)
+        implicit none
         class(type_domain), intent(in) :: self
-        integer(int32) :: num_dofs_per_node
+        integer(int32), intent(inout) :: num_dofs_per_node
+
         num_dofs_per_node = self%dof_map%num_dof_per_node
-    end function get_num_dofs_per_node_domain
+    end subroutine get_num_dofs_per_node_domain
 
-    pure function get_total_dofs_domain(self) result(total_dofs)
+    pure subroutine get_total_dofs_domain(self, total_dofs)
+        implicit none
         class(type_domain), intent(in) :: self
-        integer(int32) :: total_dofs
+        integer(int32), intent(inout) :: total_dofs
+
         total_dofs = self%nodes%num_nodes * self%dof_map%num_dof_per_node
-    end function get_total_dofs_domain
+    end subroutine get_total_dofs_domain
 
-    pure function get_computation_dimension_domain(self) result(comp_dim)
+    pure subroutine get_computation_dimension_domain(self, computation_dimension)
+        implicit none
         class(type_domain), intent(in) :: self
-        integer(int32) :: comp_dim
-        comp_dim = self%computation_dimension
-    end function get_computation_dimension_domain
+        integer(int32), intent(inout) :: computation_dimension
 
-    pure function get_computation_type_domain(self) result(comp_type)
-        class(type_domain), intent(in) :: self
-        integer(int32) :: comp_type
-        comp_type = self%computation_type
-    end function get_computation_type_domain
+        computation_dimension = self%computation_dimension
+    end subroutine get_computation_dimension_domain
 
-    pure function get_coupling_mode_domain(self) result(coupling_mode)
+    pure subroutine get_computation_type_domain(self, computation_type)
+        implicit none
         class(type_domain), intent(in) :: self
-        integer(int32) :: coupling_mode
+        integer(int32), intent(inout) :: computation_type
+
+        computation_type = self%computation_type
+    end subroutine get_computation_type_domain
+
+    pure subroutine get_coupling_mode_domain(self, coupling_mode)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(inout) :: coupling_mode
+
         coupling_mode = self%coupling_mode
-    end function get_coupling_mode_domain
+    end subroutine get_coupling_mode_domain
 
     subroutine get_node_adjacency_domain(self, matrix_type, row, col)
         implicit none

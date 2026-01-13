@@ -35,6 +35,7 @@ module main_base
 
         integer(int32) :: material_id
         integer(int32) :: element_id
+        integer(int32) :: computation_type
 
         logical, private :: associated_bdf = .false.
         integer(int32) :: bdf_order = -1
@@ -58,12 +59,13 @@ module main_base
     end type type_assemble_workspace
 
 contains
-    subroutine initialize_type_assemble_workspace(self, fe, target_material_id, target_element_id, controls)
+    subroutine initialize_type_assemble_workspace(self, fe, material_id, element_id, computation_type, controls)
         implicit none
         class(type_assemble_workspace), intent(inout) :: self
         class(abst_fe), intent(in), target :: fe
-        integer(int32), intent(in) :: target_material_id
-        integer(int32), intent(in) :: target_element_id
+        integer(int32), intent(in) :: material_id
+        integer(int32), intent(in) :: element_id
+        integer(int32), intent(in) :: computation_type
         type(type_controls), intent(in) :: controls
 
         integer(int32) :: fe_type
@@ -82,8 +84,9 @@ contains
             end if
         end if
 
-        self%material_id = target_material_id
-        self%element_id = target_element_id
+        self%material_id = material_id
+        self%element_id = element_id
+        self%computation_type = computation_type
 
         if (.not. self%associated_bdf) then
             call self%set_bdf_info(controls)
@@ -157,7 +160,6 @@ contains
         do i = 1, self%num_fe_nodes
             call self%state(i)%get(temperature=self%T_node(i), &
                                    temperature_history=work_history)
-            print *, work_history
             self%work_node(1:self%bdf_order + 1, i) = work_history(1:self%bdf_order + 1)
         end do
         do i = 1, self%num_fe_gauss
@@ -173,7 +175,7 @@ contains
 
         end do
         do i = 1, self%num_fe_gauss
-            call self%fe%dlerp(gp(i), self%T_node, dlerped_value)
+            call self%fe%dlerp(gp(i), self%T_node, self%coordinates, self%computation_type, dlerped_value)
             call self%state_gp(i)%grad_T%set(dlerped_value)
         end do
 
@@ -197,7 +199,7 @@ contains
             call self%state_gp(j)%pressure_history%set(work_history)
         end do
         do i = 1, self%num_fe_gauss
-            call self%fe%dlerp(gp(i), self%P_node, dlerped_value)
+            call self%fe%dlerp(gp(i), self%P_node, self%coordinates, self%computation_type, dlerped_value)
             call self%state_gp(i)%grad_P%set(dlerped_value)
         end do
 
@@ -330,6 +332,7 @@ contains
 
             self%material_id = -1
             self%element_id = -1
+            self%computation_type = -1
 
             self%associated_bdf = .false.
             self%bdf_order = -1

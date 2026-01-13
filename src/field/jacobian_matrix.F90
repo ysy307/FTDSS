@@ -18,6 +18,7 @@ module field_jacobian_matrix
     type :: type_jacobian_matrix
         private
         integer(int32) :: matrix_type = -1
+        integer(int32) :: num_nodes = 0
         integer(int32) :: num_dofs_per_node = 0
         integer(int32) :: size = 0
 
@@ -62,21 +63,23 @@ contains
         ! 既に割り当てられていれば破棄
         if (allocated(self%matrix)) call self%destroy()
 
-        self%size = domain%get_total_dofs()
-        num_nodes = domain%get_num_nodes()
-        num_dofs = domain%get_num_dofs_per_node()
-        self%num_dofs_per_node = num_dofs
-
+        call domain%get_total_dofs(self%size)
+        call domain%get_num_nodes(self%num_nodes)
+        call domain%get_num_dofs_per_node(self%num_dofs_per_node)
+        print *, "Initializing Jacobian Matrix: Num Nodes =", num_nodes, &
+            ", Num DOFs per Node =", self%num_dofs_per_node, ", Total DOFs =", self%size
         ! 基本方針としてBSRを採用するため、matrix_typeを上書きまたは優先利用
         ! もし疎行列構造が必要ならdomainから取得
-        target_matrix_type = MATRIX_BSR
+        print *, "Target Matrix Type for Jacobian:", MATRIX_BSR
         call domain%get_node_adjacency(MATRIX_CSR, row, col)
 
-        self%matrix_type = target_matrix_type
+        self%matrix_type = MATRIX_BSR
 
         ! 行列ファクトリを使用してBSR行列を生成
         ! block_size に num_dofs を渡すことで、Node x Node のブロック構造を作る
-        self%matrix = create_matrix(target_matrix_type, num_nodes, row, col, num_dofs)
+        self%matrix = create_matrix(MATRIX_BSR, self%num_nodes, row, col, self%num_dofs_per_node)
+
+        print *, "Jacobian Matrix initialized with BSR format."
 
         deallocate (row, col)
     end subroutine initialize_jacobian_matrix

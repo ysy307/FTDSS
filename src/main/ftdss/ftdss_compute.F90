@@ -24,8 +24,7 @@ contains
         real(real64) :: sum_qw_vol, sum_qi_vol, sum_qa_vol, sum_qv_vol
 
         call self%controls%profiler%start("Setup")
-
-        num_nodes = self%domain%get_num_nodes()
+        call self%domain%get_num_nodes(num_nodes)
 
         ! ----------------------------------------------------------------------
         ! 節点ループ
@@ -50,7 +49,7 @@ contains
                     i_elem = element_list(j)
 
                     ! 要素体積の取得 (これが抜けると重み付けできません)
-                    call self%domain%get_geometry(i_elem, elem_vol)
+                    call self%domain%calc_measure(i_elem, elem_vol)
 
                     ! 状態変数の更新と取得
                     call self%domain%get_material_id(i_elem, material_id)
@@ -149,9 +148,9 @@ contains
         integer(int32) :: n_nodes_elem, n_gauss
         integer(int32) :: i, p, k, d, global_nid
 
-        num_elements = self%domain%get_num_elements()
-        num_total_nodes = self%domain%get_num_nodes()
-        dim = self%domain%get_computation_dimension()
+        call self%domain%get_num_elements(num_elements)
+        call self%domain%get_num_nodes(num_total_nodes)
+        call self%domain%get_computation_dimension(dim)
 
         call grad%zero()
 
@@ -189,7 +188,7 @@ contains
             do p = 1, n_gauss
                 r = fe_gauss_pts(p)
 
-                call fe%calc_shape_data(r, node_coords, psi, dpsi_dx, det_j)
+                call fe%calc_shape_function(r, node_coords, psi=psi, dpsi_dx=dpsi_dx, determinant_jacobian=det_j)
                 w_vol = fe_weights(p) * det_j
 
                 gauss_grad = 0.0d0
@@ -276,7 +275,7 @@ contains
         real(real64) :: K_wT, K_wP
         real(real64) :: rho_w, gravity_term
 
-        computation_type = self%domain%get_computation_type()
+        call self%domain%get_computation_dimension(computation_type)
 
         call self%hydraulic%calc_K_wT(material_id, state, K_wT)
         call self%hydraulic%calc_K_wP(material_id, state, K_wP)
@@ -317,7 +316,7 @@ contains
 
         real(real64) :: K_vT, K_vP
 
-        computation_type = self%domain%get_computation_type()
+        call self%domain%get_computation_dimension(computation_type)
 
         call self%hydraulic%calc_K_vT(material_id, state, K_vT)
         call self%hydraulic%calc_K_vP(material_id, state, K_vP)

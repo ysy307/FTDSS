@@ -51,11 +51,11 @@ contains
 
         ! セルタイプに応じた計算ルーチンを呼び出し
         select case (cell_type)
-        case (FE_TRIANGLE, FE_QUADRATIC_TRIANGLE)
+        case (FE_TYPE%TRIANGLE%value, FE_TYPE%QUADRATIC_TRIANGLE%value)
             call self%compute_triangle_rule(integration_order)
-        case (FE_QUAD, FE_QUADRATIC_QUAD)
+        case (FE_TYPE%QUAD%value, FE_TYPE%QUADRATIC_QUAD%value)
             call self%compute_quad_rule(integration_order)
-        case (FE_LINE, FE_QUADRATIC_EDGE)
+        case (FE_TYPE%LINE%value, FE_TYPE%QUADRATIC_EDGE%value)
             call self%compute_line_rule(integration_order)
         case default
             self%num_gauss = 0

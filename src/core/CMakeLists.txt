@@ -17,6 +17,7 @@ enable_build_flags(Core_Validation)
 enable_thirdparty(Core_Validation)
 
 set(CORE_CONSTANTS_SOURCES
+    constants/constants_base.F90
     constants/constants_solver.F90
     constants/constants_parallel.F90
     constants/constants_utils.F90

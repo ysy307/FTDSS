@@ -56,8 +56,8 @@ contains
             allocate (self%coordinate_normalized(self%num_observations))
 
             ! --- 座標探索ロジック ---
-            num_elements = domain%get_num_elements()
-            comp_dim = domain%get_computation_dimension()
+            call domain%get_num_elements(num_elements)
+            call domain%get_computation_dimension(comp_dim)
             calc_type = input%basic%simulation_settings%calculate_type
 
             do iObs = 1, self%num_observations

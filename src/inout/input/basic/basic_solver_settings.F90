@@ -56,7 +56,7 @@ submodule(inout_input_basic) inout_input_basic_solver_settings
     character(len=16), parameter :: valid_nonlinear_solver_methods_str(4) = &
                                     [character(len=16) :: "none", "newton", "modified_newton", "picard"]
     character(len=16), parameter :: valid_norm_types_str(2) = [character(len=4) :: "l2", "linf"]
-    character(len=16), parameter :: valid_criteria_types_str(3) = [character(len=16) :: "residual", "update", "both"]
+    character(len=16), parameter :: valid_criteria_types_str(4) = [character(len=16) :: "none", "residual", "update", "both"]
     character(len=16), parameter :: valid_logic_types_str(2) = [character(len=16) :: "and", "or"]
     character(len=16), parameter :: valid_local_criteria_types_str(3) = [character(len=16) :: "absolute", "relative", "both"]
 

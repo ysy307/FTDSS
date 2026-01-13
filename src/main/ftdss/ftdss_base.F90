@@ -14,6 +14,7 @@ contains
         integer(int32) :: num_nodes
         character(len=10), allocatable :: profiler_labels(:)
         real(real64) :: current_time
+        integer(int32) :: computation_dimension
         integer(int32) :: num_total_dofs
         integer(int32) :: ierr
 
@@ -25,13 +26,16 @@ contains
         call self%controls%profiler%record(TIME_RECORD_START)
         call self%controls%profiler%start("Total")
 
-        call setup_handler()
+        ! call setup_handler()
 
         call self%controls%profiler%stop("IO")
         call input%initialize()
+        call global_logger%log_information(message="Input data initialized.")
         call self%controls%profiler%start("IO")
         call self%controls%initialize(input)
+        call global_logger%log_information(message="Control settings initialized.")
         call ic%initialize(input)
+        call global_logger%log_information(message="Initial conditions initialized.")
 
         if (input%output_settings%standard_output%print_progress) then
             call global_logger%configure(level=information_level, &
@@ -45,11 +49,13 @@ contains
 
         num_nodes = input%geometry%vtk%num_points
         call self%domain%initialize(input, self%controls)
-        num_total_dofs = self%domain%get_total_dofs()
+        call global_logger%log_information(message="Domain initialized.")
+        call self%domain%get_total_dofs(num_total_dofs)
 
         call self%J%initialize(self%domain)
         call self%R%initialize(self%domain)
         call self%delta%initialize(self%domain)
+        call global_logger%log_information(message="Global system matrices and vectors initialized.")
 
         max_bdf_order = input%basic%solver_settings%bdf_order
         call self%porosity%initialize(num_nodes, max_bdf_order)
@@ -70,10 +76,15 @@ contains
         call self%Qa%initialize(num_nodes, max_bdf_order)
         call self%Qv%initialize(num_nodes, max_bdf_order)
 
-        call input%geometry%vtk%get_active_region_info(active_region_ids, target_dim=self%domain%get_computation_dimension())
+        call global_logger%log_information(message="Field variables initialized.")
+
+        call self%domain%get_computation_dimension(computation_dimension)
+        call input%geometry%vtk%get_active_region_info(active_region_ids, target_dim=computation_dimension)
 
         call self%thermal%initialize(input, active_region_ids)
         call self%hydraulic%initialize(input, active_region_ids)
+
+        call global_logger%log_information(message="Physical property managers initialized.")
 
         ! ソルバーの初期化
         associate (solver_settings => input%basic%solver_settings%linear_solver)
@@ -276,8 +287,8 @@ contains
         !     dumping_ratio = 1.0d0
         ! end if
 
-        num_nodes = self%domain%get_num_nodes()
-        num_dofs_per_node = self%domain%get_num_dofs_per_node()
+        call self%domain%get_num_nodes(num_nodes)
+        call self%domain%get_num_dofs_per_node(num_dofs_per_node)
 
         call self%controls%time%get_bdf_coeffs(bdf_coeffs)
         call self%controls%time%get_bdf_order(bdf_order)
