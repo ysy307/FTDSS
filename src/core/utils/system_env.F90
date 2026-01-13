@@ -2,7 +2,9 @@
 !> Provides a routine to read environment variables in an MPI-safe way.
 !>
 module core_system_env
+#ifdef _MPI
     use :: mpi_f08
+#endif
     use, intrinsic :: iso_fortran_env, only: int32
     implicit none
     private
@@ -26,22 +28,27 @@ contains
         character(len=2048) :: buffer
         integer(int32) :: nulpos
         integer(int32) :: status
+#ifdef _MPI
         integer(int32) :: my_rank, ierr
 
         call MPI_Comm_rank(MPI_COMM_WORLD, my_rank, ierr)
-
+#endif
         if (allocated(value)) deallocate (value)
 
         ! Rank 0 reads the environment variable
+#ifdef _MPI
         if (my_rank == 0) then
+#endif
             call get_environment_variable(env_var_name, buffer, status=status)
             if (status /= 0) then
                 error stop 'Error retrieving environment variable: '//trim(env_var_name)
             end if
+#ifdef _MPI
         end if
 
         ! Broadcast the result to all ranks
         call MPI_Bcast(buffer, len(buffer), MPI_CHARACTER, 0, MPI_COMM_WORLD, ierr)
+#endif
 
         ! Trim the result and allocate the output string to the correct length
         if (len_trim(buffer) > 0) then

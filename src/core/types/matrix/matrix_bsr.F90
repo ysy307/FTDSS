@@ -55,9 +55,6 @@ contains
         ! Allocate val as (rows, cols, blocks) to improve memory access patterns in block operations
         call allocate_array(self%val, self%num_block_rows, self%num_block_cols, self%num_blocks)
 
-        print *, "BSR Matrix initialized: Num Nodes =", self%num_nodes, &
-            ", Num Blocks =", self%num_blocks, ", Block Size =", &
-            self%num_block_rows, "x", self%num_block_cols
         call self%zero()
 
         self%is_initialized_matrix = .true.

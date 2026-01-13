@@ -30,12 +30,9 @@ contains
 
         call self%controls%profiler%stop("IO")
         call input%initialize()
-        call global_logger%log_information(message="Input data initialized.")
         call self%controls%profiler%start("IO")
         call self%controls%initialize(input)
-        call global_logger%log_information(message="Control settings initialized.")
         call ic%initialize(input)
-        call global_logger%log_information(message="Initial conditions initialized.")
 
         if (input%output_settings%standard_output%print_progress) then
             call global_logger%configure(level=information_level, &
@@ -49,13 +46,11 @@ contains
 
         num_nodes = input%geometry%vtk%num_points
         call self%domain%initialize(input, self%controls)
-        call global_logger%log_information(message="Domain initialized.")
         call self%domain%get_total_dofs(num_total_dofs)
 
         call self%J%initialize(self%domain)
         call self%R%initialize(self%domain)
         call self%delta%initialize(self%domain)
-        call global_logger%log_information(message="Global system matrices and vectors initialized.")
 
         max_bdf_order = input%basic%solver_settings%bdf_order
         call self%porosity%initialize(num_nodes, max_bdf_order)
@@ -76,15 +71,11 @@ contains
         call self%Qa%initialize(num_nodes, max_bdf_order)
         call self%Qv%initialize(num_nodes, max_bdf_order)
 
-        call global_logger%log_information(message="Field variables initialized.")
-
         call self%domain%get_computation_dimension(computation_dimension)
         call input%geometry%vtk%get_active_region_info(active_region_ids, target_dim=computation_dimension)
 
         call self%thermal%initialize(input, active_region_ids)
         call self%hydraulic%initialize(input, active_region_ids)
-
-        call global_logger%log_information(message="Physical property managers initialized.")
 
         ! ソルバーの初期化
         associate (solver_settings => input%basic%solver_settings%linear_solver)

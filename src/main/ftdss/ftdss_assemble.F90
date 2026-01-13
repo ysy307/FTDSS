@@ -63,6 +63,7 @@ contains
 
         class(abst_fe), pointer :: fe => null()
         integer(int32), pointer, contiguous, dimension(:) :: connectivity => null()
+        real(real64), allocatable :: coordinates(:, :)
         integer(int32) :: material_id
         integer(int32) :: computation_type
         integer(int32) :: num_nodes
@@ -74,9 +75,10 @@ contains
         call self%domain%get_element(element_id, fe)
         call self%domain%get_element_connectivity(element_id, connectivity)
         call self%domain%get_computation_type(computation_type)
+        call self%domain%get_element_coordinate(element_id, coordinates)
 
         !!------
-        call workspace%initialize(fe, material_id, element_id, computation_type, self%controls)
+        call workspace%initialize(fe, material_id, element_id, computation_type, coordinates, self%controls)
         do i = 1, size(connectivity)
             call self%set_state(connectivity(i), element_id, workspace%state(i))
         end do

@@ -38,6 +38,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 # ★Toolchainの読み込み（修正箇所）
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(Toolchain)
+include(fypp)
 
 # ====================================================================
 # 2. Module Dependencies Definition

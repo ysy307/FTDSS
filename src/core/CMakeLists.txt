@@ -35,23 +35,27 @@ enable_thirdparty(Core_Constants)
 # ====================================================================
 
 # --- Memory Library (Validationに依存) ---
-set(CORE_MEMORY_SOURCES
-    memory/allocate.F90
-    memory/deallocate.F90
+set(CORE_MEMORY_FYPP_SOURCES
+    memory/allocate.fypp
+    memory/deallocate.fypp
 )
-add_library(Core_Memory STATIC ${CORE_MEMORY_SOURCES})
+fypp_F90("" "${CORE_MEMORY_FYPP_SOURCES}" CORE_MEMORY_GENERATED_SOURCES)
+add_library(Core_Memory STATIC ${CORE_MEMORY_GENERATED_SOURCES})
 target_include_directories(Core_Memory PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Core_Memory PUBLIC Core_Validation)
 enable_build_flags(Core_Memory)
 
 # --- Utils Library (Memoryに依存) ---
+set(CORE_UTILS_FYPP_SOURCES
+    utils/unique.fypp
+)
 set(CORE_UTILS_SOURCES
     utils/string_utils.F90
     utils/system_env.F90
-    utils/unique.F90
     utils/findings.F90
 )
-add_library(Core_Utils STATIC ${CORE_UTILS_SOURCES})
+fypp_F90("" "${CORE_UTILS_FYPP_SOURCES}" CORE_UTILS_GENERATED_SOURCES)
+add_library(Core_Utils STATIC ${CORE_UTILS_GENERATED_SOURCES} ${CORE_UTILS_SOURCES})
 target_include_directories(Core_Utils PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Core_Utils PUBLIC Core_Memory Core_Constants)
 enable_build_flags(Core_Utils)

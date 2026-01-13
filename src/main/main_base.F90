@@ -59,13 +59,14 @@ module main_base
     end type type_assemble_workspace
 
 contains
-    subroutine initialize_type_assemble_workspace(self, fe, material_id, element_id, computation_type, controls)
+    subroutine initialize_type_assemble_workspace(self, fe, material_id, element_id, computation_type, coordinates, controls)
         implicit none
         class(type_assemble_workspace), intent(inout) :: self
         class(abst_fe), intent(in), target :: fe
         integer(int32), intent(in) :: material_id
         integer(int32), intent(in) :: element_id
         integer(int32), intent(in) :: computation_type
+        real(real64), intent(in) :: coordinates(:, :)
         type(type_controls), intent(in) :: controls
 
         integer(int32) :: fe_type
@@ -87,6 +88,7 @@ contains
         self%material_id = material_id
         self%element_id = element_id
         self%computation_type = computation_type
+        call allocate_array(self%coordinates, source=coordinates)
 
         if (.not. self%associated_bdf) then
             call self%set_bdf_info(controls)

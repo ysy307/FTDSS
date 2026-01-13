@@ -1,7 +1,7 @@
 # src/main/CMakeLists.txt
 
 set(Main_Base_SOURCES
-    base.F90
+    main_base.F90
 )
 add_library(Main_Base STATIC ${Main_Base_SOURCES})
 target_include_directories(Main_Base PUBLIC ${CMAKE_CURRENT_BINARY_DIR})

@@ -4,7 +4,7 @@ module module_core
     use :: core_check_range, only:value_in_range
     use :: core_check_length, only:check_match_length
     use :: core_unique, only:unique
-    use :: core_allocate, only:allocate_array, allocate_pointer
+    use :: core_allocate, only:allocate_array
     use :: core_deallocate, only:deallocate_array
     use :: core_string_utils, only:join, filter, modify_path_format, get_bc_type_from_string
     use :: core_system_env, only:get_env_string

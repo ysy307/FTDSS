@@ -57,21 +57,28 @@ module core_types_variable
         procedure, private, pass(self) :: set_current_array_variable
         procedure, private, pass(self) :: set_current_scalar_variable
         procedure, private, pass(self) :: set_current_scalar_all_variable
-        generic, public :: set_current => set_current_array_variable, set_current_scalar_variable, set_current_scalar_all_variable
+        generic, public :: set_current => set_current_array_variable, &
+            set_current_scalar_variable, &
+            set_current_scalar_all_variable
         procedure, private, pass(self) :: set_previous_array_variable
         procedure, private, pass(self) :: set_previous_scalar_variable
         procedure, private, pass(self) :: set_previous_scalar_all_variable
-        generic, public :: set_previous => set_previous_array_variable, set_previous_scalar_variable, set_previous_scalar_all_variable
+        generic, public :: set_previous => set_previous_array_variable, &
+            set_previous_scalar_variable, &
+            set_previous_scalar_all_variable
 
         !> 値の取得（Getter）
         procedure, private, pass(self) :: get_current_array_variable
         procedure, private, pass(self) :: get_current_scalar_variable
         procedure, private, pass(self) :: get_current_gradient_variable
-        generic, public :: get_current => get_current_array_variable, get_current_scalar_variable, get_current_gradient_variable
+        generic, public :: get_current => get_current_array_variable, &
+            get_current_scalar_variable, &
+            get_current_gradient_variable
 
         procedure, private, pass(self) :: get_previous_array
         procedure, private, pass(self) :: get_previous_scalar
-        generic, public :: get_previous => get_previous_array, get_previous_scalar
+        generic, public :: get_previous => get_previous_array, &
+            get_previous_scalar
 
         procedure, public, pass(self) :: get_history => get_history_values_variable
 

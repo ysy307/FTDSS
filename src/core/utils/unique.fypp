@@ -1,0 +1,79 @@
+#:set kinds_map = [ &
+    ('int8',  'int32'), &
+    ('int16', 'int32'), &
+    ('int32', 'int32'), &
+    ('int64', 'int64')  &
+    ]
+
+!>
+!> Provides a generic interface and implementations for finding the unique
+!> elements in integer arrays of various kinds.
+!>
+module core_unique
+    use, intrinsic :: iso_fortran_env
+    use :: stdlib_sorting, only:sort
+    use :: core_allocate, only:allocate_array
+    implicit none
+    private
+
+    public :: unique
+
+    interface unique
+        #:for kind_name, count_kind in kinds_map
+            module procedure :: unique_${kind_name}$
+        #:endfor
+    end interface
+
+contains
+
+    #:for kind_name, count_kind in kinds_map
+        !>
+        !> Finds the unique elements in an ${kind_name}$ array and returns them in sorted order.
+        !>
+        subroutine unique_${kind_name}$ (array, unique_array)
+            implicit none
+            !> The input array of ${kind_name}$ integers.
+            integer(${kind_name}$), intent(in) :: array(:)
+            !> An allocatable output array that will contain the sorted unique elements.
+            integer(${kind_name}$), intent(inout), allocatable :: unique_array(:)
+
+            integer(${kind_name}$), allocatable :: sorted_array(:)
+            integer(${count_kind}$) :: i, count
+
+            if (size(array) == 0) then
+                call allocate_array(unique_array, 0_${count_kind}$)
+                return
+            end if
+
+            ! Create a sorted copy of the input array
+            sorted_array = array
+            call sort(sorted_array)
+
+            ! ==========================================================
+            ! First pass: Count the number of unique elements
+            ! ==========================================================
+            count = 1 ! The first element is always unique
+            do i = 2, size(sorted_array, kind=${count_kind}$)
+                if (sorted_array(i) /= sorted_array(i - 1)) count = count + 1
+            end do
+
+            ! ==========================================================
+            ! Second pass: Populate the output array with unique elements
+            ! ==========================================================
+            call allocate_array(unique_array, count)
+
+            if (count > 0) then
+                unique_array(1) = sorted_array(1)
+                count = 1
+                do i = 2, size(sorted_array, kind=${count_kind}$)
+                    if (sorted_array(i) /= sorted_array(i - 1)) then
+                        count = count + 1
+                        unique_array(count) = sorted_array(i)
+                    end if
+                end do
+            end if
+        end subroutine unique_${kind_name}$
+
+    #:endfor
+
+end module core_unique
