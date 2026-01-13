@@ -72,7 +72,7 @@ contains
 
         ! 形状関数の物理勾配を格納する一時配列 (num_nodes x 3)
         ! スタック領域(Automatic Array)を使用
-        real(real64) :: shape_grads(self%num_nodes, 3)
+        real(real64) :: shape_grads(3, self%num_nodes)
 
         ! 1. 初期化
         call dlerped_value%reset()
@@ -85,27 +85,27 @@ contains
         ! 3. 勾配の計算: grad u = sum( u_i * grad N_i )
         if (self%dimension == 3) then
             ! --- 3次元 (XYZ) ---
-            dlerped_value%x = vector_dot(values, shape_grads(:, 1))
-            dlerped_value%y = vector_dot(values, shape_grads(:, 2))
-            dlerped_value%z = vector_dot(values, shape_grads(:, 3))
+            dlerped_value%x = vector_dot(values, shape_grads(1, :))
+            dlerped_value%y = vector_dot(values, shape_grads(2, :))
+            dlerped_value%z = vector_dot(values, shape_grads(3, :))
 
         else if (self%dimension == 2) then
             ! --- 2次元 (XY or XZ) ---
             ! 第1成分は常に x
-            dlerped_value%x = vector_dot(values, shape_grads(:, 1))
+            dlerped_value%x = vector_dot(values, shape_grads(1, :))
 
             if (plane_axis == 2) then
                 ! XZ面の場合: 第2成分を z にマッピング
                 dlerped_value%y = 0.0d0
-                dlerped_value%z = vector_dot(values, shape_grads(:, 2))
+                dlerped_value%z = vector_dot(values, shape_grads(3, :))
             else
                 ! XY面の場合: 第2成分を y にマッピング (default)
-                dlerped_value%y = vector_dot(values, shape_grads(:, 2))
+                dlerped_value%y = vector_dot(values, shape_grads(2, :))
                 dlerped_value%z = 0.0d0
             end if
 
         else if (self%dimension == 1) then
-            dlerped_value%x = vector_dot(values, shape_grads(:, 1))
+            dlerped_value%x = vector_dot(values, shape_grads(1, :))
         end if
 
     end subroutine dlerp_abst_fe

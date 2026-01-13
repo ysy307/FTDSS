@@ -116,7 +116,7 @@ contains
         if (present(work_dpsi_dx)) then
             p_dpsi_dx => work_dpsi_dx
         else
-            call allocate_array(local_dpsi_dx, nd, dim)
+            call allocate_array(local_dpsi_dx, dim, nd)
             p_dpsi_dx => local_dpsi_dx
         end if
 
@@ -142,21 +142,23 @@ contains
             ! Compute term: M * nabla psi_j
             do j = 1, nd
                 ! Matrix-Vector multiplication using pointers
-                ! M_gp(:, :, p) is [dim x dim], p_dpsi_dx(j, :) is [dim]
-                call matvec(M_gp(:, :, p), p_dpsi_dx(j, :), p_M_grad_psi_j, ierr)
+                ! M_gp(:, :, p) is [dim x dim]
+                ! p_dpsi_dx(:, j) is [dim] (Corrected from (j, :))
+                call matvec(M_gp(:, :, p), p_dpsi_dx(:, j), p_M_grad_psi_j, ierr)
 
                 do i = 1, nd
                     ! nabla psi_i . (M * nabla psi_j)
+                    ! p_dpsi_dx(:, i) is [dim] (Corrected from (i, :))
                     elem_mat(i, j) = elem_mat(i, j) + &
-                                     w * det_J * vector_dot(p_dpsi_dx(i, :), p_M_grad_psi_j)
+                                     w * det_J * vector_dot(p_dpsi_dx(:, i), p_M_grad_psi_j)
                 end do
             end do
         end do
 
         ! --- Cleanup ---
-        if (allocated(local_psi)) call deallocate_array(local_psi)
-        if (allocated(local_dpsi_dx)) call deallocate_array(local_dpsi_dx)
-        if (allocated(local_vec_dim)) call deallocate_array(local_vec_dim)
+        call deallocate_array(local_psi)
+        call deallocate_array(local_dpsi_dx)
+        call deallocate_array(local_vec_dim)
 
         nullify (p_psi)
         nullify (p_dpsi_dx)
@@ -208,7 +210,7 @@ contains
         if (present(work_dpsi_dx)) then
             p_dpsi_dx => work_dpsi_dx
         else
-            call allocate_array(local_dpsi_dx, nd, dim)
+            call allocate_array(local_dpsi_dx, dim, nd)
             p_dpsi_dx => local_dpsi_dx
         end if
 
@@ -227,7 +229,7 @@ contains
             do j = 1, nd
                 do i = 1, nd
                     ! nabla psi_i . nabla psi_j (Simple dot product)
-                    grad_dot = vector_dot(p_dpsi_dx(i, :), p_dpsi_dx(j, :))
+                    grad_dot = vector_dot(p_dpsi_dx(:, i), p_dpsi_dx(:, j))
 
                     elem_mat(i, j) = elem_mat(i, j) + &
                                      w * det_J * M_val * grad_dot
@@ -236,8 +238,8 @@ contains
         end do
 
         ! --- Cleanup ---
-        if (allocated(local_psi)) call deallocate_array(local_psi)
-        if (allocated(local_dpsi_dx)) call deallocate_array(local_dpsi_dx)
+        call deallocate_array(local_psi)
+        call deallocate_array(local_dpsi_dx)
 
         nullify (p_psi)
         nullify (p_dpsi_dx)
@@ -286,7 +288,8 @@ contains
         if (present(work_dpsi_dx)) then
             p_dpsi_dx => work_dpsi_dx
         else
-            call allocate_array(local_dpsi_dx, nd, dim)
+            ! Corrected allocation: (dim, nd)
+            call allocate_array(local_dpsi_dx, dim, nd)
             p_dpsi_dx => local_dpsi_dx
         end if
 
@@ -303,7 +306,8 @@ contains
 
             do i = 1, nd
                 ! (nabla psi_i . V)
-                grad_psi_i_dot_V = vector_dot(p_dpsi_dx(i, :), V_gp(:, p))
+                ! p_dpsi_dx(:, i) is [dim], V_gp(:, p) is [dim]
+                grad_psi_i_dot_V = vector_dot(p_dpsi_dx(:, i), V_gp(:, p))
 
                 do j = 1, nd
                     elem_mat(i, j) = elem_mat(i, j) + &
@@ -313,8 +317,8 @@ contains
         end do
 
         ! --- Cleanup ---
-        if (allocated(local_psi)) call deallocate_array(local_psi)
-        if (allocated(local_dpsi_dx)) call deallocate_array(local_dpsi_dx)
+        call deallocate_array(local_psi)
+        call deallocate_array(local_dpsi_dx)
 
         nullify (p_psi)
         nullify (p_dpsi_dx)
@@ -376,7 +380,7 @@ contains
         end do
 
         ! --- Cleanup ---
-        if (allocated(local_psi)) call deallocate_array(local_psi)
+        call deallocate_array(local_psi)
         nullify (p_psi)
 
     end subroutine compute_R1_source_abst_fe
@@ -387,15 +391,12 @@ contains
     !>    F_gp: Flux vector evaluated at Gauss points [dim, num_gauss]
     !>    work_psi, work_dpsi_dx: (Optional) Workspace
     !>
-    module subroutine compute_R2_flux_abst_fe(self, nodes, F_gp, elem_vec, &
-                                              work_psi, work_dpsi_dx)
+    module subroutine compute_R2_flux_abst_fe(self, nodes, F_gp, elem_vec, work_dpsi_dx)
         implicit none
         class(abst_fe), intent(in) :: self
         real(real64), intent(in) :: nodes(:, :)
         real(real64), intent(in) :: F_gp(:, :)
         real(real64), intent(inout) :: elem_vec(:)
-        !> Optional workspace
-        real(real64), intent(inout), optional, target :: work_psi(:)
         real(real64), intent(inout), optional, target :: work_dpsi_dx(:, :)
 
         integer(int32) :: p, i, nd, dim, num_gauss
@@ -403,29 +404,19 @@ contains
         type(type_coordinate_dp) :: r
 
         !> Pointers for alias
-        real(real64), pointer :: p_psi(:) => null()
         real(real64), pointer :: p_dpsi_dx(:, :) => null()
 
         !> Local allocatables (fallback)
-        real(real64), allocatable, target :: local_psi(:)
         real(real64), allocatable, target :: local_dpsi_dx(:, :)
 
         call self%get_dimension(dim)
         call self%get_num_nodes(nd)
         call self%get_num_gauss(num_gauss)
 
-        ! --- Workspace Setup ---
-        if (present(work_psi)) then
-            p_psi => work_psi
-        else
-            call allocate_array(local_psi, nd)
-            p_psi => local_psi
-        end if
-
         if (present(work_dpsi_dx)) then
             p_dpsi_dx => work_dpsi_dx
         else
-            call allocate_array(local_dpsi_dx, nd, dim)
+            call allocate_array(local_dpsi_dx, dim, nd)
             p_dpsi_dx => local_dpsi_dx
         end if
 
@@ -436,23 +427,22 @@ contains
             r = self%integration_rule%gauss(p)
             w = self%integration_rule%weight(p)
 
-            ! R2では dpsi_dx が必須。psiは幾何計算(Jacobian)で内部的に使われる可能性があるため渡しておく
-            call self%calc_shape_function(r, nodes, psi=p_psi, dpsi_dx=p_dpsi_dx, determinant_jacobian=det_J)
+            ! R2では dpsi_dx が必須。psiは計算に不要なため渡さない。
+            call self%calc_shape_function(r, nodes, dpsi_dx=p_dpsi_dx, determinant_jacobian=det_J)
 
             ! Direct evaluation: F_gp(:, p)
             do i = 1, nd
                 ! (nabla psi_i . F)
-                grad_psi_i_dot_F = vector_dot(p_dpsi_dx(i, :), F_gp(:, p))
+                grad_psi_i_dot_F = vector_dot(p_dpsi_dx(:, i), F_gp(:, p))
 
                 elem_vec(i) = elem_vec(i) + w * det_J * grad_psi_i_dot_F
             end do
         end do
 
         ! --- Cleanup ---
-        if (allocated(local_psi)) call deallocate_array(local_psi)
-        if (allocated(local_dpsi_dx)) call deallocate_array(local_dpsi_dx)
+        ! local_psi 関連は削除済み
+        call deallocate_array(local_dpsi_dx)
 
-        nullify (p_psi)
         nullify (p_dpsi_dx)
 
     end subroutine compute_R2_flux_abst_fe

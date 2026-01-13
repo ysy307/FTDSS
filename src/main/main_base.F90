@@ -71,6 +71,10 @@ contains
 
         integer(int32) :: fe_type
 
+        if (.not. self%associated_bdf) then
+            call self%set_bdf_info(controls)
+        end if
+
         if (.not. self%is_initialized) then
             self%fe => fe
             call self%set_basic()
@@ -81,6 +85,7 @@ contains
             if (fe_type /= self%fe_type) then
                 call self%destroy()
                 self%fe => fe
+                if (self%bdf_order == -1) call self%set_bdf_info(controls)
                 call self%set_basic()
             end if
         end if
@@ -89,10 +94,6 @@ contains
         self%element_id = element_id
         self%computation_type = computation_type
         call allocate_array(self%coordinates, source=coordinates)
-
-        if (.not. self%associated_bdf) then
-            call self%set_bdf_info(controls)
-        end if
 
     end subroutine initialize_type_assemble_workspace
 
@@ -296,7 +297,7 @@ contains
 
         self%work_psi(:) = 0.0d0
         self%work_dpsi_dx(:, :) = 0.0d0
-        call self%fe%compute_R2(self%coordinates, V_gp, local_vector, self%work_psi, self%work_dpsi_dx)
+        call self%fe%compute_R2(self%coordinates, V_gp, local_vector, self%work_dpsi_dx)
     end subroutine compute_R2_assemble_workspace
 
     subroutine destroy_type_assemble_workspace(self)

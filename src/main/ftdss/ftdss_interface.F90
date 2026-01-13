@@ -12,6 +12,7 @@ module main_ftdss
     use :: module_initial, only:type_ic_manager
     use :: module_field, only:type_jacobian_matrix, type_residual_vector
     use :: module_physics, only:g => gravity_acceleration
+    use :: module_linalg
 
     use :: module_thermal, only:type_thermal
     use :: module_hydraulic, only:type_hydraulic

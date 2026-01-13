@@ -314,14 +314,12 @@ module domain_base_fe
 
         end subroutine compute_R1_source_abst_fe
 
-        module subroutine compute_R2_flux_abst_fe(self, nodes, F_gp, elem_vec, &
-                                                  work_psi, work_dpsi_dx)
+        module subroutine compute_R2_flux_abst_fe(self, nodes, F_gp, elem_vec, work_dpsi_dx)
             implicit none
             class(abst_fe), intent(in) :: self
             real(real64), intent(in) :: nodes(:, :)
             real(real64), intent(in) :: F_gp(:, :)
             real(real64), intent(inout) :: elem_vec(:)
-            real(real64), intent(inout), optional, target :: work_psi(:)
             real(real64), intent(inout), optional, target :: work_dpsi_dx(:, :)
 
         end subroutine compute_R2_flux_abst_fe

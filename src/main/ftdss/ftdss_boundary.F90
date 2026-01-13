@@ -167,13 +167,11 @@ contains
                         call fe%get_gauss(fe_gauss_pts)
 
                         if (allocated(psi)) deallocate (psi)
-                        if (allocated(dpsi_dx)) deallocate (dpsi_dx)
                         allocate (psi(num_nodes_loc))
-                        allocate (dpsi_dx(num_nodes_loc, self%domain%computation_dimension))
 
                         do k_gp = 1, num_gp
                             r = fe_gauss_pts(k_gp)
-                            call fe%calc_shape_function(r, node_coords, psi=psi, dpsi_dx=dpsi_dx, determinant_jacobian=det_j)
+                            call fe%calc_shape_function(r, node_coords, psi=psi, determinant_jacobian=det_j)
                             w_vol = fe_weights(k_gp) * det_j
 
                             u_curr = 0.0d0

@@ -205,7 +205,7 @@ contains
         tz_h = abs_tz / 60
         tz_m = mod(abs_tz, 60)
 
-        write (res, '(I4.4, "-", I2.2, "-", I2.2, "T", I2.2, ":", I2.2, ":", I2.2, A, I2.2, ":", I2.2)') &
+        write (res, '(i4.4, "-", i2.2, "-", i2.2, "T", i2.2, ":", i2.2, ":", i2.2, A, i2.2, ":", i2.2)') &
             self%year, self%month, self%day, &
             self%hour, self%minute, self%second, &
             sign, tz_h, tz_m

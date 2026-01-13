@@ -74,6 +74,7 @@ target_link_libraries(MAIN_FTDSS_LIB PUBLIC
     Solver::Input
     Solver::Conditions
     Solver::Output
+    Solver::Linalg
 )
 
 # ルートCMakeでのリンク名解決用エイリアス

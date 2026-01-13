@@ -178,7 +178,7 @@ contains
 
             allocate (elem_u(n_nodes_elem))
             allocate (psi(n_nodes_elem))
-            allocate (dpsi_dx(n_nodes_elem, dim))
+            allocate (dpsi_dx(dim, n_nodes_elem))
 
             elem_u(:) = values_vec(p_conn(:))
 
@@ -193,7 +193,7 @@ contains
 
                 gauss_grad = 0.0d0
                 do d = 1, dim
-                    gauss_grad(d) = dot_product(elem_u, dpsi_dx(:, d))
+                    gauss_grad(d) = vector_dot(elem_u, dpsi_dx(d, :))
                 end do
 
                 do k = 1, n_nodes_elem

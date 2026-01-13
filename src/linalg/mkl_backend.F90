@@ -40,7 +40,7 @@ contains
     function norm_1_mkl(x) result(norm_value)
         implicit none
         !> The input vector.
-        real(real64), intent(in) :: x(:)
+        real(real64), intent(in), contiguous :: x(:)
         !> The computed 1-norm, \( \sum |x_i| \).
         real(real64) :: norm_value
 
@@ -64,7 +64,7 @@ contains
     function norm_2_mkl(x) result(norm_value)
         implicit none
         !> The input vector.
-        real(real64), intent(in) :: x(:)
+        real(real64), intent(in), contiguous :: x(:)
         !> The computed 2-norm, \( \sqrt{\sum x_i^2} \).
         real(real64) :: norm_value
 
@@ -87,7 +87,7 @@ contains
     function norm_inf_mkl(x) result(norm_value)
         implicit none
         !> The input vector.
-        real(real64), intent(in) :: x(:)
+        real(real64), intent(in), contiguous :: x(:)
         !> The computed infinity-norm, \( \max(|x_i|) \).
         real(real64) :: norm_value
 
@@ -114,9 +114,9 @@ contains
     function dot_mkl(x, y) result(product)
         implicit none
         !> The first input vector.
-        real(real64), intent(in) :: x(:)
+        real(real64), intent(in), contiguous :: x(:)
         !> The second input vector.
-        real(real64), intent(in) :: y(:)
+        real(real64), intent(in), contiguous :: y(:)
         !> The computed dot product, \( \sum x_i y_i \).
         real(real64) :: product
 
@@ -143,7 +143,7 @@ contains
     function norm_1_native(x) result(norm_value)
         implicit none
         !> The input vector.
-        real(real64), intent(in) :: x(:)
+        real(real64), intent(in), contiguous :: x(:)
         !> The computed 1-norm, \( \sum |x_i| \).
         real(real64) :: norm_value
 
@@ -166,7 +166,7 @@ contains
     function norm_2_native(x) result(norm_value)
         implicit none
         !> The input vector.
-        real(real64), intent(in) :: x(:)
+        real(real64), intent(in), contiguous :: x(:)
         !> The computed 2-norm, \( \sqrt{\sum x_i^2} \).
         real(real64) :: norm_value
 
@@ -189,7 +189,7 @@ contains
     function norm_inf_native(x) result(norm_value)
         implicit none
         !> The input vector.
-        real(real64), intent(in) :: x(:)
+        real(real64), intent(in), contiguous :: x(:)
         !> The computed infinity-norm, \( \max(|x_i|) \).
         real(real64) :: norm_value
 
@@ -216,9 +216,9 @@ contains
     function dot_native(x, y) result(product)
         implicit none
         !> The first input vector.
-        real(real64), intent(in) :: x(:)
+        real(real64), intent(in), contiguous :: x(:)
         !> The second input vector.
-        real(real64), intent(in) :: y(:)
+        real(real64), intent(in), contiguous :: y(:)
         !> The computed dot product, \( \sum x_i y_i \).
         real(real64) :: product
 

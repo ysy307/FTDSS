@@ -79,14 +79,14 @@ contains
 
             ! Transform to global coordinates
             if (self%dimension == 1) then
-                dpsi_dx(i, 1) = dpsi_dxi(1) * inverse_jacobian(1, 1)
+                dpsi_dx(1, i) = dpsi_dxi(1) * inverse_jacobian(1, 1)
             else if (self%dimension == 2) then
-                dpsi_dx(i, 1) = dpsi_dxi(1) * inverse_jacobian(1, 1) + dpsi_dxi(2) * inverse_jacobian(2, 1)
-                dpsi_dx(i, 2) = dpsi_dxi(1) * inverse_jacobian(1, 2) + dpsi_dxi(2) * inverse_jacobian(2, 2)
+                dpsi_dx(1, i) = dpsi_dxi(1) * inverse_jacobian(1, 1) + dpsi_dxi(2) * inverse_jacobian(2, 1)
+                dpsi_dx(2, i) = dpsi_dxi(1) * inverse_jacobian(1, 2) + dpsi_dxi(2) * inverse_jacobian(2, 2)
             else if (self%dimension == 3) then
-                dpsi_dx(i, 1) = vector_dot(dpsi_dxi, inverse_jacobian(:, 1))
-                dpsi_dx(i, 2) = vector_dot(dpsi_dxi, inverse_jacobian(:, 2))
-                dpsi_dx(i, 3) = vector_dot(dpsi_dxi, inverse_jacobian(:, 3))
+                dpsi_dx(1, i) = vector_dot(dpsi_dxi, inverse_jacobian(:, 1))
+                dpsi_dx(2, i) = vector_dot(dpsi_dxi, inverse_jacobian(:, 2))
+                dpsi_dx(3, i) = vector_dot(dpsi_dxi, inverse_jacobian(:, 3))
             end if
         end do
 
