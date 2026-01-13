@@ -1,10 +1,10 @@
 #:set REAL_KINDS = ['real32', 'real64', 'real128']
 
-$ ! (Suffix, Dimension, IsArray)
+! (Suffix, Dimension, IsArray)
 #:set RANKS = [ &
-    ('scalar', '',       .False.), &
-    ('rank1',  '(:)',    .True.),  &
-    ('rank2',  '(:, :)', .True.)   &
+    ('scalar', '',       False), &
+    ('rank1',  '(:)',    True),  &
+    ('rank2',  '(:, :)', True)   &
     ]
 
 !>
@@ -43,11 +43,11 @@ contains
                 !> The value to check.
                 real(${k}$), intent(in) :: val${r_dim}$
 
-                #{if is_array}#
-                has_nan_${r_name}$_${k}$ = any(ieee_is_nan(val))
-                #{else}#
-                has_nan_${r_name}$_${k}$ = ieee_is_nan(val)
-                #{endif}#
+                #:if is_array
+                    has_nan_${r_name}$_${k}$ = any(ieee_is_nan(val))
+                #:else
+                    has_nan_${r_name}$_${k}$ = ieee_is_nan(val)
+                #:endif
             end function has_nan_${r_name}$_${k}$
 
         #:endfor

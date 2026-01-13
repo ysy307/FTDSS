@@ -141,16 +141,16 @@ contains
 
             ! Compute term: M * nabla psi_j
             do j = 1, nd
-                ! Matrix-Vector multiplication using pointers
-                ! M_gp(:, :, p) is [dim x dim]
-                ! p_dpsi_dx(:, j) is [dim] (Corrected from (j, :))
-                call matvec(M_gp(:, :, p), p_dpsi_dx(:, j), p_M_grad_psi_j, ierr)
+                ! Matrix-Vector multiplication
+                ! M_gp(1:dim, 1:dim, p)
+                ! p_dpsi_dx(1:dim, j) : Node j's gradient vector [dim]
+                call matvec(M_gp(1:dim, 1:dim, p), p_dpsi_dx(1:dim, j), p_M_grad_psi_j(1:dim), ierr)
 
                 do i = 1, nd
                     ! nabla psi_i . (M * nabla psi_j)
-                    ! p_dpsi_dx(:, i) is [dim] (Corrected from (i, :))
+                    ! p_dpsi_dx(1:dim, i) : Node i's gradient vector [dim]
                     elem_mat(i, j) = elem_mat(i, j) + &
-                                     w * det_J * vector_dot(p_dpsi_dx(:, i), p_M_grad_psi_j)
+                                     w * det_J * vector_dot(p_dpsi_dx(1:dim, i), p_M_grad_psi_j(1:dim))
                 end do
             end do
         end do
@@ -228,8 +228,9 @@ contains
 
             do j = 1, nd
                 do i = 1, nd
-                    ! nabla psi_i . nabla psi_j (Simple dot product)
-                    grad_dot = vector_dot(p_dpsi_dx(:, i), p_dpsi_dx(:, j))
+                    ! nabla psi_i . nabla psi_j
+                    ! Explicitly passing slices (1:dim) for contiguous memory access and safety
+                    grad_dot = vector_dot(p_dpsi_dx(1:dim, i), p_dpsi_dx(1:dim, j))
 
                     elem_mat(i, j) = elem_mat(i, j) + &
                                      w * det_J * M_val * grad_dot
@@ -306,8 +307,8 @@ contains
 
             do i = 1, nd
                 ! (nabla psi_i . V)
-                ! p_dpsi_dx(:, i) is [dim], V_gp(:, p) is [dim]
-                grad_psi_i_dot_V = vector_dot(p_dpsi_dx(:, i), V_gp(:, p))
+                ! Explicit stride (1:dim) for column access (contiguous)
+                grad_psi_i_dot_V = vector_dot(p_dpsi_dx(1:dim, i), V_gp(1:dim, p))
 
                 do j = 1, nd
                     elem_mat(i, j) = elem_mat(i, j) + &
@@ -433,7 +434,10 @@ contains
             ! Direct evaluation: F_gp(:, p)
             do i = 1, nd
                 ! (nabla psi_i . F)
-                grad_psi_i_dot_F = vector_dot(p_dpsi_dx(:, i), F_gp(:, p))
+                ! [修正] ストライドと物理次元を合わせる
+                ! p_dpsi_dx(1:dim, i) : 節点 i の勾配ベクトル [サイズ dim] (メモリ連続)
+                ! F_gp(1:dim, p)      : 積分点 p の流束ベクトル [サイズ dim] (メモリ連続)
+                grad_psi_i_dot_F = vector_dot(p_dpsi_dx(1:dim, i), F_gp(1:dim, p))
 
                 elem_vec(i) = elem_vec(i) + w * det_J * grad_psi_i_dot_F
             end do
