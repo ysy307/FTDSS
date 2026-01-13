@@ -29,31 +29,30 @@
 
         end function construct_triangle_second
 
-        module subroutine get_area_triangle_second(self, node_coords, geometry)
+        module subroutine calc_area_triangle_second(self, node_coords, measure)
             implicit none
             class(type_triangle_second), intent(in) :: self
             real(real64), intent(in) :: node_coords(:, :)
-            real(real64), intent(inout) :: geometry
-
+            real(real64), intent(inout) :: measure
             integer(int32) :: i
             integer(int32) :: ng
             type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gauss_pts
             real(real64), pointer, contiguous, dimension(:) :: weights
             real(real64) :: det_j
 
-            geometry = 0.0d0
+            measure = 0.0d0
             call self%get_gauss(gauss_pts)
             call self%get_weight(weights)
             call self%get_num_gauss(ng)
 
             do i = 1, ng
-                call self%jacobian_det(gauss_pts(i), node_coords, det_j)
-                geometry = geometry + det_j * weights(i)
+                call self%calc_jacobian_determinant(gauss_pts(i), node_coords, det_j)
+                measure = measure + det_j * weights(i)
             end do
 
-        end subroutine get_area_triangle_second
+        end subroutine calc_area_triangle_second
 
-        pure elemental module subroutine psi_triangle_second(self, i, r, psi_val)
+        pure elemental module subroutine calc_psi_triangle_second(self, i, r, psi_val)
             implicit none
             class(type_triangle_second), intent(in) :: self
             integer(int32), intent(in) :: i
@@ -83,9 +82,9 @@
             case default
                 psi_val = 0.0d0
             end select
-        end subroutine psi_triangle_second
+        end subroutine calc_psi_triangle_second
 
-        pure elemental module subroutine dpsi_triangle_second(self, i, j, r, dpsi_val)
+        pure elemental module subroutine calc_dpsi_triangle_second(self, i, j, r, dpsi_val)
             implicit none
             class(type_triangle_second), intent(in) :: self
             integer(int32), intent(in) :: i
@@ -117,9 +116,9 @@
                 if (j == 1) dpsi_val = -4.0d0 * eta
                 if (j == 2) dpsi_val = 4.0d0 - 4.0d0 * xi - 8.0d0 * eta
             end select
-        end subroutine dpsi_triangle_second
+        end subroutine calc_dpsi_triangle_second
 
-        pure module subroutine jacobian_triangle_second(self, r, node_coords, jac)
+        pure module subroutine calc_jacobian_triangle_second(self, r, node_coords, jac)
             implicit none
             class(type_triangle_second), intent(in) :: self
             type(type_coordinate_dp), intent(in) :: r
@@ -133,26 +132,14 @@
 
             jac = 0.0d0
             do k = 1, 6
-                call self%dpsi(k, 1, r, dpsi_xi)
-                call self%dpsi(k, 2, r, dpsi_eta)
+                call self%calc_dpsi(k, 1, r, dpsi_xi)
+                call self%calc_dpsi(k, 2, r, dpsi_eta)
                 jac(1, 1) = jac(1, 1) + dpsi_xi * node_coords(1, k)
                 jac(1, 2) = jac(1, 2) + dpsi_xi * node_coords(2, k)
                 jac(2, 1) = jac(2, 1) + dpsi_eta * node_coords(1, k)
                 jac(2, 2) = jac(2, 2) + dpsi_eta * node_coords(2, k)
             end do
-        end subroutine jacobian_triangle_second
-
-        pure module subroutine jacobian_det_triangle_second(self, r, node_coords, det_j)
-            implicit none
-            class(type_triangle_second), intent(in) :: self
-            type(type_coordinate_dp), intent(in) :: r
-            real(real64), intent(in) :: node_coords(:, :)
-            real(real64), intent(inout) :: det_j
-
-            real(real64) :: jac(2, 2)
-            call self%jacobian(r, node_coords, jac)
-            det_j = jac(1, 1) * jac(2, 2) - jac(1, 2) * jac(2, 1)
-        end subroutine jacobian_det_triangle_second
+        end subroutine calc_jacobian_triangle_second
 
         module subroutine is_in_triangle_second(self, cartesian, normalized, node_coords, is_in)
             implicit none
@@ -184,7 +171,7 @@
             do iter = 1, max_iter
                 call pos%set(0.0d0, 0.0d0, 0.0d0)
                 do i = 1, nn
-                    call self%psi(i, r, val)
+                    call self%calc_psi(i, r, val)
                     pos%x = pos%x + val * node_coords(1, i)
                     pos%y = pos%y + val * node_coords(2, i)
                 end do
@@ -196,10 +183,10 @@
                     exit
                 end if
 
-                call self%jacobian_det(r, node_coords, det_j)
+                call self%calc_jacobian_determinant(r, node_coords, det_j)
                 if (abs(det_j) < epsilon(det_j)) exit
 
-                call self%jacobian(r, node_coords, jac)
+                call self%calc_jacobian(r, node_coords, jac)
 
                 r%x = r%x + (jac(2, 2) * dx - jac(1, 2) * dy) / det_j
                 r%y = r%y + (-jac(2, 1) * dx + jac(1, 1) * dy) / det_j

@@ -35,12 +35,11 @@ contains
     !>
     !> Calculates the straight-line length of the element.
     !>
-    module subroutine get_length_side_first(self, node_coords, geometry)
+    module subroutine calc_length_side_first(self, node_coords, measure)
         implicit none
         class(type_side_first), intent(in) :: self
         real(real64), intent(in) :: node_coords(:, :)
-        real(real64), intent(inout) :: geometry
-
+        real(real64), intent(inout) :: measure
         integer(int32) :: node1_id
         integer(int32) :: node2_id
         real(real64) :: dx
@@ -51,13 +50,13 @@ contains
         dy = node_coords(2, 2) - node_coords(2, 1)
         dz = node_coords(3, 2) - node_coords(3, 1)
 
-        geometry = sqrt(dx**2 + dy**2 + dz**2)
-    end subroutine get_length_side_first
+        measure = sqrt(dx**2 + dy**2 + dz**2)
+    end subroutine calc_length_side_first
 
     !>
     !> Evaluates the shape function psi.
     !>
-    pure elemental module subroutine psi_side_first(self, i, r, psi_val)
+    pure elemental module subroutine calc_psi_side_first(self, i, r, psi_val)
         implicit none
         class(type_side_first), intent(in) :: self
         integer(int32), intent(in) :: i
@@ -72,12 +71,12 @@ contains
         case default
             psi_val = 0.0d0
         end select
-    end subroutine psi_side_first
+    end subroutine calc_psi_side_first
 
     !>
     !> Evaluates the derivative of the shape function dpsi.
     !>
-    pure elemental module subroutine dpsi_side_first(self, i, j, r, dpsi_val)
+    pure elemental module subroutine calc_dpsi_side_first(self, i, j, r, dpsi_val)
         implicit none
         class(type_side_first), intent(in) :: self
         integer(int32), intent(in) :: i
@@ -94,7 +93,7 @@ contains
                 dpsi_val = 0.5d0
             end select
         end if
-    end subroutine dpsi_side_first
+    end subroutine calc_dpsi_side_first
 
     !>
     !> Computes the tangent vector at a specified local coordinate.
@@ -115,7 +114,7 @@ contains
         call self%get_num_nodes(nn)
 
         do i = 1, nn
-            call self%dpsi(i, 1, r, dpsi_val)
+            call self%calc_dpsi(i, 1, r, dpsi_val)
             tangent_vec(1) = tangent_vec(1) + dpsi_val * node_coords(1, i)
             tangent_vec(2) = tangent_vec(2) + dpsi_val * node_coords(2, i)
             tangent_vec(3) = tangent_vec(3) + dpsi_val * node_coords(3, i)
@@ -125,7 +124,7 @@ contains
     !>
     !> Calculates the Jacobian matrix.
     !>
-    pure module subroutine jacobian_side_first(self, r, node_coords, jac)
+    pure module subroutine calc_jacobian_side_first(self, r, node_coords, jac)
         implicit none
         class(type_side_first), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
@@ -136,23 +135,7 @@ contains
 
         call self%compute_tangent_vector(r, node_coords, tangent_vec)
         jac(1, 1) = sqrt(sum(tangent_vec**2))
-    end subroutine jacobian_side_first
-
-    !>
-    !> Calculates the Jacobian determinant.
-    !>
-    pure module subroutine jacobian_det_side_first(self, r, node_coords, det_j)
-        implicit none
-        class(type_side_first), intent(in) :: self
-        type(type_coordinate_dp), intent(in) :: r
-        real(real64), intent(in) :: node_coords(:, :)
-        real(real64), intent(inout) :: det_j
-
-        real(real64) :: jac(1, 1)
-
-        call self%jacobian(r, node_coords, jac)
-        det_j = jac(1, 1)
-    end subroutine jacobian_det_side_first
+    end subroutine calc_jacobian_side_first
 
     !>
     !> Checks if a point is on the element.

@@ -11,6 +11,7 @@ module linalg_matrix_operations
     public :: matrix_gemv
     public :: matrix_gemm
     public :: matrix_inverse
+    public :: matrix_determinant
     public :: matvec
 
     interface matrix_gemv
@@ -27,6 +28,10 @@ module linalg_matrix_operations
 
     interface matrix_inverse
         module procedure :: matrix_inverse_real64
+    end interface
+
+    interface matrix_determinant
+        module procedure :: matrix_determinant_real64
     end interface
 
     interface matvec
@@ -868,4 +873,5 @@ contains
         end select
 
     end subroutine matvec_matrix
+
 end module linalg_matrix_operations

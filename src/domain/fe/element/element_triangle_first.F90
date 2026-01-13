@@ -36,11 +36,11 @@ contains
     !>
     !> Calculates the area of the element.
     !>
-    module subroutine get_area_triangle_first(self, node_coords, geometry)
+    module subroutine calc_area_triangle_first(self, node_coords, measure)
         implicit none
         class(type_triangle_first), intent(in) :: self
         real(real64), intent(in) :: node_coords(:, :)
-        real(real64), intent(inout) :: geometry
+        real(real64), intent(inout) :: measure
 
         real(real64) :: x(3)
         real(real64) :: y(3)
@@ -52,13 +52,13 @@ contains
             y(i) = node_coords(2, i)
         end do
 
-        geometry = 0.5d0 * abs(x(1) * (y(2) - y(3)) + x(2) * (y(3) - y(1)) + x(3) * (y(1) - y(2)))
-    end subroutine get_area_triangle_first
+        measure = 0.5d0 * abs(x(1) * (y(2) - y(3)) + x(2) * (y(3) - y(1)) + x(3) * (y(1) - y(2)))
+    end subroutine calc_area_triangle_first
 
     !>
     !> Evaluates the shape function psi.
     !>
-    pure elemental module subroutine psi_triangle_first(self, i, r, psi_val)
+    pure elemental module subroutine calc_psi_triangle_first(self, i, r, psi_val)
         implicit none
         class(type_triangle_first), intent(in) :: self
         integer(int32), intent(in) :: i
@@ -75,12 +75,12 @@ contains
         case default
             psi_val = 0.0d0
         end select
-    end subroutine psi_triangle_first
+    end subroutine calc_psi_triangle_first
 
     !>
     !> Evaluates the derivative of the shape function dpsi.
     !>
-    pure elemental module subroutine dpsi_triangle_first(self, i, j, r, dpsi_val)
+    pure elemental module subroutine calc_dpsi_triangle_first(self, i, j, r, dpsi_val)
         implicit none
         class(type_triangle_first), intent(in) :: self
         integer(int32), intent(in) :: i
@@ -98,12 +98,12 @@ contains
         case (3)
             if (j == 2) dpsi_val = 1.0d0
         end select
-    end subroutine dpsi_triangle_first
+    end subroutine calc_dpsi_triangle_first
 
     !>
     !> Calculates the Jacobian matrix.
     !>
-    pure module subroutine jacobian_triangle_first(self, r, node_coords, jac)
+    pure module subroutine calc_jacobian_triangle_first(self, r, node_coords, jac)
         implicit none
         class(type_triangle_first), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
@@ -125,23 +125,7 @@ contains
         jac(1, 2) = y(2) - y(1)
         jac(2, 1) = x(3) - x(1)
         jac(2, 2) = y(3) - y(1)
-    end subroutine jacobian_triangle_first
-
-    !>
-    !> Calculates the Jacobian determinant.
-    !>
-    pure module subroutine jacobian_det_triangle_first(self, r, node_coords, det_j)
-        implicit none
-        class(type_triangle_first), intent(in) :: self
-        type(type_coordinate_dp), intent(in) :: r
-        real(real64), intent(in) :: node_coords(:, :)
-        real(real64), intent(inout) :: det_j
-
-        real(real64) :: jac(2, 2)
-
-        call self%jacobian(r, node_coords, jac)
-        det_j = jac(1, 1) * jac(2, 2) - jac(1, 2) * jac(2, 1)
-    end subroutine jacobian_det_triangle_first
+    end subroutine calc_jacobian_triangle_first
 
     !>
     !> Checks if point is inside using analytical Barycentric coordinates.

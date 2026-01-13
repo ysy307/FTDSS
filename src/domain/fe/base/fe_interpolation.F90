@@ -13,7 +13,7 @@ contains
 
         lerped_value = 0.0d0
         do i = 1, self%num_nodes
-            call self%psi(i, r, psi_i)
+            call self%calc_psi(i, r, psi_i)
             lerped_value = lerped_value + psi_i * values(i)
         end do
     end subroutine lerp_1d_abst_fe
@@ -29,7 +29,7 @@ contains
 
         lerped_values(:) = 0.0d0
         do i = 1, self%num_nodes
-            call self%psi(i, r, psi_i)
+            call self%calc_psi(i, r, psi_i)
             lerped_values(:) = lerped_values(:) + psi_i * values(:, i)
         end do
     end subroutine lerp_2d_abst_fe
@@ -45,12 +45,12 @@ contains
 
         lerped_values = 0.0d0
         do i = 1, self%num_nodes
-            call self%psi(i, r, psi_i)
+            call self%calc_psi(i, r, psi_i)
             lerped_values(:, :) = lerped_values(:, :) + psi_i * values(:, :, i)
         end do
     end subroutine lerp_3d_abst_fe
 
-!---------------------------------------------------------------------------
+    !---------------------------------------------------------------------------
     !> 物理座標系における値の勾配(nabla u)を計算する
     !> 内部で dpsi_dx (形状関数の物理勾配) を呼び出して線形結合をとる
     !>
@@ -80,7 +80,7 @@ contains
 
         ! 2. 形状関数の物理勾配 (dN_i/dx, dN_i/dy, dN_i/dz) を取得
         !    ここで逆ヤコビアンの計算等はすべて行われる
-        call self%dpsi_dx(r, node_coords, shape_grads)
+        call self%calc_dpsi_dx(r, node_coords, shape_grads)
 
         ! 3. 勾配の計算: grad u = sum( u_i * grad N_i )
         if (self%dimension == 3) then

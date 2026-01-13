@@ -61,8 +61,8 @@ module domain_base_fe
         !>
         procedure, public, pass(self) :: calc_shape_function => calc_shape_function_abst_fe
         procedure, public, pass(self) :: calc_inverse_jacobian => calc_inverse_jacobian_abst_fe
-        ! procedure, public,pass(self):: calc_inverse_jacobian
-        procedure, public, pass(self) :: dpsi_dx => dpsi_dx_abst_fe
+        procedure, public, pass(self) :: calc_dpsi_dx => calc_dpsi_dx_abst_fe
+        procedure, public, pass(self) :: calc_jacobian_determinant => calc_jacobian_determinant_abst_fe
 
         ! !> Integration routines taking Gauss-point values
         procedure, public, pass(self) :: compute_K1 => compute_K1_capacity_abst_fe
@@ -77,25 +77,24 @@ module domain_base_fe
         !----------------------------------------------------------------------
         ! Abstract methods to be implemented in derived types
         !----------------------------------------------------------------------
-        procedure(abst_get_geometry), pass(self), public, deferred :: get_geometry
-        procedure(abst_psi), pass(self), public, deferred :: psi
-        procedure(abst_dpsi), pass(self), public, deferred :: dpsi
-        procedure(abst_jacobian), pass(self), public, deferred :: jacobian
-        procedure(abst_jacobian_det), pass(self), public, deferred :: jacobian_det
-        procedure(abst_is_inside), pass(self), public, deferred :: is_inside
+        procedure(abst_calc_measure), public, pass(self), deferred :: calc_measure
+        procedure(abst_calc_psi), public, pass(self), deferred :: calc_psi
+        procedure(abst_calc_dpsi), public, pass(self), deferred :: calc_dpsi
+        procedure(abst_calc_jacobian), public, pass(self), deferred :: calc_jacobian
+        procedure(abst_is_inside), public, pass(self), deferred :: is_inside
     end type
 
     abstract interface
-        subroutine abst_get_geometry(self, node_coords, geometry)
+        subroutine abst_calc_measure(self, node_coords, measure)
             import :: abst_fe, int32, real64
             implicit none
             class(abst_fe), intent(in) :: self
             real(real64), intent(in) :: node_coords(:, :)
-            real(real64), intent(inout) :: geometry
+            real(real64), intent(inout) :: measure
 
-        end subroutine abst_get_geometry
+        end subroutine abst_calc_measure
 
-        pure elemental subroutine abst_psi(self, i, r, psi_val)
+        pure elemental subroutine abst_calc_psi(self, i, r, psi_val)
             import :: abst_fe, type_coordinate_dp, int32, real64
             implicit none
             class(abst_fe), intent(in) :: self
@@ -103,9 +102,9 @@ module domain_base_fe
             type(type_coordinate_dp), intent(in) :: r
             real(real64), intent(inout) :: psi_val
 
-        end subroutine abst_psi
+        end subroutine abst_calc_psi
 
-        pure elemental subroutine abst_dpsi(self, i, j, r, dpsi_val)
+        pure elemental subroutine abst_calc_dpsi(self, i, j, r, dpsi_val)
             import :: abst_fe, type_coordinate_dp, int32, real64
             implicit none
             class(abst_fe), intent(in) :: self
@@ -114,9 +113,9 @@ module domain_base_fe
             type(type_coordinate_dp), intent(in) :: r
             real(real64), intent(inout) :: dpsi_val
 
-        end subroutine abst_dpsi
+        end subroutine abst_calc_dpsi
 
-        pure subroutine abst_jacobian(self, r, node_coords, jac)
+        pure subroutine abst_calc_jacobian(self, r, node_coords, jac)
             import :: abst_fe, type_coordinate_dp, int32, real64
             implicit none
             class(abst_fe), intent(in) :: self
@@ -124,17 +123,7 @@ module domain_base_fe
             real(real64), intent(in) :: node_coords(:, :)
             real(real64), intent(inout) :: jac(:, :)
 
-        end subroutine abst_jacobian
-
-        pure subroutine abst_jacobian_det(self, r, node_coords, det_j)
-            import :: abst_fe, type_coordinate_dp, int32, real64
-            implicit none
-            class(abst_fe), intent(in) :: self
-            type(type_coordinate_dp), intent(in) :: r
-            real(real64), intent(in) :: node_coords(:, :)
-            real(real64), intent(inout) :: det_j
-
-        end subroutine abst_jacobian_det
+        end subroutine abst_calc_jacobian
 
         subroutine abst_is_inside(self, cartesian, normalized, node_coords, is_in)
             import abst_fe, type_coordinate_dp, int32, real64
@@ -362,14 +351,23 @@ module domain_base_fe
 
         end subroutine calc_inverse_jacobian_abst_fe
 
-        module subroutine dpsi_dx_abst_fe(self, r, node_coords, dpsi_dx)
+        module subroutine calc_dpsi_dx_abst_fe(self, r, node_coords, dpsi_dx)
             implicit none
             class(abst_fe), intent(in) :: self
             type(type_coordinate_dp), intent(in) :: r
             real(real64), intent(in) :: node_coords(:, :)
             real(real64), intent(inout) :: dpsi_dx(:, :)
 
-        end subroutine dpsi_dx_abst_fe
+        end subroutine calc_dpsi_dx_abst_fe
+
+        module subroutine calc_jacobian_determinant_abst_fe(self, r, node_coords, determinant_jacobian)
+            implicit none
+            class(abst_fe), intent(in) :: self
+            type(type_coordinate_dp), intent(in) :: r
+            real(real64), intent(in) :: node_coords(:, :)
+            real(real64), intent(inout) :: determinant_jacobian
+
+        end subroutine calc_jacobian_determinant_abst_fe
     end interface
 
     !> Wrapper for polymorphic FE objects

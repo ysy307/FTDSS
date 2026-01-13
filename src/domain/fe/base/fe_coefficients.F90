@@ -22,26 +22,26 @@ contains
         if (present(psi)) then
             psi(:) = 0.0d0
             do i = 1, self%num_nodes
-                call self%psi(i, r, psi(i))
+                call self%calc_psi(i, r, psi(i))
             end do
         end if
 
         ! 2. Compute Jacobian Matrix (Isoparametric formulation)
         if (present(determinant_jacobian)) then
             determinant_jacobian = 0.0d0
-            call self%jacobian_det(r, node_coords, determinant_jacobian)
+            call self%calc_jacobian_determinant(r, node_coords, determinant_jacobian)
         end if
 
         ! 3. Compute Determinant and Inverse Jacobian
         if (present(inverse_jacobian)) then
             inverse_jacobian(:, :) = 0.0d0
-            call self%calc_inverse_jacobian(r, node_coords, inverse_jacobian(1:self%dimension, 1:self%dimension))
+            call self%calc_inverse_jacobian(r, node_coords, inverse_jacobian)
         end if
 
         ! 4. Compute Global Gradients if requested
         if (present(dpsi_dx)) then
             dpsi_dx(:, :) = 0.0d0
-            call self%dpsi_dx(r, node_coords, dpsi_dx(:, 1:self%dimension))
+            call self%calc_dpsi_dx(r, node_coords, dpsi_dx)
         end if
 
     end subroutine calc_shape_function_abst_fe
@@ -55,12 +55,12 @@ contains
 
         integer(int32) :: ierr
 
-        call self%jacobian(r, node_coords, inverse_jacobian)
+        call self%calc_jacobian(r, node_coords, inverse_jacobian)
         call matrix_inverse(inverse_jacobian, ierr)
 
     end subroutine calc_inverse_jacobian_abst_fe
 
-    module subroutine dpsi_dx_abst_fe(self, r, node_coords, dpsi_dx)
+    module subroutine calc_dpsi_dx_abst_fe(self, r, node_coords, dpsi_dx)
         implicit none
         class(abst_fe), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
@@ -74,7 +74,7 @@ contains
         call self%calc_inverse_jacobian(r, node_coords, inverse_jacobian)
         do i = 1, self%num_nodes
             do j = 1, self%dimension
-                call self%dpsi(i, j, r, dpsi_dxi(j))
+                call self%calc_dpsi(i, j, r, dpsi_dxi(j))
             end do
 
             ! Transform to global coordinates
@@ -90,6 +90,21 @@ contains
             end if
         end do
 
-    end subroutine dpsi_dx_abst_fe
+    end subroutine calc_dpsi_dx_abst_fe
+
+    module subroutine calc_jacobian_determinant_abst_fe(self, r, node_coords, determinant_jacobian)
+        implicit none
+        class(abst_fe), intent(in) :: self
+        type(type_coordinate_dp), intent(in) :: r
+        real(real64), intent(in) :: node_coords(:, :)
+        real(real64), intent(inout) :: determinant_jacobian
+
+        real(real64) :: jacobian(3, 3)
+        integer(int32) :: ierr
+
+        call self%calc_jacobian(r, node_coords, jacobian)
+        call matrix_determinant(jacobian(1:self%dimension, 1:self%dimension), determinant_jacobian, ierr)
+
+    end subroutine calc_jacobian_determinant_abst_fe
 
 end submodule domain_base_fe_coefficients

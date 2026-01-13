@@ -53,7 +53,7 @@ contains
         n_dim = size(node_coords, 1)
 
         do i = 1, nn
-            call self%dpsi(i, 1, r, dpsi_val)
+            call self%calc_dpsi(i, 1, r, dpsi_val)
 
             ! tangent_vec のサイズだけでなく、node_coords の次元数もチェックする
             if (size(tangent_vec) >= 1 .and. n_dim >= 1) &
@@ -70,34 +70,30 @@ contains
     !>
     !> Calculates the curved length of the element using Gauss quadrature.
     !>
-    module subroutine get_length_side_second(self, node_coords, geometry)
+    module subroutine calc_length_side_second(self, node_coords, measure)
         implicit none
         class(type_side_second), intent(in) :: self
         real(real64), intent(in) :: node_coords(:, :)
-        real(real64), intent(inout) :: geometry
+        real(real64), intent(inout) :: measure
 
         integer(int32) :: i
-        integer(int32) :: ng
-        type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gauss_pts
-        real(real64), pointer, contiguous, dimension(:) :: weights
+        type(type_gauss_integration_rule), pointer :: gauss_rule
         real(real64) :: det_j
 
-        geometry = 0.0d0
-        call self%get_gauss(gauss_pts)
-        call self%get_weight(weights)
-        call self%get_num_gauss(ng)
+        measure = 0.0d0
+        call self%get_integration_rule(gauss_rule)
 
-        do i = 1, ng
-            call self%jacobian_det(gauss_pts(i), node_coords, det_j)
-            geometry = geometry + det_j * weights(i)
+        do i = 1, gauss_rule%num_gauss
+            call self%calc_jacobian_determinant(gauss_rule%gauss(i), node_coords, det_j)
+            measure = measure + det_j * gauss_rule%weight(i)
         end do
 
-    end subroutine get_length_side_second
+    end subroutine calc_length_side_second
 
     !>
     !> Evaluates the shape function psi.
     !>
-    pure elemental module subroutine psi_side_second(self, i, r, psi_val)
+    pure elemental module subroutine calc_psi_side_second(self, i, r, psi_val)
         implicit none
         class(type_side_second), intent(in) :: self
         integer(int32), intent(in) :: i
@@ -116,12 +112,12 @@ contains
         case default
             psi_val = 0.0d0
         end select
-    end subroutine psi_side_second
+    end subroutine calc_psi_side_second
 
     !>
     !> Evaluates the derivative dpsi.
     !>
-    pure elemental module subroutine dpsi_side_second(self, i, j, r, dpsi_val)
+    pure elemental module subroutine calc_dpsi_side_second(self, i, j, r, dpsi_val)
         implicit none
         class(type_side_second), intent(in) :: self
         integer(int32), intent(in) :: i
@@ -142,12 +138,12 @@ contains
                 dpsi_val = -2.0d0 * xi
             end select
         end if
-    end subroutine dpsi_side_second
+    end subroutine calc_dpsi_side_second
 
     !>
     !> Calculates the Jacobian matrix.
     !>
-    pure module subroutine jacobian_side_second(self, r, node_coords, jac)
+    pure module subroutine calc_jacobian_side_second(self, r, node_coords, jac)
         implicit none
         class(type_side_second), intent(in) :: self
         type(type_coordinate_dp), intent(in) :: r
@@ -158,23 +154,7 @@ contains
 
         call self%compute_tangent_vector(r, node_coords, tangent_vec)
         jac(1, 1) = sqrt(sum(tangent_vec**2))
-    end subroutine jacobian_side_second
-
-    !>
-    !> Calculates the Jacobian determinant.
-    !>
-    pure module subroutine jacobian_det_side_second(self, r, node_coords, det_j)
-        implicit none
-        class(type_side_second), intent(in) :: self
-        type(type_coordinate_dp), intent(in) :: r
-        real(real64), intent(in) :: node_coords(:, :)
-        real(real64), intent(inout) :: det_j
-
-        real(real64) :: jac(1, 1)
-
-        call self%jacobian(r, node_coords, jac)
-        det_j = jac(1, 1)
-    end subroutine jacobian_det_side_second
+    end subroutine calc_jacobian_side_second
 
     !>
     !> Checks if point is inside using Newton-Raphson.
@@ -209,7 +189,7 @@ contains
         do iter = 1, max_iter
             call pos_guess%set(0.0d0, 0.0d0, 0.0d0)
             do i = 1, nn
-                call self%psi(i, r_local, psi_val)
+                call self%calc_psi(i, r_local, psi_val)
                 pos_guess%x = pos_guess%x + psi_val * node_coords(1, i)
                 pos_guess%y = pos_guess%y + psi_val * node_coords(2, i)
                 pos_guess%z = pos_guess%z + psi_val * node_coords(3, i)

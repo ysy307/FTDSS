@@ -180,7 +180,7 @@ module domain_manager
         procedure, public, pass(self) :: get_element => get_element_domain
         procedure, public, pass(self) :: get_element_connectivity => get_element_connectivity_domain
         procedure, public, pass(self) :: get_element_coordinate => get_element_coordinate_domain
-        procedure, public, pass(self) :: get_geometry => get_geometry_domain
+        procedure, public, pass(self) :: get_measure => calc_measure_domain
         procedure, public, pass(self) :: get_target_dof => get_target_dof_domain
         procedure, public, pass(self) :: get_material_id => get_material_id_domain
 
@@ -188,6 +188,7 @@ module domain_manager
         procedure, private, pass(self) :: lerp_2d_domain
         procedure, private, pass(self) :: lerp_3d_domain
         generic, public :: lerp => lerp_1d_domain, lerp_2d_domain, lerp_3d_domain
+        procedure, public, pass(self) :: dlerp => dlerp_domain
         procedure, public, pass(self) :: display => display_domain
     end type type_domain
 
@@ -273,20 +274,11 @@ contains
         self%num_nodes = input%geometry%vtk%num_points
 
         if (allocated(self%coordinates)) deallocate (self%coordinates)
-        allocate (self%coordinates(self%parent%computation_dimension, self%num_nodes))
+        allocate (self%coordinates(3, self%num_nodes))
 
-        select case (self%parent%computation_type)
-        case (COMP_TYPE_2D_XY)
-            self%coordinates(1, :) = input%geometry%vtk%points%x(1:self%num_nodes)
-            self%coordinates(2, :) = input%geometry%vtk%points%y(1:self%num_nodes)
-        case (COMP_TYPE_2D_XZ)
-            self%coordinates(1, :) = input%geometry%vtk%points%x(1:self%num_nodes)
-            self%coordinates(2, :) = input%geometry%vtk%points%z(1:self%num_nodes)
-        case (COMP_TYPE_3D)
-            self%coordinates(1, :) = input%geometry%vtk%points%x(1:self%num_nodes)
-            self%coordinates(2, :) = input%geometry%vtk%points%y(1:self%num_nodes)
-            self%coordinates(3, :) = input%geometry%vtk%points%z(1:self%num_nodes)
-        end select
+        self%coordinates(1, :) = input%geometry%vtk%points%x(1:self%num_nodes)
+        self%coordinates(2, :) = input%geometry%vtk%points%y(1:self%num_nodes)
+        self%coordinates(3, :) = input%geometry%vtk%points%z(1:self%num_nodes)
 
         if (allocated(self%node_global_ids)) deallocate (self%node_global_ids)
         call allocate_array(self%node_global_ids, self%num_nodes)
@@ -892,11 +884,11 @@ contains
         material_id = self%elements%fe_material_ids(element_id)
     end subroutine get_material_id_domain
 
-    subroutine get_geometry_domain(self, element_id, geometry)
+    subroutine calc_measure_domain(self, element_id, measure)
         implicit none
         class(type_domain), intent(in) :: self
         integer(int32), intent(in) :: element_id
-        real(real64), intent(inout) :: geometry
+        real(real64), intent(inout) :: measure
 
         class(abst_fe), pointer :: fe
         real(real64), allocatable :: coordinates(:, :)
@@ -904,9 +896,9 @@ contains
         call self%get_element(element_id, fe)
         call self%get_element_coordinate(element_id, coordinates)
 
-        call fe%get_geometry(coordinates, geometry)
+        call fe%calc_measure(coordinates, measure)
 
-    end subroutine get_geometry_domain
+    end subroutine calc_measure_domain
 
     subroutine lerp_1d_domain(self, element_id, r, value, lerped_value)
         implicit none
@@ -955,6 +947,24 @@ contains
         call fe%lerp(r, value, lerped_value)
 
     end subroutine lerp_3d_domain
+
+    subroutine dlerp_domain(self, element_id, r, values, dlerped_value)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(in) :: element_id
+        type(type_coordinate_dp), intent(in) :: r
+        real(real64), intent(in) :: values(:)
+        type(type_coordinate_dp) :: dlerped_value
+
+        class(abst_fe), pointer :: fe
+        real(real64), allocatable :: coordinates(:, :)
+
+        call self%get_element(element_id, fe)
+        call self%get_element_coordinate(element_id, coordinates)
+
+        call fe%dlerp(r, values, coordinates, self%computation_type, dlerped_value)
+
+    end subroutine dlerp_domain
 
     ! --------------------------------------------------------------------------
     ! Display Procedures for Debugging
