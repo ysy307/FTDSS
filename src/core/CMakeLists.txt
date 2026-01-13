@@ -4,14 +4,17 @@
 # 1. Foundational Libraries
 # ====================================================================
 
-# --- Validation Library (依存なし) ---
+# --- Validation Library ---
+set(CORE_VALIDATION_FYPP_SOURCES
+    validation/check_length.fypp
+    validation/check_nan.fypp
+    validation/check_range.fypp
+)
 set(CORE_VALIDATION_SOURCES
     validation/error.F90
-    validation/check_nan.F90
-    validation/check_range.F90
-    validation/check_length.F90
 )
-add_library(Core_Validation STATIC ${CORE_VALIDATION_SOURCES})
+fypp_F90("" "${CORE_VALIDATION_FYPP_SOURCES}" CORE_VALIDATION_GENERATED_SOURCES)
+add_library(Core_Validation STATIC ${CORE_VALIDATION_SOURCES} ${CORE_VALIDATION_GENERATED_SOURCES})
 target_include_directories(Core_Validation PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 enable_build_flags(Core_Validation)
 enable_thirdparty(Core_Validation)
@@ -48,11 +51,11 @@ enable_build_flags(Core_Memory)
 # --- Utils Library (Memoryに依存) ---
 set(CORE_UTILS_FYPP_SOURCES
     utils/unique.fypp
+    utils/findings.fypp
 )
 set(CORE_UTILS_SOURCES
     utils/string_utils.F90
     utils/system_env.F90
-    utils/findings.F90
 )
 fypp_F90("" "${CORE_UTILS_FYPP_SOURCES}" CORE_UTILS_GENERATED_SOURCES)
 add_library(Core_Utils STATIC ${CORE_UTILS_GENERATED_SOURCES} ${CORE_UTILS_SOURCES})

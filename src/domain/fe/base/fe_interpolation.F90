@@ -56,7 +56,7 @@ contains
     !>
     !> @param[in]    self          要素オブジェクト
     !> @param[in]    r             局所座標 (xi, eta, zeta)
-    !> @param[in]    values        節点値配列 (u_i)
+    !> @param[in]    values        節点値配列 (u_i) [num_nodes]
     !> @param[in]    node_coords   節点座標配列 (x, y, z)
     !> @param[in]    plane_axis    2次元の場合の軸指定 (1:XY面, 2:XZ面). 3次元は無視.
     !> @param[inout] dlerped_value 計算された勾配ベクトル (du/dx, du/dy, du/dz)
@@ -70,8 +70,8 @@ contains
         integer(int32), intent(in) :: plane_axis
         type(type_coordinate_dp), intent(inout) :: dlerped_value
 
-        ! 形状関数の物理勾配を格納する一時配列 (num_nodes x 3)
-        ! スタック領域(Automatic Array)を使用
+        ! 形状関数の物理勾配を格納する一時配列 (3 x num_nodes)
+        ! calc_dpsi_dx は dim=2 の場合 (1:2, :) に値を埋めることに注意
         real(real64) :: shape_grads(3, self%num_nodes)
 
         ! 1. 初期化
@@ -79,35 +79,42 @@ contains
         shape_grads(:, :) = 0.0d0
 
         ! 2. 形状関数の物理勾配 (dN_i/dx, dN_i/dy, dN_i/dz) を取得
-        !    ここで逆ヤコビアンの計算等はすべて行われる
         call self%calc_dpsi_dx(r, node_coords, shape_grads)
 
         ! 3. 勾配の計算: grad u = sum( u_i * grad N_i )
+        ! shape_grads の第1次元は常に 1〜dim に詰められていることを考慮してマッピングする
+
         if (self%dimension == 3) then
             ! --- 3次元 (XYZ) ---
-            dlerped_value%x = vector_dot(values, shape_grads(1, :))
-            dlerped_value%y = vector_dot(values, shape_grads(2, :))
-            dlerped_value%z = vector_dot(values, shape_grads(3, :))
+            ! shape_grads(1:3, :) に順に x, y, z 成分が入っている
+            dlerped_value%x = vector_dot(values(1:self%num_nodes), shape_grads(1, 1:self%num_nodes))
+            dlerped_value%y = vector_dot(values(1:self%num_nodes), shape_grads(2, 1:self%num_nodes))
+            dlerped_value%z = vector_dot(values(1:self%num_nodes), shape_grads(3, 1:self%num_nodes))
 
         else if (self%dimension == 2) then
             ! --- 2次元 (XY or XZ) ---
+            ! shape_grads(1, :) -> 第1成分 (x)
+            ! shape_grads(2, :) -> 第2成分 (y or z)
+
             ! 第1成分は常に x
-            dlerped_value%x = vector_dot(values, shape_grads(1, :))
+            dlerped_value%x = vector_dot(values(1:self%num_nodes), shape_grads(1, 1:self%num_nodes))
 
             if (plane_axis == 2) then
-                ! XZ面の場合: 第2成分を z にマッピング
+                ! XZ面の場合: 計算された第2成分(index 2)を z にマッピング
                 dlerped_value%y = 0.0d0
-                dlerped_value%z = vector_dot(values, shape_grads(3, :))
+                dlerped_value%z = vector_dot(values(1:self%num_nodes), shape_grads(2, 1:self%num_nodes)) ! [修正] index 3 -> 2
             else
-                ! XY面の場合: 第2成分を y にマッピング (default)
-                dlerped_value%y = vector_dot(values, shape_grads(2, :))
+                ! XY面の場合: 計算された第2成分(index 2)を y にマッピング
+                dlerped_value%y = vector_dot(values(1:self%num_nodes), shape_grads(2, 1:self%num_nodes))
                 dlerped_value%z = 0.0d0
             end if
 
         else if (self%dimension == 1) then
-            dlerped_value%x = vector_dot(values, shape_grads(1, :))
+            ! --- 1次元 (X) ---
+            dlerped_value%x = vector_dot(values(1:self%num_nodes), shape_grads(1, 1:self%num_nodes))
+            dlerped_value%y = 0.0d0
+            dlerped_value%z = 0.0d0
         end if
 
     end subroutine dlerp_abst_fe
-
 end submodule domain_base_fe_interpolation
