@@ -31,6 +31,7 @@ module main_thermal
         ! procedure, pass(self), public :: compute_V_T => compute_V_T
         ! procedure, pass(self), public :: compute_R_T => compute_R_T
 
+        procedure, pass(self), public :: calc_enthalpy_density => calc_enthalpy_density_thermal
         procedure, pass(self), public :: calc_density_water => calc_density_water_thermal
         procedure, pass(self), public :: calc_density_ice => calc_density_ice_thermal
         procedure, pass(self), public :: calc_density_vapor_saturation => calc_density_vapor_saturation_thermal
@@ -105,6 +106,15 @@ module main_thermal
             real(real64), intent(in) :: bdf_coeffs(:)
             real(real64), intent(inout) :: dU_dt
         end subroutine compute_transient_term_thermal
+
+        module subroutine calc_enthalpy_density_thermal(self, material_id, state, U)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: U
+
+        end subroutine calc_enthalpy_density_thermal
 
         module pure elemental subroutine calc_density_water_thermal(self, state, rho_water)
             implicit none

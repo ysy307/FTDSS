@@ -10,6 +10,7 @@ submodule(inout_input_output_conditions) inout_input_output_conditions_history
     character(*), parameter :: x = "x"
     character(*), parameter :: y = "y"
     character(*), parameter :: z = "z"
+    character(*), parameter :: output_time_unit = "output_time_unit"
 
 contains
 
@@ -32,6 +33,11 @@ contains
             buffer(2) = observation_type
             call get_json_value(json, join(buffer), self%history_output%observation_type, &
                                 is_required=.true., valid_list=valid_observation_types)
+
+            buffer(2) = output_time_unit
+            call get_json_value(json, join(buffer(1:2)), tmp_string, &
+                                is_required=.true., valid_list=valid_time_units)
+            self%field_output%output_time_unit = get_time_unit(trim(tmp_string))
 
             buffer(2) = output_interval
             buffer(3) = unit

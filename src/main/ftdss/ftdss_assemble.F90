@@ -8,7 +8,6 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
-        ! ループ外で宣言（ここまではOK）
         type(type_matrix_dense) :: local_J_TT, local_J_TH, local_J_HH, local_J_HT
         type(type_vector_dp) :: local_R_T, local_R_H
         type(type_assemble_workspace) :: workspace
@@ -50,11 +49,8 @@ contains
             call self%R%add(thermal_dof, p_connectivity, local_R_T)
             ! call self%R%add(hydraulic_dof, p_connectivity, local_R_H)
 
-            ! [修正] ここで finalize (destroy) を呼ばない！
-            ! ループ内でのメモリ解放・再確保を防ぐため、次のループで変数を再利用する。
         end do
 
-        ! [修正] ループが終わった後に一括でメモリ解放を行う
         call self%assemble_finalize(workspace, local_J_TT, local_J_TH, &
                                     local_J_HH, local_J_HT, local_R_T, local_R_H)
 
@@ -77,7 +73,6 @@ contains
         integer(int32) :: material_id
         integer(int32) :: computation_type
         integer(int32) :: num_nodes
-        ! type(type_matrix_info) :: matrix_info ! 未使用なら削除
 
         integer(int32) :: i
 
@@ -87,10 +82,6 @@ contains
         call self%domain%get_computation_type(computation_type)
         call self%domain%get_element_coordinate(element_id, coordinates)
 
-        ! Workspaceのセットアップ
-        ! workspace%initialize は「メモリ確保」ではなく「値のリセットとポインタ設定」を行うように
-        ! 内部実装されていることが望ましい。もし毎回 allocate しているなら、
-        ! workspace%reset() のような軽量なメソッドを作るべき。
         call workspace%initialize(fe, material_id, element_id, computation_type, coordinates, self%controls)
 
         do i = 1, size(connectivity)
@@ -102,15 +93,10 @@ contains
             call self%thermal%update_water_phases(material_id, workspace%state_gp(i))
         end do
 
-        ! [注意] workspace%coordinates へのコピーなどは workspace%initialize でポインタ接続する方が効率的
-        ! ここではそのままにしておく
         workspace%coordinates = coordinates
 
-        !!------ 行列・ベクトルの準備 ------
         call fe%get_num_nodes(num_nodes)
 
-        ! 以下の check_initialize_matrix/vector 内で
-        ! 「サイズが同じなら allocate しない」かつ「値をゼロクリアする」処理が必要
         if (present(local_J_TT)) call check_initialize_matrix(local_J_TT, num_nodes)
         if (present(local_J_TH)) call check_initialize_matrix(local_J_TH, num_nodes)
         if (present(local_J_HH)) call check_initialize_matrix(local_J_HH, num_nodes)
@@ -128,16 +114,13 @@ contains
         type(type_matrix_info) :: matrix_info
 
         if (.not. matrix%is_initialized()) then
-            ! 未初期化なら確保 (ゼロクリア含む)
             call matrix%initialize(num_nodes)
         else
             call matrix%get_info(matrix_info)
             if (matrix_info%num_nodes /= num_nodes) then
-                ! サイズが変わる場合のみ再確保
                 call matrix%destroy()
                 call matrix%initialize(num_nodes)
             else
-                ! [修正] サイズが同じなら、メモリ解放せず値だけゼロにする
                 call matrix%zero()
             end if
         end if
@@ -157,13 +140,11 @@ contains
                 call vector%destroy()
                 call vector%initialize(num_nodes)
             else
-                ! [修正] 値だけゼロにする
                 call vector%zero()
             end if
         end if
     end subroutine check_initialize_vector
 
-    !> Compute local matrices and residual vectors for a specific element.
     module subroutine assemble_local_ftdss(self, workspace, local_J_TT, local_J_TH, &
                                            local_J_HH, local_J_HT, local_R_T, local_R_H)
         implicit none
@@ -177,8 +158,6 @@ contains
 
     end subroutine assemble_local_ftdss
 
-    !> Cleanup assembly variables
-    !> [修正] ループ内ではなく、assemble_ftdss の最後に呼ばれることを想定
     module subroutine assemble_finalize_ftdss(self, workspace, local_J_TT, local_J_TH, &
                                               local_J_HH, local_J_HT, local_R_T, local_R_H)
         implicit none

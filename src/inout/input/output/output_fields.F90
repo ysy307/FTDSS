@@ -5,6 +5,7 @@ submodule(inout_input_output_conditions) inout_input_output_conditions_fields
     !!------------------------------------------------------------------------------------------------------------------------------
     character(*), parameter :: field_output = "field_output"
     character(*), parameter :: valid_field_file_formats(3) = [character(len=16) :: "none", "vtk", "vtu"]
+    character(*), parameter :: output_time_unit = "output_time_unit"
     !!------------------------------------------------------------------------------------------------------------------------------
 contains
     module subroutine read_output_settings_fields(self, json)
@@ -17,8 +18,13 @@ contains
         character(256) :: buffer(3) = [character(256) :: field_output, "", ""]
 
         buffer(2) = file_format
-        call get_json_value(json, join(buffer), self%field_output%file_format, &
+        call get_json_value(json, join(buffer(1:2)), self%field_output%file_format, &
                             is_required=.true., valid_list=valid_field_file_formats)
+
+        buffer(2) = output_time_unit
+        call get_json_value(json, join(buffer(1:2)), tmp_string, &
+                            is_required=.true., valid_list=valid_time_units)
+        self%field_output%output_time_unit = get_time_unit(trim(tmp_string))
 
         buffer(2) = output_interval
         buffer(3) = unit
