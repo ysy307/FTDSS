@@ -1,6 +1,9 @@
 !> Defines core constants used throughout the application.
 module core_constants_solver
     use, intrinsic :: iso_fortran_env, only: int32
+    use :: stdlib_strings, only:strip
+    use :: stdlib_ascii, only:to_lower
+    use :: core_constants_base, only:type_constant_id, type_constant_value
     implicit none
     private
 
@@ -15,6 +18,18 @@ module core_constants_solver
     integer(int32), parameter, public :: MATRIX_COO = 3
     !> Block Sparse Row format
     integer(int32), parameter, public :: MATRIX_BSR = 4
+
+    type :: type_matrix_types
+        type(type_constant_id) :: DENSE = type_constant_id("dense", 1)
+        type(type_constant_id) :: CSR = type_constant_id("csr", 2)
+        type(type_constant_id) :: COO = type_constant_id("coo", 3)
+        type(type_constant_id) :: BSR = type_constant_id("bsr", 4)
+    contains
+        procedure, public, pass(self) :: to_id => to_id_matrix_type
+        procedure, public, pass(self) :: to_name => to_name_matrix_type
+    end type type_matrix_types
+
+    type(type_matrix_types), parameter, public :: MATRIX_TYPES = type_matrix_types()
 
     ! ==========================================================
     ! Coupling Modes
@@ -182,15 +197,28 @@ module core_constants_solver
     !> L-infinity (maximum absolute value) norm
     integer(int32), parameter, public :: NORM_TYPE_LINF = 2
 
-    !> Time unit in seconds
+    type :: type_constants_time_unit
+        !> Time unit in seconds
+        type(type_constant_value) :: SECONDS = type_constant_value("seconds", 1, "s", 1.0d0)
+        !> Time unit in minutes
+        type(type_constant_value) :: MINUTES = type_constant_value("minutes", 2, "m", 60.0d0)
+        !> Time unit in hours
+        type(type_constant_value) :: HOURS = type_constant_value("hours", 3, "h", 3600.0d0)
+        !> Time unit in days
+        type(type_constant_value) :: DAYS = type_constant_value("days", 4, "d", 86400.0d0)
+        !> Time unit in years
+        type(type_constant_value) :: YEARS = type_constant_value("years", 5, "y", 31536000.0d0)
+    contains
+        procedure, public, pass(self) :: to_id => to_id_time_unit
+        procedure, public, pass(self) :: to_name => to_name_time_unit
+    end type type_constants_time_unit
+
+    type(type_constants_time_unit), parameter, public :: TIME_UNITS = type_constants_time_unit()
+
     integer(int32), parameter, public :: TIME_UNIT_SECONDS = 1
-    !> Time unit in minutes
     integer(int32), parameter, public :: TIME_UNIT_MINUTES = 2
-    !> Time unit in hours
     integer(int32), parameter, public :: TIME_UNIT_HOURS = 3
-    !> Time unit in days
     integer(int32), parameter, public :: TIME_UNIT_DAYS = 4
-    !> Time unit in years
     integer(int32), parameter, public :: TIME_UNIT_YEARS = 5
 
     !> Time recording point at the start
@@ -287,19 +315,31 @@ module core_constants_solver
     ! ==========================================================
     ! Solver Status Codes
     ! ==========================================================
-    !> Solver completed successfully
+    type :: type_solver_status
+        !> Solver completed successfully
+        type(type_constant_id) :: SUCCESS = type_constant_id("SUCCESS", 0)
+        !> Solver encountered ill-conditioned options
+        type(type_constant_id) :: ILL_OPTIONS = type_constant_id("ILL_OPTIONS", -1)
+        !> Solver encountered a breakdown
+        type(type_constant_id) :: BREAKDOWN = type_constant_id("BREAKDOWN", -2)
+        !> Solver ran out of memory
+        type(type_constant_id) :: OUT_OF_MEMORY = type_constant_id("OUT_OF_MEMORY", -3)
+        !> Solver reached maximum iterations without convergence
+        type(type_constant_id) :: MAXITER = type_constant_id("MAXITER", -4)
+        !> Preconditioner setup failure
+        type(type_constant_id) :: DECOMPOSITION_FAILURE = type_constant_id("DECOMPOSITION_FAILURE", -5)
+        !> Solver method not implemented
+        type(type_constant_id) :: NOT_IMPLEMENTED = type_constant_id("NOT_IMPLEMENTED", -6)
+    end type type_solver_status
+
+    type(type_solver_status), parameter, public :: SOLVER_STATUS = type_solver_status()
+
     integer(int32), parameter, public :: SOLVER_STATUS_SUCCESS = 0
-    !> Solver encountered ill-conditioned options
     integer(int32), parameter, public :: SOLVER_STATUS_ILL_OPTIONS = -1
-    !> Solver encountered a breakdown
     integer(int32), parameter, public :: SOLVER_STATUS_BREAKDOWN = -2
-    !> Solver ran out of memory
     integer(int32), parameter, public :: SOLVER_STATUS_OUT_OF_MEMORY = -3
-    !> Solver reached maximum iterations without convergence
     integer(int32), parameter, public :: SOLVER_STATUS_MAXITER = -4
-    !> Preconditioner setup failure
     integer(int32), parameter, public :: SOLVER_STATUS_DECOMPOSITION_FAILURE = -5
-    !> Solver method not implemented
     integer(int32), parameter, public :: SOLVER_STATUS_NOT_IMPLEMENTED = -6
 
     ! =========================================================
@@ -330,5 +370,96 @@ module core_constants_solver
     integer(int32), parameter, public :: VECTOR_STATUS_ILL_OPERATIONS = -1
     integer(int32), parameter, public :: VECTOR_STATUS_OUT_OF_MEMORY = -3
     integer(int32), parameter, public :: VECTOR_STATUS_NOT_IMPLEMENTED = -5
+
+contains
+    !> Convert matrix type constant to its ID.
+    pure subroutine to_id_matrix_type(self, name, id)
+        implicit none
+        class(type_matrix_types), intent(in) :: self
+        character(len=*), intent(in) :: name
+        integer(int32), intent(inout) :: id
+
+        character(len=:), allocatable :: lname
+        lname = strip(to_lower(name))
+
+        if (lname == strip(self%DENSE%name)) then
+            id = self%DENSE%id
+        else if (lname == strip(self%CSR%name)) then
+            id = self%CSR%id
+        else if (lname == strip(self%COO%name)) then
+            id = self%COO%id
+        else if (lname == strip(self%BSR%name)) then
+            id = self%BSR%id
+        else
+            id = -1
+        end if
+    end subroutine to_id_matrix_type
+
+    !> Convert matrix type ID to its name.
+    pure subroutine to_name_matrix_type(self, id, name)
+        implicit none
+        class(type_matrix_types), intent(in) :: self
+        integer(int32), intent(in) :: id
+        character(len=*), intent(inout) :: name
+
+        if (id == self%DENSE%id) then
+            name = self%DENSE%name
+        else if (id == self%CSR%id) then
+            name = self%CSR%name
+        else if (id == self%COO%id) then
+            name = self%COO%name
+        else if (id == self%BSR%id) then
+            name = self%BSR%name
+        else
+            name = "unknown"
+        end if
+    end subroutine to_name_matrix_type
+
+    !> Convert time unit constant to its ID.
+    pure subroutine to_id_time_unit(self, name, id)
+        implicit none
+        class(type_constants_time_unit), intent(in) :: self
+        character(len=*), intent(in) :: name
+        integer(int32), intent(inout) :: id
+
+        character(len=:), allocatable :: lname
+        lname = strip(to_lower(name))
+
+        if (lname == strip(self%SECONDS%name)) then
+            id = self%SECONDS%id
+        else if (lname == strip(self%MINUTES%name)) then
+            id = self%MINUTES%id
+        else if (lname == strip(self%HOURS%name)) then
+            id = self%HOURS%id
+        else if (lname == strip(self%DAYS%name)) then
+            id = self%DAYS%id
+        else if (lname == strip(self%YEARS%name)) then
+            id = self%YEARS%id
+        else
+            id = -1
+        end if
+    end subroutine to_id_time_unit
+
+    !> Convert time unit ID to its name.
+    pure subroutine to_name_time_unit(self, id, name)
+        implicit none
+        class(type_constants_time_unit), intent(in) :: self
+        integer(int32), intent(in) :: id
+        character(len=*), intent(inout) :: name
+
+        if (id == self%SECONDS%id) then
+            name = self%SECONDS%name
+        else if (id == self%MINUTES%id) then
+            name = self%MINUTES%name
+        else if (id == self%HOURS%id) then
+            name = self%HOURS%name
+        else if (id == self%DAYS%id) then
+            name = self%DAYS%name
+        else if (id == self%YEARS%id) then
+            name = self%YEARS%name
+        else
+            name = "unknown"
+        end if
+    end subroutine to_name_time_unit
 
 end module core_constants_solver

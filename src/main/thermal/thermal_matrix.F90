@@ -12,6 +12,7 @@ contains
         type(type_vector_dp), intent(inout), optional :: R_T
 
         integer(int32) :: i, j
+        real(real64) :: row_sum_val
 
         ! --- 1. Reset Workspace Arrays ---
         workspace%work_C(:) = 0.0d0
@@ -45,10 +46,17 @@ contains
         ! J_TT += alpha * M
         call workspace%compute_K1(workspace%work_C, workspace%work_matrix)
         if (present(J_TT)) then
+            ! === 変更点: Lumping処理 ===
+            ! 行列の各行の値を合計して、対角成分に押し込める
             do i = 1, workspace%num_fe_nodes
+                row_sum_val = 0.0d0
                 do j = 1, workspace%num_fe_nodes
-                    call J_TT%set(OP_ADD, i, j, workspace%bdf_coeffs(1) * workspace%work_matrix(i, j))
+                    ! 行の和を計算 (Row-Sum)
+                    row_sum_val = row_sum_val + workspace%work_matrix(i, j)
                 end do
+
+                ! 対角項 (i, i) にのみ、集約した値を加算する
+                call J_TT%set(OP_ADD, i, i, workspace%bdf_coeffs(1) * row_sum_val)
             end do
         end if
 
