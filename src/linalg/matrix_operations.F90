@@ -213,10 +213,19 @@ contains
         integer(int32), intent(inout) :: ierr
 
         real(real64), dimension(:), pointer :: diag
+        integer(int32) :: i
 
         call d%copy(b)
         call A%get_diagonal(d)
         diag => d%get_data()
+
+        ! Zero division check
+        do i = 1, size(diag)
+            if (abs(diag(i)) < epsilon(1.0_real64)) then
+                ! Handle zero diagonal element safely to avoid NaN
+                diag(i) = 1.0d0
+            end if
+        end do
 
         select case (op)
         case (OP_SCALE_SYMM_DIAG)
@@ -235,18 +244,19 @@ contains
 
     !> Perform general matrix-vector multiplication for real64 matrices.
     !> Computes \( y = \alpha A x + \beta y \).
+    !> [FIX] Added contiguous attribute to avoid array temporary creation warning.
     subroutine gemv_matrix_real64(alpha, A, x, beta, y, ierr)
         implicit none
         !> Scalar \( \alpha \)
         real(real64), intent(in) :: alpha
-        !> Dense matrix A
-        real(real64), intent(in) :: A(:, :)
-        !> Input vector x
-        real(real64), intent(in) :: x(:)
+        !> Dense matrix A (contiguous)
+        real(real64), intent(in), contiguous :: A(:, :)
+        !> Input vector x (contiguous)
+        real(real64), intent(in), contiguous :: x(:)
         !> Scalar \( \beta \)
         real(real64), intent(in) :: beta
-        !> Input/Output vector y
-        real(real64), intent(inout) :: y(:)
+        !> Input/Output vector y (contiguous)
+        real(real64), intent(inout), contiguous :: y(:)
         !> Error status
         integer(int32), intent(inout) :: ierr
 
@@ -256,6 +266,7 @@ contains
         num_row = size(A, 1)
         num_col = size(A, 2)
 #ifdef _MKL
+        ! Warning (406) fixed by declaring A as contiguous
         call dgemv('N', num_row, num_col, alpha, A, num_row, x, 1, beta, y, 1)
 #else
         !$omp parallel do private(i)
@@ -285,17 +296,21 @@ contains
         !> Error status
         integer(int32), intent(inout) :: ierr
 
-        integer(int32) :: i
-        integer(int32) :: num_row, num_col
         type(type_matrix_info) :: info
+        integer(int32) :: i
 
 #ifdef _MKL
+        real(real64), dimension(:, :), pointer :: val_ptr
+
         call A%get_info(info)
         if (info%num_rows /= size(x) .or. info%num_cols /= size(y)) then
             ierr = MATRIX_STATUS_ILL_OPERATIONS
             return
         end if
-        call dgemv('N', info%num_rows, info%num_cols, alpha, A%val, info%num_rows, x, 1, beta, y, 1)
+
+        val_ptr => A%get_val()
+        ! Ensure pointer target is handled correctly by MKL
+        call dgemv('N', info%num_rows, info%num_cols, alpha, val_ptr, info%num_rows, x, 1, beta, y, 1)
 #else
         call A%get_info(info)
         !$omp parallel do private(i)
@@ -397,6 +412,7 @@ contains
         end if
 
         ! Add the contribution of each non-zero element
+        ! Note: Atomic update may cause bitwise non-reproducibility in parallel
         !$omp parallel do
         do i = 1, info%nnz
             !$omp atomic update
@@ -474,14 +490,16 @@ contains
 
     end subroutine gemv_matrix_bsr
 
+    !> General matrix-matrix multiplication.
+    !> [FIX] Added contiguous attribute to inputs.
     subroutine matrix_gemm_real64(A, B, C, ierr)
         implicit none
-        !> Input matrix A
-        real(real64), intent(in) :: A(:, :)
-        !> Input matrix B
-        real(real64), intent(in) :: B(:, :)
-        !> Output matrix C
-        real(real64), intent(inout) :: C(:, :)
+        !> Input matrix A (contiguous)
+        real(real64), intent(in), contiguous :: A(:, :)
+        !> Input matrix B (contiguous)
+        real(real64), intent(in), contiguous :: B(:, :)
+        !> Output matrix C (contiguous)
+        real(real64), intent(inout), contiguous :: C(:, :)
         !> Error status
         integer(int32), intent(inout) :: ierr
 
@@ -515,7 +533,8 @@ contains
     !> Compute the inverse of a square matrix A.
     !> The result overwrites A (In-place).
     !> Uses analytical formulas (Cramer's rule variant) for N <= 3.
-    !> For N > 3: Uses LAPACK (dgetrf/dgetri) if _MKL is defined, otherwise uses Gauss-Jordan elimination.
+    !> For N > 3: Uses LAPACK (dgetrf/dgetri) if _MKL is defined.
+    !> [FIX] Corrected fallback implementation (Gauss-Jordan with identity augmentation) for non-MKL case.
     subroutine matrix_inverse_real64(A, ierr)
         implicit none
         !> Input/Output matrix A. On exit, contains the inverse.
@@ -534,9 +553,12 @@ contains
         integer(int32) :: info
         real(real64) :: work_query(1)
 #else
-        integer(int32) :: i, j, k, pivot_idx
+        ! Variables for Fallback Gauss-Jordan
+        real(real64), allocatable :: invA(:, :)
+        real(real64), allocatable :: temp_row_A(:)
+        real(real64), allocatable :: temp_row_inv(:)
         real(real64) :: pivot_val, temp_val
-        real(real64), allocatable :: temp_row(:)
+        integer(int32) :: i, j, k, pivot_idx
 #endif
 
         n = size(A, 1)
@@ -550,7 +572,6 @@ contains
 
         ! -----------------------------------------------------------------------
         ! 1. Analytical Solution for Small Matrices (N <= 3)
-        !    Uses Cramer's rule (Adjugate matrix / Determinant)
         ! -----------------------------------------------------------------------
         if (n <= 3) then
             ierr = MATRIX_STATUS_SUCCESS
@@ -582,7 +603,7 @@ contains
 
             case (3)
                 ! Sarrus rule / Cofactor expansion
-                T(1:3, 1:3) = A(1:3, 1:3) ! Copy to temp to compute safely
+                T(1:3, 1:3) = A(1:3, 1:3)
 
                 det = T(1, 1) * (T(2, 2) * T(3, 3) - T(2, 3) * T(3, 2)) &
                       - T(1, 2) * (T(2, 1) * T(3, 3) - T(2, 3) * T(3, 1)) &
@@ -595,17 +616,14 @@ contains
                 invDet = 1.0d0 / det
 
                 ! Compute Adjugate Matrix * invDet
-                ! Row 1
                 A(1, 1) = (T(2, 2) * T(3, 3) - T(2, 3) * T(3, 2)) * invDet
                 A(1, 2) = (T(1, 3) * T(3, 2) - T(1, 2) * T(3, 3)) * invDet
                 A(1, 3) = (T(1, 2) * T(2, 3) - T(1, 3) * T(2, 2)) * invDet
 
-                ! Row 2
                 A(2, 1) = (T(2, 3) * T(3, 1) - T(2, 1) * T(3, 3)) * invDet
                 A(2, 2) = (T(1, 1) * T(3, 3) - T(1, 3) * T(3, 1)) * invDet
                 A(2, 3) = (T(1, 3) * T(2, 1) - T(1, 1) * T(2, 3)) * invDet
 
-                ! Row 3
                 A(3, 1) = (T(2, 1) * T(3, 2) - T(2, 2) * T(3, 1)) * invDet
                 A(3, 2) = (T(1, 2) * T(3, 1) - T(1, 1) * T(3, 2)) * invDet
                 A(3, 3) = (T(1, 1) * T(2, 2) - T(1, 2) * T(2, 1)) * invDet
@@ -652,7 +670,15 @@ contains
         ! -----------------------------------------------------------------------
         ! 3. Fallback Implementation (Gauss-Jordan) for N > 3
         ! -----------------------------------------------------------------------
-        call allocate_array(temp_row, n)
+        ! Initialize auxiliary identity matrix
+        call allocate_array(invA, n, n)
+        invA = 0.0d0
+        do i = 1, n
+            invA(i, i) = 1.0d0
+        end do
+
+        call allocate_array(temp_row_A, n)
+        call allocate_array(temp_row_inv, n)
         ierr = MATRIX_STATUS_SUCCESS
 
         do i = 1, n
@@ -672,41 +698,50 @@ contains
                 exit
             end if
 
-            ! Swap rows if needed
+            ! Swap rows (both A and invA)
             if (pivot_idx /= i) then
-                temp_row = A(i, :)
+                temp_row_A = A(i, :)
                 A(i, :) = A(pivot_idx, :)
-                A(pivot_idx, :) = temp_row
+                A(pivot_idx, :) = temp_row_A
+
+                temp_row_inv = invA(i, :)
+                invA(i, :) = invA(pivot_idx, :)
+                invA(pivot_idx, :) = temp_row_inv
             end if
 
             ! Scale pivot row
             temp_val = 1.0d0 / A(i, i)
-            A(i, i) = 1.0d0
             A(i, :) = A(i, :) * temp_val
+            invA(i, :) = invA(i, :) * temp_val
 
             ! Eliminate other rows
             do k = 1, n
                 if (k /= i) then
                     temp_val = A(k, i)
-                    A(k, i) = 0.0d0
                     A(k, :) = A(k, :) - temp_val * A(i, :)
+                    invA(k, :) = invA(k, :) - temp_val * invA(i, :)
                 end if
             end do
         end do
 
-        call deallocate_array(temp_row)
+        ! If successful, copy result back
+        if (ierr == MATRIX_STATUS_SUCCESS) then
+            A = invA
+        end if
+
+        call deallocate_array(invA)
+        call deallocate_array(temp_row_A)
+        call deallocate_array(temp_row_inv)
 #endif
 
     end subroutine matrix_inverse_real64
 
     !> Compute the determinant of a square matrix A.
     !> Input A is preserved (intent(in)).
-    !> Uses analytical formulas for N <= 3.
-    !> For N > 3: Uses LAPACK (dgetrf) if _MKL is defined, otherwise uses Gaussian elimination.
     subroutine matrix_determinant_real64(A, det, ierr)
         implicit none
         real(real64), intent(in) :: A(:, :)
-        real(real64), intent(inout) :: det ! intent(out)禁止のためinout
+        real(real64), intent(inout) :: det
         integer(int32), intent(inout) :: ierr
 
         integer(int32) :: n, m
@@ -733,7 +768,7 @@ contains
         end if
         ierr = MATRIX_STATUS_SUCCESS
 
-        ! --- N <= 3: Analytical Solution (No allocation needed) ---
+        ! --- N <= 3: Analytical Solution ---
         if (n <= 3) then
             select case (n)
             case (1)
@@ -748,8 +783,7 @@ contains
             return
         end if
 
-        ! --- N > 3: LU Decomposition ---
-        ! Copy A to temp_A because LU is destructive
+        ! --- N > 3: LU Decomposition or Gaussian Elimination ---
         call allocate_array(temp_A, n, n)
         temp_A = A
 
@@ -776,7 +810,6 @@ contains
 
         call deallocate_array(ipiv)
 #else
-        ! Gaussian Elimination
         call allocate_array(temp_row, n)
         det_sign = 1.0d0
         det = 1.0d0
@@ -834,9 +867,6 @@ contains
         real(real64), intent(inout) :: y(:)
         !> Error status
         integer(int32), intent(inout) :: ierr
-
-        real(real64), dimension(:), pointer :: x_data
-        real(real64), dimension(:), pointer :: y_data
 
         call gemv_matrix_real64(1.0d0, A, x, 0.0d0, y, ierr)
     end subroutine matvec_real64

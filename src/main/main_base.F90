@@ -172,13 +172,13 @@ contains
         do j = 1, self%num_fe_gauss
             work_history(:) = 0.0d0
             do i = 1, self%bdf_order + 1
-                call self%fe%lerp(gp(j), self%work_node(i, :), work_history(i))
+                call self%fe%lerp(gp(j), self%work_node(i, 1:self%num_fe_nodes), work_history(i))
             end do
             call self%state_gp(j)%set(temperature_history=work_history)
 
         end do
         do i = 1, self%num_fe_gauss
-            call self%fe%dlerp(gp(i), self%T_node, self%coordinates, self%computation_type, dlerped_value)
+            call self%fe%dlerp(gp(i), self%T_node(1:self%num_fe_nodes), self%coordinates, self%computation_type, dlerped_value)
             call self%state_gp(i)%grad_T%set(dlerped_value)
         end do
 

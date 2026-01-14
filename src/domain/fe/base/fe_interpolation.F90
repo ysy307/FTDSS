@@ -72,46 +72,45 @@ contains
 
         ! 形状関数の物理勾配を格納する一時配列 (3 x num_nodes)
         ! calc_dpsi_dx は dim=2 の場合 (1:2, :) に値を埋めることに注意
-        real(real64) :: shape_grads(3, self%num_nodes)
+        real(real64) :: shape_grads(self%dimension, self%num_nodes)
+        real(real64) :: dlerp_array(self%dimension)
+        integer(int32) :: ierr
 
         ! 1. 初期化
         call dlerped_value%reset()
         shape_grads(:, :) = 0.0d0
+        dlerp_array(:) = 0.0d0
 
         ! 2. 形状関数の物理勾配 (dN_i/dx, dN_i/dy, dN_i/dz) を取得
-        call self%calc_dpsi_dx(r, node_coords, shape_grads)
+        call self%calc_shape_function(r, node_coords, dpsi_dx=shape_grads)
+
+        call matvec(shape_grads, values, dlerp_array, ierr)
 
         ! 3. 勾配の計算: grad u = sum( u_i * grad N_i )
         ! shape_grads の第1次元は常に 1〜dim に詰められていることを考慮してマッピングする
-
         if (self%dimension == 3) then
             ! --- 3次元 (XYZ) ---
             ! shape_grads(1:3, :) に順に x, y, z 成分が入っている
-            dlerped_value%x = vector_dot(values(1:self%num_nodes), shape_grads(1, 1:self%num_nodes))
-            dlerped_value%y = vector_dot(values(1:self%num_nodes), shape_grads(2, 1:self%num_nodes))
-            dlerped_value%z = vector_dot(values(1:self%num_nodes), shape_grads(3, 1:self%num_nodes))
-
+            dlerped_value%x = dlerp_array(1)
+            dlerped_value%y = dlerp_array(2)
+            dlerped_value%z = dlerp_array(3)
         else if (self%dimension == 2) then
             ! --- 2次元 (XY or XZ) ---
             ! shape_grads(1, :) -> 第1成分 (x)
             ! shape_grads(2, :) -> 第2成分 (y or z)
 
             ! 第1成分は常に x
-            dlerped_value%x = vector_dot(values(1:self%num_nodes), shape_grads(1, 1:self%num_nodes))
+            dlerped_value%x = dlerp_array(1)
 
             if (plane_axis == 2) then
-                ! XZ面の場合: 計算された第2成分(index 2)を z にマッピング
                 dlerped_value%y = 0.0d0
-                dlerped_value%z = vector_dot(values(1:self%num_nodes), shape_grads(2, 1:self%num_nodes)) ! [修正] index 3 -> 2
+                dlerped_value%z = dlerp_array(2)
             else
-                ! XY面の場合: 計算された第2成分(index 2)を y にマッピング
-                dlerped_value%y = vector_dot(values(1:self%num_nodes), shape_grads(2, 1:self%num_nodes))
+                dlerped_value%y = dlerp_array(2)
                 dlerped_value%z = 0.0d0
             end if
-
         else if (self%dimension == 1) then
-            ! --- 1次元 (X) ---
-            dlerped_value%x = vector_dot(values(1:self%num_nodes), shape_grads(1, 1:self%num_nodes))
+            dlerped_value%x = dlerp_array(1)
             dlerped_value%y = 0.0d0
             dlerped_value%z = 0.0d0
         end if

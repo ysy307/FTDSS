@@ -4,6 +4,5 @@ module module_thermal
     private
 
     public :: type_thermal
-    ! public :: type_thermal_crs
 
 end module module_thermal

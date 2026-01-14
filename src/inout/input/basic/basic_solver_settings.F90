@@ -23,9 +23,11 @@ submodule(inout_input_basic) inout_input_basic_solver_settings
     character(*), parameter :: relative_tolerance = "relative_tolerance"
     character(*), parameter :: linear_solver = "linear_solver"
     character(*), parameter :: iterative_solver = "iterative_solver"
-    character(*), parameter :: solver_type = "solver_type"
+    character(*), parameter :: solver_type = "type"
     character(*), parameter :: preconditioner_type = "preconditioner_type"
     character(*), parameter :: tolerance = "tolerance"
+    character(*), parameter :: restart_size = "restart_size"
+
     character(*), parameter :: parallel_settings = "parallel_settings"
     character(*), parameter :: threads = "threads"
     character(*), parameter :: is_parallel = "is_parallel"
@@ -198,7 +200,7 @@ contains
         buffer(3) = solver_type
 
         call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%solver_type, &
-                            is_required=.true., default_value=4, valid_range=[1, 10])
+                            is_required=.true., default_value=4, valid_range=[1, 20])
         buffer(3) = preconditioner_type
         call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%preconditioner_type, &
                             is_required=.true., default_value=1, valid_range=[1, 10])

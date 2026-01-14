@@ -153,18 +153,18 @@ contains
 
         C_TT = 0.0d0
         ! Heat Capacity Calculation
+        ! C_TT = c_s * rho_s * (1.0d0 - porosity) &
+        !        + c_w * rho_w * Qw &
+        !        + c_i * rho_i * Qi &
+        !        + c_v * rho_w * Qv &
+        !        - Lf * rho_i * dQi_dT &
+        !        + Lv * rho_w * dQv_dT
         C_TT = c_s * rho_s * (1.0d0 - porosity) &
-               + c_w * rho_w * Qw &
-               + c_i * rho_i * Qi &
-               + c_v * rho_w * Qv &
-               - Lf * rho_i * dQi_dT &
-               + Lv * rho_w * dQv_dT
-        ! C_TT = c_s * rho_s * (1.0d0 - Qn) &
-        !        + c_w * rho_w * Qw + c_w * Qw * temperature * drho_w_dT + c_w * rho_w * temperature * dQw_dT &
-        !        + c_i * rho_i * Qi + c_i * Qi * temperature * drho_ice_dT + c_i * rho_i * temperature * dQi_dT &
-        !        + c_v * rho_w * Qv + c_v * Qv * temperature * drho_w_dT + c_v * rho_w * temperature * dQv_dT &
-        !        - Lf * Qi * drho_ice_dT - Lf * rho_i * dQi_dT &
-        !        + Lv * Qv * drho_w_dT + Lv * rho_w * dQv_dT
+               + c_w * rho_w * Qw + c_w * Qw * temperature * drho_w_dT + c_w * rho_w * temperature * dQw_dT &
+               + c_i * rho_i * Qi + c_i * Qi * temperature * drho_ice_dT + c_i * rho_i * temperature * dQi_dT &
+               + c_v * rho_w * Qv + c_v * Qv * temperature * drho_w_dT + c_v * rho_w * temperature * dQv_dT &
+               - Lf * Qi * drho_ice_dT - Lf * rho_i * dQi_dT &
+               + Lv * Qv * drho_w_dT + Lv * rho_w * dQv_dT
 
     end subroutine compute_mass_term_thermal
 

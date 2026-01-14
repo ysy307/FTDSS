@@ -66,20 +66,12 @@ contains
         call domain%get_total_dofs(self%size)
         call domain%get_num_nodes(self%num_nodes)
         call domain%get_num_dofs_per_node(self%num_dofs_per_node)
-        print *, "Initializing Jacobian Matrix: Num Nodes =", num_nodes, &
-            ", Num DOFs per Node =", self%num_dofs_per_node, ", Total DOFs =", self%size
-        ! 基本方針としてBSRを採用するため、matrix_typeを上書きまたは優先利用
-        ! もし疎行列構造が必要ならdomainから取得
-        print *, "Target Matrix Type for Jacobian:", MATRIX_BSR
         call domain%get_node_adjacency(MATRIX_CSR, row, col)
 
         self%matrix_type = MATRIX_BSR
 
         ! 行列ファクトリを使用してBSR行列を生成
-        ! block_size に num_dofs を渡すことで、Node x Node のブロック構造を作る
         self%matrix = create_matrix(MATRIX_BSR, self%num_nodes, row, col, self%num_dofs_per_node)
-
-        print *, "Jacobian Matrix initialized with BSR format."
 
         deallocate (row, col)
     end subroutine initialize_jacobian_matrix

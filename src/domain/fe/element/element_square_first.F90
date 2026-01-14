@@ -1,6 +1,6 @@
 !>
 !> Implements the procedures for the first-order quadrilateral (4-node) finite element.
-!> Corrected to use subroutine calls.
+!> Corrected Jacobian definition.
 !>
 submodule(domain_fe_element) domain_fe_element_square_first
     implicit none
@@ -49,7 +49,7 @@ contains
         do i = 1, ng
             r = gauss_pts(i)
             call self%calc_jacobian_determinant(r, node_coords, det_j)
-            measure = measure + det_j * weights(i)
+            measure = measure + abs(det_j) * weights(i)
         end do
 
     end subroutine calc_area_square_first
@@ -110,6 +110,10 @@ contains
         end select
     end subroutine calc_dpsi_square_first
 
+    !>
+    !> Calculates the Jacobian matrix.
+    !> Standard definition: J(i, j) = d(x_i) / d(xi_j)
+    !>
     pure module subroutine calc_jacobian_square_first(self, r, node_coords, jac)
         implicit none
         class(type_square_first), intent(in) :: self
@@ -118,7 +122,6 @@ contains
         real(real64), intent(inout) :: jac(:, :)
 
         integer(int32) :: k
-        integer(int32) :: nid
         real(real64) :: dpsi_xi
         real(real64) :: dpsi_eta
         real(real64) :: xk
@@ -132,10 +135,13 @@ contains
             call self%calc_dpsi(k, 1, r, dpsi_xi)
             call self%calc_dpsi(k, 2, r, dpsi_eta)
 
-            jac(1, 1) = jac(1, 1) + dpsi_xi * xk
-            jac(1, 2) = jac(1, 2) + dpsi_xi * yk
-            jac(2, 1) = jac(2, 1) + dpsi_eta * xk
-            jac(2, 2) = jac(2, 2) + dpsi_eta * yk
+            ! Row 1: x derivatives
+            jac(1, 1) = jac(1, 1) + dpsi_xi * xk ! dx/dxi
+            jac(1, 2) = jac(1, 2) + dpsi_eta * xk ! dx/deta (was yk*dpsi_xi)
+
+            ! Row 2: y derivatives
+            jac(2, 1) = jac(2, 1) + dpsi_xi * yk ! dy/dxi (was xk*dpsi_eta)
+            jac(2, 2) = jac(2, 2) + dpsi_eta * yk ! dy/deta
         end do
     end subroutine calc_jacobian_square_first
 
@@ -156,7 +162,6 @@ contains
         real(real64) :: psi_val
         integer(int32) :: iter
         integer(int32) :: i
-        integer(int32) :: node_id
         integer(int32) :: nn
         logical :: converged
         real(real64), parameter :: tol = 1.0e-9
@@ -186,6 +191,9 @@ contains
 
             call self%calc_jacobian(r, node_coords, jac)
 
+            ! Inverse Jacobian Update:
+            ! dxi = (J22*dx - J12*dy) / det
+            ! deta = (-J21*dx + J11*dy) / det
             r%x = r%x + (jac(2, 2) * dx - jac(1, 2) * dy) / det_j
             r%y = r%y + (-jac(2, 1) * dx + jac(1, 1) * dy) / det_j
         end do

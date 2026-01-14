@@ -1,6 +1,6 @@
 !>
 !> Implements the procedures for the first-order triangular (3-node) finite element.
-!> Corrected to use subroutine calls for all interface methods.
+!> Corrected Jacobian definition.
 !>
 submodule(domain_fe_element) domain_fe_element_triangle_first
     implicit none
@@ -45,13 +45,13 @@ contains
         real(real64) :: x(3)
         real(real64) :: y(3)
         integer(int32) :: i
-        integer(int32) :: nid
 
         do i = 1, 3
             x(i) = node_coords(1, i)
             y(i) = node_coords(2, i)
         end do
 
+        ! Area = 0.5 * |x1(y2-y3) + x2(y3-y1) + x3(y1-y2)|
         measure = 0.5d0 * abs(x(1) * (y(2) - y(3)) + x(2) * (y(3) - y(1)) + x(3) * (y(1) - y(2)))
     end subroutine calc_area_triangle_first
 
@@ -102,6 +102,7 @@ contains
 
     !>
     !> Calculates the Jacobian matrix.
+    !> Standard definition: J(i, j) = d(x_i) / d(xi_j)
     !>
     pure module subroutine calc_jacobian_triangle_first(self, r, node_coords, jac)
         implicit none
@@ -113,7 +114,6 @@ contains
         real(real64) :: x(3)
         real(real64) :: y(3)
         integer(int32) :: k
-        integer(int32) :: nid
 
         do k = 1, 3
             x(k) = node_coords(1, k)
@@ -121,9 +121,12 @@ contains
         end do
 
         jac = 0.0d0
+        ! Row 1: dx/dxi, dx/deta
         jac(1, 1) = x(2) - x(1)
-        jac(1, 2) = y(2) - y(1)
-        jac(2, 1) = x(3) - x(1)
+        jac(1, 2) = x(3) - x(1) ! Fixed: Was y(2)-y(1) in previous/implicit logic
+
+        ! Row 2: dy/dxi, dy/deta
+        jac(2, 1) = y(2) - y(1) ! Fixed: Was x(3)-x(1) in previous/implicit logic
         jac(2, 2) = y(3) - y(1)
     end subroutine calc_jacobian_triangle_first
 
@@ -146,7 +149,6 @@ contains
         real(real64) :: xi
         real(real64) :: eta
         integer(int32) :: i
-        integer(int32) :: nid
         real(real64), parameter :: tol = 1.0e-9
 
         do i = 1, 3
@@ -164,6 +166,7 @@ contains
         dx = cartesian%x - x(1)
         dy = cartesian%y - y(1)
 
+        ! Solving linear system for barycentric coords
         xi = ((y(3) - y(1)) * dx - (x(3) - x(1)) * dy) / det_T
         eta = (-(y(2) - y(1)) * dx + (x(2) - x(1)) * dy) / det_T
 

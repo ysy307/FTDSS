@@ -4,6 +4,8 @@
 !>
 module core_types_coordinate
     use, intrinsic :: iso_fortran_env
+    use :: stdlib_optval, only:optval
+    use :: stdlib_strings, only:strip
     implicit none
     private
 
@@ -26,6 +28,8 @@ module core_types_coordinate
         !> Generic interface to set the coordinate's components.
         generic, public :: set => set_coordinate_dp, set_coordinate_dp_array
         procedure, public, pass(self) :: reset => reset_coordinate_dp
+        procedure, public, pass(self) :: to_array => to_array_coordinate_dp
+        procedure, public, pass(self) :: display => display_coordinate_dp
     end type type_coordinate_dp
 
     !>
@@ -44,6 +48,8 @@ module core_types_coordinate
         !> Generic interface to set the coordinate's components.
         generic, public :: set => set_coordinate_int, set_coordinate_int_array
         procedure, public, pass(self) :: reset => reset_coordinate_int
+        procedure, public, pass(self) :: to_array => to_array_coordinate_int
+        procedure, public, pass(self) :: display => display_coordinate_int
     end type type_coordinate_int
 
 contains
@@ -95,6 +101,33 @@ contains
         self%z = 0.0d0
     end subroutine reset_coordinate_dp
 
+    subroutine to_array_coordinate_dp(self, arr)
+        implicit none
+        class(type_coordinate_dp), intent(in) :: self
+        real(real64), intent(inout) :: arr(3)
+
+        arr(1) = self%x
+        arr(2) = self%y
+        arr(3) = self%z
+    end subroutine to_array_coordinate_dp
+
+    subroutine display_coordinate_dp(self, unit_in, label_in)
+        implicit none
+        class(type_coordinate_dp), intent(in) :: self
+        integer(int32), intent(in), optional :: unit_in
+        character(len=*), intent(in), optional :: label_in
+
+        integer(int32) :: unit
+        character(len=128) :: label
+
+        unit = optval(unit_in, output_unit)
+        label = optval(label_in, "Values")
+
+        write (unit, '(2A,F12.6,A,F12.6,A,F12.6,A)') &
+            strip(label), " :(", self%x, ", ", self%y, ", ", self%z, ")"
+
+    end subroutine display_coordinate_dp
+
     ! ==========================================================
     ! Integer Coordinate Procedures
     ! ==========================================================
@@ -141,5 +174,31 @@ contains
         self%y = 0
         self%z = 0
     end subroutine reset_coordinate_int
+
+    subroutine to_array_coordinate_int(self, arr)
+        implicit none
+        class(type_coordinate_int), intent(in) :: self
+        integer(int32), intent(inout) :: arr(3)
+
+        arr(1) = self%x
+        arr(2) = self%y
+        arr(3) = self%z
+    end subroutine to_array_coordinate_int
+
+    subroutine display_coordinate_int(self, unit_in, label_in)
+        implicit none
+        class(type_coordinate_int), intent(in) :: self
+        integer(int32), intent(in), optional :: unit_in
+        character(len=*), intent(in), optional :: label_in
+
+        integer(int32) :: unit
+        character(len=128) :: label
+
+        unit = optval(unit_in, output_unit)
+        label = optval(label_in, "Values")
+
+        write (unit, '(2A,I12,A,I12,A,I12,A)') &
+            strip(label), " :(", self%x, ", ", self%y, ", ", self%z, ") "
+    end subroutine display_coordinate_int
 
 end module core_types_coordinate

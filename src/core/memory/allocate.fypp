@@ -10,8 +10,6 @@
     ('logical', '4',         'logical4'), &
     ('logical', '8',         'logical8') &
     ]
-
-! 引数用の整数Kindリスト
 #:set arg_kinds = ['int8', 'int16', 'int32', 'int64']
 
 module core_allocate
@@ -24,42 +22,21 @@ module core_allocate
 
     interface allocate_array
         #:for type_name, kind_name, suffix in kinds_map
-            ! ==========================================
-            ! Rank-1
-            ! ==========================================
-            ! 1. Source only
             module procedure :: allocate_rank1_${suffix}$_source
-
             #:for akind in arg_kinds
-                ! 2. By Length (Length is SCALAR, so no conflict)
                 module procedure :: allocate_rank1_${suffix}$_len_${akind}$
-
-                ! 3. By Bounds (Rank-1 array)
-                !    Conflict Prevention:
-                !    If Array is Integer AND Bounds is Integer of SAME Kind,
-                !    signature matches 'Source'. Skip 'Bounds' version to prioritize 'Source'.
                 #:if not (type_name == 'integer' and suffix == akind)
                     module procedure :: allocate_rank1_${suffix}$_bnds_${akind}$
                 #:endif
             #:endfor
 
-            ! ==========================================
-            ! Rank-2
-            ! ==========================================
-            ! 1. Source only
             module procedure :: allocate_rank2_${suffix}$_source
             #:for akind in arg_kinds
-                ! 2. By Dims (Scalar integers, no conflict)
                 module procedure :: allocate_rank2_${suffix}$_sz_${akind}$
             #:endfor
 
-            ! ==========================================
-            ! Rank-3
-            ! ==========================================
-            ! 1. Source only
             module procedure :: allocate_rank3_${suffix}$_source
             #:for akind in arg_kinds
-                ! 2. By Dims (Scalar integers, no conflict)
                 module procedure :: allocate_rank3_${suffix}$_sz_${akind}$
             #:endfor
         #:endfor
@@ -68,15 +45,9 @@ module core_allocate
 contains
 
     #:for type_name, kind_name, suffix in kinds_map
-        ! ==========================================================
-        ! Type: ${type_name}$(${kind_name}$), Suffix: ${suffix}$
-        ! ==========================================================
-
         ! ----------------------------------------------------------
         ! Rank-1 Implementations
         ! ----------------------------------------------------------
-
-        !> [Rank-1] Source based allocation
         subroutine allocate_rank1_${suffix}$_source(array, source)
             implicit none
             ${type_name}$ (${kind_name}$), intent(inout), allocatable :: array(:)
@@ -91,10 +62,10 @@ contains
                 deallocate (array)
             end if
             allocate (array, source=source, stat=stat)
+            if (stat /= 0) call error_message(991)
         end subroutine allocate_rank1_${suffix}$_source
 
         #:for akind in arg_kinds
-            !> [Rank-1] Length based allocation
             subroutine allocate_rank1_${suffix}$_len_${akind}$ (array, length, source)
                 implicit none
                 ${type_name}$ (${kind_name}$), intent(inout), allocatable :: array(:)
@@ -103,7 +74,10 @@ contains
                 integer(int32) :: stat
 
                 if (allocated(array)) then
-                    if (size(array) == length) return
+                    if (size(array) == length) then
+                        if (present(source)) array = source
+                        return
+                    end if
                     deallocate (array)
                 end if
 
@@ -113,12 +87,10 @@ contains
                     else
                         allocate (array(length), stat=stat)
                     end if
+                    if (stat /= 0) call error_message(992)
                 end if
             end subroutine allocate_rank1_${suffix}$_len_${akind}$
 
-            !> [Rank-1] Bounds based allocation
-            !  Note: This subroutine is always generated, but excluded from generic interface
-            !        if it conflicts with the source routine.
             subroutine allocate_rank1_${suffix}$_bnds_${akind}$ (array, bounds, source)
                 implicit none
                 ${type_name}$ (${kind_name}$), intent(inout), allocatable :: array(:)
@@ -128,12 +100,14 @@ contains
                 integer(${akind}$) :: lb, ub
 
                 if (size(bounds) /= 2) return
-
                 lb = bounds(1)
                 ub = bounds(2)
 
                 if (allocated(array)) then
-                    if (size(array) == (ub - lb + 1)) return
+                    if (size(array) == (ub - lb + 1)) then
+                        if (present(source)) array = source
+                        return
+                    end if
                     deallocate (array)
                 end if
 
@@ -143,6 +117,7 @@ contains
                     else
                         allocate (array(lb:ub), stat=stat)
                     end if
+                    if (stat /= 0) call error_message(993)
                 end if
             end subroutine allocate_rank1_${suffix}$_bnds_${akind}$
         #:endfor
@@ -150,8 +125,6 @@ contains
         ! ----------------------------------------------------------
         ! Rank-2 Implementations
         ! ----------------------------------------------------------
-
-        !> [Rank-2] Source based allocation
         subroutine allocate_rank2_${suffix}$_source(array, source)
             implicit none
             ${type_name}$ (${kind_name}$), intent(inout), allocatable :: array(:, :)
@@ -160,14 +133,17 @@ contains
 
             if (allocated(array)) then
                 if (size(array, 1) == size(source, 1) .and. &
-                    size(array, 2) == size(source, 2)) return
+                    size(array, 2) == size(source, 2)) then
+                    array = source
+                    return
+                end if
                 deallocate (array)
             end if
             allocate (array, source=source, stat=stat)
+            if (stat /= 0) call error_message(994)
         end subroutine allocate_rank2_${suffix}$_source
 
         #:for akind in arg_kinds
-            !> [Rank-2] Dimensions based allocation
             subroutine allocate_rank2_${suffix}$_sz_${akind}$ (array, dim1, dim2, source)
                 implicit none
                 ${type_name}$ (${kind_name}$), intent(inout), allocatable :: array(:, :)
@@ -176,7 +152,10 @@ contains
                 integer(int32) :: stat
 
                 if (allocated(array)) then
-                    if (size(array, 1) == dim1 .and. size(array, 2) == dim2) return
+                    if (size(array, 1) == dim1 .and. size(array, 2) == dim2) then
+                        if (present(source)) array = source
+                        return
+                    end if
                     deallocate (array)
                 end if
 
@@ -186,6 +165,7 @@ contains
                     else
                         allocate (array(dim1, dim2), stat=stat)
                     end if
+                    if (stat /= 0) call error_message(995)
                 end if
             end subroutine allocate_rank2_${suffix}$_sz_${akind}$
         #:endfor
@@ -193,8 +173,6 @@ contains
         ! ----------------------------------------------------------
         ! Rank-3 Implementations
         ! ----------------------------------------------------------
-
-        !> [Rank-3] Source based allocation
         subroutine allocate_rank3_${suffix}$_source(array, source)
             implicit none
             ${type_name}$ (${kind_name}$), intent(inout), allocatable :: array(:, :, :)
@@ -204,14 +182,17 @@ contains
             if (allocated(array)) then
                 if (size(array, 1) == size(source, 1) .and. &
                     size(array, 2) == size(source, 2) .and. &
-                    size(array, 3) == size(source, 3)) return
+                    size(array, 3) == size(source, 3)) then
+                    array = source
+                    return
+                end if
                 deallocate (array)
             end if
             allocate (array, source=source, stat=stat)
+            if (stat /= 0) call error_message(996)
         end subroutine allocate_rank3_${suffix}$_source
 
         #:for akind in arg_kinds
-            !> [Rank-3] Dimensions based allocation
             subroutine allocate_rank3_${suffix}$_sz_${akind}$ (array, dim1, dim2, dim3, source)
                 implicit none
                 ${type_name}$ (${kind_name}$), intent(inout), allocatable :: array(:, :, :)
@@ -222,7 +203,10 @@ contains
                 if (allocated(array)) then
                     if (size(array, 1) == dim1 .and. &
                         size(array, 2) == dim2 .and. &
-                        size(array, 3) == dim3) return
+                        size(array, 3) == dim3) then
+                        if (present(source)) array = source
+                        return
+                    end if
                     deallocate (array)
                 end if
 
@@ -232,6 +216,7 @@ contains
                     else
                         allocate (array(dim1, dim2, dim3), stat=stat)
                     end if
+                    if (stat /= 0) call error_message(997)
                 end if
             end subroutine allocate_rank3_${suffix}$_sz_${akind}$
         #:endfor

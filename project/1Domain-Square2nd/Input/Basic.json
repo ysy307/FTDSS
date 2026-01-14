@@ -109,13 +109,13 @@
         }
     ],
     "solver_settings": {
-        "bdf_order": 2,
+        "bdf_order": 1,
         "nonlinear_solver": {
             "method": "newton",
             "update_frequency": 5,
-            "max_iterations": 3,
+            "max_iterations": 30,
             "convergence": {
-                "use_criteria": "none",
+                "use_criteria": "both",
                 "norm_type": "linf",
                 "logic_between_criteria": "and",
                 "residual": {
@@ -133,10 +133,11 @@
             }
         },
         "linear_solver": {
-            "type": 4,
+            "type": 9,
             "preconditioner_type": 1,
             "max_iterations": 50000,
-            "tolerance": 1e-10
+            "tolerance": 1e-10,
+            "restart_size": 1000
         },
         "parallel_settings": {
             "threads": {

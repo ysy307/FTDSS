@@ -18,7 +18,7 @@ contains
         integer(int32) :: num_total_dofs
         integer(int32) :: ierr
 
-        type(type_solver_settings) :: matrix_info
+        type(type_solver_settings) :: solver_info
         type(type_preconditioner_settings) :: pc_info
 
         profiler_labels = [character(len=10) :: "IO", "Setup", "Assemble", "Solve", "Total"]
@@ -79,13 +79,13 @@ contains
 
         ! ソルバーの初期化
         associate (solver_settings => input%basic%solver_settings%linear_solver)
-            call matrix_info%set(solver_settings%solver_type, &
+            call solver_info%set(solver_settings%solver_type, &
                                  num_total_dofs, &
                                  solver_settings%tolerance, &
                                  solver_settings%max_iterations, &
                                  solver_settings%m_restarts)
             call pc_info%set(solver_settings%preconditioner_type, num_total_dofs)
-            call create_solver(self%solver, matrix_info, pc_info, ierr)
+            call create_solver(self%solver, solver_info, pc_info, ierr)
         end associate
 
         ! 初期化時にBCを適用（Dirichlet値をフィールドに設定）
@@ -260,10 +260,9 @@ contains
 
         real(real64), pointer, contiguous, dimension(:) :: delta => null()
         integer(int32) :: target_dof
-        ! [修正] タイポを修正 (nondes -> nodes)
         integer(int32) :: start_idx, end_idx, num_nodes, num_dofs_per_node
         integer(int32) :: iter
-        real(real64) :: dumping_ratio
+        real(real64) :: damping_ratio
         real(real64), pointer, dimension(:) :: bdf_coeffs => null()
         integer(int32) :: bdf_order
         real(real64), pointer, contiguous, dimension(:) :: temperature => null()
@@ -272,11 +271,12 @@ contains
 
         delta => self%delta%get_data()
         call self%controls%iteration%get_nonlinear_iter(iter)
-        ! if (iter <= 3) then
-        !     dumping_ratio = 0.2d0
-        ! else
-        !     dumping_ratio = 1.0d0
-        ! end if
+        if (iter <= 5) then
+            damping_ratio = 0.2d0
+        else
+            damping_ratio = 1.0d0
+        end if
+        ! damping_ratio = 0.2d0
 
         call self%domain%get_num_nodes(num_nodes)
         call self%domain%get_num_dofs_per_node(num_dofs_per_node)
@@ -284,7 +284,6 @@ contains
         call self%controls%time%get_bdf_coeffs(bdf_coeffs)
         call self%controls%time%get_bdf_order(bdf_order)
 
-        ! --- Thermal Update ---
         if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
             call self%domain%get_target_dof(PHYSICS_TYPE_THERMAL, target_dof)
 
@@ -293,7 +292,7 @@ contains
 
             call self%temperature%get_current(temperature)
             if (associated(temperature)) then
-                temperature(:) = temperature(:) + delta(start_idx:end_idx:num_dofs_per_node)
+                temperature(:) = temperature(:) + damping_ratio * delta(start_idx:end_idx:num_dofs_per_node)
             end if
 
             call self%calc_gradient_temperature()

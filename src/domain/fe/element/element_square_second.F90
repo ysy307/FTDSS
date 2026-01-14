@@ -1,5 +1,6 @@
 !>
 !> Implements the procedures for the second-order quadrilateral (8-node) finite element.
+!> Corrected Jacobian definition and Newton-Raphson inverse logic.
 !>
 submodule(domain_fe_element) domain_fe_element_square_second
     implicit none
@@ -47,7 +48,7 @@ contains
 
         do i = 1, ng
             call self%calc_jacobian_determinant(gauss_pts(i), node_coords, det_j)
-            measure = measure + det_j * weights(i)
+            measure = measure + abs(det_j) * weights(i)
         end do
 
     end subroutine calc_area_square_second
@@ -64,6 +65,7 @@ contains
         xi = r%x
         eta = r%y
 
+        ! Serendipity element shape functions
         select case (i)
         case (1)
             psi_val = 0.25d0 * (1.0d0 - xi) * (1.0d0 - eta) * (-1.0d0 - xi - eta)
@@ -141,6 +143,12 @@ contains
         end if
     end subroutine calc_dpsi_square_second
 
+    !>
+    !> Calculates the Jacobian matrix.
+    !> Standard definition: J(i, j) = d(x_i) / d(xi_j)
+    !> Row 1: dx/dxi, dx/deta
+    !> Row 2: dy/dxi, dy/deta
+    !>
     pure module subroutine calc_jacobian_square_second(self, r, node_coords, jac)
         implicit none
         class(type_square_second), intent(in) :: self
@@ -151,15 +159,22 @@ contains
         integer(int32) :: k
         real(real64) :: dpsi_xi
         real(real64) :: dpsi_eta
+        real(real64) :: xk, yk
 
         jac = 0.0d0
         do k = 1, 8
             call self%calc_dpsi(k, 1, r, dpsi_xi)
             call self%calc_dpsi(k, 2, r, dpsi_eta)
-            jac(1, 1) = jac(1, 1) + dpsi_xi * node_coords(1, k)
-            jac(1, 2) = jac(1, 2) + dpsi_xi * node_coords(2, k)
-            jac(2, 1) = jac(2, 1) + dpsi_eta * node_coords(1, k)
-            jac(2, 2) = jac(2, 2) + dpsi_eta * node_coords(2, k)
+            xk = node_coords(1, k)
+            yk = node_coords(2, k)
+
+            ! dpsi_xi contributes to derivatives w.r.t xi (Col 1)
+            jac(1, 1) = jac(1, 1) + dpsi_xi * xk ! dx/dxi
+            jac(2, 1) = jac(2, 1) + dpsi_xi * yk ! dy/dxi (was mixed in original)
+
+            ! dpsi_eta contributes to derivatives w.r.t eta (Col 2)
+            jac(1, 2) = jac(1, 2) + dpsi_eta * xk ! dx/deta (was mixed in original)
+            jac(2, 2) = jac(2, 2) + dpsi_eta * yk ! dy/deta
         end do
     end subroutine calc_jacobian_square_second
 
@@ -184,15 +199,15 @@ contains
 
         real(real64), parameter :: tol = 1.0e-5
         real(real64), parameter :: bbox_margin = 1.0e-3
-        integer(int32), parameter :: max_iter = 100 ! 反復回数を増加
+        integer(int32), parameter :: max_iter = 100
         real(real64) :: psi_val
         real(real64) :: inv_det
         real(real64) :: dr_x, dr_y
         real(real64) :: min_coord(2), max_coord(2)
-        real(real64) :: init_guesses(9, 2) ! 9点試行
+        real(real64) :: init_guesses(9, 2)
         integer(int32) :: ig
 
-        ! 1. バウンディングボックスによる早期判定
+        ! 1. Bounding box check
         min_coord(1) = minval(node_coords(1, :))
         max_coord(1) = maxval(node_coords(1, :))
         min_coord(2) = minval(node_coords(2, :))
@@ -207,7 +222,7 @@ contains
         call self%get_num_nodes(nn)
         is_in = .false.
 
-        ! 2. 複数の初期値でニュートン法を試行 (中心 + 四隅 + 辺中点)
+        ! 2. Newton-Raphson with multiple initial guesses
         init_guesses(1, :) = [0.0d0, 0.0d0]
         init_guesses(2, :) = [0.9d0, 0.9d0]
         init_guesses(3, :) = [-0.9d0, 0.9d0]
@@ -233,7 +248,7 @@ contains
                 dx = cartesian%x - pos%x
                 dy = cartesian%y - pos%y
 
-                ! 残差チェック
+                ! Convergence check
                 if (sqrt(dx**2 + dy**2) < 1.0e-9) then
                     if (abs(r%x) <= 1.0d0 + 1.0e-4 .and. abs(r%y) <= 1.0d0 + 1.0e-4) then
                         is_in = .true.
@@ -244,22 +259,27 @@ contains
                 end if
 
                 call self%calc_jacobian_determinant(r, node_coords, det_j)
-                ! 特異点の場合は次の初期値へ(cycleでなくexit newton_loopで次のguessへ)
                 if (abs(det_j) < 1.0e-12) exit newton_loop
 
                 call self%calc_jacobian(r, node_coords, jac)
                 inv_det = 1.0d0 / det_j
-                dr_x = (jac(2, 2) * dx - jac(2, 1) * dy) * inv_det
-                dr_y = (-jac(1, 2) * dx + jac(1, 1) * dy) * inv_det
+
+                ! Calculate inverse Jacobian * residual
+                ! [dxi ]   1   [ J22  -J12 ] [ dx ]
+                ! [deta] = det [ -J21  J11 ] [ dy ]
+                ! Note: J12 is jac(1,2), J21 is jac(2,1)
+
+                dr_x = (jac(2, 2) * dx - jac(1, 2) * dy) * inv_det
+                dr_y = (-jac(2, 1) * dx + jac(1, 1) * dy) * inv_det
 
                 r%x = r%x + dr_x
                 r%y = r%y + dr_y
 
-                ! 発散チェック (範囲外に大きく飛び出したらこの初期値は諦める)
+                ! Divergence check
                 if (abs(r%x) > 3.0d0 .or. abs(r%y) > 3.0d0) exit newton_loop
             end do newton_loop
 
-            ! 反復回数切れでも残差が十分小さければ採用
+            ! Check if residual is small enough even if max_iter reached
             if (.not. is_in .and. sqrt(dx**2 + dy**2) < tol) then
                 if (abs(r%x) <= 1.0d0 + 1.0e-4 .and. abs(r%y) <= 1.0d0 + 1.0e-4) then
                     is_in = .true.

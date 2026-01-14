@@ -80,8 +80,8 @@ contains
             ice_content = porosity
 
             ! 上限に張り付いているため、微分は0とする（これ以上増えない）
-            dQi_dP = 0.0d0
-            dQi_dT = 0.0d0
+            ! dQi_dP = 0.0d0
+            ! dQi_dT = 0.0d0
 
             ! 水・空気は存在できない
             water_content = 0.0d0
