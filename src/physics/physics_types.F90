@@ -6,7 +6,8 @@ module physics_types
     use :: module_core, only:type_state
     use :: physics_constants, only:TtoK => celsius_to_kelvin, &
         P_atm => standard_atmospheric_pressure, &
-        min_vapor_density
+        min_vapor_density, &
+        reference_water_density
     implicit none
     private
 
@@ -164,6 +165,10 @@ contains
         real(real64) :: T_K, P_abs
 
         call self%get_thermo_state_TP(state, T_K, P_abs)
+        if (T_K < 273.15d0) then
+            density = reference_water_density
+            return
+        end if
         call self%water%calc_rho(T_K, P_abs, density)
     end subroutine calc_rho_water_abst_physics
 
@@ -176,6 +181,10 @@ contains
         real(real64) :: T_K, P_abs
 
         call self%get_thermo_state_TP(state, T_K, P_abs)
+        if (T_K < 273.15d0) then
+            deriv_density = 0.0d0
+            return
+        end if
         call self%water%calc_drho_dT(T_K, P_abs, deriv_density)
     end subroutine calc_drho_water_dT_abst_physics
 
@@ -188,6 +197,10 @@ contains
         real(real64) :: T_K, P_abs
 
         call self%get_thermo_state_TP(state, T_K, P_abs)
+        if (T_K < 273.15d0) then
+            deriv_density = 0.0d0
+            return
+        end if
         call self%water%calc_drho_dP(T_K, P_abs, deriv_density)
     end subroutine calc_drho_water_dP_abst_physics
 
@@ -200,6 +213,10 @@ contains
         real(real64) :: T_K, P_abs
 
         call self%get_thermo_state_TP(state, T_K, P_abs)
+        if (T_K < 273.15d0) then
+            cp = 4181.3d0 ! 約定値 (水の比熱 4.1813 kJ/kg-K)
+            return
+        end if
         call self%water%calc_cp(T_K, P_abs, cp)
     end subroutine calc_cp_water_abst_physics
 

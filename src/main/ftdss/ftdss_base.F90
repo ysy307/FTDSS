@@ -258,6 +258,8 @@ contains
         call self%controls%iteration%get_nonlinear_iter(iter)
         if (iter <= 5) then
             damping_ratio = 0.2d0
+        else if (iter <= 10) then
+            damping_ratio = 0.5d0
         else
             damping_ratio = 1.0d0
         end if

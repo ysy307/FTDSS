@@ -28,20 +28,20 @@ module core_types_variable
 
         !> [t_{n+1}] 計算用現在値．
         !> Newton-Raphson法などの反復計算中は，収束前の「未確定値」が格納される．
-        real(real64), allocatable, private :: current(:)
+        real(real64), allocatable :: current(:)
 
         !> [t_n] 確定した直前のタイムステップでの値
-        real(real64), allocatable, private :: previous(:)
+        real(real64), allocatable :: previous(:)
 
         !> [t_{n-1}, t_{n-2}, ...] さらに過去の履歴値
         !> 第2次元が古い順に並ぶ (:, 1) -> t_{n-1}, (:, 2) -> t_{n-2}
-        real(real64), allocatable, private :: history(:, :)
+        real(real64), allocatable :: history(:, :)
 
         !> [du/dt] 時間微分値（currentの変化に伴い更新される）
-        real(real64), allocatable, private :: diff(:)
+        real(real64), allocatable :: diff(:)
 
         !> [grad u] 空間勾配
-        type(type_coordinate_array_dp), private :: grad
+        type(type_coordinate_array_dp) :: grad
 
     contains
         !> 初期化・破棄

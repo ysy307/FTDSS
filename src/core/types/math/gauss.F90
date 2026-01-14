@@ -50,16 +50,21 @@ contains
         self%order = integration_order
 
         ! セルタイプに応じた計算ルーチンを呼び出し
-        select case (cell_type)
-        case (FE_TYPE%TRIANGLE%value, FE_TYPE%QUADRATIC_TRIANGLE%value)
+        if (FE_TYPE%TRIANGLE == cell_type) then
             call self%compute_triangle_rule(integration_order)
-        case (FE_TYPE%QUAD%value, FE_TYPE%QUADRATIC_QUAD%value)
+        else if (FE_TYPE%QUADRATIC_TRIANGLE == cell_type) then
+            call self%compute_triangle_rule(integration_order)
+        else if (FE_TYPE%QUAD == cell_type) then
             call self%compute_quad_rule(integration_order)
-        case (FE_TYPE%LINE%value, FE_TYPE%QUADRATIC_EDGE%value)
+        else if (FE_TYPE%QUADRATIC_QUAD == cell_type) then
+            call self%compute_quad_rule(integration_order)
+        else if (FE_TYPE%LINE == cell_type) then
             call self%compute_line_rule(integration_order)
-        case default
+        else if (FE_TYPE%QUADRATIC_EDGE == cell_type) then
+            call self%compute_line_rule(integration_order)
+        else
             self%num_gauss = 0
-        end select
+        end if
 
         if (self%num_gauss > 0) then
             self%initialized = .true.
