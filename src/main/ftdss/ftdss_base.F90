@@ -263,7 +263,7 @@ contains
         else
             damping_ratio = 1.0d0
         end if
-        ! damping_ratio = 1.0d0
+        damping_ratio = 1.0d0
 
         call self%domain%get_num_nodes(num_nodes)
         call self%domain%get_num_dofs_per_node(num_dofs_per_node)

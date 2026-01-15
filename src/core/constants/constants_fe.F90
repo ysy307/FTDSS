@@ -88,15 +88,11 @@ module core_constants_fe
 
 contains
 
-    !---------------------------------------------------------------------------
-    ! 名前からIDを取得 (String -> Int)
-    ! select case が使えないため if/else if で実装
-    !---------------------------------------------------------------------------
-    subroutine to_id_from_name_fe_type(self, name, id)
+    pure function to_id_from_name_fe_type(self, name) result(id)
         implicit none
         class(type_constant_ids_fe_type), intent(in) :: self
         character(len=*), intent(in) :: name
-        integer(int32), intent(inout) :: id
+        integer(int32) :: id
 
         character(len=128) :: lname
         lname = strip(to_lower(name))
@@ -232,28 +228,22 @@ contains
         else
             id = -1
         end if
-    end subroutine to_id_from_name_fe_type
+    end function to_id_from_name_fe_type
 
-    !---------------------------------------------------------------------------
-    ! オブジェクトからIDを取得
-    !---------------------------------------------------------------------------
-    subroutine to_id_from_object_fe_type(self, object, id)
+    pure function to_id_from_object_fe_type(self, object) result(id)
         implicit none
         class(type_constant_ids_fe_type), intent(in) :: self
         type(type_constant_id), intent(in) :: object
-        integer(int32), intent(inout) :: id
-        ! ここはオブジェクト自身がIDを持っているので直接代入で問題ありません
-        id = object%id
-    end subroutine to_id_from_object_fe_type
+        integer(int32) :: id
 
-    !---------------------------------------------------------------------------
-    ! IDから名前を取得 (Int -> String)
-    !---------------------------------------------------------------------------
-    subroutine to_name_from_id_fe_type(self, id, name)
+        id = object%id
+    end function to_id_from_object_fe_type
+
+    pure function to_name_from_id_fe_type(self, id) result(name)
         implicit none
         class(type_constant_ids_fe_type), intent(in) :: self
         integer(int32), intent(in) :: id
-        character(len=*), intent(inout) :: name
+        character(len=:), allocatable :: name
 
         if (id == self%EMPTY_CELL%id) then
             name = self%EMPTY_CELL%name
@@ -386,27 +376,22 @@ contains
         else
             name = ""
         end if
-    end subroutine to_name_from_id_fe_type
+    end function to_name_from_id_fe_type
 
-    !---------------------------------------------------------------------------
-    ! オブジェクトから名前を取得
-    !---------------------------------------------------------------------------
-    subroutine to_name_from_object_fe_type(self, object, name)
+    pure function to_name_from_object_fe_type(self, object) result(name)
         implicit none
         class(type_constant_ids_fe_type), intent(in) :: self
         type(type_constant_id), intent(in) :: object
-        character(len=*), intent(inout) :: name
-        name = object%name
-    end subroutine to_name_from_object_fe_type
+        character(len=:), allocatable :: name
 
-    !---------------------------------------------------------------------------
-    ! IDからオブジェクトを取得 (Int -> Object)
-    !---------------------------------------------------------------------------
-    subroutine to_object_from_id_fe_type(self, id, object)
+        name = object%name
+    end function to_name_from_object_fe_type
+
+    pure function to_object_from_id_fe_type(self, id) result(object)
         implicit none
         class(type_constant_ids_fe_type), intent(in) :: self
         integer(int32), intent(in) :: id
-        type(type_constant_id), intent(inout) :: object
+        type(type_constant_id) :: object
 
         if (id == self%EMPTY_CELL%id) then
             object = self%EMPTY_CELL
@@ -537,16 +522,13 @@ contains
         else if (id == self%BEZIER_PYRAMID%id) then
             object = self%BEZIER_PYRAMID
         end if
-    end subroutine to_object_from_id_fe_type
+    end function to_object_from_id_fe_type
 
-    !---------------------------------------------------------------------------
-    ! 名前からオブジェクトを取得 (String -> Object)
-    !---------------------------------------------------------------------------
-    subroutine to_object_from_name_fe_type(self, name, object)
+    pure function to_object_from_name_fe_type(self, name) result(object)
         implicit none
         class(type_constant_ids_fe_type), intent(in) :: self
         character(len=*), intent(in) :: name
-        type(type_constant_id), intent(inout) :: object
+        type(type_constant_id) :: object
 
         character(len=128) :: lname
         lname = strip(to_lower(name))
@@ -680,6 +662,6 @@ contains
         else if (trim(lname) == strip(to_lower(self%BEZIER_PYRAMID%name))) then
             object = self%BEZIER_PYRAMID
         end if
-    end subroutine to_object_from_name_fe_type
+    end function to_object_from_name_fe_type
 
 end module core_constants_fe

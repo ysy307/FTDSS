@@ -124,7 +124,7 @@ contains
 
         call allocate_array(self%work_psi, self%num_fe_nodes)
         call allocate_array(self%work_dpsi_dx, self%num_fe_dimension, self%num_fe_nodes)
-        call allocate_array(self%work_vec, self%num_fe_dimension)
+        call allocate_array(self%work_vec, self%num_fe_nodes)
 
         call allocate_array(self%work_C, self%num_fe_gauss)
         call allocate_array(self%work_D, self%num_fe_dimension, self%num_fe_dimension, self%num_fe_gauss)

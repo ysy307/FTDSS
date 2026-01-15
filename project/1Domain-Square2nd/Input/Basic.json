@@ -23,7 +23,7 @@
         "color_key": "color",
         "integration": {
             "integration_type": "full",
-            "integration_order": 2,
+            "integration_order": 3,
             "integration_points": 0.8165
         }
     },
@@ -113,19 +113,19 @@
         "nonlinear_solver": {
             "method": "newton",
             "update_frequency": 5,
-            "max_iterations": 30,
+            "max_iterations": 1,
             "convergence": {
                 "use_criteria": "both",
                 "norm_type": "linf",
                 "logic_between_criteria": "and",
                 "residual": {
-                    "criteria": "both",
+                    "criteria": "absolute",
                     "logic": "or",
                     "absolute_tolerance": 1e-03,
                     "relative_tolerance": 1e-03
                 },
                 "update": {
-                    "criteria": "both",
+                    "criteria": "absolute",
                     "logic": "or",
                     "absolute_tolerance": 1e-03,
                     "relative_tolerance": 1e-03
