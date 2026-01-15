@@ -66,12 +66,14 @@ module domain_base_fe
 
         ! !> Integration routines taking Gauss-point values
         procedure, public, pass(self) :: compute_K1 => compute_K1_capacity_abst_fe
+        procedure, public, pass(self) :: compute_K1_lumped => compute_K1_lumped_capacity_abst_fe
         procedure, pass(self), private :: compute_K2_diffusion => compute_K2_diffusion_abst_fe
         procedure, pass(self), private :: compute_K2_diffusion_scalar => compute_K2_diffusion_scalar_abst_fe
         generic, public :: compute_K2 => compute_K2_diffusion, compute_K2_diffusion_scalar
         procedure, public, pass(self) :: compute_K3 => compute_K3_mixed_abst_fe
 
         procedure, public, pass(self) :: compute_R1 => compute_R1_source_abst_fe
+        procedure, public, pass(self) :: compute_R1_lumped => compute_R1_lumped_source_abst_fe
         procedure, public, pass(self) :: compute_R2 => compute_R2_flux_abst_fe
 
         !----------------------------------------------------------------------
@@ -266,7 +268,18 @@ module domain_base_fe
             real(real64), intent(in) :: A_gp(:)
             real(real64), intent(inout) :: elem_mat(:, :)
             real(real64), intent(inout), optional, target :: work_psi(:)
+
         end subroutine compute_K1_capacity_abst_fe
+
+        module subroutine compute_K1_lumped_capacity_abst_fe(self, nodes, A_gp, elem_mat, work_psi)
+            implicit none
+            class(abst_fe), intent(in) :: self
+            real(real64), intent(in) :: nodes(:, :)
+            real(real64), intent(in) :: A_gp(:)
+            real(real64), intent(inout) :: elem_mat(:, :)
+            real(real64), intent(inout), optional, target :: work_psi(:)
+
+        end subroutine compute_K1_lumped_capacity_abst_fe
 
         module subroutine compute_K2_diffusion_abst_fe(self, nodes, M_gp, elem_mat, &
                                                        work_psi, work_dpsi_dx, work_vec)
@@ -313,6 +326,16 @@ module domain_base_fe
             real(real64), intent(inout), optional, target :: work_psi(:)
 
         end subroutine compute_R1_source_abst_fe
+
+        module subroutine compute_R1_lumped_source_abst_fe(self, nodes, S_node, elem_vec, work_psi)
+            implicit none
+            class(abst_fe), intent(in) :: self
+            real(real64), intent(in) :: nodes(:, :)
+            real(real64), intent(in) :: S_node(:)
+            real(real64), intent(inout) :: elem_vec(:)
+            real(real64), intent(inout), optional, target :: work_psi(:)
+
+        end subroutine compute_R1_lumped_source_abst_fe
 
         module subroutine compute_R2_flux_abst_fe(self, nodes, F_gp, elem_vec, work_dpsi_dx)
             implicit none

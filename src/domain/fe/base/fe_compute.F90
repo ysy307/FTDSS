@@ -19,7 +19,7 @@ contains
         real(real64), intent(inout) :: elem_mat(:, :)
         real(real64), intent(inout), optional, target :: work_psi(:)
 
-        integer(int32) :: p, i, j, nd, dim, num_gauss
+        integer(int32) :: p, i, j, num_nodes, dim, num_gauss
         real(real64) :: w, det_J, A_val
         type(type_coordinate_dp) :: r
 
@@ -27,13 +27,13 @@ contains
         real(real64), allocatable, target :: local_psi(:)
 
         call self%get_dimension(dim)
-        call self%get_num_nodes(nd)
+        call self%get_num_nodes(num_nodes)
         call self%get_num_gauss(num_gauss)
 
         if (present(work_psi)) then
             p_psi => work_psi
         else
-            call allocate_array(local_psi, nd)
+            call allocate_array(local_psi, num_nodes)
             p_psi => local_psi
         end if
 
@@ -47,8 +47,8 @@ contains
             call self%calc_shape_function(r, nodes, psi=p_psi, determinant_jacobian=det_J)
             A_val = A_gp(p)
 
-            do j = 1, nd
-                do i = 1, nd
+            do j = 1, num_nodes
+                do i = 1, num_nodes
                     elem_mat(i, j) = elem_mat(i, j) + w * abs(det_J) * A_val * p_psi(i) * p_psi(j)
                 end do
             end do
@@ -59,6 +59,65 @@ contains
             call deallocate_array(local_psi)
         end if
     end subroutine compute_K1_capacity_abst_fe
+
+    !>
+    !> 1-Lumped. Lumped Capacity Matrix K1 (Diagonal)
+    !>    K_ii = \int A(x) * psi_i dOmega (Row-sum lumping approximation)
+    !>    A_gp: Coefficients evaluated directly at Gauss points [num_gauss]
+    !>    The result is stored in the diagonal elements of elem_mat.
+    !>    Off-diagonal elements are zero.
+    !>
+    module subroutine compute_K1_lumped_capacity_abst_fe(self, nodes, A_gp, elem_mat, work_psi)
+        implicit none
+        class(abst_fe), intent(in) :: self
+        real(real64), intent(in) :: nodes(:, :)
+        real(real64), intent(in) :: A_gp(:)
+        real(real64), intent(inout) :: elem_mat(:, :)
+        real(real64), intent(inout), optional, target :: work_psi(:)
+
+        integer(int32) :: p, i, num_nodes, dim, num_gauss
+        real(real64) :: w, det_J, A_val
+        type(type_coordinate_dp) :: r
+
+        real(real64), pointer :: p_psi(:) => null()
+        real(real64), allocatable, target :: local_psi(:)
+
+        call self%get_dimension(dim)
+        call self%get_num_nodes(num_nodes)
+        call self%get_num_gauss(num_gauss)
+
+        if (present(work_psi)) then
+            p_psi => work_psi
+        else
+            call allocate_array(local_psi, num_nodes)
+            p_psi => local_psi
+        end if
+
+        ! Initialize matrix to zero (including off-diagonal)
+        elem_mat(:, :) = 0.0d0
+        p_psi(:) = 0.0d0
+
+        do p = 1, num_gauss
+            r = self%integration_rule%gauss(p)
+            w = self%integration_rule%weight(p)
+
+            ! Calc shape function only (derivatives not needed for mass matrix)
+            call self%calc_shape_function(r, nodes, psi=p_psi, determinant_jacobian=det_J)
+            A_val = A_gp(p)
+
+            do i = 1, num_nodes
+                ! Row-sum lumping:
+                ! Consistent mass term is psi_i * psi_j.
+                ! Since sum(psi_j) = 1, summing rows is equivalent to integrating psi_i.
+                elem_mat(i, i) = elem_mat(i, i) + w * abs(det_J) * A_val * p_psi(i)
+            end do
+        end do
+
+        nullify (p_psi)
+        if (.not. present(work_psi)) then
+            call deallocate_array(local_psi)
+        end if
+    end subroutine compute_K1_lumped_capacity_abst_fe
 
     !>
     !> 2. Diffusion Matrix K2
@@ -76,7 +135,7 @@ contains
         real(real64), intent(inout), optional, target :: work_dpsi_dx(:, :)
         real(real64), intent(inout), optional, target :: work_vec(:) ! For M_grad_psi_j [dim]
 
-        integer(int32) :: p, i, j, nd, dim, num_gauss
+        integer(int32) :: p, i, j, num_nodes, dim, num_gauss
         integer(int32) :: ierr
         real(real64) :: w, det_J
         type(type_coordinate_dp) :: r
@@ -90,20 +149,20 @@ contains
         real(real64), allocatable, target :: local_vec_dim(:)
 
         call self%get_dimension(dim)
-        call self%get_num_nodes(nd)
+        call self%get_num_nodes(num_nodes)
         call self%get_num_gauss(num_gauss)
 
         if (present(work_psi)) then
             p_psi => work_psi
         else
-            call allocate_array(local_psi, nd)
+            call allocate_array(local_psi, num_nodes)
             p_psi => local_psi
         end if
 
         if (present(work_dpsi_dx)) then
             p_dpsi_dx => work_dpsi_dx
         else
-            call allocate_array(local_dpsi_dx, dim, nd)
+            call allocate_array(local_dpsi_dx, dim, num_nodes)
             p_dpsi_dx => local_dpsi_dx
         end if
 
@@ -125,10 +184,10 @@ contains
 
             call self%calc_shape_function(r, nodes, psi=p_psi, dpsi_dx=p_dpsi_dx, determinant_jacobian=det_J)
 
-            do j = 1, nd
+            do j = 1, num_nodes
                 call matvec(M_gp(1:dim, 1:dim, p), p_dpsi_dx(1:dim, j), p_M_grad_psi_j(1:dim), ierr)
 
-                do i = 1, nd
+                do i = 1, num_nodes
                     elem_mat(i, j) = elem_mat(i, j) + &
                                      w * abs(det_J) * vector_dot(p_dpsi_dx(1:dim, i), p_M_grad_psi_j(1:dim))
                 end do
@@ -160,7 +219,7 @@ contains
         real(real64), intent(inout), optional, target :: work_psi(:)
         real(real64), intent(inout), optional, target :: work_dpsi_dx(:, :)
 
-        integer(int32) :: p, i, j, nd, dim, num_gauss
+        integer(int32) :: p, i, j, num_nodes, dim, num_gauss
         real(real64) :: w, det_J, M_val, grad_dot
         type(type_coordinate_dp) :: r
 
@@ -171,20 +230,20 @@ contains
         real(real64), allocatable, target :: local_dpsi_dx(:, :)
 
         call self%get_dimension(dim)
-        call self%get_num_nodes(nd)
+        call self%get_num_nodes(num_nodes)
         call self%get_num_gauss(num_gauss)
 
         if (present(work_psi)) then
             p_psi => work_psi
         else
-            call allocate_array(local_psi, nd)
+            call allocate_array(local_psi, num_nodes)
             p_psi => local_psi
         end if
 
         if (present(work_dpsi_dx)) then
             p_dpsi_dx => work_dpsi_dx
         else
-            call allocate_array(local_dpsi_dx, dim, nd)
+            call allocate_array(local_dpsi_dx, dim, num_nodes)
             p_dpsi_dx => local_dpsi_dx
         end if
 
@@ -198,8 +257,8 @@ contains
 
             M_val = M_gp(p)
 
-            do j = 1, nd
-                do i = 1, nd
+            do j = 1, num_nodes
+                do i = 1, num_nodes
                     grad_dot = vector_dot(p_dpsi_dx(1:dim, i), p_dpsi_dx(1:dim, j))
 
                     elem_mat(i, j) = elem_mat(i, j) + &
@@ -230,7 +289,7 @@ contains
         real(real64), intent(inout), optional, target :: work_psi(:)
         real(real64), intent(inout), optional, target :: work_dpsi_dx(:, :)
 
-        integer(int32) :: p, i, j, nd, dim, num_gauss
+        integer(int32) :: p, i, j, num_nodes, dim, num_gauss
         real(real64) :: w, det_J, grad_psi_j_dot_V
         type(type_coordinate_dp) :: r
 
@@ -241,20 +300,20 @@ contains
         real(real64), allocatable, target :: local_dpsi_dx(:, :)
 
         call self%get_dimension(dim)
-        call self%get_num_nodes(nd)
+        call self%get_num_nodes(num_nodes)
         call self%get_num_gauss(num_gauss)
 
         if (present(work_psi)) then
             p_psi => work_psi
         else
-            call allocate_array(local_psi, nd)
+            call allocate_array(local_psi, num_nodes)
             p_psi => local_psi
         end if
 
         if (present(work_dpsi_dx)) then
             p_dpsi_dx => work_dpsi_dx
         else
-            call allocate_array(local_dpsi_dx, dim, nd)
+            call allocate_array(local_dpsi_dx, dim, num_nodes)
             p_dpsi_dx => local_dpsi_dx
         end if
 
@@ -268,8 +327,8 @@ contains
 
             call self%calc_shape_function(r, nodes, psi=p_psi, dpsi_dx=p_dpsi_dx, determinant_jacobian=det_J)
 
-            do i = 1, nd
-                do j = 1, nd
+            do i = 1, num_nodes
+                do j = 1, num_nodes
                     grad_psi_j_dot_V = vector_dot(p_dpsi_dx(1:dim, j), V_gp(1:dim, p))
                     elem_mat(i, j) = elem_mat(i, j) + w * abs(det_J) * p_psi(i) * grad_psi_j_dot_V
                 end do
@@ -298,7 +357,7 @@ contains
         real(real64), intent(inout) :: elem_vec(:)
         real(real64), intent(inout), optional, target :: work_psi(:)
 
-        integer(int32) :: p, i, nd, dim, num_gauss
+        integer(int32) :: p, i, num_nodes, dim, num_gauss
         real(real64) :: w, det_J, S_val
         type(type_coordinate_dp) :: r
 
@@ -307,13 +366,13 @@ contains
         real(real64), allocatable, target :: local_psi(:)
 
         call self%get_dimension(dim)
-        call self%get_num_nodes(nd)
+        call self%get_num_nodes(num_nodes)
         call self%get_num_gauss(num_gauss)
 
         if (present(work_psi)) then
             p_psi => work_psi
         else
-            call allocate_array(local_psi, nd)
+            call allocate_array(local_psi, num_nodes)
             p_psi => local_psi
         end if
 
@@ -327,7 +386,7 @@ contains
 
             S_val = S_gp(p)
 
-            do i = 1, nd
+            do i = 1, num_nodes
                 elem_vec(i) = elem_vec(i) + w * abs(det_J) * S_val * p_psi(i)
             end do
         end do
@@ -336,6 +395,67 @@ contains
         nullify (p_psi)
 
     end subroutine compute_R1_source_abst_fe
+
+    !>
+    !> 1-Lumped. Lumped Scalar Source Residual R1 (Dedicated Routine)
+    !>
+    !>    Calculation:
+    !>       R_i = S_node_i * \int \psi_i d\Omega
+    !>
+    !>    Physically equivalent to:
+    !>       Residual_i = (Source Value at Node i) * (Lumped Volume of Node i)
+    !>
+    !>    S_node: Source term evaluated AT NODES [num_nodes]
+    !>            (e.g., dU/dt at each node)
+    !>
+    module subroutine compute_R1_lumped_source_abst_fe(self, nodes, S_node, elem_vec, work_psi)
+        implicit none
+        class(abst_fe), intent(in) :: self
+        real(real64), intent(in) :: nodes(:, :)
+        real(real64), intent(in) :: S_node(:)
+        real(real64), intent(inout) :: elem_vec(:)
+        real(real64), intent(inout), optional, target :: work_psi(:)
+
+        integer(int32) :: p, i, num_nodes, dim, num_gauss
+        real(real64) :: w, det_J
+        type(type_coordinate_dp) :: r
+
+        real(real64), pointer :: p_psi(:) => null()
+        real(real64), allocatable, target :: local_psi(:)
+
+        call self%get_dimension(dim)
+        call self%get_num_nodes(num_nodes)
+        call self%get_num_gauss(num_gauss)
+
+        if (present(work_psi)) then
+            p_psi => work_psi
+        else
+            call allocate_array(local_psi, num_nodes)
+            p_psi => local_psi
+        end if
+
+        elem_vec = 0.0d0
+
+        do p = 1, num_gauss
+            r = self%integration_rule%gauss(p)
+            w = self%integration_rule%weight(p)
+
+            call self%calc_shape_function(r, nodes, psi=p_psi, determinant_jacobian=det_J)
+
+            ! 各節点ごとに「支配体積 × 節点値」を計算
+            do i = 1, num_nodes
+                ! \int \psi_i d\Omega の寄与分
+                ! R_i += Volume_fraction * S_node_i
+                elem_vec(i) = elem_vec(i) + w * abs(det_J) * p_psi(i) * S_node(i)
+            end do
+        end do
+
+        if (.not. present(work_psi)) then
+            call deallocate_array(local_psi)
+        end if
+        nullify (p_psi)
+
+    end subroutine compute_R1_lumped_source_abst_fe
 
     !>
     !> 2. Flux/Divergence Residual R2
@@ -351,7 +471,7 @@ contains
         real(real64), intent(inout) :: elem_vec(:)
         real(real64), intent(inout), optional, target :: work_dpsi_dx(:, :)
 
-        integer(int32) :: p, i, nd, dim, num_gauss
+        integer(int32) :: p, i, num_nodes, dim, num_gauss
         real(real64) :: w, det_J, grad_psi_i_dot_F
         type(type_coordinate_dp) :: r
 
@@ -360,13 +480,13 @@ contains
         real(real64), allocatable, target :: local_dpsi_dx(:, :)
 
         call self%get_dimension(dim)
-        call self%get_num_nodes(nd)
+        call self%get_num_nodes(num_nodes)
         call self%get_num_gauss(num_gauss)
 
         if (present(work_dpsi_dx)) then
             p_dpsi_dx => work_dpsi_dx
         else
-            call allocate_array(local_dpsi_dx, dim, nd)
+            call allocate_array(local_dpsi_dx, dim, num_nodes)
             p_dpsi_dx => local_dpsi_dx
         end if
 
@@ -378,7 +498,7 @@ contains
 
             call self%calc_shape_function(r, nodes, dpsi_dx=p_dpsi_dx, determinant_jacobian=det_J)
 
-            do i = 1, nd
+            do i = 1, num_nodes
                 grad_psi_i_dot_F = vector_dot(p_dpsi_dx(1:dim, i), F_gp(1:dim, p))
 
                 elem_vec(i) = elem_vec(i) + w * abs(det_J) * grad_psi_i_dot_F
