@@ -4,6 +4,7 @@ module main_thermal
     use :: module_control, only:type_controls
     use :: module_input, only:type_input
     use :: module_physics, only:type_physics_manager, type_wrf_params, type_hcf_params, type_thc_dispersivity
+    use :: module_linalg
     use :: main_base, only:type_assemble_workspace
     implicit none
     private

@@ -1,5 +1,7 @@
+!> Module for managing time stepping control and BDF (Backward Differentiation Formula) coefficients.
+!> Handles variable time steps, time unit conversions, and history management for high-order time integration schemes.
 module control_time
-    use, intrinsic :: iso_fortran_env, only: int32, real64
+    use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
     use :: omp_lib
     use :: stdlib_optval, only:optval
     use :: stdlib_strings, only:strip
@@ -12,45 +14,72 @@ module control_time
     public :: type_time
 
     ! --- Constants ---
+    !> Maximum supported order for BDF schemes.
     integer(int32), parameter :: MAX_BDF_ORDER = 6
+    !> Error code for time initialization failure.
     integer(int32), parameter :: ERR_TIME_INIT = 981
+    !> Error code for profiler issues.
     integer(int32), parameter :: ERR_PROFILER = 982
 
+    !> Data structure holding time stepping state and integration parameters.
     type :: type_time
         private
         ! --- Time Stepping State ---
+        !> Simulation start time [s]
         real(real64) :: start_time = 0.0d0
+        !> Simulation end time [s]
         real(real64) :: end_time = 0.0d0
-        real(real64) :: current_time = 0.0d0
+        !> Current simulation time [s]
+        real(real64) :: current_time_s = 0.0d0
+        !> Time at previous step [s]
         real(real64) :: time_old = 0.0d0
 
-        real(real64) :: dt = 0.0d0
-        real(real64), allocatable :: dt_history(:) ! dtの履歴 (dt_{n}, dt_{n-1}, ...)
-        real(real64) :: dt_min = 0.0d0
-        real(real64) :: dt_max = 0.0d0
+        !> Current time step size \( \Delta t \) [s]
+        real(real64) :: dt_s = 0.0d0
+        !> History of time steps \( [\Delta t_n, \Delta t_{n-1}, \dots] \)
+        real(real64), allocatable :: dt_s_history(:)
+        !> Minimum allowable time step [s]
+        real(real64) :: dt_s_min = 0.0d0
+        !> Maximum allowable time step [s]
+        real(real64) :: dt_s_max = 0.0d0
 
-        real(real64) :: time_conversion = 1.0d0 ! 表示用の単位変換係数
+        !> Conversion factor for display units
+        real(real64) :: time_conversion = 1.0d0
 
         ! --- BDF Coefficients ---
-        ! 方程式: dy/dt = sum( coeffs(j) * y_{n-j} )
-        ! coeffsは 1/dt の次元を持つ (dtによる除算を含む)
+        !> Coefficients \( \alpha_j \) for the BDF formula:
+        !> \( \frac{dy}{dt} \approx \sum_{j=0}^{k} \alpha_j y_{n-j} \).
+        !> Note: Coefficients include the \( 1/\Delta t \) scaling.
         real(real64) :: coeffs(0:MAX_BDF_ORDER) = 0.0d0
-        integer(int32) :: target_bdf_order = 1 ! 設定された目標次数
-        integer(int32) :: current_bdf_order = 1 ! 現在利用可能な次数（起動直後など）
+        !> Target BDF order set by user
+        integer(int32) :: target_bdf_order = 1
+        !> Currently active BDF order (ramps up from 1 at start)
+        integer(int32) :: current_bdf_order = 1
     contains
         ! --- Public Interfaces ---
+        !> Initialize time control settings from input.
         procedure, public, pass(self) :: initialize => initialize_type_time
+        !> Update BDF coefficients based on current history.
         procedure, public, pass(self) :: update_bdf_coefficients
+        !> Get current simulation time.
         procedure, public, pass(self) :: get_time
+        !> Get current time step size.
         procedure, public, pass(self) :: get_dt
+        !> Get current BDF order.
         procedure, public, pass(self) :: get_bdf_order
+        !> Get BDF coefficients array.
         procedure, public, pass(self) :: get_bdf_coeffs
+        !> Advance simulation time by one step.
         procedure, public, pass(self) :: advance => advance_time
+        !> Shift time history for the next step.
         procedure, public, pass(self) :: shift => shift_time
+        !> Display current time status to standard output.
         procedure, public, pass(self) :: display => display_status
 
         ! --- Private Procedures ---
+        !> Compute variable step BDF coefficients.
         procedure, private, pass(self) :: compute_bdf_coefficients
+        !> Helper to convert time units.
         procedure, public, pass(self) :: convert_time_unit
     end type type_time
 
@@ -59,42 +88,47 @@ contains
     ! ==========================================================================
     ! Initialization
     ! ==========================================================================
+
+    !> Initialize the time control object using input configuration.
+    !> Sets up initial time step, simulation period, and allocates history arrays.
     subroutine initialize_type_time(self, input)
         implicit none
+        !> Time control instance
         class(type_time), intent(inout) :: self
+        !> Input data structure
         type(type_input), intent(in) :: input
 
         integer(int32) :: i, istat
         real(real64) :: time_conv_coeff
 
-        ! --- BDF設定 ---
+        ! --- BDF Settings ---
         self%target_bdf_order = input%basic%solver_settings%bdf_order
         if (self%target_bdf_order > MAX_BDF_ORDER) then
             self%target_bdf_order = MAX_BDF_ORDER
         end if
-        ! 初期状態では履歴がないため1次からスタート
+        ! Start with 1st order (Backward Euler) as no history exists
         self%current_bdf_order = 1
 
-        ! --- 時間単位変換係数の取得 ---
+        ! --- Time Unit Conversion ---
         associate (time_control => input%conditions%time_control)
             call self%convert_time_unit(time_control%time_stepping%unit, TIME_UNIT_SECONDS, time_conv_coeff)
 
-            ! --- dt 設定 ---
-            self%dt = time_control%time_stepping%initial_step * time_conv_coeff
-            self%dt_max = time_control%time_stepping%max_step * time_conv_coeff
-            self%dt_min = time_control%time_stepping%min_step * time_conv_coeff
+            ! --- Set dt ---
+            self%dt_s = time_control%time_stepping%initial_step * time_conv_coeff
+            self%dt_s_max = time_control%time_stepping%max_step * time_conv_coeff
+            self%dt_s_min = time_control%time_stepping%min_step * time_conv_coeff
 
-            ! --- 履歴配列確保 ---
-            call deallocate_array(self%dt_history)
-            call allocate_array(self%dt_history, self%target_bdf_order)
+            ! --- Allocate History ---
+            call deallocate_array(self%dt_s_history)
+            call allocate_array(self%dt_s_history, self%target_bdf_order)
 
-            self%dt_history(:) = 0.0d0
-            self%dt_history(1) = self%dt
+            self%dt_s_history(:) = 0.0d0
+            self%dt_s_history(1) = self%dt_s
 
-            ! --- 初期係数計算 (1次精度) ---
+            ! --- Compute Initial Coefficients (1st Order) ---
             call self%compute_bdf_coefficients()
 
-            ! --- シミュレーション期間 ---
+            ! --- Simulation Period ---
             if (input%output_settings%field_output%file_format /= "none") then
                 call self%convert_time_unit(time_control%simulation_period%unit, TIME_UNIT_SECONDS, time_conv_coeff)
                 self%start_time = time_control%simulation_period%start * time_conv_coeff
@@ -105,8 +139,8 @@ contains
                                             self%time_conversion)
             end if
 
-            ! 初期時間をセット
-            self%current_time = self%start_time
+            ! Set initial time
+            self%current_time_s = self%start_time
 
         end associate
 
@@ -115,44 +149,50 @@ contains
     ! ==========================================================================
     ! Time Stepping & BDF
     ! ==========================================================================
+
+    !> Shift time history and update current time state after a successful step.
+    !> Also manages the ramping up of BDF order during initial steps.
     subroutine shift_time(self)
         implicit none
+        !> Time control instance
         class(type_time), intent(inout) :: self
         integer(int32) :: n
 
-        if (.not. allocated(self%dt_history)) return
-        n = size(self%dt_history)
+        if (.not. allocated(self%dt_s_history)) return
+        n = size(self%dt_s_history)
 
-        ! 時間更新
-        self%time_old = self%current_time
-        self%current_time = self%current_time + self%dt
+        ! Update time
+        self%time_old = self%current_time_s
+        self%current_time_s = self%current_time_s + self%dt_s
 
-        ! 履歴のシフト (dt_history(1) が最新のステップ幅になるようにする)
-        ! dt_history(1) = dt_{n}
-        ! dt_history(2) = dt_{n-1} ...
-        if (n > 1) self%dt_history(2:n) = self%dt_history(1:n - 1)
-        self%dt_history(1) = self%dt
+        ! Shift history: dt_history(1) becomes current dt_n
+        if (n > 1) self%dt_s_history(2:n) = self%dt_s_history(1:n - 1)
+        self%dt_s_history(1) = self%dt_s
 
-        ! 利用可能な次数の更新（履歴が溜まるまでは次数を下げる）
+        ! Update available BDF order (Ramp up strategy)
         if (self%current_bdf_order < self%target_bdf_order) then
             self%current_bdf_order = self%current_bdf_order + 1
         end if
 
-        ! 係数の再計算
+        ! Recompute coefficients
         call self%compute_bdf_coefficients()
 
     end subroutine shift_time
 
+    !> Advance the simulation time tentatively for the next step solver.
     subroutine advance_time(self, new_dt)
         implicit none
+        !> Time control instance
         class(type_time), intent(inout) :: self
+        !> New time step size (optional)
         real(real64), intent(in), optional :: new_dt
 
-        self%dt = optval(new_dt, self%dt)
+        self%dt_s = optval(new_dt, self%dt_s)
 
-        self%current_time = self%current_time + self%dt
+        self%current_time_s = self%current_time_s + self%dt_s
     end subroutine advance_time
 
+    !> Explicitly trigger an update of BDF coefficients.
     subroutine update_bdf_coefficients(self)
         implicit none
         class(type_time), intent(inout) :: self
@@ -161,61 +201,51 @@ contains
     end subroutine update_bdf_coefficients
 
     ! --------------------------------------------------------------------------
-    ! 可変刻み幅BDF係数の計算
-    ! 定義: dy/dt|_{t_n} approx sum_{j=0}^{k} coeffs(j) * y_{n-j}
-    ! coeffsには 1/dt のスケーリングが含まれていることに注意．
-    ! --------------------------------------------------------------------------
+    !> Compute variable step-size BDF coefficients.
+    !> Calculates \( \alpha_j \) such that \( \frac{dy}{dt}|_{t_n} \approx \sum_{j=0}^{k} \alpha_j y_{n-j} \).
+    !> Note: Coefficients \( \alpha_j \) inherently include the \( 1/\Delta t \) scaling.
     subroutine compute_bdf_coefficients(self)
         implicit none
+        !> Time control instance
         class(type_time), intent(inout) :: self
 
         integer(int32) :: k, j, m
         real(real64) :: tau(0:self%current_bdf_order)
-        real(real64) :: prod_term, denom_term
+        real(real64) :: prod_term
 
         k = self%current_bdf_order
 
-        ! 0. dtが不正でないかチェック
-        if (self%dt <= 1.0d-16) then
-            ! dtが極小の場合は警告あるいはエラーだが，ここでは安全のためBackward Euler係数をセットして戻る
+        ! 0. Check for invalid dt
+        if (self%dt_s <= 1.0d-16) then
+            ! Fallback to Backward Euler for safety if dt is extremely small
             self%coeffs = 0.0d0
-            if (self%dt > 0.0d0) then
-                self%coeffs(0) = 1.0d0 / self%dt
-                self%coeffs(1) = -1.0d0 / self%dt
+            if (self%dt_s > 0.0d0) then
+                self%coeffs(0) = 1.0d0 / self%dt_s
+                self%coeffs(1) = -1.0d0 / self%dt_s
             end if
             return
         end if
 
-        ! 1. 相対時間 tau の計算
+        ! 1. Calculate relative time differences tau
         ! tau(j) = t_n - t_{n-j}
-        ! tau(0) = 0
-        ! tau(1) = dt_n
-        ! tau(2) = dt_n + dt_{n-1} ...
         tau(0) = 0.0d0
         do j = 1, k
-            tau(j) = tau(j - 1) + self%dt_history(j)
+            tau(j) = tau(j - 1) + self%dt_s_history(j)
         end do
 
         self%coeffs = 0.0d0
 
-        ! 2. ラグランジュ補間多項式の微分値 (t=t_n) を計算
+        ! 2. Compute derivative of Lagrange interpolating polynomial at t_n
         ! L_j(t) = prod_{m!=j} (t - t_{n-m}) / (t_{n-j} - t_{n-m})
-        ! dL_j/dt (t_n) を求める．
 
-        ! (A) j = 0 の場合 (現在のステップ y_n に対する係数)
-        ! L_0(t) = prod_{m=1}^k (t - t_{n-m}) / (t_n - t_{n-m})
-        ! L_0'(t_n) = sum_{m=1}^k [ 1 / (t_n - t_{n-m}) * prod_{p!=m, p!=0} ... ]
-        ! t=t_n を代入すると，(t_n - t_{n-m}) が約分されるため，
-        ! L_0'(t_n) = sum_{m=1}^k (1 / tau(m)) となる．
+        ! (A) Case j = 0 (Coefficient for y_n)
+        ! L_0'(t_n) = sum_{m=1}^k (1 / tau(m))
         do m = 1, k
             self%coeffs(0) = self%coeffs(0) + (1.0d0 / tau(m))
         end do
 
-        ! (B) j > 0 の場合 (過去のステップ y_{n-j} に対する係数)
-        ! L_j(t) = (t - t_n)/(t_{n-j} - t_n) * prod_{m!=0, j} ...
-        ! t=t_n で微分すると，(t - t_n) の微分の項（=1）だけが残り，他は (t-t_n) が掛かって消える．
-        ! Coeff_j = (1 / (t_{n-j} - t_n)) * prod_{m!=0, j} (t_n - t_{n-m}) / (t_{n-j} - t_{n-m})
-        !         = (1 / -tau(j)) * prod_{m!=0, j} (tau(m) / (tau(m) - tau(j)))
+        ! (B) Case j > 0 (Coefficient for y_{n-j})
+        ! Coeff_j = (1 / -tau(j)) * prod_{m!=0, j} (tau(m) / (tau(m) - tau(j)))
         do j = 1, k
             prod_term = 1.0d0
             do m = 1, k
@@ -227,23 +257,53 @@ contains
 
     end subroutine compute_bdf_coefficients
 
+    ! ==========================================================================
     ! Getters
-    subroutine get_time(self, current_time)
+    ! ==========================================================================
+
+    !> Get current simulation time (seconds) with optional unit conversion.
+    !> If a target time unit is provided, the `current_time` is converted accordingly.
+    subroutine get_time(self, current_time, time_unit)
         implicit none
         class(type_time), intent(in) :: self
+        !> Output current time
         real(real64), intent(inout) :: current_time
+        !> Target time unit (optional)
+        type(type_constant_value), intent(in), optional :: time_unit
 
-        current_time = self%current_time
+        real(real64) :: coeff
+
+        if (present(time_unit)) then
+            coeff = 1.0d0 / time_unit%value
+        else
+            coeff = 1.0d0
+        end if
+
+        current_time = self%current_time_s * coeff
     end subroutine get_time
 
-    subroutine get_dt(self, dt)
+    !> Get current time step size (seconds) with optional unit conversion.
+    !> If a target time unit is provided,  `dt` is converted accordingly.
+    subroutine get_dt(self, dt, time_unit)
         implicit none
         class(type_time), intent(in) :: self
+        !> Output time step
         real(real64), intent(inout) :: dt
+        !> Target time unit (optional)
+        type(type_constant_value), intent(in), optional :: time_unit
 
-        dt = self%dt
+        real(real64) :: coeff
+
+        if (present(time_unit)) then
+            coeff = 1.0d0 / time_unit%value
+        else
+            coeff = 1.0d0
+        end if
+
+        dt = self%dt_s * coeff
     end subroutine get_dt
 
+    !> Get current BDF order.
     subroutine get_bdf_order(self, bdf_order)
         implicit none
         class(type_time), intent(in) :: self
@@ -252,6 +312,7 @@ contains
         bdf_order = self%current_bdf_order
     end subroutine get_bdf_order
 
+    !> Get pointer to current BDF coefficient array.
     subroutine get_bdf_coeffs(self, coeffs)
         implicit none
         class(type_time), intent(in), target :: self
@@ -260,6 +321,7 @@ contains
         coeffs => self%coeffs(0:self%current_bdf_order)
     end subroutine get_bdf_coeffs
 
+    !> Convert value between time units based on internal factors.
     pure subroutine convert_time_unit(self, source_unit, target_unit, coefficient)
         implicit none
         class(type_time), intent(in) :: self
@@ -277,25 +339,30 @@ contains
         end if
     end subroutine convert_time_unit
 
-    subroutine display_status(self)
+    !> Display time status summary to stdout.
+    subroutine display_status(self, unit_in)
         implicit none
         class(type_time), intent(in) :: self
-        integer :: i
+        integer(int32), intent(in), optional :: unit_in
 
-        write (*, '(a)') "## Time Status"
-        write (*, '(a)') "---"
-        write (*, *)
+        integer(int32) :: unit
 
-        write (*, '(a)') "### Simulation Period"
-        write (*, '(" - Start Time       : ", ES12.5)') self%start_time
-        write (*, '(" - End Time         : ", ES12.5)') self%end_time
-        write (*, *)
+        unit = optval(unit_in, output_unit)
 
-        write (*, '(a)') "### Current Time Step"
-        write (*, '(" - Current Time     : ", ES12.5)') self%current_time
-        write (*, '(" - Current dt       : ", ES12.5)') self%dt
-        write (*, '(" - BDF Order        : ", I0)') self%current_bdf_order
-        write (*, *)
+        write (unit, '(a)') "## Time Status"
+        write (unit, '(a)') "---"
+        write (unit, *)
+
+        write (unit, '(a)') "### Simulation Period"
+        write (unit, '(" - Start Time       : ", ES12.5)') self%start_time
+        write (unit, '(" - End Time         : ", ES12.5)') self%end_time
+        write (unit, *)
+
+        write (unit, '(a)') "### Current Time Step"
+        write (unit, '(" - Current Time     : ", ES12.5)') self%current_time_s
+        write (unit, '(" - Current dt       : ", ES12.5)') self%dt_s
+        write (unit, '(" - BDF Order        : ", I0)') self%current_bdf_order
+        write (unit, *)
 
     end subroutine display_status
 

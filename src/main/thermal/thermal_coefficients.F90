@@ -122,31 +122,6 @@ contains
                                  porosity=porosity_history(j))
             call self%update_water_phases(material_id, local_state)
             call self%calc_enthalpy_density(material_id, local_state, Uj)
-            ! call local_state%get(temperature=T, &
-            !                      porosity=porosity, &
-            !                      water_content=Qw, &
-            !                      ice_content=Qi, &
-            !                      vapor_content=Qv)
-
-            ! call self%physics%get_density_solid(material_id, rho_s)
-            ! call self%physics%calc_density_water(local_state, rho_w)
-            ! call self%physics%calc_density_ice(local_state, rho_i)
-
-            ! call self%physics%get_specific_heat_solid(material_id, c_s)
-            ! call self%physics%calc_specific_heat_water(local_state, c_w)
-            ! call self%physics%calc_specific_heat_ice(local_state, c_i)
-            ! call self%physics%calc_specific_heat_vapor(local_state, c_v)
-
-            ! call self%physics%calc_latent_heat_fusion(material_id, local_state, Lf)
-            ! call self%physics%calc_latent_heat_vaporization(material_id, local_state, Lv)
-
-            ! Uj = c_s * rho_s * (1.0d0 - porosity) * T &
-            !      + c_w * rho_w * Qw * T &
-            !      + c_i * rho_i * Qi * T &
-            !      + c_v * rho_w * Qv * T &
-            !      - rho_i * Lf * Qi &
-            !      + rho_w * Lv * Qv
-
             dU_dt = dU_dt + bdf_coeffs(j) * Uj
         end do
 

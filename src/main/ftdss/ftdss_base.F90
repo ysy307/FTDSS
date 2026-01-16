@@ -247,7 +247,6 @@ contains
         integer(int32) :: target_dof
         integer(int32) :: start_idx, end_idx, num_nodes, num_dofs_per_node
         integer(int32) :: iter
-        real(real64) :: damping_ratio
         real(real64), pointer, dimension(:) :: bdf_coeffs => null()
         integer(int32) :: bdf_order
         real(real64), pointer, contiguous, dimension(:) :: temperature => null()
@@ -256,14 +255,6 @@ contains
 
         delta => self%delta%get_data()
         call self%controls%iteration%get_nonlinear_iter(iter)
-        if (iter <= 5) then
-            damping_ratio = 0.2d0
-        else if (iter <= 10) then
-            damping_ratio = 0.5d0
-        else
-            damping_ratio = 1.0d0
-        end if
-        damping_ratio = 1.0d0
 
         call self%domain%get_num_nodes(num_nodes)
         call self%domain%get_num_dofs_per_node(num_dofs_per_node)
@@ -279,7 +270,7 @@ contains
 
             call self%temperature%get_current(temperature)
             if (associated(temperature)) then
-                temperature(:) = temperature(:) + damping_ratio * delta(start_idx:end_idx:num_dofs_per_node)
+                temperature(:) = temperature(:) + delta(start_idx:end_idx:num_dofs_per_node)
             end if
 
             call self%calc_gradient_temperature()

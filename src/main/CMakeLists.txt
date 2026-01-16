@@ -29,7 +29,8 @@ target_link_libraries(Main_Thermal PUBLIC
     Solver::Control
     Solver::Input
     Solver::Physics
-    )
+    Solver::Linalg
+)
 add_library(Solver::Thermal ALIAS Main_Thermal)
     
 # ====================================================================

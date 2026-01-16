@@ -18,7 +18,6 @@ module module_control
         private
         logical :: is_active(NUM_PHYSICS_TYPES) = .false.
         integer(int32) :: coupling_mode
-        ! --- マテリアルごとのフラグ ---
         logical, allocatable :: thermal(:)
         logical, allocatable :: hydraulic(:)
         logical, allocatable :: mechanical(:)
@@ -49,6 +48,7 @@ contains
         integer(int32) :: i, num_unique_regions, max_region_id
         integer(int32) :: current_material_id
         character(len=10), allocatable :: profiler_labels(:)
+        real(real64) :: currenet_time
 
         if (present(input)) then
 
@@ -109,16 +109,19 @@ contains
             call self%iteration%initialize(input)
             call initialize_openmp(input)
 
+            call self%time%get_time(currenet_time)
             call self%out_field%initialize( &
                 input%output_settings%field_output%output_interval_step, &
                 input%output_settings%field_output%output_interval_unit, &
+                input%output_settings%field_output%output_time_unit, &
                 input%output_settings%field_output%file_format, &
-                self%time)
+                currenet_time)
             call self%out_history%initialize( &
                 input%output_settings%history_output%output_interval_step, &
                 input%output_settings%history_output%output_interval_unit, &
+                input%output_settings%history_output%output_time_unit, &
                 input%output_settings%history_output%file_format, &
-                self%time)
+                currenet_time)
 
         end if
 

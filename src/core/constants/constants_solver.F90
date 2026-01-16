@@ -20,10 +20,10 @@ module core_constants_solver
     integer(int32), parameter, public :: MATRIX_BSR = 4
 
     type :: type_matrix_types
-        type(type_constant_id) :: DENSE = type_constant_id("dense", 1)
-        type(type_constant_id) :: CSR = type_constant_id("csr", 2)
-        type(type_constant_id) :: COO = type_constant_id("coo", 3)
-        type(type_constant_id) :: BSR = type_constant_id("bsr", 4)
+        type(type_constant_id) :: DENSE = type_constant_id("MATRIX_TYPE", "dense", 1)
+        type(type_constant_id) :: CSR = type_constant_id("MATRIX_TYPE", "csr", 2)
+        type(type_constant_id) :: COO = type_constant_id("MATRIX_TYPE", "coo", 3)
+        type(type_constant_id) :: BSR = type_constant_id("MATRIX_TYPE", "bsr", 4)
     contains
         procedure, public, pass(self) :: to_id => to_id_matrix_type
         procedure, public, pass(self) :: to_name => to_name_matrix_type
@@ -197,23 +197,27 @@ module core_constants_solver
     !> L-infinity (maximum absolute value) norm
     integer(int32), parameter, public :: NORM_TYPE_LINF = 2
 
-    type :: type_constants_time_unit
+    type :: type_constants_time_units
         !> Time unit in seconds
-        type(type_constant_value) :: SECONDS = type_constant_value("seconds", 1, "s", 1.0d0)
+        type(type_constant_value) :: SECONDS = type_constant_value("TIME_UNIT", "seconds", 1, "s", 1.0d0)
         !> Time unit in minutes
-        type(type_constant_value) :: MINUTES = type_constant_value("minutes", 2, "m", 60.0d0)
+        type(type_constant_value) :: MINUTES = type_constant_value("TIME_UNIT", "minutes", 2, "m", 60.0d0)
         !> Time unit in hours
-        type(type_constant_value) :: HOURS = type_constant_value("hours", 3, "h", 3600.0d0)
+        type(type_constant_value) :: HOURS = type_constant_value("TIME_UNIT", "hours", 3, "h", 3600.0d0)
         !> Time unit in days
-        type(type_constant_value) :: DAYS = type_constant_value("days", 4, "d", 86400.0d0)
+        type(type_constant_value) :: DAYS = type_constant_value("TIME_UNIT", "days", 4, "d", 86400.0d0)
         !> Time unit in years
-        type(type_constant_value) :: YEARS = type_constant_value("years", 5, "y", 31536000.0d0)
+        type(type_constant_value) :: YEARS = type_constant_value("TIME_UNIT", "years", 5, "y", 31536000.0d0)
     contains
-        procedure, public, pass(self) :: to_id => to_id_time_unit
-        procedure, public, pass(self) :: to_name => to_name_time_unit
-    end type type_constants_time_unit
+        procedure, public, pass(self) :: to_id => to_id_time_units
+        procedure, public, pass(self) :: to_name => to_name_time_units
+        procedure, public, pass(self) :: to_object_from_id => to_object_from_id_time_units
+        procedure, public, pass(self) :: to_object_from_name => to_object_from_name_time_units
+        generic, public :: to_object => to_object_from_id, to_object_from_name
 
-    type(type_constants_time_unit), parameter, public :: TIME_UNITS = type_constants_time_unit()
+    end type type_constants_time_units
+
+    type(type_constants_time_units), parameter, public :: TIME_UNITS = type_constants_time_units()
 
     integer(int32), parameter, public :: TIME_UNIT_SECONDS = 1
     integer(int32), parameter, public :: TIME_UNIT_MINUTES = 2
@@ -317,19 +321,19 @@ module core_constants_solver
     ! ==========================================================
     type :: type_solver_status
         !> Solver completed successfully
-        type(type_constant_id) :: SUCCESS = type_constant_id("SUCCESS", 0)
+        type(type_constant_id) :: SUCCESS = type_constant_id("SOLVER_STATUS", "SUCCESS", 0)
         !> Solver encountered ill-conditioned options
-        type(type_constant_id) :: ILL_OPTIONS = type_constant_id("ILL_OPTIONS", -1)
+        type(type_constant_id) :: ILL_OPTIONS = type_constant_id("SOLVER_STATUS", "ILL_OPTIONS", -1)
         !> Solver encountered a breakdown
-        type(type_constant_id) :: BREAKDOWN = type_constant_id("BREAKDOWN", -2)
+        type(type_constant_id) :: BREAKDOWN = type_constant_id("SOLVER_STATUS", "BREAKDOWN", -2)
         !> Solver ran out of memory
-        type(type_constant_id) :: OUT_OF_MEMORY = type_constant_id("OUT_OF_MEMORY", -3)
+        type(type_constant_id) :: OUT_OF_MEMORY = type_constant_id("SOLVER_STATUS", "OUT_OF_MEMORY", -3)
         !> Solver reached maximum iterations without convergence
-        type(type_constant_id) :: MAXITER = type_constant_id("MAXITER", -4)
+        type(type_constant_id) :: MAXITER = type_constant_id("SOLVER_STATUS", "MAXITER", -4)
         !> Preconditioner setup failure
-        type(type_constant_id) :: DECOMPOSITION_FAILURE = type_constant_id("DECOMPOSITION_FAILURE", -5)
+        type(type_constant_id) :: DECOMPOSITION_FAILURE = type_constant_id("SOLVER_STATUS", "DECOMPOSITION_FAILURE", -5)
         !> Solver method not implemented
-        type(type_constant_id) :: NOT_IMPLEMENTED = type_constant_id("NOT_IMPLEMENTED", -6)
+        type(type_constant_id) :: NOT_IMPLEMENTED = type_constant_id("SOLVER_STATUS", "NOT_IMPLEMENTED", -6)
     end type type_solver_status
 
     type(type_solver_status), parameter, public :: SOLVER_STATUS = type_solver_status()
@@ -416,34 +420,34 @@ contains
     end subroutine to_name_matrix_type
 
     !> Convert time unit constant to its ID.
-    pure subroutine to_id_time_unit(self, name, id)
+    pure subroutine to_id_time_units(self, name, id)
         implicit none
-        class(type_constants_time_unit), intent(in) :: self
+        class(type_constants_time_units), intent(in) :: self
         character(len=*), intent(in) :: name
         integer(int32), intent(inout) :: id
 
         character(len=:), allocatable :: lname
         lname = strip(to_lower(name))
 
-        if (lname == strip(self%SECONDS%name)) then
+        if (lname == strip(to_lower(self%SECONDS%name))) then
             id = self%SECONDS%id
-        else if (lname == strip(self%MINUTES%name)) then
+        else if (lname == strip(to_lower(self%MINUTES%name))) then
             id = self%MINUTES%id
-        else if (lname == strip(self%HOURS%name)) then
+        else if (lname == strip(to_lower(self%HOURS%name))) then
             id = self%HOURS%id
-        else if (lname == strip(self%DAYS%name)) then
+        else if (lname == strip(to_lower(self%DAYS%name))) then
             id = self%DAYS%id
-        else if (lname == strip(self%YEARS%name)) then
+        else if (lname == strip(to_lower(self%YEARS%name))) then
             id = self%YEARS%id
         else
             id = -1
         end if
-    end subroutine to_id_time_unit
+    end subroutine to_id_time_units
 
     !> Convert time unit ID to its name.
-    pure subroutine to_name_time_unit(self, id, name)
+    pure subroutine to_name_time_units(self, id, name)
         implicit none
-        class(type_constants_time_unit), intent(in) :: self
+        class(type_constants_time_units), intent(in) :: self
         integer(int32), intent(in) :: id
         character(len=*), intent(inout) :: name
 
@@ -460,6 +464,53 @@ contains
         else
             name = "unknown"
         end if
-    end subroutine to_name_time_unit
+    end subroutine to_name_time_units
 
+    !> Convert time unit ID to its object.
+    pure function to_object_from_id_time_units(self, id) result(object)
+        implicit none
+        class(type_constants_time_units), intent(in) :: self
+        integer(int32), intent(in) :: id
+        type(type_constant_value) :: object
+
+        if (id == self%SECONDS%id) then
+            object = self%SECONDS
+        else if (id == self%MINUTES%id) then
+            object = self%MINUTES
+        else if (id == self%HOURS%id) then
+            object = self%HOURS
+        else if (id == self%DAYS%id) then
+            object = self%DAYS
+        else if (id == self%YEARS%id) then
+            object = self%YEARS
+        else
+            object = type_constant_value("TIME_UNIT", "unknown", -1, "unknown", 0.0d0)
+        end if
+
+    end function to_object_from_id_time_units
+
+    !> Convert time unit name to its object.
+    pure function to_object_from_name_time_units(self, name) result(object)
+        implicit none
+        class(type_constants_time_units), intent(in) :: self
+        character(len=*), intent(in) :: name
+        type(type_constant_value) :: object
+
+        character(len=:), allocatable :: lname
+        lname = strip(to_lower(name))
+
+        if (lname == strip(to_lower(self%SECONDS%name))) then
+            object = self%SECONDS
+        else if (lname == strip(to_lower(self%MINUTES%name))) then
+            object = self%MINUTES
+        else if (lname == strip(to_lower(self%HOURS%name))) then
+            object = self%HOURS
+        else if (lname == strip(to_lower(self%DAYS%name))) then
+            object = self%DAYS
+        else if (lname == strip(to_lower(self%YEARS%name))) then
+            object = self%YEARS
+        else
+            object = type_constant_value("TIME_UNIT", "unknown", -1, "unknown", 0.0d0)
+        end if
+    end function to_object_from_name_time_units
 end module core_constants_solver

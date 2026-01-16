@@ -9,6 +9,7 @@ module core_constants_base
     public :: type_constant_value
 
     type :: type_constant_id
+        character(len=64) :: group
         character(len=64) :: name
         integer(int32) :: id
     contains
@@ -24,6 +25,7 @@ module core_constants_base
     end type type_constant_id
 
     type :: type_constant_value
+        character(len=64) :: group
         character(len=64) :: name
         integer(int32) :: id
         character(len=16) :: unit
@@ -53,7 +55,7 @@ contains
         integer(int32) :: unit
         unit = optval(unit_in, output_unit)
 
-        write (unit, '(A, ": ", I12)') strip(self%name), self%id
+        write (unit, '("[Group: ", A, "]", A, ": ", I12)') strip(self%group), strip(self%name), self%id
     end subroutine display_constant_id
 
     pure elemental function eq_const_const_id(self, other) result(is_equal)
@@ -63,7 +65,8 @@ contains
         logical :: is_equal
 
         is_equal = ((self%id == other%id) .and. &
-                    (strip(self%name) == strip(other%name)))
+                    (strip(self%name) == strip(other%name)) .and. &
+                    (strip(self%group) == strip(other%group)))
     end function eq_const_const_id
 
     pure elemental function eq_id_const_id(self, other) result(is_equal)
@@ -91,7 +94,8 @@ contains
         logical :: is_not_equal
 
         is_not_equal = .not. ((self%id == other%id) .and. &
-                              (strip(self%name) == strip(other%name)))
+                              (strip(self%name) == strip(other%name)) .and. &
+                              (strip(self%group) == strip(other%group)))
     end function neq_const_const_id
 
     pure elemental function neq_id_const_id(self, other) result(is_not_equal)
@@ -120,7 +124,8 @@ contains
         integer(int32) :: unit
         unit = optval(unit_in, output_unit)
 
-        write (unit, '(A, ": ", I12, " ", A, " ", ES24.16)') trim(self%name), self%id, trim(self%unit), self%value
+        write (unit, '("[Group: ", A, "]", A, ": ", I12, " ", A, " ", ES24.16)') &
+            strip(self%group), strip(self%name), self%id, strip(self%unit), self%value
     end subroutine display_constant
 
     pure elemental function eq_const_const_value(self, other) result(is_equal)
@@ -132,7 +137,8 @@ contains
         is_equal = ((self%id == other%id) .and. &
                     (self%value == other%value) .and. &
                     (strip(self%name) == strip(other%name)) .and. &
-                    (strip(self%unit) == strip(other%unit)))
+                    (strip(self%unit) == strip(other%unit)) .and. &
+                    (strip(self%group) == strip(other%group)))
     end function eq_const_const_value
 
     pure elemental function eq_id_const_value(self, other) result(is_equal)
@@ -162,7 +168,8 @@ contains
         is_not_equal = .not. ((self%id == other%id) .and. &
                               (self%value == other%value) .and. &
                               (strip(self%name) == strip(other%name)) .and. &
-                              (strip(self%unit) == strip(other%unit)))
+                              (strip(self%unit) == strip(other%unit)) .and. &
+                              (strip(self%group) == strip(other%group)))
     end function neq_const_const_value
 
     pure elemental function neq_id_const_value(self, other) result(is_not_equal)

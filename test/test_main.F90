@@ -33,10 +33,9 @@ contains
         integer(int32) :: iter
         call ftdss%initialize()
 
-        do iter = 1, 100
+        do iter = 1, 2880
             call ftdss%controls%iteration%increment_total()
             call ftdss%solve_time_step(is_step_converged)
-            print *, is_step_converged
             call ftdss%update_variables()
             call ftdss%shift()
             call ftdss%output_fields()

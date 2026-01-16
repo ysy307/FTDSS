@@ -19,8 +19,11 @@ module main_base
         type(type_state), allocatable :: state(:)
         type(type_state), allocatable :: state_gp(:)
         real(real64), allocatable :: T_node(:)
+        real(real64), allocatable :: T_gp(:)
         real(real64), allocatable :: P_node(:)
+        real(real64), allocatable :: P_gp(:)
         real(real64), allocatable :: phi_node(:)
+        real(real64), allocatable :: phi_gp(:)
         real(real64), allocatable :: work_node(:, :)
         real(real64), allocatable :: work_psi(:)
         real(real64), allocatable :: work_dpsi_dx(:, :)
@@ -50,11 +53,13 @@ module main_base
         procedure, public, pass(self) :: lerp => lerp_states
 
         procedure, public, pass(self) :: compute_K1 => compute_K1_assemble_workspace
+        procedure, public, pass(self) :: compute_K1_lumped => compute_K1_lumped_assemble_workspace
         procedure, private, pass(self) :: compute_K2_scalar_assemble_workspace
         procedure, private, pass(self) :: compute_K2_assemble_workspace
         generic :: compute_K2 => compute_K2_scalar_assemble_workspace, compute_K2_assemble_workspace
         procedure, public, pass(self) :: compute_K3 => compute_K3_assemble_workspace
         procedure, public, pass(self) :: compute_R1 => compute_R1_assemble_workspace
+        procedure, public, pass(self) :: compute_R1_lumped => compute_R1_lumped_assemble_workspace
         procedure, public, pass(self) :: compute_R2 => compute_R2_assemble_workspace
     end type type_assemble_workspace
 
@@ -120,6 +125,9 @@ contains
         call allocate_array(self%T_node, self%num_fe_nodes)
         call allocate_array(self%P_node, self%num_fe_nodes)
         call allocate_array(self%phi_node, self%num_fe_nodes)
+        call allocate_array(self%T_gp, self%num_fe_gauss)
+        call allocate_array(self%P_gp, self%num_fe_gauss)
+        call allocate_array(self%phi_gp, self%num_fe_gauss)
         call allocate_array(self%work_node, self%bdf_order + 1, self%num_fe_nodes)
 
         call allocate_array(self%work_psi, self%num_fe_nodes)
@@ -152,7 +160,6 @@ contains
 
         integer(int32) :: i, j
         type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gp => null()
-        real(real64) :: lerped_value
         type(type_coordinate_dp) :: dlerped_value
         real(real64), allocatable :: work_history(:)
 
@@ -166,8 +173,8 @@ contains
             self%work_node(1:self%bdf_order + 1, i) = work_history(1:self%bdf_order + 1)
         end do
         do i = 1, self%num_fe_gauss
-            call self%fe%lerp(gp(i), self%T_node, lerped_value)
-            call self%state_gp(i)%temperature%set(lerped_value)
+            call self%fe%lerp(gp(i), self%T_node, self%T_gp(i))
+            call self%state_gp(i)%temperature%set(self%T_gp(i))
         end do
         do j = 1, self%num_fe_gauss
             work_history(:) = 0.0d0
@@ -175,8 +182,8 @@ contains
                 call self%fe%lerp(gp(j), self%work_node(i, 1:self%num_fe_nodes), work_history(i))
             end do
             call self%state_gp(j)%set(temperature_history=work_history)
-
         end do
+
         do i = 1, self%num_fe_gauss
             call self%fe%dlerp(gp(i), self%T_node(1:self%num_fe_nodes), self%coordinates, self%computation_type, dlerped_value)
             call self%state_gp(i)%grad_T%set(dlerped_value)
@@ -190,8 +197,8 @@ contains
             self%work_node(1:self%bdf_order + 1, i) = work_history(1:self%bdf_order + 1)
         end do
         do i = 1, self%num_fe_gauss
-            call self%fe%lerp(gp(i), self%P_node, lerped_value)
-            call self%state_gp(i)%pressure%set(lerped_value)
+            call self%fe%lerp(gp(i), self%P_node, self%P_gp(i))
+            call self%state_gp(i)%pressure%set(self%P_gp(i))
         end do
 
         do j = 1, self%num_fe_gauss
@@ -214,8 +221,8 @@ contains
             self%work_node(1:self%bdf_order + 1, i) = work_history(1:self%bdf_order + 1)
         end do
         do i = 1, self%num_fe_gauss
-            call self%fe%lerp(gp(i), self%phi_node, lerped_value)
-            call self%state_gp(i)%porosity%set(lerped_value)
+            call self%fe%lerp(gp(i), self%phi_node, self%phi_gp(i))
+            call self%state_gp(i)%porosity%set(self%phi_gp(i))
         end do
         do j = 1, self%num_fe_gauss
             do i = 1, self%bdf_order + 1
@@ -237,6 +244,18 @@ contains
         self%work_psi(:) = 0.0d0
         call self%fe%compute_K1(self%coordinates, A_gp, local_matrix, self%work_psi)
     end subroutine compute_K1_assemble_workspace
+
+    subroutine compute_K1_lumped_assemble_workspace(self, A_gp, local_matrix)
+        implicit none
+        class(type_assemble_workspace), intent(inout) :: self
+        real(real64), intent(in) :: A_gp(:)
+        real(real64), intent(inout) :: local_matrix(:, :)
+
+        local_matrix(:, :) = 0.0d0
+
+        self%work_psi(:) = 0.0d0
+        call self%fe%compute_K1_lumped(self%coordinates, A_gp, local_matrix, self%work_psi)
+    end subroutine compute_K1_lumped_assemble_workspace
 
     subroutine compute_K2_scalar_assemble_workspace(self, D_gp, local_matrix)
         implicit none
@@ -275,17 +294,29 @@ contains
         call self%fe%compute_K3(self%coordinates, V_gp, local_matrix, self%work_psi, self%work_dpsi_dx)
     end subroutine compute_K3_assemble_workspace
 
-    subroutine compute_R1_assemble_workspace(self, L_gp, local_vector)
+    subroutine compute_R1_assemble_workspace(self, S_gp, local_vector)
         implicit none
         class(type_assemble_workspace), intent(inout) :: self
-        real(real64), intent(in) :: L_gp(:)
+        real(real64), intent(in) :: S_gp(:)
         real(real64), intent(inout) :: local_vector(:)
 
         local_vector(:) = 0.0d0
 
         self%work_psi(:) = 0.0d0
-        call self%fe%compute_R1(self%coordinates, L_gp, local_vector, self%work_psi)
+        call self%fe%compute_R1(self%coordinates, S_gp, local_vector, self%work_psi)
     end subroutine compute_R1_assemble_workspace
+
+    subroutine compute_R1_lumped_assemble_workspace(self, S_node, local_vector)
+        implicit none
+        class(type_assemble_workspace), intent(inout) :: self
+        real(real64), intent(in) :: S_node(:)
+        real(real64), intent(inout) :: local_vector(:)
+
+        local_vector(:) = 0.0d0
+
+        self%work_psi(:) = 0.0d0
+        call self%fe%compute_R1_lumped(self%coordinates, S_node, local_vector, self%work_psi)
+    end subroutine compute_R1_lumped_assemble_workspace
 
     subroutine compute_R2_assemble_workspace(self, V_gp, local_vector)
         implicit none
@@ -318,6 +349,10 @@ contains
             call deallocate_array(self%T_node)
             call deallocate_array(self%P_node)
             call deallocate_array(self%phi_node)
+            call deallocate_array(self%T_gp)
+            call deallocate_array(self%P_gp)
+            call deallocate_array(self%phi_gp)
+            call deallocate_array(self%coordinates)
             call deallocate_array(self%work_node)
             call deallocate_array(self%work_psi)
             call deallocate_array(self%work_dpsi_dx)

@@ -12,6 +12,7 @@ contains
         type(type_vector_dp), intent(inout), optional :: R_T
 
         integer(int32) :: i, j, d
+        integer(int32) :: ierr
         real(real64) :: row_sum_val
 
         real(real64) :: local_vec(workspace%num_fe_nodes)
@@ -31,6 +32,10 @@ contains
             call self%compute_transient_term(workspace%material_id, workspace%state_gp(i), &
                                              workspace%bdf_coeffs(1:workspace%bdf_order + 1), workspace%work_d_dt(i))
         end do
+        ! do i = 1, workspace%num_fe_nodes
+        !     call self%compute_transient_term(workspace%material_id, workspace%state(i), &
+        !                                      workspace%bdf_coeffs(1:workspace%bdf_order + 1), workspace%work_d_dt(i))
+        ! end do
 
         if (controls%is_target(PHYSICS_TYPE_HYDRAULIC, workspace%material_id)) then
             do i = 1, workspace%num_fe_gauss
@@ -42,23 +47,16 @@ contains
         end if
 
         call workspace%compute_K1(workspace%work_C, workspace%work_matrix)
-        do i = 1, workspace%num_fe_nodes
-            row_sum_val = 0.0d0
-            do j = 1, workspace%num_fe_nodes
-                row_sum_val = row_sum_val + workspace%work_matrix(i, j)
-            end do
-            local_mass_diagonal(i) = row_sum_val
-        end do
-
         if (present(J_TT)) then
             do i = 1, workspace%num_fe_nodes
                 do j = 1, workspace%num_fe_nodes
-                    call J_TT%set(OP_ADD, i, i, -1.0d0 * workspace%bdf_coeffs(1) * workspace%work_matrix(i, j))
+                    call J_TT%set(OP_ADD, i, j, workspace%bdf_coeffs(1) * workspace%work_matrix(i, j))
                 end do
             end do
         end if
 
         if (present(R_T)) then
+            local_vec(:) = 0.0d0
             call workspace%compute_R1(workspace%work_d_dt, local_vec)
 
             do i = 1, workspace%num_fe_nodes
@@ -71,14 +69,14 @@ contains
         if (present(J_TT)) then
             do i = 1, workspace%num_fe_nodes
                 do j = 1, workspace%num_fe_nodes
-                    call J_TT%set(OP_ADD, i, j, -workspace%work_matrix(i, j))
+                    call J_TT%set(OP_ADD, i, j, workspace%work_matrix(i, j))
                 end do
             end do
         end if
 
         if (present(R_T)) then
             workspace%work_vec(:) = 0.0d0
-            workspace%work_vec = matmul(workspace%work_matrix, workspace%T_node)
+            call matvec(workspace%work_matrix, workspace%T_node, workspace%work_vec, ierr)
 
             do i = 1, workspace%num_fe_nodes
                 call R_T%set(OP_ADD, i, -workspace%work_vec(i))
