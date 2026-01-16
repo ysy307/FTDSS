@@ -19,8 +19,8 @@ contains
 
         call self%controls%profiler%start("Assemble")
 
-        call self%J%zero()
-        call self%R%zero()
+        call self%K%zero()
+        call self%F%zero()
 
         call self%domain%get_num_elements(num_elements)
 
@@ -41,13 +41,13 @@ contains
             call self%domain%get_target_dof(PHYSICS_TYPE_THERMAL, thermal_dof)
             call self%domain%get_target_dof(PHYSICS_TYPE_HYDRAULIC, hydraulic_dof)
 
-            call self%J%add(thermal_dof, thermal_dof, p_connectivity, local_J_TT)
-            ! call self%J%add(thermal_dof, hydraulic_dof, p_connectivity, local_J_TH)
-            ! call self%J%add(hydraulic_dof, hydraulic_dof, p_connectivity, local_J_HH)
-            ! call self%J%add(hydraulic_dof, thermal_dof, p_connectivity, local_J_HT)
+            call self%K%add(thermal_dof, thermal_dof, p_connectivity, local_J_TT)
+            ! call self%K%add(thermal_dof, hydraulic_dof, p_connectivity, local_J_TH)
+            ! call self%K%add(hydraulic_dof, hydraulic_dof, p_connectivity, local_J_HH)
+            ! call self%K%add(hydraulic_dof, thermal_dof, p_connectivity, local_J_HT)
 
-            call self%R%add(thermal_dof, p_connectivity, local_R_T)
-            ! call self%R%add(hydraulic_dof, p_connectivity, local_R_H)
+            call self%F%add(thermal_dof, p_connectivity, local_R_T)
+            ! call self%F%add(hydraulic_dof, p_connectivity, local_R_H)
 
         end do
 

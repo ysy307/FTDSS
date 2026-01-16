@@ -48,9 +48,9 @@ contains
         call self%domain%initialize(input, self%controls)
         call self%domain%get_total_dofs(num_total_dofs)
 
-        call self%J%initialize(self%domain)
-        call self%R%initialize(self%domain)
-        call self%delta%initialize(self%domain)
+        call self%K%initialize(self%domain)
+        call self%F%initialize(self%domain)
+        call self%u%initialize(self%domain)
 
         max_bdf_order = input%basic%solver_settings%bdf_order
         call self%porosity%initialize(num_nodes, max_bdf_order)
@@ -245,7 +245,7 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
-        real(real64), pointer, contiguous, dimension(:) :: delta => null()
+        real(real64), pointer, contiguous, dimension(:) :: u => null()
         integer(int32) :: target_dof
         integer(int32) :: start_idx, end_idx, num_nodes, num_dofs_per_node
         integer(int32) :: iter
@@ -255,7 +255,7 @@ contains
 
         call self%controls%profiler%start("Setup")
 
-        delta => self%delta%get_data()
+        u => self%u%get_data()
         call self%controls%iteration%get_nonlinear_iter(iter)
 
         call self%domain%get_num_nodes(num_nodes)
@@ -272,7 +272,7 @@ contains
 
             call self%temperature%get_current(temperature)
             if (associated(temperature)) then
-                temperature(:) = temperature(:) + delta(start_idx:end_idx:num_dofs_per_node)
+                temperature(:) = temperature(:) + u(start_idx:end_idx:num_dofs_per_node)
             end if
 
             call self%calc_gradient_temperature()

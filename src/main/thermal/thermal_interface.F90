@@ -27,6 +27,7 @@ module main_thermal
         procedure, pass(self), private :: compute_advective_term => compute_advective_term_thermal
         procedure, pass(self), private :: compute_latent_term => compute_latent_term_thermal
         procedure, pass(self), private :: compute_transient_term => compute_transient_term_thermal
+        procedure, pass(self), private :: compute_history_term => compute_history_term_thermal
 
         ! procedure, pass(self), public :: compute_D_T => compute_D_T
         ! procedure, pass(self), public :: compute_V_T => compute_V_T
@@ -98,6 +99,16 @@ module main_thermal
             real(real64), intent(inout) :: L_TT
 
         end subroutine compute_latent_term_thermal
+
+        module subroutine compute_history_term_thermal(self, material_id, state, bdf_coeffs, history_term)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(in) :: bdf_coeffs(:)
+            real(real64), intent(inout) :: history_term
+
+        end subroutine compute_history_term_thermal
 
         module subroutine compute_transient_term_thermal(self, material_id, state, bdf_coeffs, dU_dt)
             implicit none

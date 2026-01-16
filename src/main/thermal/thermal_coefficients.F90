@@ -140,107 +140,73 @@ contains
         real(real64) :: c_s, c_w, c_i, c_v
         real(real64) :: drho_w_dT, drho_ice_dT
         real(real64) :: drho_w_dP, drho_ice_dP
-        real(real64) :: dP_ice_dP_water
         real(real64) :: dQw_dT, dQi_dT, dQv_dT
         real(real64) :: dQw_dP, dQi_dP, dQv_dP
         real(real64) :: Lf, Lv
 
         ! Get state variables
-        call state%temperature%get(temperature)
-        call state%porosity%get(porosity)
-        call state%water_content%get(Qw)
-        call state%ice_content%get(Qi)
-        call state%vapor_content%get(Qv)
-
-        ! Derivatives
-        call state%dQw_dT%get(dQw_dT)
-        call state%dQi_dT%get(dQi_dT)
-        call state%dQv_dT%get(dQv_dT)
-        call state%dQw_dP%get(dQw_dP)
-        call state%dQi_dP%get(dQi_dP)
-        call state%dQv_dP%get(dQv_dP)
-
-        ! Properties
-        call self%physics%get_density_solid(target_material_id, rho_s)
-        call self%physics%calc_density_water(state, rho_w)
-        call self%physics%calc_density_ice(state, rho_i)
-        call self%physics%calc_density_water_derivatives(target_material_id, state, drho_w_dT, drho_w_dP)
-        call self%physics%calc_density_ice_derivatives(target_material_id, state, drho_ice_dT, drho_ice_dP)
-        call self%physics%get_specific_heat_solid(target_material_id, c_s)
-        call self%physics%calc_specific_heat_water(state, c_w)
-        call self%physics%calc_specific_heat_ice(state, c_i)
-        call self%physics%calc_specific_heat_vapor(state, c_v)
-        call self%physics%calc_latent_heat_fusion(target_material_id, state, Lf)
-        call self%physics%calc_latent_heat_vaporization(target_material_id, state, Lv)
-        call self%physics%calc_pressure_ice_water_derivative(target_material_id, state, dP_ice_dP_water)
+        call state%get(temperature=temperature, &
+                       porosity=porosity, &
+                       water_content=Qw, &
+                       ice_content=Qi, &
+                       vapor_content=Qv)
 
         C_TT = 0.0d0
+
+        if (porosity > 0.0d0) then
+            call self%physics%get_density_solid(target_material_id, rho_s)
+            call self%physics%get_specific_heat_solid(target_material_id, c_s)
+            C_TT = C_TT + rho_s * c_s * (1.0d0 - porosity)
+        end if
+
+        if (Qw > 0.0d0) then
+            call self%physics%calc_density_water(state, rho_w)
+            call self%physics%calc_specific_heat_water(state, c_w)
+            call state%dQw_dT%get(dQw_dT)
+            call state%dQw_dP%get(dQw_dP)
+            C_TT = C_TT + rho_w * c_w * Qw
+        end if
+
+        if (Qi > 0.0d0) then
+            call self%physics%calc_density_ice(state, rho_i)
+            call self%physics%calc_specific_heat_ice(state, c_i)
+            call self%physics%calc_latent_heat_fusion(target_material_id, state, Lf)
+            call state%dQi_dT%get(dQi_dT)
+            call state%dQi_dP%get(dQi_dP)
+            C_TT = C_TT + rho_i * c_i * Qi - Lf * rho_i * dQi_dT
+        end if
+
+        if (Qv > 0.0d0) then
+            call self%physics%calc_density_water(state, rho_w)
+            call self%physics%calc_specific_heat_vapor(state, c_v)
+            call state%dQv_dT%get(dQv_dT)
+            call state%dQv_dP%get(dQv_dP)
+            C_TT = C_TT + rho_w * c_v * Qv + Lv * rho_w * dQv_dT
+        end if
+        ! call self%physics%calc_density_water(state, rho_w)
+        ! call self%physics%calc_density_ice(state, rho_i)
+        ! call self%physics%calc_density_water_derivatives(target_material_id, state, drho_w_dT, drho_w_dP)
+        ! call self%physics%calc_density_ice_derivatives(target_material_id, state, drho_ice_dT, drho_ice_dP)
+        ! call self%physics%calc_specific_heat_water(state, c_w)
+        ! call self%physics%calc_specific_heat_ice(state, c_i)
+        ! call self%physics%calc_specific_heat_vapor(state, c_v)
+        ! call self%physics%calc_latent_heat_fusion(target_material_id, state, Lf)
+        ! call self%physics%calc_latent_heat_vaporization(target_material_id, state, Lv)
+
         ! Heat Capacity Calculation
-        C_TT = c_s * rho_s * (1.0d0 - porosity) &
-               + c_w * rho_w * Qw &
-               + c_i * rho_i * Qi &
-               + c_v * rho_w * Qv &
-               - Lf * rho_i * dQi_dT &
-               + Lv * rho_w * dQv_dT
-        ! ! C_TT = c_s * rho_s * (1.0d0 - porosity) &
-        ! !        + c_w * rho_w * Qw + c_w * Qw * temperature * drho_w_dT + c_w * rho_w * temperature * dQw_dT &
-        ! !        + c_i * rho_i * Qi + c_i * Qi * temperature * drho_ice_dT + c_i * rho_i * temperature * dQi_dT &
-        ! !        + c_v * rho_w * Qv + c_v * Qv * temperature * drho_w_dT + c_v * rho_w * temperature * dQv_dT &
-        ! !        - Lf * Qi * drho_ice_dT - Lf * rho_i * dQi_dT &
-        ! !        + Lv * Qv * drho_w_dT + Lv * rho_w * dQv_dT
-
-        ! ! ! 数値微分用の変数
-        ! type(type_state) :: state_perturb
-        ! real(real64) :: T_current, T_perturb
-        ! real(real64) :: U_current, U_perturb
-        ! real(real64) :: delta_T
-        ! real(real64) :: p_dummy, T_dummy ! stateコピー用の一時変数
-        ! real(real64) :: porosity
-
-        ! ! 微少温度変化量 (小さすぎると桁落ちし、大きすぎると精度が悪化する。1e-5程度が妥当)
-        ! delta_T = 1.0d-5
-
-        ! ! -------------------------------------------------------
-        ! ! 1. 現在の温度でのエンタルピー (U_current)
-        ! ! -------------------------------------------------------
-        ! call self%calc_enthalpy_density(target_material_id, state, U_current)
-
-        ! ! -------------------------------------------------------
-        ! ! 2. 温度を摂動させた状態 (State_perturb) の作成
-        ! ! -------------------------------------------------------
-        ! ! stateオブジェクトのディープコピーが必要ですが、
-        ! ! ここでは簡易的に、現在のP, Tを取得して新しいstateにセットし直す方法をとります
-        ! ! ※もしstate%copy()のようなメソッドがあればそれを使ってください
-
-        ! call state%temperature%get(T_current)
-        ! call state%pressure%get(p_dummy) ! 圧力は固定とみなす（偏微分のため）
-        ! call state%porosity%get(porosity)
-
-        ! T_perturb = T_current + delta_T
-
-        ! ! 摂動用stateのリセットとセット
-        ! call state_perturb%reset()
-        ! call state_perturb%porosity%set(porosity) ! 空隙率も引き継ぐ
-        ! call state_perturb%pressure%set(p_dummy)
-        ! call state_perturb%temperature%set(T_perturb)
-
-        ! ! ★最重要★: 温度が変わったので、相組成(水・氷・蒸気)を再計算させる！
-        ! ! これにより、Ice CapやSFCCの急激な変化が U_perturb に反映される
-        ! call self%update_water_phases(target_material_id, state_perturb)
-
-        ! ! -------------------------------------------------------
-        ! ! 3. 摂動後のエンタルピー (U_perturb)
-        ! ! -------------------------------------------------------
-        ! call self%calc_enthalpy_density(target_material_id, state_perturb, U_perturb)
-
-        ! ! -------------------------------------------------------
-        ! ! 4. 有効熱容量 (C_TT) の算出
-        ! ! -------------------------------------------------------
-        ! C_TT = (U_perturb - U_current) / delta_T
-
-        ! if (C_TT < 1.0d5) then
-        !     C_TT = 1.0d5
-        ! end if
+        ! C_TT = c_s * rho_s * (1.0d0 - porosity) &
+        !        + c_w * rho_w * Qw &
+        !        + c_i * rho_i * Qi &
+        !        + c_v * rho_w * Qv &
+        !        - Lf * rho_i * dQi_dT &
+        !        + Lv * rho_w * dQv_dT
+        ! Additional Terms from Density and Content Derivatives
+        ! C_TT = c_s * rho_s * (1.0d0 - porosity) &
+        !        + c_w * rho_w * Qw + c_w * Qw * temperature * drho_w_dT + c_w * rho_w * temperature * dQw_dT &
+        !        + c_i * rho_i * Qi + c_i * Qi * temperature * drho_ice_dT + c_i * rho_i * temperature * dQi_dT &
+        !        + c_v * rho_w * Qv + c_v * Qv * temperature * drho_w_dT + c_v * rho_w * temperature * dQv_dT &
+        !        - Lf * Qi * drho_ice_dT - Lf * rho_i * dQi_dT &
+        !        + Lv * Qv * drho_w_dT + Lv * rho_w * dQv_dT
 
     end subroutine compute_mass_term_thermal
 
@@ -292,8 +258,8 @@ contains
         real(real64) :: rho_w, c_w, c_v
 
         ! Get fluxes
-        call state%water_flux%get(water_flux)
-        call state%vapor_flux%get(vapor_flux)
+        call state%get(water_flux=water_flux, &
+                       vapor_flux=vapor_flux)
 
         call self%physics%calc_density_water(state, rho_w)
         call self%physics%calc_specific_heat_water(state, c_w)
@@ -333,4 +299,51 @@ contains
 
     end subroutine compute_latent_term_thermal
 
+    !>
+    !> 積分点における履歴項（History Term）を計算する
+    !>
+    !> 定義
+    !>   H_term = C_TT(T^m) * sum_{k=1}^{order} ( alpha_k * T_{n+1-k} )
+    !>
+    !>   bdf_coeffs(1) は alpha_0 (現在の項) なのでループから除外する。
+    !>   temperature_history(1) も current (現在の項) なのでループから除外する。
+    !>   よって、インデックス j=2 から開始することで整合する。
+    !>
+    module subroutine compute_history_term_thermal(self, material_id, state, bdf_coeffs, history_term)
+        implicit none
+        class(type_thermal), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(in) :: bdf_coeffs(:)
+        real(real64), intent(inout) :: history_term
+
+        real(real64), allocatable :: temperature_history(:)
+        real(real64) :: C_TT
+        real(real64) :: T_hist_sum
+        integer(int32) :: j, n_steps
+
+        ! 1. 積分点における温度履歴配列を取得
+        call state%get(temperature_history=temperature_history)
+
+        ! 2. 積分点における熱容量係数 C_TT を計算
+        !    (現在の反復温度 T^m に基づいて評価)
+        call self%compute_mass_term(material_id, state, C_TT)
+
+        ! 3. 履歴項の積和計算
+        !    History = alpha_1 * T_{n} + alpha_2 * T_{n-1} + ...
+        !    配列のインデックス j=2 が alpha_1 および T_{n} に対応する
+        T_hist_sum = 0.0d0
+        n_steps = size(bdf_coeffs)
+
+        do j = 2, n_steps
+            ! 安全のため配列サイズ確認（通常は一致するはず）
+            if (j > size(temperature_history)) exit
+
+            T_hist_sum = T_hist_sum + bdf_coeffs(j) * temperature_history(j)
+        end do
+
+        ! 4. 熱容量を乗じて履歴項とする
+        history_term = C_TT * T_hist_sum
+
+    end subroutine compute_history_term_thermal
 end submodule thermal_coefficients

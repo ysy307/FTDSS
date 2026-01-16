@@ -33,9 +33,9 @@ module main_ftdss
         type(type_variable) :: Qa
         type(type_variable) :: Qv
 
-        type(type_jacobian_matrix) :: J
-        type(type_residual_vector) :: R
-        type(type_residual_vector) :: delta
+        type(type_jacobian_matrix) :: K
+        type(type_residual_vector) :: F
+        type(type_residual_vector) :: u
 
         type(type_thermal) :: thermal
         type(type_hydraulic) :: hydraulic

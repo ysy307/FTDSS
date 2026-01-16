@@ -184,11 +184,11 @@ contains
 
                             do i = 1, num_nodes_loc
                                 ! Residual: add(row_dof, global_node_index, value)
-                                call self%R%add(dof_offset, connectivity(i), psi(i) * q_flux * w_vol)
+                                call self%F%add(dof_offset, connectivity(i), psi(i) * q_flux * w_vol)
 
                                 do j = 1, num_nodes_loc
                                     ! Jacobian: add(row_dof, col_dof, row_node, col_node, value)
-                                    call self%J%add(dof_offset, dof_offset, &
+                                    call self%K%add(dof_offset, dof_offset, &
                                                     connectivity(i), connectivity(j), &
                                                     psi(i) * dq_du * psi(j) * w_vol)
                                 end do
@@ -231,13 +231,13 @@ contains
                         call variable%get_current(glob_node_id, val_curr)
 
                         ! 1. Jacobianの行をゼロ化 (zero_row使用)
-                        call self%J%zero(glob_node_id, dof_offset)
+                        call self%K%zero(glob_node_id, dof_offset)
 
                         !    対角成分に1.0をセット
-                        call self%J%set(dof_offset, dof_offset, glob_node_id, glob_node_id, 1.0d0)
+                        call self%K%set(dof_offset, dof_offset, glob_node_id, glob_node_id, 1.0d0)
 
                         ! 2. 残差ベクトルを上書き (set使用)
-                        call self%R%set(dof_offset, glob_node_id, val_curr - val_fixed)
+                        call self%F%set(dof_offset, glob_node_id, val_curr - val_fixed)
                     end do
                 end associate
             end do

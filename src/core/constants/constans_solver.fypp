@@ -1,0 +1,486 @@
+#:mute
+    #! -----------------------------------------------------------------------------
+    #! Core Constants Definition via Fypp
+    #! -----------------------------------------------------------------------------
+!&<
+    set constant_groups = [ &
+        { &
+            'kind'       : 'id', &
+            'type_name'  : 'type_matrix_types', &
+            'obj_name'   : 'MATRIX_TYPES', &
+            'category'   : 'MATRIX_TYPE', &
+            'suffix'     : 'matrix_type', &
+            'int_prefix' : 'MATRIX', &
+            'items'      : [ &
+                ('DENSE', 1, 'dense'), &
+                ('CSR',   2, 'csr'), &
+                ('COO',   3, 'coo'), &
+                ('BSR',   4, 'bsr') &
+            ] &
+        }, &
+        { &
+            'kind'       : 'id', &
+            'type_name'  : 'type_coupling_modes', &
+            'obj_name'   : 'COUPLING_MODES', &
+            'category'   : 'COUPLING_MODE', &
+            'suffix'     : 'coupling_mode', &
+            'int_prefix' : 'COUPLING_MODE', &
+            'items'      : [ &
+                ('STAGGERED',  1, 'staggered'), &
+                ('MONOLITHIC', 2, 'monolithic') &
+            ] &
+        }, &
+        { &
+            'kind'       : 'id', &
+            'type_name'  : 'type_physics_types', &
+            'obj_name'   : 'PHYSICS_TYPES', &
+            'category'   : 'PHYSICS_TYPE', &
+            'suffix'     : 'physics_type', &
+            'int_prefix' : 'PHYSICS_TYPE', &
+            'seq_name'   : 'PHYSICS_TYPES_LIST', &
+            'seq_len'    : 'NUM_PHYSICS_TYPES', &
+            'seq_order'  : ['THERMAL', 'HYDRAULIC', 'MECHANICAL'], &
+            'items'      : [ &
+                ('THERMAL',    1, 'thermal'), &
+                ('HYDRAULIC',  2, 'hydraulic'), &
+                ('MECHANICAL', 3, 'mechanical') &
+            ] &
+        }, &
+        { &
+            'kind'       : 'id', &
+            'type_name'  : 'type_dof_types', &
+            'obj_name'   : 'DOF_TYPES', &
+            'category'   : 'DOF_TYPE', &
+            'suffix'     : 'dof_type', &
+            'int_prefix' : 'DOF_TYPE', &
+            'items'      : [ &
+                ('T',  1, 't'), &
+                ('P',  2, 'p'), &
+                ('DX', 3, 'dx'), &
+                ('DY', 4, 'dy'), &
+                ('DZ', 5, 'dz') &
+            ] &
+        }, &
+        { &
+            'kind'       : 'id', &
+            'type_name'  : 'type_thermal_bc_types', &
+            'obj_name'   : 'THERMAL_BC_TYPES', &
+            'category'   : 'THERMAL_BC', &
+            'suffix'     : 'thermal_bc_type', &
+            'int_prefix' : 'THERMAL_BC', &
+            'seq_name'   : 'THERMAL_BC_SEQUENCE', &
+            'seq_len'    : 'NUM_THERMAL_BC_TYPES', &
+            'seq_order'  : ['ROBIN', 'CONVECTIVE', 'RADIATION', 'FLUX', 'ADIABATIC', 'FREE', 'NEUMANN', 'DIRICHLET'], &
+            'items'      : [ &
+                ('DIRICHLET',  101, 'dirichlet'), &
+                ('NEUMANN',    102, 'neumann'), &
+                ('FLUX',       103, 'flux'), &
+                ('ROBIN',      104, 'robin'), &
+                ('CONVECTIVE', 105, 'convective'), &
+                ('RADIATION',  106, 'radiation'), &
+                ('ADIABATIC',  107, 'adiabatic'), &
+                ('FREE',       108, 'free') &
+            ] &
+        }, &
+        { &
+            'kind'       : 'id', &
+            'type_name'  : 'type_hydraulic_bc_types', &
+            'obj_name'   : 'HYDRAULIC_BC_TYPES', &
+            'category'   : 'HYDRAULIC_BC', &
+            'suffix'     : 'hydraulic_bc_type', &
+            'int_prefix' : 'HYDRAULIC_BC', &
+            'seq_name'   : 'HYDRAULIC_BC_SEQUENCE', &
+            'seq_len'    : 'NUM_HYDRAULIC_BC_TYPES', &
+            'seq_order'  : ['FLUX', 'IMPERMEABLE', 'SEEPAGE', 'NEUMANN', 'DIRICHLET'], &
+            'items'      : [ &
+                ('DIRICHLET',   201, 'dirichlet'), &
+                ('NEUMANN',     202, 'neumann'), &
+                ('FLUX',        203, 'flux'), &
+                ('IMPERMEABLE', 204, 'impermeable'), &
+                ('SEEPAGE',     205, 'seepage') &
+            ] &
+        }, &
+        { &
+            'kind'       : 'id', &
+            'type_name'  : 'type_ic_targets', &
+            'obj_name'   : 'IC_TARGETS', &
+            'category'   : 'IC_TARGET', &
+            'suffix'     : 'ic_target', &
+            'int_prefix' : 'IC_TARGET', &
+            'seq_name'   : 'IC_TARGET_SEQUENCE', &
+            'seq_len'    : 'NUM_IC_TARGETS', &
+            'seq_order'  : ['THERMAL', 'HYDRAULIC', 'MECHANICAL', 'POROSITY'], &
+            'items'      : [ &
+                ('THERMAL',    1, 'thermal'), &
+                ('HYDRAULIC',  2, 'hydraulic'), &
+                ('MECHANICAL', 3, 'mechanical'), &
+                ('POROSITY',   4, 'porosity') &
+            ] &
+        }, &
+        { &
+            'kind'       : 'id', &
+            'type_name'  : 'type_ic_methods', &
+            'obj_name'   : 'IC_METHODS', &
+            'category'   : 'IC_METHOD', &
+            'suffix'     : 'ic_method', &
+            'int_prefix' : 'IC_METHOD', &
+            'seq_name'   : 'IC_METHOD_SEQUENCE', &
+            'seq_len'    : 'NUM_IC_METHODS', &
+            'seq_order'  : ['UNIFORM', 'LAPLACE', 'FROM_FILE'], &
+            'items'      : [ &
+                ('UNIFORM',   1, 'uniform'), &
+                ('LAPLACE',   2, 'laplace'), &
+                ('FROM_FILE', 3, 'from_file') &
+            ] &
+        }, &
+        { &
+            'kind'       : 'id', &
+            'type_name'  : 'type_nonlinear_solver_types', &
+            'obj_name'   : 'NONLINEAR_SOLVER_TYPES', &
+            'category'   : 'NONLINEAR_SOLVER', &
+            'suffix'     : 'nonlinear_solver', &
+            'int_prefix' : 'NONLINEAR_SOLVER', &
+            'items'      : [ &
+                ('NONE',            0, 'none'), &
+                ('NEWTON',          1, 'newton'), &
+                ('MODIFIED_NEWTON', 2, 'modified_newton'), &
+                ('PICARD',          3, 'picard') &
+            ] &
+        }, &
+        { &
+            'kind'       : 'id', &
+            'type_name'  : 'type_nonlinear_norm_criteria', &
+            'obj_name'   : 'NONLINEAR_NORM_CRITERIA', &
+            'category'   : 'NL_NORM_CRIT', &
+            'suffix'     : 'nonlinear_norm_criteria', &
+            'int_prefix' : 'NONLINEAR_NORM_CRITERIA', &
+            'items'      : [ &
+                ('NONE',     0, 'none'), &
+                ('RESIDUAL', 1, 'residual'), &
+                ('UPDATE',   2, 'update'), &
+                ('BOTH',     3, 'both') &
+            ] &
+        }, &
+        { &
+            'kind'       : 'id', &
+            'type_name'  : 'type_nonlinear_criteria', &
+            'obj_name'   : 'NONLINEAR_CRITERIA', &
+            'category'   : 'NL_CRITERIA', &
+            'suffix'     : 'nonlinear_criteria', &
+            'int_prefix' : 'NONLINEAR_CRITERIA', &
+            'items'      : [ &
+                ('NONE',     0, 'none'), &
+                ('RELATIVE', 1, 'relative'), &
+                ('ABSOLUTE', 2, 'absolute'), &
+                ('BOTH',     3, 'both') &
+            ] &
+        }, &
+        { &
+            'kind'       : 'id', &
+            'type_name'  : 'type_nonlinear_logic', &
+            'obj_name'   : 'NONLINEAR_LOGIC', &
+            'category'   : 'NL_LOGIC', &
+            'suffix'     : 'nonlinear_logic', &
+            'int_prefix' : 'NONLINEAR_LOGIC', &
+            'items'      : [ &
+                ('OR',  1, 'or'), &
+                ('AND', 2, 'and') &
+            ] &
+        }, &
+        { &
+            'kind'       : 'id', &
+            'type_name'  : 'type_norm_types', &
+            'obj_name'   : 'NORM_TYPES', &
+            'category'   : 'NORM_TYPE', &
+            'suffix'     : 'norm_type', &
+            'int_prefix' : 'NORM_TYPE', &
+            'items'      : [ &
+                ('L2',   1, 'l2'), &
+                ('LINF', 2, 'linf') &
+            ] &
+        }, &
+        { &
+            'kind'       : 'value', &
+            'type_name'  : 'type_constants_time_units', &
+            'obj_name'   : 'TIME_UNITS', &
+            'category'   : 'TIME_UNIT', &
+            'suffix'     : 'time_units', &
+            'int_prefix' : 'TIME_UNIT', &
+            'items'      : [ &
+                ('SECONDS', 1, 'second', 's', 1.0), &
+                ('MINUTES', 2, 'minute', 'm', 60.0), &
+                ('HOURS',   3, 'hour',   'h', 3600.0), &
+                ('DAYS',    4, 'day',    'd', 86400.0), &
+                ('YEARS',   5, 'year',   'y', 31536000.0) &
+            ] &
+        }, &
+        { &
+            'kind'       : 'id', &
+            'type_name'  : 'type_comp_types', &
+            'obj_name'   : 'COMP_TYPES', &
+            'category'   : 'COMP_TYPE', &
+            'suffix'     : 'comp_type', &
+            'int_prefix' : 'COMP_TYPE', &
+            'items'      : [ &
+                ('XY_2D',  1, '2d_xy'), &
+                ('XZ_2D',  2, '2d_xz'), &
+                ('XYZ_3D', 3, '3d') &
+            ] &
+        }, &
+        { &
+            'kind'       : 'id', &
+            'type_name'  : 'type_linear_solver_types', &
+            'obj_name'   : 'LINEAR_SOLVER_TYPES', &
+            'category'   : 'LINEAR_SOLVER', &
+            'suffix'     : 'linear_solver_type', &
+            'int_prefix' : 'SOLVER', &
+            'items'      : [ &
+                ('CG',           1, 'cg'), &
+                ('BICG',         2, 'bicg'), &
+                ('CGS',          3, 'cgs'), &
+                ('BICGSTAB',     4, 'bicgstab'), &
+                ('BICGSTAB_L',   5, 'bicgstab_l'), &
+                ('GPBICG',       6, 'gpbicg'), &
+                ('TFQMR',        7, 'tfqmr'), &
+                ('ORTHOMIN_M',   8, 'orthomin_m'), &
+                ('GMRES_M',      9, 'gmres_m'), &
+                ('JACOBI',      10, 'jacobi'), &
+                ('GAUSS_SEIDEL',11, 'gauss_seidel'), &
+                ('SOR',         12, 'sor'), &
+                ('BICGSAFE',    13, 'bicgsafe'), &
+                ('CR',          14, 'cr'), &
+                ('BICR',        15, 'bicr'), &
+                ('CRS',         16, 'crs'), &
+                ('BICRSTAB',    17, 'bicrstab'), &
+                ('GPBICR',      18, 'gpbicr'), &
+                ('BICRSAFE',    19, 'bicrsafe'), &
+                ('FGMRES_M',    20, 'fgmres_m'), &
+                ('IDR_S',       21, 'idr_s'), &
+                ('IDR1',        22, 'idr1'), &
+                ('MINRES',      23, 'minres'), &
+                ('COCG',        24, 'cocg'), &
+                ('COCR',        25, 'cocr') &
+            ] &
+        }, &
+        { &
+            'kind'       : 'id', &
+            'type_name'  : 'type_preconditioner_types', &
+            'obj_name'   : 'PRECONDITIONER_TYPES', &
+            'category'   : 'PRECONDITIONER', &
+            'suffix'     : 'preconditioner_type', &
+            'int_prefix' : 'SOLVER_PRECONDITION', &
+            'items'      : [ &
+                ('NONE',   0, 'none'), &
+                ('JACOBI', 1, 'jacobi'), &
+                ('ILU',    2, 'ilu'), &
+                ('SSOR',   3, 'ssor'), &
+                ('HYBRID', 4, 'hybrid'), &
+                ('IS',     5, 'is'), &
+                ('SAINV',  6, 'sainv'), &
+                ('SAAMG',  7, 'saamg'), &
+                ('ILUC',   8, 'iluc'), &
+                ('ILUT',   9, 'ilut') &
+            ] &
+        }, &
+        { &
+            'kind'       : 'id', &
+            'type_name'  : 'type_solver_status', &
+            'obj_name'   : 'SOLVER_STATUS', &
+            'category'   : 'SOLVER_STATUS', &
+            'suffix'     : 'solver_status', &
+            'int_prefix' : 'SOLVER_STATUS', &
+            'items'      : [ &
+                ('SUCCESS',                0, 'SUCCESS'), &
+                ('ILL_OPTIONS',           -1, 'ILL_OPTIONS'), &
+                ('BREAKDOWN',             -2, 'BREAKDOWN'), &
+                ('OUT_OF_MEMORY',         -3, 'OUT_OF_MEMORY'), &
+                ('MAXITER',               -4, 'MAXITER'), &
+                ('DECOMPOSITION_FAILURE', -5, 'DECOMPOSITION_FAILURE'), &
+                ('NOT_IMPLEMENTED',       -6, 'NOT_IMPLEMENTED') &
+            ] &
+        }, &
+        { &
+            'kind'       : 'id', &
+            'type_name'  : 'type_matrix_ops', &
+            'obj_name'   : 'MATRIX_OPS', &
+            'category'   : 'MATRIX_OP', &
+            'suffix'     : 'matrix_op', &
+            'int_prefix' : 'OP', &
+            'items'      : [ &
+                ('INS',             1, 'ins'), &
+                ('ADD',             2, 'add'), &
+                ('SCALE_SYMM_DIAG', 3, 'scale_symm_diag'), &
+                ('SCALE_JACOBI',    4, 'scale_jacobi') &
+            ] &
+        }, &
+        { &
+            'kind'       : 'id', &
+            'type_name'  : 'type_matrix_status_codes', &
+            'obj_name'   : 'MATRIX_STATUS', &
+            'category'   : 'MAT_STATUS', &
+            'suffix'     : 'matrix_status', &
+            'int_prefix' : 'MATRIX_STATUS', &
+            'items'      : [ &
+                ('SUCCESS',          0, 'SUCCESS'), &
+                ('ILL_OPERATIONS',  -1, 'ILL_OPERATIONS'), &
+                ('OUT_OF_MEMORY',   -2, 'OUT_OF_MEMORY'), &
+                ('NOT_INITIALIZED', -3, 'NOT_INITIALIZED'), &
+                ('NOT_IMPLEMENTED', -5, 'NOT_IMPLEMENTED') &
+            ] &
+        }, &
+        { &
+            'kind'       : 'id', &
+            'type_name'  : 'type_vector_status_codes', &
+            'obj_name'   : 'VECTOR_STATUS', &
+            'category'   : 'VEC_STATUS', &
+            'suffix'     : 'vector_status', &
+            'int_prefix' : 'VECTOR_STATUS', &
+            'items'      : [ &
+                ('SUCCESS',          0, 'SUCCESS'), &
+                ('ILL_OPERATIONS',  -1, 'ILL_OPERATIONS'), &
+                ('OUT_OF_MEMORY',   -3, 'OUT_OF_MEMORY'), &
+                ('NOT_IMPLEMENTED', -5, 'NOT_IMPLEMENTED') &
+            ] &
+        } &
+    ]
+!&>
+#:endmute
+module core_constants_solver
+    use, intrinsic :: iso_fortran_env, only: int32
+    use :: stdlib_strings, only:strip
+    use :: stdlib_ascii, only:to_lower
+    use :: core_constants_base, only:type_constant_id, type_constant_value
+    implicit none
+    private
+
+    ! ==========================================================
+    ! Integer Constants & Sequences (Generated)
+    ! ==========================================================
+    #:for group in constant_groups
+        ! --- ${group['obj_name']}$ Constants ---
+        #:for item in group['items']
+            integer(int32), parameter, public :: ${group['int_prefix']}$_${item[0]}$ = ${item[1]}$
+        #:endfor
+        #:if 'seq_name' in group
+            integer(int32), parameter, public :: ${group['seq_len']}$ = ${len(group['items'])}$
+            integer(int32), parameter, public :: ${group['seq_name']}$ (${group['seq_len']}$) = [ &
+#:for seq_item in group['seq_order']
+                                                 ${group['int_prefix']}$_${seq_item}$${',' if not loop.last else ''}$ &
+#:endfor
+                                                 ]
+        #:endif
+
+    #:endfor
+
+    ! ==========================================================
+    ! Derived Type Definitions (Generated)
+    ! ==========================================================
+    #:for group in constant_groups
+        ! --- ${group['obj_name']}$ Type ---
+        type :: ${group['type_name']}$
+        #:if group['kind'] == 'id'
+            #:for item in group['items']
+                type(type_constant_id) :: ${item[0]}$ = type_constant_id("${group['category']}$", "${item[2]}$", ${group['int_prefix']}$_${item[0]}$)
+            #:endfor
+        #:elif group['kind'] == 'value'
+            #:for item in group['items']
+                type(type_constant_value) :: ${item[0]}$ = type_constant_value("${group['category']}$", "${item[2]}$", ${group['int_prefix']}$_${item[0]}$, "${item[3]}$", ${item[4]}0d0)
+            #:endfor
+        #:endif
+        contains
+        procedure, public, pass(self) :: to_id => to_id_${group['suffix']}$
+        procedure, public, pass(self) :: to_name => to_name_${group['suffix']}$
+        #:if group['kind'] == 'value'
+            procedure, public, pass(self) :: to_object_from_id => to_object_from_id_${group['suffix']}$
+            procedure, public, pass(self) :: to_object_from_name => to_object_from_name_${group['suffix']}$
+            generic, public :: to_object => to_object_from_id, to_object_from_name
+        #:endif
+        end type ${group['type_name']}$
+
+        type(${group['type_name']}$), parameter, public :: ${group['obj_name']}$ = ${group['type_name']}$ ()
+
+        #:endfor
+
+        contains
+
+!&<
+        ! ==========================================================
+        ! Helper Procedures (Generated)
+        ! ==========================================================
+        #:for group in constant_groups
+            !> Convert ${group['category']}$ name to ID.
+            pure function to_id_${group['suffix']}$(self, name) result(id)
+                implicit none
+                class(${group['type_name']}$), intent(in) :: self
+                character(len=*), intent(in) :: name
+                integer(int32) :: id
+                character(len=:), allocatable :: lname
+
+                lname = strip(to_lower(name))
+
+                #:for i, item in enumerate(group['items'])
+                    ${'if' if i == 0 else 'else if'}$ (lname == strip(to_lower(self%${item[0]}$%name))) then
+                    id = self%${item[0]}$%id
+                #:endfor
+                else
+                id = -1
+                end if
+                end function to_id_${group['suffix']}$
+
+                !> Convert ${group['category']}$ ID to name.
+                pure function to_name_${group['suffix']}$(self, id) result(name)
+                    implicit none
+                    class(${group['type_name']}$), intent(in) :: self
+                    integer(int32), intent(in) :: id
+                    character(len=:), allocatable :: name
+
+                    #:for i, item in enumerate(group['items'])
+                        ${'if' if i == 0 else 'else if'}$ (id == self%${item[0]}$%id) then
+                        name = self%${item[0]}$%name
+                    #:endfor
+                    else
+                    name = "unknown"
+                    end if
+                end function to_name_${group['suffix']}$
+
+                #:if group['kind'] == 'value'
+                    !> Convert ${group['category']}$ ID to object (for value types).
+                    pure function to_object_from_id_${group['suffix']}$(self, id) result(object)
+                        implicit none
+                        class(${group['type_name']}$), intent(in) :: self
+                        integer(int32), intent(in) :: id
+                        type(type_constant_value) :: object
+
+                        #:for i, item in enumerate(group['items'])
+                            ${'if' if i == 0 else 'else if'}$ (id == self%${item[0]}$%id) then
+                            object = self%${item[0]}$
+                        #:endfor
+                        else
+                        object = type_constant_value("${group['category']}$", "unknown", -1, "unknown", 0.0d0)
+                        end if
+                        end function to_object_from_id_${group['suffix']}$
+
+                        !> Convert ${group['category']}$ name to object (for value types).
+                        pure function to_object_from_name_${group['suffix']}$(self, name) result(object)
+                            implicit none
+                            class(${group['type_name']}$), intent(in) :: self
+                            character(len=*), intent(in) :: name
+                            type(type_constant_value) :: object
+                            character(len=:), allocatable :: lname
+
+                            lname = strip(to_lower(name))
+
+                            #:for i, item in enumerate(group['items'])
+                                ${'if' if i == 0 else 'else if'}$ (lname == strip(to_lower(self%${item[0]}$%name))) then
+                                object = self%${item[0]}$
+                            #:endfor
+                            else
+                            object = type_constant_value("${group['category']}$", "unknown", -1, "unknown", 0.0d0)
+                            end if
+                        end function to_object_from_name_${group['suffix']}$
+                    #:endif
+
+                #:endfor
+!&>
+
+            end module core_constants_solver

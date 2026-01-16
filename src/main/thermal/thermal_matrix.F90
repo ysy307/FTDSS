@@ -29,22 +29,22 @@ contains
         do i = 1, workspace%num_fe_gauss
             call self%compute_mass_term(workspace%material_id, workspace%state_gp(i), workspace%work_C(i))
             call self%compute_diffusion_term(workspace%material_id, workspace%state_gp(i), workspace%work_D(:, :, i))
-            call self%compute_transient_term(workspace%material_id, workspace%state_gp(i), &
-                                             workspace%bdf_coeffs(1:workspace%bdf_order + 1), workspace%work_d_dt(i))
+            call self%compute_history_term(workspace%material_id, workspace%state_gp(i), &
+                                           workspace%bdf_coeffs(1:workspace%bdf_order + 1), workspace%work_d_dt(i))
         end do
         ! do i = 1, workspace%num_fe_nodes
         !     call self%compute_transient_term(workspace%material_id, workspace%state(i), &
         !                                      workspace%bdf_coeffs(1:workspace%bdf_order + 1), workspace%work_d_dt(i))
         ! end do
 
-        if (controls%is_target(PHYSICS_TYPE_HYDRAULIC, workspace%material_id)) then
-            do i = 1, workspace%num_fe_gauss
-                call self%compute_latent_term(workspace%material_id, workspace%state_gp(i), workspace%work_L(i))
-                do d = 1, workspace%num_fe_dimension
-                    workspace%work_D(d, d, i) = workspace%work_D(d, d, i) + workspace%work_L(i)
-                end do
-            end do
-        end if
+        ! if (controls%is_target(PHYSICS_TYPE_HYDRAULIC, workspace%material_id)) then
+        !     do i = 1, workspace%num_fe_gauss
+        !         call self%compute_latent_term(workspace%material_id, workspace%state_gp(i), workspace%work_L(i))
+        !         do d = 1, workspace%num_fe_dimension
+        !             workspace%work_D(d, d, i) = workspace%work_D(d, d, i) + workspace%work_L(i)
+        !         end do
+        !     end do
+        ! end if
 
         call workspace%compute_K1(workspace%work_C, workspace%work_matrix)
         if (present(J_TT)) then
@@ -64,8 +64,8 @@ contains
             end do
         end if
 
+        !!!! NRから変える必要なし
         call workspace%compute_K2(workspace%work_D, workspace%work_matrix)
-
         if (present(J_TT)) then
             do i = 1, workspace%num_fe_nodes
                 do j = 1, workspace%num_fe_nodes
@@ -74,14 +74,14 @@ contains
             end do
         end if
 
-        if (present(R_T)) then
-            workspace%work_vec(:) = 0.0d0
-            call matvec(workspace%work_matrix, workspace%T_node, workspace%work_vec, ierr)
+        ! if (present(R_T)) then
+        !     workspace%work_vec(:) = 0.0d0
+        !     call matvec(workspace%work_matrix, workspace%T_node, workspace%work_vec, ierr)
 
-            do i = 1, workspace%num_fe_nodes
-                call R_T%set(OP_ADD, i, -workspace%work_vec(i))
-            end do
-        end if
+        !     do i = 1, workspace%num_fe_nodes
+        !         call R_T%set(OP_ADD, i, -workspace%work_vec(i))
+        !     end do
+        ! end if
 
     end subroutine assemble_local_thermal
 end submodule thermal_matrix

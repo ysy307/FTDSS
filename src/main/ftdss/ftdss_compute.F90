@@ -96,22 +96,22 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
-        class(abst_matrix), pointer :: J_ptr => null()
-        type(type_vector_dp), pointer :: R_ptr => null()
-        type(type_vector_dp), pointer :: delta_prt => null()
+        class(abst_matrix), pointer :: K_ptr => null()
+        type(type_vector_dp), pointer :: F_ptr => null()
+        type(type_vector_dp), pointer :: u_ptr => null()
 
         call self%controls%profiler%start("Solve")
 
-        J_ptr => self%J%get_matrix()
-        R_ptr => self%R%get_vector()
-        delta_prt => self%delta%get_vector()
+        K_ptr => self%K%get_matrix()
+        F_ptr => self%F%get_vector()
+        u_ptr => self%u%get_vector()
 
-        call self%solver%solve(J_ptr, R_ptr, delta_prt)
+        call self%solver%solve(K_ptr, F_ptr, u_ptr)
         call self%solver%check()
 
-        J_ptr => null()
-        R_ptr => null()
-        delta_prt => null()
+        nullify (K_ptr)
+        nullify (F_ptr)
+        nullify (u_ptr)
 
         call self%controls%profiler%stop("Solve")
 
@@ -377,22 +377,22 @@ contains
 
         integer(int32) :: iter
 
-        real(real64), pointer, contiguous, dimension(:) :: R_values => null()
-        real(real64), pointer, contiguous, dimension(:) :: delta_values => null()
+        real(real64), pointer, contiguous, dimension(:) :: F_values => null()
+        real(real64), pointer, contiguous, dimension(:) :: u_values => null()
 
-        R_values => self%R%get_data()
-        delta_values => self%delta%get_data()
+        F_values => self%F%get_data()
+        u_values => self%u%get_data()
 
         call self%controls%iteration%get_nonlinear_iter(iter)
 
         if (iter == 1) then
-            call self%controls%iteration%set_initial_norms(R_values, delta_values)
+            call self%controls%iteration%set_initial_norms(F_values, u_values)
         else
-            call self%controls%iteration%check_convergence(R_values, delta_values)
+            call self%controls%iteration%check_convergence(F_values, u_values)
         end if
 
-        nullify (R_values)
-        nullify (delta_values)
+        nullify (F_values)
+        nullify (u_values)
 
     end subroutine solve_time_step_check_convergence_ftdss
 
