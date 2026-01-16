@@ -124,10 +124,11 @@ contains
             call self%output%output_fields(iter, self%domain, porosity, &
                                            temperature, ice_content, pressure)
             call self%controls%out_field%update(current_time)
-            porosity => null()
-            temperature => null()
-            pressure => null()
-            ice_content => null()
+
+            nullify (porosity)
+            nullify (temperature)
+            nullify (pressure)
+            nullify (ice_content)
         end if
 
         call self%controls%profiler%stop("IO")
@@ -137,7 +138,7 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
-        real(real64) :: current_time
+        real(real64) :: current_time, current_time_converted
         real(real64), pointer, contiguous, dimension(:) :: porosity => null()
         real(real64), pointer, contiguous, dimension(:) :: temperature => null()
         real(real64), pointer, contiguous, dimension(:) :: pressure => null()
@@ -150,13 +151,14 @@ contains
             call self%porosity%get_previous(porosity)
             call self%temperature%get_previous(temperature)
             call self%pressure%get_previous(pressure)
-            call self%output%output_history(current_time, self%domain, porosity, &
+            current_time_converted = self%controls%out_history%convert_output_time(current_time)
+            call self%output%output_history(current_time_converted, self%domain, porosity, &
                                             temperature, pressure)
             call self%controls%out_history%update(current_time)
 
-            porosity => null()
-            temperature => null()
-            pressure => null()
+            nullify (porosity)
+            nullify (temperature)
+            nullify (pressure)
         end if
 
         call self%controls%profiler%stop("IO")

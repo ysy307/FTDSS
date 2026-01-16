@@ -56,10 +56,10 @@ contains
                     call self%set_state(i_node, i_elem, state)
 
                     ! Stateから各相の体積含水率などを取得
-                    call state%water_content%get(elem_qw)
-                    call state%ice_content%get(elem_qi)
-                    call state%air_content%get(elem_qa)
-                    call state%vapor_content%get(elem_qv)
+                    call state%get(water_content=elem_qw, ice_content=elem_qi, &
+                                   air_content=elem_qa, vapor_content=elem_qv)
+                    ! write (*, '("Qw: ", F8.4, " Qi: ", F8.4, " Qa: ", F8.4, " Qv: ", F8.4, "measure: ", F8.4)') &
+                    !     elem_qw, elem_qi, elem_qa, elem_qv, elem_vol
 
                     ! 重み付き加算
                     sum_vol = sum_vol + elem_vol
@@ -72,6 +72,8 @@ contains
 
             ! 3. 正規化して節点へ格納
             if (abs(sum_vol) > epsilon(1.0d0)) then
+                ! write (*, '(" Node ", I6, ": sum_vol=", F8.4, " Qw=", F8.4, " Qi=", F8.4, " Qa=", F8.4, " Qv=", F8.4)') &
+                !     i_node, sum_vol, sum_qw_vol / sum_vol, sum_qi_vol / sum_vol, sum_qa_vol / sum_vol, sum_qv_vol / sum_vol
                 call self%Qw%set_current(i_node, sum_qw_vol / sum_vol)
                 call self%Qi%set_current(i_node, sum_qi_vol / sum_vol)
                 call self%Qa%set_current(i_node, sum_qa_vol / sum_vol)

@@ -236,7 +236,7 @@ contains
             ! [修正] coordinate 引数を削除, domain を渡す
             call self%observations(i)%initialize(input, domain, self%dir_output, &
                                                  input%output_settings%history_output%variable_names(i))
-            call self%observations(i)%write_header(input%output_settings%history_output%output_interval_unit)
+            call self%observations(i)%write_header(input%output_settings%history_output%output_time_unit)
         end do
 
         ! [修正] control を渡し, coordinate を削除

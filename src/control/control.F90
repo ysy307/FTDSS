@@ -48,7 +48,7 @@ contains
         integer(int32) :: i, num_unique_regions, max_region_id
         integer(int32) :: current_material_id
         character(len=10), allocatable :: profiler_labels(:)
-        real(real64) :: currenet_time
+        real(real64) :: current_time_s
 
         if (present(input)) then
 
@@ -56,7 +56,7 @@ contains
             call input%geometry%vtk%get_active_region_info(unique_material_ids)
             if (ierr /= 0) return
             if (.not. allocated(unique_material_ids) .or. size(unique_material_ids) == 0) then
-                ierr = -1 ! エラーコード
+                ierr = -1
                 print *, "Error: No active material regions found."
                 stop 1
             end if
@@ -64,7 +64,6 @@ contains
             num_unique_regions = size(unique_material_ids)
             max_region_id = maxval(unique_material_ids)
 
-            ! [修正] PHYSICS_TYPE_* 定数を使用
             self%is_active(PHYSICS_TYPE_THERMAL) = input%basic%analysis_controls%is_active(PHYSICS_TYPE_THERMAL)
             if (self%is_active(PHYSICS_TYPE_THERMAL)) then
                 allocate (self%thermal(max_region_id))
@@ -109,20 +108,21 @@ contains
             call self%iteration%initialize(input)
             call initialize_openmp(input)
 
-            call self%time%get_time(currenet_time)
-            call self%out_field%initialize( &
-                input%output_settings%field_output%output_interval_step, &
-                input%output_settings%field_output%output_interval_unit, &
-                input%output_settings%field_output%output_time_unit, &
-                input%output_settings%field_output%file_format, &
-                currenet_time)
-            call self%out_history%initialize( &
-                input%output_settings%history_output%output_interval_step, &
-                input%output_settings%history_output%output_interval_unit, &
-                input%output_settings%history_output%output_time_unit, &
-                input%output_settings%history_output%file_format, &
-                currenet_time)
-
+            call self%time%get_time(current_time_s)
+            associate (field_output => input%output_settings%field_output)
+                call self%out_field%initialize(field_output%output_interval_step, &
+                                               field_output%output_interval_unit, &
+                                               field_output%output_time_unit, &
+                                               field_output%file_format, &
+                                               current_time_s)
+            end associate
+            associate (history_output => input%output_settings%history_output)
+                call self%out_history%initialize(history_output%output_interval_step, &
+                                                 history_output%output_interval_unit, &
+                                                 history_output%output_time_unit, &
+                                                 history_output%file_format, &
+                                                 current_time_s)
+            end associate
         end if
 
         call deallocate_array(unique_material_ids)

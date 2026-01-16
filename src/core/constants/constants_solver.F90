@@ -199,15 +199,15 @@ module core_constants_solver
 
     type :: type_constants_time_units
         !> Time unit in seconds
-        type(type_constant_value) :: SECONDS = type_constant_value("TIME_UNIT", "seconds", 1, "s", 1.0d0)
+        type(type_constant_value) :: SECONDS = type_constant_value("TIME_UNIT", "second", 1, "s", 1.0d0)
         !> Time unit in minutes
-        type(type_constant_value) :: MINUTES = type_constant_value("TIME_UNIT", "minutes", 2, "m", 60.0d0)
+        type(type_constant_value) :: MINUTES = type_constant_value("TIME_UNIT", "minute", 2, "m", 60.0d0)
         !> Time unit in hours
-        type(type_constant_value) :: HOURS = type_constant_value("TIME_UNIT", "hours", 3, "h", 3600.0d0)
+        type(type_constant_value) :: HOURS = type_constant_value("TIME_UNIT", "hour", 3, "h", 3600.0d0)
         !> Time unit in days
-        type(type_constant_value) :: DAYS = type_constant_value("TIME_UNIT", "days", 4, "d", 86400.0d0)
+        type(type_constant_value) :: DAYS = type_constant_value("TIME_UNIT", "day", 4, "d", 86400.0d0)
         !> Time unit in years
-        type(type_constant_value) :: YEARS = type_constant_value("TIME_UNIT", "years", 5, "y", 31536000.0d0)
+        type(type_constant_value) :: YEARS = type_constant_value("TIME_UNIT", "year", 5, "y", 31536000.0d0)
     contains
         procedure, public, pass(self) :: to_id => to_id_time_units
         procedure, public, pass(self) :: to_name => to_name_time_units
@@ -420,11 +420,11 @@ contains
     end subroutine to_name_matrix_type
 
     !> Convert time unit constant to its ID.
-    pure subroutine to_id_time_units(self, name, id)
+    pure function to_id_time_units(self, name) result(id)
         implicit none
         class(type_constants_time_units), intent(in) :: self
         character(len=*), intent(in) :: name
-        integer(int32), intent(inout) :: id
+        integer(int32) :: id
 
         character(len=:), allocatable :: lname
         lname = strip(to_lower(name))
@@ -442,14 +442,14 @@ contains
         else
             id = -1
         end if
-    end subroutine to_id_time_units
+    end function to_id_time_units
 
     !> Convert time unit ID to its name.
-    pure subroutine to_name_time_units(self, id, name)
+    pure function to_name_time_units(self, id) result(name)
         implicit none
         class(type_constants_time_units), intent(in) :: self
         integer(int32), intent(in) :: id
-        character(len=*), intent(inout) :: name
+        character(len=:), allocatable :: name
 
         if (id == self%SECONDS%id) then
             name = self%SECONDS%name
@@ -464,7 +464,7 @@ contains
         else
             name = "unknown"
         end if
-    end subroutine to_name_time_units
+    end function to_name_time_units
 
     !> Convert time unit ID to its object.
     pure function to_object_from_id_time_units(self, id) result(object)

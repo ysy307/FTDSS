@@ -101,58 +101,68 @@ contains
 
         select case (trim(adjustl(variable_name)))
         case ("temperature")
-            self%name = trim(adjustl(variable_name))
-            self%unit = "degC"
+            self%name = "Temperature"
+            self%unit = "deg C"
             self%file_name = trim(adjustl(dir_output))//"obsf_T."//trim(adjustl(input%output_settings%history_output%file_format))
             self%num_unit = 99999999
             select case (trim(self%type))
-            case ("node_ids"); self%get_values => get_observations_temperature
-            case ("coordinates"); self%get_values => interpolate_observations_temperature
+            case ("node_ids")
+                self%get_values => get_observations_temperature
+            case ("coordinates")
+                self%get_values => interpolate_observations_temperature
             end select
         case ("ice_saturation")
-            self%name = trim(adjustl(variable_name))
+            self%name = "Ice Saturation"
             self%unit = "-"
             self%file_name = trim(adjustl(dir_output))//"obsf_Si."//trim(adjustl(input%output_settings%history_output%file_format))
             self%num_unit = 99999999
             select case (trim(self%type))
-            case ("node_ids"); self%get_values => get_observations_si
-            case ("coordinates"); self%get_values => interpolate_observations_si
+            case ("node_ids")
+                self%get_values => get_observations_si
+            case ("coordinates")
+                self%get_values => interpolate_observations_si
             end select
         case ("thermal_conductivity")
-            self%name = trim(adjustl(variable_name))
+            self%name = "Thermal Conductivity"
             self%unit = "W/m/K"
             self%file_name = trim(adjustl(dir_output))//"obsf_TC."//trim(adjustl(input%output_settings%history_output%file_format))
             self%num_unit = 99999999
             select case (trim(self%type))
-            case ("node_ids"); self%get_values => get_observations_thc
-            case ("coordinates"); self%get_values => interpolate_observations_thc
+            case ("node_ids")
+                self%get_values => get_observations_thc
+            case ("coordinates")
+                self%get_values => interpolate_observations_thc
             end select
         case ("volumetric_heat_capacity")
-            self%name = trim(adjustl(variable_name))
+            self%name = "Volumetric Heat Capacity"
             self%unit = "J/m^3/K"
             self%file_name = trim(adjustl(dir_output))//"obsf_C."//trim(adjustl(input%output_settings%history_output%file_format))
             self%num_unit = 99999999
             select case (trim(self%type))
-            case ("node_ids"); self%get_values => get_observations_vhc
-            case ("coordinates"); self%get_values => interpolate_observations_vhc
+            case ("node_ids")
+                self%get_values => get_observations_vhc
+            case ("coordinates")
+                self%get_values => interpolate_observations_vhc
             end select
         case ("pressure")
-            self%name = trim(adjustl(variable_name))
+            self%name = "Pressure"
             self%unit = "m"
             self%file_name = trim(adjustl(dir_output))//"obsf_P."//trim(adjustl(input%output_settings%history_output%file_format))
             self%num_unit = 99999999
             select case (trim(self%type))
-            case ("node_ids"); self%get_values => get_observations_pw
-            case ("coordinates"); self%get_values => interpolate_observations_pw
+            case ("node_ids")
+                self%get_values => get_observations_pw
+            case ("coordinates")
+                self%get_values => interpolate_observations_pw
             end select
         case ("water_flux")
-            self%name = trim(adjustl(variable_name))
+            self%name = "Water Flux"
             self%unit = "m/s"
             self%file_name = trim(adjustl(dir_output))//"obsf_Flux."//trim(adjustl(input%output_settings%history_output%file_format))
             self%num_unit = 99999999
             self%num_observations = self%num_observations * 3
         case ("hydraulic_conductivity")
-            self%name = trim(adjustl(variable_name))
+            self%name = "Hydraulic Conductivity"
             self%unit = "m/s"
             self%file_name = trim(adjustl(dir_output))//"obsf_K."//trim(adjustl(input%output_settings%history_output%file_format))
             self%num_unit = 99999999
@@ -213,7 +223,7 @@ contains
         end select
 
         write (self%num_unit, '(a)') "#"
-        write (self%num_unit, '(a)') "# Output Unit: Time ["//trim(get_time_unit_string(time_unit))//"], " &
+        write (self%num_unit, '(a)') "# Output Unit: Time ["//trim(TIME_UNITS%to_name(time_unit))//"], " &
             //trim(self%name)//" ["//trim(self%unit)//"]"
         write (self%num_unit, '(a)') "#"
 

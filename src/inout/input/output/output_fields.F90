@@ -24,13 +24,13 @@ contains
         buffer(2) = output_time_unit
         call get_json_value(json, join(buffer(1:2)), tmp_string, &
                             is_required=.true., valid_list=valid_time_units)
-        self%field_output%output_time_unit = get_time_unit(trim(tmp_string))
+        self%field_output%output_time_unit = TIME_UNITS%to_id(tmp_string)
 
         buffer(2) = output_interval
         buffer(3) = unit
         call get_json_value(json, join(buffer), tmp_string, &
                             is_required=.true., valid_list=valid_time_units)
-        self%field_output%output_interval_unit = get_time_unit(trim(tmp_string))
+        self%field_output%output_interval_unit = TIME_UNITS%to_id(tmp_string)
         buffer(3) = value
         call get_json_value(json, join(buffer), self%field_output%output_interval_step, is_required=.true., &
                             valid_range=[0.0d0, huge(0.0d0)])

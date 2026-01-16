@@ -21,7 +21,7 @@ module control_output
         procedure, pass(self), public :: is_due => check_output_timing
         procedure, pass(self), public :: update => update_state
         procedure, pass(self), public :: get_step
-        procedure, pass(self), public :: get_output_time => get_output_time_value
+        procedure, pass(self), public :: convert_output_time => convert_output_time_value
     end type type_output_manager
 
 contains
@@ -62,9 +62,9 @@ contains
     ! ----------------------------------------------------------------------
     ! 判定: 引数のcurrent_time(秒)と比較．引数は変更しない (intent(in))
     ! ----------------------------------------------------------------------
-    function check_output_timing(self, current_time_seconds) result(is_ready)
+    pure function check_output_timing(self, current_time_seconds) result(is_ready)
         implicit none
-        class(type_output_manager), intent(inout) :: self ! 内部状態を変えないならinでも良い
+        class(type_output_manager), intent(in) :: self
         real(real64), intent(in) :: current_time_seconds
         logical :: is_ready
         real(real64), parameter :: tolerance = 1.0d-9
@@ -74,7 +74,6 @@ contains
             return
         end if
 
-        ! 秒同士で比較
         if (current_time_seconds >= self%next_output_seconds - tolerance) then
             is_ready = .true.
         else
@@ -106,22 +105,18 @@ contains
         self%current_step = self%current_step + 1
     end subroutine update_state
 
-    ! ----------------------------------------------------------------------
-    ! 便利機能: 現在設定されている出力単位での時間を返す
-    ! ----------------------------------------------------------------------
-    pure function get_output_time_value(self, current_time_seconds) result(formatted_time)
+    pure function convert_output_time_value(self, current_time_seconds) result(converted_time)
         implicit none
         class(type_output_manager), intent(in) :: self
         real(real64), intent(in) :: current_time_seconds
-        real(real64) :: formatted_time
+        real(real64) :: converted_time
 
-        ! ここで割り算を行う
         if (self%output_time_unit%value > 0.0d0) then
-            formatted_time = current_time_seconds / self%output_time_unit%value
+            converted_time = current_time_seconds / self%output_time_unit%value
         else
-            formatted_time = current_time_seconds
+            converted_time = current_time_seconds
         end if
-    end function get_output_time_value
+    end function convert_output_time_value
 
     ! (get_step は変更なし)
     pure subroutine get_step(self, step)
