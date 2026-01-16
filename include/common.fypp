@@ -1,20 +1,23 @@
-# :mute
-# ! number of bits of integer type
-# :set INTEGER_BITS = [8, 16, 32, 64]
+#:mute
+    #:set PRECISION_BITS = { &
+        'integer': [8, 16, 32, 64], &
+        'real':    [32, 64, 128], &
+        'logical': [1, 4, 8] &
+        }
 
-# ! integer kinds
-# :set INTEGER_KINDS = ["int{}".format(bits) for bits in INTEGER_BITS]
+    #:set KINDS = { &
+        'integer': ["int{}".format(b) for b in PRECISION_BITS['integer']], &
+        'real':    ["real{}".format(b) for b in PRECISION_BITS['real']], &
+        'logical': ["{}".format(b)    for b in PRECISION_BITS['logical']] &
+        }
 
-# ! integer types
-# :set INTEGER_TYPES = ["integer({})".format(kind) for kind in INTEGER_KINDS]
+    #:set TYPES = { &
+        'integer': ["integer({})".format(k) for k in KINDS['integer']], &
+        'real':    ["real({})".format(k)    for k in KINDS['real']], &
+        'logical': ["logical({})".format(k) for k in KINDS['logical']] &
+        }
 
-# ! nubmer of bits of real type
-# :set REAL_BITS = [32, 64]
-
-# ! real kinds
-# :set REAL_KINDS = ["real{}".format(bits) for bits in REAL_BITS]
-
-# ! real types
-# :set REAL_TYPES = ["real({})".format(kind) for kind in REAL_KINDS]
-
-# :endmute
+    #:def rank_suffix(rank)
+        ${"({0})".format(":" + ",:" * (rank - 1)) if rank > 0 else ""}$
+    #:enddef
+#:endmute

@@ -1,15 +1,4 @@
-#:set kinds_map = [ &
-    ('integer', 'int8',      'int8'), &
-    ('integer', 'int16',     'int16'), &
-    ('integer', 'int32',     'int32'), &
-    ('integer', 'int64',     'int64'), &
-    ('real',    'real32',    'real32'), &
-    ('real',    'real64',    'real64'), &
-    ('real',    'real128',   'real128'), &
-    ('logical', '1',         'logical1'), &
-    ('logical', '4',         'logical4'), &
-    ('logical', '8',         'logical8') &
-    ]
+#:include "common.fypp"
 
 !> Module providing generic deallocation routines with error handling.
 !> Uses fypp preprocessor to generate procedures for various types and ranks.
@@ -23,37 +12,41 @@ module core_deallocate
 
     !> Generic interface for safe array deallocation.
     interface deallocate_array
-        #:for rank in [1, 2, 3]
+        #:for rank in range(1, 4)
             ! Rank-${rank}$
-            #:for type_name, kind_name, suffix in kinds_map
-                module procedure :: deallocate_rank${rank}$_${suffix}$
+            #:for dtype in ['integer', 'real', 'logical']
+                #:for k in KINDS[dtype]
+                    #:set suffix = ('logical' + k) if dtype == 'logical' else k
+                    module procedure :: deallocate_rank${rank}$_${suffix}$
+                #:endfor
             #:endfor
         #:endfor
     end interface
 
 contains
 
-    #:for rank in [1, 2, 3]
-        #:set colon_str = ", ".join([":" for _ in range(rank)])
-        #:for type_name, kind_name, suffix in kinds_map
-            ! ==========================================================
-            ! Rank-${rank}$, Type: ${type_name}$(${kind_name}$)
-            ! ==========================================================
+    #:for rank in range(1, 4)
+        #:for dtype in ['integer', 'real', 'logical']
+            #:for k, t_decl in zip(KINDS[dtype], TYPES[dtype])
+                #:set suffix = ('logical' + k) if dtype == 'logical' else k
+                ! ==========================================================
+                ! Rank-${rank}$, Type: ${t_decl}$
+                ! ==========================================================
 
-            !> Safely deallocate a Rank-${rank}$ array of type ${type_name}$(${kind_name}$).
-            !> Checks allocation status before deallocating to prevent errors.
-            subroutine deallocate_rank${rank}$_${suffix}$ (array)
-                implicit none
-                !> The array to be deallocated
-                ${type_name}$ (${kind_name}$), allocatable, intent(inout) :: array(${colon_str}$)
-                integer(int32) :: stat
+                !> Safely deallocate a Rank-${rank}$ array of type ${t_decl}$.
+                subroutine deallocate_rank${rank}$_${suffix}$ (array)
+                    implicit none
+                    !> The array to be deallocated
+                    ${t_decl}$, allocatable, intent(inout) :: array${rank_suffix(rank)}$
+                    integer(int32) :: stat
 
-                if (allocated(array)) then
-                    deallocate (array, stat=stat)
-                    if (stat /= 0) call error_message(961)
-                end if
-            end subroutine deallocate_rank${rank}$_${suffix}$
+                    if (allocated(array)) then
+                        deallocate (array, stat=stat)
+                        if (stat /= 0) call error_message(961)
+                    end if
+                end subroutine deallocate_rank${rank}$_${suffix}$
 
+            #:endfor
         #:endfor
     #:endfor
 
