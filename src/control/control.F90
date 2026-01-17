@@ -234,7 +234,7 @@ contains
 
         write (*, '(a)') "## Time and Iteration Settings"
         call self%time%display()
-        call self%iteration%display()
+        ! call self%iteration%display()
 
         write (*, '(a)') "---"
     end subroutine display_controls

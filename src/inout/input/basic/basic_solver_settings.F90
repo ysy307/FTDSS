@@ -7,7 +7,7 @@ submodule(inout_input_basic) inout_input_basic_solver_settings
     !!------------------------------------------------------------------------------------------------------------------------------
     character(*), parameter :: solver_settings = "solver_settings"
     character(*), parameter :: bdf_order = "bdf_order"
-    character(*), parameter :: nonlinear_solver = "nonlinear_solver"
+    character(*), parameter :: t_nonlinear_solver = "nonlinear_solver"
     character(*), parameter :: method = "method"
     character(*), parameter :: update_frequency = "update_frequency"
     character(*), parameter :: max_iterations = "max_iterations"
@@ -55,9 +55,9 @@ submodule(inout_input_basic) inout_input_basic_solver_settings
                                      SCHEDULE_TYPE_GUIDED, SCHEDULE_TYPE_RUNTIME, SCHEDULE_TYPE_STATIC]
 
     ! String lists for JSON validation
-    character(len=16), parameter :: valid_nonlinear_solver_methods_str(4) = &
-                                    [character(len=16) :: "none", "newton", "modified_newton", "picard"]
-    character(len=16), parameter :: valid_norm_types_str(2) = [character(len=4) :: "l2", "linf"]
+    character(len=16), parameter :: valid_nonlinear_solver_methods_str(5) = &
+                                    [character(len=16) :: "none", "newton", "modified_newton", "picard", "modified_picard"]
+    character(len=16), parameter :: valid_norm_types_str(3) = [character(len=4) :: "l1", "l2", "linf"]
     character(len=16), parameter :: valid_criteria_types_str(4) = [character(len=16) :: "none", "residual", "update", "both"]
     character(len=16), parameter :: valid_logic_types_str(2) = [character(len=16) :: "and", "or"]
     character(len=16), parameter :: valid_local_criteria_types_str(3) = [character(len=16) :: "absolute", "relative", "both"]
@@ -95,7 +95,7 @@ contains
         character(:), allocatable :: temp_string
 
         buffer(1) = solver_settings
-        buffer(2) = nonlinear_solver
+        buffer(2) = t_nonlinear_solver
 
         buffer(3) = method
         call get_json_value(json, join(buffer(1:3)), temp_string, &

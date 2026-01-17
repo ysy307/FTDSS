@@ -111,41 +111,41 @@
     "solver_settings": {
         "bdf_order": 1,
         "nonlinear_solver": {
-            "method": "newton",
-            "update_frequency": 5,
-            "max_iterations": 1,
+            "method": "picard",
+            "update_frequency": 1,
+            "max_iterations": 30,
             "convergence": {
-                "use_criteria": "none",
-                "norm_type": "linf",
+                "use_criteria": "both",
+                "norm_type": "l2",
                 "logic_between_criteria": "and",
                 "residual": {
-                    "criteria": "absolute",
+                    "criteria": "relative",
                     "logic": "or",
-                    "absolute_tolerance": 1e-03,
+                    "absolute_tolerance": 1e-06,
                     "relative_tolerance": 1e-03
                 },
                 "update": {
-                    "criteria": "absolute",
+                    "criteria": "both",
                     "logic": "or",
-                    "absolute_tolerance": 1e-03,
-                    "relative_tolerance": 1e-03
+                    "absolute_tolerance": 1e-05,
+                    "relative_tolerance": 1e-04
                 }
             }
-        },
-        "linear_solver": {
-            "type": 4,
-            "preconditioner_type": 1,
-            "max_iterations": 50000,
-            "tolerance": 1e-10,
-            "restart_size": 1000
-        },
-        "parallel_settings": {
-            "threads": {
-                "is_parallel": true,
-                "num_threads": 4,
-                "schedule": "static",
-                "max_active_levels": 1
-            }
+        }
+    },
+    "linear_solver": {
+        "type": 4,
+        "preconditioner_type": 1,
+        "max_iterations": 50000,
+        "tolerance": 1e-10,
+        "restart_size": 1000
+    },
+    "parallel_settings": {
+        "threads": {
+            "is_parallel": true,
+            "num_threads": 4,
+            "schedule": "static",
+            "max_active_levels": 1
         }
     }
 }

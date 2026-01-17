@@ -359,7 +359,6 @@ contains
         call self%controls%iteration%increment_nonlinear()
         call self%controls%iteration%get_nonlinear_iter(iter)
 
-        print *, iter
         if (iter == 1) then
             prescribe_bc = .true.
         else
@@ -419,11 +418,10 @@ contains
             ! 2.3 境界条件の適用
             call self%apply_bc(prescribe_bc)
 
-            ! 2.4 線形ソルバー (J * delta = -R)
+            ! 2.4 線形ソルバー (K * u = F)
             call self%solve()
 
-            ! 2.5 収束判定 (Rとdeltaをチェックして、内部状態を更新するだけ)
-            !     ※ここで収束フラグが立てば、次の do while でループを抜けます
+            ! 2.5 収束判定
             call self%solve_time_step_check_convergence()
 
             ! 2.6 解の更新 (U <= U + delta)
