@@ -300,15 +300,16 @@ contains
         end do
     end subroutine reset_nonlinear
 
-    subroutine increment_nonlinear(self)
+    pure subroutine increment_nonlinear(self)
         implicit none
         class(type_iteration), intent(inout) :: self
         self%nonlinear_iter = self%nonlinear_iter + 1
     end subroutine increment_nonlinear
 
-    subroutine increment_total(self)
+    pure subroutine increment_total(self)
         implicit none
         class(type_iteration), intent(inout) :: self
+
         self%total_iter = self%total_iter + 1
     end subroutine increment_total
 
@@ -374,15 +375,12 @@ contains
         class(type_iteration), intent(in) :: self
         logical :: continue_flag
 
-        ! [重要] まだ一度も計算していない(iter=0)場合は、
-        ! is_convergedが初期値(.true.)であっても必ずループに入るようにする。
+        ! First iteration always continues
         if (self%nonlinear_iter == 0) then
             continue_flag = .true.
             return
         end if
 
-        ! 全ての物理量が収束(all true)していなければ継続 (.not. all(...) is true)
-        ! かつ、最大反復回数未満であれば継続
         continue_flag = (.not. all(self%is_converged)) .and. &
                         (self%nonlinear_iter < self%config%max_iterations)
     end function should_continue

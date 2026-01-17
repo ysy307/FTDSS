@@ -132,12 +132,14 @@ contains
                                 is_required=.true., default_value="l2", valid_list=valid_norm_types_str)
             self%solver_settings%nonlinear_solver%convergence%norm_type = get_norm_type(temp_string)
 
-            if (any(self%solver_settings%nonlinear_solver%convergence%use_criteria == [NONLINEAR_NORM_CRITERIA_RESIDUAL, NONLINEAR_NORM_CRITERIA_BOTH])) then
+            if (any(self%solver_settings%nonlinear_solver%convergence%use_criteria == &
+                    [NONLINEAR_NORM_CRITERIA_RESIDUAL, NONLINEAR_NORM_CRITERIA_BOTH])) then
                 buffer(4) = residual
                 call read_parameters_solver_settings_nonlinear_convergence( &
                     self%solver_settings%nonlinear_solver%convergence%residual, json, buffer, 4)
             end if
-            if (any(self%solver_settings%nonlinear_solver%convergence%use_criteria == [NONLINEAR_NORM_CRITERIA_UPDATE, NONLINEAR_NORM_CRITERIA_BOTH])) then
+            if (any(self%solver_settings%nonlinear_solver%convergence%use_criteria == &
+                    [NONLINEAR_NORM_CRITERIA_UPDATE, NONLINEAR_NORM_CRITERIA_BOTH])) then
                 buffer(4) = update
                 call read_parameters_solver_settings_nonlinear_convergence( &
                     self%solver_settings%nonlinear_solver%convergence%update, json, buffer, 4)
@@ -147,8 +149,8 @@ contains
         if (allocated(temp_string)) deallocate (temp_string)
     end subroutine read_parameters_solver_settings_nonlinear
 
+    !> Reads a specific convergence criteria block (residual or update).
     subroutine read_parameters_solver_settings_nonlinear_convergence(convergence_obj, json, buffer, end_index)
-        !> Reads a specific convergence criteria block (residual or update).
         implicit none
         type(type_convergence_criteria), intent(inout) :: convergence_obj
         type(json_file), intent(inout) :: json
