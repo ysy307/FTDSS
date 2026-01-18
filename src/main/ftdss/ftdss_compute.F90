@@ -376,22 +376,32 @@ contains
 
         integer(int32) :: iter
 
-        real(real64), pointer, contiguous, dimension(:) :: F_values => null()
-        real(real64), pointer, contiguous, dimension(:) :: u_values => null()
+        real(real64), pointer, contiguous, dimension(:) :: current_value => null()
 
-        F_values => self%F%get_data()
-        u_values => self%u%get_data()
+        real(real64), allocatable :: variable(:)
+        real(real64), allocatable :: diff(:)
+        integer(int32) :: num_nodes
 
         call self%controls%iteration%get_nonlinear_iter(iter)
+        call self%domain%get_num_nodes(num_nodes)
 
-        if (iter == 1) then
-            call self%controls%iteration%set_initial_norms(F_values, u_values)
-        else
-            call self%controls%iteration%check_convergence(F_values, u_values)
+        call allocate_array(diff, num_nodes)
+
+        if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
+            call self%get_variable(PHYSICS_TYPES%THERMAL, variable)
+            call self%temperature%get_current(current_value)
+
+            diff(:) = current_value(:) - variable(:)
+
         end if
 
-        nullify (F_values)
-        nullify (u_values)
+        ! if (iter == 1) then
+        !     call self%controls%iteration%set_initial_norms(F, u)
+        ! else
+        !     call self%controls%iteration%check_convergence(F, u)
+        ! end if
+
+        nullify (current_value)
 
     end subroutine solve_time_step_check_convergence_ftdss
 

@@ -69,6 +69,7 @@ set(MAIN_FTDSS_SOURCES
 add_library(MAIN_FTDSS_LIB STATIC ${MAIN_FTDSS_SOURCES})
 target_include_directories(MAIN_FTDSS_LIB PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(MAIN_FTDSS_LIB PUBLIC
+    Solver::Core
     Solver::Thermal
     Solver::Hydraulic
     Solver::Control 

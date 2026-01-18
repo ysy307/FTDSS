@@ -17,7 +17,7 @@ module physics_models_phase_change_liquid_solid_gcc
         Tf0 => water_freezing_point_at_standard_atmospheric_pressure, &
         Tf0_K => water_freezing_point_at_standard_atmospheric_pressure_k
 
-    use :: physics_types, only:abst_physics
+    use :: physics_base, only:abst_physics
     implicit none
     private
 

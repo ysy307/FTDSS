@@ -4,7 +4,7 @@
 # 定数は他のすべてから参照されるため、独立させておきます
 add_library(Physics_Base STATIC
     physics_constants.F90
-    physics_types.F90
+    physics_base.F90
 )
 target_include_directories(Physics_Base PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Base PUBLIC

@@ -1,0 +1,475 @@
+#:mute
+
+    #:set MATRIX_TYPES = { &
+        'type_name'  : 'type_matrix_types', &
+        'obj_name'   : 'MATRIX_TYPES', &
+        'category'   : 'MATRIX_TYPE', &
+        'suffix'     : 'matrix_type', &
+        'description': 'Matrix types', &
+        'items'      : [ &
+            ('DENSE', 1, 'dense'), &
+            ('CSR',   2, 'csr'), &
+            ('COO',   3, 'coo'), &
+            ('BSR',   4, 'bsr') &
+        ], &
+        'num' : 4 &
+    }
+
+    #:set COUPLING_MODES = { &
+        'type_name'  : 'type_coupling_modes', &
+        'obj_name'   : 'COUPLING_MODES', &
+        'category'   : 'COUPLING_MODE', &
+        'suffix'     : 'coupling_mode', &
+        'description': 'Coupling modes', &
+        'items'      : [ &
+            ('STAGGERED',  1, 'staggered'), &
+            ('MONOLITHIC', 2, 'monolithic') &
+        ], &
+        'num' : 2 &
+    }
+
+    #:set PHYSICS_TYPES = { &
+        'type_name'  : 'type_physics_types', &
+        'obj_name'   : 'PHYSICS_TYPES', &
+        'category'   : 'PHYSICS_TYPE', &
+        'suffix'     : 'physics_type', &
+        'description': 'Physics types', &
+        'items'      : [ &
+            ('THERMAL',    1, 'thermal'), &
+            ('HYDRAULIC',  2, 'hydraulic'), &
+            ('MECHANICAL', 3, 'mechanical') &
+        ], &
+        'num' : 3 &
+    }
+
+    #:set DOF_TYPES = { &
+        'type_name'  : 'type_dof_types', &
+        'obj_name'   : 'DOF_TYPES', &
+        'category'   : 'DOF_TYPE', &
+        'suffix'     : 'dof_type', &
+        'description': 'Degree of freedom types', &
+        'items'      : [ &
+            ('T',  1, 't'), &
+            ('P',  2, 'p'), &
+            ('DX', 3, 'dx'), &
+            ('DY', 4, 'dy'), &
+            ('DZ', 5, 'dz') &
+        ], &
+        'num' : 5 &
+    }
+
+    #:set THERMAL_BC_TYPES = { &
+        'type_name'  : 'type_thermal_bc_types', &
+        'obj_name'   : 'THERMAL_BC_TYPES', &
+        'category'   : 'THERMAL_BC', &
+        'suffix'     : 'thermal_bc_type', &
+        'description': 'Thermal boundary condition types', &
+        'items'      : [ &
+            ('DIRICHLET',  101, 'dirichlet'), &
+            ('NEUMANN',    102, 'neumann'), &
+            ('FLUX',       103, 'flux'), &
+            ('ROBIN',      104, 'robin'), &
+            ('CONVECTIVE', 105, 'convective'), &
+            ('RADIATION',  106, 'radiation'), &
+            ('ADIABATIC',  107, 'adiabatic'), &
+            ('FREE',       108, 'free') &
+        ], &
+        'num' : 8 &
+    }
+
+    #:set HYDRAULIC_BC_TYPES = { &
+        'type_name'  : 'type_hydraulic_bc_types', &
+        'obj_name'   : 'HYDRAULIC_BC_TYPES', &
+        'category'   : 'HYDRAULIC_BC', &
+        'suffix'     : 'hydraulic_bc_type', &
+        'description': 'Hydraulic boundary condition types', &
+        'items'      : [ &
+            ('DIRICHLET',   201, 'dirichlet'), &
+            ('NEUMANN',     202, 'neumann'), &
+            ('FLUX',        203, 'flux'), &
+            ('IMPERMEABLE', 204, 'impermeable'), &
+            ('SEEPAGE',     205, 'seepage') &
+        ], &
+        'num' : 5 &
+    }
+
+    #:set IC_TARGETS = { &
+        'type_name'  : 'type_ic_targets', &
+        'obj_name'   : 'IC_TARGETS', &
+        'category'   : 'IC_TARGET', &
+        'suffix'     : 'ic_target', &
+        'description': 'Initial condition targets', &
+        'items'      : [ &
+            ('THERMAL',    1, 'thermal'), &
+            ('HYDRAULIC',  2, 'hydraulic'), &
+            ('MECHANICAL', 3, 'mechanical'), &
+            ('POROSITY',   4, 'porosity') &
+        ], &
+        'num' : 4 &
+    }
+
+    #:set IC_METHODS = { &
+        'type_name'  : 'type_ic_methods', &
+        'obj_name'   : 'IC_METHODS', &
+        'category'   : 'IC_METHOD', &
+        'suffix'     : 'ic_method', &
+        'description': 'Initial condition methods', &
+        'items'      : [ &
+            ('UNIFORM',   1, 'uniform'), &
+            ('LAPLACE',   2, 'laplace'), &
+            ('FROM_FILE', 3, 'from_file') &
+        ], &
+        'num' : 3 &
+    }
+
+    #:set NONLINEAR_SOLVER = { &
+        'type_name'  : 'type_nonlinear_solver', &
+        'obj_name'   : 'NONLINEAR_SOLVER', &
+        'category'   : 'NONLINEAR_SOLVER', &
+        'suffix'     : 'nonlinear_solver', &
+        'description': 'Nonlinear solver types', &
+        'items'      : [ &
+            ('NONE',            0, 'none'), &
+            ('NEWTON',          1, 'newton'), &
+            ('MODIFIED_NEWTON', 2, 'modified_newton'), &
+            ('PICARD',          3, 'picard'), &
+            ('MODIFIED_PICARD', 4, 'modified_picard') &
+        ], &
+        'num' : 5 &
+    }
+
+    #:set NONLINEAR_NORM_CRITERIA = { &
+        'type_name'  : 'type_nonlinear_norm_criteria', &
+        'obj_name'   : 'NONLINEAR_NORM_CRITERIA', &
+        'category'   : 'NL_NORM_CRIT', &
+        'suffix'     : 'nonlinear_norm_criteria', &
+        'description': 'Nonlinear norm criteria', &
+        'items'      : [ &
+            ('NONE',     0, 'none'), &
+            ('RESIDUAL', 1, 'residual'), &
+            ('UPDATE',   2, 'update'), &
+            ('BOTH',     3, 'both') &
+        ], &
+        'num' : 4 &
+    }
+
+    #:set NONLINEAR_CRITERIA = { &
+        'type_name'  : 'type_nonlinear_criteria', &
+        'obj_name'   : 'NONLINEAR_CRITERIA', &
+        'category'   : 'NL_CRITERIA', &
+        'suffix'     : 'nonlinear_criteria', &
+        'description': 'Nonlinear criteria', &
+        'items'      : [ &
+            ('NONE',     0, 'none'), &
+            ('RELATIVE', 1, 'relative'), &
+            ('ABSOLUTE', 2, 'absolute'), &
+            ('BOTH',     3, 'both') &
+        ], &
+        'num' : 4 &
+    }
+
+    #:set NONLINEAR_LOGIC = { &
+        'type_name'  : 'type_nonlinear_logic', &
+        'obj_name'   : 'NONLINEAR_LOGIC', &
+        'category'   : 'NL_LOGIC', &
+        'suffix'     : 'nonlinear_logic', &
+        'description': 'Nonlinear logic', &
+        'items'      : [ &
+            ('OR',  1, 'or'), &
+            ('AND', 2, 'and') &
+        ], &
+        'num' : 2 &
+    }
+
+    #:set NORM_TYPES = { &
+        'type_name'  : 'type_norm_types', &
+        'obj_name'   : 'NORM_TYPES', &
+        'category'   : 'NORM_TYPE', &
+        'suffix'     : 'norm_type', &
+        'description': 'Norm types', &
+        'items'      : [ &
+            ('L1',   1, 'l1'), &
+            ('L2',   2, 'l2'), &
+            ('LINF', 3, 'linf') &
+        ], &
+        'num' : 3 &
+    }
+
+    #:set COMP_TYPES = { &
+        'type_name'  : 'type_comp_types', &
+        'obj_name'   : 'COMP_TYPES', &
+        'category'   : 'COMP_TYPE', &
+        'suffix'     : 'comp_type', &
+        'description': 'Component types', &
+        'items'      : [ &
+            ('XY_2D',  1, '2d_xy'), &
+            ('XZ_2D',  2, '2d_xz'), &
+            ('XYZ_3D', 3, '3d') &
+        ], &
+        'num' : 3 &
+    }
+
+    #:set LINEAR_SOLVER_TYPES = { &
+        'type_name'  : 'type_linear_solver_types', &
+        'obj_name'   : 'LINEAR_SOLVER_TYPES', &
+        'category'   : 'LINEAR_SOLVER', &
+        'description': 'Linear solver types', &
+        'suffix'     : 'linear_solver_type', &
+        'items'      : [ &
+            ('CG',         1,  'cg'), &
+            ('BICG',       2,  'bicg'), &
+            ('CGS',        3,  'cgs'), &
+            ('BICGSTAB',   4,  'bicgstab'), &
+            ('BICGSTAB_L', 5,  'bicgstab_l'), &
+            ('GPBICG',     6,  'gpbicg'), &
+            ('TFQMR',      7,  'tfqmr'), &
+            ('ORTHOMIN_M', 8,  'orthomin_m'), &
+            ('GMRES_M',    9,  'gmres_m'), &
+            ('JACOBI',     10, 'jacobi'), &
+            ('GAUSS_SEIDEL',11,'gauss_seidel'), &
+            ('SOR',        12, 'sor'), &
+            ('BICGSAFE',   13, 'bicgsafe'), &
+            ('CR',         14, 'cr'), &
+            ('BICR',       15, 'bicr'), &
+            ('CRS',        16, 'crs'), &
+            ('BICRSTAB',   17, 'bicrstab'), &
+            ('GPBICR',     18, 'gpbicr'), &
+            ('BICRSAFE',   19, 'bicrsafe'), &
+            ('FGMRES_M',   20, 'fgmres_m'), &
+            ('IDR_S',      21, 'idr_s'), &
+            ('IDR1',       22, 'idr1'), &
+            ('MINRES',     23, 'minres'), &
+            ('COCG',       24, 'cocg'), &
+            ('COCR',       25, 'cocr') &
+        ], &
+        'num' : 25 &
+    }
+
+    #:set PRECONDITIONER_TYPES = { &
+        'type_name'  : 'type_preconditioner_types', &
+        'obj_name'   : 'PRECONDITIONER_TYPES', &
+        'category'   : 'PRECONDITIONER', &
+        'suffix'     : 'preconditioner_type', &
+        'description': 'Preconditioner types', &
+        'items'      : [ &
+            ('NONE',   0, 'none'), &
+            ('JACOBI', 1, 'jacobi'), &
+            ('ILU',    2, 'ilu'), &
+            ('SSOR',   3, 'ssor'), &
+            ('HYBRID', 4, 'hybrid'), &
+            ('IS',     5, 'is'), &
+            ('SAINV',  6, 'sainv'), &
+            ('SAAMG',  7, 'saamg'), &
+            ('ILUC',   8, 'iluc'), &
+            ('ILUT',   9, 'ilut') &
+        ], &
+        'num' : 10 &
+    }
+
+    #:set SOLVER_STATUS = { &
+        'type_name'  : 'type_solver_status', &
+        'obj_name'   : 'SOLVER_STATUS', &
+        'category'   : 'SOLVER_STATUS', &
+        'suffix'     : 'solver_status', &
+        'description': 'Solver status codes', &
+        'items'      : [ &
+            ('SUCCESS',                0,  'SUCCESS'), &
+            ('ILL_OPTIONS',           -1,  'ILL_OPTIONS'), &
+            ('BREAKDOWN',             -2,  'BREAKDOWN'), &
+            ('OUT_OF_MEMORY',         -3,  'OUT_OF_MEMORY'), &
+            ('MAXITER',               -4,  'MAXITER'), &
+            ('DECOMPOSITION_FAILURE', -5,  'DECOMPOSITION_FAILURE'), &
+            ('NOT_IMPLEMENTED',       -6,  'NOT_IMPLEMENTED') &
+        ], &
+        'num' : 7 &
+    }
+
+    #:set MATRIX_OPS = { &
+        'type_name'  : 'type_matrix_ops', &
+        'obj_name'   : 'MATRIX_OPS', &
+        'category'   : 'MATRIX_OP', &
+        'suffix'     : 'matrix_op', &
+        'description': 'Matrix operations', &
+        'items'      : [ &
+            ('INS',             1, 'ins'), &
+            ('ADD',             2, 'add'), &
+            ('SCALE_SYMM_DIAG', 3, 'scale_symm_diag'), &
+            ('SCALE_JACOBI',    4, 'scale_jacobi')&
+        ], &
+        'num' : 4 &
+    }
+
+    #:set MATRIX_STATUS = { &
+        'type_name'  : 'type_matrix_status_codes', &
+        'obj_name'   : 'MATRIX_STATUS', &
+        'category'   : 'MAT_STATUS', &
+        'suffix'     : 'matrix_status', &
+        'description': 'Matrix status codes', &
+        'items'      : [ &
+            ('SUCCESS',          0,  'SUCCESS'), &
+            ('ILL_OPERATIONS',  -1,  'ILL_OPERATIONS'), &
+            ('OUT_OF_MEMORY',   -2,  'OUT_OF_MEMORY'), &
+            ('NOT_INITIALIZED', -3,  'NOT_INITIALIZED'), &
+            ('NOT_IMPLEMENTED', -5,  'NOT_IMPLEMENTED')&
+        ], &
+        'num' : 5 &
+    }
+
+    #:set VECTOR_STATUS = { &
+        'type_name'  : 'type_vector_status_codes', &
+        'obj_name'   : 'VECTOR_STATUS', &
+        'category'   : 'VEC_STATUS', &
+        'suffix'     : 'vector_status', &
+        'description': 'Vector status codes', &
+        'items'      : [ &
+            ('SUCCESS',          0,  'SUCCESS'), &
+            ('ILL_OPERATIONS',  -1,  'ILL_OPERATIONS'), &
+            ('OUT_OF_MEMORY',   -3,  'OUT_OF_MEMORY'), &
+            ('NOT_IMPLEMENTED', -5,  'NOT_IMPLEMENTED') &
+        ], &
+        'num' : 4 &
+    }
+
+    #:set NODE_TYPES = { &
+        'type_name' : 'type_node_types', &
+        'obj_name'  : 'NODE_TYPES', &
+        'category'  : 'NODE_TYPE', &
+        'suffix'    : 'node_type', &
+        'description': 'Node types', &
+        'items'     : [ &
+            ('NODE_INTERNAL', 1, 'internal'), &
+            ('NODE_BORDER',   2, 'border'), &
+            ('NODE_HALO',     3, 'halo') &
+        ], &
+        'num' : 3 &
+    }
+
+    #:set COMM_ROLES = { &
+        'type_name' : 'type_comm_roles', &
+        'obj_name'  : 'COMM_ROLES', &
+        'category'  : 'COMM_ROLE', &
+        'suffix'    : 'comm_role', &
+        'description': 'Communication roles', &
+        'items'     : [ &
+            ('ROLE_OWNER',    0,  'owner'), &
+            ('ROLE_RECEIVER', 1,  'receiver'), &
+            ('ROLE_NONE',    -1,  'none') &
+        ], &
+        'num' : 3 &
+    }
+
+    #:set COMM_OPS = { &
+        'type_name' : 'type_comm_ops', &
+        'obj_name'  : 'COMM_OPS', &
+        'category'  : 'COMM_OP', &
+        'suffix'    : 'comm_op', &
+        'description': 'Communication operations', &
+        'items'     : [ &
+            ('OP_UPDATE',   1, 'update'), &
+            ('OP_ASSEMBLE', 2, 'assemble') &
+        ], &
+        'num' : 2 &
+    }
+    #:set FE_TYPES = { &
+        'type_name' : 'type_fe_types', &
+        'obj_name'  : 'FE_TYPE', &
+        'category'  : 'FE_TYPE', &
+        'suffix'    : 'fe_type', &
+        'description': 'Finite element types', &
+        'items'     : [ &
+            ('EMPTY_CELL', 0, 'empty_cell'), &
+            ('VERTEX', 1, 'vertex'), &
+            ('POLY_VERTEX', 2, 'poly_vertex'), &
+            ('LINE', 3, 'line'), &
+            ('POLY_LINE', 4, 'poly_line'), &
+            ('TRIANGLE', 5, 'triangle'), &
+            ('TRIANGLE_STRIP', 6, 'triangle_strip'), &
+            ('POLYGON', 7, 'polygon'), &
+            ('PIXEL', 8, 'pixel'), &
+            ('QUAD', 9, 'quad'), &
+            ('TETRA', 10, 'tetra'), &
+            ('VOXEL', 11, 'voxel'), &
+            ('HEXAHEDRON', 12, 'hexahedron'), &
+            ('WEDGE', 13, 'wedge'), &
+            ('PYRAMID', 14, 'pyramid'), &
+            ('PENTAGONAL_PRISM', 15, 'pentagonal_prism'), &
+            ('HEXAGONAL_PRISM', 16, 'hexagonal_prism'), &
+            ('QUADRATIC_EDGE', 21, 'quadratic_edge'), &
+            ('QUADRATIC_TRIANGLE', 22, 'quadratic_triangle'), &
+            ('QUADRATIC_QUAD', 23, 'quadratic_quad'), &
+            ('QUADRATIC_TETRA', 24, 'quadratic_tetra'), &
+            ('QUADRATIC_HEXAHEDRON', 25, 'quadratic_hexahedron'), &
+            ('QUADRATIC_WEDGE', 26, 'quadratic_wedge'), &
+            ('QUADRATIC_PYRAMID', 27, 'quadratic_pyramid'), &
+            ('BIQUADRATIC_QUAD', 28, 'biquadratic_quad'), &
+            ('TRIQUADRATIC_HEXAHEDRON', 29, 'triquadratic_hexahedron'), &
+            ('QUADRATIC_LINEAR_QUAD', 30, 'quadratic_linear_quad'), &
+            ('QUADRATIC_LINEAR_WEDGE', 31, 'quadratic_linear_wedge'), &
+            ('BIQUADRATIC_QUADRATIC_WEDGE', 32, 'biquadratic_quadratic_wedge'), &
+            ('BIQUADRATIC_QUADRATIC_HEXAHEDRON', 33, 'biquadratic_quadratic_hexahedron'), &
+            ('BIQUADRATIC_TRIANGLE', 34, 'biquadratic_triangle'), &
+            ('CUBIC_LINE', 35, 'cubic_line'), &
+            ('QUADRATIC_POLYGON', 36, 'quadratic_polygon'), &
+            ('TRIQUADRATIC_PYRAMID', 37, 'triquadratic_pyramid'), &
+            ('CONVEX_POINT_SET', 41, 'convex_point_set'), &
+            ('POLYHEDRON', 42, 'polyhedron'), &
+            ('PARAMETRIC_CURVE', 51, 'parametric_curve'), &
+            ('PARAMETRIC_SURFACE', 52, 'parametric_surface'), &
+            ('PARAMETRIC_TRI_SURFACE', 53, 'parametric_tri_surface'), &
+            ('PARAMETRIC_QUAD_SURFACE', 54, 'parametric_quad_surface'), &
+            ('PARAMETRIC_TETRA_REGION', 55, 'parametric_tetra_region'), &
+            ('PARAMETRIC_HEX_REGION', 56, 'parametric_hex_region'), &
+            ('HIGHER_ORDER_EDGE', 60, 'higher_order_edge'), &
+            ('HIGHER_ORDER_TRIANGLE', 61, 'higher_order_triangle'), &
+            ('HIGHER_ORDER_QUAD', 62, 'higher_order_quad'), &
+            ('HIGHER_ORDER_POLYGON', 63, 'higher_order_polygon'), &
+            ('HIGHER_ORDER_TETRAHEDRON', 64, 'higher_order_tetrahedron'), &
+            ('HIGHER_ORDER_WEDGE', 65, 'higher_order_wedge'), &
+            ('HIGHER_ORDER_PYRAMID', 66, 'higher_order_pyramid'), &
+            ('HIGHER_ORDER_HEXAHEDRON', 67, 'higher_order_hexahedron'), &
+            ('LAGRANGE_CURVE', 68, 'lagrange_curve'), &
+            ('LAGRANGE_TRIANGLE', 69, 'lagrange_triangle'), &
+            ('LAGRANGE_QUADRILATERAL', 70, 'lagrange_quadrilateral'), &
+            ('LAGRANGE_TETRAHEDRON', 71, 'lagrange_tetrahedron'), &
+            ('LAGRANGE_HEXAHEDRON', 72, 'lagrange_hexahedron'), &
+            ('LAGRANGE_WEDGE', 73, 'lagrange_wedge'), &
+            ('LAGRANGE_PYRAMID', 74, 'lagrange_pyramid'), &
+            ('BEZIER_CURVE', 75, 'bezier_curve'), &
+            ('BEZIER_TRIANGLE', 76, 'bezier_triangle'), &
+            ('BEZIER_QUADRILATERAL', 77, 'bezier_quadrilateral'), &
+            ('BEZIER_TETRAHEDRON', 78, 'bezier_tetrahedron'), &
+            ('BEZIER_HEXAHEDRON', 79, 'bezier_hexahedron'), &
+            ('BEZIER_WEDGE', 80, 'bezier_wedge'), &
+            ('BEZIER_PYRAMID', 81, 'bezier_pyramid') &
+        ], &
+        'num' : 81 &
+    }
+
+    #:set constant_id_groups = [ &
+        MATRIX_TYPES, &
+        COUPLING_MODES, &
+        PHYSICS_TYPES, &
+        DOF_TYPES, &
+        THERMAL_BC_TYPES, &
+        HYDRAULIC_BC_TYPES, &
+        IC_TARGETS, &
+        IC_METHODS, &
+        NONLINEAR_SOLVER, &
+        NONLINEAR_NORM_CRITERIA, &
+        NONLINEAR_CRITERIA, &
+        NONLINEAR_LOGIC, &
+        NORM_TYPES, &
+        COMP_TYPES, &
+        LINEAR_SOLVER_TYPES, &
+        PRECONDITIONER_TYPES, &
+        SOLVER_STATUS, &
+        MATRIX_OPS, &
+        MATRIX_STATUS, &
+        VECTOR_STATUS, &
+        NODE_TYPES, &
+        COMM_ROLES, &
+        COMM_OPS, &
+        FE_TYPES &
+    ]
+
+#:endmute

@@ -3,7 +3,7 @@ module physics_materials_base
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core, only:type_state, type_physics_info
     use :: physics_constants, only:TtoK => celsius_to_kelvin, P_atm => standard_atmospheric_pressure
-    use :: physics_types, only:abst_physics
+    use :: physics_base, only:abst_physics
     implicit none
     private
 

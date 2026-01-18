@@ -12,7 +12,7 @@ module physics_models_phase_change_liquid_vapor_vaporization
         Mw => molar_mass_water, &
         rho_std => reference_water_density, &
         P_atm => standard_atmospheric_pressure
-    use :: physics_types, only:abst_physics
+    use :: physics_base, only:abst_physics
 
     implicit none
     private

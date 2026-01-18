@@ -1,6 +1,6 @@
 !> @brief 物理計算のための抽象型とインターフェース定義モジュール
 !> @details 状態変数(State)と具体的なIAPWS物質モデル(水・氷)を接続し、物性値を計算します。
-module physics_types
+module physics_base
     use, intrinsic :: iso_fortran_env
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core, only:type_state
@@ -392,4 +392,4 @@ contains
 
     end function is_initialized_abst_physics
 
-end module physics_types
+end module physics_base

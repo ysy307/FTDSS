@@ -19,10 +19,10 @@ target_include_directories(Core_Validation PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 enable_build_flags(Core_Validation)
 enable_thirdparty(Core_Validation)
 
-# set(CORE_CONSTANTS_FYPP_SOURCES
-#     constants/constans_solver.fypp
-# )
-# fypp_F90("" "${CORE_CONSTANTS_FYPP_SOURCES}" CORE_CONSTANTS_GENERATED_SOURCES)
+set(CORE_CONSTANTS_FYPP_SOURCES
+    constants/constans_ids.fypp
+)
+fypp_F90("" "${CORE_CONSTANTS_FYPP_SOURCES}" CORE_CONSTANTS_GENERATED_SOURCES)
 set(CORE_CONSTANTS_SOURCES
     constants/constants_base.F90
     constants/constants_solver.F90
@@ -32,7 +32,7 @@ set(CORE_CONSTANTS_SOURCES
     constants/constants_fe.F90
     constants/constants.F90
 )
-add_library(Core_Constants STATIC ${CORE_CONSTANTS_SOURCES})
+add_library(Core_Constants STATIC ${CORE_CONSTANTS_SOURCES} ${CORE_CONSTANTS_GENERATED_SOURCES})
 target_include_directories(Core_Constants PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 enable_build_flags(Core_Constants)
 enable_thirdparty(Core_Constants)

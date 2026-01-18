@@ -4,7 +4,7 @@ module physics_models_hcf
     use :: module_core
     use :: physics_constants, only:TtoK => celsius_to_kelvin, Mw => molar_mass_water, &
         Rg => universal_gas_constant, g => gravity_acceleration, rho_std => reference_water_density
-    use :: physics_types, only:abst_physics
+    use :: physics_base, only:abst_physics
     implicit none
     private
 

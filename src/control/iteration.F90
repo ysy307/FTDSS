@@ -42,7 +42,7 @@ module control_iteration
         !> 収束判定に使用するノルムの種類 (L2, LInf, etc.)
         type(type_constant_id) :: norm_type = NORM_TYPES%L2
         !> 複数の基準（ResidualとUpdate）間の結合ロジック (AND, OR)
-        type(type_constant_id) :: combination_logic = NONLINEAR_LOGICS%AND
+        type(type_constant_id) :: combination_logic = NONLINEAR_LOGIC%AND
 
         !> 残差ベクトルの収束基準（物理量ごと）
         type(type_convergence_criterion) :: residual(PHYSICS_TYPES%NUM_ID)
@@ -87,8 +87,6 @@ module control_iteration
         procedure, pass(self), public :: increment_nonlinear
         procedure, pass(self), public :: increment_total
         procedure, pass(self), public :: check_convergence
-        procedure, pass(self), public :: set_converged_flag
-
         ! Query
         procedure, pass(self), public :: should_continue
         procedure, pass(self), public :: has_converged
@@ -221,7 +219,7 @@ contains
 
             ! --- 収束判定設定 ---
             self%convergence_control%norm_type = NORM_TYPES%to_object(conv%norm_type)
-            self%convergence_control%combination_logic = NONLINEAR_LOGICS%to_object(conv%use_logic)
+            self%convergence_control%combination_logic = NONLINEAR_LOGIC%to_object(conv%use_logic)
 
             nl_crit_type = NONLINEAR_NORM_CRITERIA%to_object(conv%use_criteria)
 
@@ -323,8 +321,12 @@ contains
     subroutine check_convergence(self, field_id, res_vec, upd_vec)
         implicit none
         class(type_iteration), intent(inout) :: self
+        !> 物理フィールドID
         type(type_constant_id), intent(in) :: field_id
-        real(real64), intent(in) :: res_vec(:), upd_vec(:)
+        !> 残差ベクトル
+        real(real64), intent(in) :: res_vec(:)
+        !> 更新量ベクトル
+        real(real64), intent(in) :: upd_vec(:)
 
         logical :: is_res_ok, is_upd_ok
 
@@ -348,9 +350,9 @@ contains
             is_upd_ok = ctrl%update(field_id%id)%check(upd_vec, self%nonlinear_iter, ctrl%norm_type)
 
             ! --- Combine Logic (AND / OR) ---
-            if (ctrl%combination_logic == NONLINEAR_LOGICS%OR) then
+            if (ctrl%combination_logic == NONLINEAR_LOGIC%OR) then
                 self%is_converged(field_id%id) = is_res_ok .or. is_upd_ok
-            else if (ctrl%combination_logic == NONLINEAR_LOGICS%AND) then
+            else if (ctrl%combination_logic == NONLINEAR_LOGIC%AND) then
                 self%is_converged(field_id%id) = is_res_ok .and. is_upd_ok
             else
                 ! Default AND

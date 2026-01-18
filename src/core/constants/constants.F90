@@ -5,6 +5,7 @@ module core_constants
     use :: core_constants_physical
     use :: core_constants_base
     use :: core_constants_fe
+    use :: core_constants_ids
 
     implicit none
     public

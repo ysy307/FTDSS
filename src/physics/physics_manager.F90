@@ -2,7 +2,7 @@ module physics_service
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core
-    use :: physics_types, only:type_iapws_wrapper
+    use :: physics_base, only:type_iapws_wrapper
     use :: module_physics_materials, only:type_material_manager, type_thc_dispersivity
     use :: module_physics_models, only:type_models_manager, type_wrf_params, type_hcf_params
     implicit none

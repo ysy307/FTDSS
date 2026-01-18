@@ -164,6 +164,42 @@ contains
         call self%controls%profiler%stop("IO")
     end subroutine output_history_ftdss
 
+    module subroutine get_variable_ftdss(self, variable_id, variable)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+        type(type_constant_id), intent(in) :: variable_id
+        real(real64), intent(inout), allocatable :: variable(:)
+
+        real(real64), pointer, contiguous, dimension(:) :: u => null()
+
+        integer(int32) :: target_dof
+        integer(int32) :: num_nodes, num_dofs_per_node
+        integer(int32) :: start_idx, end_idx
+
+        call deallocate_array(variable)
+
+        u => self%u%get_data()
+        if (.not. associated(u)) then
+            return
+        end if
+
+        if (self%controls%is_physics_active(variable_id%id)) then
+            call self%domain%get_num_nodes(num_nodes)
+            call self%domain%get_num_dofs_per_node(num_dofs_per_node)
+            call self%domain%get_target_dof(variable_id%id, target_dof)
+
+            call allocate_array(variable, num_nodes)
+
+            start_idx = target_dof
+            end_idx = num_dofs_per_node * (num_nodes - 1) + target_dof
+
+            variable(:) = u(start_idx:end_idx:num_dofs_per_node)
+        end if
+
+        nullify (u)
+
+    end subroutine get_variable_ftdss
+
     module subroutine set_state_ftdss(self, node_id, element_id, state)
         implicit none
         class(type_ftdss), intent(inout) :: self
@@ -245,38 +281,30 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
-        real(real64), pointer, contiguous, dimension(:) :: u => null()
-        integer(int32) :: target_dof
-        integer(int32) :: start_idx, end_idx, num_nodes, num_dofs_per_node
         integer(int32) :: iter
         real(real64), pointer, dimension(:) :: bdf_coeffs => null()
         integer(int32) :: bdf_order
-        real(real64), pointer, contiguous, dimension(:) :: temperature => null()
+        real(real64), pointer, contiguous, dimension(:) :: temperature_current => null()
+        real(real64), allocatable :: temperature(:)
 
         call self%controls%profiler%start("Setup")
 
-        u => self%u%get_data()
         call self%controls%iteration%get_nonlinear_iter(iter)
-
-        call self%domain%get_num_nodes(num_nodes)
-        call self%domain%get_num_dofs_per_node(num_dofs_per_node)
 
         call self%controls%time%get_bdf_coeffs(bdf_coeffs)
         call self%controls%time%get_bdf_order(bdf_order)
 
         if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
-            call self%domain%get_target_dof(PHYSICS_TYPE_THERMAL, target_dof)
-
-            start_idx = target_dof
-            end_idx = num_dofs_per_node * (num_nodes - 1) + target_dof
-
-            call self%temperature%get_current(temperature)
-            if (associated(temperature)) then
-                temperature(:) = temperature(:) + u(start_idx:end_idx:num_dofs_per_node)
+            call self%get_variable(PHYSICS_TYPES%THERMAL, temperature)
+            call self%temperature%get_current(temperature_current)
+            if (associated(temperature_current)) then
+                temperature_current(:) = temperature_current(:) + temperature(:)
             end if
 
             call self%calc_gradient_temperature()
             call self%temperature%compute_time_derivative(bdf_coeffs(1:bdf_order + 1))
+
+            call deallocate_array(temperature)
         end if
 
         call self%controls%profiler%stop("Setup")

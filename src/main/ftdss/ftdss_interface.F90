@@ -75,6 +75,8 @@ module main_ftdss
         procedure, private, pass(self) :: assemble_initialize => assemble_initialize_ftdss
         procedure, private, pass(self) :: assemble_finalize => assemble_finalize_ftdss
 
+        procedure, private, pass(self) :: get_variable => get_variable_ftdss
+
         !> 1タイムステップ分の計算を行う（非線形反復ループを含む）
         procedure, public, pass(self) :: solve_time_step => solve_time_step_ftdss
         procedure, private, pass(self) :: solve_time_step_initial_setup => solve_time_step_initial_setup_ftdss
@@ -230,6 +232,14 @@ module main_ftdss
             type(type_vector_dp), intent(inout), optional :: local_R_T, local_R_H
 
         end subroutine assemble_finalize_ftdss
+
+        module subroutine get_variable_ftdss(self, variable_id, variable)
+            implicit none
+            class(type_ftdss), intent(inout) :: self
+            type(type_constant_id), intent(in) :: variable_id
+            real(real64), intent(inout), allocatable :: variable(:)
+
+        end subroutine get_variable_ftdss
 
         module subroutine assemble_ftdss(self)
             implicit none
