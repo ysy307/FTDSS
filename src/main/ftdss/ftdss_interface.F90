@@ -1,5 +1,6 @@
 module main_ftdss
     use, intrinsic :: iso_fortran_env
+    use :: stdlib_optval, only:optval
     use :: mpi_f08
     use :: stdlib_logger
     use :: module_core
@@ -97,16 +98,15 @@ module main_ftdss
         module subroutine prescribe_essential_bc_generic(self, physics_type, current_time, variable)
             implicit none
             class(type_ftdss), intent(inout), target :: self
-            integer(int32), intent(in) :: physics_type
+            type(type_constant_id), intent(in) :: physics_type
             real(real64), intent(in) :: current_time
             type(type_variable), intent(inout) :: variable
-
         end subroutine prescribe_essential_bc_generic
 
         module subroutine apply_natural_bc_generic(self, physics_type, current_time, variable, dof_offset)
             implicit none
             class(type_ftdss), intent(inout), target :: self
-            integer(int32), intent(in) :: physics_type
+            type(type_constant_id), intent(in) :: physics_type
             real(real64), intent(in) :: current_time
             type(type_variable), intent(in) :: variable
             integer(int32), intent(in) :: dof_offset
@@ -116,7 +116,7 @@ module main_ftdss
         module subroutine apply_essential_bc_generic(self, physics_type, current_time, variable, dof_offset)
             implicit none
             class(type_ftdss), intent(inout), target :: self
-            integer(int32), intent(in) :: physics_type
+            type(type_constant_id), intent(in) :: physics_type
             real(real64), intent(in) :: current_time
             type(type_variable), intent(in) :: variable
             integer(int32), intent(in) :: dof_offset

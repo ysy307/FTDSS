@@ -56,12 +56,12 @@ contains
         call self%porosity%initialize(num_nodes, max_bdf_order)
         call ic%apply(IC_TARGET_POROSITY, self%porosity)
 
-        if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
+        if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             call self%temperature%initialize(num_nodes, max_bdf_order)
             call ic%apply(IC_TARGET_THERMAL, self%temperature)
         end if
 
-        if (self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) then
+        if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
             call self%pressure%initialize(num_nodes, max_bdf_order)
             call ic%apply(IC_TARGET_HYDRAULIC, self%pressure)
         end if
@@ -183,7 +183,7 @@ contains
             return
         end if
 
-        if (self%controls%is_physics_active(variable_id%id)) then
+        if (self%controls%is_physics_active(variable_id)) then
             call self%domain%get_num_nodes(num_nodes)
             call self%domain%get_num_dofs_per_node(num_dofs_per_node)
             call self%domain%get_target_dof(variable_id%id, target_dof)
@@ -258,11 +258,11 @@ contains
 
         call self%controls%profiler%start("Setup")
 
-        if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
+        if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             call self%temperature%advance()
         end if
 
-        if (self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) then
+        if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
             call self%pressure%advance()
         end if
 
@@ -285,7 +285,8 @@ contains
         real(real64), pointer, dimension(:) :: bdf_coeffs => null()
         integer(int32) :: bdf_order
         real(real64), pointer, contiguous, dimension(:) :: temperature_current => null()
-        real(real64), allocatable :: temperature(:)
+        real(real64), allocatable :: u(:)
+        type(type_constant_id), pointer :: nonlinear_solver_type
 
         call self%controls%profiler%start("Setup")
 
@@ -294,17 +295,24 @@ contains
         call self%controls%time%get_bdf_coeffs(bdf_coeffs)
         call self%controls%time%get_bdf_order(bdf_order)
 
-        if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
-            call self%get_variable(PHYSICS_TYPES%THERMAL, temperature)
+        if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
+            call self%get_variable(PHYSICS_TYPES%THERMAL, u)
             call self%temperature%get_current(temperature_current)
+            call self%controls%iteration%get_nonlinear_solver(nonlinear_solver_type)
             if (associated(temperature_current)) then
-                temperature_current(:) = temperature_current(:) + temperature(:)
+                if (nonlinear_solver_type == NONLINEAR_SOLVER%NEWTON .or. &
+                    nonlinear_solver_type == NONLINEAR_SOLVER%MODIFIED_NEWTON) then
+                    temperature_current(:) = temperature_current(:) + u(:)
+                else if (nonlinear_solver_type == NONLINEAR_SOLVER%PICARD .or. &
+                         nonlinear_solver_type == NONLINEAR_SOLVER%MODIFIED_PICARD) then
+                    temperature_current(:) = u(:)
+                end if
             end if
 
             call self%calc_gradient_temperature()
             call self%temperature%compute_time_derivative(bdf_coeffs(1:bdf_order + 1))
 
-            call deallocate_array(temperature)
+            call deallocate_array(u)
         end if
 
         call self%controls%profiler%stop("Setup")

@@ -27,42 +27,42 @@ contains
         ! Step 0: Prescribe Dirichlet Values (Update Field Variables directly)
         ! ----------------------------------------------------------------------
         if (prescribe_essential) then
-            if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
-                call self%prescribe_essential_bc_generic(PHYSICS_TYPE_THERMAL, current_time, self%temperature)
+            if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
+                call self%prescribe_essential_bc_generic(PHYSICS_TYPES%THERMAL, current_time, self%temperature)
             end if
 
-            if (self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) then
-                call self%prescribe_essential_bc_generic(PHYSICS_TYPE_HYDRAULIC, current_time, self%pressure)
+            if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
+                call self%prescribe_essential_bc_generic(PHYSICS_TYPES%HYDRAULIC, current_time, self%pressure)
             end if
         end if
 
         ! ----------------------------------------------------------------------
         ! Step 1: Apply Natural BCs (Neumann, Robin, etc.)
         ! ----------------------------------------------------------------------
-        if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
+        if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPE_THERMAL)
-            call self%apply_natural_bc_generic(PHYSICS_TYPE_THERMAL, current_time, &
+            call self%apply_natural_bc_generic(PHYSICS_TYPES%THERMAL, current_time, &
                                                self%temperature, dof_offset)
         end if
 
-        if (self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) then
+        if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
             dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPE_HYDRAULIC)
-            call self%apply_natural_bc_generic(PHYSICS_TYPE_HYDRAULIC, current_time, &
+            call self%apply_natural_bc_generic(PHYSICS_TYPES%HYDRAULIC, current_time, &
                                                self%pressure, dof_offset)
         end if
 
         ! ----------------------------------------------------------------------
         ! Step 2: Apply Essential BCs (Dirichlet Constraints)
         ! ----------------------------------------------------------------------
-        if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
+        if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPE_THERMAL)
-            call self%apply_essential_bc_generic(PHYSICS_TYPE_THERMAL, current_time, &
+            call self%apply_essential_bc_generic(PHYSICS_TYPES%THERMAL, current_time, &
                                                  self%temperature, dof_offset)
         end if
 
-        if (self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) then
+        if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
             dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPE_HYDRAULIC)
-            call self%apply_essential_bc_generic(PHYSICS_TYPE_HYDRAULIC, current_time, &
+            call self%apply_essential_bc_generic(PHYSICS_TYPES%HYDRAULIC, current_time, &
                                                  self%pressure, dof_offset)
         end if
 
@@ -74,7 +74,7 @@ contains
     module subroutine prescribe_essential_bc_generic(self, physics_type, current_time, variable)
         implicit none
         class(type_ftdss), intent(inout), target :: self
-        integer(int32), intent(in) :: physics_type
+        type(type_constant_id), intent(in) :: physics_type
         real(real64), intent(in) :: current_time
         type(type_variable), intent(inout) :: variable
 
@@ -83,7 +83,7 @@ contains
         logical :: is_active
         class(abst_bc), pointer :: bc_obj
 
-        associate (phys_mgr => self%domain%boundaries%physics(physics_type))
+        associate (phys_mgr => self%domain%boundaries%physics(physics_type%id))
             do i_patch = 1, phys_mgr%num_bcs
                 bc_obj => phys_mgr%bcs(i_patch)%condition
 
@@ -109,7 +109,7 @@ contains
     module subroutine apply_natural_bc_generic(self, physics_type, current_time, variable, dof_offset)
         implicit none
         class(type_ftdss), intent(inout), target :: self
-        integer(int32), intent(in) :: physics_type
+        type(type_constant_id), intent(in) :: physics_type
         real(real64), intent(in) :: current_time
         type(type_variable), intent(in) :: variable
         integer(int32), intent(in) :: dof_offset
@@ -134,7 +134,7 @@ contains
         class(abst_bc), pointer :: bc_obj
         class(abst_fe), pointer :: fe
 
-        associate (phys_mgr => self%domain%boundaries%physics(physics_type))
+        associate (phys_mgr => self%domain%boundaries%physics(physics_type%id))
             do i_patch = 1, phys_mgr%num_bcs
                 bc_obj => phys_mgr%bcs(i_patch)%condition
 
@@ -206,18 +206,36 @@ contains
     !>
     module subroutine apply_essential_bc_generic(self, physics_type, current_time, variable, dof_offset)
         implicit none
+        !> Instance of FTDSS solver
         class(type_ftdss), intent(inout), target :: self
-        integer(int32), intent(in) :: physics_type
+        !> Physics type identifier in PHYSICS_TYPES
+        type(type_constant_id), intent(in) :: physics_type
+        !> Current simulation time in seconds
         real(real64), intent(in) :: current_time
+        !> Field variable to apply BCs to
         type(type_variable), intent(in) :: variable
+        !> Degree of freedom offset for the physics type
         integer(int32), intent(in) :: dof_offset
 
         integer(int32) :: i_patch, i, glob_node_id
         real(real64) :: val_fixed, val_curr
         logical :: is_active
         class(abst_bc), pointer :: bc_obj
+        type(type_constant_id), pointer :: nonlinear_solver_type
 
-        associate (phys_mgr => self%domain%boundaries%physics(physics_type))
+        logical :: is_residual_form
+
+        call self%controls%iteration%get_nonlinear_solver(nonlinear_solver_type)
+
+        ! Determine calculation form from solver type
+        if (nonlinear_solver_type == NONLINEAR_SOLVER%NEWTON .or. &
+            nonlinear_solver_type == NONLINEAR_SOLVER%MODIFIED_NEWTON) then
+            is_residual_form = .true.
+        else
+            is_residual_form = .false.
+        end if
+
+        associate (phys_mgr => self%domain%boundaries%physics(physics_type%id))
             do i_patch = 1, phys_mgr%num_bcs
                 bc_obj => phys_mgr%bcs(i_patch)%condition
 
@@ -228,16 +246,22 @@ contains
                     do i = 1, size(patch%connectivity%val)
                         glob_node_id = patch%connectivity%val(i)
 
-                        call variable%get_current(glob_node_id, val_curr)
-
-                        ! 1. Jacobianの行をゼロ化 (zero_row使用)
+                        ! 1. Zero out the row of the Jacobian matrix
                         call self%K%zero(glob_node_id, dof_offset)
-
-                        !    対角成分に1.0をセット
+                        !    Set diagonal element to 1.0
                         call self%K%set(dof_offset, dof_offset, glob_node_id, glob_node_id, 1.0d0)
 
-                        ! 2. 残差ベクトルを上書き (set使用)
-                        call self%F%set(dof_offset, glob_node_id, val_curr - val_fixed)
+                        ! 2. Set Residual/Force vector
+                        if (is_residual_form) then
+                            ! Newton Method/ Modified Newton Method (Residual form): K * du = -R
+                            ! [NOTE] du = val_curr - val_fixed
+                            call variable%get_current(glob_node_id, val_curr)
+                            call self%F%set(dof_offset, glob_node_id, val_curr - val_fixed)
+                        else
+                            ! Picard Method (Full form): K * u = F
+                            ! [NOTE] u = val_fixed
+                            call self%F%set(dof_offset, glob_node_id, val_fixed)
+                        end if
                     end do
                 end associate
             end do

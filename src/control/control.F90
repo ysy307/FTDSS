@@ -170,17 +170,26 @@ contains
         end select
     end function is_target_control
 
+    !>
+    !> 指定された物理定数が計算対象かどうかを判定する
     pure function is_physics_active_control(self, physics_type) result(is_active)
         implicit none
+        !> Instance of control settings
         class(type_controls), intent(in) :: self
-        integer, intent(in) :: physics_type
+        !> Physics type identifier in PHYSICS_TYPES
+        type(type_constant_id), intent(in) :: physics_type
+        !> Returns `true` if the physics type is active
         logical :: is_active
 
-        if (physics_type < 1 .or. physics_type > NUM_PHYSICS_TYPES) then
-            is_active = .false.
+        if (PHYSICS_TYPES%in_group(physics_type)) then
+            if (physics_type%id < 1 .or. physics_type%id > PHYSICS_TYPES%NUM_ID) then
+                is_active = .false.
+            end if
+            is_active = self%is_active(physics_type%id)
         else
-            is_active = self%is_active(physics_type)
+            is_active = .false.
         end if
+
     end function is_physics_active_control
 
     pure subroutine get_coupling_mode_control(self, coupling_mode)

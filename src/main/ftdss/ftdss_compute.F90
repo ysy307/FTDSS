@@ -241,7 +241,7 @@ contains
 
         real(real64), pointer, contiguous, dimension(:) :: temperature => null()
 
-        if (.not. self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) return
+        if (.not. self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) return
 
         call self%temperature%get_current(temperature)
         call self%calc_gradient(temperature, self%temperature%grad)
@@ -255,7 +255,7 @@ contains
 
         real(real64), pointer, contiguous, dimension(:) :: pressure => null()
 
-        if (.not. self%controls%is_physics_active(PHYSICS_TYPE_HYDRAULIC)) return
+        if (.not. self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) return
 
         call self%pressure%get_current(pressure)
         call self%calc_gradient(pressure, self%pressure%grad)
@@ -387,7 +387,7 @@ contains
 
         call allocate_array(diff, num_nodes)
 
-        if (self%controls%is_physics_active(PHYSICS_TYPE_THERMAL)) then
+        if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             call self%get_variable(PHYSICS_TYPES%THERMAL, variable)
             call self%temperature%get_current(current_value)
 

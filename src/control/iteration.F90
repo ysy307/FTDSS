@@ -93,6 +93,8 @@ module control_iteration
         procedure, pass(self), public :: get_nonlinear_iter
         procedure, pass(self), public :: get_total_iter
         procedure, pass(self), public :: get_max_iterations
+        procedure, pass(self), public :: get_update_frequency
+        procedure, pass(self), public :: get_nonlinear_solver => get_nonlinear_solver_type_iteration
     end type type_iteration
 
 contains
@@ -396,21 +398,43 @@ contains
 
     ! --- Getters ---
     pure subroutine get_nonlinear_iter(self, val)
+        implicit none
         class(type_iteration), intent(in) :: self
-        integer(int32), intent(out) :: val
+        integer(int32), intent(inout) :: val
+
         val = self%nonlinear_iter
     end subroutine get_nonlinear_iter
 
     pure subroutine get_total_iter(self, val)
+        implicit none
         class(type_iteration), intent(in) :: self
-        integer(int32), intent(out) :: val
+        integer(int32), intent(inout) :: val
+
         val = self%total_iter
     end subroutine get_total_iter
 
     pure subroutine get_max_iterations(self, val)
+        implicit none
         class(type_iteration), intent(in) :: self
-        integer(int32), intent(out) :: val
+        integer(int32), intent(inout) :: val
+
         val = self%config%max_iterations
     end subroutine get_max_iterations
+
+    pure subroutine get_update_frequency(self, val)
+        implicit none
+        class(type_iteration), intent(in) :: self
+        integer(int32), intent(inout) :: val
+
+        val = self%config%update_frequency
+    end subroutine get_update_frequency
+
+    subroutine get_nonlinear_solver_type_iteration(self, val)
+        implicit none
+        class(type_iteration), intent(in), target :: self
+        type(type_constant_id), intent(inout), pointer :: val
+
+        val => self%nonlinear_solver_type
+    end subroutine get_nonlinear_solver_type_iteration
 
 end module control_iteration
