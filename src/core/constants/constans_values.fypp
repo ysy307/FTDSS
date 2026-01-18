@@ -1,0 +1,151 @@
+#:include "constans.fypp"
+
+!>
+!> Module defining various constant ID groups
+!>
+module core_constants_values
+    use, intrinsic :: iso_fortran_env
+    use :: stdlib_strings, only:strip
+    use :: stdlib_ascii, only:to_lower
+    use :: core_constants_base, only:type_constant_value
+    implicit none
+    private
+
+    #:for group in constant_value_groups
+    !> ${group['description']}$ group of constants
+    type :: ${group['type_name']}$
+        !> Group name
+        character(len=32) :: group = "${group['category']}$"
+        #:for item in group['items']
+        !> ${group['description']}$ in ${item[1]}$
+        type(type_constant_value) :: ${item[0]}$ = type_constant_value("${group['category']}$", "${item[1]}$", ${item[2]}$, "${item[3]}$", ${item[4]}$d0)
+        #:endfor
+        !> Number of constants in ${group['description']}$
+        integer(int32) :: NUM_ID = ${group['num']}$
+    contains
+        procedure, public, pass(self) :: to_id => to_id_${group['suffix']}$
+        procedure, public, pass(self) :: to_name => to_name_${group['suffix']}$
+        procedure, private, pass(self) :: to_object_from_id => to_object_from_id_${group['suffix']}$
+        procedure, private, pass(self) :: to_object_from_name => to_object_from_name_${group['suffix']}$
+        generic, public :: to_object => to_object_from_id, to_object_from_name
+        procedure, public, pass(self) :: in_group => in_group_${group['suffix']}$
+    end type ${group['type_name']}$
+
+    type(${group['type_name']}$), parameter, public :: ${group['obj_name']}$ = ${group['type_name']}$()
+
+    #:endfor
+
+contains
+    #:for group in constant_value_groups
+    !> Convert name to ID in ${group['description']}$
+    pure function to_id_${group['suffix']}$(self, name) result(id)
+        implicit none
+        !> ${group['description']}$ instance
+        class(${group['type_name']}$), intent(in) :: self
+        !> Name of the constant
+        character(len=*), intent(in) :: name
+        !> ID of the constant
+        integer(int32) :: id
+
+        character(len=:), allocatable :: lname
+
+        lname = strip(to_lower(name))
+
+        #:for i, item in enumerate(group['items'])
+        ${'if' if i == 0 else 'else if'}$ (lname == strip(to_lower(self%${item[0]}$%name))) then
+            id = self%${item[0]}$%id
+        #:endfor
+        else
+            id = -1
+        end if
+
+    end function to_id_${group['suffix']}$
+
+    !> Convert ID to name in ${group['description']}$
+    pure function to_name_${group['suffix']}$(self, id) result(name)
+        implicit none
+        !> ${group['description']}$ instance
+        class(${group['type_name']}$), intent(in) :: self
+        !> ID of the constant
+        integer(int32), intent(in) :: id
+        !> Name of the constant
+        character(len=:), allocatable :: name
+
+        #:for i, item in enumerate(group['items'])
+        ${'if' if i == 0 else 'else if'}$ (id == self%${item[0]}$%id) then
+            name = self%${item[0]}$%name
+        #:endfor
+        else
+            name = "unknown"
+        end if
+
+    end function to_name_${group['suffix']}$
+
+    !> Convert ID to object in ${group['description']}$
+    pure function to_object_from_id_${group['suffix']}$(self, id) result(object)
+        implicit none
+        !> ${group['description']}$ instance
+        class(${group['type_name']}$), intent(in) :: self
+        !> ID of the constant
+        integer(int32), intent(in) :: id
+        !> Constant object
+        type(type_constant_value) :: object
+
+        #:for i, item in enumerate(group['items'])
+        ${'if' if i == 0 else 'else if'}$ (id == self%${item[0]}$%id) then
+            object = self%${item[0]}$
+        #:endfor
+        else
+            object = type_constant_value("${group['category']}$", "unknown", -1, "unknown", 0.0d0)
+        end if
+
+    end function to_object_from_id_${group['suffix']}$
+
+    !> Convert name to object in ${group['description']}$
+    pure function to_object_from_name_${group['suffix']}$(self, name) result(object)
+        implicit none
+        !> ${group['description']}$ instance
+        class(${group['type_name']}$), intent(in) :: self
+        !> Name of the constant
+        character(len=*), intent(in) :: name
+        !> Constant object
+        type(type_constant_value) :: object
+
+        character(len=:), allocatable :: lname
+
+        lname = strip(to_lower(name))
+
+        #:for i, item in enumerate(group['items'])
+        ${'if' if i == 0 else 'else if'}$ (lname == strip(to_lower(self%${item[0]}$%name))) then
+            object = self%${item[0]}$
+        #:endfor
+        else
+            object = type_constant_value("${group['category']}$", "unknown", -1, "unknown", 0.0d0)
+        end if
+
+    end function to_object_from_name_${group['suffix']}$
+
+    !> Check if object belongs to ${group['description']}$
+    pure function in_group_${group['suffix']}$(self, object) result(is_in)
+        implicit none
+        !> ${group['description']}$ instance
+        class(${group['type_name']}$), intent(in) :: self
+        !> Constant object to check
+        type(type_constant_value), intent(in) :: object
+        !> `True` if object belongs to the group
+        logical :: is_in
+
+        character(len=:), allocatable :: lname
+
+        is_in = .false.
+        lname = strip(to_lower(object%group))
+
+        if (lname == strip(to_lower(self%group))) then
+            is_in = .true.
+        else
+            is_in = .false.
+        end if
+    end function in_group_${group['suffix']}$
+
+    #:endfor
+end module core_constants_values

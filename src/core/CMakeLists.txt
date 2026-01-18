@@ -21,6 +21,7 @@ enable_thirdparty(Core_Validation)
 
 set(CORE_CONSTANTS_FYPP_SOURCES
     constants/constans_ids.fypp
+    constants/constans_values.fypp
 )
 fypp_F90("" "${CORE_CONSTANTS_FYPP_SOURCES}" CORE_CONSTANTS_GENERATED_SOURCES)
 set(CORE_CONSTANTS_SOURCES
@@ -29,7 +30,6 @@ set(CORE_CONSTANTS_SOURCES
     constants/constants_parallel.F90
     constants/constants_utils.F90
     constants/constants_physical.F90
-    constants/constants_fe.F90
     constants/constants.F90
 )
 add_library(Core_Constants STATIC ${CORE_CONSTANTS_SOURCES} ${CORE_CONSTANTS_GENERATED_SOURCES})

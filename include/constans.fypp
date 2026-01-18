@@ -472,4 +472,25 @@
         FE_TYPES &
     ]
 
+
+    #:set TIME_UNITS = { &
+        'type_name'  : 'type_constants_time_units', &
+        'obj_name'   : 'TIME_UNITS', &
+        'category'   : 'TIME_UNITS', &
+        'suffix'     : 'time_units', &
+        'description': 'Time units', &
+        'items'      : [ &
+            ('SECONDS', "second", 1, 's', 1.0), &
+            ('MINUTES', "minute", 2, 'm', 60.0), &
+            ('HOURS',   "hour",   3, 'h', 3600.0), &
+            ('DAYS',    "day",    4, 'd', 86400.0), &
+            ('WEEKS',   "week",   5, 'w', 604800.0), &
+            ('YEARS',   "year",   6, 'y', 31536000.0) &
+        ], &
+        'num' : 6 &
+    }
+
+    #:set constant_value_groups = [ &
+        TIME_UNITS &
+    ]
 #:endmute
