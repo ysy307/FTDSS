@@ -16,6 +16,8 @@
         'real':    ["real({})".format(k)    for k in KINDS['real']], &
         'logical': ["logical({})".format(k) for k in KINDS['logical']] &
         }
+    
+    #:set MAX_RANK = 3
 
     #:def rank_suffix(rank)
         ${"({0})".format(":" + ",:" * (rank - 1)) if rank > 0 else ""}$

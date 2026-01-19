@@ -29,6 +29,7 @@ module core_constants_ids
         procedure, private, pass(self) :: to_object_from_name => to_object_from_name_${group['suffix']}$
         generic, public :: to_object => to_object_from_id, to_object_from_name
         procedure, public, pass(self) :: in_group => in_group_${group['suffix']}$
+        procedure, public, pass(self) :: is_invalid => is_invalid_${group['suffix']}$
     end type ${group['type_name']}$
 
     type(${group['type_name']}$), parameter, public :: ${group['obj_name']}$ = ${group['type_name']}$()
@@ -146,6 +147,28 @@ contains
             is_in = .false.
         end if
     end function in_group_${group['suffix']}$
+
+    !> Check if object is in ${group['description']}$
+    pure function is_invalid_${group['suffix']}$(self, object) result(is_invalid)
+        implicit none
+        !> ${group['description']}$ instance
+        class(${group['type_name']}$), intent(in) :: self
+        !> Constant object to check
+        type(type_constant_id), intent(in) :: object
+        !> `True` if object is in the group
+        logical :: is_invalid
+
+        is_invalid = self%in_group(object)
+
+        if (.not. is_invalid) return
+
+        if (object%id < 0 .or. object%id >= self%NUM_ID) then
+            is_invalid = .false.
+        else
+            is_invalid = .true.
+        end if
+
+    end function is_invalid_${group['suffix']}$
 
     #:endfor
 end module core_constants_ids

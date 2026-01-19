@@ -16,8 +16,9 @@ module module_control
 
     type :: type_controls
         private
-        logical :: is_active(NUM_PHYSICS_TYPES) = .false.
-        integer(int32) :: coupling_mode
+        logical :: is_active(PHYSICS_TYPES%NUM_ID) = .false.
+        type(type_constant_id) :: coupling_mode
+        ! integer(int32) :: coupling_mode
         logical, allocatable :: thermal(:)
         logical, allocatable :: hydraulic(:)
         logical, allocatable :: mechanical(:)
@@ -41,7 +42,7 @@ contains
     subroutine initialize_type_controls(self, input)
         implicit none
         class(type_controls), intent(inout) :: self
-        class(type_input), intent(in), optional :: input
+        class(type_input), intent(in) :: input
 
         integer(int32), allocatable :: unique_material_ids(:)
         integer(int32) :: ierr
@@ -49,8 +50,6 @@ contains
         integer(int32) :: current_material_id
         character(len=10), allocatable :: profiler_labels(:)
         real(real64) :: current_time_s
-
-        if (present(input)) then
 
             ierr = 0
             call input%geometry%vtk%get_active_region_info(unique_material_ids)
@@ -102,10 +101,10 @@ contains
                 end if
             end do
 
-            self%coupling_mode = input%basic%analysis_controls%coupling_mode
+            self%coupling_mode = COUPLING_MODES%to_object(input%basic%analysis_controls%coupling_mode)
 
             call self%time%initialize(input)
-            call self%iteration%initialize(input)
+            ! call self%iteration%initialize(input)
             call initialize_openmp(input)
 
             call self%time%get_time(current_time_s)
@@ -123,7 +122,6 @@ contains
                                                  history_output%file_format, &
                                                  current_time_s)
             end associate
-        end if
 
         call deallocate_array(unique_material_ids)
 
@@ -192,12 +190,12 @@ contains
 
     end function is_physics_active_control
 
-    pure subroutine get_coupling_mode_control(self, coupling_mode)
+    subroutine get_coupling_mode_control(self, coupling_mode)
         implicit none
-        class(type_controls), intent(in) :: self
-        integer(int32), intent(inout) :: coupling_mode
+        class(type_controls), intent(in), target :: self
+        type(type_constant_id), intent(inout), pointer :: coupling_mode
 
-        coupling_mode = self%coupling_mode
+        coupling_mode => self%coupling_mode
     end subroutine get_coupling_mode_control
 
     subroutine display_controls(self)
@@ -218,7 +216,7 @@ contains
         end if
 
         write (*, '(a)') "## Coupling Mode:"
-        write (*, '(a)') "- "//trim(get_coupling_mode_string(self%coupling_mode))
+        write (*, '(a)') "- "//trim(self%coupling_mode%name)
 
         if (allocated(self%thermal)) then
             write (*, '(a)') "### Thermal Material Flags:"

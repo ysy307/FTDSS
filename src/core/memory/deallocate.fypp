@@ -12,7 +12,7 @@ module core_deallocate
 
     !> Generic interface for safe array deallocation.
     interface deallocate_array
-        #:for rank in range(1, 4)
+        #:for rank in range(1, MAX_RANK + 1)
             ! Rank-${rank}$
             #:for dtype in ['integer', 'real', 'logical']
                 #:for k in KINDS[dtype]
@@ -25,7 +25,7 @@ module core_deallocate
 
 contains
 
-    #:for rank in range(1, 4)
+    #:for rank in range(1, MAX_RANK + 1)
         #:for dtype in ['integer', 'real', 'logical']
             #:for k, t_decl in zip(KINDS[dtype], TYPES[dtype])
                 #:set suffix = ('logical' + k) if dtype == 'logical' else k

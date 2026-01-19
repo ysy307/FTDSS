@@ -14,49 +14,61 @@ module control_iteration
     integer(int32), parameter :: ERR_ITER_INIT = 991
 
     !>
-    !> 個別の収束判定基準（残差または更新量、1つの物理量に対して）
+    !> Individual convergence criterion (residual or update, for one physical quantity)
     !>
     type :: type_convergence_criterion
-        !> この基準をチェックするかどうかのフラグ
-        logical :: should_check = .false.
-        !> 判定基準タイプ (Absolute, Relative, Both, None)
-        type(type_constant_id) :: criterion = NONLINEAR_CRITERIA%none
-        !> 絶対許容誤差
-        real(real64) :: absolute_tolerance = 1.0d-8
-        !> 相対許容誤差
-        real(real64) :: relative_tolerance = 1.0d-6
+        !> Flags whether to check convergence for this criterion
+        logical, private :: should_check = .false.
+        !> Criterion type (Absolute, Relative, Both, None)
+        type(type_constant_id), private :: criterion = NONLINEAR_CRITERIA%none
+        !> Tolerance of absolute error
+        real(real64), private :: absolute_tolerance = 1.0d-8
+        !> Tolerance of relative error
+        real(real64), private :: relative_tolerance = 1.0d-6
+        !> Reference value for relative error evaluation.
+        !> This value is used as the denominator to normalize the error.
+        !> The default is 1.0, which effectively performs an absolute error check.
+        !> Typically, this should be set to the characteristic physical scale (e.g., max-min range).
+        real(real64), private :: reference_value = 1.0d0
 
-        !> 各反復におけるノルムの履歴
+        !> Norm history for each iteration
         !> Dimension: (num_norm_type, max_iteration)
-        real(real64), allocatable :: norms_history(:, :)
+        !> (1,:) -> L1 norm history
+        !> (2,:) -> L2 norm history
+        !> (3,:) -> LInf norm history
+        real(real64), allocatable, private :: norms_history(:, :)
     contains
-        procedure, public, pass(self) :: initialize => initialize_criterion
+        procedure, public, pass(self) :: initialize => initialize_type_convergence_criterion
         procedure, public, pass(self) :: reset => reset_criterion
-        procedure, public, pass(self) :: check => check_criterion_value
+        procedure, public, pass(self) :: check => check_convergence_criterion
     end type type_convergence_criterion
 
     !>
-    !> 全体の収束制御設定
+    !> Overall convergence control settings
     !>
     type :: type_convergence_control
-        !> 収束判定に使用するノルムの種類 (L2, LInf, etc.)
-        type(type_constant_id) :: norm_type = NORM_TYPES%L2
-        !> 複数の基準（ResidualとUpdate）間の結合ロジック (AND, OR)
-        type(type_constant_id) :: combination_logic = NONLINEAR_LOGIC%AND
-
-        !> 残差ベクトルの収束基準（物理量ごと）
-        type(type_convergence_criterion) :: residual(PHYSICS_TYPES%NUM_ID)
-        !> 更新量ベクトルの収束基準（物理量ごと）
-        type(type_convergence_criterion) :: update(PHYSICS_TYPES%NUM_ID)
+        !> Norm type used for convergence check (L2, LInf, etc.)
+        type(type_constant_id), private :: norm_type = NORM_TYPES%L2
+        !> Combination logic between multiple criteria (Residual and Update) (AND, OR)
+        type(type_constant_id), private :: combination_logic = NONLINEAR_LOGIC%AND
+        !> Convergence criterion type (Residual, Update, Both)
+        type(type_constant_id), private :: residual_criterion_type = NONLINEAR_NORM_CRITERIA%RESIDUAL
+        !> Residual vector convergence criteria (for each physical quantity)
+        type(type_convergence_criterion), private :: residual(PHYSICS_TYPES%NUM_ID)
+        !> Update vector convergence criteria (for each physical quantity)
+        type(type_convergence_criterion), private :: update(PHYSICS_TYPES%NUM_ID)
     end type type_convergence_control
 
     !>
-    !> イテレータの設定コンテナ
+    !> Iterator configuration container
     !>
     type :: type_iterator_config
+        !> Maximum number of iterations
         integer(int32) :: max_iterations = 10
+        !> Frequency of updating system matrices
         integer(int32) :: update_frequency = 1
-        type(type_convergence_control) :: convergence_control
+        !> Convergence control settings
+        type(type_convergence_control), private :: convergence_control
     contains
         procedure, public, pass(self) :: initialize => initialize_config
     end type type_iterator_config
@@ -72,12 +84,11 @@ module control_iteration
 
         ! --- 状態フラグ ---
         ! 物理量ごとに収束状態を保持する (Thermal, Hydro, etc.)
-        logical :: is_converged(PHYSICS_TYPES%NUM_ID) = .true.
+        logical, private :: is_converged(PHYSICS_TYPES%NUM_ID) = .true.
 
         ! --- 設定 ---
-        type(type_constant_id) :: nonlinear_solver_type = NONLINEAR_SOLVER%NONE
+        type(type_constant_id), private :: nonlinear_solver_type = NONLINEAR_SOLVER%NONE
         type(type_iterator_config) :: config
-
     contains
         ! Initialization / Reset
         procedure, pass(self), public :: initialize
@@ -99,16 +110,23 @@ module control_iteration
 
 contains
 
-    ! ==========================================================================
-    ! type_convergence_criterion methods
-    ! ==========================================================================
-    subroutine initialize_criterion(self, should_check, criterion, &
-                                    absolute_tolerance, relative_tolerance, max_iterations)
+    !> Initialize convergence criterion
+    subroutine initialize_type_convergence_criterion(self, should_check, criterion, absolute_tolerance, &
+                                                     relative_tolerance, reference_value, max_iterations)
         implicit none
+        !> Initialize the convergence criterion with specified parameters.
         class(type_convergence_criterion), intent(inout) :: self
+        !> Flag to indicate whether to check this criterion
         logical, intent(in) :: should_check
+        !> Criterion type (Absolute, Relative, Both, None)
         type(type_constant_id), intent(in) :: criterion
-        real(real64), intent(in) :: absolute_tolerance, relative_tolerance
+        !> Tolerance of absolute error
+        real(real64), intent(in) :: absolute_tolerance
+        !> Tolerance of relative error
+        real(real64), intent(in) :: relative_tolerance
+        !> Reference value for relative error calculation
+        real(real64), intent(in) :: reference_value
+        !> Maximum number of iterations for allocating norm history
         integer(int32), intent(in) :: max_iterations
 
         self%should_check = should_check
@@ -116,10 +134,18 @@ contains
         self%absolute_tolerance = absolute_tolerance
         self%relative_tolerance = relative_tolerance
 
-        if (allocated(self%norms_history)) deallocate (self%norms_history)
-        allocate (self%norms_history(NORM_TYPES%NUM_ID, max_iterations))
+        ! Set reference value with a safeguard against near-zero values.
+        ! If the physical scale is zero (e.g., uniform fields), default to 1.0 to effectively use absolute error.
+        if (abs(reference_value) < 1.0d-6) then
+            self%reference_value = 1.0d0
+        else
+            self%reference_value = reference_value
+        end if
+
+        call deallocate_array(self%norms_history)
+        call allocate_array(self%norms_history, NORM_TYPES%NUM_ID, max_iterations)
         self%norms_history = 0.0d0
-    end subroutine initialize_criterion
+    end subroutine initialize_type_convergence_criterion
 
     subroutine reset_criterion(self)
         implicit none
@@ -130,10 +156,10 @@ contains
         end if
     end subroutine reset_criterion
 
+!>
+    !> Calculate norms, store them in history, and check convergence criteria.
     !>
-    !> ノルムを計算し、履歴に保存し、収束判定を行う
-    !>
-    function check_criterion_value(self, vector, iter, norm_type) result(is_ok)
+    function check_convergence_criterion(self, vector, iter, norm_type) result(is_ok)
         implicit none
         class(type_convergence_criterion), intent(inout) :: self
         real(real64), intent(in) :: vector(:)
@@ -141,71 +167,63 @@ contains
         type(type_constant_id), intent(in) :: norm_type
         logical :: is_ok
 
-        real(real64) :: current_norm, init_norm, rel_val
-        real(real64), parameter :: tiny_norm = 1.0d-14
+        real(real64) :: current_norm
         logical :: abs_ok, rel_ok
 
-        ! チェック不要なら常にTrue
+        ! Return true immediately if checking is disabled
         if (.not. self%should_check) then
             is_ok = .true.
             return
         end if
 
-        ! 基準なしならTrue
+        ! Return true if no criterion is set
         if (self%criterion == NONLINEAR_CRITERIA%none) then
             is_ok = .true.
             return
         end if
 
-        ! 1. ノルム計算と保存
-        !    範囲外アクセス防止
+        ! 1. Calculate and store norms
+        !    Prevent out-of-bounds access
         if (iter >= 1 .and. iter <= size(self%norms_history, 2)) then
             self%norms_history(NORM_TYPES%L1%id, iter) = vector_norm1(vector)
             self%norms_history(NORM_TYPES%L2%id, iter) = vector_norm2(vector)
             self%norms_history(NORM_TYPES%LINF%id, iter) = vector_norminf(vector)
         end if
 
+        ! Retrieve the specified norm for the current iteration
         current_norm = self%norms_history(norm_type%id, iter)
 
-        ! 2. 初回ノルムの取得 (Relative check用)
-        !    ※ iter=1 の値を初期値とする
-        init_norm = self%norms_history(norm_type%id, 1)
+        ! 3. Convergence logic
 
-        ! 3. 判定ロジック
         ! Absolute Check
         abs_ok = (current_norm < self%absolute_tolerance)
 
-        ! Relative Check
-        if (init_norm > tiny_norm) then
-            rel_val = current_norm / init_norm
-        else
-            ! 初期値がほぼゼロの場合、相対誤差は計算不能
-            ! ここでは安全側に 0.0 とする（= 収束とみなす）
-            rel_val = 0.0d0
-        end if
-        rel_ok = (rel_val < self%relative_tolerance)
+        ! Perform standard relative error calculation
+        rel_ok = (current_norm / self%reference_value < self%relative_tolerance)
 
-        ! Criteriaによる分岐 (select case禁止のためif文)
+        ! Determine final result based on the selected criterion
         if (self%criterion == NONLINEAR_CRITERIA%ABSOLUTE) then
             is_ok = abs_ok
         else if (self%criterion == NONLINEAR_CRITERIA%RELATIVE) then
             is_ok = rel_ok
         else if (self%criterion == NONLINEAR_CRITERIA%BOTH) then
+            ! Both conditions must be met (AND condition)
             is_ok = abs_ok .and. rel_ok
         else
-            ! Default
+            ! Default to absolute check
             is_ok = abs_ok
         end if
 
-    end function check_criterion_value
+    end function check_convergence_criterion
 
     ! ==========================================================================
     ! type_iterator_config methods
     ! ==========================================================================
-    subroutine initialize_config(self, input)
+    subroutine initialize_config(self, input, reference_value)
         implicit none
         class(type_iterator_config), intent(inout) :: self
         type(type_input), intent(in) :: input
+        real(real64), intent(in) :: reference_value
 
         integer(int32) :: i
         type(type_constant_id) :: nl_crit_type
@@ -246,6 +264,7 @@ contains
                     NONLINEAR_CRITERIA%to_object(conv%residual%criteria), &
                     conv%residual%absolute_tolerance, &
                     conv%residual%relative_tolerance, &
+                    reference_value, &
                     self%max_iterations)
 
                 ! Update Criteria
@@ -254,6 +273,7 @@ contains
                     NONLINEAR_CRITERIA%to_object(conv%update%criteria), &
                     conv%update%absolute_tolerance, &
                     conv%update%relative_tolerance, &
+                    reference_value, &
                     self%max_iterations)
             end do
         end associate
@@ -262,10 +282,11 @@ contains
     ! ==========================================================================
     ! type_iteration methods
     ! ==========================================================================
-    subroutine initialize(self, input)
+    subroutine initialize(self, input, reference_value)
         implicit none
         class(type_iteration), intent(inout) :: self
         type(type_input), intent(in) :: input
+        real(real64), intent(in) :: reference_value
 
         self%total_iter = 0
         self%nonlinear_iter = 0
@@ -278,7 +299,7 @@ contains
             return
         end if
 
-        call self%config%initialize(input)
+        call self%config%initialize(input, reference_value)
 
     end subroutine initialize
 
@@ -314,65 +335,64 @@ contains
     end subroutine increment_total
 
     !>
-    !> 指定された物理フィールドに対する収束判定を行う
+    !> Check convergence for a specific physics type based on residual and update vectors.
     !>
-    !> @param field_id : PHYSICS_TYPES (Thermal, Hydro, etc.)
-    !> @param res_vec  : 残差ベクトル
-    !> @param upd_vec  : 更新量ベクトル
-    !>
-    subroutine check_convergence(self, field_id, res_vec, upd_vec)
+    subroutine check_convergence(self, physics_type, residual_vector, update_vector)
         implicit none
         class(type_iteration), intent(inout) :: self
-        !> 物理フィールドID
-        type(type_constant_id), intent(in) :: field_id
-        !> 残差ベクトル
-        real(real64), intent(in) :: res_vec(:)
-        !> 更新量ベクトル
-        real(real64), intent(in) :: upd_vec(:)
+        !> Physics type identifier in PHYSICS_TYPES
+        type(type_constant_id), intent(in) :: physics_type
+        !> Residual vector
+        !> If the solver used in Neton-Raphson or Modified Newton methods,
+        !> this vector, \(R\) should represent the residual of the governing equations.
+        !> \(R= -J^{m+1} \Delta u^{m+1}\)
+        !> On the other hand, if the solver is Picard or Modified Picard,
+        !> this vector should represent the residual of system equations.
+        !> \(R = K^{m+1} u^{m+1} - F^{m+1}\)
+        real(real64), intent(in), optional :: residual_vector(:)
+        !> Update vector
+        !> This vector, \(\Delta u\), represents the change in the solution
+        !> between the current and previous iterations.
+        !> \(\Delta u^{m+1} = u^{m+1} - u^{m}\)
+        real(real64), intent(in), optional :: update_vector(:)
 
-        logical :: is_res_ok, is_upd_ok
+        logical :: is_resisual_ok, is_update_ok
 
         ! ソルバーなしの場合は常にTrue
         if (self%nonlinear_solver_type == NONLINEAR_SOLVER%NONE) then
-            self%is_converged(field_id%id) = .true.
+            self%is_converged(physics_type%id) = .true.
             return
         end if
 
-        associate (ctrl => self%config%convergence_control)
+        if (.not. PHYSICS_TYPES%is_invalid(physics_type)) then
+            return
+        end if
 
-            ! 安全チェック
-            if (field_id%id < 1 .or. field_id%id > PHYSICS_TYPES%NUM_ID) then
-                return
+        is_resisual_ok = .false.
+        is_update_ok = .false.
+        associate (control => self%config%convergence_control)
+            ! --- Residual Check ---
+            if (present(residual_vector)) then
+                is_resisual_ok = control%residual(physics_type%id)%check(residual_vector, self%nonlinear_iter, control%norm_type)
             end if
 
-            ! --- Residual Check ---
-            is_res_ok = ctrl%residual(field_id%id)%check(res_vec, self%nonlinear_iter, ctrl%norm_type)
-
             ! --- Update Check ---
-            is_upd_ok = ctrl%update(field_id%id)%check(upd_vec, self%nonlinear_iter, ctrl%norm_type)
+            if (present(update_vector)) then
+                is_update_ok = control%update(physics_type%id)%check(update_vector, self%nonlinear_iter, control%norm_type)
+            end if
 
             ! --- Combine Logic (AND / OR) ---
-            if (ctrl%combination_logic == NONLINEAR_LOGIC%OR) then
-                self%is_converged(field_id%id) = is_res_ok .or. is_upd_ok
-            else if (ctrl%combination_logic == NONLINEAR_LOGIC%AND) then
-                self%is_converged(field_id%id) = is_res_ok .and. is_upd_ok
+            if (control%combination_logic == NONLINEAR_LOGIC%OR) then
+                self%is_converged(physics_type%id) = is_resisual_ok .or. is_update_ok
+            else if (control%combination_logic == NONLINEAR_LOGIC%AND) then
+                self%is_converged(physics_type%id) = is_resisual_ok .and. is_update_ok
             else
                 ! Default AND
-                self%is_converged(field_id%id) = is_res_ok .and. is_upd_ok
+                self%is_converged(physics_type%id) = is_resisual_ok .and. is_update_ok
             end if
 
         end associate
     end subroutine check_convergence
-
-    !>
-    !> 全フィールドの収束判定が終わった後に、外部から全体収束フラグを強制設定する場合に使用
-    !>
-    subroutine set_converged_flag(self, converged)
-        implicit none
-        class(type_iteration), intent(inout) :: self
-        logical, intent(in) :: converged
-        self%is_converged(:) = converged
-    end subroutine set_converged_flag
 
     function should_continue(self) result(continue_flag)
         implicit none
