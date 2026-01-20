@@ -286,7 +286,8 @@ contains
         integer(int32) :: bdf_order
         real(real64), pointer, contiguous, dimension(:) :: temperature_current => null()
         real(real64), allocatable :: u(:)
-        type(type_constant_id), pointer :: nonlinear_solver_type
+
+        real(real64) :: omega = 0.5d0
 
         call self%controls%profiler%start("Setup")
 
@@ -298,14 +299,13 @@ contains
         if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             call self%get_variable(PHYSICS_TYPES%THERMAL, u)
             call self%temperature%get_current(temperature_current)
-            call self%controls%iteration%get_nonlinear_solver(nonlinear_solver_type)
             if (associated(temperature_current)) then
-                if (nonlinear_solver_type == NONLINEAR_SOLVER%NEWTON .or. &
-                    nonlinear_solver_type == NONLINEAR_SOLVER%MODIFIED_NEWTON) then
+                if (self%controls%iteration%is_newton()) then
                     temperature_current(:) = temperature_current(:) + u(:)
-                else if (nonlinear_solver_type == NONLINEAR_SOLVER%PICARD .or. &
-                         nonlinear_solver_type == NONLINEAR_SOLVER%MODIFIED_PICARD) then
-                    temperature_current(:) = u(:)
+                else if (self%controls%iteration%is_picard()) then
+                    ! temperature_current(:) = u(:)
+                    ! Picard with Under-Relaxation
+                    temperature_current(:) = omega * u(:) + (1.0d0 - omega) * temperature_current(:)
                 end if
             end if
 
@@ -319,4 +319,11 @@ contains
 
     end subroutine reflect_variables_ftdss
 
+    module subroutine reset_ftdss(self)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+
+        call self%controls%reset()
+
+    end subroutine reset_ftdss
 end submodule ftdss_base

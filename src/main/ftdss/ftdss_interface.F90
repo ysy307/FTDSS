@@ -78,6 +78,8 @@ module main_ftdss
 
         procedure, private, pass(self) :: get_variable => get_variable_ftdss
 
+        procedure, public, pass(self) :: reset => reset_ftdss
+
         !> 1タイムステップ分の計算を行う（非線形反復ループを含む）
         procedure, public, pass(self) :: solve_time_step => solve_time_step_ftdss
         procedure, private, pass(self) :: solve_time_step_initial_setup => solve_time_step_initial_setup_ftdss
@@ -203,33 +205,33 @@ module main_ftdss
 
         end subroutine calc_vapor_flux_ftdss
 
-        module subroutine assemble_local_ftdss(self, workspace, local_J_TT, local_J_TH, &
-                                               local_J_HH, local_J_HT, local_R_T, local_R_H)
+        module subroutine assemble_local_ftdss(self, workspace, local_K_TT, local_K_TH, &
+                                               local_K_HH, local_K_HT, local_F_T, local_F_H)
             implicit none
             class(type_ftdss), intent(inout) :: self
             type(type_assemble_workspace), intent(inout) :: workspace
-            type(type_matrix_dense), intent(inout), optional :: local_J_TT, local_J_TH, local_J_HH, local_J_HT
-            type(type_vector_dp), intent(inout), optional :: local_R_T, local_R_H
+            type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
+            type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
 
         end subroutine assemble_local_ftdss
-        module subroutine assemble_initialize_ftdss(self, element_id, workspace, local_J_TT, local_J_TH, &
-                                                    local_J_HH, local_J_HT, local_R_T, local_R_H)
+        module subroutine assemble_initialize_ftdss(self, element_id, workspace, local_K_TT, local_K_TH, &
+                                                    local_K_HH, local_K_HT, local_F_T, local_F_H)
             implicit none
             class(type_ftdss), intent(inout) :: self
             integer(int32), intent(in) :: element_id
             type(type_assemble_workspace), intent(inout) :: workspace
-            type(type_matrix_dense), intent(inout), optional :: local_J_TT, local_J_TH, local_J_HH, local_J_HT
-            type(type_vector_dp), intent(inout), optional :: local_R_T, local_R_H
+            type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
+            type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
 
         end subroutine assemble_initialize_ftdss
 
-        module subroutine assemble_finalize_ftdss(self, workspace, local_J_TT, local_J_TH, &
-                                                  local_J_HH, local_J_HT, local_R_T, local_R_H)
+        module subroutine assemble_finalize_ftdss(self, workspace, local_K_TT, local_K_TH, &
+                                                  local_K_HH, local_K_HT, local_F_T, local_F_H)
             implicit none
             class(type_ftdss), intent(inout) :: self
             type(type_assemble_workspace), intent(inout) :: workspace
-            type(type_matrix_dense), intent(inout), optional :: local_J_TT, local_J_TH, local_J_HH, local_J_HT
-            type(type_vector_dp), intent(inout), optional :: local_R_T, local_R_H
+            type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
+            type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
 
         end subroutine assemble_finalize_ftdss
 
@@ -240,6 +242,12 @@ module main_ftdss
             real(real64), intent(inout), allocatable :: variable(:)
 
         end subroutine get_variable_ftdss
+
+        module subroutine reset_ftdss(self)
+            implicit none
+            class(type_ftdss), intent(inout) :: self
+
+        end subroutine reset_ftdss
 
         module subroutine assemble_ftdss(self)
             implicit none

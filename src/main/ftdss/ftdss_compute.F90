@@ -343,9 +343,8 @@ contains
     module subroutine solve_time_step_initial_setup_ftdss(self)
         implicit none
         class(type_ftdss), intent(inout) :: self
-
+        
         call self%controls%iteration%increment_total()
-        call self%controls%iteration%reset_nonlinear()
 
     end subroutine solve_time_step_initial_setup_ftdss
 
@@ -389,18 +388,34 @@ contains
 
         if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             call self%get_variable(PHYSICS_TYPES%THERMAL, variable)
-            call self%temperature%get_current(current_value)
 
-            diff(:) = current_value(:) - variable(:)
+            if (self%controls%iteration%is_newton()) then
+                diff(:) = variable(:)
+            else if (self%controls%iteration%is_picard()) then
+                call self%temperature%get_current(current_value)
+                diff(:) = current_value(:) - variable(:)
+            end if
 
+            call self%controls%iteration%check_convergence(PHYSICS_TYPES%THERMAL, update_vector=diff)
         end if
 
-        ! if (iter == 1) then
-        !     call self%controls%iteration%set_initial_norms(F, u)
-        ! else
-        !     call self%controls%iteration%check_convergence(F, u)
-        ! end if
+        if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
+            call self%get_variable(PHYSICS_TYPES%HYDRAULIC, variable)
 
+            if (self%controls%iteration%is_newton()) then
+                diff(:) = variable(:)
+            else if (self%controls%iteration%is_picard()) then
+                call self%pressure%get_current(current_value)
+                diff(:) = current_value(:) - variable(:)
+            end if
+
+            call self%controls%iteration%check_convergence(PHYSICS_TYPES%HYDRAULIC, update_vector=diff)
+        end if
+
+
+
+        call deallocate_array(variable)
+        call deallocate_array(diff)
         nullify (current_value)
 
     end subroutine solve_time_step_check_convergence_ftdss

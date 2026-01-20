@@ -4,7 +4,6 @@
 !> It provides methods to set, get, and format datetime information.
 module core_types_datetime
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: stdlib_strings, only:strip
     use :: stdlib_optval, only:optval
     implicit none
     private

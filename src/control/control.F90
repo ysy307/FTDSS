@@ -35,6 +35,7 @@ module module_control
         procedure, pass(self), public :: is_physics_active => is_physics_active_control
         procedure, pass(self), public :: is_target => is_target_control
         procedure, pass(self), public :: get_coupling_mode => get_coupling_mode_control
+        procedure, pass(self), public :: reset => reset_controls
         procedure, pass(self) :: display => display_controls
     end type type_controls
 
@@ -197,6 +198,14 @@ contains
 
         coupling_mode => self%coupling_mode
     end subroutine get_coupling_mode_control
+
+    subroutine reset_controls(self)
+        implicit none
+        class(type_controls), intent(inout) :: self
+
+        call self%iteration%reset()
+
+    end subroutine reset_controls
 
     subroutine display_controls(self)
         implicit none

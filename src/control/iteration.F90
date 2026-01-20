@@ -97,21 +97,24 @@ module control_iteration
         type(type_iterator_config) :: config
     contains
         ! Initialization / Reset
-        procedure, pass(self), public :: initialize
-        procedure, pass(self), public :: reset_nonlinear
+        procedure, public, pass(self) :: initialize
+        procedure, public, pass(self) :: reset => reset_nonlinear
 
         ! Operation
-        procedure, pass(self), public :: increment_nonlinear
-        procedure, pass(self), public :: increment_total
-        procedure, pass(self), public :: check_convergence
+        procedure, public, pass(self) :: increment_nonlinear
+        procedure, public, pass(self) :: increment_total
+        procedure, public, pass(self) :: check_convergence
         ! Query
-        procedure, pass(self), public :: should_continue
-        procedure, pass(self), public :: has_converged
-        procedure, pass(self), public :: get_nonlinear_iter
-        procedure, pass(self), public :: get_total_iter
-        procedure, pass(self), public :: get_max_iterations
-        procedure, pass(self), public :: get_update_frequency
-        procedure, pass(self), public :: get_nonlinear_solver => get_nonlinear_solver_type_iteration
+        procedure, public, pass(self) :: should_continue => should_continue_iteration
+        procedure, public, pass(self) :: has_converged => has_converged_iteration
+        procedure, public, pass(self) :: get_nonlinear_iter
+        procedure, public, pass(self) :: get_total_iter
+        procedure, public, pass(self) :: get_max_iterations
+        procedure, public, pass(self) :: get_update_frequency
+        procedure, public, pass(self) :: get_nonlinear_solver => get_nonlinear_solver_type_iteration
+
+        procedure, public, pass(self) :: is_newton => is_newton_method_iteration
+        procedure, public, pass(self) :: is_picard => is_picard_method_iteration
     end type type_iteration
 
 contains
@@ -202,6 +205,7 @@ contains
 
         ! Retrieve the specified norm for the current iteration
         current_norm = self%norms_history(norm_type%id, iter)
+        print *, iter, current_norm
 
         ! 3. Convergence logic
 
@@ -405,8 +409,7 @@ contains
         check_update = self%config%convergence_control%should_check_update()
 
         is_residual_ok = .true.
-        is_update_ok   = .true.
-
+        is_update_ok = .true.
 
         associate (control => self%config%convergence_control)
             ! --- Residual vector check ---
@@ -439,27 +442,28 @@ contains
         end associate
     end subroutine check_convergence
 
-    function should_continue(self) result(continue_flag)
+    function should_continue_iteration(self) result(should_continue)
         implicit none
         class(type_iteration), intent(in) :: self
-        logical :: continue_flag
+        logical :: should_continue
 
         ! First iteration always continues
-        if (self%nonlinear_iter == 0) then
-            continue_flag = .true.
+        if (self%nonlinear_iter <= 1) then
+            should_continue = .true.
             return
         end if
 
-        continue_flag = (.not. all(self%is_converged)) .and. &
-                        (self%nonlinear_iter < self%config%max_iterations)
-    end function should_continue
+        should_continue = (.not. self%has_converged()) .and. &
+                          (self%nonlinear_iter < self%config%max_iterations)
+    end function should_continue_iteration
 
-    pure function has_converged(self) result(val)
+    pure function has_converged_iteration(self) result(has_converged)
         class(type_iteration), intent(in) :: self
-        logical :: val
+        logical :: has_converged
+
         ! 全ての物理量が収束しているかチェック
-        val = all(self%is_converged)
-    end function has_converged
+        has_converged = all(self%is_converged)
+    end function has_converged_iteration
 
     ! --- Getters ---
     pure subroutine get_nonlinear_iter(self, val)
@@ -501,5 +505,23 @@ contains
 
         val => self%nonlinear_solver_type
     end subroutine get_nonlinear_solver_type_iteration
+
+    !> Returns true if the current solver is Newton-Raphson
+    pure function is_newton_method_iteration(self) result(is_newton)
+        class(type_iteration), intent(in) :: self
+        logical :: is_newton
+
+        is_newton = (self%nonlinear_solver_type == NONLINEAR_SOLVER%NEWTON .or. &
+                     self%nonlinear_solver_type == NONLINEAR_SOLVER%MODIFIED_NEWTON)
+    end function is_newton_method_iteration
+
+    !> Returns true if the current solver is Picard (Successive Substitution)
+    pure function is_picard_method_iteration(self) result(is_picard)
+        class(type_iteration), intent(in) :: self
+        logical :: is_picard
+
+        is_picard = (self%nonlinear_solver_type == NONLINEAR_SOLVER%PICARD .or. &
+                     self%nonlinear_solver_type == NONLINEAR_SOLVER%MODIFIED_PICARD)
+    end function is_picard_method_iteration
 
 end module control_iteration

@@ -8,8 +8,8 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
-        type(type_matrix_dense) :: local_J_TT, local_J_TH, local_J_HH, local_J_HT
-        type(type_vector_dp) :: local_R_T, local_R_H
+        type(type_matrix_dense) :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
+        type(type_vector_dp) :: local_F_T, local_F_H
         type(type_assemble_workspace) :: workspace
 
         integer(int32) :: num_elements
@@ -28,44 +28,44 @@ contains
         do i = 1, num_elements
             ! 1. 初期化・準備 (Allocateは初回またはサイズ変更時のみ。値はゼロクリアされる)
             call self%assemble_initialize(element_id=i, workspace=workspace, &
-                                          local_J_TT=local_J_TT, local_J_TH=local_J_TH, &
-                                          local_J_HH=local_J_HH, local_J_HT=local_J_HT, &
-                                          local_R_T=local_R_T, local_R_H=local_R_H)
+                                          local_K_TT=local_K_TT, local_K_TH=local_K_TH, &
+                                          local_K_HH=local_K_HH, local_K_HT=local_K_HT, &
+                                          local_F_T=local_F_T, local_F_H=local_F_H)
 
             ! 2. 局所行列の計算
-            call self%assemble_local(workspace, local_J_TT, local_J_TH, local_J_HH, local_J_HT, &
-                                     local_R_T, local_R_H)
+            call self%assemble_local(workspace, local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
+                                     local_F_T, local_F_H)
 
             ! 3. 全体行列への組み込み
             call self%domain%get_element_connectivity(i, p_connectivity)
             call self%domain%get_target_dof(PHYSICS_TYPE_THERMAL, thermal_dof)
             call self%domain%get_target_dof(PHYSICS_TYPE_HYDRAULIC, hydraulic_dof)
 
-            call self%K%add(thermal_dof, thermal_dof, p_connectivity, local_J_TT)
-            ! call self%K%add(thermal_dof, hydraulic_dof, p_connectivity, local_J_TH)
-            ! call self%K%add(hydraulic_dof, hydraulic_dof, p_connectivity, local_J_HH)
-            ! call self%K%add(hydraulic_dof, thermal_dof, p_connectivity, local_J_HT)
+            call self%K%add(thermal_dof, thermal_dof, p_connectivity, local_K_TT)
+            ! call self%K%add(thermal_dof, hydraulic_dof, p_connectivity, local_K_TH)
+            ! call self%K%add(hydraulic_dof, hydraulic_dof, p_connectivity, local_K_HH)
+            ! call self%K%add(hydraulic_dof, thermal_dof, p_connectivity, local_K_HT)
 
-            call self%F%add(thermal_dof, p_connectivity, local_R_T)
-            ! call self%F%add(hydraulic_dof, p_connectivity, local_R_H)
+            call self%F%add(thermal_dof, p_connectivity, local_F_T)
+            ! call self%F%add(hydraulic_dof, p_connectivity, local_F_H)
 
         end do
 
-        call self%assemble_finalize(workspace, local_J_TT, local_J_TH, &
-                                    local_J_HH, local_J_HT, local_R_T, local_R_H)
+        call self%assemble_finalize(workspace, local_K_TT, local_K_TH, &
+                                    local_K_HH, local_K_HT, local_F_T, local_F_H)
 
         call self%controls%profiler%stop("Assemble")
 
     end subroutine assemble_ftdss
 
-    module subroutine assemble_initialize_ftdss(self, element_id, workspace, local_J_TT, local_J_TH, &
-                                                local_J_HH, local_J_HT, local_R_T, local_R_H)
+    module subroutine assemble_initialize_ftdss(self, element_id, workspace, local_K_TT, local_K_TH, &
+                                                local_K_HH, local_K_HT, local_F_T, local_F_H)
         implicit none
         class(type_ftdss), intent(inout) :: self
         integer(int32), intent(in) :: element_id
         type(type_assemble_workspace), intent(inout) :: workspace
-        type(type_matrix_dense), intent(inout), optional :: local_J_TT, local_J_TH, local_J_HH, local_J_HT
-        type(type_vector_dp), intent(inout), optional :: local_R_T, local_R_H
+        type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
+        type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
 
         class(abst_fe), pointer :: fe => null()
         integer(int32), pointer, contiguous, dimension(:) :: connectivity => null()
@@ -97,13 +97,13 @@ contains
 
         call fe%get_num_nodes(num_nodes)
 
-        if (present(local_J_TT)) call check_initialize_matrix(local_J_TT, num_nodes)
-        if (present(local_J_TH)) call check_initialize_matrix(local_J_TH, num_nodes)
-        if (present(local_J_HH)) call check_initialize_matrix(local_J_HH, num_nodes)
-        if (present(local_J_HT)) call check_initialize_matrix(local_J_HT, num_nodes)
+        if (present(local_K_TT)) call check_initialize_matrix(local_K_TT, num_nodes)
+        if (present(local_K_TH)) call check_initialize_matrix(local_K_TH, num_nodes)
+        if (present(local_K_HH)) call check_initialize_matrix(local_K_HH, num_nodes)
+        if (present(local_K_HT)) call check_initialize_matrix(local_K_HT, num_nodes)
 
-        if (present(local_R_T)) call check_initialize_vector(local_R_T, num_nodes)
-        if (present(local_R_H)) call check_initialize_vector(local_R_H, num_nodes)
+        if (present(local_F_T)) call check_initialize_vector(local_F_T, num_nodes)
+        if (present(local_F_H)) call check_initialize_vector(local_F_H, num_nodes)
 
     end subroutine assemble_initialize_ftdss
 
@@ -145,35 +145,35 @@ contains
         end if
     end subroutine check_initialize_vector
 
-    module subroutine assemble_local_ftdss(self, workspace, local_J_TT, local_J_TH, &
-                                           local_J_HH, local_J_HT, local_R_T, local_R_H)
+    module subroutine assemble_local_ftdss(self, workspace, local_K_TT, local_K_TH, &
+                                           local_K_HH, local_K_HT, local_F_T, local_F_H)
         implicit none
         class(type_ftdss), intent(inout) :: self
         type(type_assemble_workspace), intent(inout) :: workspace
-        type(type_matrix_dense), intent(inout), optional :: local_J_TT, local_J_TH, local_J_HH, local_J_HT
-        type(type_vector_dp), intent(inout), optional :: local_R_T, local_R_H
+        type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
+        type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
 
         call self%thermal%assemble_local(controls=self%controls, workspace=workspace, &
-                                         J_TT=local_J_TT, J_TH=local_J_TH, R_T=local_R_T)
+                                         J_TT=local_K_TT, J_TH=local_K_TH, R_T=local_F_T)
 
     end subroutine assemble_local_ftdss
 
-    module subroutine assemble_finalize_ftdss(self, workspace, local_J_TT, local_J_TH, &
-                                              local_J_HH, local_J_HT, local_R_T, local_R_H)
+    module subroutine assemble_finalize_ftdss(self, workspace, local_K_TT, local_K_TH, &
+                                              local_K_HH, local_K_HT, local_F_T, local_F_H)
         implicit none
         class(type_ftdss), intent(inout) :: self
         type(type_assemble_workspace), intent(inout) :: workspace
-        type(type_matrix_dense), intent(inout), optional :: local_J_TT, local_J_TH, local_J_HH, local_J_HT
-        type(type_vector_dp), intent(inout), optional :: local_R_T, local_R_H
+        type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
+        type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
 
         call workspace%destroy()
 
-        if (present(local_J_TT)) call local_J_TT%destroy()
-        if (present(local_J_TH)) call local_J_TH%destroy()
-        if (present(local_J_HH)) call local_J_HH%destroy()
-        if (present(local_J_HT)) call local_J_HT%destroy()
-        if (present(local_R_T)) call local_R_T%destroy()
-        if (present(local_R_H)) call local_R_H%destroy()
+        if (present(local_K_TT)) call local_K_TT%destroy()
+        if (present(local_K_TH)) call local_K_TH%destroy()
+        if (present(local_K_HH)) call local_K_HH%destroy()
+        if (present(local_K_HT)) call local_K_HT%destroy()
+        if (present(local_F_T)) call local_F_T%destroy()
+        if (present(local_F_H)) call local_F_H%destroy()
     end subroutine assemble_finalize_ftdss
 
 end submodule ftdss_assemble

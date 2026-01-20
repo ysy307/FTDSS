@@ -113,10 +113,10 @@
         "nonlinear_solver": {
             "method": "picard",
             "update_frequency": 1,
-            "max_iterations": 3,
+            "max_iterations": 30,
             "convergence": {
                 "use_criteria": "update",
-                "norm_type": "l2",
+                "norm_type": "linf",
                 "logic_between_criteria": "and",
                 "residual": {
                     "criteria": "relative",
@@ -125,7 +125,7 @@
                     "relative_tolerance": 1e-03
                 },
                 "update": {
-                    "criteria": "both",
+                    "criteria": "absolute",
                     "logic": "or",
                     "absolute_tolerance": 1e-05,
                     "relative_tolerance": 1e-04
