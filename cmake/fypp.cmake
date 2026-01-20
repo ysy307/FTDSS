@@ -7,6 +7,11 @@ set(FYPP_INCLUDE_DIR
 # fypp から include されうる全ファイルを列挙（GLOB禁止）
 set(FYPP_INCLUDE_FILES
     ${FYPP_INCLUDE_DIR}/common.fypp
+    ${FYPP_INCLUDE_DIR}/constants.fypp
+)
+
+set(FYPP_DEFAULT_OPTS
+    --line-length=132
 )
 
 # =====================================
@@ -39,9 +44,15 @@ function(fypp_F90 preprocopts fyppfiles F90files)
         find_program(FYPP fypp REQUIRED)
         set(FYPP ${FYPP} CACHE PATH "Path to fypp preprocessor" FORCE)
     endif()
+
+    set(_fypp_opts
+        ${FYPP_DEFAULT_OPTS}
+        ${preprocopts}
+    )
+
     preprocess(
         "${FYPP}"
-        "${preprocopts}"
+        "${_fypp_opts}"
         "fypp"
         "F90"
         "${fyppfiles}"

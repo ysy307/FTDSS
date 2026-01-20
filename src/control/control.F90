@@ -104,7 +104,7 @@ contains
             self%coupling_mode = COUPLING_MODES%to_object(input%basic%analysis_controls%coupling_mode)
 
             call self%time%initialize(input)
-            ! call self%iteration%initialize(input)
+            call self%iteration%initialize(input)
             call initialize_openmp(input)
 
             call self%time%get_time(current_time_s)

@@ -1,4 +1,4 @@
-#:include "constans.fypp"
+#:include "constants.fypp"
 
 !>
 !> Module defining various constant ID groups
@@ -29,6 +29,7 @@ module core_constants_values
         procedure, private, pass(self) :: to_object_from_name => to_object_from_name_${group['suffix']}$
         generic, public :: to_object => to_object_from_id, to_object_from_name
         procedure, public, pass(self) :: in_group => in_group_${group['suffix']}$
+        procedure, public, pass(self) :: is_valid => is_valid_${group['suffix']}$
     end type ${group['type_name']}$
 
     type(${group['type_name']}$), parameter, public :: ${group['obj_name']}$ = ${group['type_name']}$()
@@ -135,17 +136,36 @@ contains
         !> `True` if object belongs to the group
         logical :: is_in
 
-        character(len=:), allocatable :: lname
-
         is_in = .false.
-        lname = strip(to_lower(object%group))
 
-        if (lname == strip(to_lower(self%group))) then
+        if (strip(to_lower(object%group)) == strip(to_lower(self%group))) then
             is_in = .true.
         else
             is_in = .false.
         end if
     end function in_group_${group['suffix']}$
+
+    !> Check if object is in ${group['description']}$
+    pure function is_valid_${group['suffix']}$(self, object) result(is_valid)
+        implicit none
+        !> ${group['description']}$ instance
+        class(${group['type_name']}$), intent(in) :: self
+        !> Constant object to check
+        type(type_constant_value), intent(in) :: object
+        !> `True` if object is in the group
+        logical :: is_valid
+
+        is_valid = self%in_group(object)
+
+        if (.not. is_valid) return
+
+        if (object%id < ${group['id_range'][0]}$ .or. object%id > ${group['id_range'][1]}$) then
+            is_valid = .false.
+        else
+            is_valid = .true.
+        end if
+
+    end function is_valid_${group['suffix']}$
 
     #:endfor
 end module core_constants_values

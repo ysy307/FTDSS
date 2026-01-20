@@ -12,7 +12,8 @@
             ('COO',   3, 'coo'), &
             ('BSR',   4, 'bsr') &
         ], &
-        'num' : 4 &
+        'num' : 4, &
+        'id_range' : [1, 4] &
     }
 
     #:set COUPLING_MODES = { &
@@ -25,7 +26,8 @@
             ('STAGGERED',  1, 'staggered'), &
             ('MONOLITHIC', 2, 'monolithic') &
         ], &
-        'num' : 2 &
+        'num' : 2, &
+        'id_range' : [1, 2] &
     }
 
     #:set PHYSICS_TYPES = { &
@@ -39,7 +41,8 @@
             ('HYDRAULIC',  2, 'hydraulic'), &
             ('MECHANICAL', 3, 'mechanical') &
         ], &
-        'num' : 3 &
+        'num' : 3, &
+        'id_range' : [1, 3] &
     }
 
     #:set DOF_TYPES = { &
@@ -55,7 +58,8 @@
             ('DY', 4, 'dy'), &
             ('DZ', 5, 'dz') &
         ], &
-        'num' : 5 &
+        'num' : 5, &
+        'id_range' : [1, 5] &
     }
 
     #:set THERMAL_BC_TYPES = { &
@@ -74,7 +78,8 @@
             ('ADIABATIC',  107, 'adiabatic'), &
             ('FREE',       108, 'free') &
         ], &
-        'num' : 8 &
+        'num' : 8, &
+        'id_range' : [101, 108] &
     }
 
     #:set HYDRAULIC_BC_TYPES = { &
@@ -90,7 +95,8 @@
             ('IMPERMEABLE', 204, 'impermeable'), &
             ('SEEPAGE',     205, 'seepage') &
         ], &
-        'num' : 5 &
+        'num' : 5, &
+        'id_range' : [201, 205] &
     }
 
     #:set IC_TARGETS = { &
@@ -105,7 +111,8 @@
             ('MECHANICAL', 3, 'mechanical'), &
             ('POROSITY',   4, 'porosity') &
         ], &
-        'num' : 4 &
+        'num' : 4, &
+        'id_range' : [1, 4] &
     }
 
     #:set IC_METHODS = { &
@@ -119,7 +126,8 @@
             ('LAPLACE',   2, 'laplace'), &
             ('FROM_FILE', 3, 'from_file') &
         ], &
-        'num' : 3 &
+        'num' : 3, &
+        'id_range' : [1, 3] &
     }
 
     #:set NONLINEAR_SOLVER = { &
@@ -135,7 +143,8 @@
             ('PICARD',          3, 'picard'), &
             ('MODIFIED_PICARD', 4, 'modified_picard') &
         ], &
-        'num' : 5 &
+        'num' : 5, &
+        'id_range' : [0, 4] &
     }
 
     #:set NONLINEAR_NORM_CRITERIA = { &
@@ -150,7 +159,8 @@
             ('UPDATE',   2, 'update'), &
             ('BOTH',     3, 'both') &
         ], &
-        'num' : 4 &
+        'num' : 4, &
+        'id_range' : [0, 3] &
     }
 
     #:set NONLINEAR_CRITERIA = { &
@@ -165,7 +175,8 @@
             ('ABSOLUTE', 2, 'absolute'), &
             ('BOTH',     3, 'both') &
         ], &
-        'num' : 4 &
+        'num' : 4, &
+        'id_range' : [0, 3] &
     }
 
     #:set NONLINEAR_LOGIC = { &
@@ -178,7 +189,8 @@
             ('OR',  1, 'or'), &
             ('AND', 2, 'and') &
         ], &
-        'num' : 2 &
+        'num' : 2, &
+        'id_range' : [1, 2] &
     }
 
     #:set NORM_TYPES = { &
@@ -192,7 +204,8 @@
             ('L2',   2, 'l2'), &
             ('LINF', 3, 'linf') &
         ], &
-        'num' : 3 &
+        'num' : 3, &
+        'id_range' : [1, 3] &
     }
 
     #:set COMP_TYPES = { &
@@ -206,7 +219,8 @@
             ('XZ_2D',  2, '2d_xz'), &
             ('XYZ_3D', 3, '3d') &
         ], &
-        'num' : 3 &
+        'num' : 3, &
+        'id_range' : [1, 3] &
     }
 
     #:set LINEAR_SOLVER_TYPES = { &
@@ -242,7 +256,8 @@
             ('COCG',       24, 'cocg'), &
             ('COCR',       25, 'cocr') &
         ], &
-        'num' : 25 &
+        'num' : 25, &
+        'id_range' : [1, 25] &
     }
 
     #:set PRECONDITIONER_TYPES = { &
@@ -263,7 +278,8 @@
             ('ILUC',   8, 'iluc'), &
             ('ILUT',   9, 'ilut') &
         ], &
-        'num' : 10 &
+        'num' : 10, &
+        'id_range' : [0, 9] &
     }
 
     #:set SOLVER_STATUS = { &
@@ -274,14 +290,15 @@
         'description': 'Solver status codes', &
         'items'      : [ &
             ('SUCCESS',                0,  'SUCCESS'), &
-            ('ILL_OPTIONS',           -1,  'ILL_OPTIONS'), &
-            ('BREAKDOWN',             -2,  'BREAKDOWN'), &
-            ('OUT_OF_MEMORY',         -3,  'OUT_OF_MEMORY'), &
-            ('MAXITER',               -4,  'MAXITER'), &
-            ('DECOMPOSITION_FAILURE', -5,  'DECOMPOSITION_FAILURE'), &
-            ('NOT_IMPLEMENTED',       -6,  'NOT_IMPLEMENTED') &
+            ('ILL_OPTIONS',           1,  'ILL_OPTIONS'), &
+            ('BREAKDOWN',             2,  'BREAKDOWN'), &
+            ('OUT_OF_MEMORY',         3,  'OUT_OF_MEMORY'), &
+            ('MAXITER',               4,  'MAXITER'), &
+            ('DECOMPOSITION_FAILURE', 5,  'DECOMPOSITION_FAILURE'), &
+            ('NOT_IMPLEMENTED',       6,  'NOT_IMPLEMENTED') &
         ], &
-        'num' : 7 &
+        'num' : 7, &
+        'id_range' : [0, 6] &
     }
 
     #:set MATRIX_OPS = { &
@@ -296,7 +313,8 @@
             ('SCALE_SYMM_DIAG', 3, 'scale_symm_diag'), &
             ('SCALE_JACOBI',    4, 'scale_jacobi')&
         ], &
-        'num' : 4 &
+        'num' : 4, &
+        'id_range' : [1, 4] &
     }
 
     #:set MATRIX_STATUS = { &
@@ -312,7 +330,8 @@
             ('NOT_INITIALIZED', 3,  'NOT_INITIALIZED'), &
             ('NOT_IMPLEMENTED', 5,  'NOT_IMPLEMENTED')&
         ], &
-        'num' : 5 &
+        'num' : 5, &
+        'id_range' : [0, 5] &
     }
 
     #:set VECTOR_STATUS = { &
@@ -327,7 +346,8 @@
             ('OUT_OF_MEMORY',   3,  'OUT_OF_MEMORY'), &
             ('NOT_IMPLEMENTED', 5,  'NOT_IMPLEMENTED') &
         ], &
-        'num' : 4 &
+        'num' : 4, &
+        'id_range' : [0, 5] &
     }
 
     #:set NODE_TYPES = { &
@@ -341,7 +361,8 @@
             ('NODE_BORDER',   2, 'border'), &
             ('NODE_HALO',     3, 'halo') &
         ], &
-        'num' : 3 &
+        'num' : 3, &
+        'id_range' : [1, 3] &
     }
 
     #:set COMM_ROLES = { &
@@ -353,9 +374,10 @@
         'items'     : [ &
             ('ROLE_OWNER',    0,  'owner'), &
             ('ROLE_RECEIVER', 1,  'receiver'), &
-            ('ROLE_NONE',    -1,  'none') &
+            ('ROLE_NONE',     2,  'none') &
         ], &
-        'num' : 3 &
+        'num' : 3, &
+        'id_range' : [0, 2] &
     }
 
     #:set COMM_OPS = { &
@@ -368,7 +390,8 @@
             ('OP_UPDATE',   1, 'update'), &
             ('OP_ASSEMBLE', 2, 'assemble') &
         ], &
-        'num' : 2 &
+        'num' : 2, &
+        'id_range' : [1, 2] &
     }
     #:set FE_TYPES = { &
         'type_name' : 'type_fe_types', &
@@ -442,7 +465,8 @@
             ('BEZIER_WEDGE', 80, 'bezier_wedge'), &
             ('BEZIER_PYRAMID', 81, 'bezier_pyramid') &
         ], &
-        'num' : 81 &
+        'num' : 81, &
+        'id_range' : [0, 81] &
     }
 
     #:set constant_id_groups = [ &
@@ -487,7 +511,8 @@
             ('WEEKS',   "week",   5, 'w', 604800.0), &
             ('YEARS',   "year",   6, 'y', 31536000.0) &
         ], &
-        'num' : 6 &
+        'num' : 6, &
+        'id_range' : [1, 6] &
     }
 
     #:set constant_value_groups = [ &
