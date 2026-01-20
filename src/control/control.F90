@@ -35,7 +35,6 @@ module module_control
         procedure, pass(self), public :: is_physics_active => is_physics_active_control
         procedure, pass(self), public :: is_target => is_target_control
         procedure, pass(self), public :: get_coupling_mode => get_coupling_mode_control
-        procedure, pass(self), public :: reset => reset_controls
         procedure, pass(self) :: display => display_controls
     end type type_controls
 
@@ -52,77 +51,77 @@ contains
         character(len=10), allocatable :: profiler_labels(:)
         real(real64) :: current_time_s
 
-            ierr = 0
-            call input%geometry%vtk%get_active_region_info(unique_material_ids)
-            if (ierr /= 0) return
-            if (.not. allocated(unique_material_ids) .or. size(unique_material_ids) == 0) then
-                ierr = -1
-                print *, "Error: No active material regions found."
-                stop 1
-            end if
+        ierr = 0
+        call input%geometry%vtk%get_active_region_info(unique_material_ids)
+        if (ierr /= 0) return
+        if (.not. allocated(unique_material_ids) .or. size(unique_material_ids) == 0) then
+            ierr = -1
+            print *, "Error: No active material regions found."
+            stop 1
+        end if
 
-            num_unique_regions = size(unique_material_ids)
-            max_region_id = maxval(unique_material_ids)
+        num_unique_regions = size(unique_material_ids)
+        max_region_id = maxval(unique_material_ids)
 
-            self%is_active(PHYSICS_TYPE_THERMAL) = input%basic%analysis_controls%is_active(PHYSICS_TYPE_THERMAL)
+        self%is_active(PHYSICS_TYPE_THERMAL) = input%basic%analysis_controls%is_active(PHYSICS_TYPE_THERMAL)
+        if (self%is_active(PHYSICS_TYPE_THERMAL)) then
+            allocate (self%thermal(max_region_id))
+            self%thermal = .false.
+        end if
+
+        self%is_active(PHYSICS_TYPE_HYDRAULIC) = input%basic%analysis_controls%is_active(PHYSICS_TYPE_HYDRAULIC)
+        if (self%is_active(PHYSICS_TYPE_HYDRAULIC)) then
+            allocate (self%hydraulic(max_region_id))
+            self%hydraulic = .false.
+        end if
+
+        self%is_active(PHYSICS_TYPE_MECHANICAL) = input%basic%analysis_controls%is_active(PHYSICS_TYPE_MECHANICAL)
+        if (self%is_active(PHYSICS_TYPE_MECHANICAL)) then
+            allocate (self%mechanical(max_region_id))
+            self%mechanical = .false.
+        end if
+
+        do i = 1, num_unique_regions
+            current_material_id = unique_material_ids(i)
+            if (current_material_id > size(input%basic%materials)) cycle
+
             if (self%is_active(PHYSICS_TYPE_THERMAL)) then
-                allocate (self%thermal(max_region_id))
-                self%thermal = .false.
+                self%thermal(current_material_id) = &
+                    input%basic%materials(current_material_id)%is_active(PHYSICS_TYPE_THERMAL)
             end if
 
-            self%is_active(PHYSICS_TYPE_HYDRAULIC) = input%basic%analysis_controls%is_active(PHYSICS_TYPE_HYDRAULIC)
             if (self%is_active(PHYSICS_TYPE_HYDRAULIC)) then
-                allocate (self%hydraulic(max_region_id))
-                self%hydraulic = .false.
+                self%hydraulic(current_material_id) = &
+                    input%basic%materials(current_material_id)%is_active(PHYSICS_TYPE_HYDRAULIC)
             end if
 
-            self%is_active(PHYSICS_TYPE_MECHANICAL) = input%basic%analysis_controls%is_active(PHYSICS_TYPE_MECHANICAL)
             if (self%is_active(PHYSICS_TYPE_MECHANICAL)) then
-                allocate (self%mechanical(max_region_id))
-                self%mechanical = .false.
+                self%mechanical(current_material_id) = &
+                    input%basic%materials(current_material_id)%is_active(PHYSICS_TYPE_MECHANICAL)
             end if
+        end do
 
-            do i = 1, num_unique_regions
-                current_material_id = unique_material_ids(i)
-                if (current_material_id > size(input%basic%materials)) cycle
+        self%coupling_mode = COUPLING_MODES%to_object(input%basic%analysis_controls%coupling_mode)
 
-                if (self%is_active(PHYSICS_TYPE_THERMAL)) then
-                    self%thermal(current_material_id) = &
-                        input%basic%materials(current_material_id)%is_active(PHYSICS_TYPE_THERMAL)
-                end if
+        call self%time%initialize(input)
+        call self%iteration%initialize(input)
+        call initialize_openmp(input)
 
-                if (self%is_active(PHYSICS_TYPE_HYDRAULIC)) then
-                    self%hydraulic(current_material_id) = &
-                        input%basic%materials(current_material_id)%is_active(PHYSICS_TYPE_HYDRAULIC)
-                end if
-
-                if (self%is_active(PHYSICS_TYPE_MECHANICAL)) then
-                    self%mechanical(current_material_id) = &
-                        input%basic%materials(current_material_id)%is_active(PHYSICS_TYPE_MECHANICAL)
-                end if
-            end do
-
-            self%coupling_mode = COUPLING_MODES%to_object(input%basic%analysis_controls%coupling_mode)
-
-            call self%time%initialize(input)
-            call self%iteration%initialize(input)
-            call initialize_openmp(input)
-
-            call self%time%get_time(current_time_s)
-            associate (field_output => input%output_settings%field_output)
-                call self%out_field%initialize(field_output%output_interval_step, &
-                                               field_output%output_interval_unit, &
-                                               field_output%output_time_unit, &
-                                               field_output%file_format, &
-                                               current_time_s)
-            end associate
-            associate (history_output => input%output_settings%history_output)
-                call self%out_history%initialize(history_output%output_interval_step, &
-                                                 history_output%output_interval_unit, &
-                                                 history_output%output_time_unit, &
-                                                 history_output%file_format, &
-                                                 current_time_s)
-            end associate
+        call self%time%get_time(current_time_s)
+        associate (field_output => input%output_settings%field_output)
+            call self%out_field%initialize(field_output%output_interval_step, &
+                                           field_output%output_interval_unit, &
+                                           field_output%output_time_unit, &
+                                           field_output%file_format, &
+                                           current_time_s)
+        end associate
+        associate (history_output => input%output_settings%history_output)
+            call self%out_history%initialize(history_output%output_interval_step, &
+                                             history_output%output_interval_unit, &
+                                             history_output%output_time_unit, &
+                                             history_output%file_format, &
+                                             current_time_s)
+        end associate
 
         call deallocate_array(unique_material_ids)
 

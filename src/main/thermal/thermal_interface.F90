@@ -11,6 +11,10 @@ module main_thermal
 
     public :: type_thermal
 
+    ! 定数定義（可読性のため）
+    integer, parameter :: SCHEME_TANGENT = 0 ! 厳密な微分（NR法推奨）
+    integer, parameter :: SCHEME_SECANT = 1 ! 差分近似（Picard法/相変化安定化用）
+
     type :: type_thermal
         private
         integer(int32) :: computation_type
@@ -20,18 +24,16 @@ module main_thermal
         procedure, pass(self), public :: initialize => initialize_type_thermal
         procedure, pass(self), public :: destroy => destroy_type_thermal
 
-        ! procedure, pass(self), public :: compute_C_T => compute_C_T
         procedure, pass(self), public :: assemble_local => assemble_local_thermal
+        procedure, pass(self), private :: assemble_local_newton => assemble_local_newton_thermal
+        procedure, pass(self), private :: assemble_local_picard => assemble_local_picard_thermal
+
         procedure, pass(self), private :: compute_mass_term => compute_mass_term_thermal
         procedure, pass(self), private :: compute_diffusion_term => compute_diffusion_term_thermal
         procedure, pass(self), private :: compute_advective_term => compute_advective_term_thermal
         procedure, pass(self), private :: compute_latent_term => compute_latent_term_thermal
         procedure, pass(self), private :: compute_transient_term => compute_transient_term_thermal
         procedure, pass(self), private :: compute_history_term => compute_history_term_thermal
-
-        ! procedure, pass(self), public :: compute_D_T => compute_D_T
-        ! procedure, pass(self), public :: compute_V_T => compute_V_T
-        ! procedure, pass(self), public :: compute_R_T => compute_R_T
 
         procedure, pass(self), public :: calc_enthalpy_density => calc_enthalpy_density_thermal
         procedure, pass(self), public :: calc_density_water => calc_density_water_thermal
@@ -41,91 +43,12 @@ module main_thermal
     end type type_thermal
 
     interface
-        module subroutine initialize_type_thermal(self, input, active_region_ids)
-            implicit none
-            class(type_thermal), intent(inout) :: self
-            type(type_input), intent(in) :: input
-            integer(int32), intent(in) :: active_region_ids(:)
-
-        end subroutine initialize_type_thermal
-
-        module subroutine destroy_type_thermal(self)
-            implicit none
-            class(type_thermal), intent(inout) :: self
-
-        end subroutine destroy_type_thermal
-
-        module subroutine assemble_local_thermal(self, controls, workspace, J_TT, J_TH, R_T)
-            implicit none
-            class(type_thermal), intent(in) :: self
-            type(type_controls), intent(in) :: controls
-            type(type_assemble_workspace), intent(inout) :: workspace
-            type(type_matrix_dense), intent(inout), optional :: J_TT
-            type(type_matrix_dense), intent(inout), optional :: J_TH
-            type(type_vector_dp), intent(inout), optional :: R_T
-        end subroutine assemble_local_thermal
-
-        module subroutine compute_mass_term_thermal(self, target_material_id, state, C_TT)
-            implicit none
-            class(type_thermal), intent(in) :: self
-            integer(int32), intent(in) :: target_material_id
-            type(type_state), intent(in) :: state
-            real(real64), intent(inout) :: C_TT
-        end subroutine compute_mass_term_thermal
-
-        module subroutine compute_diffusion_term_thermal(self, target_material_id, state, D_TT)
-            implicit none
-            class(type_thermal), intent(in) :: self
-            integer(int32), intent(in) :: target_material_id
-            type(type_state), intent(inout) :: state
-            real(real64), intent(inout) :: D_TT(:, :)
-
-        end subroutine compute_diffusion_term_thermal
-
-        module subroutine compute_advective_term_thermal(self, target_material_id, state, V_TT)
-            implicit none
-            class(type_thermal), intent(in) :: self
-            integer(int32), intent(in) :: target_material_id
-            type(type_state), intent(inout) :: state
-            real(real64), intent(inout) :: V_TT(:)
-
-        end subroutine compute_advective_term_thermal
-
-        module subroutine compute_latent_term_thermal(self, target_material_id, state, L_TT)
-            implicit none
-            class(type_thermal), intent(in) :: self
-            integer(int32), intent(in) :: target_material_id
-            type(type_state), intent(inout) :: state
-            real(real64), intent(inout) :: L_TT
-
-        end subroutine compute_latent_term_thermal
-
-        module subroutine compute_history_term_thermal(self, material_id, state, bdf_coeffs, history_term)
-            implicit none
-            class(type_thermal), intent(in) :: self
-            integer(int32), intent(in) :: material_id
-            type(type_state), intent(in) :: state
-            real(real64), intent(in) :: bdf_coeffs(:)
-            real(real64), intent(inout) :: history_term
-
-        end subroutine compute_history_term_thermal
-
-        module subroutine compute_transient_term_thermal(self, material_id, state, bdf_coeffs, dU_dt)
-            implicit none
-            class(type_thermal), intent(in) :: self
-            integer(int32), intent(in) :: material_id
-            type(type_state), intent(in) :: state
-            real(real64), intent(in) :: bdf_coeffs(:)
-            real(real64), intent(inout) :: dU_dt
-        end subroutine compute_transient_term_thermal
-
         module subroutine calc_enthalpy_density_thermal(self, material_id, state, U)
             implicit none
             class(type_thermal), intent(in) :: self
             integer(int32), intent(in) :: material_id
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: U
-
         end subroutine calc_enthalpy_density_thermal
 
         module pure elemental subroutine calc_density_water_thermal(self, state, rho_water)
@@ -159,6 +82,111 @@ module main_thermal
             type(type_state), intent(inout) :: state
 
         end subroutine update_water_phases_thermal
+
+        module subroutine compute_transient_term_thermal(self, material_id, state, bdf_coeffs, dU_dt)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(in) :: bdf_coeffs(:)
+            real(real64), intent(inout) :: dU_dt
+
+        end subroutine compute_transient_term_thermal
+        module subroutine compute_mass_term_thermal(self, material_id, state, C_TT, scheme_opt)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: C_TT
+            integer(int32), intent(in), optional :: scheme_opt
+
+        end subroutine compute_mass_term_thermal
+        module subroutine compute_diffusion_term_thermal(self, material_id, state, D_TT)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(inout) :: state
+            real(real64), intent(inout) :: D_TT(:, :)
+            type(type_thc_dispersivity) :: lambda
+
+        end subroutine compute_diffusion_term_thermal
+
+        module subroutine compute_advective_term_thermal(self, material_id, state, V_TT)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(inout) :: state
+            real(real64), intent(inout) :: V_TT(:)
+
+        end subroutine compute_advective_term_thermal
+
+        module subroutine compute_latent_term_thermal(self, material_id, state, L_TT)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(inout) :: state
+            real(real64), intent(inout) :: L_TT
+
+        end subroutine compute_latent_term_thermal
+
+        module subroutine compute_history_term_thermal(self, material_id, state, bdf_coeffs, history_term)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(in) :: bdf_coeffs(:)
+            real(real64), intent(inout) :: history_term
+
+        end subroutine compute_history_term_thermal
+    end interface
+
+    interface
+        module subroutine initialize_type_thermal(self, input, active_region_ids)
+            implicit none
+            class(type_thermal), intent(inout) :: self
+            type(type_input), intent(in) :: input
+            integer(int32), intent(in) :: active_region_ids(:)
+
+        end subroutine initialize_type_thermal
+
+        module subroutine destroy_type_thermal(self)
+            implicit none
+            class(type_thermal), intent(inout) :: self
+
+        end subroutine destroy_type_thermal
+
+        module subroutine assemble_local_thermal(self, controls, workspace, K_TT, K_TH, F_T)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            type(type_controls), intent(in) :: controls
+            type(type_assemble_workspace), intent(inout) :: workspace
+            type(type_matrix_dense), intent(inout), optional :: K_TT
+            type(type_matrix_dense), intent(inout), optional :: K_TH
+            type(type_vector_dp), intent(inout), optional :: F_T
+
+        end subroutine assemble_local_thermal
+
+        module subroutine assemble_local_newton_thermal(self, controls, workspace, K_TT, K_TH, F_T)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            type(type_controls), intent(in) :: controls
+            type(type_assemble_workspace), intent(inout) :: workspace
+            type(type_matrix_dense), intent(inout), optional :: K_TT
+            type(type_matrix_dense), intent(inout), optional :: K_TH
+            type(type_vector_dp), intent(inout), optional :: F_T
+
+        end subroutine assemble_local_newton_thermal
+
+        module subroutine assemble_local_picard_thermal(self, controls, workspace, K_TT, K_TH, F_T)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            type(type_controls), intent(in) :: controls
+            type(type_assemble_workspace), intent(inout) :: workspace
+            type(type_matrix_dense), intent(inout), optional :: K_TT
+            type(type_matrix_dense), intent(inout), optional :: K_TH
+            type(type_vector_dp), intent(inout), optional :: F_T
+
+        end subroutine assemble_local_picard_thermal
 
     end interface
 

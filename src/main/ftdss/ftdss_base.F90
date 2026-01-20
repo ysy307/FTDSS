@@ -284,10 +284,15 @@ contains
         integer(int32) :: iter
         real(real64), pointer, dimension(:) :: bdf_coeffs => null()
         integer(int32) :: bdf_order
-        real(real64), pointer, contiguous, dimension(:) :: temperature_current => null()
+        real(real64), pointer, contiguous, dimension(:) :: current => null()
+        real(real64), pointer, contiguous, dimension(:) :: delta => null()
         real(real64), allocatable :: u(:)
 
-        real(real64) :: omega = 0.5d0
+        integer(int32) :: i
+        real(real64) :: omega
+        real(real64) :: u_new, u_old, du, max_du
+        real(real64), parameter :: T_phase_low = -2.0d0
+        real(real64), parameter :: T_phase_high = 1.0d0
 
         call self%controls%profiler%start("Setup")
 
@@ -298,14 +303,40 @@ contains
 
         if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             call self%get_variable(PHYSICS_TYPES%THERMAL, u)
-            call self%temperature%get_current(temperature_current)
-            if (associated(temperature_current)) then
+            call self%temperature%get_current(current)
+            call self%temperature%get_delta(delta)
+            if (associated(current) .and. associated(delta)) then
                 if (self%controls%iteration%is_newton()) then
-                    temperature_current(:) = temperature_current(:) + u(:)
+                    call self%temperature%set_delta(u)
+                    current(:) = current(:) + u(:)
                 else if (self%controls%iteration%is_picard()) then
-                    ! temperature_current(:) = u(:)
-                    ! Picard with Under-Relaxation
-                    temperature_current(:) = omega * u(:) + (1.0d0 - omega) * temperature_current(:)
+                    call self%temperature%set_delta(u - current)
+                    do i = 1, size(u)
+                        u_new = u(i)
+                        u_old = current(i)
+                        du = u_new - u_old
+                        ! call self%temperature%set_delta(i, du)
+                        !     max_du = max(abs(du), 1.0d-6)
+
+                        !     ! Simple temperature-dependent relaxation factor
+                        !     if (u_old < T_phase_low) then
+                        !         omega = 0.8d0
+                        !         max_du = 3.0d0
+                        !     else if (u_old >= T_phase_low .and. u_old <= T_phase_high) then
+                        !         omega = 0.5d0 / (1.0d0 + 0.1d0 * real(iter, real64))
+                        !         max_du = 0.05d0
+                        !     else
+                        !         omega = 1.0d0
+                        !         max_du = 5.0d0 ! Loose limit elsewhere
+                        !     end if
+
+                        !     ! Apply clamped update with relaxation
+                        !     ! current = t_old + omega * (clamped_du)
+                        !     current(i) = u_old + omega * sign(min(abs(du), max_du), du)
+                    end do
+                    ! ! ! current(:) = u(:)
+                    ! ! ! Picard with Under-Relaxation
+                    ! current(:) = omega * u(:) + (1.0d0 - omega) * current(:)
                 end if
             end if
 
