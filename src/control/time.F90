@@ -200,7 +200,6 @@ contains
         call self%compute_bdf_coefficients()
     end subroutine update_bdf_coefficients
 
-    ! --------------------------------------------------------------------------
     !> Compute variable step-size BDF coefficients.
     !> Calculates \( \alpha_j \) such that \( \frac{dy}{dt}|_{t_n} \approx \sum_{j=0}^{k} \alpha_j y_{n-j} \).
     !> Note: Coefficients \( \alpha_j \) inherently include the \( 1/\Delta t \) scaling.

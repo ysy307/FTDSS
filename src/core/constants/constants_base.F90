@@ -14,10 +14,12 @@ module core_constants_base
         integer(int32) :: id
     contains
         procedure, public, pass(self) :: display => display_constant_id
+        
         procedure, private, pass(self) :: eq_const => eq_const_const_id
         procedure, private, pass(self) :: eq_id => eq_id_const_id
         procedure, private, pass(self) :: eq_name => eq_name_const_id
         generic, public :: operator(==) => eq_const, eq_id, eq_name
+
         procedure, private, pass(self) :: neq_const => neq_const_const_id
         procedure, private, pass(self) :: neq_id => neq_id_const_id
         procedure, private, pass(self) :: neq_name => neq_name_const_id
@@ -32,18 +34,16 @@ module core_constants_base
         real(real64) :: value
     contains
         procedure, public, pass(self) :: display => display_constant
-        procedure, private, pass(self) :: eq_const_const_value
-        procedure, private, pass(self) :: eq_id_const_value
-        procedure, private, pass(self) :: eq_name_const_value
-        generic, public :: operator(==) => &
-            eq_const_const_value, eq_id_const_value, eq_name_const_value
 
-        procedure, private, pass(self) :: neq_const_const_value
-        procedure, private, pass(self) :: neq_id_const_value
-        procedure, private, pass(self) :: neq_name_const_value
-        generic, public :: operator(/=) => &
-            neq_const_const_value, neq_id_const_value, neq_name_const_value
+        procedure, private, pass(self) :: eq_const => eq_const_const_value
+        procedure, private, pass(self) :: eq_id => eq_id_const_value
+        procedure, private, pass(self) :: eq_name => eq_name_const_value
+        generic, public :: operator(==) => eq_const, eq_id, eq_name
 
+        procedure, private, pass(self) :: neq_const => neq_const_const_value
+        procedure, private, pass(self) :: neq_id => neq_id_const_value
+        procedure, private, pass(self) :: neq_name => neq_name_const_value
+        generic, public :: operator(/=) => neq_const, neq_id, neq_name
     end type type_constant_value
 
 contains
@@ -55,7 +55,7 @@ contains
         integer(int32) :: unit
         unit = optval(unit_in, output_unit)
 
-        write (unit, '("[Group: ", A, "]", A, ": ", I12)') strip(self%group), strip(self%name), self%id
+        write (unit, '("[Group: ", a, "]", a, ": ", i6)') strip(self%group), strip(self%name), self%id
     end subroutine display_constant_id
 
     pure elemental function eq_const_const_id(self, other) result(is_equal)
@@ -93,9 +93,7 @@ contains
         class(type_constant_id), intent(in) :: other
         logical :: is_not_equal
 
-        is_not_equal = .not. ((self%id == other%id) .and. &
-                              (strip(self%name) == strip(other%name)) .and. &
-                              (strip(self%group) == strip(other%group)))
+        is_not_equal = .not. self%eq_const(other)
     end function neq_const_const_id
 
     pure elemental function neq_id_const_id(self, other) result(is_not_equal)
@@ -104,7 +102,7 @@ contains
         integer(int32), intent(in) :: other
         logical :: is_not_equal
 
-        is_not_equal = .not. (self%id == other)
+        is_not_equal = .not. (self%eq_id(other))
     end function neq_id_const_id
 
     pure elemental function neq_name_const_id(self, other) result(is_not_equal)
@@ -113,7 +111,7 @@ contains
         character(len=*), intent(in) :: other
         logical :: is_not_equal
 
-        is_not_equal = .not. (strip(self%name) == strip(other))
+        is_not_equal = .not. (self%eq_name(other))
     end function neq_name_const_id
 
     subroutine display_constant(self, unit_in)
@@ -124,7 +122,7 @@ contains
         integer(int32) :: unit
         unit = optval(unit_in, output_unit)
 
-        write (unit, '("[Group: ", A, "]", A, ": ", I12, " ", A, " ", ES24.16)') &
+        write (unit, '("[Group: ", a, "]", a, ": ", i6, " ", a, " ", es24.16)') &
             strip(self%group), strip(self%name), self%id, strip(self%unit), self%value
     end subroutine display_constant
 
@@ -165,11 +163,7 @@ contains
         class(type_constant_value), intent(in) :: other
         logical :: is_not_equal
 
-        is_not_equal = .not. ((self%id == other%id) .and. &
-                              (self%value == other%value) .and. &
-                              (strip(self%name) == strip(other%name)) .and. &
-                              (strip(self%unit) == strip(other%unit)) .and. &
-                              (strip(self%group) == strip(other%group)))
+        is_not_equal = .not. self%eq_const(other)
     end function neq_const_const_value
 
     pure elemental function neq_id_const_value(self, other) result(is_not_equal)
@@ -178,7 +172,7 @@ contains
         integer(int32), intent(in) :: other
         logical :: is_not_equal
 
-        is_not_equal = .not. (self%id == other)
+        is_not_equal = .not. (self%eq_id(other))
     end function neq_id_const_value
 
     pure elemental function neq_name_const_value(self, other) result(is_not_equal)
@@ -187,7 +181,7 @@ contains
         character(len=*), intent(in) :: other
         logical :: is_not_equal
 
-        is_not_equal = .not. (strip(self%name) == strip(other))
+        is_not_equal = .not. (self%eq_name(other))
     end function neq_name_const_value
 
 end module core_constants_base
