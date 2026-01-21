@@ -117,6 +117,7 @@ contains
         call allocate_array(self%previous, num_dof)
         call allocate_array(self%history, num_dof, self%num_history_steps)
         call allocate_array(self%diff, num_dof)
+        call allocate_array(self%delta, num_dof)
 
         call self%grad%initialize(num_dof, 0.0d0)
 

@@ -311,32 +311,7 @@ contains
                     current(:) = current(:) + u(:)
                 else if (self%controls%iteration%is_picard()) then
                     call self%temperature%set_delta(u - current)
-                    do i = 1, size(u)
-                        u_new = u(i)
-                        u_old = current(i)
-                        du = u_new - u_old
-                        ! call self%temperature%set_delta(i, du)
-                        !     max_du = max(abs(du), 1.0d-6)
-
-                        !     ! Simple temperature-dependent relaxation factor
-                        !     if (u_old < T_phase_low) then
-                        !         omega = 0.8d0
-                        !         max_du = 3.0d0
-                        !     else if (u_old >= T_phase_low .and. u_old <= T_phase_high) then
-                        !         omega = 0.5d0 / (1.0d0 + 0.1d0 * real(iter, real64))
-                        !         max_du = 0.05d0
-                        !     else
-                        !         omega = 1.0d0
-                        !         max_du = 5.0d0 ! Loose limit elsewhere
-                        !     end if
-
-                        !     ! Apply clamped update with relaxation
-                        !     ! current = t_old + omega * (clamped_du)
-                        !     current(i) = u_old + omega * sign(min(abs(du), max_du), du)
-                    end do
-                    ! ! ! current(:) = u(:)
-                    ! ! ! Picard with Under-Relaxation
-                    ! current(:) = omega * u(:) + (1.0d0 - omega) * current(:)
+                    current(:) = u(:)
                 end if
             end if
 
@@ -354,7 +329,7 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
-        call self%controls%reset()
+        call self%controls%iteration%reset()
 
     end subroutine reset_ftdss
 end submodule ftdss_base

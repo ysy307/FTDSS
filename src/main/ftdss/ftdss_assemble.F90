@@ -154,7 +154,7 @@ contains
         type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
 
         call self%thermal%assemble_local(controls=self%controls, workspace=workspace, &
-                                         J_TT=local_K_TT, J_TH=local_K_TH, R_T=local_F_T)
+                                         K_TT=local_K_TT, K_TH=local_K_TH, F_T=local_F_T)
 
     end subroutine assemble_local_ftdss
 
