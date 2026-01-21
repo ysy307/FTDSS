@@ -190,6 +190,21 @@ contains
         real(real64) :: current_norm
         logical :: abs_ok, rel_ok
 
+        is_ok = .false.
+
+        ! Calculate and store norms
+        !    Prevent out-of-bounds access
+        if (iter >= 1 .and. iter <= size(self%norms_history, 2)) then
+            self%norms_history(NORM_TYPES%L1%id, iter) = vector_norm1(vector)
+            self%norms_history(NORM_TYPES%L2%id, iter) = vector_norm2(vector)
+            self%norms_history(NORM_TYPES%LINF%id, iter) = vector_norminf(vector)
+
+            write (*, '(A, I6, A, F12.6, A, F12.6, A, F12.6)') '    [Debug] Iteration:', iter, ' Norms - L1:', &
+                self%norms_history(NORM_TYPES%L1%id, iter), &
+                ' L2:', self%norms_history(NORM_TYPES%L2%id, iter), &
+                ' LInf:', self%norms_history(NORM_TYPES%LINF%id, iter)
+        end if
+
         ! Return true immediately if checking is disabled
         if (.not. self%should_check) then
             is_ok = .true.
@@ -202,19 +217,10 @@ contains
             return
         end if
 
-        ! 1. Calculate and store norms
-        !    Prevent out-of-bounds access
-        if (iter >= 1 .and. iter <= size(self%norms_history, 2)) then
-            self%norms_history(NORM_TYPES%L1%id, iter) = vector_norm1(vector)
-            self%norms_history(NORM_TYPES%L2%id, iter) = vector_norm2(vector)
-            self%norms_history(NORM_TYPES%LINF%id, iter) = vector_norminf(vector)
-        end if
-
         ! Retrieve the specified norm for the current iteration
         current_norm = self%norms_history(norm_type%id, iter)
 
-        ! 3. Convergence logic
-
+        ! Convergence logic
         ! Absolute Check
         abs_ok = (current_norm < self%absolute_tolerance)
 
@@ -427,23 +433,23 @@ contains
 
         associate (control => self%config%convergence_control)
             ! --- Residual vector check ---
-            if (check_residual) then
-                if (present(residual_vector)) then
-                    is_residual_ok = control%residual(physics_type%id)%check( &
-                                     residual_vector, self%nonlinear_iter, control%norm_type)
-                else
-                    is_residual_ok = .false.
-                end if
+            if (present(residual_vector)) then
+                write (*, '(A, i0)') '    [Debug] Checking residual convergence for physics type ID: ', physics_type%id
+                is_residual_ok = control%residual(physics_type%id)%check( &
+                                 residual_vector, self%nonlinear_iter, control%norm_type)
+                if (.not. check_residual) is_residual_ok = .true.
+            else
+                is_residual_ok = .not. check_residual
             end if
 
             ! --- Update vector check ---
-            if (check_update) then
-                if (present(update_vector)) then
-                    is_update_ok = control%update(physics_type%id)%check( &
-                                   update_vector, self%nonlinear_iter, control%norm_type)
-                else
-                    is_update_ok = .false.
-                end if
+            if (present(update_vector)) then
+                write (*, '(A, i0)') '    [Debug] Checking update convergence for physics type ID: ', physics_type%id
+                is_update_ok = control%update(physics_type%id)%check( &
+                               update_vector, self%nonlinear_iter, control%norm_type)
+                if (.not. check_update) is_update_ok = .true.
+            else
+                is_update_ok = .not. check_update
             end if
 
             ! --- Combine Logic (AND / OR) ---
@@ -544,21 +550,14 @@ contains
         type(type_constant_id), intent(in) :: norm_type
         real(real64), intent(inout) :: current_norm
 
-        if (.not. PHYSICS_TYPES%is_valid(physics_type)) then
-            current_norm = 0.0d0
-            return
-        end if
+        current_norm = 0.0d0
+        if (.not. PHYSICS_TYPES%is_valid(physics_type)) return
 
-        if (.not. NORM_TYPES%is_valid(norm_type)) then
-            current_norm = 0.0d0
-            return
-        end if
+        if (.not. NORM_TYPES%is_valid(norm_type)) return
 
         if (self%nonlinear_iter >= 1 .and. self%nonlinear_iter <= self%config%max_iterations) then
             current_norm = &
                 self%config%convergence_control%update(physics_type%id)%norms_history(norm_type%id, self%nonlinear_iter)
-        else
-            current_norm = 0.0d0
         end if
     end subroutine get_current_update_norm_iteration
 

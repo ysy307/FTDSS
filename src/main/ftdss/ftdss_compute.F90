@@ -343,7 +343,7 @@ contains
     module subroutine solve_time_step_initial_setup_ftdss(self)
         implicit none
         class(type_ftdss), intent(inout) :: self
-        
+
         call self%controls%iteration%increment_total()
 
     end subroutine solve_time_step_initial_setup_ftdss
@@ -377,46 +377,60 @@ contains
 
         real(real64), pointer, contiguous, dimension(:) :: current_value => null()
 
-        real(real64), allocatable :: variable(:)
-        real(real64), allocatable :: diff(:)
-        integer(int32) :: num_nodes
-
-        call self%controls%iteration%get_nonlinear_iter(iter)
-        call self%domain%get_num_nodes(num_nodes)
-
-        call allocate_array(diff, num_nodes)
+        real(real64), allocatable :: residual(:)
+        real(real64), allocatable :: increment(:)
+        real(real64) :: current_norm
+        real(real64) :: switch_norm(PHYSICS_TYPES%NUM_ID) = [1.0d-2, 1.0d-4, 1.0d-4] ! [温度, 圧力] 切り替え閾値
+        logical :: should_switch = .true.
 
         if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
-            call self%get_variable_increment(PHYSICS_TYPES%THERMAL, diff)
-
-            ! if (self%controls%iteration%is_newton()) then
-            !     diff(:) = variable(:)
-            ! else if (self%controls%iteration%is_picard()) then
-            !     call self%temperature%get_current(current_value)
-            !     diff(:) = current_value(:) - variable(:)
-            ! end if
-
-            call self%controls%iteration%check_convergence(PHYSICS_TYPES%THERMAL, update_vector=diff)
+            call self%get_variable_residual(PHYSICS_TYPES%THERMAL, residual)
+            call self%get_variable_increment(PHYSICS_TYPES%THERMAL, increment)
+            call self%controls%iteration%check_convergence(PHYSICS_TYPES%THERMAL, residual, increment)
         end if
 
         if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
-            call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, variable)
-
-            if (self%controls%iteration%is_newton()) then
-                diff(:) = variable(:)
-            else if (self%controls%iteration%is_picard()) then
-                call self%pressure%get_current(current_value)
-                diff(:) = current_value(:) - variable(:)
-            end if
-
-            call self%controls%iteration%check_convergence(PHYSICS_TYPES%HYDRAULIC, update_vector=diff)
+            call self%get_variable_residual(PHYSICS_TYPES%HYDRAULIC, residual)
+            call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, increment)
+            call self%controls%iteration%check_convergence(PHYSICS_TYPES%HYDRAULIC, residual, increment)
         end if
 
+        ! ----------------------------------------------------------------------
+        ! 2. [追加] Hybrid法 切り替え判定 (Residual Check)
+        !    Picardモードで，残差が十分小さくなったらNewtonへ切り替える
+        ! ----------------------------------------------------------------------
+        call self%controls%iteration%get_nonlinear_iter(iter)
 
+        if (iter > 1) then
+            if (self%controls%iteration%is_picard()) then
+                should_switch = .true.
+                if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
+                    current_norm = 0.0d0
+                    call self%controls%iteration%get_current_residual_norm(PHYSICS_TYPES%THERMAL, NORM_TYPES%LINF, current_norm)
+                    ! [推奨] デバッグ出力: 熱の残差状況を表示
+                    write (*, '("   [Picard Check] Thermal |R|_inf: ", ES10.3, " / Threshold: ", ES10.3)') &
+                        current_norm, switch_norm(PHYSICS_TYPES%THERMAL%id)
+                    if (current_norm > switch_norm(PHYSICS_TYPES%THERMAL%id)) then
+                        should_switch = .false.
+                    end if
+                end if
+                if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
+                    call self%controls%iteration%get_current_residual_norm(PHYSICS_TYPES%HYDRAULIC, NORM_TYPES%LINF, current_norm)
+                    if (current_norm > switch_norm(PHYSICS_TYPES%HYDRAULIC%id)) then
+                        should_switch = .false.
+                    end if
+                end if
 
-        call deallocate_array(variable)
-        call deallocate_array(diff)
-        nullify (current_value)
+                if (should_switch) then
+                    write (*, '("   -> Residual small enough. Switching to Newton-Raphson.")')
+                    call self%controls%iteration%set_nonlinear_solver(NONLINEAR_SOLVER%NEWTON)
+                end if
+
+            end if
+        end if
+
+        call deallocate_array(increment)
+        call deallocate_array(residual)
 
     end subroutine solve_time_step_check_convergence_ftdss
 

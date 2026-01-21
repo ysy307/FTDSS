@@ -77,6 +77,7 @@ module main_ftdss
         procedure, private, pass(self) :: assemble_finalize => assemble_finalize_ftdss
 
         procedure, private, pass(self) :: get_variable_increment => get_variable_increment_ftdss
+        procedure, private, pass(self) :: get_variable_residual => get_variable_residual_ftdss
 
         procedure, public, pass(self) :: reset => reset_ftdss
 
@@ -242,6 +243,14 @@ module main_ftdss
             real(real64), intent(inout), allocatable :: variable(:)
 
         end subroutine get_variable_increment_ftdss
+
+        module subroutine get_variable_residual_ftdss(self, variable_id, variable)
+            implicit none
+            class(type_ftdss), intent(inout) :: self
+            type(type_constant_id), intent(in) :: variable_id
+            real(real64), intent(inout), allocatable :: variable(:)
+
+        end subroutine get_variable_residual_ftdss
 
         module subroutine reset_ftdss(self)
             implicit none

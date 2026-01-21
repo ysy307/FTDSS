@@ -178,8 +178,14 @@ contains
 
         call deallocate_array(variable)
 
+        if (.not. PHYSICS_TYPES%is_valid(variable_id)) then
+            call allocate_array(variable, 0)
+            return
+        end if
+
         du => self%du%get_data()
         if (.not. associated(du)) then
+            call allocate_array(variable, 0)
             return
         end if
 
@@ -194,11 +200,55 @@ contains
             end_idx = num_dofs_per_node * (num_nodes - 1) + target_dof
 
             variable(:) = du(start_idx:end_idx:num_dofs_per_node)
+        else
+            call allocate_array(variable, 0)
         end if
 
         nullify (du)
 
     end subroutine get_variable_increment_ftdss
+
+    module subroutine get_variable_residual_ftdss(self, variable_id, variable)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+        type(type_constant_id), intent(in) :: variable_id
+        real(real64), intent(inout), allocatable :: variable(:)
+
+        real(real64), pointer, contiguous, dimension(:) :: F => null()
+
+        integer(int32) :: target_dof
+        integer(int32) :: num_nodes, num_dofs_per_node
+        integer(int32) :: start_idx, end_idx
+
+        call deallocate_array(variable)
+
+        if (.not. PHYSICS_TYPES%is_valid(variable_id)) then
+            call allocate_array(variable, 0)
+            return
+        end if
+
+        F => self%F%get_data()
+        if (.not. associated(F)) then
+            call allocate_array(variable, 0)
+            return
+        end if
+
+        if (self%controls%is_physics_active(variable_id)) then
+            call self%domain%get_num_nodes(num_nodes)
+            call self%domain%get_num_dofs_per_node(num_dofs_per_node)
+            call self%domain%get_target_dof(variable_id%id, target_dof)
+
+            call allocate_array(variable, num_nodes)
+
+            start_idx = target_dof
+            end_idx = num_dofs_per_node * (num_nodes - 1) + target_dof
+
+            variable(:) = F(start_idx:end_idx:num_dofs_per_node)
+        else
+            call allocate_array(variable, 0)
+        end if
+
+    end subroutine get_variable_residual_ftdss
 
     module subroutine set_state_ftdss(self, node_id, element_id, state)
         implicit none
@@ -289,7 +339,7 @@ contains
         real(real64), allocatable :: du(:)
 
         ! integer(int32) :: i
-        ! real(real64) :: omega
+        real(real64) :: omega = 0.5d0
         ! ! real(real64) :: u_new, u_old, du, max_du
         ! real(real64), parameter :: T_phase_low = -2.0d0
         ! real(real64), parameter :: T_phase_high = 1.0d0
@@ -306,13 +356,8 @@ contains
             call self%temperature%get_current(current)
             call self%temperature%get_delta(delta)
             if (associated(current) .and. associated(delta)) then
-                ! if (self%controls%iteration%is_newton()) then
                 call self%temperature%set_delta(du)
-                current(:) = current(:) + du(:)
-                ! else if (self%controls%iteration%is_picard()) then
-                !     call self%temperature%set_delta(du - current)
-                !     current(:) =current(:) +  du(:)
-                ! end if
+                current(:) = current(:) + omega * du(:)
             end if
 
             call self%calc_gradient_temperature()
