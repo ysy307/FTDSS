@@ -7,12 +7,22 @@ module module_control
     use :: control_iteration, only:type_iteration
     use :: control_output, only:type_output_manager
     use :: control_openmp, only:initialize_openmp
+    use :: module_linalg
     implicit none
     private
 
     public :: type_time
     public :: type_iteration
     public :: type_controls
+
+    type :: type_aitken_params
+        real(real64), private :: relaxation_factor = 0.5d0
+        real(real64), private :: previous_relaxation_factor = 0.5d0
+    contains
+        procedure, public, pass(self) :: reset => reset_aitken_params
+        procedure, public, pass(self) :: compute_relaxation => compute_aitken_relaxation
+        procedure, public, pass(self) :: get_relaxation => get_aitken_relaxation
+    end type type_aitken_params
 
     type :: type_controls
         private
@@ -28,6 +38,8 @@ module module_control
 
         type(type_output_manager), public :: out_field
         type(type_output_manager), public :: out_history
+
+        type(type_aitken_params), public :: aitken
 
     contains
         procedure, pass(self), public :: initialize => initialize_type_controls
@@ -274,5 +286,47 @@ contains
 
         write (*, '(a)') "---"
     end subroutine display_controls
+
+    subroutine reset_aitken_params(self)
+        implicit none
+        class(type_aitken_params), intent(inout) :: self
+
+        self%relaxation_factor = 0.5d0
+    end subroutine reset_aitken_params
+
+    subroutine compute_aitken_relaxation(self, du_new, du_old)
+        implicit none
+        class(type_aitken_params), intent(inout) :: self
+        real(real64), intent(in) :: du_new(:)
+        real(real64), intent(in) :: du_old(:)
+
+        integer(int32) :: ierr
+        real(real64) :: numerator
+        real(real64) :: denominator
+
+        numerator = vector_dot((du_new - du_old), du_old)
+        denominator = vector_norm2(du_new - du_old)**2
+
+        if (denominator /= 0.0d0) then
+            self%relaxation_factor = -self%previous_relaxation_factor * (numerator / denominator)
+            ! Relaxation factor limits
+            if (self%relaxation_factor < 0.1d0) then
+                self%relaxation_factor = 0.1d0
+            else if (self%relaxation_factor > 1.0d0) then
+                self%relaxation_factor = 1.0d0
+            end if
+            self%previous_relaxation_factor = self%relaxation_factor
+        end if
+
+    end subroutine compute_aitken_relaxation
+
+    pure subroutine get_aitken_relaxation(self, relaxation_factor)
+        implicit none
+        class(type_aitken_params), intent(in) :: self
+        real(real64), intent(out) :: relaxation_factor
+
+        relaxation_factor = self%relaxation_factor
+
+    end subroutine get_aitken_relaxation
 
 end module module_control

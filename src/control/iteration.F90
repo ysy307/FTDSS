@@ -1,9 +1,9 @@
 module control_iteration
     use, intrinsic :: iso_fortran_env, only: int32, real64
+    use :: stdlib_strings, only: strip
     use :: module_core
     use :: module_input, only:type_input
     use :: module_linalg, only:vector_norm1, vector_norm2, vector_norminf
-    use :: core_constants_utils
 
     implicit none
     private
@@ -421,8 +421,7 @@ contains
         end if
 
         if (.not. PHYSICS_TYPES%is_valid(physics_type)) then
-            !! TODO: エラーハンドリング
-            return
+            call raise_error(ERROR_CODES%INVALID_TYPE, opt=strip(physics_type%name))
         end if
 
         check_residual = self%config%convergence_control%should_check_residual()
