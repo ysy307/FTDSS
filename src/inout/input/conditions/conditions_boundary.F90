@@ -31,7 +31,7 @@ contains
 
         call json%info(boundary_conditions, found=found, n_children=self%num_boundaries)
         if (.not. found .or. self%num_boundaries <= 0) then
-            call error_message(904, c_opt=boundary_conditions)
+            call raise_error(ERROR_CODES%VAR_INVALID, opt=boundary_conditions)
         end if
 
         if (allocated(self%boundary_conditions)) deallocate (self%boundary_conditions)

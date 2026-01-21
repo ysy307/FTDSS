@@ -4,7 +4,8 @@
 !> Uses fypp preprocessor to generate procedures for various types and ranks.
 module core_deallocate
     use, intrinsic :: iso_fortran_env
-    use :: core_error, only:error_message
+    use :: core_constants, only:ERROR_CODES
+    use :: core_error, only:raise_error
     implicit none
     private
 
@@ -42,7 +43,9 @@ contains
 
                     if (allocated(array)) then
                         deallocate (array, stat=stat)
-                        if (stat /= 0) call error_message(961)
+                        if (stat /= 0) call raise_error(ERROR_CODES%DEALLOC_FAILED, &
+                                                        scope="core_deallocate:deallocate_rank${rank}$_${suffix}$", &
+                                                        line=__LINE__)
                     end if
                 end subroutine deallocate_rank${rank}$_${suffix}$
 

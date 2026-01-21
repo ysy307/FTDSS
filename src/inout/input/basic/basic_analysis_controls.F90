@@ -38,7 +38,7 @@ contains
                             is_required=.true., default_value=.false.)
 
         if (.not. any(self%analysis_controls%is_active(:))) then
-            call error_message(905, c_opt=analysis_controls)
+            call raise_error(ERROR_CODES%VAR_INVALID, opt=analysis_controls)
         end if
 
         buffer(2) = coupling_mode

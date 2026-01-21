@@ -54,7 +54,7 @@ contains
 
         ! Custom validation: Ensure start time is before end time
         if (self%time_control%simulation_period%start >= self%time_control%simulation_period%end) then
-            call error_message(905, c_opt="In "//join(buffer(1:2))//", 'start' time must be before 'end' time.")
+            call raise_error(ERROR_CODES%VAR_INVALID, opt=start//" and "//fend)
         end if
     end subroutine read_conditions_time_controls_simulation_period
 
@@ -90,11 +90,11 @@ contains
 
         ! Custom validation for time step consistency
         if (self%time_control%time_stepping%min_step > self%time_control%time_stepping%max_step) then
-            call error_message(905, c_opt="In "//join(buffer(1:2))//", 'min_step' cannot be greater than 'max_step'.")
+            call raise_error(ERROR_CODES%VAR_INVALID, opt="In "//join(buffer(1:2))//", 'min_step' cannot be greater than 'max_step'.")
         end if
         if (self%time_control%time_stepping%initial_step < self%time_control%time_stepping%min_step .or. &
             self%time_control%time_stepping%initial_step > self%time_control%time_stepping%max_step) then
-            call error_message(905, c_opt="In "//join(buffer(1:2))//", 'initial_step' must be between 'min_step' and 'max_step'.")
+            call raise_error(ERROR_CODES%VAR_INVALID, opt="In "//join(buffer(1:2))//", 'initial_step' must be between 'min_step' and 'max_step'.")
         end if
     end subroutine read_conditions_time_controls_time_stepping
 
@@ -115,24 +115,24 @@ contains
 
         ! --- Custom Validations for the time points array ---
         if (size(self%time_control%boundary_time_points) < 2) then
-            call error_message(905, c_opt="Key '"//join(buffer)//"' must contain at least two time points.")
+            call raise_error(ERROR_CODES%VAR_INVALID, opt="Key '"//join(buffer)//"' must contain at least two time points.")
         end if
 
         ! Check if the time points are sorted in strictly ascending order
         do i = 1, size(self%time_control%boundary_time_points) - 1
             if (self%time_control%boundary_time_points(i) >= self%time_control%boundary_time_points(i + 1)) then
-                call error_message(905, c_opt="Time points for key '"//join(buffer)//"' must be in strictly ascending order.")
+                call raise_error(ERROR_CODES%VAR_INVALID, opt="Time points for key '"//join(buffer)//"' must be in strictly ascending order.")
             end if
         end do
 
         ! Check if the first and last time points match the simulation period
         if (abs(self%time_control%boundary_time_points(1) - &
                 self%time_control%simulation_period%start) > machine_epsilon) then
-            call error_message(905, c_opt="The first boundary time point must match the simulation start time.")
+            call raise_error(ERROR_CODES%VAR_INVALID, opt="The first boundary time point must match the simulation start time.")
         end if
         if (abs(self%time_control%boundary_time_points(size(self%time_control%boundary_time_points)) - &
                 self%time_control%simulation_period%end) > machine_epsilon) then
-            call error_message(905, c_opt="The last boundary time point must match the simulation end time.")
+            call raise_error(ERROR_CODES%VAR_INVALID, opt="The last boundary time point must match the simulation end time.")
         end if
 
     end subroutine read_conditions_time_controls_boundary_time_points

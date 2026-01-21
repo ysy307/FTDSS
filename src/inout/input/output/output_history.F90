@@ -67,10 +67,10 @@ contains
                 call json%print_error_message(output_unit)
                 if (.not. found) then
                     call json%destroy()
-                    call error_message(904, c_opt=join(buffer))
+                    call raise_error(ERROR_CODES%VAR_NOT_FOUND, opt=join(buffer))
                 else if (self%history_output%num_observations <= 0) then
                     call json%destroy()
-                    call error_message(905, c_opt=join(buffer))
+                    call raise_error(ERROR_CODES%VAR_INVALID, opt=join(buffer))
                 end if
                 allocate (self%history_output%coordinates(self%history_output%num_observations))
 

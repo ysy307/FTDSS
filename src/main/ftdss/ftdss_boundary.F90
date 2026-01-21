@@ -83,14 +83,14 @@ contains
         logical :: is_active
         class(abst_bc), pointer :: bc_obj
 
-        associate (phys_mgr => self%domain%boundaries%physics(physics_type%id))
-            do i_patch = 1, phys_mgr%num_bcs
-                bc_obj => phys_mgr%bcs(i_patch)%condition
+        associate (bc_manager => self%domain%boundaries%physics(physics_type%id))
+            do i_patch = 1, bc_manager%num_bcs
+                bc_obj => bc_manager%bcs(i_patch)%condition
 
                 call bc_obj%get_dirichlet_value(current_time, val_fixed, is_active)
                 if (.not. is_active) cycle
 
-                associate (patch => phys_mgr%bcs(i_patch))
+                associate (patch => bc_manager%bcs(i_patch))
                     do i = 1, size(patch%connectivity%val)
                         glob_node_id = patch%connectivity%val(i)
                         ! 現在の変数値をBC値に上書き
@@ -134,16 +134,16 @@ contains
         class(abst_bc), pointer :: bc_obj
         class(abst_fe), pointer :: fe
 
-        associate (phys_mgr => self%domain%boundaries%physics(physics_type%id))
-            do i_patch = 1, phys_mgr%num_bcs
-                bc_obj => phys_mgr%bcs(i_patch)%condition
+        associate (bc_manager => self%domain%boundaries%physics(physics_type%id))
+            do i_patch = 1, bc_manager%num_bcs
+                bc_obj => bc_manager%bcs(i_patch)%condition
 
                 select type (bc_obj)
                 type is (type_bc_dirichlet)
                     cycle
                 end select
 
-                associate (patch => phys_mgr%bcs(i_patch))
+                associate (patch => bc_manager%bcs(i_patch))
                     ! パッチ内の全ての境界要素についてFEタイプは同一と仮定して代表を取得 (index=1)
                     fe => patch%fe_manager%get_fe(1)
 
@@ -220,29 +220,18 @@ contains
         integer(int32) :: i_patch, i, glob_node_id
         real(real64) :: val_fixed, val_curr
         logical :: is_active
-        class(abst_bc), pointer :: bc_obj
-        type(type_constant_id), pointer :: nonlinear_solver_type
+        class(abst_bc), pointer :: bc_object
 
-        logical :: is_residual_form
+        if (.not. PHYSICS_TYPES%is_valid(physics_type)) return
 
-        call self%controls%iteration%get_nonlinear_solver(nonlinear_solver_type)
+        associate (bc_manager => self%domain%boundaries%physics(physics_type%id))
+            do i_patch = 1, bc_manager%num_bcs
+                bc_object => bc_manager%bcs(i_patch)%condition
 
-        ! Determine calculation form from solver type
-        if (nonlinear_solver_type == NONLINEAR_SOLVER%NEWTON .or. &
-            nonlinear_solver_type == NONLINEAR_SOLVER%MODIFIED_NEWTON) then
-            is_residual_form = .true.
-        else
-            is_residual_form = .false.
-        end if
-
-        associate (phys_mgr => self%domain%boundaries%physics(physics_type%id))
-            do i_patch = 1, phys_mgr%num_bcs
-                bc_obj => phys_mgr%bcs(i_patch)%condition
-
-                call bc_obj%get_dirichlet_value(current_time, val_fixed, is_active)
+                call bc_object%get_dirichlet_value(current_time, val_fixed, is_active)
                 if (.not. is_active) cycle
 
-                associate (patch => phys_mgr%bcs(i_patch))
+                associate (patch => bc_manager%bcs(i_patch))
                     do i = 1, size(patch%connectivity%val)
                         glob_node_id = patch%connectivity%val(i)
 
@@ -252,16 +241,7 @@ contains
                         call self%K%set(dof_offset, dof_offset, glob_node_id, glob_node_id, 1.0d0)
 
                         ! 2. Set Residual/Force vector
-                        if (is_residual_form) then
-                            ! Newton Method/ Modified Newton Method (Residual form): K * du = -R
-                            ! [NOTE] du = val_curr - val_fixed
-                            call variable%get_current(glob_node_id, val_curr)
-                            call self%F%set(dof_offset, glob_node_id, val_curr - val_fixed)
-                        else
-                            ! Picard Method (Full form): K * u = F
-                            ! [NOTE] u = val_fixed
-                            call self%F%set(dof_offset, glob_node_id, val_fixed)
-                        end if
+                        call self%F%set(dof_offset, glob_node_id, 0.0d0)
                     end do
                 end associate
             end do

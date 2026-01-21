@@ -306,13 +306,13 @@ contains
             call self%temperature%get_current(current)
             call self%temperature%get_delta(delta)
             if (associated(current) .and. associated(delta)) then
-                if (self%controls%iteration%is_newton()) then
-                    call self%temperature%set_delta(du)
-                    current(:) = current(:) + du(:)
-                else if (self%controls%iteration%is_picard()) then
-                    call self%temperature%set_delta(du - current)
-                    current(:) = du(:)
-                end if
+                ! if (self%controls%iteration%is_newton()) then
+                call self%temperature%set_delta(du)
+                current(:) = current(:) + du(:)
+                ! else if (self%controls%iteration%is_picard()) then
+                !     call self%temperature%set_delta(du - current)
+                !     current(:) =current(:) +  du(:)
+                ! end if
             end if
 
             call self%calc_gradient_temperature()

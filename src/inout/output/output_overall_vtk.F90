@@ -75,7 +75,7 @@ contains
 
         write (output_name, self%format_output) trim(self%dir_output_field), "Out_", file_counts, self%file_extension
         open (newunit=unit_num, file=output_name, status='replace', action='write', iostat=status)
-        if (status /= 0) call error_message(931)
+        if (status /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, opt=output_name)
 
         write (unit_num, '(a)') "# vtk DataFile Version 2.0"
         write (unit_num, '(a)') "Analysis ASCII VTK file"
@@ -138,7 +138,8 @@ contains
 
         open (newunit=unit_num, file=trim(self%dir_output_field)//trim(file_name)//trim(self%file_extension), &
               status='replace', action='write', iostat=status)
-        if (status /= 0) call error_message(931)
+        if (status /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, &
+                                          opt=trim(self%dir_output_field)//trim(file_name)//trim(self%file_extension))
 
         write (unit_num, '(a)') "# vtk DataFile Version 2.0"
         write (unit_num, '(a)') "Analysis ASCII VTK file"

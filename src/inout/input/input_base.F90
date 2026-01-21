@@ -1,8 +1,8 @@
 module inout_input_base
     use, intrinsic :: iso_fortran_env
-    use :: stdlib_strings, only:to_string, ends_with
+    use :: stdlib_strings, only:to_string, strip, ends_with
     use :: json_module, only:json_file
-    use :: module_core, only:error_message
+    use :: module_core, only:raise_error, ERROR_CODES
     implicit none
     private
 
@@ -52,18 +52,18 @@ contains
             if (present(default_value)) then
                 target_var = default_value
             else if (required) then
-                call error_message(904, c_opt="Required key not found: "//trim(key))
+                call raise_error(ERROR_CODES%MISSING_REQ_ARG, opt=strip(key))
             end if
         else
             ! 値が見つかった場合のバリデーション
             if (present(valid_range)) then
                 if (target_var < valid_range(1) .or. target_var > valid_range(2)) then
-                    call error_message(905, c_opt="Value for key '"//trim(key)//"' is out of range.")
+                    call raise_error(ERROR_CODES%PARAM_RANGE, opt=strip(key))
                 end if
             end if
             if (present(valid_list)) then
                 if (.not. any(valid_list == target_var)) then
-                    call error_message(905, c_opt="Value for key '"//trim(key)//"' is not in the valid list.")
+                    call raise_error(ERROR_CODES%PARAM_RANGE, opt=strip(key))
                 end if
             end if
         end if
@@ -95,12 +95,12 @@ contains
             if (present(default_value)) then
                 target_var = default_value
             else if (required) then
-                call error_message(904, c_opt="Required key not found: "//trim(key))
+                call raise_error(ERROR_CODES%MISSING_REQ_ARG, opt=trim(key))
             end if
         else
             if (present(valid_range)) then
                 if (target_var < valid_range(1) .or. target_var > valid_range(2)) then
-                    call error_message(905, c_opt="Value for key '"//trim(key)//"' is out of range.")
+                    call raise_error(ERROR_CODES%PARAM_RANGE, opt=strip(key))
                 end if
             end if
         end if
@@ -157,7 +157,7 @@ contains
             if (present(default_value)) then
                 target_var = default_value
             else if (required) then
-                call error_message(904, c_opt="Required key not found: "//trim(key))
+                call raise_error(ERROR_CODES%MISSING_REQ_ARG, opt=trim(key))
             end if
         else
             ! 値が見つかった場合のバリデーション
@@ -170,7 +170,7 @@ contains
                     end if
                 end do
                 if (.not. is_in_list) then
-                    call error_message(905, c_opt="Value for key '"//trim(key)//"' is not in the valid list.")
+                    call raise_error(ERROR_CODES%PARAM_RANGE, opt=strip(key))
                 end if
             end if
         end if
@@ -205,7 +205,7 @@ contains
             if (present(default_value)) then
                 target_var = default_value
             else if (required) then
-                call error_message(904, c_opt="Required key not found: "//trim(key))
+                call raise_error(ERROR_CODES%MISSING_REQ_ARG, opt=trim(key))
             else
                 if (allocated(target_var)) deallocate (target_var)
                 allocate (target_var(0))
@@ -213,17 +213,17 @@ contains
         else
             if (present(array_size)) then
                 if (size(target_var) /= array_size) then
-                    call error_message(905, c_opt="Array size for key '"//trim(key)//"' does not match the expected size.")
+                    call raise_error(ERROR_CODES%PARAM_RANGE, opt=strip(key))
                 end if
             end if
             if (present(valid_range)) then
                 if (any(target_var < valid_range(1)) .or. any(target_var > valid_range(2))) then
-                    call error_message(905, c_opt="One or more values for key '"//trim(key)//"' are out of range.")
+                    call raise_error(ERROR_CODES%PARAM_RANGE, opt=strip(key))
                 end if
             end if
             if (present(valid_list)) then
                 if (.not. all(merge(.true., .false., [(any(valid_list == target_var(i)), i=1, size(target_var))]))) then
-                    call error_message(905, c_opt="One or more values for key '"//trim(key)//"' are not in the valid list.")
+                    call raise_error(ERROR_CODES%PARAM_RANGE, opt=strip(key))
                 end if
             end if
         end if
@@ -259,7 +259,7 @@ contains
             if (present(default_value)) then
                 target_var = default_value
             else if (required) then
-                call error_message(904, c_opt="Required key not found: "//trim(key))
+                call raise_error(ERROR_CODES%MISSING_REQ_ARG, opt=trim(key))
             else
                 if (allocated(target_var)) deallocate (target_var)
                 allocate (target_var(0))
@@ -267,17 +267,17 @@ contains
         else
             if (present(array_size)) then
                 if (size(target_var) /= array_size) then
-                    call error_message(905, c_opt="Array size for key '"//trim(key)//"' does not match the expected size.")
+                    call raise_error(ERROR_CODES%PARAM_RANGE, opt=strip(key))
                 end if
             end if
             if (present(valid_range)) then
                 if (any(target_var < valid_range(1)) .or. any(target_var > valid_range(2))) then
-                    call error_message(905, c_opt="One or more values for key '"//trim(key)//"' are out of range.")
+                    call raise_error(ERROR_CODES%PARAM_RANGE, opt=strip(key))
                 end if
             end if
             if (present(valid_list)) then
                 if (.not. all(merge(.true., .false., [(any(valid_list == target_var(i)), i=1, size(target_var))]))) then
-                    call error_message(905, c_opt="One or more values for key '"//trim(key)//"' are not in the valid list.")
+                    call raise_error(ERROR_CODES%PARAM_RANGE, opt=strip(key))
                 end if
             end if
         end if
@@ -315,7 +315,7 @@ contains
                 allocate (character(len=len(default_value(1))) :: target_var(size(default_value)))
                 target_var = default_value
             else if (required) then
-                call error_message(904, c_opt="Required key not found: "//trim(key))
+                call raise_error(ERROR_CODES%MISSING_REQ_ARG, opt=trim(key))
             else
                 if (allocated(target_var)) deallocate (target_var)
                 allocate (character(len=0) :: target_var(0))
@@ -333,14 +333,14 @@ contains
 
             if (present(array_size)) then
                 if (size(target_var) /= array_size) then
-                    call error_message(905, c_opt="Array size for key '"//trim(key)//"' does not match the expected size.")
+                    call raise_error(ERROR_CODES%PARAM_RANGE, opt=strip(key))
                 end if
             end if
 
             if (present(valid_list)) then
                 do i = 1, size(target_var)
                     if (.not. any(valid_list == trim(target_var(i)))) then
-                        call error_message(905, c_opt="Invalid value '"//trim(target_var(i))//"' for key '"//trim(key)//"'")
+                        call raise_error(ERROR_CODES%PARAM_RANGE, opt=strip(key))
                     end if
                 end do
             end if

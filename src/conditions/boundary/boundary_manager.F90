@@ -51,9 +51,7 @@ contains
             ! ※ Free境界の実装によりますが、勾配0(Neumann)とみなす場合など
 
         case default
-            call error_message(ERR_BC_UNKNOWN, &
-                               c_opt="Unknown boundary condition type ID: "//trim(to_string(target_bc_id)))
-            return ! bcはunallocatedのまま返る
+            call raise_error(ERROR_CODES%INVALID_BC_TYPE)
         end select
 
         ! 2. 共通初期化メソッドを呼ぶ

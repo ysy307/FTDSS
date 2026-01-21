@@ -58,7 +58,7 @@ contains
         call json%info(materials, found=found, n_children=self%num_materials)
         call json%print_error_message(output_unit)
         if (.not. found .or. self%num_materials <= 0) then
-            call error_message(904, c_opt=materials)
+            call raise_error(ERROR_CODES%VAR_INVALID, opt=materials)
         end if
 
         if (allocated(self%materials)) deallocate (self%materials)

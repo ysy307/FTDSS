@@ -98,20 +98,20 @@ contains
 
         class(abst_matrix), pointer :: K_ptr => null()
         type(type_vector_dp), pointer :: F_ptr => null()
-        type(type_vector_dp), pointer :: u_ptr => null()
+        type(type_vector_dp), pointer :: du_ptr => null()
 
         call self%controls%profiler%start("Solve")
 
         K_ptr => self%K%get_matrix()
         F_ptr => self%F%get_vector()
-        u_ptr => self%u%get_vector()
+        du_ptr => self%du%get_vector()
 
-        call self%solver%solve(K_ptr, F_ptr, u_ptr)
+        call self%solver%solve(K_ptr, F_ptr, du_ptr)
         call self%solver%check()
 
         nullify (K_ptr)
         nullify (F_ptr)
-        nullify (u_ptr)
+        nullify (du_ptr)
 
         call self%controls%profiler%stop("Solve")
 
@@ -387,20 +387,20 @@ contains
         call allocate_array(diff, num_nodes)
 
         if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
-            call self%get_variable(PHYSICS_TYPES%THERMAL, variable)
+            call self%get_variable_increment(PHYSICS_TYPES%THERMAL, diff)
 
-            if (self%controls%iteration%is_newton()) then
-                diff(:) = variable(:)
-            else if (self%controls%iteration%is_picard()) then
-                call self%temperature%get_current(current_value)
-                diff(:) = current_value(:) - variable(:)
-            end if
+            ! if (self%controls%iteration%is_newton()) then
+            !     diff(:) = variable(:)
+            ! else if (self%controls%iteration%is_picard()) then
+            !     call self%temperature%get_current(current_value)
+            !     diff(:) = current_value(:) - variable(:)
+            ! end if
 
             call self%controls%iteration%check_convergence(PHYSICS_TYPES%THERMAL, update_vector=diff)
         end if
 
         if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
-            call self%get_variable(PHYSICS_TYPES%HYDRAULIC, variable)
+            call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, variable)
 
             if (self%controls%iteration%is_newton()) then
                 diff(:) = variable(:)

@@ -138,7 +138,7 @@ contains
         if (id > 0) then
             call self%start_profile_by_id(id)
         else
-            call error_message(ERR_PROFILER, c_opt="Unknown label: "//strip(label))
+            call raise_error(ERROR_CODES%INVALID_PROFILER_LABEL, opt=strip(label))
         end if
     end subroutine start_profile_by_name
 
@@ -165,7 +165,7 @@ contains
         if (id > 0) then
             call self%stop_profile_by_id(id)
         else
-            call error_message(ERR_PROFILER, c_opt="Unknown label: "//strip(label))
+            call raise_error(ERROR_CODES%INVALID_PROFILER_LABEL, opt=strip(label))
         end if
     end subroutine stop_profile_by_name
 

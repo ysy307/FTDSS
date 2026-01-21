@@ -4,24 +4,10 @@
 # 1. Foundational Libraries
 # ====================================================================
 
-# --- Validation Library ---
-set(CORE_VALIDATION_FYPP_SOURCES
-    validation/check_length.fypp
-    validation/check_nan.fypp
-    validation/check_range.fypp
-)
-set(CORE_VALIDATION_SOURCES
-    validation/error.F90
-)
-fypp_F90("" "${CORE_VALIDATION_FYPP_SOURCES}" CORE_VALIDATION_GENERATED_SOURCES)
-add_library(Core_Validation STATIC ${CORE_VALIDATION_SOURCES} ${CORE_VALIDATION_GENERATED_SOURCES})
-target_include_directories(Core_Validation PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-enable_build_flags(Core_Validation)
-enable_thirdparty(Core_Validation)
-
 set(CORE_CONSTANTS_FYPP_SOURCES
     constants/constans_ids.fypp
     constants/constans_values.fypp
+    constants/constans_error.fypp
 )
 fypp_F90("" "${CORE_CONSTANTS_FYPP_SOURCES}" CORE_CONSTANTS_GENERATED_SOURCES)
 set(CORE_CONSTANTS_SOURCES
@@ -38,6 +24,26 @@ enable_build_flags(Core_Constants)
 enable_thirdparty(Core_Constants)
 
 
+# --- Validation Library ---
+set(CORE_VALIDATION_FYPP_SOURCES
+    validation/check_length.fypp
+    validation/check_nan.fypp
+    validation/check_range.fypp
+)
+set(CORE_VALIDATION_SOURCES
+    validation/error.F90
+)
+fypp_F90("" "${CORE_VALIDATION_FYPP_SOURCES}" CORE_VALIDATION_GENERATED_SOURCES)
+add_library(Core_Validation STATIC ${CORE_VALIDATION_SOURCES} ${CORE_VALIDATION_GENERATED_SOURCES})
+target_include_directories(Core_Validation PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(Core_Validation PUBLIC
+    Core_Constants
+)
+enable_build_flags(Core_Validation)
+enable_thirdparty(Core_Validation)
+
+
+
 # ====================================================================
 # 2. Dependent Libraries
 # ====================================================================
@@ -50,7 +56,10 @@ set(CORE_MEMORY_FYPP_SOURCES
 fypp_F90("" "${CORE_MEMORY_FYPP_SOURCES}" CORE_MEMORY_GENERATED_SOURCES)
 add_library(Core_Memory STATIC ${CORE_MEMORY_GENERATED_SOURCES})
 target_include_directories(Core_Memory PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Core_Memory PUBLIC Core_Validation)
+target_link_libraries(Core_Memory PUBLIC 
+    Core_Validation
+    Core_Constants
+)
 enable_build_flags(Core_Memory)
 
 # --- Utils Library (Memoryに依存) ---

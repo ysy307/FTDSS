@@ -1,170 +1,90 @@
+!>
+!> Module for error handling implementation
+!> Uses error constants defined in core_constants_error
+!>
 module core_error
-    use, intrinsic :: iso_fortran_env, only: int32, real32, real64, real128
-#ifdef _MPI
-    use :: mpi_f08
-#endif
-    use :: stdlib_logger
+    use, intrinsic :: iso_fortran_env, only: int32
+    use :: stdlib_strings, only: to_string, strip
+    use :: core_constants, only: ERROR_CODES, type_constant_error
     implicit none
     private
 
-    public :: error_message
+    public :: raise_error
 
 contains
 
-    subroutine error_message(err_number, opt, c_opt)
+    !> Raise an error, format the message, and stop execution.
+    !>
+    !> Usage:
+    !>   call raise_error(ERROR_CODES%FILE_MISSING, opt="data.txt", scope="mod:sub", line=__LINE__)
+    !>
+    pure subroutine raise_error(err, opt, scope, line)
         implicit none
-        integer(int32), intent(in) :: err_number
-        real(real64), optional, intent(in) :: opt
-        character(*), optional, intent(in) :: c_opt
+        !> The error constant object (e.g. ERROR_CODES%FILE_MISSING)
+        type(type_constant_error), intent(in) :: err
+        !> String to replace '{}' in the message template
+        character(*), optional, intent(in) :: opt
+        !> Scope name (e.g. 'module_name:procedure_name')
+        character(*), optional, intent(in) :: scope
+        !> Line number where the error occurred (usually __LINE__)
+        integer(int32), optional, intent(in) :: line
 
-        character(256) :: msg
-        integer(int32) :: ierr, rank
-        character(8) :: fmt = '(a,i3,a)'
+        character(1024) :: msg
+        character(256) :: val
+        character(20)  :: line_str
 
-        if (err_number == 901) then
-            write (msg, '(a)') "Don't exist Input folder."
-        else if (err_number == 902) then
-            if (present(c_opt)) then
-                write (msg, '(3a)') "Don't exist file '", trim(adjustl(c_opt)), "'."
-            else
-                write (msg, '(a)') "Don't exist file."
-            end if
-        else if (err_number == 903) then
-            if (present(c_opt)) then
-                write (msg, '(3a)') "Can't open file '", trim(adjustl(c_opt)), "'."
-            else
-                write (msg, '(a)') "Can't open file."
-            end if
-        else if (err_number == 904) then
-            if (present(c_opt)) then
-                write (msg, '(3a)') "Selected variable '", trim(adjustl(c_opt)), "' is not found in JSON file."
-            else
-                write (msg, '(a)') "Selected variable is not found in JSON file."
-            end if
-        else if (err_number == 905) then
-            if (present(c_opt)) then
-                write (msg, '(3a)') "Selected variable '", trim(adjustl(c_opt)), "' is invalid."
-            else
-                write (msg, '(a)') "Selected variable is invalid."
-            end if
-        else if (err_number == 906) then
-            if (present(c_opt)) then
-                write (msg, '(3a)') "Selected file '", trim(adjustl(c_opt)), "' is invalid"
-            else
-                write (msg, '(a)') "Selected file is invalid"
-            end if
-        else if (err_number == 911) then
-            msg = "The number of elements must be positive."
-        else if (err_number == 912) then
-            msg = "The number of nodal must be positive."
-        else if (err_number == 913) then
-            msg = "The number of shape must be positive."
-        else if (err_number == 914) then
-            msg = "The number of dimention must be positive."
-        else if (err_number == 915) then
-            msg = "Dirichlet boundary conditions for water transport must be positive."
-        else if (err_number == 916) then
-            msg = "Dirichlet boundary conditions for heat transport must be positive."
-        else if (err_number == 917) then
-            msg = "The value of porosity must be positive."
-        else if (err_number == 918) then
-            msg = "The value of density must be positive."
-        else if (err_number == 919) then
-            msg = "The value of hydrulic conductivity must be positive."
-        else if (err_number == 920) then
-            msg = "The value of thermal conductivity must be positive."
-        else if (err_number == 921) then
-            msg = "The value of specific heat must be positive."
-        else if (err_number == 922) then
-            msg = "The value of latent heat must be positive."
-        else if (err_number == 923) then
-            msg = "The number of concering time information must be positive."
-        else if (err_number == 924) then
-            msg = "The initial and coolant temperature are same."
-        else if (err_number == 928) then
-            msg = "Two or more points are the same."
-        else if (err_number == 929) then
-            msg = "The number of array elements must be positive."
-        else if (err_number == 930) then
-            msg = "The number of matrix elements must be positive."
-
-            ! reordering error message
-        else if (err_number == 931) then
-            if (present(c_opt)) then
-                write (msg, fmt) "#", err_number, ": Could not find a starting node in "//trim(adjustl(c_opt))//"."
-            else
-                write (msg, fmt) "#", err_number, ": Could not find a starting node."
-            end if
-        else if (err_number == 932) then
-            if (present(c_opt)) then
-                write (msg, fmt) "#", err_number, ": Permutation is not ready in"//trim(adjustl(c_opt))//". Call reordering first."
-            else
-                write (msg, fmt) "#", err_number, ": Permutation is not ready. Call reordering first."
-            end if
-
-            ! solver error message
-        else if (err_number == 933) then
-            msg = "Solver type is not selected."
-        else if (err_number == 934) then
-            msg = "Freezing calculation is not selected."
-        else if (err_number == 941) then
-            msg = "The solution to the simultaneous linear equations could not be found."
-        else if (err_number == 942) then
-            msg = "LU decomposition could not be successed."
-        else if (err_number == 943) then
-            msg = "The inverse matrix could not be found."
-        else if (err_number == 944) then
-            msg = "The target result is too high."
-        else if (err_number == 945) then
-            msg = "The target result is too low."
-        else if (err_number == 946) then
-            msg = "The solution has been diverged."
-        else if (err_number == 951) then
-            write (msg, fmt) "#", err_number, ": Array is already allocated."
-        else if (err_number == 952) then
-            write (msg, fmt) "#", err_number, ": Invalid array length."
-        else if (err_number == 953) then
-            write (msg, fmt) "#", err_number, ": Requested index range is too large."
-        else if (err_number == 954) then
-            write (msg, fmt) "#", err_number, ": Invalid range - first index is greater than last."
-        else if (err_number == 955) then
-            write (msg, fmt) "#", err_number, ": Memory allocation failed."
-        else if (err_number == 956) then
-            write (msg, fmt) "#", err_number, ": Cannot specify both length and bounds."
-        else if (err_number == 957) then
-            write (msg, fmt) "#", err_number, ": Either length or bounds must be specified."
-        else if (err_number == 958) then
-            write (msg, fmt) "#", err_number, ": bounds array must have exactly 2 elements."
-        else if (err_number == 961) then
-            write (msg, '(a)') "Pointer has already allocated."
-        else if (err_number == 971) then
-            write (msg, fmt) "#", err_number, ": Memory deallocation failed."
-        else if (err_number == 981) then
-            if (present(c_opt)) then
-                write (msg, fmt) "#", err_number, ": Unknown time unit in "//trim(adjustl(c_opt))//"."
-            else
-                write (msg, fmt) "#", err_number, ": Unknown time unit"
-            end if
-        else if (err_number == 982) then
-            if (present(c_opt)) then
-                write (msg, fmt) "#", err_number, ": Unknown time label in "//trim(adjustl(c_opt))//"."
-            else
-                write (msg, fmt) "#", err_number, ": Unknown time label"
-            end if
+        ! 1. Base Message Construction (Handle '{}' replacement)
+        ! The message template is stored in err%message
+        if (present(opt)) then
+            val = strip(opt)
+            msg = replace_placeholder(err%message, val)
         else
-            if (present(c_opt)) then
-                write (msg, fmt) "#", err_number, ": Unknown error - "//trim(adjustl(c_opt))//"."
-            else
-                write (msg, fmt) "#", err_number, ": Unknown error."
-            end if
+            msg = strip(err%message)
         end if
 
-#ifdef _MPI
-        call MPI_Comm_rank(MPI_COMM_WORLD, rank, ierr)
-        if (rank == 0) call global_logger%log_error(message=msg)
-#else
-        call global_logger%log_error(message=msg)
-#endif
-    end subroutine error_message
+        ! 2. Add Scope info if present: "Message [mod:sub]"
+        if (present(scope)) then
+            msg = trim(msg) // " [" // strip(scope)
+            
+            if (present(line)) then
+                line_str = to_string(line)
+                msg = trim(msg) // ":" // trim(line_str)
+            end if
+            msg = trim(msg) // "]"
+        else if (present(line)) then
+            ! Line number without scope
+            line_str = to_string(line)
+            msg = trim(msg) // " [Line:" // trim(line_str) // "]"
+        end if
+
+        ! 3. Prepend Error ID and Name:
+        ! Format: "# 901(INPUT_DIR_MISSING): Message..."
+        msg = "# " // trim(to_string(err%id)) // &
+              "(" // trim(strip(err%name)) // "): " // trim(msg)
+
+        ! 4. STOP Execution (Pure safe in F2018+)
+        error stop trim(msg)
+
+    end subroutine raise_error
+
+    ! --------------------------------------------------------------------------
+    ! Internal Helpers
+    ! --------------------------------------------------------------------------
+    
+    !> Simple Pure placeholder replacer for '{}'
+    !> Replaces only the first occurrence.
+    pure function replace_placeholder(tmpl, val) result(res)
+        character(*), intent(in) :: tmpl, val
+        character(len(tmpl)+len(val)) :: res
+        integer :: idx
+
+        idx = index(tmpl, '{}')
+        if (idx > 0) then
+            ! Replace first occurrence of {}
+            res = tmpl(1:idx-1) // trim(val) // tmpl(idx+2:)
+        else
+            res = tmpl
+        end if
+    end function replace_placeholder
 
 end module core_error

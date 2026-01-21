@@ -14,7 +14,8 @@
 
 module core_allocate
     use, intrinsic :: iso_fortran_env
-    use :: core_error, only:error_message
+    use :: core_constants, only:ERROR_CODES
+    use :: core_error, only:raise_error
     implicit none
     private
 
@@ -62,7 +63,9 @@ contains
                 deallocate (array)
             end if
             allocate (array, source=source, stat=stat)
-            if (stat /= 0) call error_message(991)
+            if (stat /= 0) call raise_error(ERROR_CODES%ALLOC_FAILED, &
+                                            scope="core_allocate:allocate_rank1_${suffix}$_source", &
+                                            line=__LINE__)
         end subroutine allocate_rank1_${suffix}$_source
 
         #:for akind in arg_kinds
@@ -87,7 +90,9 @@ contains
                     else
                         allocate (array(length), stat=stat)
                     end if
-                    if (stat /= 0) call error_message(992)
+                    if (stat /= 0) call raise_error(ERROR_CODES%ALLOC_FAILED, &
+                                                    scope="core_allocate:allocate_rank1_${suffix}$_len_${akind}$", &
+                                                    line=__LINE__)
                 end if
             end subroutine allocate_rank1_${suffix}$_len_${akind}$
 
@@ -117,7 +122,9 @@ contains
                     else
                         allocate (array(lb:ub), stat=stat)
                     end if
-                    if (stat /= 0) call error_message(993)
+                    if (stat /= 0) call raise_error(ERROR_CODES%ALLOC_FAILED, &
+                                                    scope="core_allocate:allocate_rank1_${suffix}$_bnds_${akind}$", &
+                                                    line=__LINE__)
                 end if
             end subroutine allocate_rank1_${suffix}$_bnds_${akind}$
         #:endfor
@@ -140,7 +147,9 @@ contains
                 deallocate (array)
             end if
             allocate (array, source=source, stat=stat)
-            if (stat /= 0) call error_message(994)
+            if (stat /= 0) call raise_error(ERROR_CODES%ALLOC_FAILED, &
+                                            scope="core_allocate:allocate_rank2_${suffix}$_source", &
+                                            line=__LINE__)
         end subroutine allocate_rank2_${suffix}$_source
 
         #:for akind in arg_kinds
@@ -165,7 +174,9 @@ contains
                     else
                         allocate (array(dim1, dim2), stat=stat)
                     end if
-                    if (stat /= 0) call error_message(995)
+                    if (stat /= 0) call raise_error(ERROR_CODES%ALLOC_FAILED, &
+                                                    scope="core_allocate:allocate_rank2_${suffix}$_sz_${akind}$", &
+                                                    line=__LINE__)
                 end if
             end subroutine allocate_rank2_${suffix}$_sz_${akind}$
         #:endfor
@@ -189,7 +200,9 @@ contains
                 deallocate (array)
             end if
             allocate (array, source=source, stat=stat)
-            if (stat /= 0) call error_message(996)
+            if (stat /= 0) call raise_error(ERROR_CODES%ALLOC_FAILED, &
+                                            scope="core_allocate:allocate_rank3_${suffix}$_source", &
+                                            line=__LINE__)
         end subroutine allocate_rank3_${suffix}$_source
 
         #:for akind in arg_kinds
@@ -216,7 +229,9 @@ contains
                     else
                         allocate (array(dim1, dim2, dim3), stat=stat)
                     end if
-                    if (stat /= 0) call error_message(997)
+                    if (stat /= 0) call raise_error(ERROR_CODES%ALLOC_FAILED, &
+                                                    scope="core_allocate:allocate_rank3_${suffix}$_sz_${akind}$", &
+                                                    line=__LINE__)
                 end if
             end subroutine allocate_rank3_${suffix}$_sz_${akind}$
         #:endfor

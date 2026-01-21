@@ -53,8 +53,7 @@ contains
             self%num_variables = 1
 
         case default
-            call error_message(ERR_BC_INIT, c_opt="Unknown BC Type ID: "//trim(to_string(target_bc)))
-            return
+            call raise_error(ERROR_CODES%INVALID_BC_TYPE)
         end select
         self%physics_type = target_physics
 
@@ -107,7 +106,7 @@ contains
                 self%values = 0.0d0
                 found = .true.
             case default
-                call error_message(ERR_BC_INIT, c_opt="BC data missing for ID: "//trim(to_string(cell_id)))
+                call raise_error(ERROR_CODES%BC_VAL_INVALID, opt="Cell ID "//trim(to_string(cell_id)))
                 return
             end select
         end if

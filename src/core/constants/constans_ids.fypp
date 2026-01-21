@@ -21,7 +21,7 @@ module core_constants_ids
         type(type_constant_id) :: ${item[0]}$ = type_constant_id("${group['category']}$", "${item[2]}$", ${item[1]}$)
         #:endfor
         !> Number of constants in ${group['description']}$
-        integer(int32) :: NUM_ID = ${group['num']}$
+        integer(int32) :: NUM_ID = ${len(group['items'])}$
     contains
         procedure, public, pass(self) :: to_id => to_id_${group['suffix']}$
         procedure, public, pass(self) :: to_name => to_name_${group['suffix']}$

@@ -518,4 +518,78 @@
     #:set constant_value_groups = [ &
         TIME_UNITS &
     ]
+
+
+
+    ! Define the error group structure to match your 'constant_id_groups' pattern
+    ! Items format: (NAME, ID, MESSAGE_TEMPLATE)
+    #:set ERROR_CODES = { &
+        'type_name'   : 'type_error_codes', &
+        'obj_name'    : 'ERROR_CODES', &
+        'category'    : 'ERROR', &
+        'suffix'      : 'error', &
+        'description' : 'Core system errors', &
+        'items'       : [ &
+            ('INPUT_DIR_MISSING', 901, "Input folder does not exist."), &
+            ('FILE_MISSING',      902, "File '{}' does not exist."), &
+            ('OPEN_FILE_FAILED',  903, "Cannot open file '{}'."), &
+            ('READ_FILE_FAILED',  904, "Failed to read file '{}'."), &
+            ('WRITE_FILE_FAILED', 905, "Failed to write to file '{}'."), &
+            ('INVALID_FILE_EXT',  906, "Invalid file extension in '{}'."), &
+            ('INVALID_FILE_FMT',  907, "Invalid file format detected in '{}'."), &
+            ('VAR_NOT_FOUND',     910, "Variable '{}' is not found in JSON/Input file."), &
+            ('VAR_INVALID',       911, "Value for variable '{}' is invalid."), &
+            ('PARAM_RANGE',       912, "Parameter '{}' is out of valid range."), &
+            ('PARAM_POSITIVE',    913, "Parameter '{}' must be positive."), &
+            ('PARAM_NON_NEG',     914, "Parameter '{}' must be non-negative."), &
+            ('INVALID_OPTION',    915, "Option '{}' is invalid or not supported."), &
+            ('MISSING_REQ_ARG',   916, "Required argument or parameter '{}' is missing."), &
+            ('INVALID_ELEM_NUM',  920, "The number of elements must be positive."), &
+            ('INVALID_NODE_NUM',  921, "The number of nodes must be positive."), &
+            ('INVALID_DIMENSION', 922, "The number of dimensions must be positive."), &
+            ('NEG_JACOBIAN',      923, "Negative Jacobian detected (element inversion) in '{}'."), &
+            ('ZERO_VOLUME',       924, "Element volume/area is zero or negative."), &
+            ('MESH_CORRUPTED',    925, "Mesh connectivity appears corrupted in '{}'."), &
+            ('NODE_NOT_FOUND',    926, "Node index out of bounds or not found."), &
+            ('INVALID_POROSITY',  930, "Porosity must be between 0 and 1."), &
+            ('INVALID_DENSITY',   931, "Density must be positive."), &
+            ('INVALID_HC',        932, "Hydraulic conductivity must be positive."), &
+            ('INVALID_TC',        933, "Thermal conductivity must be positive."), &
+            ('INVALID_SH',        934, "Specific heat must be positive."), &
+            ('INVALID_LH',        935, "Latent heat must be positive."), &
+            ('PHY_MODEL_ERR',     936, "Physics model calculation failed in '{}'."), &
+            ('INVALID_BC_TYPE',   940, "Unknown or invalid boundary condition type."), &
+            ('INVALID_IC_TYPE',   941, "Unknown or invalid initial condition type."), &
+            ('BC_VAL_INVALID',    942, "Boundary condition value for '{}' is invalid."), &
+            ('IC_VAL_INVALID',    943, "Initial condition value for '{}' is invalid."), &
+            ('BC_CONFLICT',       944, "Conflicting boundary conditions detected."), &
+            ('MAT_SIZE_INVALID',  950, "Matrix dimensions are invalid or incompatible."), &
+            ('MAT_ZERO_DIAG',     951, "Zero diagonal element detected in matrix."), &
+            ('MAT_SINGULAR',      952, "Matrix is singular or near-singular."), &
+            ('SOLVER_NOT_SET',    953, "Solver type is not selected."), &
+            ('SOLVER_FAILED',     954, "Solver failed to converge."), &
+            ('SOLVER_DIVERGED',   955, "Solution has diverged (NaN or Inf detected)."), &
+            ('SOLVER_MAX_ITER',   956, "Maximum iterations reached without convergence."), &
+            ('LU_FAILED',         957, "LU decomposition failed."), &
+            ('INV_MAT_FAILED',    958, "Failed to calculate inverse matrix."), &
+            ('MPI_ERROR',         960, "MPI error occurred in '{}'."), &
+            ('RANK_INVALID',      961, "Invalid MPI rank detected."), &
+            ('START_NODE_MISS',   962, "Could not find a starting node in '{}'."), &
+            ('PERM_NOT_READY',    963, "Permutation is not ready in '{}'. Call reordering first."), &
+            ('ALLOC_FAILED',      970, "Memory allocation failed for '{}'."), &
+            ('DEALLOC_FAILED',    971, "Memory deallocation failed for '{}'."), &
+            ('ALREADY_ALLOC',     972, "Attempted to allocate already allocated variable '{}'."), &
+            ('NOT_ALLOCATED',     973, "Attempted to access unallocated variable '{}'."), &
+            ('PTR_NULL',          974, "Pointer is null where target is required."), &
+            ('INDEX_OUT_BOUNDS',  975, "Array index out of bounds."), &
+            ('SIZE_MISMATCH',     976, "Array or vector size mismatch."), &
+            ('UNKNOWN_TIME_UNIT', 980, "Unknown time unit '{}'."), &
+            ('INVALID_DT',        981, "Time step size must be positive."), &
+            ('TIME_END_REACHED',  982, "Simulation end time reached unexpectedly."), &
+            ('INVALID_PROFILER_LABEL',  983, "Invalid profiler label '{}'."), &
+            ('NOT_IMPLEMENTED',   990, "Feature '{}' is not yet implemented."), &
+            ('UNKNOWN_ERROR',     999, "An unknown error occurred.") &
+        ] &
+    }
+
 #:endmute
