@@ -18,7 +18,6 @@ module module_control
         private
         logical :: is_active(PHYSICS_TYPES%NUM_ID) = .false.
         type(type_constant_id) :: coupling_mode
-        ! integer(int32) :: coupling_mode
         logical, allocatable :: thermal(:)
         logical, allocatable :: hydraulic(:)
         logical, allocatable :: mechanical(:)
@@ -35,6 +34,10 @@ module module_control
         procedure, pass(self), public :: is_physics_active => is_physics_active_control
         procedure, pass(self), public :: is_target => is_target_control
         procedure, pass(self), public :: get_coupling_mode => get_coupling_mode_control
+
+        procedure, pass(self), public :: is_monolithic => is_monolithic_control
+        procedure, pass(self), public :: is_staggered => is_staggered_control
+
         procedure, pass(self) :: display => display_controls
     end type type_controls
 
@@ -197,6 +200,24 @@ contains
 
         coupling_mode => self%coupling_mode
     end subroutine get_coupling_mode_control
+
+    pure function is_monolithic_control(self) result(is_monolithic)
+        implicit none
+        class(type_controls), intent(in) :: self
+        logical :: is_monolithic
+
+        is_monolithic = (self%coupling_mode == COUPLING_MODES%MONOLITHIC)
+
+    end function is_monolithic_control
+
+    pure function is_staggered_control(self) result(is_staggered)
+        implicit none
+        class(type_controls), intent(in) :: self
+        logical :: is_staggered
+
+        is_staggered = (self%coupling_mode == COUPLING_MODES%STAGGERED)
+
+    end function is_staggered_control
 
     subroutine reset_controls(self)
         implicit none

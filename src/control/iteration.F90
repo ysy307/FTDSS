@@ -61,7 +61,7 @@ module control_iteration
         !> Update vector convergence criteria (for each physical quantity)
         type(type_convergence_criterion), private :: update(PHYSICS_TYPES%NUM_ID)
     contains
-        procedure, public, pass(self) :: should_check_residual => should_check_convergence_control
+        procedure, public, pass(self) :: should_check_residual => should_check_residual_convergence_control
         procedure, public, pass(self) :: should_check_update => should_check_update_convergence_control
     end type type_convergence_control
 
@@ -70,9 +70,9 @@ module control_iteration
     !>
     type :: type_iterator_config
         !> Maximum number of iterations
-        integer(int32) :: max_iterations = 10
+        integer(int32), private :: max_iterations = 10
         !> Frequency of updating system matrices
-        integer(int32) :: update_frequency = 1
+        integer(int32), private :: update_frequency = 1
         !> Convergence control settings
         type(type_convergence_control), private :: convergence_control
     contains
@@ -83,18 +83,17 @@ module control_iteration
     !> 反復管理クラス (Main)
     !>
     type :: type_iteration
-        private
         ! --- カウンタ ---
-        integer(int32) :: total_iter = 0
-        integer(int32) :: nonlinear_iter = 0
+        integer(int32), private :: total_iter = 0
+        integer(int32), private :: nonlinear_iter = 0
 
         ! --- 状態フラグ ---
         ! 物理量ごとに収束状態を保持する (Thermal, Hydro, etc.)
         logical, private :: is_converged(PHYSICS_TYPES%NUM_ID) = .true.
 
         ! --- 設定 ---
-        type(type_constant_id), private :: nonlinear_solver_type = NONLINEAR_SOLVER%NONE
-        type(type_iterator_config) :: config
+        type(type_constant_id), private :: nonlinear_solver_type = NONLINEAR_SOLVER%PICARD
+        type(type_iterator_config), private :: config
     contains
         ! Initialization / Reset
         procedure, public, pass(self) :: initialize
@@ -111,7 +110,15 @@ module control_iteration
         procedure, public, pass(self) :: get_total_iter
         procedure, public, pass(self) :: get_max_iterations
         procedure, public, pass(self) :: get_update_frequency
-        procedure, public, pass(self) :: get_nonlinear_solver => get_nonlinear_solver_type_iteration
+
+        procedure, public, pass(self) :: get_current_update_norm => get_current_update_norm_iteration
+        procedure, public, pass(self) :: get_current_residual_norm => get_current_residual_norm_iteration
+
+        procedure, public, pass(self) :: get_absolute_tolerance => get_absolute_tolerance_iteration
+        procedure, public, pass(self) :: get_relative_tolerance => get_relative_tolerance_iteration
+
+        procedure, public, pass(self) :: get_nonlinear_solver => get_nonlinear_type_iteration
+        procedure, public, pass(self) :: set_nonlinear_solver => set_nonlinear_type_iteration
 
         procedure, public, pass(self) :: is_newton => is_newton_method_iteration
         procedure, public, pass(self) :: is_picard => is_picard_method_iteration
@@ -205,7 +212,6 @@ contains
 
         ! Retrieve the specified norm for the current iteration
         current_norm = self%norms_history(norm_type%id, iter)
-        print *, iter, current_norm
 
         ! 3. Convergence logic
 
@@ -231,9 +237,11 @@ contains
     end function check_convergence_criterion
 
     !> Check if residual convergence check is enabled
-    pure function should_check_convergence_control(self) result(should_check)
+    pure function should_check_residual_convergence_control(self) result(should_check)
         implicit none
+        !> Convergence control instance
         class(type_convergence_control), intent(in) :: self
+        !> Return value indicating if residual check is enabled
         logical :: should_check
 
         if (self%convergence_norm_type == NONLINEAR_NORM_CRITERIA%RESIDUAL .or. &
@@ -242,12 +250,14 @@ contains
         else
             should_check = .false.
         end if
-    end function should_check_convergence_control
+    end function should_check_residual_convergence_control
 
     !> Check if update convergence check is enabled
     pure function should_check_update_convergence_control(self) result(should_check)
         implicit none
+        !> Convergence control instance
         class(type_convergence_control), intent(in) :: self
+        !> Return `True` if update check is enabled
         logical :: should_check
 
         if (self%convergence_norm_type == NONLINEAR_NORM_CRITERIA%UPDATE .or. &
@@ -338,9 +348,9 @@ contains
 
         self%nonlinear_iter = 0
 
-        ! [重要] 計算されていない変数がFalseのままだと永遠に終わらないため、
-        !        一旦すべて「収束済み(.true.)」とする。
-        !        計算対象の変数は、check_convergenceが呼ばれた時点で結果に応じて上書きされる。
+        ! 計算されていない変数がFalseのままだと永遠に終わらないため、
+        ! 一旦すべて「収束済み(.true.)」とする。
+        ! 計算対象の変数は、check_convergenceが呼ばれた時点で結果に応じて上書きされる。
         !
         self%is_converged(:) = .true.
 
@@ -348,11 +358,15 @@ contains
             call self%config%convergence_control%residual(i)%reset()
             call self%config%convergence_control%update(i)%reset()
         end do
+
+        ! 初期ステップ周辺はPicard法を使う
+        call self%set_nonlinear_solver(NONLINEAR_SOLVER%PICARD)
     end subroutine reset_nonlinear
 
     pure subroutine increment_nonlinear(self)
         implicit none
         class(type_iteration), intent(inout) :: self
+
         self%nonlinear_iter = self%nonlinear_iter + 1
     end subroutine increment_nonlinear
 
@@ -466,45 +480,145 @@ contains
     end function has_converged_iteration
 
     ! --- Getters ---
-    pure subroutine get_nonlinear_iter(self, val)
+    pure subroutine get_nonlinear_iter(self, nonlinear_iter)
         implicit none
         class(type_iteration), intent(in) :: self
-        integer(int32), intent(inout) :: val
+        integer(int32), intent(inout) :: nonlinear_iter
 
-        val = self%nonlinear_iter
+        nonlinear_iter = self%nonlinear_iter
     end subroutine get_nonlinear_iter
 
-    pure subroutine get_total_iter(self, val)
+    pure subroutine get_total_iter(self, total_iter)
         implicit none
         class(type_iteration), intent(in) :: self
-        integer(int32), intent(inout) :: val
+        integer(int32), intent(inout) :: total_iter
 
-        val = self%total_iter
+        total_iter = self%total_iter
     end subroutine get_total_iter
 
-    pure subroutine get_max_iterations(self, val)
+    pure subroutine get_max_iterations(self, max_iterations)
         implicit none
         class(type_iteration), intent(in) :: self
-        integer(int32), intent(inout) :: val
+        integer(int32), intent(inout) :: max_iterations
 
-        val = self%config%max_iterations
+        max_iterations = self%config%max_iterations
     end subroutine get_max_iterations
 
-    pure subroutine get_update_frequency(self, val)
+    pure subroutine get_update_frequency(self, update_frequency)
         implicit none
         class(type_iteration), intent(in) :: self
-        integer(int32), intent(inout) :: val
+        integer(int32), intent(inout) :: update_frequency
 
-        val = self%config%update_frequency
+        update_frequency = self%config%update_frequency
     end subroutine get_update_frequency
 
-    subroutine get_nonlinear_solver_type_iteration(self, val)
+    pure subroutine get_current_residual_norm_iteration(self, physics_type, norm_type, current_norm)
+        implicit none
+        class(type_iteration), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        type(type_constant_id), intent(in) :: norm_type
+        real(real64), intent(inout) :: current_norm
+
+        if (.not. PHYSICS_TYPES%is_valid(physics_type)) then
+            current_norm = 0.0d0
+            return
+        end if
+
+        if (.not. NORM_TYPES%is_valid(norm_type)) then
+            current_norm = 0.0d0
+            return
+        end if
+
+        if (self%nonlinear_iter >= 1 .and. self%nonlinear_iter <= self%config%max_iterations) then
+            current_norm = &
+                self%config%convergence_control%residual(physics_type%id)%norms_history(norm_type%id, self%nonlinear_iter)
+        else
+            current_norm = 0.0d0
+        end if
+    end subroutine get_current_residual_norm_iteration
+
+    pure subroutine get_current_update_norm_iteration(self, physics_type, norm_type, current_norm)
+        implicit none
+        class(type_iteration), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        type(type_constant_id), intent(in) :: norm_type
+        real(real64), intent(inout) :: current_norm
+
+        if (.not. PHYSICS_TYPES%is_valid(physics_type)) then
+            current_norm = 0.0d0
+            return
+        end if
+
+        if (.not. NORM_TYPES%is_valid(norm_type)) then
+            current_norm = 0.0d0
+            return
+        end if
+
+        if (self%nonlinear_iter >= 1 .and. self%nonlinear_iter <= self%config%max_iterations) then
+            current_norm = &
+                self%config%convergence_control%update(physics_type%id)%norms_history(norm_type%id, self%nonlinear_iter)
+        else
+            current_norm = 0.0d0
+        end if
+    end subroutine get_current_update_norm_iteration
+
+    pure subroutine get_absolute_tolerance_iteration(self, physics_type, criteria_type, absolute_tolerance)
+        implicit none
+        class(type_iteration), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        type(type_constant_id), intent(in) :: criteria_type
+        real(real64), intent(inout) :: absolute_tolerance
+
+        absolute_tolerance = 0.0d0
+        if (.not. PHYSICS_TYPES%is_valid(physics_type)) return
+
+        if (.not. NONLINEAR_NORM_CRITERIA%is_valid(criteria_type)) return
+
+        if (criteria_type == NONLINEAR_NORM_CRITERIA%UPDATE) then
+            absolute_tolerance = &
+                self%config%convergence_control%update(physics_type%id)%absolute_tolerance
+        elseif (criteria_type == NONLINEAR_NORM_CRITERIA%RESIDUAL) then
+            absolute_tolerance = &
+                self%config%convergence_control%residual(physics_type%id)%absolute_tolerance
+        end if
+    end subroutine get_absolute_tolerance_iteration
+
+    pure subroutine get_relative_tolerance_iteration(self, physics_type, criteria_type, relative_tolerance)
+        implicit none
+        class(type_iteration), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        type(type_constant_id), intent(in) :: criteria_type
+        real(real64), intent(inout) :: relative_tolerance
+
+        relative_tolerance = 0.0d0
+        if (.not. PHYSICS_TYPES%is_valid(physics_type)) return
+
+        if (.not. NONLINEAR_NORM_CRITERIA%is_valid(criteria_type)) return
+
+        if (criteria_type == NONLINEAR_NORM_CRITERIA%UPDATE) then
+            relative_tolerance = &
+                self%config%convergence_control%update(physics_type%id)%relative_tolerance
+        elseif (criteria_type == NONLINEAR_NORM_CRITERIA%RESIDUAL) then
+            relative_tolerance = &
+                self%config%convergence_control%residual(physics_type%id)%relative_tolerance
+        end if
+    end subroutine get_relative_tolerance_iteration
+
+    subroutine get_nonlinear_type_iteration(self, nonlinear_solver_type)
         implicit none
         class(type_iteration), intent(in), target :: self
-        type(type_constant_id), intent(inout), pointer :: val
+        type(type_constant_id), intent(inout), pointer :: nonlinear_solver_type
 
-        val => self%nonlinear_solver_type
-    end subroutine get_nonlinear_solver_type_iteration
+        nonlinear_solver_type => self%nonlinear_solver_type
+    end subroutine get_nonlinear_type_iteration
+
+    subroutine set_nonlinear_type_iteration(self, nonlinear_solver_type)
+        implicit none
+        class(type_iteration), intent(inout) :: self
+        type(type_constant_id), intent(in) :: nonlinear_solver_type
+
+        self%nonlinear_solver_type = nonlinear_solver_type
+    end subroutine set_nonlinear_type_iteration
 
     !> Returns true if the current solver is Newton-Raphson
     pure function is_newton_method_iteration(self) result(is_newton)

@@ -36,7 +36,7 @@ module main_ftdss
 
         type(type_jacobian_matrix) :: K
         type(type_residual_vector) :: F
-        type(type_residual_vector) :: u
+        type(type_residual_vector) :: du
 
         type(type_thermal) :: thermal
         type(type_hydraulic) :: hydraulic
@@ -76,7 +76,7 @@ module main_ftdss
         procedure, private, pass(self) :: assemble_initialize => assemble_initialize_ftdss
         procedure, private, pass(self) :: assemble_finalize => assemble_finalize_ftdss
 
-        procedure, private, pass(self) :: get_variable => get_variable_ftdss
+        procedure, private, pass(self) :: get_variable_increment => get_variable_increment_ftdss
 
         procedure, public, pass(self) :: reset => reset_ftdss
 
@@ -235,13 +235,13 @@ module main_ftdss
 
         end subroutine assemble_finalize_ftdss
 
-        module subroutine get_variable_ftdss(self, variable_id, variable)
+        module subroutine get_variable_increment_ftdss(self, variable_id, variable)
             implicit none
             class(type_ftdss), intent(inout) :: self
             type(type_constant_id), intent(in) :: variable_id
             real(real64), intent(inout), allocatable :: variable(:)
 
-        end subroutine get_variable_ftdss
+        end subroutine get_variable_increment_ftdss
 
         module subroutine reset_ftdss(self)
             implicit none

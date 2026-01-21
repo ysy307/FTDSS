@@ -50,7 +50,7 @@ contains
 
         call self%K%initialize(self%domain)
         call self%F%initialize(self%domain)
-        call self%u%initialize(self%domain)
+        call self%du%initialize(self%domain)
 
         max_bdf_order = input%basic%solver_settings%bdf_order
         call self%porosity%initialize(num_nodes, max_bdf_order)
@@ -164,13 +164,13 @@ contains
         call self%controls%profiler%stop("IO")
     end subroutine output_history_ftdss
 
-    module subroutine get_variable_ftdss(self, variable_id, variable)
+    module subroutine get_variable_increment_ftdss(self, variable_id, variable)
         implicit none
         class(type_ftdss), intent(inout) :: self
         type(type_constant_id), intent(in) :: variable_id
         real(real64), intent(inout), allocatable :: variable(:)
 
-        real(real64), pointer, contiguous, dimension(:) :: u => null()
+        real(real64), pointer, contiguous, dimension(:) :: du => null()
 
         integer(int32) :: target_dof
         integer(int32) :: num_nodes, num_dofs_per_node
@@ -178,8 +178,8 @@ contains
 
         call deallocate_array(variable)
 
-        u => self%u%get_data()
-        if (.not. associated(u)) then
+        du => self%du%get_data()
+        if (.not. associated(du)) then
             return
         end if
 
@@ -193,12 +193,12 @@ contains
             start_idx = target_dof
             end_idx = num_dofs_per_node * (num_nodes - 1) + target_dof
 
-            variable(:) = u(start_idx:end_idx:num_dofs_per_node)
+            variable(:) = du(start_idx:end_idx:num_dofs_per_node)
         end if
 
-        nullify (u)
+        nullify (du)
 
-    end subroutine get_variable_ftdss
+    end subroutine get_variable_increment_ftdss
 
     module subroutine set_state_ftdss(self, node_id, element_id, state)
         implicit none
@@ -286,13 +286,13 @@ contains
         integer(int32) :: bdf_order
         real(real64), pointer, contiguous, dimension(:) :: current => null()
         real(real64), pointer, contiguous, dimension(:) :: delta => null()
-        real(real64), allocatable :: u(:)
+        real(real64), allocatable :: du(:)
 
-        integer(int32) :: i
-        real(real64) :: omega
-        real(real64) :: u_new, u_old, du, max_du
-        real(real64), parameter :: T_phase_low = -2.0d0
-        real(real64), parameter :: T_phase_high = 1.0d0
+        ! integer(int32) :: i
+        ! real(real64) :: omega
+        ! ! real(real64) :: u_new, u_old, du, max_du
+        ! real(real64), parameter :: T_phase_low = -2.0d0
+        ! real(real64), parameter :: T_phase_high = 1.0d0
 
         call self%controls%profiler%start("Setup")
 
@@ -302,23 +302,23 @@ contains
         call self%controls%time%get_bdf_order(bdf_order)
 
         if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
-            call self%get_variable(PHYSICS_TYPES%THERMAL, u)
+            call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du)
             call self%temperature%get_current(current)
             call self%temperature%get_delta(delta)
             if (associated(current) .and. associated(delta)) then
                 if (self%controls%iteration%is_newton()) then
-                    call self%temperature%set_delta(u)
-                    current(:) = current(:) + u(:)
+                    call self%temperature%set_delta(du)
+                    current(:) = current(:) + du(:)
                 else if (self%controls%iteration%is_picard()) then
-                    call self%temperature%set_delta(u - current)
-                    current(:) = u(:)
+                    call self%temperature%set_delta(du - current)
+                    current(:) = du(:)
                 end if
             end if
 
             call self%calc_gradient_temperature()
             call self%temperature%compute_time_derivative(bdf_coeffs(1:bdf_order + 1))
 
-            call deallocate_array(u)
+            call deallocate_array(du)
         end if
 
         call self%controls%profiler%stop("Setup")
