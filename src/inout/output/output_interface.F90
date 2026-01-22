@@ -2,7 +2,7 @@ module inout_output
     use, intrinsic :: iso_fortran_env
     use, intrinsic :: iso_c_binding, only: c_int64_t, c_ptr, c_f_pointer, c_char, c_null_char, c_associated
     use :: omp_lib
-    use :: stdlib_strings, only:to_string
+    use :: stdlib_strings, only:to_string, strip
     use :: vtk_fortran, only:vtk_file
     use :: module_core
     use :: module_input

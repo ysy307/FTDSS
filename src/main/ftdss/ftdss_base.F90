@@ -335,14 +335,9 @@ contains
         real(real64), pointer, dimension(:) :: bdf_coeffs => null()
         integer(int32) :: bdf_order
         real(real64), pointer, contiguous, dimension(:) :: current => null()
-        real(real64), pointer, contiguous, dimension(:) :: delta => null()
         real(real64), allocatable :: du(:)
 
-        ! integer(int32) :: i
-        real(real64) :: omega = 0.5d0
-        ! ! real(real64) :: u_new, u_old, du, max_du
-        ! real(real64), parameter :: T_phase_low = -2.0d0
-        ! real(real64), parameter :: T_phase_high = 1.0d0
+        real(real64) :: relaxation_factor
 
         call self%controls%profiler%start("Setup")
 
@@ -354,10 +349,16 @@ contains
         if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du)
             call self%temperature%get_current(current)
-            call self%temperature%get_delta(delta)
-            if (associated(current) .and. associated(delta)) then
-                call self%temperature%set_delta(du)
-                current(:) = current(:) + omega * du(:)
+            if (associated(current)) then
+                if (iter > 1) then
+                    call self%controls%aitken%compute_relaxation(PHYSICS_TYPES%THERMAL, du)
+                end if
+                call self%controls%aitken%get_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
+                write(*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
+                current(:) = current(:) + relaxation_factor * du(:)
+                call self%temperature%set_delta(relaxation_factor * du(:))
+
+                call self%controls%aitken%set_du(PHYSICS_TYPES%THERMAL, du)
             end if
 
             call self%calc_gradient_temperature()

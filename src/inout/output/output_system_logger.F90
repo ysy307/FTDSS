@@ -50,20 +50,19 @@ contains
         ! --- ログファイルのオープン ---
         open (newunit=num_unit, file=self%log_file_name, status='replace', action='write', iostat=ios)
         if (ios /= 0) then
-            print *, "Error: Cannot open log file: ", self%log_file_name
-            return
+            call raise_error(ERROR_CODES%OPEN_FILE_FAILED, opt=self%log_file_name)
         end if
 
         ! --- ヘッダー出力 ---
         write (num_unit, '(a)') repeat('=', n_repeat)
         write (num_unit, '(a)') "FTDSS System Log"
         write (num_unit, '(a)') repeat('=', n_repeat)
-        write (num_unit, '(a)') "Username           : "//trim(username)
-        write (num_unit, '(a)') "Hostname           : "//trim(hostname)
-        write (num_unit, '(a)') "OS                 : "//trim(os_name)
-        write (num_unit, '(a)') "Architecture       : "//trim(architecture)
-        write (num_unit, '(a)') "Compiler           : "//trim(compiler)
-        write (num_unit, '(a)') "Compiler Version   : "//trim(compiler_version)
+        write (num_unit, '(a)') "Username           : "//strip(username)
+        write (num_unit, '(a)') "Hostname           : "//strip(hostname)
+        write (num_unit, '(a)') "OS                 : "//strip(os_name)
+        write (num_unit, '(a)') "Architecture       : "//strip(architecture)
+        write (num_unit, '(a)') "Compiler           : "//strip(compiler)
+        write (num_unit, '(a)') "Compiler Version   : "//strip(compiler_version)
 #ifdef _OPENMP
         write (num_unit, '(a, i0)') "OpenMP Threads     : ", omp_get_max_threads()
 #else
@@ -79,13 +78,13 @@ contains
         ! Start Time
         call control%profiler%get_record(TIME_RECORD_START, time_record_str)
         if (allocated(time_record_str)) then
-            write (num_unit, '(a)') time_record_str
+            write (num_unit, '(a)') strip(time_record_str)
         end if
 
         ! End Time
         call control%profiler%get_record(TIME_RECORD_END, time_record_str)
         if (allocated(time_record_str)) then
-            write (num_unit, '(a)') time_record_str
+            write (num_unit, '(a)') strip(time_record_str)
         end if
 
         ! --- プロファイリング集計出力 ---
@@ -94,8 +93,6 @@ contains
         write (num_unit, '(a)') repeat('=', n_repeat)
 
         call control%profiler%display(unit=num_unit)
-
-        ! 行列・ドメイン情報の出力は指示により削除
 
         close (num_unit)
 

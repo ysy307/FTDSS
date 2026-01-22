@@ -2,9 +2,7 @@
 !> Handles variable time steps, time unit conversions, and history management for high-order time integration schemes.
 module control_time
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
-    use :: omp_lib
     use :: stdlib_optval, only:optval
-    use :: stdlib_strings, only:strip
     use :: module_core
     use :: module_input, only:type_input
 
@@ -16,10 +14,8 @@ module control_time
     ! --- Constants ---
     !> Maximum supported order for BDF schemes.
     integer(int32), parameter :: MAX_BDF_ORDER = 6
-    !> Error code for time initialization failure.
-    integer(int32), parameter :: ERR_TIME_INIT = 981
-    !> Error code for profiler issues.
-    integer(int32), parameter :: ERR_PROFILER = 982
+    !> Small number for zero-division check
+    real(real64), parameter :: EPS_TIME = 1.0d-14
 
     !> Data structure holding time stepping state and integration parameters.
     type :: type_time
@@ -42,9 +38,6 @@ module control_time
         real(real64) :: dt_s_min = 0.0d0
         !> Maximum allowable time step [s]
         real(real64) :: dt_s_max = 0.0d0
-
-        !> Conversion factor for display units
-        real(real64) :: time_conversion = 1.0d0
 
         ! --- BDF Coefficients ---
         !> Coefficients \( \alpha_j \) for the BDF formula:
@@ -69,18 +62,22 @@ module control_time
         procedure, public, pass(self) :: get_bdf_order
         !> Get BDF coefficients array.
         procedure, public, pass(self) :: get_bdf_coeffs
-        !> Advance simulation time by one step.
-        procedure, public, pass(self) :: advance => advance_time
         !> Shift time history for the next step.
         procedure, public, pass(self) :: shift => shift_time
         !> Display current time status to standard output.
         procedure, public, pass(self) :: display => display_status
 
+        !> Set current time step size.
+        procedure, public, pass(self) :: set_dt
+
+        !> Check if simulation reached end time.
+        procedure, public, pass(self) :: is_end_time
+        procedure, public, pass(self) :: is_min_dt => is_min_dt_reached
+        procedure, public, pass(self) :: is_max_dt => is_max_dt_reached
+
         ! --- Private Procedures ---
         !> Compute variable step BDF coefficients.
         procedure, private, pass(self) :: compute_bdf_coefficients
-        !> Helper to convert time units.
-        procedure, public, pass(self) :: convert_time_unit
     end type type_time
 
 contains
@@ -98,8 +95,9 @@ contains
         !> Input data structure
         type(type_input), intent(in) :: input
 
-        integer(int32) :: i, istat
+        integer(int32) :: istat
         real(real64) :: time_conv_coeff
+        type(type_constant_value) :: time_unit
 
         ! --- BDF Settings ---
         self%target_bdf_order = input%basic%solver_settings%bdf_order
@@ -111,7 +109,8 @@ contains
 
         ! --- Time Unit Conversion ---
         associate (time_control => input%conditions%time_control)
-            call self%convert_time_unit(time_control%time_stepping%unit, TIME_UNIT_SECONDS, time_conv_coeff)
+            time_unit = TIME_UNITS%to_object(time_control%simulation_period%unit)
+            time_conv_coeff = time_unit%value
 
             ! --- Set dt ---
             self%dt_s = time_control%time_stepping%initial_step * time_conv_coeff
@@ -119,24 +118,24 @@ contains
             self%dt_s_min = time_control%time_stepping%min_step * time_conv_coeff
 
             ! --- Allocate History ---
-            call deallocate_array(self%dt_s_history)
-            call allocate_array(self%dt_s_history, self%target_bdf_order)
+            if (allocated(self%dt_s_history)) then
+                deallocate (self%dt_s_history)
+            end if
+            allocate (self%dt_s_history(self%target_bdf_order), stat=istat)
 
-            self%dt_s_history(:) = 0.0d0
-            self%dt_s_history(1) = self%dt_s
+            if (istat == 0) then
+                self%dt_s_history(:) = 0.0d0
+                self%dt_s_history(1) = self%dt_s
+            end if
 
             ! --- Compute Initial Coefficients (1st Order) ---
             call self%compute_bdf_coefficients()
 
             ! --- Simulation Period ---
             if (input%output_settings%field_output%file_format /= "none") then
-                call self%convert_time_unit(time_control%simulation_period%unit, TIME_UNIT_SECONDS, time_conv_coeff)
-                self%start_time = time_control%simulation_period%start * time_conv_coeff
-                self%end_time = time_control%simulation_period%end * time_conv_coeff
-
-                call self%convert_time_unit(input%output_settings%field_output%output_interval_unit, &
-                                            time_control%simulation_period%unit, &
-                                            self%time_conversion)
+                time_unit = TIME_UNITS%to_object(input%output_settings%field_output%output_interval_unit)
+                self%start_time = time_control%simulation_period%start * time_unit%value
+                self%end_time = time_control%simulation_period%end * time_unit%value
             end if
 
             ! Set initial time
@@ -166,7 +165,9 @@ contains
         self%current_time_s = self%current_time_s + self%dt_s
 
         ! Shift history: dt_history(1) becomes current dt_n
-        if (n > 1) self%dt_s_history(2:n) = self%dt_s_history(1:n - 1)
+        if (n > 1) then
+            self%dt_s_history(2:n) = self%dt_s_history(1:n - 1)
+        end if
         self%dt_s_history(1) = self%dt_s
 
         ! Update available BDF order (Ramp up strategy)
@@ -178,19 +179,6 @@ contains
         call self%compute_bdf_coefficients()
 
     end subroutine shift_time
-
-    !> Advance the simulation time tentatively for the next step solver.
-    subroutine advance_time(self, new_dt)
-        implicit none
-        !> Time control instance
-        class(type_time), intent(inout) :: self
-        !> New time step size (optional)
-        real(real64), intent(in), optional :: new_dt
-
-        self%dt_s = optval(new_dt, self%dt_s)
-
-        self%current_time_s = self%current_time_s + self%dt_s
-    end subroutine advance_time
 
     !> Explicitly trigger an update of BDF coefficients.
     subroutine update_bdf_coefficients(self)
@@ -215,10 +203,10 @@ contains
         k = self%current_bdf_order
 
         ! 0. Check for invalid dt
-        if (self%dt_s <= 1.0d-16) then
+        if (self%dt_s <= EPS_TIME) then
             ! Fallback to Backward Euler for safety if dt is extremely small
             self%coeffs = 0.0d0
-            if (self%dt_s > 0.0d0) then
+            if (self%dt_s > epsilon(0.0d0)) then
                 self%coeffs(0) = 1.0d0 / self%dt_s
                 self%coeffs(1) = -1.0d0 / self%dt_s
             end if
@@ -302,6 +290,59 @@ contains
         dt = self%dt_s * coeff
     end subroutine get_dt
 
+    !> Set current time step size (seconds) with optional unit conversion.
+    !> If a target time unit is provided, `dt` is converted accordingly before setting.
+    subroutine set_dt(self, new_dt, time_unit)
+        implicit none
+        class(type_time), intent(inout) :: self
+        !> Input time step
+        real(real64), intent(in) :: new_dt
+        !> Target time unit (optional)
+        type(type_constant_value), intent(in), optional :: time_unit
+
+        real(real64) :: dt
+
+        if (present(time_unit)) then
+            dt = new_dt * time_unit%value
+        else
+            dt = new_dt
+        end if
+
+        if (dt <= self%dt_s_min) then
+            self%dt_s = self%dt_s_min
+        else if (dt >= self%dt_s_max) then
+            self%dt_s = self%dt_s_max
+        else
+            self%dt_s = dt
+        end if
+
+        call self%compute_bdf_coefficients()
+    end subroutine set_dt
+
+    !>
+    !> Check if minimum time step is reached.
+    pure function is_min_dt_reached(self) result(is_min_dt)
+        implicit none
+        !> Time control instance
+        class(type_time), intent(in) :: self
+        !> Result flag
+        logical :: is_min_dt
+
+        is_min_dt = abs(self%dt_s - self%dt_s_min) <= EPS_TIME
+    end function is_min_dt_reached
+
+    !>
+    !> Check if maximum time step is reached.
+    pure function is_max_dt_reached(self) result(is_max_dt)
+        implicit none
+        !> Time control instance
+        class(type_time), intent(in) :: self
+        !> Result flag
+        logical :: is_max_dt
+
+        is_max_dt = abs(self%dt_s_max - self%dt_s) <= EPS_TIME
+    end function is_max_dt_reached
+
     !> Get current BDF order.
     subroutine get_bdf_order(self, bdf_order)
         implicit none
@@ -320,23 +361,14 @@ contains
         coeffs => self%coeffs(0:self%current_bdf_order)
     end subroutine get_bdf_coeffs
 
-    !> Convert value between time units based on internal factors.
-    pure subroutine convert_time_unit(self, source_unit, target_unit, coefficient)
+    !> Check if the simulation has reached or exceeded the end time.
+    pure function is_end_time(self) result(is_end)
         implicit none
         class(type_time), intent(in) :: self
-        integer(int32), intent(in) :: source_unit, target_unit
-        real(real64), intent(inout) :: coefficient
-        real(real64) :: to_seconds_factor(5)
+        logical :: is_end
 
-        ! 1:sec, 2:min, 3:hour, 4:day, 5:year
-        to_seconds_factor = [1.0d0, 60.0d0, 3600.0d0, 86400.0d0, 31557600.0d0]
-
-        if (source_unit < 1 .or. source_unit > 5 .or. target_unit < 1 .or. target_unit > 5) then
-            coefficient = 1.0d0
-        else
-            coefficient = to_seconds_factor(source_unit) / to_seconds_factor(target_unit)
-        end if
-    end subroutine convert_time_unit
+        is_end = self%current_time_s >= self%end_time
+    end function is_end_time
 
     !> Display time status summary to stdout.
     subroutine display_status(self, unit_in)

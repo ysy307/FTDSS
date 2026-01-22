@@ -346,6 +346,8 @@ contains
 
         call self%controls%iteration%increment_total()
 
+        call self%controls%aitken%reset()
+
     end subroutine solve_time_step_initial_setup_ftdss
 
     module subroutine solve_time_step_setup_ftdss(self, prescribe_bc)
