@@ -292,6 +292,7 @@ contains
         class(type_aitken_params), intent(inout) :: self
 
         self%relaxation_factor = 0.5d0
+        self%previous_relaxation_factor = 0.5d0
     end subroutine reset_aitken_params
 
     subroutine compute_aitken_relaxation(self, du_new, du_old)
@@ -305,17 +306,20 @@ contains
         real(real64) :: denominator
 
         numerator = vector_dot((du_new - du_old), du_old)
-        denominator = vector_norm2(du_new - du_old)**2
+        denominator = vector_dot(du_new - du_old, du_new - du_old)
 
-        if (denominator /= 0.0d0) then
+        if (denominator > epsilon(1.0d0)) then
             self%relaxation_factor = -self%previous_relaxation_factor * (numerator / denominator)
             ! Relaxation factor limits
-            if (self%relaxation_factor < 0.1d0) then
-                self%relaxation_factor = 0.1d0
+            if (self%relaxation_factor < 0.05d0) then
+                self%relaxation_factor = 0.05d0
             else if (self%relaxation_factor > 1.0d0) then
                 self%relaxation_factor = 1.0d0
             end if
             self%previous_relaxation_factor = self%relaxation_factor
+        else
+            ! If denominator is too small, keep previous relaxation factor
+            self%relaxation_factor = self%previous_relaxation_factor
         end if
 
     end subroutine compute_aitken_relaxation
@@ -323,7 +327,7 @@ contains
     pure subroutine get_aitken_relaxation(self, relaxation_factor)
         implicit none
         class(type_aitken_params), intent(in) :: self
-        real(real64), intent(out) :: relaxation_factor
+        real(real64), intent(inout) :: relaxation_factor
 
         relaxation_factor = self%relaxation_factor
 
