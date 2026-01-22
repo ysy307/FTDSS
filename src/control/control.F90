@@ -1,5 +1,6 @@
 module module_control
     use, intrinsic :: iso_fortran_env
+    use :: stdlib_strings, only: strip
     use :: module_core
     use :: module_input, only:type_input
     use :: control_time, only:type_time
@@ -16,8 +17,8 @@ module module_control
     public :: type_controls
 
     type :: type_aitken_params
-        real(real64), private :: relaxation_factor = 0.5d0
-        real(real64), private :: previous_relaxation_factor = 0.5d0
+        real(real64), private :: relaxation_factor(PHYSICS_TYPES%NUM_ID) = 0.5d0
+        real(real64), private :: previous_relaxation_factor(PHYSICS_TYPES%NUM_ID) = 0.5d0
     contains
         procedure, public, pass(self) :: reset => reset_aitken_params
         procedure, public, pass(self) :: compute_relaxation => compute_aitken_relaxation
@@ -291,13 +292,14 @@ contains
         implicit none
         class(type_aitken_params), intent(inout) :: self
 
-        self%relaxation_factor = 0.5d0
-        self%previous_relaxation_factor = 0.5d0
+        self%relaxation_factor(:) = 0.5d0
+        self%previous_relaxation_factor(:) = 0.5d0
     end subroutine reset_aitken_params
 
-    subroutine compute_aitken_relaxation(self, du_new, du_old)
+    subroutine compute_aitken_relaxation(self, physics_type, du_new, du_old)
         implicit none
         class(type_aitken_params), intent(inout) :: self
+        type(type_constant_id), intent(in) :: physics_type
         real(real64), intent(in) :: du_new(:)
         real(real64), intent(in) :: du_old(:)
 
@@ -305,16 +307,20 @@ contains
         real(real64) :: numerator
         real(real64) :: denominator
 
+        if (.not. PHYSICS_TYPES%is_valid(physics_type)) then
+            call raise_error(ERROR_CODES%INVALID_TYPE, opt=strip(physics_type%name))
+        end if
+
         numerator = vector_dot((du_new - du_old), du_old)
         denominator = vector_dot(du_new - du_old, du_new - du_old)
 
         if (denominator > epsilon(1.0d0)) then
-            self%relaxation_factor = -self%previous_relaxation_factor * (numerator / denominator)
+            self%relaxation_factor(physics_type%id) = -self%previous_relaxation_factor(physics_type%id) * (numerator / denominator)
             ! Relaxation factor limits
-            if (self%relaxation_factor < 0.05d0) then
-                self%relaxation_factor = 0.05d0
-            else if (self%relaxation_factor > 1.0d0) then
-                self%relaxation_factor = 1.0d0
+            if (self%relaxation_factor(physics_type%id) < 0.05d0) then
+                self%relaxation_factor(physics_type%id) = 0.05d0
+            else if (self%relaxation_factor(physics_type%id) > 1.0d0) then
+                self%relaxation_factor(physics_type%id) = 1.0d0
             end if
             self%previous_relaxation_factor = self%relaxation_factor
         else
@@ -324,12 +330,17 @@ contains
 
     end subroutine compute_aitken_relaxation
 
-    pure subroutine get_aitken_relaxation(self, relaxation_factor)
+    pure subroutine get_aitken_relaxation(self, physics_type, relaxation_factor)
         implicit none
         class(type_aitken_params), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
         real(real64), intent(inout) :: relaxation_factor
 
-        relaxation_factor = self%relaxation_factor
+        if (.not. PHYSICS_TYPES%is_valid(physics_type)) then
+            call raise_error(ERROR_CODES%INVALID_TYPE, opt=strip(physics_type%name))
+        end if
+
+        relaxation_factor = self%relaxation_factor(physics_type%id)
 
     end subroutine get_aitken_relaxation
 
