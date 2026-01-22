@@ -89,6 +89,8 @@ module main_ftdss
 
         procedure, public, pass(self) :: output_fields => output_fields_ftdss
         procedure, public, pass(self) :: output_history => output_history_ftdss
+
+        procedure, public, pass(self) :: run => run_ftdss
     end type type_ftdss
 
     interface
@@ -302,6 +304,11 @@ module main_ftdss
 
         end subroutine output_history_ftdss
 
+        module subroutine run_ftdss(self)
+            implicit none
+            class(type_ftdss), intent(inout) :: self
+
+        end subroutine run_ftdss
     end interface
 
 end module main_ftdss

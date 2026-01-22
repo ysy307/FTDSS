@@ -520,4 +520,67 @@ contains
         is_step_converged = self%controls%iteration%has_converged()
     end subroutine solve_time_step_ftdss
 
+    module subroutine run_ftdss(self)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+
+        logical :: is_step_converged
+        real(real64) :: current_dt, next_dt
+
+        ! 終了時刻までループ
+        time_loop: do while (.not. self%controls%time%is_end_time())
+
+            ! ------------------------------------------------------------------
+            ! 2. 1ステップ計算
+            ! ------------------------------------------------------------------
+            ! ここで reset や 非線形反復ループ が回る
+            call self%solve_time_step(is_step_converged)
+
+            ! ------------------------------------------------------------------
+            ! 3. 判定分岐 (ATSの核心)
+            ! ------------------------------------------------------------------
+            if (is_step_converged) then
+                ! ! ==============================================================
+                ! ! [成功] 次のステップへ進む処理
+                ! ! ==============================================================
+                ! write(*, '("   [INFO] Step Converged at t=", ES12.4)') self%controls%time%current_time
+
+                ! ! A. 要素等へのマッピング (平滑化)
+                ! call self%update_variables()
+
+                ! ! B. ファイル出力 (現在のステップの結果を出力)
+                ! call self%output_fields()
+                ! call self%output_history()
+
+                ! ! C. 時間を進める (New -> Old へ値をシフト)
+                ! call self%shift()
+
+                ! ! D. 時間管理変数の更新 (t = t + dt)
+                ! call self%controls%time%update()
+
+                ! E. 次の dt を少し増やす (回復運転: dt = dt * 1.1 等)
+                !    (もし余裕があれば実装)
+                ! call self%controls%time%increase_dt()
+
+            else
+                ! ! ==============================================================
+                ! ! [失敗] やり直し処理 (リトライ)
+                ! ! ==============================================================
+                ! write(*, '("   [WARNING] Step Failed. Retrying with smaller dt...")')
+
+                ! ! A. 状態を巻き戻す (温度などを解く前の値に戻す)
+                ! call self%restore_state()
+
+                ! ! B. 時間刻みを半分にする (dt = dt * 0.5)
+                ! !    ※ ここで dt が小さくなりすぎたら停止するエラー処理も必要
+                ! call self%controls%time%cut_dt(0.5d0)
+
+                ! ! C. ループの先頭に戻って再計算 (cycle)
+                ! cycle time_loop
+
+            end if
+
+        end do time_loop
+
+    end subroutine run_ftdss
 end submodule ftdss_compute
