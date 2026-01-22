@@ -394,17 +394,17 @@ contains
 
     end subroutine set_du_raw_aitken
 
-    pure function reach_min_relaxation_aitken(self, physics_type) result(is_exceeded)
+    pure function reach_min_relaxation_aitken(self, physics_type) result(is_min_exceeded)
         implicit none
         class(type_aitken_params), intent(in) :: self
         type(type_constant_id), intent(in) :: physics_type
-        logical :: is_exceeded
+        logical :: is_min_exceeded
 
         if (.not. PHYSICS_TYPES%is_valid(physics_type)) then
             call raise_error(ERROR_CODES%INVALID_TYPE, opt=strip(physics_type%name))
         end if
 
-        is_exceeded = self%relaxation_factor(physics_type%id) <= self%min_relaxation
+        is_min_exceeded = self%relaxation_factor(physics_type%id) <= self%min_relaxation
 
     end function reach_min_relaxation_aitken
 

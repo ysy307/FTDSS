@@ -344,9 +344,32 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
-        call self%controls%iteration%increment_total()
+        real(real64), pointer, contiguous, dimension(:) :: u => null()
 
+        call self%controls%iteration%increment_total()
         call self%controls%aitken%reset()
+
+        call self%porosity%get_previous(u)
+        if (associated(u)) then
+            call self%porosity%set_current(u)
+            nullify (u)
+        end if
+
+        if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
+            call self%temperature%get_previous(u)
+            if (associated(u)) then
+                call self%temperature%set_current(u)
+                nullify (u)
+            end if
+        end if
+
+        if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
+            call self%pressure%get_previous(u)
+            if (associated(u)) then
+                call self%pressure%set_current(u)
+                nullify (u)
+            end if
+        end if
 
     end subroutine solve_time_step_initial_setup_ftdss
 
@@ -384,17 +407,41 @@ contains
         real(real64) :: current_norm
         real(real64) :: switch_norm(PHYSICS_TYPES%NUM_ID) = [1.0d-2, 1.0d-4, 1.0d-4] ! [温度, 圧力] 切り替え閾値
         logical :: should_switch = .true.
+        logical, parameter :: diverged = .true.
 
         if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             call self%get_variable_residual(PHYSICS_TYPES%THERMAL, residual)
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, increment)
-            call self%controls%iteration%check_convergence(PHYSICS_TYPES%THERMAL, residual, increment)
+            if (has_nan(residual) .or. has_nan(increment)) then
+                write (*, *) "Error: NaN detected in thermal variables during convergence check."
+                call self%controls%iteration%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
+            else
+                call self%controls%iteration%check_convergence(PHYSICS_TYPES%THERMAL, residual, increment)
+            end if
+            if (self%controls%iteration%is_picard()) then
+                if (self%controls%aitken%reach_min_relaxation(PHYSICS_TYPES%THERMAL)) then
+                    write (*, *) "Warning: Relaxation factor too small. Stagnation detected."
+                    call self%controls%iteration%set_diverged(PHYSICS_TYPES%THERMAL, .true.) ! 即時撤退させる
+                end if
+            end if
         end if
 
         if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
             call self%get_variable_residual(PHYSICS_TYPES%HYDRAULIC, residual)
             call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, increment)
-            call self%controls%iteration%check_convergence(PHYSICS_TYPES%HYDRAULIC, residual, increment)
+            if (has_nan(residual) .or. has_nan(increment)) then
+                write (*, *) "Error: NaN detected in hydraulic variables during convergence check."
+                call self%controls%iteration%set_diverged(PHYSICS_TYPES%HYDRAULIC, .true.)
+            else
+                call self%controls%iteration%check_convergence(PHYSICS_TYPES%HYDRAULIC, residual, increment)
+            end if
+
+            if (self%controls%iteration%is_picard()) then
+                if (self%controls%aitken%reach_min_relaxation(PHYSICS_TYPES%HYDRAULIC)) then
+                    write (*, *) "Warning: Relaxation factor too small. Stagnation detected."
+                    call self%controls%iteration%set_diverged(PHYSICS_TYPES%HYDRAULIC, .true.) ! 即時撤退させる
+                end if
+            end if
         end if
 
         ! ----------------------------------------------------------------------
@@ -403,7 +450,7 @@ contains
         ! ----------------------------------------------------------------------
         call self%controls%iteration%get_nonlinear_iter(iter)
 
-        if (iter > 1) then
+        if (iter > 1 .and. .not. self%controls%iteration%has_diverged()) then
             if (self%controls%iteration%is_picard()) then
                 should_switch = .true.
                 if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
@@ -441,14 +488,14 @@ contains
         class(type_ftdss), intent(inout) :: self
         logical, intent(inout) :: is_step_converged
         logical :: prescribe_bc
-
-        ! 1. 初期化
         is_step_converged = .false.
+
+        ! 1. 初期化セットアップ
         call self%solve_time_step_initial_setup()
 
         ! 2. 非線形反復ループ（Newtonループ）
         !    収束判定は check_convergence で状態を更新し、ここ(should_continue)で抜ける
-        do while (self%controls%iteration%should_continue())
+        nonlinear: do while (self%controls%iteration%should_continue())
 
             ! 2.1 セットアップ (iter更新, BCフラグ設定, 勾配計算など)
             call self%solve_time_step_setup(prescribe_bc)
@@ -468,10 +515,9 @@ contains
             ! 2.6 解の更新 (U <= U + delta)
             call self%reflect_variables()
 
-        end do
+        end do nonlinear
 
-        ! 3. 最終的な収束状態を取得して返す
         is_step_converged = self%controls%iteration%has_converged()
-
     end subroutine solve_time_step_ftdss
+
 end submodule ftdss_compute

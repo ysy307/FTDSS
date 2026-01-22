@@ -16,9 +16,9 @@ contains
 
         real(real64) :: simulation_period_second
         real(real64) :: output_step_second
-        real(real64) :: time_coeff
         integer(int32) :: max_file_counts_digit
-        integer(int32), parameter :: UNIT_SEC = 1
+
+        type(type_constant_value) :: time_unit
 
         self%do_output = .false.
 
@@ -40,22 +40,16 @@ contains
         self%file_extension = "."//trim(adjustl(input%output_settings%field_output%file_format))
 
         ! --- シミュレーション期間を秒単位に変換 ---
-        call control%time%convert_time_unit( &
-            input%conditions%time_control%simulation_period%unit, &
-            UNIT_SEC, &
-            time_coeff)
+        time_unit = TIME_UNITS%to_object(input%conditions%time_control%simulation_period%unit)
 
         simulation_period_second = (input%conditions%time_control%simulation_period%end &
-                                    - input%conditions%time_control%simulation_period%start) * time_coeff
+                                    - input%conditions%time_control%simulation_period%start) * time_unit%value
 
         ! --- 出力インターバルを秒単位に変換 ---
         if (input%output_settings%field_output%output_interval_step > 0.0d0) then
-            call control%time%convert_time_unit( &
-                input%output_settings%field_output%output_interval_unit, &
-                UNIT_SEC, &
-                time_coeff)
+            time_unit = TIME_UNITS%to_object(input%output_settings%field_output%output_interval_unit)
 
-            output_step_second = input%output_settings%field_output%output_interval_step * time_coeff
+            output_step_second = input%output_settings%field_output%output_interval_step * time_unit%value
 
             if (output_step_second > 0.0d0) then
                 max_file_counts_digit = int(log10(simulation_period_second / output_step_second), kind=int32) + 1_int32

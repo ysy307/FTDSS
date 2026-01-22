@@ -15,6 +15,7 @@ contains
         type(type_input), intent(in) :: input
         type(type_controls), intent(in) :: controls
 
+        type(type_constant_value) :: time_unit 
         integer(int32) :: i, target_physics
         real(real64) :: time_conv
         real(real64), allocatable :: raw_values(:)
@@ -61,9 +62,8 @@ contains
         associate (time_ctl => input%conditions%time_control)
             if (allocated(time_ctl%boundary_time_points)) then
                 allocate (self%time_points, source=time_ctl%boundary_time_points)
-                call controls%time%convert_time_unit( &
-                    time_ctl%simulation_period%unit, TIME_UNIT_SECONDS, time_conv)
-                self%time_points = self%time_points * time_conv
+                time_unit = TIME_UNITS%to_object(time_ctl%simulation_period%unit)
+                self%time_points = self%time_points * time_unit%value
             else
                 allocate (self%time_points(1))
                 self%time_points(1) = 0.0d0

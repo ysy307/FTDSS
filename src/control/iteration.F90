@@ -1,6 +1,6 @@
 module control_iteration
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: stdlib_strings, only: strip
+    use :: stdlib_strings, only:strip
     use :: module_core
     use :: module_input, only:type_input
     use :: module_linalg, only:vector_norm1, vector_norm2, vector_norminf
@@ -90,6 +90,7 @@ module control_iteration
         ! --- 状態フラグ ---
         ! 物理量ごとに収束状態を保持する (Thermal, Hydro, etc.)
         logical, private :: is_converged(PHYSICS_TYPES%NUM_ID) = .true.
+        logical, private :: is_diverged(PHYSICS_TYPES%NUM_ID) = .false.
 
         ! --- 設定 ---
         type(type_constant_id), private :: nonlinear_solver_type = NONLINEAR_SOLVER%PICARD
@@ -106,6 +107,11 @@ module control_iteration
         ! Query
         procedure, public, pass(self) :: should_continue => should_continue_iteration
         procedure, public, pass(self) :: has_converged => has_converged_iteration
+        procedure, public, pass(self) :: has_diverged => has_diverged_iteration
+
+        procedure, public, pass(self) :: set_converged
+        procedure, public, pass(self) :: set_diverged
+
         procedure, public, pass(self) :: get_nonlinear_iter
         procedure, public, pass(self) :: get_total_iter
         procedure, public, pass(self) :: get_max_iterations
@@ -336,6 +342,7 @@ contains
         self%total_iter = 0
         self%nonlinear_iter = 0
         self%is_converged(:) = .true.
+        self%is_diverged(:) = .false.
 
         self%nonlinear_solver_type = NONLINEAR_SOLVER%to_object(input%basic%solver_settings%nonlinear_solver%method)
 
@@ -477,12 +484,48 @@ contains
     end function should_continue_iteration
 
     pure function has_converged_iteration(self) result(has_converged)
+        implicit none
         class(type_iteration), intent(in) :: self
         logical :: has_converged
 
         ! 全ての物理量が収束しているかチェック
         has_converged = all(self%is_converged)
     end function has_converged_iteration
+
+    pure function has_diverged_iteration(self) result(has_diverged)
+        implicit none
+        class(type_iteration), intent(in) :: self
+        logical :: has_diverged
+
+        ! 全ての物理量が発散しているかチェック
+        has_diverged = any(self%is_diverged)
+    end function has_diverged_iteration
+
+    subroutine set_converged(self, physics_type, converged)
+        implicit none
+        class(type_iteration), intent(inout) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        logical, intent(in) :: converged
+
+        if (.not. PHYSICS_TYPES%is_valid(physics_type)) then
+            call raise_error(ERROR_CODES%INVALID_TYPE, opt=strip(physics_type%name))
+        end if
+
+        self%is_converged(physics_type%id) = converged
+    end subroutine set_converged
+
+    subroutine set_diverged(self, physics_type, diverged)
+        implicit none
+        class(type_iteration), intent(inout) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        logical, intent(in) :: diverged
+
+        if (.not. PHYSICS_TYPES%is_valid(physics_type)) then
+            call raise_error(ERROR_CODES%INVALID_TYPE, opt=strip(physics_type%name))
+        end if
+
+        self%is_diverged(physics_type%id) = diverged
+    end subroutine set_diverged
 
     ! --- Getters ---
     pure subroutine get_nonlinear_iter(self, nonlinear_iter)

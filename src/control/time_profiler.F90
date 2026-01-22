@@ -8,8 +8,6 @@ module control_time_profiler
 
     public :: type_profiler
 
-    integer(int32), parameter :: ERR_PROFILER = 982
-
     type :: type_profiler_section
         character(20) :: label = ''
         real(real64) :: total_time = 0.0d0
