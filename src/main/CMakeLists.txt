@@ -63,6 +63,7 @@ set(MAIN_FTDSS_SOURCES
     ftdss/ftdss_boundary.F90
     ftdss/ftdss_assemble.F90
     ftdss/ftdss_compute.F90
+    ftdss/ftdss_solve.F90
     ftdss/ftdss.F90
 )
 
