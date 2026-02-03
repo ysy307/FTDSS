@@ -322,8 +322,6 @@ contains
         call self%Qa%advance()
         call self%Qv%advance()
 
-        call self%controls%time%shift()
-
         call self%controls%profiler%stop("Setup")
     end subroutine shift_ftdss
 
@@ -338,6 +336,7 @@ contains
         real(real64), allocatable :: du(:)
 
         real(real64) :: relaxation_factor
+        logical :: is_newton, is_picard
 
         call self%controls%profiler%start("Setup")
 
@@ -346,19 +345,27 @@ contains
         call self%controls%time%get_bdf_coeffs(bdf_coeffs)
         call self%controls%time%get_bdf_order(bdf_order)
 
+        is_newton = self%controls%iteration%is_newton()
+        is_picard = self%controls%iteration%is_picard()
+
         if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du)
             call self%temperature%get_current(current)
             if (associated(current)) then
-                if (iter > 1) then
-                    call self%controls%aitken%compute_relaxation(PHYSICS_TYPES%THERMAL, du)
+                if (is_newton .or. is_picard) then
+                    if (iter > 1) then
+                        call self%controls%aitken%compute_relaxation(PHYSICS_TYPES%THERMAL, du)
+                    end if
+                    call self%controls%aitken%get_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
+                    write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
+                else
+                    relaxation_factor = 1.0d0
                 end if
-                call self%controls%aitken%get_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
-                write(*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
                 current(:) = current(:) + relaxation_factor * du(:)
                 call self%temperature%set_delta(relaxation_factor * du(:))
-
-                call self%controls%aitken%set_du(PHYSICS_TYPES%THERMAL, du)
+                if (is_newton .or. is_picard) then
+                    call self%controls%aitken%set_du(PHYSICS_TYPES%THERMAL, du)
+                end if
             end if
 
             call self%calc_gradient_temperature()
@@ -366,6 +373,8 @@ contains
 
             call deallocate_array(du)
         end if
+
+        !! TODO: Hydraulic variable reflection
 
         call self%controls%profiler%stop("Setup")
 

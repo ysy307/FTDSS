@@ -30,10 +30,20 @@ module inout_input_conditions
         real(real64) :: max_step
     end type type_time_controls_time_stepping
 
+    type :: type_time_controls_ats
+        logical :: is_active
+        integer(int32) :: iter_min
+        integer(int32) :: iter_max
+        real(real64) :: scale_up
+        real(real64) :: scale_down
+        real(real64) :: scale_retry
+    end type type_time_controls_ats
+
     type :: type_time_controls
         class(type_conditions), pointer :: parent => null()
         type(type_time_controls_simulation_period) :: simulation_period
         type(type_time_controls_time_stepping) :: time_stepping
+        type(type_time_controls_ats) :: adaptive_stepping
         real(real64), allocatable :: boundary_time_points(:)
     contains
         procedure, pass(self) :: display => display_time_controls

@@ -22,6 +22,9 @@ module control_output
         procedure, pass(self), public :: update => update_state
         procedure, pass(self), public :: get_step
         procedure, pass(self), public :: convert_output_time => convert_output_time_value
+        procedure, pass(self), public :: is_enabled
+        procedure, pass(self), public :: get_next_time
+        procedure, pass(self), public :: get_next_target_time
     end type type_output_manager
 
 contains
@@ -118,12 +121,52 @@ contains
         end if
     end function convert_output_time_value
 
-    ! (get_step は変更なし)
     pure subroutine get_step(self, step)
         implicit none
         class(type_output_manager), intent(in) :: self
         integer(int32), intent(inout) :: step
         step = self%current_step
     end subroutine get_step
+
+    !> 出力が有効かどうかを判定する
+    pure function is_enabled(self) result(is_active)
+        implicit none
+        class(type_output_manager), intent(in) :: self
+        logical :: is_active
+
+        is_active = self%is_active
+    end function is_enabled
+
+    !> 次回の出力予定時刻（秒）を取得する
+    pure function get_next_time(self) result(next_output_seconds)
+        implicit none
+        class(type_output_manager), intent(in) :: self
+        real(real64) :: next_output_seconds
+
+        next_output_seconds = self%next_output_seconds
+    end function get_next_time
+
+    !> 現在時刻に基づき，次に同期すべきターゲット時刻を返す
+    subroutine get_next_target_time(self, current_time, target_time)
+        implicit none
+        class(type_output_manager), intent(in) :: self
+        real(real64), intent(in) :: current_time
+        real(real64), intent(inout) :: target_time
+
+        real(real64), parameter :: tolerance = 1.0d-9
+
+        if (.not. self%is_active) then
+            target_time = 1.0d+30 ! 無効なら十分遠い未来
+            return
+        end if
+
+        ! もし現在時刻がすでに出力予定時刻に達している（または過ぎている）なら，
+        ! その「次の間隔」をターゲットとする
+        if (current_time >= self%next_output_seconds - tolerance) then
+            target_time = self%next_output_seconds + self%interval_seconds
+        else
+            target_time = self%next_output_seconds
+        end if
+    end subroutine get_next_target_time
 
 end module control_output

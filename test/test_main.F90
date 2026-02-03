@@ -29,19 +29,8 @@ contains
         implicit none
         type(type_ftdss) :: ftdss
 
-        logical :: is_step_converged
-        integer(int32) :: iter
         call ftdss%initialize()
-
-        do iter = 1, 100
-            call ftdss%reset()
-            call ftdss%solve_time_step(is_step_converged)
-            print *, is_step_converged
-            call ftdss%update_variables()
-            call ftdss%shift()
-            call ftdss%output_fields()
-            call ftdss%output_history()
-        end do
+        call ftdss%run()
 
     end subroutine run_test_ftdss
 

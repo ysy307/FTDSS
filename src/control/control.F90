@@ -60,6 +60,8 @@ module module_control
 
         procedure, pass(self), public :: is_end_time => is_end_time_control
 
+        procedure, pass(self), public :: update => update_controls
+
         procedure, pass(self), public :: display => display_controls
     end type type_controls
 
@@ -415,5 +417,68 @@ contains
 
         is_end_time = self%time%is_end_time()
     end function is_end_time_control
+
+    ! !> Comprehensive update of all control states (Time, ATS, Iteration, Output)
+    ! subroutine update_controls(self, success)
+    !     implicit none
+    !     class(type_controls), intent(inout) :: self
+    !     logical, intent(in) :: success
+    !     integer(int32) :: iter_count
+    !     real(real64) :: t_target
+
+    !     ! 1. 現在のステップで要した反復回数を取得
+    !     call self%iteration%get_nonlinear_iter(iter_count)
+
+    !     ! 2. 同期のターゲット時刻を決定（終了時刻，または各出力時刻の最小値）
+    !     call self%time%get_end_time(t_target)
+
+    !     if (self%out_field%is_enabled()) then
+    !         t_target = min(t_target, self%out_field%get_next_time())
+    !     end if
+    !     if (self%out_history%is_enabled()) then
+    !         t_target = min(t_target, self%out_history%get_next_time())
+    !     end if
+
+    !     ! 3. 時間管理・ATSロジックを一括実行
+    !     call self%time%update(success, iter_count, t_target)
+
+    ! end subroutine update_controls
+
+    subroutine update_controls(self, success)
+        implicit none
+        class(type_controls), intent(inout) :: self
+        logical, intent(in) :: success
+        integer(int32) :: iter_count
+        real(real64) :: t_target
+        real(real64) :: t_arrival ! 計算によって到達する時刻
+        real(real64) :: t_target_out
+        real(real64) :: current_time_s, dt_s
+
+        ! 1. 反復回数の取得
+        call self%iteration%get_nonlinear_iter(iter_count)
+
+        ! 2. 到達予測時刻 (t_new = t_old + dt)
+        !    成功していれば，この後 time%update で時刻がここまで進む
+        call self%time%get_time(current_time_s)
+        call self%time%get_dt(dt_s)
+        t_arrival = current_time_s + dt_s
+
+        ! 3. ターゲット時刻の決定
+        call self%time%get_end_time(t_target)
+
+        ! 到達時刻(300) を渡して，次のターゲット(600) を取得する
+        if (self%out_field%is_enabled()) then
+            call self%out_field%get_next_target_time(t_arrival, t_target_out)
+            t_target = min(t_target, t_target_out)
+        end if
+        if (self%out_history%is_enabled()) then
+            call self%out_history%get_next_target_time(t_arrival, t_target_out)
+            t_target = min(t_target, t_target_out)
+        end if
+
+        ! 4. 更新実行 (t_target=600 なので，残り300に合わせて dt が制限される)
+        call self%time%update(success, iter_count, t_target)
+
+    end subroutine update_controls
 
 end module module_control

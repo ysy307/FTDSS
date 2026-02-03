@@ -93,7 +93,11 @@ module control_iteration
         logical, private :: is_diverged(PHYSICS_TYPES%NUM_ID) = .false.
 
         ! --- 設定 ---
+        ! nonlinear_solver_type: 入力設定に基づく静的な設定 (NONE/PICARD/NEWTON)
+        ! compute_nonlinear_solver_type: 計算中に使用される動的なソルバータイプ
         type(type_constant_id), private :: nonlinear_solver_type = NONLINEAR_SOLVER%PICARD
+        type(type_constant_id), private :: compute_nonlinear_solver_type = NONLINEAR_SOLVER%PICARD
+
         type(type_iterator_config), private :: config
     contains
         ! Initialization / Reset
@@ -123,6 +127,7 @@ module control_iteration
         procedure, public, pass(self) :: get_absolute_tolerance => get_absolute_tolerance_iteration
         procedure, public, pass(self) :: get_relative_tolerance => get_relative_tolerance_iteration
 
+        ! 以下のメソッドは compute_nonlinear_solver_type (動的) を操作/参照するように変更
         procedure, public, pass(self) :: get_nonlinear_solver => get_nonlinear_type_iteration
         procedure, public, pass(self) :: set_nonlinear_solver => set_nonlinear_type_iteration
 
@@ -156,8 +161,6 @@ contains
         self%absolute_tolerance = absolute_tolerance
         self%relative_tolerance = relative_tolerance
 
-        ! Set reference value with a safeguard against near-zero values.
-        ! If the physical scale is zero (e.g., uniform fields), default to 1.0 to effectively use absolute error.
         if (present(reference_value)) then
             if (abs(reference_value) < 1.0d-6) then
                 self%reference_value = 1.0d0
@@ -169,7 +172,7 @@ contains
         end if
 
         call deallocate_array(self%norms_history)
-        call allocate_array(self%norms_history, NORM_TYPES%NUM_ID, max_iterations)
+        call allocate_array(self%norms_history, NORM_TYPES%NUM_ID, max(max_iterations, 1))
         self%norms_history = 0.0d0
     end subroutine initialize_type_convergence_criterion
 
@@ -182,9 +185,7 @@ contains
         end if
     end subroutine reset_criterion
 
-    !>
     !> Calculate norms, store them in history, and check convergence criteria.
-    !>
     function check_convergence_criterion(self, vector, iter, norm_type) result(is_ok)
         implicit none
         class(type_convergence_criterion), intent(inout) :: self
@@ -198,8 +199,6 @@ contains
 
         is_ok = .false.
 
-        ! Calculate and store norms
-        !    Prevent out-of-bounds access
         if (iter >= 1 .and. iter <= size(self%norms_history, 2)) then
             self%norms_history(NORM_TYPES%L1%id, iter) = vector_norm1(vector)
             self%norms_history(NORM_TYPES%L2%id, iter) = vector_norm2(vector)
@@ -211,49 +210,36 @@ contains
                 ' LInf:', self%norms_history(NORM_TYPES%LINF%id, iter)
         end if
 
-        ! Return true immediately if checking is disabled
         if (.not. self%should_check) then
             is_ok = .true.
             return
         end if
 
-        ! Return true if no criterion is set
         if (self%criterion == NONLINEAR_CRITERIA%none) then
             is_ok = .true.
             return
         end if
 
-        ! Retrieve the specified norm for the current iteration
         current_norm = self%norms_history(norm_type%id, iter)
 
-        ! Convergence logic
-        ! Absolute Check
         abs_ok = (current_norm < self%absolute_tolerance)
-
-        ! Perform standard relative error calculation
         rel_ok = (current_norm / self%reference_value < self%relative_tolerance)
 
-        ! Determine final result based on the selected criterion
         if (self%criterion == NONLINEAR_CRITERIA%ABSOLUTE) then
             is_ok = abs_ok
         else if (self%criterion == NONLINEAR_CRITERIA%RELATIVE) then
             is_ok = rel_ok
         else if (self%criterion == NONLINEAR_CRITERIA%BOTH) then
-            ! Both conditions must be met (AND condition)
             is_ok = abs_ok .and. rel_ok
         else
-            ! Default to absolute check
             is_ok = abs_ok
         end if
 
     end function check_convergence_criterion
 
-    !> Check if residual convergence check is enabled
     pure function should_check_residual_convergence_control(self) result(should_check)
         implicit none
-        !> Convergence control instance
         class(type_convergence_control), intent(in) :: self
-        !> Return value indicating if residual check is enabled
         logical :: should_check
 
         if (self%convergence_norm_type == NONLINEAR_NORM_CRITERIA%RESIDUAL .or. &
@@ -264,12 +250,9 @@ contains
         end if
     end function should_check_residual_convergence_control
 
-    !> Check if update convergence check is enabled
     pure function should_check_update_convergence_control(self) result(should_check)
         implicit none
-        !> Convergence control instance
         class(type_convergence_control), intent(in) :: self
-        !> Return `True` if update check is enabled
         logical :: should_check
 
         if (self%convergence_norm_type == NONLINEAR_NORM_CRITERIA%UPDATE .or. &
@@ -293,23 +276,17 @@ contains
         logical :: check_res, check_upd
 
         associate (nls => input%basic%solver_settings%nonlinear_solver)
-            ! --- 基本設定 ---
             self%max_iterations = nls%max_iterations
             self%update_frequency = nls%update_frequency
 
-            ! --- 収束判定設定 ---
             self%convergence_control%norm_type = NORM_TYPES%to_object(nls%convergence%norm_type)
             self%convergence_control%combination_logic = NONLINEAR_LOGIC%to_object(nls%convergence%use_logic)
-
             self%convergence_control%convergence_norm_type = NONLINEAR_NORM_CRITERIA%to_object(nls%convergence%use_criteria)
 
-            ! Residual / Update チェックの有効化フラグ (if文で実装)
             check_res = self%convergence_control%should_check_residual()
             check_upd = self%convergence_control%should_check_update()
 
-            ! --- 物理タイプごとの設定初期化 ---
             do i = 1, PHYSICS_TYPES%NUM_ID
-                ! Residual Criteria
                 call self%convergence_control%residual(i)%initialize( &
                     check_res, &
                     NONLINEAR_CRITERIA%to_object(nls%convergence%residual%criteria), &
@@ -318,7 +295,6 @@ contains
                     self%max_iterations, &
                     reference_value)
 
-                ! Update Criteria
                 call self%convergence_control%update(i)%initialize( &
                     check_upd, &
                     NONLINEAR_CRITERIA%to_object(nls%convergence%update%criteria), &
@@ -344,8 +320,14 @@ contains
         self%is_converged(:) = .true.
         self%is_diverged(:) = .false.
 
+        ! 1. 設定値(config)をロード
         self%nonlinear_solver_type = NONLINEAR_SOLVER%to_object(input%basic%solver_settings%nonlinear_solver%method)
 
+        ! 2. 計算用(compute)の初期値を設定値と同じにする
+        self%compute_nonlinear_solver_type = self%nonlinear_solver_type
+
+        ! NONEの場合はコンフィグの初期化や以降の処理は不要だが，
+        ! ルーチンの安全性のためコンフィグ初期化は呼んでも良い．
         if (self%nonlinear_solver_type == NONLINEAR_SOLVER%NONE) then
             return
         end if
@@ -361,10 +343,6 @@ contains
 
         self%nonlinear_iter = 0
 
-        ! 計算されていない変数がFalseのままだと永遠に終わらないため、
-        ! 一旦すべて「収束済み(.true.)」とする。
-        ! 計算対象の変数は、check_convergenceが呼ばれた時点で結果に応じて上書きされる。
-        !
         self%is_converged(:) = .true.
 
         do i = 1, PHYSICS_TYPES%NUM_ID
@@ -372,8 +350,15 @@ contains
             call self%config%convergence_control%update(i)%reset()
         end do
 
-        ! 初期ステップ周辺はPicard法を使う
-        call self%set_nonlinear_solver(NONLINEAR_SOLVER%PICARD)
+        ! 初期ステップ周辺の戦略設定:
+        ! 設定(nonlinear_solver_type)がNONEでない場合のみ，Picard法から開始する．
+        ! 設定がNONEの場合は，計算用(compute)もNONEとする．
+        if (self%nonlinear_solver_type /= NONLINEAR_SOLVER%NONE) then
+            call self%set_nonlinear_solver(NONLINEAR_SOLVER%PICARD)
+        else
+            call self%set_nonlinear_solver(NONLINEAR_SOLVER%NONE)
+        end if
+
     end subroutine reset_nonlinear
 
     pure subroutine increment_nonlinear(self)
@@ -390,38 +375,18 @@ contains
         self%total_iter = self%total_iter + 1
     end subroutine increment_total
 
-    !>
-    !> Check convergence for a specific physics type based on residual and update vectors.
-    !>
     subroutine check_convergence(self, physics_type, residual_vector, update_vector)
         implicit none
         class(type_iteration), intent(inout) :: self
-        !> Physics type identifier defined in PHYSICS_TYPES.
-        !> This identifier is used to select convergence criteria
-        !> specific to each physics model.
         type(type_constant_id), intent(in) :: physics_type
-        !> Residual vector used for convergence checking.
-        !>
-        !> This vector represents the residual evaluated by the nonlinear solver.
-        !> Its exact definition depends on the solver type (e.g. Newton, Picard),
-        !> but this routine treats it only as a residual norm input.
-        !>
-        !> This argument must be present if residual-based convergence
-        !> checking is enabled.
         real(real64), intent(in), optional :: residual_vector(:)
-        !> Solution update vector used for convergence checking.
-        !>
-        !> This vector represents the increment of the solution between
-        !> successive nonlinear iterations.
-        !>
-        !> This argument must be present if update-based convergence
-        !> checking is enabled.
         real(real64), intent(in), optional :: update_vector(:)
 
         logical :: is_residual_ok, is_update_ok
         logical :: check_residual, check_update
 
-        ! ソルバーなしの場合は常にTrue
+        ! 設定がソルバーなし(NONE)の場合は，収束判定をスキップして常にTrueとする．
+        ! これにより，1回のループ(線形ステップ)後にループを抜けることができる．
         if (self%nonlinear_solver_type == NONLINEAR_SOLVER%NONE) then
             self%is_converged(physics_type%id) = .true.
             return
@@ -473,7 +438,6 @@ contains
         class(type_iteration), intent(in) :: self
         logical :: should_continue
 
-        ! First iteration always continues
         if (self%nonlinear_iter <= 1) then
             should_continue = .true.
             return
@@ -488,7 +452,6 @@ contains
         class(type_iteration), intent(in) :: self
         logical :: has_converged
 
-        ! 全ての物理量が収束しているかチェック
         has_converged = all(self%is_converged)
     end function has_converged_iteration
 
@@ -497,7 +460,6 @@ contains
         class(type_iteration), intent(in) :: self
         logical :: has_diverged
 
-        ! 全ての物理量が発散しているかチェック
         has_diverged = any(self%is_diverged)
     end function has_diverged_iteration
 
@@ -567,22 +529,17 @@ contains
         type(type_constant_id), intent(in) :: norm_type
         real(real64), intent(inout) :: current_norm
 
-        if (.not. PHYSICS_TYPES%is_valid(physics_type)) then
-            current_norm = 0.0d0
-            return
-        end if
+        current_norm = 0.0d0
+        if (.not. PHYSICS_TYPES%is_valid(physics_type)) return
+        if (.not. NORM_TYPES%is_valid(norm_type)) return
 
-        if (.not. NORM_TYPES%is_valid(norm_type)) then
-            current_norm = 0.0d0
-            return
-        end if
-
-        if (self%nonlinear_iter >= 1 .and. self%nonlinear_iter <= self%config%max_iterations) then
-            current_norm = &
-                self%config%convergence_control%residual(physics_type%id)%norms_history(norm_type%id, self%nonlinear_iter)
-        else
-            current_norm = 0.0d0
-        end if
+        associate (criterion => self%config%convergence_control%residual(physics_type%id))
+            if (allocated(criterion%norms_history)) then
+                if (self%nonlinear_iter >= 1 .and. self%nonlinear_iter <= size(criterion%norms_history, 2)) then
+                    current_norm = criterion%norms_history(norm_type%id, self%nonlinear_iter)
+                end if
+            end if
+        end associate
     end subroutine get_current_residual_norm_iteration
 
     pure subroutine get_current_update_norm_iteration(self, physics_type, norm_type, current_norm)
@@ -594,7 +551,6 @@ contains
 
         current_norm = 0.0d0
         if (.not. PHYSICS_TYPES%is_valid(physics_type)) return
-
         if (.not. NORM_TYPES%is_valid(norm_type)) return
 
         if (self%nonlinear_iter >= 1 .and. self%nonlinear_iter <= self%config%max_iterations) then
@@ -612,7 +568,6 @@ contains
 
         absolute_tolerance = 0.0d0
         if (.not. PHYSICS_TYPES%is_valid(physics_type)) return
-
         if (.not. NONLINEAR_NORM_CRITERIA%is_valid(criteria_type)) return
 
         if (criteria_type == NONLINEAR_NORM_CRITERIA%UPDATE) then
@@ -633,7 +588,6 @@ contains
 
         relative_tolerance = 0.0d0
         if (.not. PHYSICS_TYPES%is_valid(physics_type)) return
-
         if (.not. NONLINEAR_NORM_CRITERIA%is_valid(criteria_type)) return
 
         if (criteria_type == NONLINEAR_NORM_CRITERIA%UPDATE) then
@@ -645,38 +599,44 @@ contains
         end if
     end subroutine get_relative_tolerance_iteration
 
+    !> Returns the ACTIVE (compute) solver type
     subroutine get_nonlinear_type_iteration(self, nonlinear_solver_type)
         implicit none
         class(type_iteration), intent(in), target :: self
         type(type_constant_id), intent(inout), pointer :: nonlinear_solver_type
 
-        nonlinear_solver_type => self%nonlinear_solver_type
+        ! 離散化ルーチンが参照すべき「現在の」ソルバータイプを返す
+        nonlinear_solver_type => self%compute_nonlinear_solver_type
     end subroutine get_nonlinear_type_iteration
 
+    !> Sets the ACTIVE (compute) solver type
     subroutine set_nonlinear_type_iteration(self, nonlinear_solver_type)
         implicit none
         class(type_iteration), intent(inout) :: self
         type(type_constant_id), intent(in) :: nonlinear_solver_type
 
-        self%nonlinear_solver_type = nonlinear_solver_type
+        ! 計算中に動的に切り替わるソルバータイプを設定する
+        self%compute_nonlinear_solver_type = nonlinear_solver_type
     end subroutine set_nonlinear_type_iteration
 
-    !> Returns true if the current solver is Newton-Raphson
+    !> Returns true if the ACTIVE solver is Newton-Raphson
+    !> (Returns false if solver is NONE)
     pure function is_newton_method_iteration(self) result(is_newton)
         class(type_iteration), intent(in) :: self
         logical :: is_newton
 
-        is_newton = (self%nonlinear_solver_type == NONLINEAR_SOLVER%NEWTON .or. &
-                     self%nonlinear_solver_type == NONLINEAR_SOLVER%MODIFIED_NEWTON)
+        is_newton = (self%compute_nonlinear_solver_type == NONLINEAR_SOLVER%NEWTON .or. &
+                     self%compute_nonlinear_solver_type == NONLINEAR_SOLVER%MODIFIED_NEWTON)
     end function is_newton_method_iteration
 
-    !> Returns true if the current solver is Picard (Successive Substitution)
+    !> Returns true if the ACTIVE solver is Picard
+    !> (Returns false if solver is NONE)
     pure function is_picard_method_iteration(self) result(is_picard)
         class(type_iteration), intent(in) :: self
         logical :: is_picard
 
-        is_picard = (self%nonlinear_solver_type == NONLINEAR_SOLVER%PICARD .or. &
-                     self%nonlinear_solver_type == NONLINEAR_SOLVER%MODIFIED_PICARD)
+        is_picard = (self%compute_nonlinear_solver_type == NONLINEAR_SOLVER%PICARD .or. &
+                     self%compute_nonlinear_solver_type == NONLINEAR_SOLVER%MODIFIED_PICARD)
     end function is_picard_method_iteration
 
 end module control_iteration

@@ -35,6 +35,8 @@ contains
             end if
         end if
 
+        call self%controls%iteration%set_nonlinear_solver(NONLINEAR_SOLVER%PICARD)
+
     end subroutine solve_time_step_initial_setup_ftdss
 
     module subroutine solve_time_step_setup_ftdss(self, prescribe_bc)
@@ -73,37 +75,54 @@ contains
         logical :: should_switch = .true.
         logical, parameter :: diverged = .true.
 
+        logical :: is_newton, is_picard
+
+        ! 現在の計算用ソルバー設定を取得 (Active Solver)
+        is_newton = self%controls%iteration%is_newton()
+        is_picard = self%controls%iteration%is_picard()
+
+        ! ----------------------------------------------------------------------
+        ! Thermal Convergence Check
+        ! ----------------------------------------------------------------------
         if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             call self%get_variable_residual(PHYSICS_TYPES%THERMAL, residual)
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, increment)
+
             if (has_nan(residual) .or. has_nan(increment)) then
                 write (*, *) "Error: NaN detected in thermal variables during convergence check."
-                call self%controls%iteration%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
+                call self%controls%iteration%set_diverged(PHYSICS_TYPES%THERMAL, diverged)
             else
                 call self%controls%iteration%check_convergence(PHYSICS_TYPES%THERMAL, residual, increment)
             end if
-            if (self%controls%iteration%is_picard()) then
+
+            ! note: 元のコードの if (is_picard .or. is_newton) ... else if (is_picard) は
+            !       Picard時に最初のブロック(空)に入りAitkenが呼ばれないため修正しました．
+            if (is_picard) then
                 if (self%controls%aitken%reach_min_relaxation(PHYSICS_TYPES%THERMAL)) then
                     write (*, *) "Warning: Relaxation factor too small. Stagnation detected."
-                    call self%controls%iteration%set_diverged(PHYSICS_TYPES%THERMAL, .true.) ! 即時撤退させる
+                    call self%controls%iteration%set_diverged(PHYSICS_TYPES%THERMAL, diverged) ! 即時撤退させる
                 end if
             end if
         end if
 
+        ! ----------------------------------------------------------------------
+        ! Hydraulic Convergence Check
+        ! ----------------------------------------------------------------------
         if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
             call self%get_variable_residual(PHYSICS_TYPES%HYDRAULIC, residual)
             call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, increment)
+
             if (has_nan(residual) .or. has_nan(increment)) then
                 write (*, *) "Error: NaN detected in hydraulic variables during convergence check."
-                call self%controls%iteration%set_diverged(PHYSICS_TYPES%HYDRAULIC, .true.)
+                call self%controls%iteration%set_diverged(PHYSICS_TYPES%HYDRAULIC, diverged)
             else
                 call self%controls%iteration%check_convergence(PHYSICS_TYPES%HYDRAULIC, residual, increment)
             end if
 
-            if (self%controls%iteration%is_picard()) then
+            if (is_picard) then
                 if (self%controls%aitken%reach_min_relaxation(PHYSICS_TYPES%HYDRAULIC)) then
                     write (*, *) "Warning: Relaxation factor too small. Stagnation detected."
-                    call self%controls%iteration%set_diverged(PHYSICS_TYPES%HYDRAULIC, .true.) ! 即時撤退させる
+                    call self%controls%iteration%set_diverged(PHYSICS_TYPES%HYDRAULIC, diverged) ! 即時撤退させる
                 end if
             end if
         end if
@@ -111,39 +130,53 @@ contains
         ! ----------------------------------------------------------------------
         ! 2. [追加] Hybrid法 切り替え判定 (Residual Check)
         !    Picardモードで，残差が十分小さくなったらNewtonへ切り替える
+        !    reset_nonlinearで初期状態がPicardになっているため，ここで条件を満たせばActiveをNewtonに変更する
         ! ----------------------------------------------------------------------
         call self%controls%iteration%get_nonlinear_iter(iter)
 
+        ! まだ発散しておらず，かつ現在の計算モードがPicardの場合のみチェック
         if (iter > 1 .and. .not. self%controls%iteration%has_diverged()) then
             if (self%controls%iteration%is_picard()) then
                 should_switch = .true.
+
+                ! Thermal Residual Check
                 if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
                     current_norm = 0.0d0
+                    ! 直前の check_convergence で計算された最新の残差ノルムを取得
                     call self%controls%iteration%get_current_residual_norm(PHYSICS_TYPES%THERMAL, NORM_TYPES%LINF, current_norm)
+
                     ! [推奨] デバッグ出力: 熱の残差状況を表示
-                    write (*, '("   [Picard Check] Thermal |R|_inf: ", ES10.3, " / Threshold: ", ES10.3)') &
+                    write (*, '("    [Picard Check] Thermal |R|_inf: ", ES10.3, " / Threshold: ", ES10.3)') &
                         current_norm, switch_norm(PHYSICS_TYPES%THERMAL%id)
+
                     if (current_norm > switch_norm(PHYSICS_TYPES%THERMAL%id)) then
                         should_switch = .false.
                     end if
                 end if
+
+                ! Hydraulic Residual Check
                 if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
+                    current_norm = 0.0d0
                     call self%controls%iteration%get_current_residual_norm(PHYSICS_TYPES%HYDRAULIC, NORM_TYPES%LINF, current_norm)
+
                     if (current_norm > switch_norm(PHYSICS_TYPES%HYDRAULIC%id)) then
                         should_switch = .false.
                     end if
                 end if
 
+                ! Switch Logic
                 if (should_switch) then
                     write (*, '("   -> Residual small enough. Switching to Newton-Raphson.")')
+                    ! ここで計算用ソルバータイプをNewtonに変更する．
+                    ! 次の反復(solve_nonlinear_step等)からは is_newton() がTrueになる．
                     call self%controls%iteration%set_nonlinear_solver(NONLINEAR_SOLVER%NEWTON)
                 end if
 
             end if
         end if
 
-        call deallocate_array(increment)
-        call deallocate_array(residual)
+        if (allocated(increment)) call deallocate_array(increment)
+        if (allocated(residual)) call deallocate_array(residual)
 
     end subroutine solve_time_step_check_convergence_ftdss
 
@@ -192,55 +225,31 @@ contains
         real(real64) :: current_dt, next_dt
 
         ! 終了時刻までループ
-        time_loop: do while (.not. self%controls%time%is_end_time())
-
-            ! ------------------------------------------------------------------
-            ! 2. 1ステップ計算
-            ! ------------------------------------------------------------------
-            ! ここで reset や 非線形反復ループ が回る
+        time_loop: do while (.not. self%controls%is_end_time())
+            ! 1. 計算実行 (t -> t+dt)
             call self%solve_time_step(is_step_converged)
 
-            ! ------------------------------------------------------------------
-            ! 3. 判定分岐 (ATSの核心)
-            ! ------------------------------------------------------------------
+            ! 2. 先に時刻とATSを更新 (時刻が t+dt になる)
+            call self%controls%update(is_step_converged)
+
             if (is_step_converged) then
-                ! ! ==============================================================
-                ! ! [成功] 次のステップへ進む処理
-                ! ! ==============================================================
-                ! write(*, '("   [INFO] Step Converged at t=", ES12.4)') self%controls%time%current_time
+                ! [成功時]
+                ! 3. 物理量の履歴のみをシフトする
+                call self%shift()
 
-                ! ! A. 要素等へのマッピング (平滑化)
-                ! call self%update_variables()
-
-                ! ! B. ファイル出力 (現在のステップの結果を出力)
-                ! call self%output_fields()
-                ! call self%output_history()
-
-                ! ! C. 時間を進める (New -> Old へ値をシフト)
-                ! call self%shift()
-
-                ! ! D. 時間管理変数の更新 (t = t + dt)
-                ! call self%controls%time%update()
-
-                ! E. 次の dt を少し増やす (回復運転: dt = dt * 1.1 等)
-                !    (もし余裕があれば実装)
-                ! call self%controls%time%increase_dt()
-
+                ! 4. 更新後の時刻で出力判定
+                call self%update_variables()
+                call self%output_fields()
+                call self%output_history()
             else
                 ! ! ==============================================================
                 ! ! [失敗] やり直し処理 (リトライ)
                 ! ! ==============================================================
-                ! write(*, '("   [WARNING] Step Failed. Retrying with smaller dt...")')
+                write (*, '("   [WARNING] Step Failed. Retrying with smaller dt...")')
 
-                ! ! A. 状態を巻き戻す (温度などを解く前の値に戻す)
-                ! call self%restore_state()
-
-                ! ! B. 時間刻みを半分にする (dt = dt * 0.5)
-                ! !    ※ ここで dt が小さくなりすぎたら停止するエラー処理も必要
-                ! call self%controls%time%cut_dt(0.5d0)
-
+                call self%controls%update(is_step_converged)
                 ! ! C. ループの先頭に戻って再計算 (cycle)
-                ! cycle time_loop
+                cycle time_loop
 
             end if
 

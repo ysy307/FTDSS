@@ -10,12 +10,42 @@ module control_time
     private
 
     public :: type_time
+    public :: type_ats
 
     ! --- Constants ---
     !> Maximum supported order for BDF schemes.
     integer(int32), parameter :: MAX_BDF_ORDER = 6
     !> Small number for zero-division check
     real(real64), parameter :: EPS_TIME = 1.0d-14
+
+    ! ==========================================================================
+    !> Type for Adaptive Time Stepping Strategy
+    !> Manages thresholds and scaling factors for automatic time step adjustment.
+    ! ==========================================================================
+    type :: type_ats
+        logical, private :: is_active = .false.
+
+        !> [Config] Thresholds for iteration counts
+        integer(int32), private :: iter_min = 4 ! If iter < min, increase dt
+        integer(int32), private :: iter_max = 8 ! If iter > max, decrease dt
+
+        !> [Config] Scaling factors
+        real(real64), private :: scale_up = 1.2d0 ! Success (easy)
+        real(real64), private :: scale_down = 0.8d0 ! Success (hard)
+        real(real64), private :: scale_retry = 0.5d0 ! Failure (diverged)
+
+        real(real64), private :: safety_factor = 0.9d0
+        real(real64), private :: max_growth_rate = 2.0d0
+
+        !> [Config] Absolute limits (Copies from time control for easy access)
+        real(real64), private :: dt_min = 1.0d-5
+        real(real64), private :: dt_max = 1.0d+2
+    contains
+        procedure, public, pass(self) :: initialize => initialize_type_ats
+        procedure, public, pass(self) :: is_enabled => is_enabled_ats
+        procedure, public, pass(self) :: predict_next_dt
+        procedure, public, pass(self) :: calc_retry_dt
+    end type type_ats
 
     !> Data structure holding time stepping state and integration parameters.
     type :: type_time
@@ -29,10 +59,9 @@ module control_time
         real(real64) :: current_time_s = 0.0d0
         !> Time at previous step [s]
         real(real64) :: time_old = 0.0d0
-
-        !> Current time step size \( \Delta t \) [s]
+        !> Current time step size [s]
         real(real64) :: dt_s = 0.0d0
-        !> History of time steps \( [\Delta t_n, \Delta t_{n-1}, \dots] \)
+        !> History of time steps
         real(real64), allocatable :: dt_s_history(:)
         !> Minimum allowable time step [s]
         real(real64) :: dt_s_min = 0.0d0
@@ -40,14 +69,16 @@ module control_time
         real(real64) :: dt_s_max = 0.0d0
 
         ! --- BDF Coefficients ---
-        !> Coefficients \( \alpha_j \) for the BDF formula:
-        !> \( \frac{dy}{dt} \approx \sum_{j=0}^{k} \alpha_j y_{n-j} \).
-        !> Note: Coefficients include the \( 1/\Delta t \) scaling.
+        !> Coefficients $\alpha_j$ for the BDF formula:
+        !> $$ \frac{dy}{dt} \approx \sum_{j=0}^{k} \alpha_j y_{n-j} $$
+        !> Note: Coefficients include the $1/\Delta t$ scaling.
         real(real64) :: coeffs(0:MAX_BDF_ORDER) = 0.0d0
         !> Target BDF order set by user
         integer(int32) :: target_bdf_order = 1
         !> Currently active BDF order (ramps up from 1 at start)
         integer(int32) :: current_bdf_order = 1
+
+        type(type_ats) :: ats
     contains
         ! --- Public Interfaces ---
         !> Initialize time control settings from input.
@@ -62,18 +93,21 @@ module control_time
         procedure, public, pass(self) :: get_bdf_order
         !> Get BDF coefficients array.
         procedure, public, pass(self) :: get_bdf_coeffs
+        !> Get simulation end time.
+        procedure, public, pass(self) :: get_end_time
         !> Shift time history for the next step.
         procedure, public, pass(self) :: shift => shift_time
         !> Display current time status to standard output.
         procedure, public, pass(self) :: display => display_status
-
         !> Set current time step size.
         procedure, public, pass(self) :: set_dt
-
         !> Check if simulation reached end time.
         procedure, public, pass(self) :: is_end_time
         procedure, public, pass(self) :: is_min_dt => is_min_dt_reached
         procedure, public, pass(self) :: is_max_dt => is_max_dt_reached
+        !> Synchronize time step with output interval.
+        procedure, public, pass(self) :: sync_with_output
+        procedure, public, pass(self) :: update => update_type_time
 
         ! --- Private Procedures ---
         !> Compute variable step BDF coefficients.
@@ -86,13 +120,10 @@ contains
     ! Initialization
     ! ==========================================================================
 
-    !> Initialize the time control object using input configuration.
-    !> Sets up initial time step, simulation period, and allocates history arrays.
+!> Initialize the time control object using input configuration.
     subroutine initialize_type_time(self, input)
         implicit none
-        !> Time control instance
         class(type_time), intent(inout) :: self
-        !> Input data structure
         type(type_input), intent(in) :: input
 
         integer(int32) :: istat
@@ -104,23 +135,19 @@ contains
         if (self%target_bdf_order > MAX_BDF_ORDER) then
             self%target_bdf_order = MAX_BDF_ORDER
         end if
-        ! Start with 1st order (Backward Euler) as no history exists
         self%current_bdf_order = 1
 
-        ! --- Time Unit Conversion ---
         associate (time_control => input%conditions%time_control)
-            time_unit = TIME_UNITS%to_object(time_control%simulation_period%unit)
+            ! --- 1. dt 関連の単位変換 (time_stepping%unit を使用) ---
+            time_unit = TIME_UNITS%to_object(time_control%time_stepping%unit)
             time_conv_coeff = time_unit%value
 
-            ! --- Set dt ---
             self%dt_s = time_control%time_stepping%initial_step * time_conv_coeff
             self%dt_s_max = time_control%time_stepping%max_step * time_conv_coeff
             self%dt_s_min = time_control%time_stepping%min_step * time_conv_coeff
 
             ! --- Allocate History ---
-            if (allocated(self%dt_s_history)) then
-                deallocate (self%dt_s_history)
-            end if
+            if (allocated(self%dt_s_history)) deallocate (self%dt_s_history)
             allocate (self%dt_s_history(self%target_bdf_order), stat=istat)
 
             if (istat == 0) then
@@ -128,23 +155,20 @@ contains
                 self%dt_s_history(1) = self%dt_s
             end if
 
-            ! --- Compute Initial Coefficients (1st Order) ---
+            ! --- Compute Initial Coefficients ---
             call self%compute_bdf_coefficients()
 
-            ! --- Simulation Period ---
-            if (input%output_settings%field_output%file_format /= "none") then
-                time_unit = TIME_UNITS%to_object(input%output_settings%field_output%output_interval_unit)
-                self%start_time = time_control%simulation_period%start * time_unit%value
-                self%end_time = time_control%simulation_period%end * time_unit%value
-            end if
-
-            ! Set initial time
+            ! --- 2. シミュレーション期間の単位変換 (simulation_period%unit を使用) ---
+            ! 出力設定に関わらず，期間は simulation_period%unit に基づいて初期化する
+            time_unit = TIME_UNITS%to_object(time_control%simulation_period%unit)
+            self%start_time = time_control%simulation_period%start * time_unit%value
+            self%end_time = time_control%simulation_period%end * time_unit%value
             self%current_time_s = self%start_time
 
+            ! --- 3. ATS の初期化を追加 ---
+            call self%ats%initialize(input, self%dt_s_min, self%dt_s_max)
         end associate
-
     end subroutine initialize_type_time
-
     ! ==========================================================================
     ! Time Stepping & BDF
     ! ==========================================================================
@@ -245,7 +269,7 @@ contains
     end subroutine compute_bdf_coefficients
 
     ! ==========================================================================
-    ! Getters
+    ! Getters & Setters
     ! ==========================================================================
 
     !> Get current simulation time (seconds) with optional unit conversion.
@@ -289,6 +313,14 @@ contains
 
         dt = self%dt_s * coeff
     end subroutine get_dt
+
+    pure subroutine get_end_time(self, end_time)
+        implicit none
+        class(type_time), intent(in) :: self
+        real(real64), intent(inout) :: end_time
+
+        end_time = self%end_time
+    end subroutine get_end_time
 
     !> Set current time step size (seconds) with optional unit conversion.
     !> If a target time unit is provided, `dt` is converted accordingly before setting.
@@ -396,5 +428,142 @@ contains
         write (unit, *)
 
     end subroutine display_status
+
+    ! ==========================================================================
+    ! ATS (Adaptive Time Stepping)
+    ! ==========================================================================
+
+    !> Initialize ATS settings.
+    subroutine initialize_type_ats(self, input, dt_min_limit, dt_max_limit)
+        implicit none
+        class(type_ats), intent(inout) :: self
+        type(type_input), intent(in) :: input
+        real(real64), intent(in) :: dt_min_limit, dt_max_limit
+
+        ! Assume ats_settings exists in the input structure and load it.
+        ! Use default values or trigger an error if not present.
+        associate (ats_config => input%conditions%time_control%adaptive_stepping)
+            self%is_active = ats_config%is_active
+
+            if (self%is_active) then
+                self%iter_min = ats_config%iter_min
+                self%iter_max = ats_config%iter_max
+                self%scale_up = ats_config%scale_up
+                self%scale_down = ats_config%scale_down
+                self%scale_retry = ats_config%scale_retry
+            end if
+        end associate
+
+        ! Store physical limits passed from the control_time side.
+        self%dt_min = dt_min_limit
+        self%dt_max = dt_max_limit
+    end subroutine initialize_type_ats
+
+    !> Check if ATS is enabled.
+    pure function is_enabled_ats(self) result(is_enabled)
+        implicit none
+        class(type_ats), intent(in) :: self
+        logical :: is_enabled
+        is_enabled = self%is_active
+    end function is_enabled_ats
+
+    !> Calculate the recommended dt for the next step after successful convergence.
+    pure subroutine predict_next_dt(self, current_dt, iter_count, next_dt)
+        implicit none
+        class(type_ats), intent(in) :: self
+        real(real64), intent(in) :: current_dt
+        integer(int32), intent(in) :: iter_count
+        real(real64), intent(inout) :: next_dt
+
+        real(real64) :: dt_temp
+
+        next_dt = current_dt
+        if (.not. self%is_active) return
+
+        if (iter_count <= self%iter_min) then
+            ! 1. Predict with scale_up and apply safety factor
+            if (self%scale_up * self%safety_factor > 1.0d0) then
+                dt_temp = current_dt * self%scale_up * self%safety_factor
+            else
+                dt_temp = current_dt * self%scale_up
+            end if
+
+            ! 2. Apply hard growth cap for BDF stability
+            ! Even if scale_up is large, we limit the ratio dt_next/dt_now
+            next_dt = min(dt_temp, current_dt * self%max_growth_rate)
+        else if (iter_count >= self%iter_max) then
+            ! Convergence is hard -> decelerate.
+            next_dt = current_dt * self%scale_down
+        end if
+
+        ! Limiters
+        next_dt = max(self%dt_min, min(next_dt, self%dt_max))
+    end subroutine predict_next_dt
+
+    !> Calculate a reduced dt for retry upon divergence.
+    pure subroutine calc_retry_dt(self, current_dt, retry_dt)
+        implicit none
+        class(type_ats), intent(in) :: self
+        real(real64), intent(in) :: current_dt
+        real(real64), intent(inout) :: retry_dt
+
+        retry_dt = current_dt
+        if (.not. self%is_active) return
+
+        retry_dt = current_dt * self%scale_retry
+
+        ! Clip to minimum allowed dt
+        if (retry_dt < self%dt_min) retry_dt = self%dt_min
+    end subroutine calc_retry_dt
+
+    !> Synchronize dt with the next output time.
+    subroutine sync_with_output(self, next_output_time)
+        implicit none
+        class(type_time), intent(inout) :: self
+        real(real64), intent(in) :: next_output_time
+
+        real(real64) :: time_to_output
+
+        ! Remaining time until the next output.
+        time_to_output = next_output_time - self%current_time_s
+
+        ! If "dt proposed by ATS" is longer than "remaining time",
+        ! shorten dt to align exactly with the output time.
+        if (self%dt_s > time_to_output .and. time_to_output > EPS_TIME) then
+
+            ! Note: exercise caution if remaining time is smaller than min_step.
+            ! (Adjustment might have been insufficient in the previous step; decide to force alignment or error.)
+            ! Determine policy: issue warning and force alignment, or ignore if too small.
+
+            self%dt_s = time_to_output
+        end if
+    end subroutine sync_with_output
+
+    !> Perform all time-related updates after a nonlinear solve attempt
+    subroutine update_type_time(self, success, iter_count, next_output_time)
+        implicit none
+        class(type_time), intent(inout) :: self
+        logical, intent(in) :: success
+        integer(int32), intent(in) :: iter_count
+        real(real64), intent(in) :: next_output_time
+        real(real64) :: next_dt
+
+        if (success) then
+            ! Step converged: advance time and predict next step
+            call self%shift()
+
+            call self%ats%predict_next_dt(self%dt_s, iter_count, next_dt)
+            self%dt_s = next_dt
+
+            ! Sync with output time (modifies dt_s if necessary)
+            call self%sync_with_output(next_output_time)
+        else
+            ! Step failed: shrink dt and reset BDF order to 1 for stability
+            call self%ats%calc_retry_dt(self%dt_s, next_dt)
+            self%dt_s = next_dt
+            self%current_bdf_order = 1
+        end if
+        call self%compute_bdf_coefficients()
+    end subroutine update_type_time
 
 end module control_time

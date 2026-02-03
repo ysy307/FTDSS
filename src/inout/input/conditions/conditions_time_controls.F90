@@ -14,6 +14,14 @@ submodule(inout_input_conditions) inout_input_conditions_time_controlss
     character(*), parameter :: min_step = "min_step"
     character(*), parameter :: max_step = "max_step"
     character(*), parameter :: boundary_condition_time_points = "boundary_condition_time_points"
+    character(*), parameter :: adaptive_stepping = "adaptive_stepping"
+    character(*), parameter :: is_active = "is_active"
+    character(*), parameter :: iter_min = "iter_min"
+    character(*), parameter :: iter_max = "iter_max"
+    character(*), parameter :: scale_up = "scale_up"
+    character(*), parameter :: scale_down = "scale_down"
+    character(*), parameter :: scale_retry = "scale_retry"
+    !!------------------------------------------------------------------------------------------------------------------------------
 
 contains
     module subroutine read_conditions_time_controls(self, json)
@@ -23,6 +31,7 @@ contains
 
         call read_conditions_time_controls_simulation_period(self, json)
         call read_conditions_time_controls_time_stepping(self, json)
+        call read_conditions_time_controls_adaptive_stepping(self, json)
         call read_conditions_time_controls_boundary_time_points(self, json)
     end subroutine read_conditions_time_controls
 
@@ -97,6 +106,38 @@ contains
             call raise_error(ERROR_CODES%VAR_INVALID, opt="In "//join(buffer(1:2))//", 'initial_step' must be between 'min_step' and 'max_step'.")
         end if
     end subroutine read_conditions_time_controls_time_stepping
+
+    subroutine read_conditions_time_controls_adaptive_stepping(self, json)
+        !> Load the adaptive time stepping parameters from the JSON file
+        implicit none
+        class(type_conditions), intent(inout) :: self
+        type(json_file), intent(inout) :: json !! JSON parser
+        character(256) :: buffer(3) = [time_controls, adaptive_stepping, ""]
+
+        buffer(3) = is_active
+        call get_json_value(json, join(buffer), self%time_control%adaptive_stepping%is_active, &
+                            is_required=.true.)
+
+        buffer(3) = iter_min
+        call get_json_value(json, join(buffer), self%time_control%adaptive_stepping%iter_min, &
+                            is_required=.true., valid_range=[1, huge(0)])
+
+        buffer(3) = iter_max
+        call get_json_value(json, join(buffer), self%time_control%adaptive_stepping%iter_max, &
+                            is_required=.true., valid_range=[1, huge(0)])
+
+        buffer(3) = scale_up
+        call get_json_value(json, join(buffer), self%time_control%adaptive_stepping%scale_up, &
+                            is_required=.true., valid_range=[1.0d0, huge(0.0d0)])
+
+        buffer(3) = scale_down
+        call get_json_value(json, join(buffer), self%time_control%adaptive_stepping%scale_down, &
+                            is_required=.true., valid_range=[epsilon(0.0d0), 1.0d0])
+
+        buffer(3) = scale_retry
+        call get_json_value(json, join(buffer), self%time_control%adaptive_stepping%scale_retry, &
+                            is_required=.true., valid_range=[epsilon(0.0d0), 1.0d0])
+    end subroutine read_conditions_time_controls_adaptive_stepping
 
     subroutine read_conditions_time_controls_boundary_time_points(self, json)
         !> Load the boundary condition time points from the JSON file
