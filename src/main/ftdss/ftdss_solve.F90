@@ -8,11 +8,19 @@ contains
 
         real(real64), pointer, contiguous, dimension(:) :: u => null()
 
+        ! 1. 反復管理のリセット
+        !    reset() は設定が NONE の場合に計算用も NONE にする可能性があります．
         call self%controls%iteration%reset()
+
+        ! [重要] 計算用ソルバーは常に PICARD か NEWTON でなければなりません．
+        ! 設定が NONE (線形) の場合でも，離散化定式化としては Picard を使用するため，
+        ! ここで明示的に PICARD をセットして reset の状態を上書きします．
+        call self%controls%iteration%set_nonlinear_solver(NONLINEAR_SOLVER%PICARD)
 
         call self%controls%iteration%increment_total()
         call self%controls%aitken%reset()
 
+        ! 2. 前ステップの値の保存 (Previous <- Current)
         call self%porosity%get_previous(u)
         if (associated(u)) then
             call self%porosity%set_current(u)
@@ -34,8 +42,6 @@ contains
                 nullify (u)
             end if
         end if
-
-        call self%controls%iteration%set_nonlinear_solver(NONLINEAR_SOLVER%PICARD)
 
     end subroutine solve_time_step_initial_setup_ftdss
 
@@ -75,11 +81,13 @@ contains
         logical :: should_switch = .true.
         logical, parameter :: diverged = .true.
 
-        logical :: is_newton, is_picard
+        logical :: is_compute_newton, is_compute_picard, is_config_none
 
-        ! 現在の計算用ソルバー設定を取得 (Active Solver)
-        is_newton = self%controls%iteration%is_newton()
-        is_picard = self%controls%iteration%is_picard()
+        ! 計算用(Dynamic)の状態を取得
+        is_compute_newton = self%controls%iteration%is_compute_newton()
+        is_compute_picard = self%controls%iteration%is_compute_picard()
+        ! 設定(Static)がNONEかどうかも取得しておく
+        is_config_none    = self%controls%iteration%is_none()
 
         ! ----------------------------------------------------------------------
         ! Thermal Convergence Check
@@ -92,15 +100,17 @@ contains
                 write (*, *) "Error: NaN detected in thermal variables during convergence check."
                 call self%controls%iteration%set_diverged(PHYSICS_TYPES%THERMAL, diverged)
             else
+                ! 設定がNONEの場合は iteration モジュール内で即時 True が返されるため問題なし
                 call self%controls%iteration%check_convergence(PHYSICS_TYPES%THERMAL, residual, increment)
             end if
 
-            ! note: 元のコードの if (is_picard .or. is_newton) ... else if (is_picard) は
-            !       Picard時に最初のブロック(空)に入りAitkenが呼ばれないため修正しました．
-            if (is_picard) then
+            ! Aitken緩和チェック
+            ! 計算用がPicard であっても，設定が NONE の場合は緩和計算(reflect側)が行われない(omega=1.0)ため，
+            ! ここでのチェックは不要(かつ誤検知の元)なのでスキップする．
+            if (is_compute_picard .and. .not. is_config_none) then
                 if (self%controls%aitken%reach_min_relaxation(PHYSICS_TYPES%THERMAL)) then
                     write (*, *) "Warning: Relaxation factor too small. Stagnation detected."
-                    call self%controls%iteration%set_diverged(PHYSICS_TYPES%THERMAL, diverged) ! 即時撤退させる
+                    call self%controls%iteration%set_diverged(PHYSICS_TYPES%THERMAL, diverged)
                 end if
             end if
         end if
@@ -119,36 +129,29 @@ contains
                 call self%controls%iteration%check_convergence(PHYSICS_TYPES%HYDRAULIC, residual, increment)
             end if
 
-            if (is_picard) then
+            if (is_compute_picard .and. .not. is_config_none) then
                 if (self%controls%aitken%reach_min_relaxation(PHYSICS_TYPES%HYDRAULIC)) then
                     write (*, *) "Warning: Relaxation factor too small. Stagnation detected."
-                    call self%controls%iteration%set_diverged(PHYSICS_TYPES%HYDRAULIC, diverged) ! 即時撤退させる
+                    call self%controls%iteration%set_diverged(PHYSICS_TYPES%HYDRAULIC, diverged)
                 end if
             end if
         end if
 
         ! ----------------------------------------------------------------------
-        ! 2. [追加] Hybrid法 切り替え判定 (Residual Check)
-        !    Picardモードで，残差が十分小さくなったらNewtonへ切り替える
-        !    reset_nonlinearで初期状態がPicardになっているため，ここで条件を満たせばActiveをNewtonに変更する
+        ! 2. Hybrid法 切り替え判定
+        !    設定が NONE (線形) の場合は切り替えを行わない
         ! ----------------------------------------------------------------------
         call self%controls%iteration%get_nonlinear_iter(iter)
 
-        ! まだ発散しておらず，かつ現在の計算モードがPicardの場合のみチェック
         if (iter > 1 .and. .not. self%controls%iteration%has_diverged()) then
-            if (self%controls%iteration%is_picard()) then
+            if (is_compute_picard .and. .not. is_config_none) then
                 should_switch = .true.
 
                 ! Thermal Residual Check
                 if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
                     current_norm = 0.0d0
-                    ! 直前の check_convergence で計算された最新の残差ノルムを取得
                     call self%controls%iteration%get_current_residual_norm(PHYSICS_TYPES%THERMAL, NORM_TYPES%LINF, current_norm)
-
-                    ! [推奨] デバッグ出力: 熱の残差状況を表示
-                    write (*, '("    [Picard Check] Thermal |R|_inf: ", ES10.3, " / Threshold: ", ES10.3)') &
-                        current_norm, switch_norm(PHYSICS_TYPES%THERMAL%id)
-
+                    ! [Debug output skipped]
                     if (current_norm > switch_norm(PHYSICS_TYPES%THERMAL%id)) then
                         should_switch = .false.
                     end if
@@ -158,20 +161,15 @@ contains
                 if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
                     current_norm = 0.0d0
                     call self%controls%iteration%get_current_residual_norm(PHYSICS_TYPES%HYDRAULIC, NORM_TYPES%LINF, current_norm)
-
                     if (current_norm > switch_norm(PHYSICS_TYPES%HYDRAULIC%id)) then
                         should_switch = .false.
                     end if
                 end if
 
-                ! Switch Logic
                 if (should_switch) then
                     write (*, '("   -> Residual small enough. Switching to Newton-Raphson.")')
-                    ! ここで計算用ソルバータイプをNewtonに変更する．
-                    ! 次の反復(solve_nonlinear_step等)からは is_newton() がTrueになる．
                     call self%controls%iteration%set_nonlinear_solver(NONLINEAR_SOLVER%NEWTON)
                 end if
-
             end if
         end if
 
@@ -185,19 +183,19 @@ contains
         class(type_ftdss), intent(inout) :: self
         logical, intent(inout) :: is_step_converged
         logical :: prescribe_bc
+        
         is_step_converged = .false.
 
-        ! 1. 初期化セットアップ
+        ! 1. 初期化セットアップ (ここで計算用ソルバーは必ず PICARD に設定される)
         call self%solve_time_step_initial_setup()
 
-        ! 2. 非線形反復ループ（Newtonループ）
-        !    収束判定は check_convergence で状態を更新し、ここ(should_continue)で抜ける
+        ! 2. 非線形反復ループ
         nonlinear: do while (self%controls%iteration%should_continue())
 
-            ! 2.1 セットアップ (iter更新, BCフラグ設定, 勾配計算など)
+            ! 2.1 セットアップ (iter更新)
             call self%solve_time_step_setup(prescribe_bc)
 
-            ! 2.2 行列・残差のアセンブル
+            ! 2.2 行列・残差のアセンブル (compute_type=PICARD なので正しく動作する)
             call self%assemble()
 
             ! 2.3 境界条件の適用
@@ -207,10 +205,16 @@ contains
             call self%solve()
 
             ! 2.5 収束判定
+            !     設定が NONE なら常に is_converged = .true. となる
             call self%solve_time_step_check_convergence()
 
-            ! 2.6 解の更新 (U <= U + delta)
+            ! 2.6 解の更新
+            !     設定が NONE なら reflect 内で omega=1.0 となる(Aitken無効化)
             call self%reflect_variables()
+
+            ! [追加] 設定(Static)が NONE の場合は，1回の計算でループを強制終了する
+            ! 計算用変数が PICARD であっても，ここで抜けることで線形計算を実現する
+            if (self%controls%iteration%is_none()) exit nonlinear
 
         end do nonlinear
 
@@ -222,7 +226,6 @@ contains
         class(type_ftdss), intent(inout) :: self
 
         logical :: is_step_converged
-        real(real64) :: current_dt, next_dt
 
         ! 終了時刻までループ
         time_loop: do while (.not. self%controls%is_end_time())
@@ -242,15 +245,10 @@ contains
                 call self%output_fields()
                 call self%output_history()
             else
-                ! ! ==============================================================
-                ! ! [失敗] やり直し処理 (リトライ)
-                ! ! ==============================================================
+                ! [失敗] やり直し処理
                 write (*, '("   [WARNING] Step Failed. Retrying with smaller dt...")')
-
                 call self%controls%update(is_step_converged)
-                ! ! C. ループの先頭に戻って再計算 (cycle)
                 cycle time_loop
-
             end if
 
         end do time_loop

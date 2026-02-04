@@ -12,9 +12,9 @@ contains
         type(type_matrix_dense), intent(inout), optional :: K_TH
         type(type_vector_dp), intent(inout), optional :: F_T
 
-        if (controls%iteration%is_newton()) then
+        if (controls%iteration%is_compute_newton()) then
             call self%assemble_local_newton(controls, workspace, K_TT, K_TH, F_T)
-        else if (controls%iteration%is_picard()) then
+        else if (controls%iteration%is_compute_picard()) then
             call self%assemble_local_picard(controls, workspace, K_TT, K_TH, F_T)
         end if
 

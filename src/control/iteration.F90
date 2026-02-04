@@ -131,8 +131,12 @@ module control_iteration
         procedure, public, pass(self) :: get_nonlinear_solver => get_nonlinear_type_iteration
         procedure, public, pass(self) :: set_nonlinear_solver => set_nonlinear_type_iteration
 
+        procedure, public, pass(self) :: is_compute_newton => is_compute_newton_method_iteration
+        procedure, public, pass(self) :: is_compute_picard => is_compute_picard_method_iteration
+        procedure, public, pass(self) :: is_compute_none => is_compute_none_method_iteration
         procedure, public, pass(self) :: is_newton => is_newton_method_iteration
         procedure, public, pass(self) :: is_picard => is_picard_method_iteration
+        procedure, public, pass(self) :: is_none => is_none_method_iteration
     end type type_iteration
 
 contains
@@ -621,22 +625,64 @@ contains
 
     !> Returns true if the ACTIVE solver is Newton-Raphson
     !> (Returns false if solver is NONE)
-    pure function is_newton_method_iteration(self) result(is_newton)
+    pure function is_compute_newton_method_iteration(self) result(is_newton)
+        implicit none
         class(type_iteration), intent(in) :: self
         logical :: is_newton
 
         is_newton = (self%compute_nonlinear_solver_type == NONLINEAR_SOLVER%NEWTON .or. &
                      self%compute_nonlinear_solver_type == NONLINEAR_SOLVER%MODIFIED_NEWTON)
-    end function is_newton_method_iteration
+    end function is_compute_newton_method_iteration
 
     !> Returns true if the ACTIVE solver is Picard
     !> (Returns false if solver is NONE)
-    pure function is_picard_method_iteration(self) result(is_picard)
+    pure function is_compute_picard_method_iteration(self) result(is_picard)
+        implicit none
         class(type_iteration), intent(in) :: self
         logical :: is_picard
 
         is_picard = (self%compute_nonlinear_solver_type == NONLINEAR_SOLVER%PICARD .or. &
                      self%compute_nonlinear_solver_type == NONLINEAR_SOLVER%MODIFIED_PICARD)
+    end function is_compute_picard_method_iteration
+
+    !> Returns true if the ACTIVE solver is Newton-Raphson
+    !> (Returns false if solver is NONE)
+    pure function is_newton_method_iteration(self) result(is_newton)
+        implicit none
+        class(type_iteration), intent(in) :: self
+        logical :: is_newton
+
+        is_newton = (self%nonlinear_solver_type == NONLINEAR_SOLVER%NEWTON .or. &
+                     self%nonlinear_solver_type == NONLINEAR_SOLVER%MODIFIED_NEWTON)
+    end function is_newton_method_iteration
+
+    !> Returns true if the ACTIVE solver is Picard
+    !> (Returns false if solver is NONE)
+    pure function is_picard_method_iteration(self) result(is_picard)
+        implicit none
+        class(type_iteration), intent(in) :: self
+        logical :: is_picard
+
+        is_picard = (self%nonlinear_solver_type == NONLINEAR_SOLVER%PICARD .or. &
+                     self%nonlinear_solver_type == NONLINEAR_SOLVER%MODIFIED_PICARD)
     end function is_picard_method_iteration
+
+    !> Returns true if the ACTIVE solver is NONE
+    pure function is_compute_none_method_iteration(self) result(is_none)
+        implicit none
+        class(type_iteration), intent(in) :: self
+        logical :: is_none
+
+        is_none = (self%compute_nonlinear_solver_type == NONLINEAR_SOLVER%NONE)
+    end function is_compute_none_method_iteration
+
+    !> Returns true if the ACTIVE solver is NONE
+    pure function is_none_method_iteration(self) result(is_none)
+        implicit none
+        class(type_iteration), intent(in) :: self
+        logical :: is_none
+
+        is_none = (self%nonlinear_solver_type == NONLINEAR_SOLVER%NONE)
+    end function is_none_method_iteration
 
 end module control_iteration

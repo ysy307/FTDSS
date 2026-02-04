@@ -336,7 +336,7 @@ contains
         real(real64), allocatable :: du(:)
 
         real(real64) :: relaxation_factor
-        logical :: is_newton, is_picard
+        logical :: is_none
 
         call self%controls%profiler%start("Setup")
 
@@ -345,14 +345,14 @@ contains
         call self%controls%time%get_bdf_coeffs(bdf_coeffs)
         call self%controls%time%get_bdf_order(bdf_order)
 
-        is_newton = self%controls%iteration%is_newton()
-        is_picard = self%controls%iteration%is_picard()
+        is_none = self%controls%iteration%is_none()
+
 
         if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du)
             call self%temperature%get_current(current)
             if (associated(current)) then
-                if (is_newton .or. is_picard) then
+                if (.not. is_none) then
                     if (iter > 1) then
                         call self%controls%aitken%compute_relaxation(PHYSICS_TYPES%THERMAL, du)
                     end if
@@ -363,7 +363,7 @@ contains
                 end if
                 current(:) = current(:) + relaxation_factor * du(:)
                 call self%temperature%set_delta(relaxation_factor * du(:))
-                if (is_newton .or. is_picard) then
+                if (.not. is_none) then
                     call self%controls%aitken%set_du(PHYSICS_TYPES%THERMAL, du)
                 end if
             end if
