@@ -53,7 +53,7 @@ contains
     !>
     !> @brief Calculate ice content based on thermodynamic state.
     !>
-    pure elemental subroutine calc_ice_content(self, state, ice_content)
+    subroutine calc_ice_content(self, state, ice_content)
         implicit none
         class(type_fusion), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -96,7 +96,7 @@ contains
     !>
     !> @brief Calculate derivatives of ice content w.r.t pressure and temperature.
     !>
-    pure elemental subroutine calc_ice_content_derivatives(self, state, dice_dP, dice_dT)
+    subroutine calc_ice_content_derivatives(self, state, dice_dP, dice_dT)
         implicit none
         class(type_fusion), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -183,7 +183,7 @@ contains
     !>
     !> @brief Calculate liquid water content based on thermodynamic state.
     !>
-    pure elemental subroutine calc_water_content(self, state, water_content)
+    subroutine calc_water_content(self, state, water_content)
         implicit none
         class(type_fusion), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -211,7 +211,7 @@ contains
     !>
     !> @brief Calculate derivatives of liquid water content w.r.t pressure and temperature.
     !>
-    pure elemental subroutine calc_water_content_derivatives(self, state, dwater_dP, dwater_dT)
+    subroutine calc_water_content_derivatives(self, state, dwater_dP, dwater_dT)
         implicit none
         class(type_fusion), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -268,7 +268,7 @@ contains
     !>
     !> @brief Calculate derivative of ice pressure w.r.t water pressure.
     !>
-    pure elemental subroutine deriv_pressure_ice_water(self, state, deriv)
+    subroutine deriv_pressure_ice_water(self, state, deriv)
         implicit none
         class(type_fusion), intent(in) :: self
         type(type_state), intent(in) :: state

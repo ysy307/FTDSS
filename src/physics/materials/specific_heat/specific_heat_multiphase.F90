@@ -1,7 +1,7 @@
 submodule(physics_materials_specific_heat) specific_heat_multiphase
     implicit none
 contains
-    module pure elemental subroutine calc_sph_gp_1phase(self, state, specific_heat)
+    module subroutine calc_sph_gp_1phase(self, state, specific_heat)
         implicit none
         class(type_sph_1phase), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -10,7 +10,7 @@ contains
         specific_heat = self%material1
     end subroutine calc_sph_gp_1phase
 
-    module pure elemental subroutine calc_sph_gp_2phase(self, state, specific_heat)
+    module subroutine calc_sph_gp_2phase(self, state, specific_heat)
         implicit none
         class(type_sph_2phase), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -26,7 +26,7 @@ contains
         call calc_sph_2(self%material1, phi1, sph_water, phi2, specific_heat)
     end subroutine calc_sph_gp_2phase
 
-    module pure elemental subroutine calc_sph_gp_3phase(self, state, specific_heat)
+    module subroutine calc_sph_gp_3phase(self, state, specific_heat)
         implicit none
         class(type_sph_3phase), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -43,7 +43,7 @@ contains
         call calc_sph_3(self%material1, phi1, sph_water, phi2, sph_ice, phi3, specific_heat)
     end subroutine calc_sph_gp_3phase
 
-    module pure elemental subroutine calc_sph_gp_4phase(self, state, specific_heat)
+    module subroutine calc_sph_gp_4phase(self, state, specific_heat)
         implicit none
         class(type_sph_4phase), intent(in) :: self
         type(type_state), intent(in) :: state

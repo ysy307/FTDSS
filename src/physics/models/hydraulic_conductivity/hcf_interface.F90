@@ -98,7 +98,7 @@ module physics_models_hcf
     end type type_hcf_vapor
 
     interface
-        module pure elemental subroutine calc_diffusivity_vapor_in_air(self, temperature, Da)
+        module subroutine calc_diffusivity_vapor_in_air(self, temperature, Da)
             implicit none
             class(type_hcf_vapor), intent(in) :: self
             real(real64), intent(in) :: temperature
@@ -106,7 +106,7 @@ module physics_models_hcf
 
         end subroutine calc_diffusivity_vapor_in_air
 
-        module pure elemental subroutine calc_tortuosity_factor_vapor(self, Qa, Qs, tau)
+        module subroutine calc_tortuosity_factor_vapor(self, Qa, Qs, tau)
             implicit none
             class(type_hcf_vapor), intent(in) :: self
             real(real64), intent(in) :: Qa
@@ -115,7 +115,7 @@ module physics_models_hcf
 
         end subroutine calc_tortuosity_factor_vapor
 
-        module pure elemental subroutine calc_enhancement_factor_vapor(self, Qw, Qs, fc, eta)
+        module subroutine calc_enhancement_factor_vapor(self, Qw, Qs, fc, eta)
             implicit none
             class(type_hcf_vapor), intent(in) :: self
             real(real64), intent(in) :: Qw
@@ -125,7 +125,7 @@ module physics_models_hcf
 
         end subroutine calc_enhancement_factor_vapor
 
-        module pure elemental subroutine calc_Kvh_vapor(self, state, Kvh)
+        module subroutine calc_Kvh_vapor(self, state, Kvh)
             implicit none
             class(type_hcf_vapor), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -133,7 +133,7 @@ module physics_models_hcf
 
         end subroutine calc_Kvh_vapor
 
-        module pure elemental subroutine calc_KvT_vapor(self, state, KvT)
+        module subroutine calc_KvT_vapor(self, state, KvT)
             implicit none
             class(type_hcf_vapor), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -169,7 +169,7 @@ module physics_models_hcf
 
         end subroutine initialize_abst_hcf
 
-        module pure elemental subroutine calc_KlT_hcf(self, state, KlT)
+        module subroutine calc_KlT_hcf(self, state, KlT)
             implicit none
             class(abst_hcf), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -177,7 +177,7 @@ module physics_models_hcf
 
         end subroutine calc_KlT_hcf
 
-        module pure elemental subroutine calc_Kvh_hcf(self, state, Kvh)
+        module subroutine calc_Kvh_hcf(self, state, Kvh)
             implicit none
             class(abst_hcf), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -185,7 +185,7 @@ module physics_models_hcf
 
         end subroutine calc_Kvh_hcf
 
-        module pure elemental subroutine calc_KvT_hcf(self, state, KvT)
+        module subroutine calc_KvT_hcf(self, state, KvT)
             implicit none
             class(abst_hcf), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -202,7 +202,7 @@ module physics_models_hcf
     end interface
 
     abstract interface
-        pure elemental subroutine abst_calc_Kflh(self, state, Kflh)
+        subroutine abst_calc_Kflh(self, state, Kflh)
             import :: abst_hcf, type_state, real64
             implicit none
             class(abst_hcf), intent(in) :: self
@@ -248,7 +248,7 @@ module physics_models_hcf
     end type type_hcf_base_impedance_viscosity
 
     interface
-        module pure elemental subroutine calc_Kflh_base(self, state, Kflh)
+        module subroutine calc_Kflh_base(self, state, Kflh)
             implicit none
             class(type_hcf_base), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -256,7 +256,7 @@ module physics_models_hcf
 
         end subroutine calc_Kflh_base
 
-        module pure elemental subroutine calc_Kflh_impedance(self, state, Kflh)
+        module subroutine calc_Kflh_impedance(self, state, Kflh)
             implicit none
             class(type_hcf_impedance), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -264,7 +264,7 @@ module physics_models_hcf
 
         end subroutine calc_Kflh_impedance
 
-        module pure elemental subroutine calc_Kflh_viscosity(self, state, Kflh)
+        module subroutine calc_Kflh_viscosity(self, state, Kflh)
             implicit none
             class(type_hcf_viscosity), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -272,7 +272,7 @@ module physics_models_hcf
 
         end subroutine calc_Kflh_viscosity
 
-        module pure elemental subroutine calc_Kflh_base_impedance(self, state, Kflh)
+        module subroutine calc_Kflh_base_impedance(self, state, Kflh)
             implicit none
             class(type_hcf_base_impedance), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -280,7 +280,7 @@ module physics_models_hcf
 
         end subroutine calc_Kflh_base_impedance
 
-        module pure elemental subroutine calc_Kflh_base_viscosity(self, state, Kflh)
+        module subroutine calc_Kflh_base_viscosity(self, state, Kflh)
             implicit none
             class(type_hcf_base_viscosity), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -288,7 +288,7 @@ module physics_models_hcf
 
         end subroutine calc_Kflh_base_viscosity
 
-        module pure elemental subroutine calc_Kflh_impedance_viscosity(self, state, Kflh)
+        module subroutine calc_Kflh_impedance_viscosity(self, state, Kflh)
             implicit none
             class(type_hcf_impedance_viscosity), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -296,7 +296,7 @@ module physics_models_hcf
 
         end subroutine calc_Kflh_impedance_viscosity
 
-        module pure elemental subroutine calc_Kflh_base_impedance_viscosity(self, state, Kflh)
+        module subroutine calc_Kflh_base_impedance_viscosity(self, state, Kflh)
             implicit none
             class(type_hcf_base_impedance_viscosity), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -314,7 +314,7 @@ module physics_models_hcf
     end type abst_hcf_base
 
     abstract interface
-        pure elemental subroutine abst_calc_base_kr(self, h, kr)
+        subroutine abst_calc_base_kr(self, h, kr)
             import :: abst_hcf_base, type_hcf_params, real64
             implicit none
             class(abst_hcf_base), intent(in) :: self
@@ -355,7 +355,7 @@ module physics_models_hcf
     end type type_hcf_base_dvgch
 
     interface
-        module pure elemental subroutine calc_kr_base_bc(self, h, kr)
+        module subroutine calc_kr_base_bc(self, h, kr)
             implicit none
             class(type_hcf_base_bc), intent(in) :: self
             real(real64), intent(in) :: h
@@ -363,7 +363,7 @@ module physics_models_hcf
 
         end subroutine calc_kr_base_bc
 
-        module pure elemental subroutine calc_kr_base_vg(self, h, kr)
+        module subroutine calc_kr_base_vg(self, h, kr)
             implicit none
             class(type_hcf_base_vg), intent(in) :: self
             real(real64), intent(in) :: h
@@ -371,7 +371,7 @@ module physics_models_hcf
 
         end subroutine calc_kr_base_vg
 
-        module pure elemental subroutine calc_kr_base_ko(self, h, kr)
+        module subroutine calc_kr_base_ko(self, h, kr)
             implicit none
             class(type_hcf_base_ko), intent(in) :: self
             real(real64), intent(in) :: h
@@ -379,7 +379,7 @@ module physics_models_hcf
 
         end subroutine calc_kr_base_ko
 
-        module pure elemental subroutine calc_kr_base_mvg(self, h, kr)
+        module subroutine calc_kr_base_mvg(self, h, kr)
             implicit none
             class(type_hcf_base_mvg), intent(in) :: self
             real(real64), intent(in) :: h
@@ -387,7 +387,7 @@ module physics_models_hcf
 
         end subroutine calc_kr_base_mvg
 
-        module pure elemental subroutine calc_kr_base_durner(self, h, kr)
+        module subroutine calc_kr_base_durner(self, h, kr)
             implicit none
             class(type_hcf_base_durner), intent(in) :: self
             real(real64), intent(in) :: h
@@ -395,7 +395,7 @@ module physics_models_hcf
 
         end subroutine calc_kr_base_durner
 
-        module pure elemental subroutine calc_kr_base_dvgch(self, h, kr)
+        module subroutine calc_kr_base_dvgch(self, h, kr)
             implicit none
             class(type_hcf_base_dvgch), intent(in) :: self
             real(real64), intent(in) :: h
@@ -417,7 +417,7 @@ module physics_models_hcf
     end type type_hcf_impedance_exp
 
     abstract interface
-        pure elemental subroutine abst_calc_impedance_kr(self, Qice, kr)
+        subroutine abst_calc_impedance_kr(self, Qice, kr)
             import :: abst_hcf_impedance, real64
             implicit none
             class(abst_hcf_impedance), intent(in) :: self
@@ -428,7 +428,7 @@ module physics_models_hcf
     end interface
 
     interface
-        module pure elemental subroutine calc_impedance_exp(self, Qice, kr)
+        module subroutine calc_impedance_exp(self, Qice, kr)
             implicit none
             class(type_hcf_impedance_exp), intent(in) :: self
             real(real64), intent(in) :: Qice
@@ -457,7 +457,7 @@ module physics_models_hcf
     end interface
 
     abstract interface
-        pure elemental subroutine abst_calc_mu(self, temperature, mu)
+        subroutine abst_calc_mu(self, temperature, mu)
             import :: abst_hcf_viscosity, real64
             implicit none
             class(abst_hcf_viscosity), intent(in) :: self
@@ -468,7 +468,7 @@ module physics_models_hcf
     end interface
 
     interface
-        module pure elemental subroutine calc_kr_abst_hcf_viscosity(self, temperature, kr)
+        module subroutine calc_kr_abst_hcf_viscosity(self, temperature, kr)
             import :: abst_hcf_viscosity, real64
             implicit none
             class(abst_hcf_viscosity), intent(in) :: self
@@ -490,7 +490,7 @@ module physics_models_hcf
 
     interface
 
-        module pure elemental subroutine calc_mu_exponential(self, temperature, mu)
+        module subroutine calc_mu_exponential(self, temperature, mu)
             implicit none
             class(type_hcf_viscosity_exp), intent(in) :: self
             real(real64), intent(in) :: temperature
@@ -498,7 +498,7 @@ module physics_models_hcf
 
         end subroutine calc_mu_exponential
 
-        module pure elemental subroutine calc_mu_exponential_supercooled(self, temperature, mu)
+        module subroutine calc_mu_exponential_supercooled(self, temperature, mu)
             implicit none
             class(type_hcf_viscosity_supercool), intent(in) :: self
             real(real64), intent(in) :: temperature
@@ -506,7 +506,7 @@ module physics_models_hcf
 
         end subroutine calc_mu_exponential_supercooled
 
-        module pure elemental subroutine calc_viscosity_exp(self, temperature, kr)
+        module subroutine calc_viscosity_exp(self, temperature, kr)
             implicit none
             class(type_hcf_viscosity_exp), intent(in) :: self
             real(real64), intent(in) :: temperature
@@ -514,7 +514,7 @@ module physics_models_hcf
 
         end subroutine calc_viscosity_exp
 
-        module pure elemental subroutine calc_viscosity_supercool(self, temperature, kr)
+        module subroutine calc_viscosity_supercool(self, temperature, kr)
             implicit none
             class(type_hcf_viscosity_supercool), intent(in) :: self
             real(real64), intent(in) :: temperature

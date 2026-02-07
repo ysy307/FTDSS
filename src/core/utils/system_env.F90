@@ -17,17 +17,19 @@ contains
     !> In an MPI environment, rank 0 reads the variable, which is then broadcast
     !> to all other ranks to ensure consistency.
     !>
-    subroutine get_env_string(env_var_name, value)
+    subroutine get_env_string(env_var_name, value, status)
         implicit none
         !> The name of the environment variable to retrieve.
         character(len=*), intent(in) :: env_var_name
         !> The retrieved value of the environment variable. An empty string is
         !> returned if the variable is not set or is empty.
         character(len=:), allocatable, intent(inout) :: value
+        !> Status code: 0 if successful, non-zero otherwise.
+        integer(int32), intent(inout), optional :: status
 
         character(len=2048) :: buffer
         integer(int32) :: nulpos
-        integer(int32) :: status
+        integer(int32) :: stat
 #ifdef _MPI
         integer(int32) :: my_rank, ierr
 
@@ -39,9 +41,11 @@ contains
 #ifdef _MPI
         if (my_rank == 0) then
 #endif
-            call get_environment_variable(env_var_name, buffer, status=status)
-            if (status /= 0) then
-                error stop 'Error retrieving environment variable: '//trim(env_var_name)
+            call get_environment_variable(env_var_name, buffer, status=stat)
+            if (stat /= 0) then
+                buffer = ''
+                if (present(status)) status = stat
+                return
             end if
 #ifdef _MPI
         end if

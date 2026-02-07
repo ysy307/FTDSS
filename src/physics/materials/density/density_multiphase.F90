@@ -1,7 +1,7 @@
 submodule(physics_materials_density) density_multiphase
     implicit none
 contains
-    module pure elemental subroutine calc_den_gp_1phase(self, state, density)
+    module subroutine calc_den_gp_1phase(self, state, density)
         implicit none
         class(type_den_1phase), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -10,7 +10,7 @@ contains
         density = self%material1
     end subroutine calc_den_gp_1phase
 
-    module pure elemental subroutine calc_den_gp_2phase(self, state, density)
+    module subroutine calc_den_gp_2phase(self, state, density)
         implicit none
         class(type_den_2phase), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -25,7 +25,7 @@ contains
         call calc_den_2(self%material1, phi1, density_water, phi2, density)
     end subroutine calc_den_gp_2phase
 
-    module pure elemental subroutine calc_den_gp_3phase(self, state, density)
+    module subroutine calc_den_gp_3phase(self, state, density)
         implicit none
         class(type_den_3phase), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -42,7 +42,7 @@ contains
         call calc_den_3(self%material1, phi1, density_water, phi2, density_ice, phi3, density)
     end subroutine calc_den_gp_3phase
 
-    module pure elemental subroutine calc_den_gp_4phase(self, state, density)
+    module subroutine calc_den_gp_4phase(self, state, density)
         implicit none
         class(type_den_4phase), intent(in) :: self
         type(type_state), intent(in) :: state

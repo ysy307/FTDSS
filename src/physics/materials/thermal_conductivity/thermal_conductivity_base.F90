@@ -56,7 +56,7 @@ contains
 
     end subroutine initialize_holder_thcs
 
-    module pure elemental subroutine reset_thc_dispersivity(self)
+    module subroutine reset_thc_dispersivity(self)
         implicit none
         class(type_thc_dispersivity), intent(inout) :: self
 
@@ -69,8 +69,8 @@ contains
 
     end subroutine reset_thc_dispersivity
 
-    module pure elemental subroutine calc_thc_2(lambda_soil, phi_soil, &
-                                                lambda_water, phi_water, lambda)
+    module subroutine calc_thc_2(lambda_soil, phi_soil, &
+                                 lambda_water, phi_water, lambda)
         implicit none
         real(real64), intent(in) :: lambda_soil
         real(real64), intent(in) :: phi_soil
@@ -83,9 +83,9 @@ contains
 
     end subroutine calc_thc_2
 
-    module pure elemental subroutine calc_thc_3(lambda_soil, phi_soil, &
-                                                lambda_water, phi_water, &
-                                                lambda_ice, phi_ice, lambda)
+    module subroutine calc_thc_3(lambda_soil, phi_soil, &
+                                 lambda_water, phi_water, &
+                                 lambda_ice, phi_ice, lambda)
         implicit none
         real(real64), intent(in) :: lambda_soil
         real(real64), intent(in) :: phi_soil
@@ -101,10 +101,10 @@ contains
 
     end subroutine calc_thc_3
 
-    module pure elemental subroutine calc_thc_4(lambda_soil, phi_soil, &
-                                                lambda_water, phi_water, &
-                                                lambda_ice, phi_ice, &
-                                                lambda_vapor, phi_vapor, lambda)
+    module subroutine calc_thc_4(lambda_soil, phi_soil, &
+                                 lambda_water, phi_water, &
+                                 lambda_ice, phi_ice, &
+                                 lambda_vapor, phi_vapor, lambda)
         implicit none
         real(real64), intent(in) :: lambda_soil
         real(real64), intent(in) :: phi_soil
@@ -123,7 +123,7 @@ contains
 
     end subroutine calc_thc_4
 
-    module pure elemental subroutine calc_thc_4_vadoze(A, B, C, D, F1, F2, phi_water, phi_ice, phi_vapor, lambda)
+    module subroutine calc_thc_4_vadoze(A, B, C, D, F1, F2, phi_water, phi_ice, phi_vapor, lambda)
         implicit none
         real(real64), intent(in) :: A, B, C, D
         real(real64), intent(in) :: F1, F2
@@ -140,7 +140,7 @@ contains
 
     end subroutine calc_thc_4_vadoze
 
-    module pure elemental subroutine calc_lambda_dispersivity_abst_thc(self, lambda_0, htc_water, q_x, q_y, q_z, lambda)
+    module subroutine calc_lambda_dispersivity_abst_thc(self, lambda_0, htc_water, q_x, q_y, q_z, lambda)
         implicit none
         class(abst_thc), intent(in) :: self
         real(real64), intent(in) :: lambda_0

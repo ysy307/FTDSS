@@ -2,7 +2,7 @@ submodule(physics_materials_thermal_conductivity) thermal_conductivity_multiphas
     implicit none
 contains
 
-    module pure elemental subroutine calc_thc_gp_1phase(self, state, lambda)
+    module subroutine calc_thc_gp_1phase(self, state, lambda)
         implicit none
         class(type_thc_1phase), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -12,23 +12,23 @@ contains
 
     end subroutine calc_thc_gp_1phase
 
-    module pure elemental subroutine calc_thc_dispersivity_gp_1phase(self, state, lambda)
+    module subroutine calc_thc_dispersivity_gp_1phase(self, state, lambda)
         implicit none
         class(type_thc_1phase), intent(in) :: self
         type(type_state), intent(in) :: state
         type(type_thc_dispersivity), intent(inout) :: lambda
 
         real(real64) :: lambda_0
-        type(type_coordinate_dp) :: water_flux
+        type(type_coordinate_dp), pointer :: water_flux
 
-        call state%water_flux%get(water_flux)
+        call state%get(water_flux=water_flux)
 
         call self%calc(state, lambda_0)
         call self%calc_lambda_dispersivity(lambda_0, 0.0d0, water_flux%x, water_flux%y, water_flux%z, lambda)
 
     end subroutine calc_thc_dispersivity_gp_1phase
 
-    module pure elemental subroutine calc_thc_gp_2phase(self, state, lambda)
+    module subroutine calc_thc_gp_2phase(self, state, lambda)
         implicit none
         class(type_thc_2phase), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -42,18 +42,18 @@ contains
 
     end subroutine calc_thc_gp_2phase
 
-    module pure elemental subroutine calc_thc_dispersivity_gp_2phase(self, state, lambda)
+    module subroutine calc_thc_dispersivity_gp_2phase(self, state, lambda)
         implicit none
         class(type_thc_2phase), intent(in) :: self
         type(type_state), intent(in) :: state
         type(type_thc_dispersivity), intent(inout) :: lambda
 
         real(real64) :: lambda_0
-        type(type_coordinate_dp) :: water_flux
+        type(type_coordinate_dp), pointer :: water_flux
 
         real(real64) :: htc_water, rho_water, cp_water
 
-        call state%water_flux%get(water_flux)
+        call state%get(water_flux=water_flux)
 
         call self%calc_water_density(state, rho_water)
         call self%calc_water_cp(state, cp_water)
@@ -64,7 +64,7 @@ contains
 
     end subroutine calc_thc_dispersivity_gp_2phase
 
-    module pure elemental subroutine calc_thc_gp_3phase(self, state, lambda)
+    module subroutine calc_thc_gp_3phase(self, state, lambda)
         implicit none
         class(type_thc_3phase), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -78,28 +78,28 @@ contains
 
     end subroutine calc_thc_gp_3phase
 
-    module pure elemental subroutine calc_thc_dispersivity_gp_3phase(self, state, lambda)
+    module subroutine calc_thc_dispersivity_gp_3phase(self, state, lambda)
         implicit none
         class(type_thc_3phase), intent(in) :: self
         type(type_state), intent(in) :: state
         type(type_thc_dispersivity), intent(inout) :: lambda
 
         real(real64) :: lambda_0
-        type(type_coordinate_dp) :: water_flux
+        type(type_coordinate_dp), pointer :: water_flux
 
         real(real64) :: htc_water, rho_water, cp_water
 
         call self%calc_water_density(state, rho_water)
         call self%calc_water_cp(state, cp_water)
         htc_water = rho_water * cp_water
-        call state%water_flux%get(water_flux)
+        call state%get(water_flux=water_flux)
 
         call self%calc(state, lambda_0)
         call self%calc_lambda_dispersivity(lambda_0, htc_water, water_flux%x, water_flux%y, water_flux%z, lambda)
 
     end subroutine calc_thc_dispersivity_gp_3phase
 
-    module pure elemental subroutine calc_thc_gp_4phase(self, state, lambda)
+    module subroutine calc_thc_gp_4phase(self, state, lambda)
         implicit none
         class(type_thc_4phase), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -118,21 +118,21 @@ contains
 
     end subroutine calc_thc_gp_4phase
 
-    module pure elemental subroutine calc_thc_dispersivity_gp_4phase(self, state, lambda)
+    module subroutine calc_thc_dispersivity_gp_4phase(self, state, lambda)
         implicit none
         class(type_thc_4phase), intent(in) :: self
         type(type_state), intent(in) :: state
         type(type_thc_dispersivity), intent(inout) :: lambda
 
         real(real64) :: lambda_0
-        type(type_coordinate_dp) :: water_flux
+        type(type_coordinate_dp), pointer :: water_flux
 
         real(real64) :: htc_water, rho_water, cp_water
 
         call self%calc_water_density(state, rho_water)
         call self%calc_water_cp(state, cp_water)
         htc_water = rho_water * cp_water
-        call state%water_flux%get(water_flux)
+        call state%get(water_flux=water_flux)
 
         call self%calc(state, lambda_0)
 

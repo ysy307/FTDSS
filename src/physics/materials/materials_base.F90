@@ -50,7 +50,7 @@ contains
         self%initialized = .true.
     end subroutine initialize_abst_material
 
-    pure elemental subroutine get_material_phi(self, state, phi1, phi2, phi3, phi4)
+    subroutine get_material_phi(self, state, phi1, phi2, phi3, phi4)
         implicit none
         class(abst_material), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -72,7 +72,7 @@ contains
 
     end subroutine get_material_phi
 
-    pure elemental subroutine get_solid_abst_material(self, solid)
+    subroutine get_solid_abst_material(self, solid)
         implicit none
         class(abst_material), intent(in) :: self
         real(real64), intent(inout) :: solid
@@ -81,7 +81,7 @@ contains
 
     end subroutine get_solid_abst_material
 
-    pure elemental subroutine calc_water_density_abst_material(self, state, density)
+    subroutine calc_water_density_abst_material(self, state, density)
         implicit none
         class(abst_material), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -95,7 +95,7 @@ contains
 
     end subroutine calc_water_density_abst_material
 
-    pure elemental subroutine calc_ice_density_abst_material(self, state, density)
+    subroutine calc_ice_density_abst_material(self, state, density)
         implicit none
         class(abst_material), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -109,7 +109,7 @@ contains
 
     end subroutine calc_ice_density_abst_material
 
-    pure elemental subroutine calc_vapor_density_abst_material(self, state, density)
+    subroutine calc_vapor_density_abst_material(self, state, density)
         implicit none
         class(abst_material), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -123,7 +123,7 @@ contains
 
     end subroutine calc_vapor_density_abst_material
 
-    pure elemental subroutine calc_water_cp_abst_material(self, state, cp)
+    subroutine calc_water_cp_abst_material(self, state, cp)
         implicit none
         class(abst_material), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -137,7 +137,7 @@ contains
 
     end subroutine calc_water_cp_abst_material
 
-    pure elemental subroutine calc_ice_cp_abst_material(self, state, cp)
+    subroutine calc_ice_cp_abst_material(self, state, cp)
         implicit none
         class(abst_material), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -151,7 +151,7 @@ contains
 
     end subroutine calc_ice_cp_abst_material
 
-    pure elemental subroutine calc_vapor_cp_abst_material(self, state, cp)
+    subroutine calc_vapor_cp_abst_material(self, state, cp)
         implicit none
         class(abst_material), intent(in) :: self
         type(type_state), intent(in) :: state

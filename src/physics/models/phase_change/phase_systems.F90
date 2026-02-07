@@ -50,7 +50,7 @@ contains
     !>
     !> @brief P, T から全ての相の状態量(量と微分)を一括更新する
     !>
-    pure elemental subroutine update_water_phases(self, state)
+    subroutine update_water_phases(self, state)
         implicit none
         class(type_phase_manager), intent(in) :: self
         type(type_state), intent(inout) :: state
@@ -159,7 +159,7 @@ contains
 
     end subroutine update_water_phases
 
-    pure elemental subroutine calc_latent_heat_fusion(self, state, Lf)
+    subroutine calc_latent_heat_fusion(self, state, Lf)
         implicit none
         class(type_phase_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -169,7 +169,7 @@ contains
 
     end subroutine calc_latent_heat_fusion
 
-    pure elemental subroutine calc_latent_heat_vaporization(self, state, Lv)
+    subroutine calc_latent_heat_vaporization(self, state, Lv)
         implicit none
         class(type_phase_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -184,7 +184,7 @@ contains
 
     end subroutine calc_latent_heat_vaporization
 
-    pure elemental subroutine deriv_pressure_ice_water(self, state, deriv)
+    subroutine deriv_pressure_ice_water(self, state, deriv)
         implicit none
         class(type_phase_manager), intent(in) :: self
         type(type_state), intent(in) :: state

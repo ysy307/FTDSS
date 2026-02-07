@@ -1,7 +1,7 @@
 submodule(physics_models_wrf) wrf_durner
     implicit none
 contains
-    module pure elemental subroutine calculate_wrf_durner(self, h, Qw)
+    module subroutine calculate_wrf_durner(self, h, Qw)
         implicit none
         class(type_wrf_durner), intent(in) :: self
         real(real64), intent(in) :: h
@@ -17,7 +17,7 @@ contains
 
     end subroutine calculate_wrf_durner
 
-    module pure elemental subroutine calculate_wrf_durner_derivative(self, h, dQw_dh)
+    module subroutine calculate_wrf_durner_derivative(self, h, dQw_dh)
         implicit none
         class(type_wrf_durner), intent(in) :: self
         real(real64), intent(in) :: h

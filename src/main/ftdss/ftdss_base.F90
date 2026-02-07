@@ -264,7 +264,7 @@ contains
         real(real64) :: K_wT, K_wP, K_vT, K_vP
         real(real64) :: temperature_history(8), pressure_history(8), porosity_history(8)
 
-        call self%controls%profiler%start("Setup")
+        ! call self%controls%profiler%start("Setup")
 
         call state%reset()
 
@@ -298,7 +298,7 @@ contains
         end if
 
         call state%set(water_flux=water_flux, vapor_flux=vapor_flux)
-        call self%controls%profiler%stop("Setup")
+        ! call self%controls%profiler%stop("Setup")
 
     end subroutine set_state_ftdss
 
@@ -347,7 +347,6 @@ contains
 
         is_none = self%controls%iteration%is_none()
 
-
         if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du)
             call self%temperature%get_current(current)
@@ -387,4 +386,14 @@ contains
         call self%controls%iteration%reset()
 
     end subroutine reset_ftdss
+
+    module subroutine finalize_type_ftdss(self)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+
+        call self%controls%profiler%stop("Total")
+        call self%controls%profiler%record(TIME_RECORD_END)
+        call self%output%output_system_log(self%controls)
+
+    end subroutine finalize_type_ftdss
 end submodule ftdss_base

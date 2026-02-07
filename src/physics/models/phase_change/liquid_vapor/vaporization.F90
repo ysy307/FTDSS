@@ -46,7 +46,7 @@ contains
         self%initialized = .true.
     end subroutine initialize_evaporation_model
 
-    pure subroutine calc_latent_heat_vaporization(self, temperature, latent_heat)
+    subroutine calc_latent_heat_vaporization(self, temperature, latent_heat)
         implicit none
         class(type_evaporation), intent(in) :: self
         real(real64), intent(in) :: temperature
@@ -63,7 +63,7 @@ contains
     end subroutine calc_latent_heat_vaporization
 
     !> @brief Calculate Relative Humidity (Kelvin equation)
-    pure elemental subroutine calc_relative_humidity_evaporation(self, state, relative_humidity)
+    subroutine calc_relative_humidity_evaporation(self, state, relative_humidity)
         implicit none
         class(type_evaporation), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -88,7 +88,7 @@ contains
     end subroutine calc_relative_humidity_evaporation
 
     !> @brief d(RH)/dT
-    pure elemental subroutine deriv_relative_humidity_temperature_evaporation(self, state, deriv_rh_temp)
+    subroutine deriv_relative_humidity_temperature_evaporation(self, state, deriv_rh_temp)
         implicit none
         class(type_evaporation), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -112,7 +112,7 @@ contains
     end subroutine deriv_relative_humidity_temperature_evaporation
 
     !> @brief d(RH)/dP
-    pure elemental subroutine deriv_relative_humidity_pressure_evaporation(self, state, deriv_rh_pressure)
+    subroutine deriv_relative_humidity_pressure_evaporation(self, state, deriv_rh_pressure)
         implicit none
         class(type_evaporation), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -138,7 +138,7 @@ contains
 
     !> @brief Calculate vapor content (Liquid equivalent).
     !> theta_v = theta_g * (rho_sat * RH / rho_w)
-    pure elemental subroutine calc_vapor_content_vaporization(self, state, vapor_content)
+    subroutine calc_vapor_content_vaporization(self, state, vapor_content)
         implicit none
         class(type_evaporation), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -163,7 +163,7 @@ contains
     !> d(theta_v)/dX = d(theta_g)/dX * (Ratio) + theta_g * d(Ratio)/dX
     !> where Ratio = rho_sat * RH / rho_w
     !>
-    pure subroutine calc_vapor_content_derivatives(self, state, dvapor_dP, dvapor_dT)
+    subroutine calc_vapor_content_derivatives(self, state, dvapor_dP, dvapor_dT)
         implicit none
         class(type_evaporation), intent(in) :: self
         type(type_state), intent(in) :: state

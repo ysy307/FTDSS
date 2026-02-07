@@ -90,7 +90,7 @@ module physics_models_wrf
     end type abst_wrf
 
     abstract interface
-        pure elemental subroutine abst_calc_wrf(self, h, Qw)
+        subroutine abst_calc_wrf(self, h, Qw)
             import :: abst_wrf, real64
             implicit none
             class(abst_wrf), intent(in) :: self
@@ -98,7 +98,7 @@ module physics_models_wrf
             real(real64), intent(inout) :: Qw
         end subroutine abst_calc_wrf
 
-        pure elemental subroutine abst_calc_wrf_derivative(self, h, dQw_dh)
+        subroutine abst_calc_wrf_derivative(self, h, dQw_dh)
             import :: abst_wrf, real64
             implicit none
             class(abst_wrf), intent(in) :: self
@@ -160,7 +160,7 @@ module physics_models_wrf
     end type type_wrf_dvgch
 
     interface
-        module pure elemental subroutine calculate_wrf_bc(self, h, Qw)
+        module subroutine calculate_wrf_bc(self, h, Qw)
             implicit none
             class(type_wrf_bc), intent(in) :: self
             real(real64), intent(in) :: h
@@ -168,7 +168,7 @@ module physics_models_wrf
 
         end subroutine calculate_wrf_bc
 
-        module pure elemental subroutine calculate_wrf_bc_derivative(self, h, dQw_dh)
+        module subroutine calculate_wrf_bc_derivative(self, h, dQw_dh)
             implicit none
             class(type_wrf_bc), intent(in) :: self
             real(real64), intent(in) :: h
@@ -178,7 +178,7 @@ module physics_models_wrf
     end interface
 
     interface
-        module pure elemental subroutine calculate_wrf_vg(self, h, Qw)
+        module subroutine calculate_wrf_vg(self, h, Qw)
             implicit none
             class(type_wrf_vg), intent(in) :: self
             real(real64), intent(in) :: h
@@ -186,7 +186,7 @@ module physics_models_wrf
 
         end subroutine calculate_wrf_vg
 
-        module pure elemental subroutine calculate_wrf_vg_derivative(self, h, dQw_dh)
+        module subroutine calculate_wrf_vg_derivative(self, h, dQw_dh)
             implicit none
             class(type_wrf_vg), intent(in) :: self
             real(real64), intent(in) :: h
@@ -196,7 +196,7 @@ module physics_models_wrf
     end interface
 
     interface
-        module pure elemental subroutine calculate_wrf_ko(self, h, Qw)
+        module subroutine calculate_wrf_ko(self, h, Qw)
             implicit none
             class(type_wrf_ko), intent(in) :: self
             real(real64), intent(in) :: h
@@ -204,7 +204,7 @@ module physics_models_wrf
 
         end subroutine calculate_wrf_ko
 
-        module pure elemental subroutine calculate_wrf_ko_derivative(self, h, dQw_dh)
+        module subroutine calculate_wrf_ko_derivative(self, h, dQw_dh)
             implicit none
             class(type_wrf_ko), intent(in) :: self
             real(real64), intent(in) :: h
@@ -215,7 +215,7 @@ module physics_models_wrf
     end interface
 
     interface
-        module pure elemental subroutine calculate_wrf_mvg(self, h, Qw)
+        module subroutine calculate_wrf_mvg(self, h, Qw)
             implicit none
             class(type_wrf_mvg), intent(in) :: self
             real(real64), intent(in) :: h
@@ -223,7 +223,7 @@ module physics_models_wrf
 
         end subroutine calculate_wrf_mvg
 
-        module pure elemental subroutine calculate_wrf_mvg_derivative(self, h, dQw_dh)
+        module subroutine calculate_wrf_mvg_derivative(self, h, dQw_dh)
             implicit none
             class(type_wrf_mvg), intent(in) :: self
             real(real64), intent(in) :: h
@@ -233,7 +233,7 @@ module physics_models_wrf
     end interface
 
     interface
-        module pure elemental subroutine calculate_wrf_durner(self, h, Qw)
+        module subroutine calculate_wrf_durner(self, h, Qw)
             implicit none
             class(type_wrf_durner), intent(in) :: self
             real(real64), intent(in) :: h
@@ -241,7 +241,7 @@ module physics_models_wrf
 
         end subroutine calculate_wrf_durner
 
-        module pure elemental subroutine calculate_wrf_durner_derivative(self, h, dQw_dh)
+        module subroutine calculate_wrf_durner_derivative(self, h, dQw_dh)
             implicit none
             class(type_wrf_durner), intent(in) :: self
             real(real64), intent(in) :: h
@@ -251,7 +251,7 @@ module physics_models_wrf
     end interface
 
     interface
-        module pure elemental subroutine calculate_wrf_dvgch(self, h, Qw)
+        module subroutine calculate_wrf_dvgch(self, h, Qw)
             implicit none
             class(type_wrf_dvgch), intent(in) :: self
             real(real64), intent(in) :: h
@@ -259,7 +259,7 @@ module physics_models_wrf
 
         end subroutine calculate_wrf_dvgch
 
-        module pure elemental subroutine calculate_wrf_dvgch_derivative(self, h, dQw_dh)
+        module subroutine calculate_wrf_dvgch_derivative(self, h, dQw_dh)
             implicit none
             class(type_wrf_dvgch), intent(in) :: self
             real(real64), intent(in) :: h

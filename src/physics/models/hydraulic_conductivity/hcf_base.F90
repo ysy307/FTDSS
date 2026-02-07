@@ -221,7 +221,7 @@ contains
         initialized = self%initialized
     end function is_initialized_hcf
 
-    module pure elemental subroutine calc_kflh_base(self, state, kflh)
+    module subroutine calc_kflh_base(self, state, kflh)
         implicit none
         class(type_hcf_base), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -237,7 +237,7 @@ contains
 
     end subroutine calc_kflh_base
 
-    module pure elemental subroutine calc_kflh_impedance(self, state, kflh)
+    module subroutine calc_kflh_impedance(self, state, kflh)
         implicit none
         class(type_hcf_impedance), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -253,7 +253,7 @@ contains
 
     end subroutine calc_kflh_impedance
 
-    module pure elemental subroutine calc_kflh_viscosity(self, state, kflh)
+    module subroutine calc_kflh_viscosity(self, state, kflh)
         implicit none
         class(type_hcf_viscosity), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -269,7 +269,7 @@ contains
 
     end subroutine calc_kflh_viscosity
 
-    module pure elemental subroutine calc_kflh_base_impedance(self, state, kflh)
+    module subroutine calc_kflh_base_impedance(self, state, kflh)
         implicit none
         class(type_hcf_base_impedance), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -287,7 +287,7 @@ contains
 
     end subroutine calc_kflh_base_impedance
 
-    module pure elemental subroutine calc_kflh_base_viscosity(self, state, kflh)
+    module subroutine calc_kflh_base_viscosity(self, state, kflh)
         implicit none
         class(type_hcf_base_viscosity), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -305,7 +305,7 @@ contains
 
     end subroutine calc_kflh_base_viscosity
 
-    module pure elemental subroutine calc_kflh_impedance_viscosity(self, state, kflh)
+    module subroutine calc_kflh_impedance_viscosity(self, state, kflh)
         implicit none
         class(type_hcf_impedance_viscosity), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -323,7 +323,7 @@ contains
 
     end subroutine calc_kflh_impedance_viscosity
 
-    module pure elemental subroutine calc_kflh_base_impedance_viscosity(self, state, kflh)
+    module subroutine calc_kflh_base_impedance_viscosity(self, state, kflh)
         implicit none
         class(type_hcf_base_impedance_viscosity), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -343,7 +343,7 @@ contains
 
     end subroutine calc_kflh_base_impedance_viscosity
 
-    module pure elemental subroutine calc_klT_hcf(self, state, klT)
+    module subroutine calc_klT_hcf(self, state, klT)
         implicit none
         class(abst_hcf), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -365,7 +365,7 @@ contains
 
     end subroutine calc_klT_hcf
 
-    pure elemental subroutine calc_surface_tension(temperature, surface_tension)
+    subroutine calc_surface_tension(temperature, surface_tension)
         implicit none
         !> Temperature [C]
         real(real64), intent(in) :: temperature
@@ -376,7 +376,7 @@ contains
 
     end subroutine calc_surface_tension
 
-    pure elemental subroutine calc_derivative_surface_tension(temperature, dsurface_tension_dT)
+    subroutine calc_derivative_surface_tension(temperature, dsurface_tension_dT)
         implicit none
         !> Temperature [C]
         real(real64), intent(in) :: temperature
@@ -387,7 +387,7 @@ contains
 
     end subroutine calc_derivative_surface_tension
 
-    module pure elemental subroutine calc_Kvh_hcf(self, state, Kvh)
+    module subroutine calc_Kvh_hcf(self, state, Kvh)
         implicit none
         class(abst_hcf), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -397,7 +397,7 @@ contains
 
     end subroutine calc_Kvh_hcf
 
-    module pure elemental subroutine calc_KvT_hcf(self, state, KvT)
+    module subroutine calc_KvT_hcf(self, state, KvT)
         implicit none
         class(abst_hcf), intent(in) :: self
         type(type_state), intent(in) :: state

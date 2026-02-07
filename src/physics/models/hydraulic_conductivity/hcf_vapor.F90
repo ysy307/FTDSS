@@ -7,7 +7,7 @@ contains
 
     !> Da is the diffusivity of water vapor in air (m2 s2 1) at tem- perature T (K) in Eq. (16)
     !> \(D_a = 2.12 \times 10^{-5} \left(\frac{T}{273.15}\right)^2 \)
-    module pure elemental subroutine calc_diffusivity_vapor_in_air(self, temperature, Da)
+    module subroutine calc_diffusivity_vapor_in_air(self, temperature, Da)
         implicit none
         !> HCF object
         class(type_hcf_vapor), intent(in) :: self
@@ -25,7 +25,7 @@ contains
     end subroutine calc_diffusivity_vapor_in_air
 
     !> Reference: Eq. (15)
-    module pure elemental subroutine calc_tortuosity_factor_vapor(self, Qa, Qs, tau)
+    module subroutine calc_tortuosity_factor_vapor(self, Qa, Qs, tau)
         implicit none
         class(type_hcf_vapor), intent(in) :: self
         !> Air-filled porosity [-]
@@ -45,7 +45,7 @@ contains
     end subroutine calc_tortuosity_factor_vapor
 
     !> Reference: Eq. (19)
-    module pure elemental subroutine calc_enhancement_factor_vapor(self, Qw, Qs, fc, eta)
+    module subroutine calc_enhancement_factor_vapor(self, Qw, Qs, fc, eta)
         implicit none
         !> HCF object
         class(type_hcf_vapor), intent(in) :: self
@@ -71,7 +71,7 @@ contains
 
     end subroutine calc_enhancement_factor_vapor
 
-    module pure elemental subroutine calc_Kvh_vapor(self, state, Kvh)
+    module subroutine calc_Kvh_vapor(self, state, Kvh)
         implicit none
         class(type_hcf_vapor), intent(in) :: self
         !> `Temperature`, `Pressure`, `Air_content`, `Porosity`, `Relative_humidity`
@@ -104,7 +104,7 @@ contains
 
     end subroutine calc_Kvh_vapor
 
-    module pure elemental subroutine calc_KvT_vapor(self, state, KvT)
+    module subroutine calc_KvT_vapor(self, state, KvT)
         implicit none
         class(type_hcf_vapor), intent(in) :: self
         !> `Temperature`, `Pressure`, `Air_content`, `Porosity`, `Water_content`, `Relative_humidity`, `Mass_fraction_clay`

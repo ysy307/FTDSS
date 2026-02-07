@@ -64,7 +64,7 @@ contains
         end if
     end subroutine initialize
 
-    pure elemental subroutine update_water_phases(self, state)
+    subroutine update_water_phases(self, state)
         implicit none
         class(type_models_manager), intent(inout) :: self
         type(type_state), intent(inout) :: state
@@ -72,7 +72,7 @@ contains
         call self%phase_manager%update_water_phases(state)
     end subroutine update_water_phases
 
-    pure elemental subroutine calc_Kflh(self, state, Kflh)
+    subroutine calc_Kflh(self, state, Kflh)
         implicit none
         class(type_models_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -81,7 +81,7 @@ contains
         call self%hcf%p%calc_Kflh(state, Kflh)
     end subroutine calc_Kflh
 
-    pure elemental subroutine calc_KlT(self, state, KlT)
+    subroutine calc_KlT(self, state, KlT)
         implicit none
         class(type_models_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -90,7 +90,7 @@ contains
         call self%hcf%p%calc_KlT(state, KlT)
     end subroutine calc_KlT
 
-    pure elemental subroutine calc_Kvh(self, state, Kvh)
+    subroutine calc_Kvh(self, state, Kvh)
         implicit none
         class(type_models_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -99,7 +99,7 @@ contains
         call self%hcf%p%calc_Kvh(state, Kvh)
     end subroutine calc_Kvh
 
-    pure elemental subroutine calc_KvT(self, state, KvT)
+    subroutine calc_KvT(self, state, KvT)
         implicit none
         class(type_models_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -108,7 +108,7 @@ contains
         call self%hcf%p%calc_KvT(state, KvT)
     end subroutine calc_KvT
 
-    pure elemental subroutine calc_latent_heat_fusion(self, state, L_fusion)
+    subroutine calc_latent_heat_fusion(self, state, L_fusion)
         implicit none
         class(type_models_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -117,7 +117,7 @@ contains
         call self%phase_manager%calc_latent_heat_fusion(state, L_fusion)
     end subroutine calc_latent_heat_fusion
 
-    pure elemental subroutine calc_latent_heat_vaporization(self, state, L_vaporization)
+    subroutine calc_latent_heat_vaporization(self, state, L_vaporization)
         implicit none
         class(type_models_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -126,7 +126,7 @@ contains
         call self%phase_manager%calc_latent_heat_vaporization(state, L_vaporization)
     end subroutine calc_latent_heat_vaporization
 
-    pure elemental subroutine calc_pressure_ice_water_derivative(self, state, deriv)
+    subroutine calc_pressure_ice_water_derivative(self, state, deriv)
         implicit none
         class(type_models_manager), intent(in) :: self
         type(type_state), intent(in) :: state

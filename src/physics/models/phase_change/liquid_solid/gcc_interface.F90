@@ -84,7 +84,7 @@ module physics_models_phase_change_liquid_solid_gcc
     !---------------------------------------------------------------------------
     abstract interface
         !> @brief Calculate suction [Pa].
-        pure elemental subroutine abst_calc_gcc(self, state, suction)
+        subroutine abst_calc_gcc(self, state, suction)
             import :: abst_gcc, type_state, real64
             implicit none
             class(abst_gcc), intent(in) :: self
@@ -93,7 +93,7 @@ module physics_models_phase_change_liquid_solid_gcc
         end subroutine abst_calc_gcc
 
         !> @brief Calculate first derivative of suction w.r.t Temperature [Pa/K].
-        pure elemental subroutine abst_deriv_temp_gcc(self, state, suction_derivative)
+        subroutine abst_deriv_temp_gcc(self, state, suction_derivative)
             import :: abst_gcc, type_state, real64
             implicit none
             class(abst_gcc), intent(in) :: self
@@ -103,7 +103,7 @@ module physics_models_phase_change_liquid_solid_gcc
 
         !> @brief Calculate first derivative of suction w.r.t Pressure [-].
         !> Note: d(Pa)/d(Pa) is dimensionless.
-        pure elemental subroutine abst_deriv_pres_gcc(self, state, suction_derivative)
+        subroutine abst_deriv_pres_gcc(self, state, suction_derivative)
             import :: abst_gcc, type_state, real64
             implicit none
             class(abst_gcc), intent(in) :: self
@@ -112,7 +112,7 @@ module physics_models_phase_change_liquid_solid_gcc
         end subroutine abst_deriv_pres_gcc
 
         !> @brief Calculate second derivative of suction w.r.t Temperature [Pa/K^2].
-        pure elemental subroutine abst_deriv2_temp_gcc(self, state, suction_derivative)
+        subroutine abst_deriv2_temp_gcc(self, state, suction_derivative)
             import :: abst_gcc, type_state, real64
             implicit none
             class(abst_gcc), intent(in) :: self
@@ -121,7 +121,7 @@ module physics_models_phase_change_liquid_solid_gcc
         end subroutine abst_deriv2_temp_gcc
 
         !> @brief Calculate derivative of ice pressure w.r.t water pressure [-].
-        pure elemental subroutine abst_deriv_pressure_ice_water(self, state, deriv)
+        subroutine abst_deriv_pressure_ice_water(self, state, deriv)
             import :: abst_gcc, type_state, real64
             implicit none
             class(abst_gcc), intent(in) :: self
@@ -173,21 +173,21 @@ module physics_models_phase_change_liquid_solid_gcc
     !---------------------------------------------------------------------------
     interface
         ! --- Holder methods ---
-        module pure elemental subroutine calc_holder(self, state, suction)
+        module subroutine calc_holder(self, state, suction)
             implicit none
             class(holder_gccs), intent(in) :: self
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: suction
         end subroutine calc_holder
 
-        module pure elemental subroutine deriv_temperature_holder(self, state, deriv)
+        module subroutine deriv_temperature_holder(self, state, deriv)
             implicit none
             class(holder_gccs), intent(in) :: self
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: deriv
         end subroutine deriv_temperature_holder
 
-        module pure elemental subroutine deriv_pressure_holder(self, state, deriv)
+        module subroutine deriv_pressure_holder(self, state, deriv)
             implicit none
             class(holder_gccs), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -195,35 +195,35 @@ module physics_models_phase_change_liquid_solid_gcc
         end subroutine deriv_pressure_holder
 
         ! --- Non-segregation methods ---
-        module pure elemental subroutine calc_gcc_nonseg(self, state, suction)
+        module subroutine calc_gcc_nonseg(self, state, suction)
             implicit none
             class(type_gcc_non_segregation), intent(in) :: self
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: suction
         end subroutine calc_gcc_nonseg
 
-        module pure elemental subroutine deriv_temp_gcc_nonseg(self, state, suction_derivative)
+        module subroutine deriv_temp_gcc_nonseg(self, state, suction_derivative)
             implicit none
             class(type_gcc_non_segregation), intent(in) :: self
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: suction_derivative
         end subroutine deriv_temp_gcc_nonseg
 
-        module pure elemental subroutine deriv_pres_gcc_nonseg(self, state, suction_derivative)
+        module subroutine deriv_pres_gcc_nonseg(self, state, suction_derivative)
             implicit none
             class(type_gcc_non_segregation), intent(in) :: self
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: suction_derivative
         end subroutine deriv_pres_gcc_nonseg
 
-        module pure elemental subroutine deriv2_temp_gcc_nonseg(self, state, suction_derivative)
+        module subroutine deriv2_temp_gcc_nonseg(self, state, suction_derivative)
             implicit none
             class(type_gcc_non_segregation), intent(in) :: self
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: suction_derivative
         end subroutine deriv2_temp_gcc_nonseg
 
-        module pure elemental subroutine deriv_pressure_ice_water_nonseg(self, state, deriv)
+        module subroutine deriv_pressure_ice_water_nonseg(self, state, deriv)
             implicit none
             class(type_gcc_non_segregation), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -232,35 +232,35 @@ module physics_models_phase_change_liquid_solid_gcc
         end subroutine deriv_pressure_ice_water_nonseg
 
         ! --- Segregation methods ---
-        module pure elemental subroutine calc_gcc_seg(self, state, suction)
+        module subroutine calc_gcc_seg(self, state, suction)
             implicit none
             class(type_gcc_segregation), intent(in) :: self
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: suction
         end subroutine calc_gcc_seg
 
-        module pure elemental subroutine deriv_temp_gcc_seg(self, state, suction_derivative)
+        module subroutine deriv_temp_gcc_seg(self, state, suction_derivative)
             implicit none
             class(type_gcc_segregation), intent(in) :: self
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: suction_derivative
         end subroutine deriv_temp_gcc_seg
 
-        module pure elemental subroutine deriv_pres_gcc_seg(self, state, suction_derivative)
+        module subroutine deriv_pres_gcc_seg(self, state, suction_derivative)
             implicit none
             class(type_gcc_segregation), intent(in) :: self
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: suction_derivative
         end subroutine deriv_pres_gcc_seg
 
-        module pure elemental subroutine deriv2_temp_gcc_seg(self, state, suction_derivative)
+        module subroutine deriv2_temp_gcc_seg(self, state, suction_derivative)
             implicit none
             class(type_gcc_segregation), intent(in) :: self
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: suction_derivative
         end subroutine deriv2_temp_gcc_seg
 
-        module pure elemental subroutine deriv_pressure_ice_water_seg(self, state, deriv)
+        module subroutine deriv_pressure_ice_water_seg(self, state, deriv)
             implicit none
             class(type_gcc_segregation), intent(in) :: self
             type(type_state), intent(in) :: state

@@ -28,8 +28,8 @@ contains
 
     end subroutine initialize_holder_sphs
 
-    module pure elemental subroutine calc_sph_2(specific_heat_soil, phi_soil, &
-                                                specific_heat_water, phi_water, specific_heat)
+    module subroutine calc_sph_2(specific_heat_soil, phi_soil, &
+                                 specific_heat_water, phi_water, specific_heat)
         implicit none
         real(real64), intent(in) :: specific_heat_soil
         real(real64), intent(in) :: phi_soil
@@ -41,9 +41,9 @@ contains
                         + specific_heat_water * phi_water
     end subroutine calc_sph_2
 
-    module pure elemental subroutine calc_sph_3(specific_heat_soil, phi_soil, &
-                                                specific_heat_water, phi_water, &
-                                                specific_heat_ice, phi_ice, specific_heat)
+    module subroutine calc_sph_3(specific_heat_soil, phi_soil, &
+                                 specific_heat_water, phi_water, &
+                                 specific_heat_ice, phi_ice, specific_heat)
         implicit none
         real(real64), intent(in) :: specific_heat_soil
         real(real64), intent(in) :: phi_soil
@@ -59,10 +59,10 @@ contains
 
     end subroutine calc_sph_3
 
-    module pure elemental subroutine calc_sph_4(specific_heat_soil, phi_soil, &
-                                                specific_heat_water, phi_water, &
-                                                specific_heat_ice, phi_ice, &
-                                                specific_heat_vapor, phi_vapor, specific_heat)
+    module subroutine calc_sph_4(specific_heat_soil, phi_soil, &
+                                 specific_heat_water, phi_water, &
+                                 specific_heat_ice, phi_ice, &
+                                 specific_heat_vapor, phi_vapor, specific_heat)
         implicit none
         real(real64), intent(in) :: specific_heat_soil
         real(real64), intent(in) :: phi_soil

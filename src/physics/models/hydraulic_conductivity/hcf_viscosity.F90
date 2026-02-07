@@ -17,7 +17,7 @@ contains
         call self%calc_mu(temp_critical, self%mu_zero)
     end subroutine initialize_abst_hcf_viscosity
 
-    module pure elemental subroutine calc_kr_abst_hcf_viscosity(self, temperature, kr)
+    module subroutine calc_kr_abst_hcf_viscosity(self, temperature, kr)
         implicit none
         class(abst_hcf_viscosity), intent(in) :: self
         real(real64), intent(in) :: temperature
@@ -30,7 +30,7 @@ contains
 
     end subroutine calc_kr_abst_hcf_viscosity
 
-    module pure elemental subroutine calc_mu_exponential(self, temperature, mu)
+    module subroutine calc_mu_exponential(self, temperature, mu)
         implicit none
         class(type_hcf_viscosity_exp), intent(in) :: self
         real(real64), intent(in) :: temperature
@@ -40,7 +40,7 @@ contains
 
     end subroutine calc_mu_exponential
 
-    module pure elemental subroutine calc_mu_exponential_supercooled(self, temperature, mu)
+    module subroutine calc_mu_exponential_supercooled(self, temperature, mu)
         implicit none
         class(type_hcf_viscosity_supercool), intent(in) :: self
         real(real64), intent(in) :: temperature

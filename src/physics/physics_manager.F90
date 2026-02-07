@@ -188,7 +188,7 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     ! Generic Type-Bound Procedures
     !-------------------------------------------------------------------------------------------------------------------------------
-    pure elemental subroutine calc_density(self, material_id, state, density)
+    subroutine calc_density(self, material_id, state, density)
         implicit none
         class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
@@ -199,7 +199,7 @@ contains
 
     end subroutine calc_density
 
-    pure elemental subroutine get_density_solid(self, material_id, density_solid)
+    subroutine get_density_solid(self, material_id, density_solid)
         implicit none
         class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
@@ -209,7 +209,7 @@ contains
 
     end subroutine get_density_solid
 
-    pure elemental subroutine calc_density_water(self, state, density_water)
+    subroutine calc_density_water(self, state, density_water)
         implicit none
         class(type_physics_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -219,7 +219,7 @@ contains
 
     end subroutine calc_density_water
 
-    pure elemental subroutine calc_density_ice(self, state, density_ice)
+    subroutine calc_density_ice(self, state, density_ice)
         implicit none
         class(type_physics_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -229,7 +229,7 @@ contains
 
     end subroutine calc_density_ice
 
-    pure elemental subroutine calc_density_vapor(self, state, density_vapor)
+    subroutine calc_density_vapor(self, state, density_vapor)
         implicit none
         class(type_physics_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -239,7 +239,7 @@ contains
 
     end subroutine calc_density_vapor
 
-    pure elemental subroutine calc_density_vapor_saturation(self, state, density_vapor_saturation)
+    subroutine calc_density_vapor_saturation(self, state, density_vapor_saturation)
         implicit none
         class(type_physics_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -249,7 +249,7 @@ contains
 
     end subroutine calc_density_vapor_saturation
 
-    pure elemental subroutine calc_density_water_derivatives(self, material_id, state, dden_dT, dden_dP)
+    subroutine calc_density_water_derivatives(self, material_id, state, dden_dT, dden_dP)
         implicit none
         class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
@@ -260,7 +260,7 @@ contains
         call self%materials(self%materials_id_map(material_id))%calc_density_water_derivatives(state, dden_dT, dden_dP)
     end subroutine calc_density_water_derivatives
 
-    pure elemental subroutine calc_density_ice_derivatives(self, material_id, state, dden_dT, dden_dP)
+    subroutine calc_density_ice_derivatives(self, material_id, state, dden_dT, dden_dP)
         implicit none
         class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
@@ -271,7 +271,7 @@ contains
         call self%materials(self%materials_id_map(material_id))%calc_density_ice_derivatives(state, dden_dT, dden_dP)
     end subroutine calc_density_ice_derivatives
 
-    pure elemental subroutine calc_density_vapor_derivatives(self, material_id, state, dden_dT, dden_dP)
+    subroutine calc_density_vapor_derivatives(self, material_id, state, dden_dT, dden_dP)
 
         implicit none
         class(type_physics_manager), intent(in) :: self
@@ -283,7 +283,7 @@ contains
         call self%materials(self%materials_id_map(material_id))%calc_density_vapor_derivatives(state, dden_dT, dden_dP)
     end subroutine calc_density_vapor_derivatives
 
-    pure elemental subroutine calc_specific_heat(self, material_id, state, specific_heat)
+    subroutine calc_specific_heat(self, material_id, state, specific_heat)
         implicit none
         class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
@@ -294,7 +294,7 @@ contains
 
     end subroutine calc_specific_heat
 
-    pure elemental subroutine get_specific_heat_solid(self, material_id, cp)
+    subroutine get_specific_heat_solid(self, material_id, cp)
         implicit none
         class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
@@ -304,7 +304,7 @@ contains
 
     end subroutine get_specific_heat_solid
 
-    pure elemental subroutine calc_specific_heat_water(self, state, specific_heat_water)
+    subroutine calc_specific_heat_water(self, state, specific_heat_water)
         implicit none
         class(type_physics_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -314,7 +314,7 @@ contains
 
     end subroutine calc_specific_heat_water
 
-    pure elemental subroutine calc_specific_heat_ice(self, state, specific_heat_ice)
+    subroutine calc_specific_heat_ice(self, state, specific_heat_ice)
         implicit none
         class(type_physics_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -324,7 +324,7 @@ contains
 
     end subroutine calc_specific_heat_ice
 
-    pure elemental subroutine calc_specific_heat_vapor(self, state, specific_heat_vapor)
+    subroutine calc_specific_heat_vapor(self, state, specific_heat_vapor)
         implicit none
         class(type_physics_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -334,7 +334,7 @@ contains
 
     end subroutine calc_specific_heat_vapor
 
-    pure elemental subroutine calc_thermal_conductivity_nondispersivity(self, material_id, state, thermal_conductivity)
+    subroutine calc_thermal_conductivity_nondispersivity(self, material_id, state, thermal_conductivity)
         implicit none
         class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
@@ -345,7 +345,7 @@ contains
 
     end subroutine calc_thermal_conductivity_nondispersivity
 
-    pure elemental subroutine calc_thermal_conductivity_dispersivity(self, material_id, state, thermal_conductivity)
+    subroutine calc_thermal_conductivity_dispersivity(self, material_id, state, thermal_conductivity)
         implicit none
         class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
@@ -356,7 +356,7 @@ contains
 
     end subroutine calc_thermal_conductivity_dispersivity
 
-    pure elemental subroutine calc_vol_heat_capacity(self, material_id, state, vol_heat_capacity)
+    subroutine calc_vol_heat_capacity(self, material_id, state, vol_heat_capacity)
         implicit none
         class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
@@ -367,7 +367,7 @@ contains
 
     end subroutine calc_vol_heat_capacity
 
-    pure elemental subroutine calc_latent_heat_fusion(self, material_id, state, latent_heat_fusion)
+    subroutine calc_latent_heat_fusion(self, material_id, state, latent_heat_fusion)
         implicit none
         class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
@@ -377,7 +377,7 @@ contains
         call self%models(self%materials_id_map(material_id))%calc_latent_heat_fusion(state, latent_heat_fusion)
     end subroutine calc_latent_heat_fusion
 
-    pure elemental subroutine calc_latent_heat_vaporization(self, material_id, state, latent_heat_vaporization)
+    subroutine calc_latent_heat_vaporization(self, material_id, state, latent_heat_vaporization)
         implicit none
         class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
@@ -387,7 +387,7 @@ contains
         call self%models(self%materials_id_map(material_id))%calc_latent_heat_vaporization(state, latent_heat_vaporization)
     end subroutine calc_latent_heat_vaporization
 
-    pure elemental subroutine calc_pressure_ice_water_derivative(self, material_id, state, deriv)
+    subroutine calc_pressure_ice_water_derivative(self, material_id, state, deriv)
         implicit none
         class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
@@ -398,16 +398,16 @@ contains
     end subroutine calc_pressure_ice_water_derivative
 
     ! subroutine update_water_phases(self, material_id, state)
-    pure elemental subroutine update_water_phases(self, material_id, state)
+    subroutine update_water_phases(self, material_id, state)
         implicit none
-        class(type_physics_manager), intent(in) :: self
+        class(type_physics_manager), intent(inout) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(inout) :: state
 
         call self%models(self%materials_id_map(material_id))%update_water_phases(state)
     end subroutine update_water_phases
 
-    pure elemental subroutine calc_Kflh(self, material_id, state, Kflh)
+    subroutine calc_Kflh(self, material_id, state, Kflh)
         implicit none
         class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
@@ -417,7 +417,7 @@ contains
         call self%models(self%materials_id_map(material_id))%calc_Kflh(state, Kflh)
     end subroutine calc_Kflh
 
-    pure elemental subroutine calc_KlT(self, material_id, state, KlT)
+    subroutine calc_KlT(self, material_id, state, KlT)
         implicit none
         class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
@@ -427,7 +427,7 @@ contains
         call self%models(self%materials_id_map(material_id))%calc_KlT(state, KlT)
     end subroutine calc_KlT
 
-    pure elemental subroutine calc_Kvh(self, material_id, state, Kvh)
+    subroutine calc_Kvh(self, material_id, state, Kvh)
         implicit none
         class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
@@ -437,7 +437,7 @@ contains
         call self%models(self%materials_id_map(material_id))%calc_Kvh(state, Kvh)
     end subroutine calc_Kvh
 
-    pure elemental subroutine calc_KvT(self, material_id, state, KvT)
+    subroutine calc_KvT(self, material_id, state, KvT)
         implicit none
         class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id

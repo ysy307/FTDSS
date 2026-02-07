@@ -82,7 +82,7 @@ contains
         end if
     end subroutine initialize
 
-    pure elemental subroutine calc_density(self, state, density)
+    subroutine calc_density(self, state, density)
         implicit none
         class(type_material_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -92,7 +92,7 @@ contains
 
     end subroutine calc_density
 
-    pure elemental subroutine get_density_solid(self, density_solid)
+    subroutine get_density_solid(self, density_solid)
         implicit none
         class(type_material_manager), intent(in) :: self
         real(real64), intent(inout) :: density_solid
@@ -101,7 +101,7 @@ contains
 
     end subroutine get_density_solid
 
-    pure elemental subroutine get_specific_heat_solid(self, cp)
+    subroutine get_specific_heat_solid(self, cp)
         implicit none
         class(type_material_manager), intent(in) :: self
         real(real64), intent(inout) :: cp
@@ -110,7 +110,7 @@ contains
 
     end subroutine get_specific_heat_solid
 
-    pure elemental subroutine calc_density_water_derivatives(self, state, dden_dT, dden_dP)
+    subroutine calc_density_water_derivatives(self, state, dden_dT, dden_dP)
         implicit none
         class(type_material_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -126,7 +126,7 @@ contains
 
     end subroutine calc_density_water_derivatives
 
-    pure elemental subroutine calc_density_ice_derivatives(self, state, dden_dT, dden_dP)
+    subroutine calc_density_ice_derivatives(self, state, dden_dT, dden_dP)
         implicit none
         class(type_material_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -142,7 +142,7 @@ contains
 
     end subroutine calc_density_ice_derivatives
 
-    pure elemental subroutine calc_density_vapor_derivatives(self, state, dden_dT, dden_dP)
+    subroutine calc_density_vapor_derivatives(self, state, dden_dT, dden_dP)
         implicit none
         class(type_material_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -158,7 +158,7 @@ contains
 
     end subroutine calc_density_vapor_derivatives
 
-    pure elemental subroutine calc_specific_heat(self, state, specific_heat)
+    subroutine calc_specific_heat(self, state, specific_heat)
         implicit none
         class(type_material_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -168,7 +168,7 @@ contains
 
     end subroutine calc_specific_heat
 
-    pure elemental subroutine calc_thermal_conductivity_nondispersivity(self, state, lambda)
+    subroutine calc_thermal_conductivity_nondispersivity(self, state, lambda)
         implicit none
         class(type_material_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -178,7 +178,7 @@ contains
 
     end subroutine calc_thermal_conductivity_nondispersivity
 
-    pure elemental subroutine calc_thermal_conductivity_dispersivity(self, state, lambda)
+    subroutine calc_thermal_conductivity_dispersivity(self, state, lambda)
         implicit none
         class(type_material_manager), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -188,7 +188,7 @@ contains
 
     end subroutine calc_thermal_conductivity_dispersivity
 
-    pure elemental subroutine calc_vol_heat_capacity(self, state, vhc)
+    subroutine calc_vol_heat_capacity(self, state, vhc)
         implicit none
         class(type_material_manager), intent(in) :: self
         type(type_state), intent(in) :: state

@@ -39,7 +39,7 @@ module physics_materials_heat_capacity
     end type abst_vhc
 
     abstract interface
-        pure elemental subroutine abst_calc_vhc_gp(self, state, vhc)
+        subroutine abst_calc_vhc_gp(self, state, vhc)
             import :: abst_vhc, type_state, real64
             implicit none
             class(abst_vhc), intent(in) :: self
@@ -54,7 +54,7 @@ module physics_materials_heat_capacity
     end type type_vhc_1phase
 
     interface
-        module pure elemental subroutine calc_vhc_gp_1phase(self, state, vhc)
+        module subroutine calc_vhc_gp_1phase(self, state, vhc)
             implicit none
             class(type_vhc_1phase), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -68,7 +68,7 @@ module physics_materials_heat_capacity
     end type type_vhc_2phase
 
     interface
-        module pure elemental subroutine calc_vhc_gp_2phase(self, state, vhc)
+        module subroutine calc_vhc_gp_2phase(self, state, vhc)
             implicit none
             class(type_vhc_2phase), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -82,7 +82,7 @@ module physics_materials_heat_capacity
     end type type_vhc_3phase
 
     interface
-        module pure elemental subroutine calc_vhc_gp_3phase(self, state, vhc)
+        module subroutine calc_vhc_gp_3phase(self, state, vhc)
             implicit none
             class(type_vhc_3phase), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -96,7 +96,7 @@ module physics_materials_heat_capacity
     end type type_vhc_4phase
 
     interface
-        module pure elemental subroutine calc_vhc_gp_4phase(self, state, vhc)
+        module subroutine calc_vhc_gp_4phase(self, state, vhc)
             implicit none
             class(type_vhc_4phase), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -105,8 +105,8 @@ module physics_materials_heat_capacity
     end interface
 
     interface
-        module pure elemental subroutine calc_vhc_2(vhc_soil, phi_soil, &
-                                                    vhc_water, phi_water, vhc)
+        module subroutine calc_vhc_2(vhc_soil, phi_soil, &
+                                     vhc_water, phi_water, vhc)
             implicit none
             real(real64), intent(in) :: vhc_soil
             real(real64), intent(in) :: phi_soil
@@ -116,8 +116,8 @@ module physics_materials_heat_capacity
 
         end subroutine calc_vhc_2
 
-        module pure elemental subroutine calc_vhc_3a(vhc_soil, phi_soil, vhc_water, phi_water, &
-                                                     vhc_ice, phi_ice, density_water, latent_heat_fusion, dQw_dT, vhc)
+        module subroutine calc_vhc_3a(vhc_soil, phi_soil, vhc_water, phi_water, &
+                                      vhc_ice, phi_ice, density_water, latent_heat_fusion, dQw_dT, vhc)
             implicit none
             real(real64), intent(in) :: vhc_soil
             real(real64), intent(in) :: phi_soil
@@ -132,9 +132,9 @@ module physics_materials_heat_capacity
 
         end subroutine calc_vhc_3a
 
-        module pure elemental subroutine calc_vhc_4a(vhc_soil, phi_soil, vhc_water, phi_water, &
-                                                     vhc_ice, phi_ice, phi_vapor, vhc_vapor, density_water, latent_heat_fusion, &
-                                                     dQw_dT, latent_heat_vaporization, dQv_dT, vhc)
+        module subroutine calc_vhc_4a(vhc_soil, phi_soil, vhc_water, phi_water, &
+                                      vhc_ice, phi_ice, phi_vapor, vhc_vapor, density_water, latent_heat_fusion, &
+                                      dQw_dT, latent_heat_vaporization, dQv_dT, vhc)
             implicit none
             real(real64), intent(in) :: vhc_soil
             real(real64), intent(in) :: phi_soil

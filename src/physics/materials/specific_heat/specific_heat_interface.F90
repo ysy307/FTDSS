@@ -39,7 +39,7 @@ module physics_materials_specific_heat
     end type abst_sph
 
     abstract interface
-        pure elemental subroutine abst_calc_sph_gp(self, state, specific_heat)
+        subroutine abst_calc_sph_gp(self, state, specific_heat)
             import :: abst_sph, type_state, real64
             implicit none
             class(abst_sph), intent(in) :: self
@@ -54,7 +54,7 @@ module physics_materials_specific_heat
     end type type_sph_1phase
 
     interface
-        module pure elemental subroutine calc_sph_gp_1phase(self, state, specific_heat)
+        module subroutine calc_sph_gp_1phase(self, state, specific_heat)
             implicit none
             class(type_sph_1phase), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -68,7 +68,7 @@ module physics_materials_specific_heat
     end type type_sph_2phase
 
     interface
-        module pure elemental subroutine calc_sph_gp_2phase(self, state, specific_heat)
+        module subroutine calc_sph_gp_2phase(self, state, specific_heat)
             implicit none
             class(type_sph_2phase), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -82,7 +82,7 @@ module physics_materials_specific_heat
     end type type_sph_3phase
 
     interface
-        module pure elemental subroutine calc_sph_gp_3phase(self, state, specific_heat)
+        module subroutine calc_sph_gp_3phase(self, state, specific_heat)
             implicit none
             class(type_sph_3phase), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -96,7 +96,7 @@ module physics_materials_specific_heat
     end type type_sph_4phase
 
     interface
-        module pure elemental subroutine calc_sph_gp_4phase(self, state, specific_heat)
+        module subroutine calc_sph_gp_4phase(self, state, specific_heat)
             implicit none
             class(type_sph_4phase), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -106,8 +106,8 @@ module physics_materials_specific_heat
 
     interface
 
-        module pure elemental subroutine calc_sph_2(specific_heat_soil, phi_soil, &
-                                                    specific_heat_water, phi_water, specific_heat)
+        module subroutine calc_sph_2(specific_heat_soil, phi_soil, &
+                                     specific_heat_water, phi_water, specific_heat)
             implicit none
             real(real64), intent(in) :: specific_heat_soil
             real(real64), intent(in) :: phi_soil
@@ -116,9 +116,9 @@ module physics_materials_specific_heat
             real(real64), intent(inout) :: specific_heat
         end subroutine calc_sph_2
 
-        module pure elemental subroutine calc_sph_3(specific_heat_soil, phi_soil, &
-                                                    specific_heat_water, phi_water, &
-                                                    specific_heat_ice, phi_ice, specific_heat)
+        module subroutine calc_sph_3(specific_heat_soil, phi_soil, &
+                                     specific_heat_water, phi_water, &
+                                     specific_heat_ice, phi_ice, specific_heat)
             implicit none
             real(real64), intent(in) :: specific_heat_soil
             real(real64), intent(in) :: phi_soil
@@ -129,10 +129,10 @@ module physics_materials_specific_heat
             real(real64), intent(inout) :: specific_heat
         end subroutine calc_sph_3
 
-        module pure elemental subroutine calc_sph_4(specific_heat_soil, phi_soil, &
-                                                    specific_heat_water, phi_water, &
-                                                    specific_heat_ice, phi_ice, &
-                                                    specific_heat_vapor, phi_vapor, specific_heat)
+        module subroutine calc_sph_4(specific_heat_soil, phi_soil, &
+                                     specific_heat_water, phi_water, &
+                                     specific_heat_ice, phi_ice, &
+                                     specific_heat_vapor, phi_vapor, specific_heat)
             implicit none
             real(real64), intent(in) :: specific_heat_soil
             real(real64), intent(in) :: phi_soil

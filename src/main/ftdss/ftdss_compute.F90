@@ -160,6 +160,18 @@ contains
         allocate (nodal_vol(num_total_nodes))
         nodal_vol(:) = 0.0d0
 
+        ! 作業用配列の再確保 (allocatableは自動再割り当てされる場合もあるが明示的に管理)
+        if (allocated(elem_u)) deallocate (elem_u)
+        if (allocated(psi)) deallocate (psi)
+        if (allocated(dpsi_dx)) deallocate (dpsi_dx)
+        ! node_coordsは get_element_coordinate 内で handle されるためここでは deallocate しない方が安全だが、
+        ! エラー回避のために明示的に ensure することも可能。
+        ! ここでは元のコードの意図通り get_element_coordinate に任せる。
+
+        allocate (elem_u(20))
+        allocate (psi(20))
+        allocate (dpsi_dx(dim, 20))
+
         do i = 1, num_elements
             call self%domain%get_element(i, fe)
             call self%domain%get_element_connectivity(i, p_conn)
@@ -170,19 +182,7 @@ contains
             call fe%get_weight(fe_weights)
             call fe%get_gauss(fe_gauss_pts)
 
-            ! 作業用配列の再確保 (allocatableは自動再割り当てされる場合もあるが明示的に管理)
-            if (allocated(elem_u)) deallocate (elem_u)
-            if (allocated(psi)) deallocate (psi)
-            if (allocated(dpsi_dx)) deallocate (dpsi_dx)
-            ! node_coordsは get_element_coordinate 内で handle されるためここでは deallocate しない方が安全だが、
-            ! エラー回避のために明示的に ensure することも可能。
-            ! ここでは元のコードの意図通り get_element_coordinate に任せる。
-
-            allocate (elem_u(n_nodes_elem))
-            allocate (psi(n_nodes_elem))
-            allocate (dpsi_dx(dim, n_nodes_elem))
-
-            elem_u(:) = values_vec(p_conn(:))
+            elem_u(1:n_nodes_elem) = values_vec(p_conn(1:n_nodes_elem))
 
             ! 座標取得 (allocatable引数)
             call self%domain%get_element_coordinate(i, node_coords)
@@ -190,12 +190,12 @@ contains
             do p = 1, n_gauss
                 r = fe_gauss_pts(p)
 
-                call fe%calc_shape_function(r, node_coords, psi=psi, dpsi_dx=dpsi_dx, determinant_jacobian=det_j)
+                call fe%calc_shape_function(r, node_coords, psi=psi(1:n_nodes_elem), dpsi_dx=dpsi_dx(:, 1:n_nodes_elem), determinant_jacobian=det_j)
                 w_vol = fe_weights(p) * det_j
 
                 gauss_grad = 0.0d0
                 do d = 1, dim
-                    gauss_grad(d) = vector_dot(elem_u, dpsi_dx(d, :))
+                    gauss_grad(d) = vector_dot(elem_u(1:n_nodes_elem), dpsi_dx(d, 1:n_nodes_elem))
                 end do
 
                 do k = 1, n_nodes_elem
@@ -339,6 +339,5 @@ contains
         end select
 
     end subroutine calc_vapor_flux_ftdss
-
 
 end submodule ftdss_compute

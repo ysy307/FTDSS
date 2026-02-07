@@ -5,7 +5,7 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Calculate kr for van-Genuchten model
     !----------------------------------------------------------------------------------------------------
-    pure elemental subroutine calc_kr_vg(alpha1, n1, m1, l, h, kr)
+    subroutine calc_kr_vg(alpha1, n1, m1, l, h, kr)
         implicit none
         real(real64), intent(in) :: alpha1
         real(real64), intent(in) :: n1
@@ -29,7 +29,7 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Wrapper of calculating kr for van-Genuchten model bounding different derived types
     !----------------------------------------------------------------------------------------------------
-    module pure elemental subroutine calc_kr_base_vg(self, h, kr)
+    module subroutine calc_kr_base_vg(self, h, kr)
         implicit none
         class(type_hcf_base_vg), intent(in) :: self
         real(real64), intent(in) :: h

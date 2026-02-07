@@ -4,7 +4,7 @@ contains
 
     !----------------------------------------------------------------------------------------------------
     ! Calculate kr for Modified van-Genuchten model
-    pure elemental subroutine calc_kr_mvg(theta_s, theta_r, alpha1, n1, m1, l, h_crit, h, kr)
+    subroutine calc_kr_mvg(theta_s, theta_r, alpha1, n1, m1, l, h_crit, h, kr)
         implicit none
         real(real64), intent(in) :: theta_s
         real(real64), intent(in) :: theta_r
@@ -48,7 +48,7 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Wrapper of calculating kr for Modified van-Genuchten model bounding different derived types
     !----------------------------------------------------------------------------------------------------
-    module pure elemental subroutine calc_kr_base_mvg(self, h, kr)
+    module subroutine calc_kr_base_mvg(self, h, kr)
         implicit none
         class(type_hcf_base_mvg), intent(in) :: self
         real(real64), intent(in) :: h

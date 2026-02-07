@@ -27,8 +27,8 @@ contains
 
     end subroutine initialize_holder_dens
 
-    module pure elemental subroutine calc_den_2(density_soil, phi_soil, &
-                                                density_water, phi_water, density)
+    module subroutine calc_den_2(density_soil, phi_soil, &
+                                 density_water, phi_water, density)
         implicit none
         real(real64), intent(in) :: density_soil
         real(real64), intent(in) :: phi_soil
@@ -40,9 +40,9 @@ contains
                   + density_water * phi_water
     end subroutine calc_den_2
 
-    module pure elemental subroutine calc_den_3(density_soil, phi_soil, &
-                                                density_water, phi_water, &
-                                                density_ice, phi_ice, density)
+    module subroutine calc_den_3(density_soil, phi_soil, &
+                                 density_water, phi_water, &
+                                 density_ice, phi_ice, density)
         implicit none
         real(real64), intent(in) :: density_soil
         real(real64), intent(in) :: phi_soil
@@ -58,10 +58,10 @@ contains
 
     end subroutine calc_den_3
 
-    module pure elemental subroutine calc_den_4(density_soil, phi_soil, &
-                                                density_water, phi_water, &
-                                                density_ice, phi_ice, &
-                                                density_vapor, phi_vapor, density)
+    module subroutine calc_den_4(density_soil, phi_soil, &
+                                 density_water, phi_water, &
+                                 density_ice, phi_ice, &
+                                 density_vapor, phi_vapor, density)
         implicit none
         real(real64), intent(in) :: density_soil
         real(real64), intent(in) :: phi_soil

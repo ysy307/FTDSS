@@ -31,6 +31,7 @@ contains
 
         call ftdss%initialize()
         call ftdss%run()
+        call ftdss%finalize()
 
     end subroutine run_test_ftdss
 

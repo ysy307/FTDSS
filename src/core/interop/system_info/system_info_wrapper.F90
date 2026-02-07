@@ -65,10 +65,12 @@ contains
         do i = 1, user_name_lists_length
             call get_env_string(user_name_lists(i), &
                                 tmp_user_name)
-            if (len_trim(tmp_user_name) > 0) then
-                user_name = strip(tmp_user_name)
-                deallocate (user_name_lists)
-                return
+            if (allocated(tmp_user_name)) then
+                if (len_trim(tmp_user_name) > 0) then
+                    user_name = strip(tmp_user_name)
+                    deallocate (user_name_lists)
+                    return
+                end if
             end if
         end do
 
@@ -119,10 +121,12 @@ contains
         do i = 1, host_name_lists_length
             call get_env_string(host_name_lists(i), &
                                 tmp_host_name)
-            if (len_trim(tmp_host_name) > 0) then
-                host_name = strip(tmp_host_name)
-                deallocate (host_name_lists)
-                return
+            if (allocated(tmp_host_name)) then
+                if (len_trim(tmp_host_name) > 0) then
+                    host_name = strip(tmp_host_name)
+                    deallocate (host_name_lists)
+                    return
+                end if
             end if
         end do
 

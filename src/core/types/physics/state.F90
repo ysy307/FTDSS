@@ -1,6 +1,7 @@
 module core_types_physics_state
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: core_types_coordinate, only:type_coordinate_dp
+    use :: core_allocate, only:allocate_array
     use :: core_deallocate, only:deallocate_array
     implicit none
     private
@@ -38,9 +39,8 @@ module core_types_physics_state
     ! 3. Coordinate Wrapper Type
     ! ------------------------------------------------------------------
     type :: type_field_coord
-        private
-        type(type_coordinate_dp) :: value
-        logical :: is_set = .false.
+        type(type_coordinate_dp), private :: value = type_coordinate_dp(0.0d0, 0.0d0, 0.0d0)
+        logical, private :: is_set = .false.
     contains
         procedure, pass(self), public :: set => field_coord_set
         procedure, pass(self), public :: get => get_field_coord
@@ -96,7 +96,7 @@ module core_types_physics_state
         procedure, public, pass(self) :: set => set_all_state
         !> Bulk Getter
         procedure, public, pass(self) :: get => get_all_state
-        !> Reset All (Pure Elemental)
+        !> Reset All (
         procedure, public, pass(self) :: reset => reset_all_state
         !> Copy
         procedure, public, pass(self) :: copy => copy_state
@@ -109,7 +109,7 @@ contains
     ! ==================================================================
 
     ! Setter
-    pure elemental subroutine set_field_dp(self, value)
+    subroutine set_field_dp(self, value)
         implicit none
         class(type_field_dp), intent(inout) :: self
         real(real64), intent(in) :: value
@@ -119,7 +119,7 @@ contains
     end subroutine set_field_dp
 
     ! Getter (Subroutine style)
-    pure elemental subroutine get_field_dp(self, value, is_set)
+    subroutine get_field_dp(self, value, is_set)
         implicit none
         class(type_field_dp), intent(in) :: self
         real(real64), intent(inout) :: value
@@ -137,7 +137,7 @@ contains
     end subroutine get_field_dp
 
     ! Reset
-    pure elemental subroutine reset_field_dp(self)
+    subroutine reset_field_dp(self)
         implicit none
         class(type_field_dp), intent(inout) :: self
 
@@ -149,20 +149,25 @@ contains
     ! Implementation: Real64 Array Field
     ! ==================================================================
 
-    pure subroutine set_field_array_dp(self, value)
+    subroutine set_field_array_dp(self, value)
         implicit none
         class(type_field_array_dp), intent(inout) :: self
         real(real64), intent(in) :: value(:)
 
         if (allocated(self%value)) then
-            deallocate (self%value)
+            ! サイズが違う場合のみ再確保
+            if (size(self%value) /= size(value)) then
+                deallocate (self%value)
+                allocate (self%value(size(value)))
+            end if
+        else
+            allocate (self%value(size(value)))
         end if
-        allocate (self%value(size(value)))
         self%value = value
         self%is_set = .true.
     end subroutine set_field_array_dp
 
-    pure subroutine set_index_field_array_dp(self, index, value)
+    subroutine set_index_field_array_dp(self, index, value)
         implicit none
         class(type_field_array_dp), intent(inout) :: self
         integer(int32), intent(in) :: index
@@ -172,30 +177,24 @@ contains
         self%value(index) = value
     end subroutine set_index_field_array_dp
 
-    pure subroutine get_field_array_dp(self, value, is_set)
+    subroutine get_field_array_dp(self, value, is_set)
         implicit none
-        class(type_field_array_dp), intent(in) :: self
-        real(real64), allocatable, intent(inout) :: value(:)
+        class(type_field_array_dp), intent(in), target :: self
+        real(real64), intent(inout), pointer, contiguous, dimension(:) :: value
         logical, intent(inout), optional :: is_set
 
         if (.not. self%is_set) then
-            if (allocated(value)) then
-                deallocate (value)
-            end if
+            nullify (value)
             if (present(is_set)) is_set = .false.
             return
         end if
 
-        if (allocated(value)) then
-            deallocate (value)
-        end if
-        allocate (value(size(self%value)))
-        value = self%value
+        value => self%value
         if (present(is_set)) is_set = self%is_set
 
     end subroutine get_field_array_dp
 
-    pure subroutine reset_field_array_dp(self)
+    subroutine reset_field_array_dp(self)
         implicit none
         class(type_field_array_dp), intent(inout) :: self
 
@@ -206,7 +205,7 @@ contains
     end subroutine reset_field_array_dp
 
     ! Setter
-    pure elemental subroutine field_coord_set(self, value)
+    subroutine field_coord_set(self, value)
         class(type_field_coord), intent(inout) :: self
         type(type_coordinate_dp), intent(in) :: value
 
@@ -215,23 +214,23 @@ contains
     end subroutine field_coord_set
 
     ! Getter
-    pure elemental subroutine get_field_coord(self, val, is_set)
+    subroutine get_field_coord(self, value, is_set)
         implicit none
-        class(type_field_coord), intent(in) :: self
-        type(type_coordinate_dp), intent(inout) :: val
+        class(type_field_coord), intent(in), target :: self
+        type(type_coordinate_dp), intent(inout), pointer :: value
         logical, intent(inout), optional :: is_set
 
         if (self%is_set) then
-            val = self%value
+            value => self%value
             if (present(is_set)) is_set = self%is_set
         else
-            val = type_coordinate_dp(huge(0.0d0), huge(0.0d0), huge(0.0d0))
+            nullify (value)
             if (present(is_set)) is_set = .false.
         end if
     end subroutine get_field_coord
 
     ! Reset
-    pure elemental subroutine reset_field_coord(self)
+    subroutine reset_field_coord(self)
         implicit none
         class(type_field_coord), intent(inout) :: self
 
@@ -244,7 +243,7 @@ contains
     ! ==================================================================
 
     ! Bulk Setter
-    ! Pure Elemental には引数制限やコンパイラ依存があるため、
+    ! には引数制限やコンパイラ依存があるため、
     ! ここでは通常の Subroutine として実装します（安全策）。
     subroutine set_all_state(self, temperature, pressure, water_content, ice_content, &
                              vapor_content, air_content, porosity, &
@@ -376,15 +375,15 @@ contains
         real(real64), intent(inout), optional :: water_content, ice_content
         real(real64), intent(inout), optional :: vapor_content, air_content
         real(real64), intent(inout), optional :: porosity
-        real(real64), allocatable, intent(inout), optional :: temperature_history(:)
-        real(real64), allocatable, intent(inout), optional :: pressure_history(:)
-        real(real64), allocatable, intent(inout), optional :: porosity_history(:)
+        real(real64), pointer, contiguous, dimension(:), intent(inout), optional :: temperature_history
+        real(real64), pointer, contiguous, dimension(:), intent(inout), optional :: pressure_history
+        real(real64), pointer, contiguous, dimension(:), intent(inout), optional :: porosity_history
         real(real64), intent(inout), optional :: latent_heat_fusion, latent_heat_vaporization
         real(real64), intent(inout), optional :: dQw_dT, dQv_dT, dQa_dT, dQi_dT
         real(real64), intent(inout), optional :: dQw_dP, dQv_dP, dQa_dP, dQi_dP
-        type(type_coordinate_dp), intent(inout), optional :: grad_T, grad_P
+        type(type_coordinate_dp), intent(inout), pointer, optional :: grad_T, grad_P
         real(real64), intent(inout), optional :: relative_humidity, mass_fraction_clay
-        type(type_coordinate_dp), intent(inout), optional :: water_flux, vapor_flux
+        type(type_coordinate_dp), intent(inout), pointer, optional :: water_flux, vapor_flux
 
         if (present(temperature)) then
             call self%temperature%get(temperature)
@@ -467,8 +466,8 @@ contains
         end if
     end subroutine get_all_state
 
-    ! Reset All (Pure Elemental)
-    pure elemental subroutine reset_all_state(self)
+    ! Reset All (
+    subroutine reset_all_state(self)
         implicit none
         class(type_state), intent(inout) :: self
 
@@ -500,7 +499,7 @@ contains
         call self%vapor_flux%reset()
     end subroutine reset_all_state
 
-    pure subroutine copy_state(self, source)
+    subroutine copy_state(self, source)
         implicit none
         class(type_state), intent(inout) :: self
         class(type_state), intent(in) :: source

@@ -6,7 +6,7 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Calculate kr for Kosugi model
     !----------------------------------------------------------------------------------------------------
-    pure elemental subroutine calc_kr_ko(alpha1, n1, l, h, kr)
+    subroutine calc_kr_ko(alpha1, n1, l, h, kr)
         implicit none
         real(real64), intent(in) :: alpha1
         real(real64), intent(in) :: n1
@@ -25,7 +25,7 @@ contains
 
     end subroutine calc_kr_ko
 
-    module pure elemental subroutine calc_kr_base_ko(self, h, kr)
+    module subroutine calc_kr_base_ko(self, h, kr)
         implicit none
         class(type_hcf_base_ko), intent(in) :: self
         real(real64), intent(in) :: h

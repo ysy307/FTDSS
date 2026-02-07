@@ -194,12 +194,10 @@ module inout_output
     end interface
 
     interface
-        module subroutine output_system_log(self, control, matrix, domain)
+        module subroutine output_system_log(self, control)
             implicit none
             class(type_output), intent(inout) :: self
             type(type_controls), intent(in) :: control
-            class(abst_matrix), intent(in) :: matrix
-            type(type_domain), intent(inout) :: domain
         end subroutine output_system_log
     end interface
 

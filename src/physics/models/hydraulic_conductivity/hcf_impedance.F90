@@ -2,7 +2,7 @@ submodule(physics_models_hcf) hcf_impedance
     implicit none
 contains
 
-    pure elemental subroutine calc_impedance_exponential(omega, Qice, impedance)
+    subroutine calc_impedance_exponential(omega, Qice, impedance)
         implicit none
         real(real64), intent(in) :: omega
         real(real64), intent(in) :: Qice
@@ -12,7 +12,7 @@ contains
 
     end subroutine calc_impedance_exponential
 
-    module pure elemental subroutine calc_impedance_exp(self, Qice, kr)
+    module subroutine calc_impedance_exp(self, Qice, kr)
         implicit none
         class(type_hcf_impedance_exp), intent(in) :: self
         real(real64), intent(in) :: Qice

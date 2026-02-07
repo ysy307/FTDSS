@@ -1,7 +1,7 @@
 submodule(physics_materials_heat_capacity) heat_capacity_multiphase
     implicit none
 contains
-    module pure elemental subroutine calc_vhc_gp_1phase(self, state, vhc)
+    module subroutine calc_vhc_gp_1phase(self, state, vhc)
         implicit none
         class(type_vhc_1phase), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -10,7 +10,7 @@ contains
         vhc = self%material1
     end subroutine calc_vhc_gp_1phase
 
-    module pure elemental subroutine calc_vhc_gp_2phase(self, state, vhc)
+    module subroutine calc_vhc_gp_2phase(self, state, vhc)
         implicit none
         class(type_vhc_2phase), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -30,7 +30,7 @@ contains
         call calc_vhc_2(self%material1, phi1, vhc_water, phi2, vhc)
     end subroutine calc_vhc_gp_2phase
 
-    module pure elemental subroutine calc_vhc_gp_3phase(self, state, vhc)
+    module subroutine calc_vhc_gp_3phase(self, state, vhc)
         implicit none
         class(type_vhc_3phase), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -60,7 +60,7 @@ contains
                          density_water, latent_heat_fusion, dQw_dT, vhc)
     end subroutine calc_vhc_gp_3phase
 
-    module pure elemental subroutine calc_vhc_gp_4phase(self, state, vhc)
+    module subroutine calc_vhc_gp_4phase(self, state, vhc)
         implicit none
         class(type_vhc_4phase), intent(in) :: self
         type(type_state), intent(in) :: state

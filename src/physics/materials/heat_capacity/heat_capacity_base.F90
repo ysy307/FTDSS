@@ -28,8 +28,8 @@ contains
 
     end subroutine initialize_holder_vhcs
 
-    module pure elemental subroutine calc_vhc_2(vhc_soil, phi_soil, &
-                                                vhc_water, phi_water, vhc)
+    module subroutine calc_vhc_2(vhc_soil, phi_soil, &
+                                 vhc_water, phi_water, vhc)
         implicit none
         real(real64), intent(in) :: vhc_soil
         real(real64), intent(in) :: phi_soil
@@ -41,8 +41,8 @@ contains
 
     end subroutine calc_vhc_2
 
-    module pure elemental subroutine calc_vhc_3a(vhc_soil, phi_soil, vhc_water, phi_water, &
-                                                 vhc_ice, phi_ice, density_water, latent_heat_fusion, dQw_dT, vhc)
+    module subroutine calc_vhc_3a(vhc_soil, phi_soil, vhc_water, phi_water, &
+                                  vhc_ice, phi_ice, density_water, latent_heat_fusion, dQw_dT, vhc)
         implicit none
         real(real64), intent(in) :: vhc_soil
         real(real64), intent(in) :: phi_soil
@@ -58,9 +58,9 @@ contains
         vhc = vhc_soil * phi_soil + vhc_water * phi_water + vhc_ice * phi_ice + latent_heat_fusion * density_water * dQw_dT
     end subroutine calc_vhc_3a
 
-    module pure elemental subroutine calc_vhc_4a(vhc_soil, phi_soil, vhc_water, phi_water, &
-                                                 vhc_ice, phi_ice, phi_vapor, vhc_vapor, density_water, latent_heat_fusion, &
-                                                 dQw_dT, latent_heat_vaporization, dQv_dT, vhc)
+    module subroutine calc_vhc_4a(vhc_soil, phi_soil, vhc_water, phi_water, &
+                                  vhc_ice, phi_ice, phi_vapor, vhc_vapor, density_water, latent_heat_fusion, &
+                                  dQw_dT, latent_heat_vaporization, dQv_dT, vhc)
         implicit none
         real(real64), intent(in) :: vhc_soil
         real(real64), intent(in) :: phi_soil

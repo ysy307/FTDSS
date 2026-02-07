@@ -38,7 +38,7 @@ module physics_materials_density
     end type abst_den
 
     abstract interface
-        pure elemental subroutine abst_calc_den_gp(self, state, density)
+        subroutine abst_calc_den_gp(self, state, density)
             import :: abst_den, type_state, type_iapws97, type_iapws06, real64
             implicit none
             class(abst_den), intent(in) :: self
@@ -53,7 +53,7 @@ module physics_materials_density
     end type type_den_1phase
 
     interface
-        module pure elemental subroutine calc_den_gp_1phase(self, state, density)
+        module subroutine calc_den_gp_1phase(self, state, density)
             implicit none
             class(type_den_1phase), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -67,7 +67,7 @@ module physics_materials_density
     end type type_den_2phase
 
     interface
-        module pure elemental subroutine calc_den_gp_2phase(self, state, density)
+        module subroutine calc_den_gp_2phase(self, state, density)
             implicit none
             class(type_den_2phase), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -81,7 +81,7 @@ module physics_materials_density
     end type type_den_3phase
 
     interface
-        module pure elemental subroutine calc_den_gp_3phase(self, state, density)
+        module subroutine calc_den_gp_3phase(self, state, density)
             implicit none
             class(type_den_3phase), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -95,7 +95,7 @@ module physics_materials_density
     end type type_den_4phase
 
     interface
-        module pure elemental subroutine calc_den_gp_4phase(self, state, density)
+        module subroutine calc_den_gp_4phase(self, state, density)
             implicit none
             class(type_den_4phase), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -107,8 +107,8 @@ module physics_materials_density
     ! 密度計算のための関数インターフェース
     ! ------------------------------------------------------------------------------
     interface
-        module pure elemental subroutine calc_den_2(density_soil, phi_soil, &
-                                                    density_water, phi_water, density)
+        module subroutine calc_den_2(density_soil, phi_soil, &
+                                     density_water, phi_water, density)
             implicit none
             real(real64), intent(in) :: density_soil
             real(real64), intent(in) :: phi_soil
@@ -118,9 +118,9 @@ module physics_materials_density
 
         end subroutine calc_den_2
 
-        module pure elemental subroutine calc_den_3(density_soil, phi_soil, &
-                                                    density_water, phi_water, &
-                                                    density_ice, phi_ice, density)
+        module subroutine calc_den_3(density_soil, phi_soil, &
+                                     density_water, phi_water, &
+                                     density_ice, phi_ice, density)
             implicit none
             real(real64), intent(in) :: density_soil
             real(real64), intent(in) :: phi_soil
@@ -132,10 +132,10 @@ module physics_materials_density
 
         end subroutine calc_den_3
 
-        module pure elemental subroutine calc_den_4(density_soil, phi_soil, &
-                                                    density_water, phi_water, &
-                                                    density_ice, phi_ice, &
-                                                    density_vapor, phi_vapor, density)
+        module subroutine calc_den_4(density_soil, phi_soil, &
+                                     density_water, phi_water, &
+                                     density_ice, phi_ice, &
+                                     density_vapor, phi_vapor, density)
             implicit none
             real(real64), intent(in) :: density_soil
             real(real64), intent(in) :: phi_soil

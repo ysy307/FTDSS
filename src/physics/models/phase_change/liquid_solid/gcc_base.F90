@@ -37,7 +37,7 @@ contains
     ! Holder Wrapper Methods
     ! --------------------------------------------------------------------------
 
-    module pure elemental subroutine calc_holder(self, state, suction)
+    module subroutine calc_holder(self, state, suction)
         implicit none
         class(holder_gccs), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -49,7 +49,7 @@ contains
         end if
     end subroutine calc_holder
 
-    module pure elemental subroutine deriv_temperature_holder(self, state, deriv)
+    module subroutine deriv_temperature_holder(self, state, deriv)
         implicit none
         class(holder_gccs), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -61,7 +61,7 @@ contains
         end if
     end subroutine deriv_temperature_holder
 
-    module pure elemental subroutine deriv_pressure_holder(self, state, deriv)
+    module subroutine deriv_pressure_holder(self, state, deriv)
         implicit none
         class(holder_gccs), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -94,7 +94,7 @@ contains
     ! Non-Segregation Implementation
     ! ==========================================================================
 
-    module pure elemental subroutine calc_gcc_nonseg(self, state, suction)
+    module subroutine calc_gcc_nonseg(self, state, suction)
         implicit none
         class(type_gcc_non_segregation), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -114,7 +114,7 @@ contains
         end if
     end subroutine calc_gcc_nonseg
 
-    module pure elemental subroutine deriv_temp_gcc_nonseg(self, state, suction_derivative)
+    module subroutine deriv_temp_gcc_nonseg(self, state, suction_derivative)
         implicit none
         class(type_gcc_non_segregation), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -134,7 +134,7 @@ contains
         end if
     end subroutine deriv_temp_gcc_nonseg
 
-    module pure elemental subroutine deriv_pres_gcc_nonseg(self, state, suction_derivative)
+    module subroutine deriv_pres_gcc_nonseg(self, state, suction_derivative)
         implicit none
         class(type_gcc_non_segregation), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -143,7 +143,7 @@ contains
         suction_derivative = 0.0d0
     end subroutine deriv_pres_gcc_nonseg
 
-    module pure elemental subroutine deriv2_temp_gcc_nonseg(self, state, suction_derivative)
+    module subroutine deriv2_temp_gcc_nonseg(self, state, suction_derivative)
         implicit none
         class(type_gcc_non_segregation), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -163,7 +163,7 @@ contains
         end if
     end subroutine deriv2_temp_gcc_nonseg
 
-    module pure elemental subroutine deriv_pressure_ice_water_nonseg(self, state, deriv)
+    module subroutine deriv_pressure_ice_water_nonseg(self, state, deriv)
         implicit none
         class(type_gcc_non_segregation), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -177,7 +177,7 @@ contains
     ! Segregation Implementation
     ! ==========================================================================
 
-    module pure elemental subroutine calc_gcc_seg(self, state, suction)
+    module subroutine calc_gcc_seg(self, state, suction)
         implicit none
         class(type_gcc_segregation), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -200,7 +200,7 @@ contains
         end if
     end subroutine calc_gcc_seg
 
-    module pure elemental subroutine deriv_temp_gcc_seg(self, state, suction_derivative)
+    module subroutine deriv_temp_gcc_seg(self, state, suction_derivative)
         implicit none
         class(type_gcc_segregation), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -220,7 +220,7 @@ contains
         end if
     end subroutine deriv_temp_gcc_seg
 
-    module pure elemental subroutine deriv_pres_gcc_seg(self, state, suction_derivative)
+    module subroutine deriv_pres_gcc_seg(self, state, suction_derivative)
         implicit none
         class(type_gcc_segregation), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -242,7 +242,7 @@ contains
         end if
     end subroutine deriv_pres_gcc_seg
 
-    module pure elemental subroutine deriv2_temp_gcc_seg(self, state, suction_derivative)
+    module subroutine deriv2_temp_gcc_seg(self, state, suction_derivative)
         implicit none
         class(type_gcc_segregation), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -262,7 +262,7 @@ contains
         end if
     end subroutine deriv2_temp_gcc_seg
 
-    module pure elemental subroutine deriv_pressure_ice_water_seg(self, state, deriv)
+    module subroutine deriv_pressure_ice_water_seg(self, state, deriv)
         implicit none
         class(type_gcc_segregation), intent(in) :: self
         type(type_state), intent(in) :: state

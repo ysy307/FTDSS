@@ -99,7 +99,7 @@ contains
     !===========================================================================
 
     !> @brief 摂氏温度をケルビンに変換します。
-    pure elemental subroutine shift_temperature_absolute_abst_physics(self, temperature_degree, temperature_K)
+    subroutine shift_temperature_absolute_abst_physics(self, temperature_degree, temperature_K)
         implicit none
         class(abst_physics), intent(in) :: self
         real(real64), intent(in) :: temperature_degree !< 摂氏温度 [C]
@@ -110,7 +110,7 @@ contains
 
     !> @brief ゲージ圧を絶対圧に変換します。
     !> @details 負圧(不飽和)の場合は大気圧を返します。
-    pure elemental subroutine shift_pressure_absolute_abst_physics(self, pressure_gauge, pressure_absolute)
+    subroutine shift_pressure_absolute_abst_physics(self, pressure_gauge, pressure_absolute)
         implicit none
         class(abst_physics), intent(in) :: self
         real(real64), intent(in) :: pressure_gauge !< ゲージ圧 [Pa]
@@ -124,7 +124,7 @@ contains
     end subroutine shift_pressure_absolute_abst_physics
 
     !> @brief Stateオブジェクトから絶対温度[K]と絶対圧力[Pa]を取得する内部ヘルパー
-    pure subroutine get_thermo_state_TP(self, state, T_K, P_abs)
+    subroutine get_thermo_state_TP(self, state, T_K, P_abs)
         implicit none
         class(abst_physics), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -132,15 +132,15 @@ contains
 
         real(real64) :: temp_c, press_g
 
-        call state%temperature%get(temp_c)
-        call state%pressure%get(press_g)
+        call state%get(temperature=temp_c, &
+                       pressure=press_g)
 
         call self%shift_temperature_absolute(temp_c, T_K)
         call self%shift_pressure_absolute(press_g, P_abs)
     end subroutine get_thermo_state_TP
 
     !> @brief Stateオブジェクトから絶対温度[K]のみを取得する内部ヘルパー
-    pure subroutine get_thermo_state_T(self, state, T_K)
+    subroutine get_thermo_state_T(self, state, T_K)
         implicit none
         class(abst_physics), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -157,7 +157,7 @@ contains
     !===========================================================================
 
     !> @brief IAPWS-97を用いて液体の水密度を計算します。
-    pure elemental subroutine calc_rho_water_abst_physics(self, state, density)
+    subroutine calc_rho_water_abst_physics(self, state, density)
         implicit none
         class(abst_physics), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -173,7 +173,7 @@ contains
     end subroutine calc_rho_water_abst_physics
 
     !> @brief 水密度の温度微分 (dRho/dT) を計算します。
-    pure elemental subroutine calc_drho_water_dT_abst_physics(self, state, deriv_density)
+    subroutine calc_drho_water_dT_abst_physics(self, state, deriv_density)
         implicit none
         class(abst_physics), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -189,7 +189,7 @@ contains
     end subroutine calc_drho_water_dT_abst_physics
 
     !> @brief 水密度の圧力微分 (dRho/dP) を計算します。
-    pure elemental subroutine calc_drho_water_dP_abst_physics(self, state, deriv_density)
+    subroutine calc_drho_water_dP_abst_physics(self, state, deriv_density)
         implicit none
         class(abst_physics), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -205,7 +205,7 @@ contains
     end subroutine calc_drho_water_dP_abst_physics
 
     !> @brief 液体の水の定圧比熱 (Cp) を計算します。
-    pure elemental subroutine calc_cp_water_abst_physics(self, state, cp)
+    subroutine calc_cp_water_abst_physics(self, state, cp)
         implicit none
         class(abst_physics), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -225,7 +225,7 @@ contains
     !===========================================================================
 
     !> @brief IAPWS-06を用いて氷密度を計算します。
-    pure elemental subroutine calc_rho_ice_abst_physics(self, state, density)
+    subroutine calc_rho_ice_abst_physics(self, state, density)
         implicit none
         class(abst_physics), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -237,7 +237,7 @@ contains
     end subroutine calc_rho_ice_abst_physics
 
     !> @brief 氷密度の温度微分 (dRho/dT) を計算します。
-    pure elemental subroutine calc_drho_ice_dT_abst_physics(self, state, deriv_density)
+    subroutine calc_drho_ice_dT_abst_physics(self, state, deriv_density)
         implicit none
         class(abst_physics), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -249,7 +249,7 @@ contains
     end subroutine calc_drho_ice_dT_abst_physics
 
     !> @brief 氷密度の圧力微分 (dRho/dP) を計算します。
-    pure elemental subroutine calc_drho_ice_dP_abst_physics(self, state, deriv_density)
+    subroutine calc_drho_ice_dP_abst_physics(self, state, deriv_density)
         implicit none
         class(abst_physics), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -261,7 +261,7 @@ contains
     end subroutine calc_drho_ice_dP_abst_physics
 
     !> @brief 氷の定圧比熱 (Cp) を計算します。
-    pure elemental subroutine calc_cp_ice_abst_physics(self, state, cp)
+    subroutine calc_cp_ice_abst_physics(self, state, cp)
         implicit none
         class(abst_physics), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -278,7 +278,7 @@ contains
 
     !> @brief 相対湿度と飽和密度に基づき蒸気密度を計算します。
     !> @details 数値計算上の問題を避けるため、最小蒸気密度(min_vapor_density)を下限とします。
-    pure elemental subroutine calc_rho_vapor_abst_physics(self, state, density)
+    subroutine calc_rho_vapor_abst_physics(self, state, density)
         implicit none
         class(abst_physics), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -295,7 +295,7 @@ contains
 
     !> @brief 蒸気密度の温度微分 (dRho_v/dT) を計算します。
     !> @details d(Rho_sat * RH)/dT = dRho_sat/dT * RH (RHは定数と仮定)
-    pure elemental subroutine calc_drho_vapor_dT_abst_physics(self, state, deriv_density)
+    subroutine calc_drho_vapor_dT_abst_physics(self, state, deriv_density)
         implicit none
         class(abst_physics), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -313,7 +313,7 @@ contains
 
     !> @brief 蒸気密度の圧力微分 (dRho_v/dP) を計算します。
     !> @details 飽和密度が温度のみに依存するモデルの場合、圧力微分は 0 となります。
-    pure elemental subroutine calc_drho_vapor_dP_abst_physics(self, state, deriv_density)
+    subroutine calc_drho_vapor_dP_abst_physics(self, state, deriv_density)
         implicit none
         class(abst_physics), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -325,7 +325,7 @@ contains
     end subroutine calc_drho_vapor_dP_abst_physics
 
     !> @brief 飽和水蒸気密度を計算します。
-    pure elemental subroutine calc_rho_vapor_saturation_abst_physics(self, state, density)
+    subroutine calc_rho_vapor_saturation_abst_physics(self, state, density)
         implicit none
         class(abst_physics), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -337,7 +337,7 @@ contains
     end subroutine calc_rho_vapor_saturation_abst_physics
 
     !> @brief 飽和水蒸気密度の温度微分を計算します。
-    pure elemental subroutine calc_drho_vapor_saturation_dT_abst_physics(self, state, deriv_density)
+    subroutine calc_drho_vapor_saturation_dT_abst_physics(self, state, deriv_density)
         implicit none
         class(abst_physics), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -349,7 +349,7 @@ contains
     end subroutine calc_drho_vapor_saturation_dT_abst_physics
 
     !> @brief 飽和水蒸気密度の圧力微分を計算します。
-    pure elemental subroutine calc_drho_vapor_saturation_dP_abst_physics(self, state, deriv_density)
+    subroutine calc_drho_vapor_saturation_dP_abst_physics(self, state, deriv_density)
         implicit none
         class(abst_physics), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -361,7 +361,7 @@ contains
     end subroutine calc_drho_vapor_saturation_dP_abst_physics
 
     !> @brief 蒸気の定圧比熱 (Cp) を飽和状態で計算します。
-    pure elemental subroutine calc_cp_vapor_abst_physics(self, state, cp)
+    subroutine calc_cp_vapor_abst_physics(self, state, cp)
         implicit none
         class(abst_physics), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -383,7 +383,7 @@ contains
         self%ice => ice_model
     end subroutine initialize_iapws_wrapper
 
-    pure function is_initialized_abst_physics(self) result(initialized)
+    function is_initialized_abst_physics(self) result(initialized)
         implicit none
         class(abst_physics), intent(in) :: self
         logical :: initialized
