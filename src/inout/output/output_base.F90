@@ -8,7 +8,7 @@ contains
 
         character(512) :: command
         logical :: exists
-        integer :: i
+        integer(int32) :: i
 
         inquire (DIRECTORY=trim(adjustl(dir_path)), exist=exists)
 

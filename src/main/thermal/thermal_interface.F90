@@ -51,7 +51,7 @@ module main_thermal
             real(real64), intent(inout) :: U
         end subroutine calc_enthalpy_density_thermal
 
-        module pure elemental subroutine calc_density_water_thermal(self, state, rho_water)
+        module subroutine calc_density_water_thermal(self, state, rho_water)
             implicit none
             class(type_thermal), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -59,7 +59,7 @@ module main_thermal
 
         end subroutine calc_density_water_thermal
 
-        module pure elemental subroutine calc_density_ice_thermal(self, state, rho_ice)
+        module subroutine calc_density_ice_thermal(self, state, rho_ice)
             implicit none
             class(type_thermal), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -67,7 +67,7 @@ module main_thermal
 
         end subroutine calc_density_ice_thermal
 
-        module pure elemental subroutine calc_density_vapor_saturation_thermal(self, state, rho_vapor_sat)
+        module subroutine calc_density_vapor_saturation_thermal(self, state, rho_vapor_sat)
             implicit none
             class(type_thermal), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -75,7 +75,7 @@ module main_thermal
 
         end subroutine calc_density_vapor_saturation_thermal
 
-        module pure elemental subroutine update_water_phases_thermal(self, material_id, state)
+        module subroutine update_water_phases_thermal(self, material_id, state)
             implicit none
             class(type_thermal), intent(in) :: self
             integer(int32), intent(in) :: material_id

@@ -259,10 +259,13 @@ contains
 
         integer(int32) :: material_id
         real(real64) :: temperature, pressure, porosity
-        type(type_coordinate_dp) :: grad_T, grad_P
-        type(type_coordinate_dp) :: water_flux, vapor_flux
+        type(type_coordinate_dp), pointer :: grad_T, grad_P
+        type(type_coordinate_dp), pointer :: water_flux, vapor_flux
         real(real64) :: K_wT, K_wP, K_vT, K_vP
-        real(real64) :: temperature_history(8), pressure_history(8), porosity_history(8)
+        ! real(real64) :: temperature_history(8), pressure_history(8), porosity_history(8)
+        real(real64), pointer, contiguous, dimension(:) :: temperature_history => null()
+        real(real64), pointer, contiguous, dimension(:) :: pressure_history => null()
+        real(real64), pointer, contiguous, dimension(:) :: porosity_history => null()
 
         ! call self%controls%profiler%start("Setup")
 

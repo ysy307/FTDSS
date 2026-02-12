@@ -32,6 +32,7 @@ set(CORE_VALIDATION_FYPP_SOURCES
 )
 set(CORE_VALIDATION_SOURCES
     validation/error.F90
+    validation/validation.F90
 )
 fypp_F90("" "${CORE_VALIDATION_FYPP_SOURCES}" CORE_VALIDATION_GENERATED_SOURCES)
 add_library(Core_Validation STATIC ${CORE_VALIDATION_SOURCES} ${CORE_VALIDATION_GENERATED_SOURCES})
@@ -53,8 +54,11 @@ set(CORE_MEMORY_FYPP_SOURCES
     memory/allocate.fypp
     memory/deallocate.fypp
 )
+set(CORE_MEMORY_SOURCES
+    memory/memory.F90
+)
 fypp_F90("" "${CORE_MEMORY_FYPP_SOURCES}" CORE_MEMORY_GENERATED_SOURCES)
-add_library(Core_Memory STATIC ${CORE_MEMORY_GENERATED_SOURCES})
+add_library(Core_Memory STATIC ${CORE_MEMORY_GENERATED_SOURCES} ${CORE_MEMORY_SOURCES})
 target_include_directories(Core_Memory PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Core_Memory PUBLIC 
     Core_Validation
@@ -70,6 +74,7 @@ set(CORE_UTILS_FYPP_SOURCES
 set(CORE_UTILS_SOURCES
     utils/string_utils.F90
     utils/system_env.F90
+    utils/utils.F90
 )
 fypp_F90("" "${CORE_UTILS_FYPP_SOURCES}" CORE_UTILS_GENERATED_SOURCES)
 add_library(Core_Utils STATIC ${CORE_UTILS_GENERATED_SOURCES} ${CORE_UTILS_SOURCES})

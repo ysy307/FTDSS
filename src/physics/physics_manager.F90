@@ -400,7 +400,7 @@ contains
     ! subroutine update_water_phases(self, material_id, state)
     subroutine update_water_phases(self, material_id, state)
         implicit none
-        class(type_physics_manager), intent(inout) :: self
+        class(type_physics_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(inout) :: state
 

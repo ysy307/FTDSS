@@ -145,7 +145,7 @@ contains
         class(type_conditions), intent(inout) :: self
         type(json_file), intent(inout) :: json !! JSON parser
         character(256) :: buffer(2)
-        integer :: i
+        integer(int32) :: i
         real(real64), parameter :: machine_epsilon = 1.0d-9
 
         buffer(1) = time_controls

@@ -161,7 +161,7 @@ contains
         integer(int32) :: i, j
         type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gp => null()
         type(type_coordinate_dp) :: dlerped_value
-        real(real64), allocatable :: work_history(:)
+        real(real64), pointer, contiguous, dimension(:) :: work_history
 
         call self%fe%get_gauss(gp)
 

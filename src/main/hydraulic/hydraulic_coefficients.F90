@@ -2,7 +2,7 @@ submodule(main_hydraulic) hydraulic_coefficients
     implicit none
 contains
 
-    module pure elemental subroutine calc_K_wT_hydraulic(self, target_id, state, K_wT)
+    module subroutine calc_K_wT_hydraulic(self, target_id, state, K_wT)
         implicit none
         class(type_hydraulic), intent(in) :: self
         integer(int32), intent(in) :: target_id
@@ -13,7 +13,7 @@ contains
 
     end subroutine calc_K_wT_hydraulic
 
-    module pure elemental subroutine calc_K_wP_hydraulic(self, target_id, state, K_wP)
+    module subroutine calc_K_wP_hydraulic(self, target_id, state, K_wP)
         implicit none
         class(type_hydraulic), intent(in) :: self
         integer(int32), intent(in) :: target_id
@@ -24,7 +24,7 @@ contains
 
     end subroutine calc_K_wP_hydraulic
 
-    module pure elemental subroutine calc_K_vT_hydraulic(self, target_id, state, K_vT)
+    module subroutine calc_K_vT_hydraulic(self, target_id, state, K_vT)
         implicit none
         class(type_hydraulic), intent(in) :: self
         integer(int32), intent(in) :: target_id
@@ -35,7 +35,7 @@ contains
 
     end subroutine calc_K_vT_hydraulic
 
-    module pure elemental subroutine calc_K_vP_hydraulic(self, target_id, state, K_vP)
+    module subroutine calc_K_vP_hydraulic(self, target_id, state, K_vP)
         implicit none
         class(type_hydraulic), intent(in) :: self
         integer(int32), intent(in) :: target_id
@@ -46,7 +46,7 @@ contains
 
     end subroutine calc_K_vP_hydraulic
 
-    module pure elemental subroutine update_water_phases_hydraulic(self, material_id, state)
+    module subroutine update_water_phases_hydraulic(self, material_id, state)
         implicit none
         class(type_hydraulic), intent(in) :: self
         integer(int32), intent(in) :: material_id
@@ -56,7 +56,7 @@ contains
 
     end subroutine update_water_phases_hydraulic
 
-    module pure subroutine calc_effective_density_hydraulic(self, material_id, state, bdf_coeffs, drho_dt)
+    module subroutine calc_effective_density_hydraulic(self, material_id, state, bdf_coeffs, drho_dt)
         implicit none
         class(type_hydraulic), intent(in) :: self
         integer(int32), intent(in) :: material_id
@@ -65,13 +65,13 @@ contains
         real(real64), intent(inout) :: drho_dt
 
         type(type_state) :: local_state
-        real(real64), allocatable :: temperature_history(:)
-        real(real64), allocatable :: pressure_history(:)
+        real(real64), pointer, dimension(:), contiguous :: temperature_history
+        real(real64), pointer, dimension(:), contiguous :: pressure_history
 
         real(real64) :: Qw, Qi, Qv
         real(real64) :: rho_w, rho_i
         real(real64) :: Uj
-        integer :: j, n
+        integer(int32) :: j, n
 
         call state%temperature_history%get(temperature_history)
         call state%pressure_history%get(pressure_history)

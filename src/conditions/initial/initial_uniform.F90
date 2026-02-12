@@ -4,7 +4,6 @@
 !          defined in the conditions_initial module.
 ! =============================================================================
 submodule(conditions_initial) conditions_initial_uniform
-    ! use :: module_core
     implicit none
 
 contains

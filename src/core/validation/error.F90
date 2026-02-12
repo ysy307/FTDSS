@@ -76,7 +76,7 @@ contains
     pure function replace_placeholder(tmpl, val) result(res)
         character(*), intent(in) :: tmpl, val
         character(len(tmpl)+len(val)) :: res
-        integer :: idx
+        integer(int32) :: idx
 
         idx = index(tmpl, '{}')
         if (idx > 0) then

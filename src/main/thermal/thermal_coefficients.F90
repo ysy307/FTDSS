@@ -28,7 +28,7 @@ contains
         call state%vapor_content%get(Qv)
 
         U = 0.0d0
-        
+
         ! Solid phase
         if (porosity > 0.0d0) then
             call self%physics%get_density_solid(material_id, rho_s)
@@ -63,9 +63,9 @@ contains
     end subroutine calc_enthalpy_density_thermal
 
     ! --------------------------------------------------------------------------
-    ! Helper Wrappers (Pure Elemental)
+    ! Helper Wrappers ()
     ! --------------------------------------------------------------------------
-    module pure elemental subroutine calc_density_water_thermal(self, state, rho_water)
+    module subroutine calc_density_water_thermal(self, state, rho_water)
         implicit none
         class(type_thermal), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -73,7 +73,7 @@ contains
         call self%physics%calc_density_water(state, rho_water)
     end subroutine calc_density_water_thermal
 
-    module pure elemental subroutine calc_density_ice_thermal(self, state, rho_ice)
+    module subroutine calc_density_ice_thermal(self, state, rho_ice)
         implicit none
         class(type_thermal), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -81,7 +81,7 @@ contains
         call self%physics%calc_density_ice(state, rho_ice)
     end subroutine calc_density_ice_thermal
 
-    module pure elemental subroutine calc_density_vapor_saturation_thermal(self, state, rho_vapor_sat)
+    module subroutine calc_density_vapor_saturation_thermal(self, state, rho_vapor_sat)
         implicit none
         class(type_thermal), intent(in) :: self
         type(type_state), intent(in) :: state
@@ -89,7 +89,7 @@ contains
         call self%physics%calc_density_vapor_saturation(state, rho_vapor_sat)
     end subroutine calc_density_vapor_saturation_thermal
 
-    module pure elemental subroutine update_water_phases_thermal(self, material_id, state)
+    module subroutine update_water_phases_thermal(self, material_id, state)
         implicit none
         class(type_thermal), intent(in) :: self
         integer(int32), intent(in) :: material_id
@@ -116,9 +116,9 @@ contains
         real(real64), intent(inout) :: dU_dt
 
         type(type_state) :: local_state
-        real(real64), allocatable :: temperature_history(:)
-        real(real64), allocatable :: pressure_history(:)
-        real(real64), allocatable :: porosity_history(:)
+        real(real64), pointer, contiguous, dimension(:) :: temperature_history
+        real(real64), pointer, contiguous, dimension(:) :: pressure_history
+        real(real64), pointer, contiguous, dimension(:) :: porosity_history
         real(real64) :: Uj
         integer(int32) :: j
 
@@ -136,7 +136,7 @@ contains
                                  porosity=porosity_history(j))
             call self%update_water_phases(material_id, local_state)
             call self%calc_enthalpy_density(material_id, local_state, Uj)
-            
+
             dU_dt = dU_dt + bdf_coeffs(j) * Uj
         end do
 
@@ -158,20 +158,20 @@ contains
         integer(int32), intent(in), optional :: scheme_opt
 
         real(real64) :: temperature
-        real(real64), allocatable :: temperature_history(:)
-        real(real64), allocatable :: pressure_history(:)
-        real(real64), allocatable :: porosity_history(:)
-        
+        real(real64), pointer, contiguous, dimension(:) :: temperature_history
+        real(real64), pointer, contiguous, dimension(:) :: pressure_history
+        real(real64), pointer, contiguous, dimension(:) :: porosity_history
+
         ! Tangent用
         real(real64) :: porosity, Qw, Qi, Qv
         real(real64) :: rho_s, rho_w, rho_i
         real(real64) :: c_s, c_w, c_i, c_v
         real(real64) :: dQi_dT, dQv_dT, Lf, Lv
-        
+
         ! Secant用
         real(real64) :: C_TT_current, C_TT_old, dT
         type(type_state) :: temp_state
-        integer :: use_scheme
+        integer(int32) :: use_scheme
 
         ! デフォルトの挙動決定（指定がなければ自動判定）
         call state%get(temperature=temperature, temperature_history=temperature_history)
@@ -193,9 +193,9 @@ contains
         if (use_scheme == SCHEME_SECANT) then
             ! --- Secant Method (Average/Effective Heat Capacity) ---
             ! C_eff = (U(T) - U(T_old)) / (T - T_old)
-            
+
             call state%get(pressure_history=pressure_history, porosity_history=porosity_history)
-            
+
             ! Current U
             call self%calc_enthalpy_density(material_id, state, C_TT_current)
 
@@ -214,7 +214,7 @@ contains
         else
             ! --- Tangent Method (Apparent Heat Capacity) ---
             ! C_app = dU/dT
-            
+
             call state%get(porosity=porosity, water_content=Qw, &
                            ice_content=Qi, vapor_content=Qv)
 
@@ -266,7 +266,7 @@ contains
         integer(int32), intent(in) :: material_id
         type(type_state), intent(inout) :: state
         real(real64), intent(inout) :: D_TT(:, :)
-        type(type_thc_dispersivity) :: lambda
+        type(type_thc_dispersivity), pointer :: lambda
 
         call self%physics%calc_thermal_conductivity(material_id, state, lambda)
 
@@ -292,7 +292,7 @@ contains
         type(type_state), intent(inout) :: state
         real(real64), intent(inout) :: V_TT(:)
 
-        type(type_coordinate_dp) :: water_flux, vapor_flux
+        type(type_coordinate_dp), pointer :: water_flux, vapor_flux
         real(real64) :: rho_w, c_w, c_v
 
         call state%get(water_flux=water_flux, vapor_flux=vapor_flux)
@@ -346,7 +346,7 @@ contains
         real(real64), intent(in) :: bdf_coeffs(:)
         real(real64), intent(inout) :: history_term
 
-        real(real64), allocatable :: temperature_history(:)
+        real(real64), pointer, contiguous, dimension(:) :: temperature_history
         real(real64) :: C_TT
         real(real64) :: T_hist_sum
         integer(int32) :: j, n_steps

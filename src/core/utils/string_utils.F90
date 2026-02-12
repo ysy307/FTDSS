@@ -35,10 +35,10 @@ contains
         !> The resulting joined string.
         character(:), allocatable :: key
 
-        integer :: i, n, total_len, current_pos
-        integer :: length_strings
+        integer(int32) :: i, n, total_len, current_pos
+        integer(int32) :: length_strings
         character(:), allocatable :: effective_delimiter
-        integer :: length_delimiter
+        integer(int32) :: length_delimiter
         logical :: is_first_element
 
         ! Determine the delimiter to use
@@ -161,7 +161,7 @@ contains
         implicit none
         !> The file path string to modify in place.
         character(len=:), allocatable, intent(inout) :: path
-        integer :: i
+        integer(int32) :: i
 
         ! Replace backslashes with forward slashes
         do i = 1, len(path)

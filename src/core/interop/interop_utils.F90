@@ -1,4 +1,5 @@
 module core_c_utils
+    use, intrinsic :: iso_fortran_env
     use, intrinsic :: iso_c_binding, only: c_ptr, c_f_pointer, c_char, c_null_char
 
     implicit none
@@ -16,9 +17,9 @@ contains
         character(:), allocatable :: f_string
 
         character(kind=c_char), pointer :: c_char_array_ptr(:)
-        integer :: i, length
+        integer(int32) :: i, length
         ! 非常に大きなサイズ（ここでは2^30）を指定
-        integer, parameter :: large_size = 2**30
+        integer(int32), parameter :: large_size = 2**30
 
         ! --- 1. 長さを決定する ---
         if (.not. c_associated(c_ptr_in)) then

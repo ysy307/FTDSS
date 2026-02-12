@@ -94,7 +94,7 @@ contains
         character(len=256) :: temp_list(NUM_IC_TARGETS)
         character(len=256) :: current_field_name
 
-        integer :: num_fields, i, k
+        integer(int32) :: num_fields, i, k
         logical :: is_duplicate
 
         num_fields = 0

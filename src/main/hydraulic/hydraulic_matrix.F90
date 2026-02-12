@@ -2,7 +2,7 @@ submodule(main_hydraulic) hydraulic_matrix
     implicit none
 contains
 
-    module pure elemental subroutine compute_C_H(self, target_id, state, C_HH, C_HT)
+    module subroutine compute_C_H(self, target_id, state, C_HH, C_HT)
         implicit none
         class(type_hydraulic), intent(in) :: self
         integer(int32), intent(in) :: target_id
@@ -56,7 +56,7 @@ contains
 
     end subroutine compute_C_H
 
-    module pure subroutine compute_D_H(self, target_id, state, D_HH, D_HT)
+    module subroutine compute_D_H(self, target_id, state, D_HH, D_HT)
         implicit none
         class(type_hydraulic), intent(in) :: self
         integer(int32), intent(in) :: target_id
@@ -107,7 +107,7 @@ contains
 
     end subroutine compute_D_H
 
-    module pure subroutine compute_V_H(self, target_id, state, V_HH, V_HT)
+    module subroutine compute_V_H(self, target_id, state, V_HH, V_HT)
         implicit none
         class(type_hydraulic), intent(in) :: self
         integer(int32), intent(in) :: target_id
@@ -123,7 +123,7 @@ contains
         real(real64) :: dKp_dP, dKwP_dP, dKT_dP
 
         real(real64) :: gravity_mag
-        type(type_coordinate_dp) :: grad_P, grad_T, grad_z
+        type(type_coordinate_dp), pointer :: grad_P, grad_T, grad_z
 
         ! Initialize gradients
         call state%grad_P%get(grad_P)
@@ -243,7 +243,7 @@ contains
 
     end subroutine compute_V_H
 
-    module pure subroutine compute_R_H(self, target_id, state, bdf_coeffs, R_H_C, R_H_D)
+    module subroutine compute_R_H(self, target_id, state, bdf_coeffs, R_H_C, R_H_D)
         implicit none
         class(type_hydraulic), intent(in) :: self
         integer(int32), intent(in) :: target_id
@@ -253,7 +253,7 @@ contains
         real(real64), intent(inout) :: R_H_D(:)
 
         real(real64) :: rho_w
-        type(type_coordinate_dp) :: water_flux, vapor_flux
+        type(type_coordinate_dp), pointer :: water_flux, vapor_flux
 
         ! --- Storage term (BDF, not dot_P/dot_T) ---
         call self%calc_effective_density(target_id, state, bdf_coeffs, R_H_C)

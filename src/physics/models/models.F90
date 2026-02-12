@@ -66,7 +66,7 @@ contains
 
     subroutine update_water_phases(self, state)
         implicit none
-        class(type_models_manager), intent(inout) :: self
+        class(type_models_manager), intent(in) :: self
         type(type_state), intent(inout) :: state
 
         call self%phase_manager%update_water_phases(state)

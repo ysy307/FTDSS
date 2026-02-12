@@ -223,8 +223,8 @@ contains
     contains
         recursive subroutine quicksort(a, first, last)
             integer(int64), intent(inout) :: a(:)
-            integer :: first, last
-            integer :: i, j
+            integer(int32) :: first, last
+            integer(int32) :: i, j
             integer(int64) :: x, t
 
             if (first < last) then

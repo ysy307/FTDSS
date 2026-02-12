@@ -194,7 +194,7 @@ contains
 
         logical :: found
         logical :: required = .false.
-        integer :: i
+        integer(int32) :: i
 
         if (present(is_required)) required = is_required
 
@@ -248,7 +248,7 @@ contains
 
         logical :: found
         logical :: required = .false.
-        integer :: i
+        integer(int32) :: i
 
         if (present(is_required)) required = is_required
 
@@ -302,7 +302,7 @@ contains
 
         logical :: found
         logical :: required = .false.
-        integer :: i
+        integer(int32) :: i
 
         if (present(is_required)) required = is_required
 

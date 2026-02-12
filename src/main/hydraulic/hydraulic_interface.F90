@@ -39,7 +39,7 @@ module main_hydraulic
 
         end subroutine initialize_type_hydraulic
 
-        module pure elemental subroutine compute_C_H(self, target_id, state, C_HH, C_HT)
+        module subroutine compute_C_H(self, target_id, state, C_HH, C_HT)
             implicit none
             class(type_hydraulic), intent(in) :: self
             integer(int32), intent(in) :: target_id
@@ -49,7 +49,7 @@ module main_hydraulic
 
         end subroutine compute_C_H
 
-        module pure subroutine compute_D_H(self, target_id, state, D_HH, D_HT)
+        module subroutine compute_D_H(self, target_id, state, D_HH, D_HT)
             implicit none
             class(type_hydraulic), intent(in) :: self
             integer(int32), intent(in) :: target_id
@@ -59,7 +59,7 @@ module main_hydraulic
 
         end subroutine compute_D_H
 
-        module pure subroutine compute_V_H(self, target_id, state, V_HH, V_HT)
+        module subroutine compute_V_H(self, target_id, state, V_HH, V_HT)
             implicit none
             class(type_hydraulic), intent(in) :: self
             integer(int32), intent(in) :: target_id
@@ -69,7 +69,7 @@ module main_hydraulic
 
         end subroutine compute_V_H
 
-        module pure subroutine compute_R_H(self, target_id, state, bdf_coeffs, R_H_C, R_H_D)
+        module subroutine compute_R_H(self, target_id, state, bdf_coeffs, R_H_C, R_H_D)
             implicit none
             class(type_hydraulic), intent(in) :: self
             integer(int32), intent(in) :: target_id
@@ -80,7 +80,7 @@ module main_hydraulic
 
         end subroutine compute_R_H
 
-        module pure elemental subroutine calc_K_wT_hydraulic(self, target_id, state, K_wT)
+        module subroutine calc_K_wT_hydraulic(self, target_id, state, K_wT)
             implicit none
             class(type_hydraulic), intent(in) :: self
             integer(int32), intent(in) :: target_id
@@ -89,7 +89,7 @@ module main_hydraulic
 
         end subroutine calc_K_wT_hydraulic
 
-        module pure elemental subroutine calc_K_wP_hydraulic(self, target_id, state, K_wP)
+        module subroutine calc_K_wP_hydraulic(self, target_id, state, K_wP)
             implicit none
             class(type_hydraulic), intent(in) :: self
             integer(int32), intent(in) :: target_id
@@ -98,7 +98,7 @@ module main_hydraulic
 
         end subroutine calc_K_wP_hydraulic
 
-        module pure elemental subroutine calc_K_vT_hydraulic(self, target_id, state, K_vT)
+        module subroutine calc_K_vT_hydraulic(self, target_id, state, K_vT)
             implicit none
             class(type_hydraulic), intent(in) :: self
             integer(int32), intent(in) :: target_id
@@ -107,7 +107,7 @@ module main_hydraulic
 
         end subroutine calc_K_vT_hydraulic
 
-        module pure elemental subroutine calc_K_vP_hydraulic(self, target_id, state, K_vP)
+        module subroutine calc_K_vP_hydraulic(self, target_id, state, K_vP)
             implicit none
             class(type_hydraulic), intent(in) :: self
             integer(int32), intent(in) :: target_id
@@ -116,7 +116,7 @@ module main_hydraulic
 
         end subroutine calc_K_vP_hydraulic
 
-        module pure elemental subroutine update_water_phases_hydraulic(self, material_id, state)
+        module subroutine update_water_phases_hydraulic(self, material_id, state)
             implicit none
             class(type_hydraulic), intent(in) :: self
             integer(int32), intent(in) :: material_id
@@ -124,7 +124,7 @@ module main_hydraulic
 
         end subroutine update_water_phases_hydraulic
 
-        module pure subroutine calc_effective_density_hydraulic(self, material_id, state, bdf_coeffs, drho_dt)
+        module subroutine calc_effective_density_hydraulic(self, material_id, state, bdf_coeffs, drho_dt)
             implicit none
             class(type_hydraulic), intent(in) :: self
             integer(int32), intent(in) :: material_id
