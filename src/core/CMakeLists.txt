@@ -1,89 +1,69 @@
 # CMakeLists.txt for src/core
 
+# ソースファイルをまとめるための変数を初期化
+set(CORE_SOURCES "")
+
 # ====================================================================
-# 1. Foundational Libraries
+# 1. Foundational & Dependent Sources (Constants, Validation, Memory, etc.)
 # ====================================================================
 
-set(CORE_CONSTANTS_FYPP_SOURCES
+# --- Constants ---
+set(CORE_CONSTANTS_FYPP
     constants/constans_ids.fypp
     constants/constans_values.fypp
     constants/constans_error.fypp
 )
-fypp_F90("" "${CORE_CONSTANTS_FYPP_SOURCES}" CORE_CONSTANTS_GENERATED_SOURCES)
-set(CORE_CONSTANTS_SOURCES
+# 生成されたソースを変数に格納
+fypp_F90("" "${CORE_CONSTANTS_FYPP}" CORE_CONSTANTS_GENERATED)
+list(APPEND CORE_SOURCES
     constants/constants_base.F90
     constants/constants_solver.F90
     constants/constants_parallel.F90
     constants/constants_utils.F90
     constants/constants_physical.F90
     constants/constants.F90
+    ${CORE_CONSTANTS_GENERATED}
 )
-add_library(Core_Constants STATIC ${CORE_CONSTANTS_SOURCES} ${CORE_CONSTANTS_GENERATED_SOURCES})
-target_include_directories(Core_Constants PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-enable_build_flags(Core_Constants)
-enable_thirdparty(Core_Constants)
 
-
-# --- Validation Library ---
-set(CORE_VALIDATION_FYPP_SOURCES
+# --- Validation ---
+set(CORE_VALIDATION_FYPP
     validation/check_length.fypp
     validation/check_nan.fypp
     validation/check_range.fypp
 )
-set(CORE_VALIDATION_SOURCES
+fypp_F90("" "${CORE_VALIDATION_FYPP}" CORE_VALIDATION_GENERATED)
+list(APPEND CORE_SOURCES
     validation/error.F90
     validation/validation.F90
+    ${CORE_VALIDATION_GENERATED}
 )
-fypp_F90("" "${CORE_VALIDATION_FYPP_SOURCES}" CORE_VALIDATION_GENERATED_SOURCES)
-add_library(Core_Validation STATIC ${CORE_VALIDATION_SOURCES} ${CORE_VALIDATION_GENERATED_SOURCES})
-target_include_directories(Core_Validation PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Core_Validation PUBLIC
-    Core_Constants
-)
-enable_build_flags(Core_Validation)
-enable_thirdparty(Core_Validation)
 
-
-
-# ====================================================================
-# 2. Dependent Libraries
-# ====================================================================
-
-# --- Memory Library (Validationに依存) ---
-set(CORE_MEMORY_FYPP_SOURCES
+# --- Memory ---
+set(CORE_MEMORY_FYPP
     memory/allocate.fypp
     memory/deallocate.fypp
 )
-set(CORE_MEMORY_SOURCES
+fypp_F90("" "${CORE_MEMORY_FYPP}" CORE_MEMORY_GENERATED)
+list(APPEND CORE_SOURCES
     memory/memory.F90
+    ${CORE_MEMORY_GENERATED}
 )
-fypp_F90("" "${CORE_MEMORY_FYPP_SOURCES}" CORE_MEMORY_GENERATED_SOURCES)
-add_library(Core_Memory STATIC ${CORE_MEMORY_GENERATED_SOURCES} ${CORE_MEMORY_SOURCES})
-target_include_directories(Core_Memory PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Core_Memory PUBLIC 
-    Core_Validation
-    Core_Constants
-)
-enable_build_flags(Core_Memory)
 
-# --- Utils Library (Memoryに依存) ---
-set(CORE_UTILS_FYPP_SOURCES
+# --- Utils ---
+set(CORE_UTILS_FYPP
     utils/unique.fypp
     utils/findings.fypp
 )
-set(CORE_UTILS_SOURCES
+fypp_F90("" "${CORE_UTILS_FYPP}" CORE_UTILS_GENERATED)
+list(APPEND CORE_SOURCES
     utils/string_utils.F90
     utils/system_env.F90
     utils/utils.F90
+    ${CORE_UTILS_GENERATED}
 )
-fypp_F90("" "${CORE_UTILS_FYPP_SOURCES}" CORE_UTILS_GENERATED_SOURCES)
-add_library(Core_Utils STATIC ${CORE_UTILS_GENERATED_SOURCES} ${CORE_UTILS_SOURCES})
-target_include_directories(Core_Utils PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Core_Utils PUBLIC Core_Memory Core_Constants)
-enable_build_flags(Core_Utils)
 
-# --- Types Library (Memoryに依存) ---
-set(CORE_TYPES_SOURCES
+# --- Types ---
+list(APPEND CORE_SOURCES
     types/types.F90
     types/coordinate_array.F90
     types/coordinate.F90
@@ -107,92 +87,44 @@ set(CORE_TYPES_SOURCES
     types/vector/vector_int.F90
     types/vector/vector.F90
 )
-add_library(Core_Types STATIC ${CORE_TYPES_SOURCES})
-target_include_directories(Core_Types PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Core_Types PUBLIC Core_Memory Core_Utils Core_Constants)
-enable_build_flags(Core_Types)
-
 
 # ====================================================================
-# 3. Interop Libraries
+# 2. Interop Sources (C/C++ & Fortran wrappers)
 # ====================================================================
-set(CORE_INTEROP_BASE_DEPS Core_Types Core_Memory Core_Utils)
 
-# --- Interop Utils (他のラッパーから使われる) ---
-set(CORE_INTEROP_UTILS_SOURCES interop/interop_utils.F90)
-add_library(Core_Interop_Utils STATIC ${CORE_INTEROP_UTILS_SOURCES})
-target_include_directories(Core_Interop_Utils PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Core_Interop_Utils PUBLIC ${CORE_INTEROP_BASE_DEPS})
+# --- Utils ---
+list(APPEND CORE_SOURCES interop/interop_utils.F90)
 
-# --- Memory Profiling Component ---
-# Part 1: C implementation + Fortran interface definition
-add_library(Core_Interop_MemoryProfiling_Impl STATIC
+# --- Memory Profiling ---
+list(APPEND CORE_SOURCES
     interop/memory_profiling/memory_stats.c
     interop/memory_profiling/memory_stats.F90
-)
-target_include_directories(Core_Interop_MemoryProfiling_Impl PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-# Part 2: High-level Fortran wrapper
-add_library(Core_Interop_MemoryProfiling STATIC
     interop/memory_profiling/memory_stats_wrapper.F90
 )
-target_include_directories(Core_Interop_MemoryProfiling PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Core_Interop_MemoryProfiling PUBLIC
-    Core_Interop_MemoryProfiling_Impl
-    Core_Interop_Utils
-    ${CORE_INTEROP_BASE_DEPS}
-)
-enable_build_flags(Core_Interop_MemoryProfiling)
 
-# --- Signal Handling Component ---
-add_library(Core_Interop_SignalHandling_Impl STATIC
+# --- Signal Handling ---
+list(APPEND CORE_SOURCES
     interop/signal_handling/signal_flag.c
     interop/signal_handling/signal_flag.F90
-)
-target_include_directories(Core_Interop_SignalHandling_Impl PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-add_library(Core_Interop_SignalHandling STATIC
     interop/signal_handling/signal_flag_wrapper.F90
 )
-target_include_directories(Core_Interop_SignalHandling PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Core_Interop_SignalHandling PUBLIC
-    Core_Interop_SignalHandling_Impl
-    Core_Interop_Utils
-    ${CORE_INTEROP_BASE_DEPS}
-)
-enable_build_flags(Core_Interop_SignalHandling)
-enable_thirdparty(Core_Interop_SignalHandling)
 
-
-# --- System Info Component ---
-add_library(Core_Interop_SystemInfo_Impl STATIC
+# --- System Info ---
+list(APPEND CORE_SOURCES
     interop/system_info/system_info.c
     interop/system_info/system_info.F90
-)
-target_include_directories(Core_Interop_SystemInfo_Impl PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-add_library(Core_Interop_SystemInfo STATIC
     interop/system_info/system_info_wrapper.F90
 )
-target_include_directories(Core_Interop_SystemInfo PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Core_Interop_SystemInfo PUBLIC
-    Core_Interop_SystemInfo_Impl
-    Core_Interop_Utils
-    ${CORE_INTEROP_BASE_DEPS}
-)
-enable_build_flags(Core_Interop_SystemInfo)
 
-# --- VTK Libraries ---
-set(CORE_INTEROP_VTK_CXX_SOURCES
+# --- VTK (C++ & Fortran) ---
+# C++ sources
+list(APPEND CORE_SOURCES
     interop/vtk/reader_vtk.cpp
     interop/vtk/reader_vtu.cpp
     interop/vtk/c_wrapper.cpp
 )
-add_library(Core_Interop_VTK_CXX STATIC ${CORE_INTEROP_VTK_CXX_SOURCES})
-target_link_libraries(Core_Interop_VTK_CXX PUBLIC
-    VTK::IOXML VTK::CommonCore VTK::CommonDataModel VTK::IOLegacy
-)
-set_target_properties(Core_Interop_VTK_CXX PROPERTIES CXX_STANDARD 17)
-enable_build_flags(Core_Interop_VTK_CXX)
-
-set(CORE_INTEROP_VTK_FORT_SOURCES
+# Fortran sources
+list(APPEND CORE_SOURCES
     interop/vtk/vtk_wrapper.F90
     interop/vtk/vtu_wrapper.F90
     interop/vtk/vtk_constants.F90
@@ -200,48 +132,39 @@ set(CORE_INTEROP_VTK_FORT_SOURCES
     interop/vtk/vtu_initialize.F90
     interop/vtk/vtk_base.F90
     interop/vtk/vtk.F90
-)
-add_library(Core_Interop_VTK_Fortran STATIC ${CORE_INTEROP_VTK_FORT_SOURCES})
-target_include_directories(Core_Interop_VTK_Fortran PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Core_Interop_VTK_Fortran PUBLIC
-    Core_Interop_VTK_CXX
-    Core_Interop_Utils
-    ${CORE_INTEROP_BASE_DEPS}
+    interop/interop.F90
 )
 
-
 # ====================================================================
-# 4. Aggregator Interface Library
-# ====================================================================
-# ====================================================================
-# 3. Aggregator Interface Library
+# 3. Main Aggregator & Library Definition
 # ====================================================================
 
-# --- Main Aggregator Library ---
-# core.F90は他の全てのCoreコンポーネントに依存する
-set(CORE_MAIN_SOURCE core.F90)
-add_library(Core_Main STATIC ${CORE_MAIN_SOURCE})
-target_include_directories(Core_Main PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-# ★ Core_Mainが他の全ての部品ライブラリに依存することを明記 ★
-target_link_libraries(Core_Main PUBLIC
-    Core_Constants
-    Core_Types
-    Core_Memory
-    Core_Validation
-    Core_Utils
-    Core_Interop_MemoryProfiling
-    Core_Interop_SignalHandling
-    Core_Interop_SystemInfo
-    Core_Interop_VTK_Fortran
-    Core_Interop_Utils
+# Core entry point
+list(APPEND CORE_SOURCES core.F90)
+
+# --------------------------------------------------------
+# Define the SINGLE library
+# --------------------------------------------------------
+add_library(Solvers_Core STATIC ${CORE_SOURCES})
+
+# インクルードディレクトリの設定
+target_include_directories(Solvers_Core PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+
+# C++ (VTK) の設定
+set_target_properties(Solvers_Core PROPERTIES CXX_STANDARD 17)
+
+# 外部ライブラリのリンク (VTK等)
+# ここでまとめてリンクする
+target_link_libraries(Solvers_Core PUBLIC
+    VTK::IOXML
+    VTK::CommonCore
+    VTK::CommonDataModel
+    VTK::IOLegacy
 )
 
-# --- Public Facing Interface Library ---
-add_library(Core_Interface INTERFACE)
+# コンパイルフラグの適用
+enable_build_flags(Solvers_Core)
+enable_thirdparty(Solvers_Core)
 
-# Core_Mainが全てに依存するため、InterfaceはCore_Mainにリンクするだけで良い
-target_link_libraries(Core_Interface INTERFACE
-    Core_Main
-)
-
-add_library(Solver::Core ALIAS Core_Interface)
+# Aliasを作成（外部から使いやすくするため）
+add_library(Solver::Core ALIAS Solvers_Core)

@@ -1,6 +1,8 @@
 module core_types_variable
     use, intrinsic :: iso_fortran_env, only: real64, int32
+    use :: core_memory
     use :: core_types_coordinate_array, only:type_coordinate_array_dp
+    use :: core_types_coordinate, only:type_coordinate_dp
     implicit none
     private
 
@@ -61,12 +63,16 @@ module core_types_variable
         procedure, public, pass(self) :: set_delta_array_variable
         generic, public :: set_delta => set_delta_array_variable
 
-        ! Getters (Pointer / Zero-Copy)
-        procedure, public, pass(self) :: get_history ! Pointer to history sequence
+        ! Getters
+        procedure, public, pass(self) :: get_history
         procedure, private, pass(self) :: get_current_values
         procedure, private, pass(self) :: get_current_scalar
         generic, public :: get_current => get_current_values, &
             get_current_scalar
+        procedure, public, pass(self) :: get_current_gradient_array
+        procedure, public, pass(self) :: get_current_gradient_scalar
+        generic, public :: get_current_gradient => get_current_gradient_array, &
+            get_current_gradient_scalar
 
         procedure, private, pass(self) :: get_previous_array
         procedure, private, pass(self) :: get_previous_scalar
@@ -77,7 +83,6 @@ module core_types_variable
         procedure, public, pass(self) :: get_diff
 
         ! Getters (Scalar)
-        procedure, public, pass(self) :: get_current_gradient
 
         ! Computation
         procedure, public, pass(self) :: compute_time_derivative => compute_time_derivative_variable
@@ -122,6 +127,7 @@ contains
     subroutine destroy_type_variable(self)
         implicit none
         class(type_variable), intent(inout) :: self
+
         if (self%is_initialized) then
             self%num_dof = 0
             self%num_history_steps = 0
@@ -194,6 +200,7 @@ contains
         implicit none
         class(type_variable), intent(inout) :: self
         real(real64), intent(in) :: val(:)
+
         self%values(self%head_idx, :) = val(:)
     end subroutine set_current_array_variable
 
@@ -202,6 +209,7 @@ contains
         class(type_variable), intent(inout) :: self
         integer(int32), intent(in) :: node_id
         real(real64), intent(in) :: val
+
         self%values(self%head_idx, node_id) = val
     end subroutine set_current_scalar_variable
 
@@ -280,20 +288,20 @@ contains
 
     !> [Important] Get pointer to history data sequence
     !> Returns a contiguous array in memory, providing fastest access in physics loops.
-    subroutine get_history(self, node_id, ptr, current_head)
+    subroutine get_history(self, node_id, values, current_head)
         implicit none
         class(type_variable), intent(in), target :: self
         integer(int32), intent(in) :: node_id
 
         ! CONTIGUOUS attribute can be applied (fastest)
-        real(real64), pointer, intent(inout), contiguous :: ptr(:)
+        real(real64), pointer, intent(inout), contiguous :: values(:)
         integer(int32), intent(inout), optional :: current_head
 
         if (self%is_initialized) then
-            ptr => self%values(:, node_id)
+            values => self%values(:, node_id)
             if (present(current_head)) current_head = self%head_idx
         else
-            nullify (ptr)
+            nullify (values)
             if (present(current_head)) current_head = 0
         end if
     end subroutine get_history
@@ -327,10 +335,10 @@ contains
     !
 
     !> Get pointer to one step previous (t_n)
-    subroutine get_previous_array(self, ptr)
+    subroutine get_previous_array(self, values)
         implicit none
         class(type_variable), intent(in), target :: self
-        real(real64), pointer, intent(inout) :: ptr(:)
+        real(real64), pointer, intent(inout) :: values(:)
         integer(int32) :: prev_idx
 
         if (self%is_initialized) then
@@ -340,9 +348,9 @@ contains
             else
                 prev_idx = self%head_idx - 1
             end if
-            ptr => self%values(prev_idx, :)
+            values => self%values(prev_idx, :)
         else
-            nullify (ptr)
+            nullify (values)
         end if
     end subroutine get_previous_array
 
@@ -367,34 +375,55 @@ contains
         end if
     end subroutine get_previous_scalar
 
-    subroutine get_delta(self, ptr)
+    subroutine get_delta(self, values)
         implicit none
         class(type_variable), intent(in), target :: self
-        real(real64), pointer, intent(inout), contiguous :: ptr(:)
+        real(real64), pointer, intent(inout), contiguous :: values(:)
+
         if (self%is_initialized) then
-            ptr => self%delta
+            values => self%delta
         else
-            nullify (ptr)
+            nullify (values)
         end if
     end subroutine get_delta
 
-    subroutine get_diff(self, ptr)
+    subroutine get_diff(self, values)
         implicit none
         class(type_variable), intent(in), target :: self
-        real(real64), pointer, intent(inout), contiguous :: ptr(:)
+        real(real64), pointer, intent(inout), contiguous :: values(:)
+
         if (self%is_initialized) then
-            ptr => self%diff
+            values => self%diff
         else
-            nullify (ptr)
+            nullify (values)
         end if
     end subroutine get_diff
 
-    subroutine get_current_gradient(self, ptr)
+    subroutine get_current_gradient_array(self, values)
         implicit none
         class(type_variable), intent(in), target :: self
-        type(type_coordinate_array_dp), pointer, intent(inout) :: ptr
-        ptr => self%grad
-    end subroutine get_current_gradient
+        type(type_coordinate_array_dp), pointer, intent(inout) :: values
+
+        if (self%is_initialized) then
+            values => self%grad
+        else
+            nullify (values)
+        end if
+    end subroutine get_current_gradient_array
+
+    subroutine get_current_gradient_scalar(self, node_id, grad)
+        implicit none
+        class(type_variable), intent(in), target :: self
+        integer(int32), intent(in) :: node_id
+        type(type_coordinate_dp), intent(inout) :: grad
+
+        if (self%is_initialized) then
+            call self%grad%get_coordinate(node_id, grad)
+        else
+            call grad%set(0.0d0, 0.0d0, 0.0d0)
+        end if
+
+    end subroutine get_current_gradient_scalar
 
     ! ------------------------------------------------------------------
     ! Scalar Access / Helpers

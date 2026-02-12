@@ -272,10 +272,10 @@ contains
         call state%reset()
 
         call self%temperature%get_current(node_id, temperature)
-        call self%temperature%get_current(node_id, grad_T)
+        call self%temperature%get_current_gradient(node_id, grad_T)
         call self%temperature%get_history(node_id, temperature_history)
         call self%pressure%get_current(node_id, pressure)
-        call self%pressure%get_current(node_id, grad_P)
+        call self%pressure%get_current_gradient(node_id, grad_P)
         call self%pressure%get_history(node_id, pressure_history)
         call self%porosity%get_current(node_id, porosity)
         call self%porosity%get_history(node_id, porosity_history)

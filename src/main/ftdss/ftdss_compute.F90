@@ -240,11 +240,16 @@ contains
         class(type_ftdss), intent(inout) :: self
 
         real(real64), pointer, contiguous, dimension(:) :: temperature => null()
+        type(type_coordinate_array_dp), pointer :: grad_T
 
         if (.not. self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) return
 
         call self%temperature%get_current(temperature)
-        call self%calc_gradient(temperature, self%temperature%grad)
+        call self%temperature%get_current_gradient(grad_T)
+        if (associated(grad_T)) then
+            call self%calc_gradient(temperature, grad_T)
+            nullify (grad_T)
+        end if
         nullify (temperature)
 
     end subroutine calc_gradient_temperature_ftdss
@@ -254,11 +259,16 @@ contains
         class(type_ftdss), intent(inout) :: self
 
         real(real64), pointer, contiguous, dimension(:) :: pressure => null()
+        type(type_coordinate_array_dp), pointer :: grad_P
 
         if (.not. self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) return
 
         call self%pressure%get_current(pressure)
-        call self%calc_gradient(pressure, self%pressure%grad)
+        call self%pressure%get_current_gradient(grad_P)
+        if (associated(grad_P)) then
+            call self%calc_gradient(pressure, grad_P)
+            nullify (grad_P)
+        end if
 
         nullify (pressure)
 

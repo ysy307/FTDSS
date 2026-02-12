@@ -4,8 +4,8 @@
 !>
 module core_types_coordinate_array
     use, intrinsic :: iso_fortran_env, only: real64, int32
-    use :: core_allocate, only:allocate_array
-    use :: core_deallocate, only:deallocate_array
+    use :: core_memory
+    use :: core_types_coordinate, only:type_coordinate_dp, type_coordinate_int
     implicit none
     private
 
@@ -32,6 +32,7 @@ module core_types_coordinate_array
         procedure, pass(self) :: is_initialized => is_initialized_type_coordinate_array_dp
         procedure, pass(self) :: get_length => get_length_type_coordinate_array_dp
         procedure, pass(self) :: zero => zero_type_coordinate_array_dp
+        procedure, pass(self) :: get_coordinate => get_coordinate_type_coordinate_array_dp
     end type
 
     !>
@@ -54,6 +55,7 @@ module core_types_coordinate_array
         procedure, pass(self) :: is_initialized => is_initialized_type_coordinate_array_int
         procedure, pass(self) :: get_length => get_length_type_coordinate_array_int
         procedure, pass(self) :: zero => zero_type_coordinate_array_int
+        procedure, pass(self) :: get_coordinate => get_coordinate_type_coordinate_array_int
     end type
 
 contains
@@ -156,6 +158,25 @@ contains
         end if
     end subroutine zero_type_coordinate_array_dp
 
+    !>
+    !> Returns the coordinate components as three separate arrays.
+    !>
+    subroutine get_coordinate_type_coordinate_array_dp(self, index, coordinate)
+        implicit none
+        !> The coordinate array object.
+        class(type_coordinate_array_dp), intent(in) :: self
+        !> The index of the coordinate point to retrieve.
+        integer(int32), intent(in) :: index
+        !> The output coordinate object to populate.
+        type(type_coordinate_dp), intent(inout) :: coordinate
+
+        if (self%is_allocated .and. index >= 1 .and. index <= self%length) then
+            call coordinate%set(self%x(index), self%y(index), self%z(index))
+        else
+            call coordinate%set(0.0d0, 0.0d0, 0.0d0)
+        end if
+    end subroutine get_coordinate_type_coordinate_array_dp
+
     ! ==========================================================
     ! Integer Coordinate Array Procedures
     ! ==========================================================
@@ -253,4 +274,23 @@ contains
             self%z(:) = 0
         end if
     end subroutine zero_type_coordinate_array_int
+
+    !>
+    !> Returns the coordinate components as three separate arrays.
+    !>
+    subroutine get_coordinate_type_coordinate_array_int(self, index, coordinate)
+        implicit none
+        !> The coordinate array object.
+        class(type_coordinate_array_int), intent(in) :: self
+        !> The index of the coordinate point to retrieve.
+        integer(int32), intent(in) :: index
+        !> The output coordinate object to populate.
+        type(type_coordinate_int), intent(inout) :: coordinate
+
+        if (self%is_allocated .and. index >= 1 .and. index <= self%length) then
+            call coordinate%set(self%x(index), self%y(index), self%z(index))
+        else
+            call coordinate%set(0, 0, 0)
+        end if
+    end subroutine get_coordinate_type_coordinate_array_int
 end module core_types_coordinate_array
