@@ -63,12 +63,15 @@ list(APPEND CORE_SOURCES
 )
 
 # --- Types ---
+set(CORE_TYPES_FYPP
+    types/variable.fypp
+)
+fypp_F90("" "${CORE_TYPES_FYPP}" CORE_TYPES_GENERATED)
 list(APPEND CORE_SOURCES
     types/types.F90
     types/coordinate_array.F90
     types/coordinate.F90
     types/pointer.F90
-    types/variable.F90
     types/graph.F90
     types/datetime.F90
     types/solar.F90
@@ -86,7 +89,9 @@ list(APPEND CORE_SOURCES
     types/vector/vector_dp.F90
     types/vector/vector_int.F90
     types/vector/vector.F90
+    ${CORE_TYPES_GENERATED}
 )
+
 
 # ====================================================================
 # 2. Interop Sources (C/C++ & Fortran wrappers)

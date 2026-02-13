@@ -266,22 +266,32 @@ contains
         integer(int32), intent(in) :: material_id
         type(type_state), intent(inout) :: state
         real(real64), intent(inout) :: D_TT(:, :)
-        type(type_thc_dispersivity), pointer :: lambda
+        type(type_thc_dispersivity) :: lambda
 
         call self%physics%calc_thermal_conductivity(material_id, state, lambda)
 
         D_TT(:, :) = 0.0d0
         select case (self%computation_type)
         case (COMP_TYPE_2D_XY)
-            D_TT(1, 1) = lambda%lambda_xx; D_TT(1, 2) = lambda%lambda_xy
-            D_TT(2, 1) = lambda%lambda_xy; D_TT(2, 2) = lambda%lambda_yy
+            D_TT(1, 1) = lambda%lambda_xx
+            D_TT(1, 2) = lambda%lambda_xy
+            D_TT(2, 1) = lambda%lambda_xy
+            D_TT(2, 2) = lambda%lambda_yy
         case (COMP_TYPE_2D_XZ)
-            D_TT(1, 1) = lambda%lambda_xx; D_TT(1, 2) = lambda%lambda_zx
-            D_TT(2, 1) = lambda%lambda_zx; D_TT(2, 2) = lambda%lambda_zz
+            D_TT(1, 1) = lambda%lambda_xx
+            D_TT(1, 2) = lambda%lambda_zx
+            D_TT(2, 1) = lambda%lambda_zx
+            D_TT(2, 2) = lambda%lambda_zz
         case (COMP_TYPE_3D)
-            D_TT(1, 1) = lambda%lambda_xx; D_TT(1, 2) = lambda%lambda_xy; D_TT(1, 3) = lambda%lambda_zx
-            D_TT(2, 1) = lambda%lambda_xy; D_TT(2, 2) = lambda%lambda_yy; D_TT(2, 3) = lambda%lambda_yz
-            D_TT(3, 1) = lambda%lambda_zx; D_TT(3, 2) = lambda%lambda_yz; D_TT(3, 3) = lambda%lambda_zz
+            D_TT(1, 1) = lambda%lambda_xx
+            D_TT(1, 2) = lambda%lambda_xy
+            D_TT(1, 3) = lambda%lambda_zx
+            D_TT(2, 1) = lambda%lambda_xy
+            D_TT(2, 2) = lambda%lambda_yy
+            D_TT(2, 3) = lambda%lambda_yz
+            D_TT(3, 1) = lambda%lambda_zx
+            D_TT(3, 2) = lambda%lambda_yz
+            D_TT(3, 3) = lambda%lambda_zz
         end select
     end subroutine compute_diffusion_term_thermal
 

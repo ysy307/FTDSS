@@ -85,17 +85,28 @@ contains
         type(type_thc_dispersivity), intent(inout) :: lambda
 
         real(real64) :: lambda_0
-        type(type_coordinate_dp), pointer :: water_flux
+        type(type_coordinate_dp), pointer :: water_flux => null()
 
+        real(real64) :: qx, qy, qz
         real(real64) :: htc_water, rho_water, cp_water
 
         call self%calc_water_density(state, rho_water)
         call self%calc_water_cp(state, cp_water)
         htc_water = rho_water * cp_water
+
         call state%get(water_flux=water_flux)
+        if (associated(water_flux)) then
+            qx = water_flux%x
+            qy = water_flux%y
+            qz = water_flux%z
+        else
+            qx = 0.0d0
+            qy = 0.0d0
+            qz = 0.0d0
+        end if
 
         call self%calc(state, lambda_0)
-        call self%calc_lambda_dispersivity(lambda_0, htc_water, water_flux%x, water_flux%y, water_flux%z, lambda)
+        call self%calc_lambda_dispersivity(lambda_0, htc_water, qx, qy, qz, lambda)
 
     end subroutine calc_thc_dispersivity_gp_3phase
 
@@ -125,18 +136,28 @@ contains
         type(type_thc_dispersivity), intent(inout) :: lambda
 
         real(real64) :: lambda_0
-        type(type_coordinate_dp), pointer :: water_flux
+        type(type_coordinate_dp), pointer :: water_flux => null()
 
+        real(real64) :: qx, qy, qz
         real(real64) :: htc_water, rho_water, cp_water
 
         call self%calc_water_density(state, rho_water)
         call self%calc_water_cp(state, cp_water)
         htc_water = rho_water * cp_water
         call state%get(water_flux=water_flux)
+        if (associated(water_flux)) then
+            qx = water_flux%x
+            qy = water_flux%y
+            qz = water_flux%z
+        else
+            qx = 0.0d0
+            qy = 0.0d0
+            qz = 0.0d0
+        end if
 
         call self%calc(state, lambda_0)
 
-        call self%calc_lambda_dispersivity(lambda_0, htc_water, water_flux%x, water_flux%y, water_flux%z, lambda)
+        call self%calc_lambda_dispersivity(lambda_0, htc_water, qx, qy, qz, lambda)
 
     end subroutine calc_thc_dispersivity_gp_4phase
 

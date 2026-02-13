@@ -161,27 +161,48 @@ contains
         integer(int32) :: i, j
         type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gp => null()
         type(type_coordinate_dp) :: dlerped_value
-        real(real64), pointer, contiguous, dimension(:) :: work_history
+
+        ! ポインターで受け取る
+        real(real64), pointer, contiguous, dimension(:) :: work_history_ptr => null()
+
+        ! 補間計算用の一時配列（allocatable）
+        real(real64), allocatable :: work_history_buffer(:)
 
         call self%fe%get_gauss(gp)
 
-        ! Temperature and its gradient at Gauss points
+        ! バッファ割り当て
+        if (allocated(work_history_buffer)) deallocate (work_history_buffer)
+        allocate (work_history_buffer(self%bdf_order + 1))
+        work_history_buffer = 0.0d0
+
+        ! --------------------------------------------------
+        ! 1. Temperature
+        ! --------------------------------------------------
         self%work_node(:, :) = 0.0d0
         do i = 1, self%num_fe_nodes
+            work_history_ptr => null()
+            ! ポインターを取得（修正されたvariableクラスにより，これは常に整列済み）
             call self%state(i)%get(temperature=self%T_node(i), &
-                                   temperature_history=work_history)
-            self%work_node(1:self%bdf_order + 1, i) = work_history(1:self%bdf_order + 1)
+                                   temperature_history=work_history_ptr)
+
+            if (associated(work_history_ptr)) then
+                ! ポインターが有効なら値をコピー
+                self%work_node(1:self%bdf_order + 1, i) = work_history_ptr(1:self%bdf_order + 1)
+            end if
         end do
+
         do i = 1, self%num_fe_gauss
             call self%fe%lerp(gp(i), self%T_node, self%T_gp(i))
             call self%state_gp(i)%temperature%set(self%T_gp(i))
         end do
+
         do j = 1, self%num_fe_gauss
-            work_history(:) = 0.0d0
+            work_history_buffer(:) = 0.0d0
             do i = 1, self%bdf_order + 1
-                call self%fe%lerp(gp(j), self%work_node(i, 1:self%num_fe_nodes), work_history(i))
+                ! work_nodeは上でセットされた正しい履歴情報を持っている
+                call self%fe%lerp(gp(j), self%work_node(i, 1:self%num_fe_nodes), work_history_buffer(i))
             end do
-            call self%state_gp(j)%set(temperature_history=work_history)
+            call self%state_gp(j)%set(temperature_history=work_history_buffer)
         end do
 
         do i = 1, self%num_fe_gauss
@@ -189,47 +210,64 @@ contains
             call self%state_gp(i)%grad_T%set(dlerped_value)
         end do
 
-        ! Pressure and its gradient at Gauss points
+        ! --------------------------------------------------
+        ! 2. Pressure
+        ! --------------------------------------------------
         self%work_node(:, :) = 0.0d0
         do i = 1, self%num_fe_nodes
+            work_history_ptr => null()
             call self%state(i)%get(pressure=self%P_node(i), &
-                                   pressure_history=work_history)
-            self%work_node(1:self%bdf_order + 1, i) = work_history(1:self%bdf_order + 1)
+                                   pressure_history=work_history_ptr)
+            if (associated(work_history_ptr)) then
+                self%work_node(1:self%bdf_order + 1, i) = work_history_ptr(1:self%bdf_order + 1)
+            end if
         end do
+
         do i = 1, self%num_fe_gauss
             call self%fe%lerp(gp(i), self%P_node, self%P_gp(i))
             call self%state_gp(i)%pressure%set(self%P_gp(i))
         end do
 
         do j = 1, self%num_fe_gauss
+            work_history_buffer(:) = 0.0d0
             do i = 1, self%bdf_order + 1
-                work_history(:) = 0.0d0
-                call self%fe%lerp(gp(j), self%work_node(i, :), work_history(i))
+                call self%fe%lerp(gp(j), self%work_node(i, :), work_history_buffer(i))
             end do
-            call self%state_gp(j)%pressure_history%set(work_history)
+            call self%state_gp(j)%pressure_history%set(work_history_buffer)
         end do
+
         do i = 1, self%num_fe_gauss
             call self%fe%dlerp(gp(i), self%P_node, self%coordinates, self%computation_type, dlerped_value)
             call self%state_gp(i)%grad_P%set(dlerped_value)
         end do
 
-        ! Porosity at Gauss points
+        ! --------------------------------------------------
+        ! 3. Porosity
+        ! --------------------------------------------------
         self%work_node(:, :) = 0.0d0
         do i = 1, self%num_fe_nodes
+            work_history_ptr => null()
             call self%state(i)%get(porosity=self%phi_node(i), &
-                                   porosity_history=work_history)
-            self%work_node(1:self%bdf_order + 1, i) = work_history(1:self%bdf_order + 1)
+                                   porosity_history=work_history_ptr)
+            if (associated(work_history_ptr)) then
+                self%work_node(1:self%bdf_order + 1, i) = work_history_ptr(1:self%bdf_order + 1)
+            end if
         end do
+
         do i = 1, self%num_fe_gauss
             call self%fe%lerp(gp(i), self%phi_node, self%phi_gp(i))
             call self%state_gp(i)%porosity%set(self%phi_gp(i))
         end do
+
         do j = 1, self%num_fe_gauss
+            work_history_buffer(:) = 0.0d0
             do i = 1, self%bdf_order + 1
-                call self%fe%lerp(gp(j), self%work_node(i, :), work_history(i))
+                call self%fe%lerp(gp(j), self%work_node(i, :), work_history_buffer(i))
             end do
-            call self%state_gp(j)%porosity_history%set(work_history)
+            call self%state_gp(j)%porosity_history%set(work_history_buffer)
         end do
+
+        if (allocated(work_history_buffer)) deallocate (work_history_buffer)
 
     end subroutine lerp_states
 

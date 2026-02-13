@@ -258,36 +258,40 @@ contains
         type(type_state), intent(inout) :: state
 
         integer(int32) :: material_id
+        integer(int32) :: bdf_order
         real(real64) :: temperature, pressure, porosity
-        type(type_coordinate_dp), pointer :: grad_T, grad_P
-        type(type_coordinate_dp), pointer :: water_flux, vapor_flux
+        type(type_coordinate_dp) :: grad_T, grad_P
+        type(type_coordinate_dp) :: water_flux, vapor_flux
         real(real64) :: K_wT, K_wP, K_vT, K_vP
-        ! real(real64) :: temperature_history(8), pressure_history(8), porosity_history(8)
-        real(real64), pointer, contiguous, dimension(:) :: temperature_history => null()
-        real(real64), pointer, contiguous, dimension(:) :: pressure_history => null()
-        real(real64), pointer, contiguous, dimension(:) :: porosity_history => null()
-
-        ! call self%controls%profiler%start("Setup")
+        real(real64) :: temperature_history(8), pressure_history(8), porosity_history(8)
+        ! real(real64), pointer, contiguous, dimension(:) :: temperature_history => null()
+        ! real(real64), pointer, contiguous, dimension(:) :: pressure_history => null()
+        ! real(real64), pointer, contiguous, dimension(:) :: porosity_history => null()
 
         call state%reset()
 
-        call self%temperature%get_current(node_id, temperature)
-        call self%temperature%get_current_gradient(node_id, grad_T)
-        call self%temperature%get_history(node_id, temperature_history)
-        call self%pressure%get_current(node_id, pressure)
-        call self%pressure%get_current_gradient(node_id, grad_P)
-        call self%pressure%get_history(node_id, pressure_history)
+        call self%controls%time%get_bdf_order(bdf_order)
+
+        if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
+            call self%temperature%get_current(node_id, temperature)
+            call self%temperature%get_current_gradient(node_id, grad_T)
+            call self%temperature%get_history(node_id, temperature_history)
+            call state%set(temperature=temperature, &
+                           grad_T=grad_T, &
+                           temperature_history=temperature_history(1:bdf_order + 1))
+        end if
+        if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
+            call self%pressure%get_current(node_id, pressure)
+            call self%pressure%get_current_gradient(node_id, grad_P)
+            call self%pressure%get_history(node_id, pressure_history)
+            call state%set(pressure=pressure, &
+                           grad_P=grad_P, &
+                           pressure_history=pressure_history(1:bdf_order + 1))
+        end if
         call self%porosity%get_current(node_id, porosity)
         call self%porosity%get_history(node_id, porosity_history)
-
-        call state%set(temperature=temperature, &
-                       pressure=pressure, &
-                       porosity=porosity, &
-                       temperature_history=temperature_history, &
-                       pressure_history=pressure_history, &
-                       porosity_history=porosity_history, &
-                       grad_T=grad_T, &
-                       grad_P=grad_P)
+        call state%set(porosity=porosity, &
+                       porosity_history=porosity_history(1:bdf_order + 1))
 
         call self%domain%get_material_id(element_id, material_id)
         call self%thermal%update_water_phases(material_id, state)
@@ -301,8 +305,6 @@ contains
         end if
 
         call state%set(water_flux=water_flux, vapor_flux=vapor_flux)
-        ! call self%controls%profiler%stop("Setup")
-
     end subroutine set_state_ftdss
 
     module subroutine shift_ftdss(self)
@@ -371,7 +373,7 @@ contains
             end if
 
             call self%calc_gradient_temperature()
-            call self%temperature%compute_time_derivative(bdf_coeffs(1:bdf_order + 1))
+            call self%temperature%compute_time_derivative(bdf_coeffs, bdf_order)
 
             call deallocate_array(du)
         end if
