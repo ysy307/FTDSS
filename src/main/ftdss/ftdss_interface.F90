@@ -78,6 +78,8 @@ module main_ftdss
         procedure, private, pass(self) :: assemble_initialize => assemble_initialize_ftdss
         procedure, private, pass(self) :: assemble_finalize => assemble_finalize_ftdss
 
+        procedure, public, pass(self) :: precompute => precompute_physics_states_ftdss
+
         procedure, private, pass(self) :: get_variable_increment => get_variable_increment_ftdss
         procedure, private, pass(self) :: get_variable_residual => get_variable_residual_ftdss
 
@@ -155,6 +157,11 @@ module main_ftdss
             type(type_state), intent(inout) :: state
 
         end subroutine set_state_ftdss
+
+        module subroutine precompute_physics_states_ftdss(self)
+            implicit none
+            class(type_ftdss), intent(inout) :: self
+        end subroutine precompute_physics_states_ftdss
 
         module subroutine shift_ftdss(self)
             implicit none

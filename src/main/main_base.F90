@@ -14,15 +14,15 @@ module main_base
         integer(int32) :: num_fe_nodes = -1
         integer(int32) :: num_fe_gauss = -1
         integer(int32) :: num_fe_dimension = -1
-        
+
         class(abst_fe), pointer :: fe => null()
-        
+
         real(real64), allocatable :: coordinates(:, :)
-        
+
         ! --- State Management ---
         type(type_state), allocatable :: state(:)
         type(type_state), allocatable :: state_gp(:)
-        
+
         ! --- Nodal Values (Buffers) ---
         real(real64), allocatable :: T_node(:)
         real(real64), allocatable :: T_gp(:)
@@ -30,11 +30,9 @@ module main_base
         real(real64), allocatable :: P_gp(:)
         real(real64), allocatable :: phi_node(:)
         real(real64), allocatable :: phi_gp(:)
-        
+
         ! --- Workspaces ---
-        ! History values at nodes: (bdf_order+1, num_nodes)
-        real(real64), allocatable :: work_node(:, :) 
-        ! History interpolation buffer: (bdf_order+1) -> Removed allocation from lerp_states
+        real(real64), allocatable :: work_node(:, :)
         real(real64), allocatable :: work_bdf_buffer(:)
 
         real(real64), allocatable :: work_psi(:)
@@ -112,9 +110,9 @@ contains
         self%material_id = material_id
         self%element_id = element_id
         self%computation_type = computation_type
-        
-        ! 座標のコピー
-        if (allocated(self%coordinates)) deallocate(self%coordinates)
+
+        ! [修正] 直前の deallocate を削除。
+        ! allocate_array 内でサイズチェックが行われ、同じならメモリ再利用されます。
         call allocate_array(self%coordinates, source=coordinates)
 
     end subroutine initialize_type_assemble_workspace
@@ -130,69 +128,91 @@ contains
         call self%fe%get_num_gauss(self%num_fe_gauss)
         call self%fe%get_dimension(self%num_fe_dimension)
 
-        ! State objects initialization
-        if (allocated(self%state)) deallocate(self%state)
-        allocate (self%state(self%num_fe_nodes))
-        do i = 1, self%num_fe_nodes
-            call self%state(i)%reset()
-        end do
+        ! [修正] 構造体配列は core_allocate が対応外なので、ここで手動最適化
+        if (allocated(self%state)) then
+            if (size(self%state) /= self%num_fe_nodes) then
+                deallocate (self%state)
+                allocate (self%state(self%num_fe_nodes))
+                do i = 1, self%num_fe_nodes
+                    call self%state(i)%reset()
+                end do
+            else
+                do i = 1, self%num_fe_nodes
+                    call self%state(i)%reset()
+                end do
+            end if
+        else
+            allocate (self%state(self%num_fe_nodes))
+            do i = 1, self%num_fe_nodes
+                call self%state(i)%reset()
+            end do
+        end if
 
-        if (allocated(self%state_gp)) deallocate(self%state_gp)
-        allocate (self%state_gp(self%num_fe_gauss))
-        do i = 1, self%num_fe_gauss
-            call self%state_gp(i)%reset()
-        end do
+        if (allocated(self%state_gp)) then
+            if (size(self%state_gp) /= self%num_fe_gauss) then
+                deallocate (self%state_gp)
+                allocate (self%state_gp(self%num_fe_gauss))
+                do i = 1, self%num_fe_gauss
+                    call self%state_gp(i)%reset()
+                end do
+            else
+                do i = 1, self%num_fe_gauss
+                    call self%state_gp(i)%reset()
+                end do
+            end if
+        else
+            allocate (self%state_gp(self%num_fe_gauss))
+            do i = 1, self%num_fe_gauss
+                call self%state_gp(i)%reset()
+            end do
+        end if
 
-        ! Array allocation and ZERO initialization
+        ! [修正] ヘルパー経由で core_allocate の allocate_array を使用する形に変更
         call allocate_and_init(self%T_node, self%num_fe_nodes)
         call allocate_and_init(self%P_node, self%num_fe_nodes)
         call allocate_and_init(self%phi_node, self%num_fe_nodes)
-        
+
         call allocate_and_init(self%T_gp, self%num_fe_gauss)
         call allocate_and_init(self%P_gp, self%num_fe_gauss)
         call allocate_and_init(self%phi_gp, self%num_fe_gauss)
-        
-        ! Workspaces
-        if (allocated(self%work_node)) deallocate(self%work_node)
-        allocate(self%work_node(self%bdf_order + 1, self%num_fe_nodes))
-        self%work_node = 0.0d0
 
-        ! Lerp optimization buffer
+        call allocate_and_init_2d(self%work_node, self%bdf_order + 1, self%num_fe_nodes)
         call allocate_and_init(self%work_bdf_buffer, self%bdf_order + 1)
-
         call allocate_and_init(self%work_psi, self%num_fe_nodes)
-        
-        if (allocated(self%work_dpsi_dx)) deallocate(self%work_dpsi_dx)
-        allocate(self%work_dpsi_dx(self%num_fe_dimension, self%num_fe_nodes))
-        self%work_dpsi_dx = 0.0d0
+        call allocate_and_init_2d(self%work_dpsi_dx, self%num_fe_dimension, self%num_fe_nodes)
 
         call allocate_and_init(self%work_vec, self%num_fe_nodes)
         call allocate_and_init(self%work_C, self%num_fe_gauss)
-
-        if (allocated(self%work_D)) deallocate(self%work_D)
-        allocate(self%work_D(self%num_fe_dimension, self%num_fe_dimension, self%num_fe_gauss))
-        self%work_D = 0.0d0
-
-        if (allocated(self%work_V)) deallocate(self%work_V)
-        allocate(self%work_V(self%num_fe_dimension, self%num_fe_gauss))
-        self%work_V = 0.0d0
+        call allocate_and_init_3d(self%work_D, self%num_fe_dimension, self%num_fe_dimension, self%num_fe_gauss)
+        call allocate_and_init_2d(self%work_V, self%num_fe_dimension, self%num_fe_gauss)
 
         call allocate_and_init(self%work_L, self%num_fe_gauss)
         call allocate_and_init(self%work_d_dt, self%num_fe_gauss)
-
-        if (allocated(self%work_matrix)) deallocate(self%work_matrix)
-        allocate(self%work_matrix(self%num_fe_nodes, self%num_fe_nodes))
-        self%work_matrix = 0.0d0
+        call allocate_and_init_2d(self%work_matrix, self%num_fe_nodes, self%num_fe_nodes)
 
     contains
-        ! Helper to reduce code duplication
+        ! [修正] 自前で allocate せず、最適化済みの allocate_array に委譲する
         subroutine allocate_and_init(arr, sz)
-            real(real64), allocatable, intent(out) :: arr(:)
+            real(real64), allocatable, intent(inout) :: arr(:)
             integer(int32), intent(in) :: sz
-            if (allocated(arr)) deallocate(arr)
-            allocate(arr(sz))
-            arr = 0.0d0
+            call allocate_array(arr, sz) ! サイズが同じなら何もしない（高速）
+            arr = 0.0d0 ! 値の初期化のみ行う
         end subroutine allocate_and_init
+
+        subroutine allocate_and_init_2d(arr, d1, d2)
+            real(real64), allocatable, intent(inout) :: arr(:, :)
+            integer(int32), intent(in) :: d1, d2
+            call allocate_array(arr, d1, d2)
+            arr = 0.0d0
+        end subroutine allocate_and_init_2d
+
+        subroutine allocate_and_init_3d(arr, d1, d2, d3)
+            real(real64), allocatable, intent(inout) :: arr(:, :, :)
+            integer(int32), intent(in) :: d1, d2, d3
+            call allocate_array(arr, d1, d2, d3)
+            arr = 0.0d0
+        end subroutine allocate_and_init_3d
+
     end subroutine set_basic
 
     subroutine set_bdf_info(self, controls)
@@ -216,34 +236,23 @@ contains
 
         real(real64), pointer, contiguous, dimension(:) :: work_history_ptr => null()
         real(real64) :: work_value
-        
+
         logical :: is_set
         integer(int32) :: history_len
 
         ! GP座標の取得
         call self%fe%get_gauss(gp)
 
-        ! ---------------------------------------------------------------------
         ! 安全対策: 全変数を妥当な値で初期化
-        ! 未使用の物理変数がゴミデータとして残るのを防ぐ
-        ! ---------------------------------------------------------------------
         self%T_node(:) = 273.15d0
         self%P_node(:) = 0.0d0
         self%phi_node(:) = 0.0d0
         self%work_bdf_buffer(:) = 0.0d0
 
-        ! --------------------------------------------------
         ! 1. Temperature (THERMAL)
-        ! --------------------------------------------------
         if (self%associated_bdf .and. allocated(self%work_bdf_buffer)) then
-            ! Thermal Physics Active Check (Assume controls accessor is available globally or via passed object, 
-            ! but here we don't have controls passed. 
-            ! NOTE: In a real scenario, check control flags here. 
-            ! Assuming thermal is always active or handling safe defaults above.)
-            
-            ! --- Node Value Extraction ---
-            self%work_node(:, :) = 0.0d0 ! Clear workspace for T
-            
+            self%work_node(:, :) = 0.0d0
+
             do i = 1, self%num_fe_nodes
                 work_history_ptr => null()
                 is_set = .false.
@@ -253,25 +262,21 @@ contains
 
                 is_set = .false.
                 call self%state(i)%temperature_history%get(work_history_ptr, is_set=is_set)
-                
+
                 if (associated(work_history_ptr) .and. is_set) then
                     history_len = min(size(work_history_ptr), self%bdf_order + 1)
                     self%work_node(1:history_len, i) = work_history_ptr(1:history_len)
                 end if
             end do
 
-            ! --- Interpolation to Gauss Points ---
             do i = 1, self%num_fe_gauss
-                ! Value
                 call self%fe%lerp(gp(i), self%T_node(1:self%num_fe_nodes), self%T_gp(i))
                 call self%state_gp(i)%temperature%set(self%T_gp(i))
-                
-                ! Gradient
+
                 call self%fe%dlerp(gp(i), self%T_node(1:self%num_fe_nodes), self%coordinates, self%computation_type, dlerped_value)
                 call self%state_gp(i)%grad_T%set(dlerped_value)
             end do
 
-            ! History Interpolation
             do j = 1, self%num_fe_gauss
                 self%work_bdf_buffer(:) = 0.0d0
                 do k = 1, self%bdf_order + 1
@@ -281,13 +286,8 @@ contains
             end do
         end if
 
-        ! --------------------------------------------------
         ! 2. Pressure (HYDRAULIC)
-        ! --------------------------------------------------
-        ! Note: Ideally check if (controls%is_physics_active(HYDRAULIC)) here
-        ! If not active, self%P_node remains 0.0d0 (safe default)
-        
-        self%work_node(:, :) = 0.0d0 ! Clear workspace for P
+        self%work_node(:, :) = 0.0d0
 
         do i = 1, self%num_fe_nodes
             work_history_ptr => null()
@@ -306,11 +306,9 @@ contains
         end do
 
         do i = 1, self%num_fe_gauss
-            ! Value
             call self%fe%lerp(gp(i), self%P_node(1:self%num_fe_nodes), self%P_gp(i))
             call self%state_gp(i)%pressure%set(self%P_gp(i))
 
-            ! Gradient
             call self%fe%dlerp(gp(i), self%P_node(1:self%num_fe_nodes), self%coordinates, self%computation_type, dlerped_value)
             call self%state_gp(i)%grad_P%set(dlerped_value)
         end do
@@ -323,10 +321,8 @@ contains
             call self%state_gp(j)%pressure_history%set(self%work_bdf_buffer)
         end do
 
-        ! --------------------------------------------------
         ! 3. Porosity
-        ! --------------------------------------------------
-        self%work_node(:, :) = 0.0d0 ! Clear workspace for Phi
+        self%work_node(:, :) = 0.0d0
 
         do i = 1, self%num_fe_nodes
             work_history_ptr => null()
@@ -464,10 +460,10 @@ contains
             self%num_fe_nodes = -1
             self%num_fe_gauss = -1
             self%num_fe_dimension = -1
-            
+
             if (allocated(self%state)) deallocate (self%state)
             if (allocated(self%state_gp)) deallocate (self%state_gp)
-            
+
             call deallocate_array(self%T_node)
             call deallocate_array(self%P_node)
             call deallocate_array(self%phi_node)
@@ -475,9 +471,9 @@ contains
             call deallocate_array(self%P_gp)
             call deallocate_array(self%phi_gp)
             call deallocate_array(self%coordinates)
-            
+
             call deallocate_array(self%work_node)
-            call deallocate_array(self%work_bdf_buffer) ! Added deallocation
+            call deallocate_array(self%work_bdf_buffer)
             call deallocate_array(self%work_psi)
             call deallocate_array(self%work_dpsi_dx)
             call deallocate_array(self%work_vec)

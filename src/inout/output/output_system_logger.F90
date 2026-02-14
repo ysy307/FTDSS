@@ -27,7 +27,6 @@ contains
         integer(int32) :: width
         real(real64) :: rss_mb
         character(len=32) :: fmt
-        integer(int32), parameter :: n_repeat = 50
 
         ! --- Initialization ---
         fmt = ''
@@ -47,6 +46,7 @@ contains
         else
             width = 6
         end if
+        ! Generate format string like: (a,f10.4,a) for the memory usage line
         write (fmt, '(a,i0,a)') '(a,f', width, '.4,a)'
 
         ! --- Open log file ---
@@ -55,48 +55,47 @@ contains
             call raise_error(ERROR_CODES%OPEN_FILE_FAILED, opt=self%log_file_name)
         end if
 
-        ! --- Output header ---
-        write (num_unit, '(a)') repeat('=', n_repeat)
-        write (num_unit, '(a)') "FTDSS System Log"
-        write (num_unit, '(a)') repeat('=', n_repeat)
-        write (num_unit, '(a)') "Username           : "//strip(username)
-        write (num_unit, '(a)') "Hostname           : "//strip(hostname)
-        write (num_unit, '(a)') "OS                 : "//strip(os_name)
-        write (num_unit, '(a)') "Architecture       : "//strip(architecture)
-        write (num_unit, '(a)') "Compiler           : "//strip(compiler)
-        write (num_unit, '(a)') "Compiler Version   : "//strip(compiler_version)
-#ifdef _OPENMP
-        write (num_unit, '(a, i0)') "OpenMP Threads     : ", omp_get_max_threads()
-#else
-        write (num_unit, '(a)') "OpenMP Threads     : 1 (Serial)"
-#endif
-        write (num_unit, fmt) "RSS Memory Usage   : ", rss_mb, " MB"
-        write (num_unit, '(a)') repeat('=', n_repeat)
-
-        ! --- Output time information ---
-        write (num_unit, '(a)') "Time Information"
-        write (num_unit, '(a)') repeat('=', n_repeat)
-
-        ! Start Time
-        if (len_trim(start_time_str) > 0) then
-            write (num_unit, '(a)') strip(start_time_str)
-        else
-            write (num_unit, '(a)') "Start Time : (Not recorded)"
-        end if
-
-        ! End Time
-        if (len_trim(end_time_str) > 0) then
-            write (num_unit, '(a)') strip(end_time_str)
-        else
-            write (num_unit, '(a)') "End Time   : (Not recorded)"
-        end if
-
-        ! --- Output profiling report ---
-        write (num_unit, '(a)') repeat('=', n_repeat)
-        write (num_unit, '(a)') "Performance Profiling Report"
-        write (num_unit, '(a)') repeat('=', n_repeat)
+        ! --- Output Header (Markdown) ---
+        write (num_unit, '(a)') "# FTDSS System Log"
         write (num_unit, '(a)') ""
-        write (num_unit, '(a)') "## Time Profiler Results"
+
+        ! --- System Information (Markdown List) ---
+        write (num_unit, '(a)') "## System Information"
+        write (num_unit, '(a)') ""
+        write (num_unit, '(a)') "- **Username**: "//strip(username)
+        write (num_unit, '(a)') "- **Hostname**: "//strip(hostname)
+        write (num_unit, '(a)') "- **OS**: "//strip(os_name)
+        write (num_unit, '(a)') "- **Architecture**: "//strip(architecture)
+        write (num_unit, '(a)') "- **Compiler**: "//strip(compiler)
+        write (num_unit, '(a)') "- **Compiler Version**: "//strip(compiler_version)
+#ifdef _OPENMP
+        write (num_unit, '(a, i0)') "- **OpenMP Threads**: ", omp_get_max_threads()
+#else
+        write (num_unit, '(a)') "- **OpenMP Threads**: 1 (Serial)"
+#endif
+        ! Output RSS Memory Usage using the dynamically generated format
+        write (num_unit, fmt) "- **RSS Memory Usage**: ", rss_mb, " MB"
+        write (num_unit, '(a)') ""
+
+        ! --- Time Information (Markdown List) ---
+        write (num_unit, '(a)') "## Time Information"
+        write (num_unit, '(a)') ""
+
+        if (len_trim(start_time_str) > 0) then
+            write (num_unit, '(a)') "- **Start Time**: "//strip(start_time_str)
+        else
+            write (num_unit, '(a)') "- **Start Time**: (Not recorded)"
+        end if
+
+        if (len_trim(end_time_str) > 0) then
+            write (num_unit, '(a)') "- **End Time**: "//strip(end_time_str)
+        else
+            write (num_unit, '(a)') "- **End Time**: (Not recorded)"
+        end if
+        write (num_unit, '(a)') ""
+
+        ! --- Profiling Report (Markdown Table) ---
+        write (num_unit, '(a)') "## Performance Profiling Report"
         write (num_unit, '(a)') ""
 
         if (size(sec_labels) > 0) then
@@ -106,7 +105,7 @@ contains
 
             ! Table Body
             do i = 1, size(sec_labels)
-                write (num_unit, '("|", a20, "|", es10.3, "|", i5, "|", f6.1, "%   |")') &
+                write (num_unit, '("|", a20, "| ", es10.3, " | ", i5, " |   ", f6.1, " % |")') &
                     sec_labels(i), &
                     sec_total_times(i), &
                     sec_call_counts(i), &
@@ -115,7 +114,7 @@ contains
         else
             write (num_unit, '(a)') "(No sections recorded)"
         end if
-        
+
         write (num_unit, '(a)') ""
 
         close (num_unit)
