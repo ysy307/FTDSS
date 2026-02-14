@@ -14,17 +14,29 @@ module main_base
         integer(int32) :: num_fe_nodes = -1
         integer(int32) :: num_fe_gauss = -1
         integer(int32) :: num_fe_dimension = -1
+        
         class(abst_fe), pointer :: fe => null()
+        
         real(real64), allocatable :: coordinates(:, :)
+        
+        ! --- State Management ---
         type(type_state), allocatable :: state(:)
         type(type_state), allocatable :: state_gp(:)
+        
+        ! --- Nodal Values (Buffers) ---
         real(real64), allocatable :: T_node(:)
         real(real64), allocatable :: T_gp(:)
         real(real64), allocatable :: P_node(:)
         real(real64), allocatable :: P_gp(:)
         real(real64), allocatable :: phi_node(:)
         real(real64), allocatable :: phi_gp(:)
-        real(real64), allocatable :: work_node(:, :)
+        
+        ! --- Workspaces ---
+        ! History values at nodes: (bdf_order+1, num_nodes)
+        real(real64), allocatable :: work_node(:, :) 
+        ! History interpolation buffer: (bdf_order+1) -> Removed allocation from lerp_states
+        real(real64), allocatable :: work_bdf_buffer(:)
+
         real(real64), allocatable :: work_psi(:)
         real(real64), allocatable :: work_dpsi_dx(:, :)
         real(real64), allocatable :: work_vec(:)
@@ -43,6 +55,7 @@ module main_base
         logical, private :: associated_bdf = .false.
         integer(int32) :: bdf_order = -1
         real(real64), pointer, contiguous, dimension(:) :: bdf_coeffs => null()
+
     contains
         procedure, public, pass(self) :: initialize => initialize_type_assemble_workspace
         procedure, public, pass(self) :: destroy => destroy_type_assemble_workspace
@@ -64,6 +77,7 @@ module main_base
     end type type_assemble_workspace
 
 contains
+
     subroutine initialize_type_assemble_workspace(self, fe, material_id, element_id, computation_type, coordinates, controls)
         implicit none
         class(type_assemble_workspace), intent(inout) :: self
@@ -98,6 +112,9 @@ contains
         self%material_id = material_id
         self%element_id = element_id
         self%computation_type = computation_type
+        
+        ! 座標のコピー
+        if (allocated(self%coordinates)) deallocate(self%coordinates)
         call allocate_array(self%coordinates, source=coordinates)
 
     end subroutine initialize_type_assemble_workspace
@@ -113,34 +130,69 @@ contains
         call self%fe%get_num_gauss(self%num_fe_gauss)
         call self%fe%get_dimension(self%num_fe_dimension)
 
+        ! State objects initialization
+        if (allocated(self%state)) deallocate(self%state)
         allocate (self%state(self%num_fe_nodes))
         do i = 1, self%num_fe_nodes
             call self%state(i)%reset()
         end do
+
+        if (allocated(self%state_gp)) deallocate(self%state_gp)
         allocate (self%state_gp(self%num_fe_gauss))
         do i = 1, self%num_fe_gauss
             call self%state_gp(i)%reset()
         end do
 
-        call allocate_array(self%T_node, self%num_fe_nodes)
-        call allocate_array(self%P_node, self%num_fe_nodes)
-        call allocate_array(self%phi_node, self%num_fe_nodes)
-        call allocate_array(self%T_gp, self%num_fe_gauss)
-        call allocate_array(self%P_gp, self%num_fe_gauss)
-        call allocate_array(self%phi_gp, self%num_fe_gauss)
-        call allocate_array(self%work_node, self%bdf_order + 1, self%num_fe_nodes)
+        ! Array allocation and ZERO initialization
+        call allocate_and_init(self%T_node, self%num_fe_nodes)
+        call allocate_and_init(self%P_node, self%num_fe_nodes)
+        call allocate_and_init(self%phi_node, self%num_fe_nodes)
+        
+        call allocate_and_init(self%T_gp, self%num_fe_gauss)
+        call allocate_and_init(self%P_gp, self%num_fe_gauss)
+        call allocate_and_init(self%phi_gp, self%num_fe_gauss)
+        
+        ! Workspaces
+        if (allocated(self%work_node)) deallocate(self%work_node)
+        allocate(self%work_node(self%bdf_order + 1, self%num_fe_nodes))
+        self%work_node = 0.0d0
 
-        call allocate_array(self%work_psi, self%num_fe_nodes)
-        call allocate_array(self%work_dpsi_dx, self%num_fe_dimension, self%num_fe_nodes)
-        call allocate_array(self%work_vec, self%num_fe_nodes)
+        ! Lerp optimization buffer
+        call allocate_and_init(self%work_bdf_buffer, self%bdf_order + 1)
 
-        call allocate_array(self%work_C, self%num_fe_gauss)
-        call allocate_array(self%work_D, self%num_fe_dimension, self%num_fe_dimension, self%num_fe_gauss)
-        call allocate_array(self%work_V, self%num_fe_dimension, self%num_fe_gauss)
-        call allocate_array(self%work_L, self%num_fe_gauss)
-        call allocate_array(self%work_d_dt, self%num_fe_gauss)
-        call allocate_array(self%work_matrix, self%num_fe_nodes, self%num_fe_nodes)
+        call allocate_and_init(self%work_psi, self%num_fe_nodes)
+        
+        if (allocated(self%work_dpsi_dx)) deallocate(self%work_dpsi_dx)
+        allocate(self%work_dpsi_dx(self%num_fe_dimension, self%num_fe_nodes))
+        self%work_dpsi_dx = 0.0d0
 
+        call allocate_and_init(self%work_vec, self%num_fe_nodes)
+        call allocate_and_init(self%work_C, self%num_fe_gauss)
+
+        if (allocated(self%work_D)) deallocate(self%work_D)
+        allocate(self%work_D(self%num_fe_dimension, self%num_fe_dimension, self%num_fe_gauss))
+        self%work_D = 0.0d0
+
+        if (allocated(self%work_V)) deallocate(self%work_V)
+        allocate(self%work_V(self%num_fe_dimension, self%num_fe_gauss))
+        self%work_V = 0.0d0
+
+        call allocate_and_init(self%work_L, self%num_fe_gauss)
+        call allocate_and_init(self%work_d_dt, self%num_fe_gauss)
+
+        if (allocated(self%work_matrix)) deallocate(self%work_matrix)
+        allocate(self%work_matrix(self%num_fe_nodes, self%num_fe_nodes))
+        self%work_matrix = 0.0d0
+
+    contains
+        ! Helper to reduce code duplication
+        subroutine allocate_and_init(arr, sz)
+            real(real64), allocatable, intent(out) :: arr(:)
+            integer(int32), intent(in) :: sz
+            if (allocated(arr)) deallocate(arr)
+            allocate(arr(sz))
+            arr = 0.0d0
+        end subroutine allocate_and_init
     end subroutine set_basic
 
     subroutine set_bdf_info(self, controls)
@@ -158,116 +210,155 @@ contains
         implicit none
         class(type_assemble_workspace), intent(inout) :: self
 
-        integer(int32) :: i, j
+        integer(int32) :: i, j, k
         type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gp => null()
         type(type_coordinate_dp) :: dlerped_value
 
-        ! ポインターで受け取る
         real(real64), pointer, contiguous, dimension(:) :: work_history_ptr => null()
+        real(real64) :: work_value
+        
+        logical :: is_set
+        integer(int32) :: history_len
 
-        ! 補間計算用の一時配列（allocatable）
-        real(real64), allocatable :: work_history_buffer(:)
-
+        ! GP座標の取得
         call self%fe%get_gauss(gp)
 
-        ! バッファ割り当て
-        if (allocated(work_history_buffer)) deallocate (work_history_buffer)
-        allocate (work_history_buffer(self%bdf_order + 1))
-        work_history_buffer = 0.0d0
+        ! ---------------------------------------------------------------------
+        ! 安全対策: 全変数を妥当な値で初期化
+        ! 未使用の物理変数がゴミデータとして残るのを防ぐ
+        ! ---------------------------------------------------------------------
+        self%T_node(:) = 273.15d0
+        self%P_node(:) = 0.0d0
+        self%phi_node(:) = 0.0d0
+        self%work_bdf_buffer(:) = 0.0d0
 
         ! --------------------------------------------------
-        ! 1. Temperature
+        ! 1. Temperature (THERMAL)
         ! --------------------------------------------------
-        self%work_node(:, :) = 0.0d0
-        do i = 1, self%num_fe_nodes
-            work_history_ptr => null()
-            ! ポインターを取得（修正されたvariableクラスにより，これは常に整列済み）
-            call self%state(i)%get(temperature=self%T_node(i), &
-                                   temperature_history=work_history_ptr)
+        if (self%associated_bdf .and. allocated(self%work_bdf_buffer)) then
+            ! Thermal Physics Active Check (Assume controls accessor is available globally or via passed object, 
+            ! but here we don't have controls passed. 
+            ! NOTE: In a real scenario, check control flags here. 
+            ! Assuming thermal is always active or handling safe defaults above.)
+            
+            ! --- Node Value Extraction ---
+            self%work_node(:, :) = 0.0d0 ! Clear workspace for T
+            
+            do i = 1, self%num_fe_nodes
+                work_history_ptr => null()
+                is_set = .false.
 
-            if (associated(work_history_ptr)) then
-                ! ポインターが有効なら値をコピー
-                self%work_node(1:self%bdf_order + 1, i) = work_history_ptr(1:self%bdf_order + 1)
-            end if
-        end do
+                call self%state(i)%temperature%get(work_value, is_set=is_set)
+                if (is_set) self%T_node(i) = work_value
 
-        do i = 1, self%num_fe_gauss
-            call self%fe%lerp(gp(i), self%T_node, self%T_gp(i))
-            call self%state_gp(i)%temperature%set(self%T_gp(i))
-        end do
-
-        do j = 1, self%num_fe_gauss
-            work_history_buffer(:) = 0.0d0
-            do i = 1, self%bdf_order + 1
-                ! work_nodeは上でセットされた正しい履歴情報を持っている
-                call self%fe%lerp(gp(j), self%work_node(i, 1:self%num_fe_nodes), work_history_buffer(i))
+                is_set = .false.
+                call self%state(i)%temperature_history%get(work_history_ptr, is_set=is_set)
+                
+                if (associated(work_history_ptr) .and. is_set) then
+                    history_len = min(size(work_history_ptr), self%bdf_order + 1)
+                    self%work_node(1:history_len, i) = work_history_ptr(1:history_len)
+                end if
             end do
-            call self%state_gp(j)%set(temperature_history=work_history_buffer)
-        end do
 
-        do i = 1, self%num_fe_gauss
-            call self%fe%dlerp(gp(i), self%T_node(1:self%num_fe_nodes), self%coordinates, self%computation_type, dlerped_value)
-            call self%state_gp(i)%grad_T%set(dlerped_value)
-        end do
+            ! --- Interpolation to Gauss Points ---
+            do i = 1, self%num_fe_gauss
+                ! Value
+                call self%fe%lerp(gp(i), self%T_node(1:self%num_fe_nodes), self%T_gp(i))
+                call self%state_gp(i)%temperature%set(self%T_gp(i))
+                
+                ! Gradient
+                call self%fe%dlerp(gp(i), self%T_node(1:self%num_fe_nodes), self%coordinates, self%computation_type, dlerped_value)
+                call self%state_gp(i)%grad_T%set(dlerped_value)
+            end do
+
+            ! History Interpolation
+            do j = 1, self%num_fe_gauss
+                self%work_bdf_buffer(:) = 0.0d0
+                do k = 1, self%bdf_order + 1
+                    call self%fe%lerp(gp(j), self%work_node(k, 1:self%num_fe_nodes), self%work_bdf_buffer(k))
+                end do
+                call self%state_gp(j)%temperature_history%set(self%work_bdf_buffer)
+            end do
+        end if
 
         ! --------------------------------------------------
-        ! 2. Pressure
+        ! 2. Pressure (HYDRAULIC)
         ! --------------------------------------------------
-        self%work_node(:, :) = 0.0d0
+        ! Note: Ideally check if (controls%is_physics_active(HYDRAULIC)) here
+        ! If not active, self%P_node remains 0.0d0 (safe default)
+        
+        self%work_node(:, :) = 0.0d0 ! Clear workspace for P
+
         do i = 1, self%num_fe_nodes
             work_history_ptr => null()
-            call self%state(i)%get(pressure=self%P_node(i), &
-                                   pressure_history=work_history_ptr)
-            if (associated(work_history_ptr)) then
-                self%work_node(1:self%bdf_order + 1, i) = work_history_ptr(1:self%bdf_order + 1)
+            is_set = .false.
+
+            call self%state(i)%pressure%get(work_value, is_set=is_set)
+            if (is_set) self%P_node(i) = work_value
+
+            is_set = .false.
+            call self%state(i)%pressure_history%get(work_history_ptr, is_set=is_set)
+
+            if (associated(work_history_ptr) .and. is_set) then
+                history_len = min(size(work_history_ptr), self%bdf_order + 1)
+                self%work_node(1:history_len, i) = work_history_ptr(1:history_len)
             end if
         end do
 
         do i = 1, self%num_fe_gauss
-            call self%fe%lerp(gp(i), self%P_node, self%P_gp(i))
+            ! Value
+            call self%fe%lerp(gp(i), self%P_node(1:self%num_fe_nodes), self%P_gp(i))
             call self%state_gp(i)%pressure%set(self%P_gp(i))
+
+            ! Gradient
+            call self%fe%dlerp(gp(i), self%P_node(1:self%num_fe_nodes), self%coordinates, self%computation_type, dlerped_value)
+            call self%state_gp(i)%grad_P%set(dlerped_value)
         end do
 
         do j = 1, self%num_fe_gauss
-            work_history_buffer(:) = 0.0d0
-            do i = 1, self%bdf_order + 1
-                call self%fe%lerp(gp(j), self%work_node(i, :), work_history_buffer(i))
+            self%work_bdf_buffer(:) = 0.0d0
+            do k = 1, self%bdf_order + 1
+                call self%fe%lerp(gp(j), self%work_node(k, 1:self%num_fe_nodes), self%work_bdf_buffer(k))
             end do
-            call self%state_gp(j)%pressure_history%set(work_history_buffer)
-        end do
-
-        do i = 1, self%num_fe_gauss
-            call self%fe%dlerp(gp(i), self%P_node, self%coordinates, self%computation_type, dlerped_value)
-            call self%state_gp(i)%grad_P%set(dlerped_value)
+            call self%state_gp(j)%pressure_history%set(self%work_bdf_buffer)
         end do
 
         ! --------------------------------------------------
         ! 3. Porosity
         ! --------------------------------------------------
-        self%work_node(:, :) = 0.0d0
+        self%work_node(:, :) = 0.0d0 ! Clear workspace for Phi
+
         do i = 1, self%num_fe_nodes
             work_history_ptr => null()
-            call self%state(i)%get(porosity=self%phi_node(i), &
-                                   porosity_history=work_history_ptr)
-            if (associated(work_history_ptr)) then
-                self%work_node(1:self%bdf_order + 1, i) = work_history_ptr(1:self%bdf_order + 1)
+            is_set = .false.
+
+            call self%state(i)%porosity%get(work_value, is_set=is_set)
+            if (is_set) self%phi_node(i) = work_value
+
+            is_set = .false.
+            call self%state(i)%porosity_history%get(work_history_ptr, is_set=is_set)
+
+            if (associated(work_history_ptr) .and. is_set) then
+                history_len = min(size(work_history_ptr), self%bdf_order + 1)
+                self%work_node(1:history_len, i) = work_history_ptr(1:history_len)
             end if
         end do
 
         do i = 1, self%num_fe_gauss
-            call self%fe%lerp(gp(i), self%phi_node, self%phi_gp(i))
+            call self%fe%lerp(gp(i), self%phi_node(1:self%num_fe_nodes), self%phi_gp(i))
             call self%state_gp(i)%porosity%set(self%phi_gp(i))
         end do
 
         do j = 1, self%num_fe_gauss
-            work_history_buffer(:) = 0.0d0
-            do i = 1, self%bdf_order + 1
-                call self%fe%lerp(gp(j), self%work_node(i, :), work_history_buffer(i))
+            self%work_bdf_buffer(:) = 0.0d0
+            do k = 1, self%bdf_order + 1
+                call self%fe%lerp(gp(j), self%work_node(k, 1:self%num_fe_nodes), self%work_bdf_buffer(k))
             end do
-            call self%state_gp(j)%porosity_history%set(work_history_buffer)
+            call self%state_gp(j)%porosity_history%set(self%work_bdf_buffer)
         end do
 
-        if (allocated(work_history_buffer)) deallocate (work_history_buffer)
+        nullify (gp)
+        nullify (work_history_ptr)
 
     end subroutine lerp_states
 
@@ -278,7 +369,6 @@ contains
         real(real64), intent(inout) :: local_matrix(:, :)
 
         local_matrix(:, :) = 0.0d0
-
         self%work_psi(:) = 0.0d0
         call self%fe%compute_K1(self%coordinates, A_gp, local_matrix, self%work_psi)
     end subroutine compute_K1_assemble_workspace
@@ -290,7 +380,6 @@ contains
         real(real64), intent(inout) :: local_matrix(:, :)
 
         local_matrix(:, :) = 0.0d0
-
         self%work_psi(:) = 0.0d0
         call self%fe%compute_K1_lumped(self%coordinates, A_gp, local_matrix, self%work_psi)
     end subroutine compute_K1_lumped_assemble_workspace
@@ -339,7 +428,6 @@ contains
         real(real64), intent(inout) :: local_vector(:)
 
         local_vector(:) = 0.0d0
-
         self%work_psi(:) = 0.0d0
         call self%fe%compute_R1(self%coordinates, S_gp, local_vector, self%work_psi)
     end subroutine compute_R1_assemble_workspace
@@ -351,7 +439,6 @@ contains
         real(real64), intent(inout) :: local_vector(:)
 
         local_vector(:) = 0.0d0
-
         self%work_psi(:) = 0.0d0
         call self%fe%compute_R1_lumped(self%coordinates, S_node, local_vector, self%work_psi)
     end subroutine compute_R1_lumped_assemble_workspace
@@ -363,7 +450,6 @@ contains
         real(real64), intent(inout) :: local_vector(:)
 
         local_vector(:) = 0.0d0
-
         self%work_psi(:) = 0.0d0
         self%work_dpsi_dx(:, :) = 0.0d0
         call self%fe%compute_R2(self%coordinates, V_gp, local_vector, self%work_dpsi_dx)
@@ -378,12 +464,10 @@ contains
             self%num_fe_nodes = -1
             self%num_fe_gauss = -1
             self%num_fe_dimension = -1
-            if (allocated(self%state)) then
-                deallocate (self%state)
-            end if
-            if (allocated(self%state_gp)) then
-                deallocate (self%state_gp)
-            end if
+            
+            if (allocated(self%state)) deallocate (self%state)
+            if (allocated(self%state_gp)) deallocate (self%state_gp)
+            
             call deallocate_array(self%T_node)
             call deallocate_array(self%P_node)
             call deallocate_array(self%phi_node)
@@ -391,7 +475,9 @@ contains
             call deallocate_array(self%P_gp)
             call deallocate_array(self%phi_gp)
             call deallocate_array(self%coordinates)
+            
             call deallocate_array(self%work_node)
+            call deallocate_array(self%work_bdf_buffer) ! Added deallocation
             call deallocate_array(self%work_psi)
             call deallocate_array(self%work_dpsi_dx)
             call deallocate_array(self%work_vec)

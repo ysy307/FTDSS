@@ -28,9 +28,10 @@ contains
 
         ! call setup_handler()
 
-        call self%controls%profiler%stop("IO")
-        call input%initialize()
+        
         call self%controls%profiler%start("IO")
+        call input%initialize()
+        call self%controls%profiler%stop("IO")
         call self%controls%initialize(input)
         call ic%initialize(input)
 
@@ -56,12 +57,12 @@ contains
         call self%porosity%initialize(num_nodes, max_bdf_order)
         call ic%apply(IC_TARGET_POROSITY, self%porosity)
 
-        if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
+        if (self%is_active_thermal()) then
             call self%temperature%initialize(num_nodes, max_bdf_order)
             call ic%apply(IC_TARGET_THERMAL, self%temperature)
         end if
 
-        if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
+        if (self%is_active_hydraulic()) then
             call self%pressure%initialize(num_nodes, max_bdf_order)
             call ic%apply(IC_TARGET_HYDRAULIC, self%pressure)
         end if
@@ -118,8 +119,12 @@ contains
         if (self%controls%out_field%is_due(current_time)) then
             call self%controls%out_field%get_step(iter)
             call self%porosity%get_previous(porosity)
-            call self%temperature%get_previous(temperature)
-            call self%pressure%get_previous(pressure)
+            if (self%is_active_thermal()) then
+                call self%temperature%get_previous(temperature)
+            end if
+            if (self%is_active_hydraulic()) then
+                call self%pressure%get_previous(pressure)
+            end if
             call self%Qi%get_previous(ice_content)
             call self%output%output_fields(iter, self%domain, porosity, &
                                            temperature, ice_content, pressure)
@@ -149,8 +154,12 @@ contains
 
         if (self%controls%out_history%is_due(current_time)) then
             call self%porosity%get_previous(porosity)
-            call self%temperature%get_previous(temperature)
-            call self%pressure%get_previous(pressure)
+            if (self%is_active_thermal()) then
+                call self%temperature%get_previous(temperature)
+            end if
+            if (self%is_active_hydraulic()) then
+                call self%pressure%get_previous(pressure)
+            end if
             current_time_converted = self%controls%out_history%convert_output_time(current_time)
             call self%output%output_history(current_time_converted, self%domain, porosity, &
                                             temperature, pressure)
@@ -313,11 +322,11 @@ contains
 
         call self%controls%profiler%start("Setup")
 
-        if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
+        if (self%is_active_thermal()) then
             call self%temperature%advance()
         end if
 
-        if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
+        if (self%is_active_hydraulic()) then
             call self%pressure%advance()
         end if
 
@@ -352,7 +361,7 @@ contains
 
         is_none = self%controls%iteration%is_none()
 
-        if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
+        if (self%is_active_thermal()) then
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du)
             call self%temperature%get_current(current)
             if (associated(current)) then
@@ -378,7 +387,31 @@ contains
             call deallocate_array(du)
         end if
 
-        !! TODO: Hydraulic variable reflection
+        if (self%is_active_hydraulic()) then
+            call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, du)
+            call self%pressure%get_current(current)
+            if (associated(current)) then
+                if (.not. is_none) then
+                    if (iter > 1) then
+                        call self%controls%aitken%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, du)
+                    end if
+                    call self%controls%aitken%get_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
+                    write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
+                else
+                    relaxation_factor = 1.0d0
+                end if
+                current(:) = current(:) + relaxation_factor * du(:)
+                call self%pressure%set_delta(relaxation_factor * du(:))
+                if (.not. is_none) then
+                    call self%controls%aitken%set_du(PHYSICS_TYPES%HYDRAULIC, du)
+                end if
+            end if
+
+            call self%calc_gradient_pressure()
+            call self%pressure%compute_time_derivative(bdf_coeffs, bdf_order)
+
+            call deallocate_array(du)
+        end if
 
         call self%controls%profiler%stop("Setup")
 
@@ -391,6 +424,24 @@ contains
         call self%controls%iteration%reset()
 
     end subroutine reset_ftdss
+
+    module function is_active_thermal_ftdss(self) result(is_active)
+        implicit none
+        class(type_ftdss), intent(in) :: self
+        logical :: is_active
+
+        is_active = self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)
+
+    end function is_active_thermal_ftdss
+
+    module function is_active_hydraulic_ftdss(self) result(is_active)
+        implicit none
+        class(type_ftdss), intent(in) :: self
+        logical :: is_active
+
+        is_active = self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)
+
+    end function is_active_hydraulic_ftdss
 
     module subroutine finalize_type_ftdss(self)
         implicit none

@@ -9,6 +9,7 @@
 # --- Control Library ---
 # This library contains all core control logic.
 set(CONTROL_SOURCES
+    ats.F90
     time.F90
     time_profiler.F90
     iteration.F90

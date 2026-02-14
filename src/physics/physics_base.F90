@@ -131,12 +131,21 @@ contains
         real(real64), intent(inout) :: T_K, P_abs
 
         real(real64) :: temp_c, press_g
+        logical :: is_set
 
-        call state%get(temperature=temp_c, &
-                       pressure=press_g)
+        call state%temperature%get(temp_c, is_set=is_set)
+        if (is_set) then
+            call self%shift_temperature_absolute(temp_c, T_K)
+        else
+            T_K = 273.15d0
+        end if
+        call state%pressure%get(press_g, is_set=is_set)
+        if (is_set) then
+            call self%shift_pressure_absolute(press_g, P_abs)
+        else
+            P_abs = P_atm
+        end if
 
-        call self%shift_temperature_absolute(temp_c, T_K)
-        call self%shift_pressure_absolute(press_g, P_abs)
     end subroutine get_thermo_state_TP
 
     !> @brief Stateオブジェクトから絶対温度[K]のみを取得する内部ヘルパー
@@ -147,9 +156,14 @@ contains
         real(real64), intent(inout) :: T_K
 
         real(real64) :: temp_c
+        logical :: is_set
 
-        call state%temperature%get(temp_c)
-        call self%shift_temperature_absolute(temp_c, T_K)
+        call state%temperature%get(temp_c, is_set=is_set)
+        if (is_set) then
+            call self%shift_temperature_absolute(temp_c, T_K)
+        else
+            T_K = 273.15d0
+        end if
     end subroutine get_thermo_state_T
 
     !===========================================================================

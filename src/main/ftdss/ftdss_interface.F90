@@ -48,6 +48,8 @@ module main_ftdss
 
     contains
         procedure, public, pass(self) :: initialize => initialize_type_ftdss
+        procedure, public, pass(self) :: finalize => finalize_type_ftdss
+
         procedure, public, pass(self) :: shift => shift_ftdss
 
         procedure, public, pass(self) :: calc_gradient => calc_gradient_ftdss
@@ -90,9 +92,11 @@ module main_ftdss
         procedure, public, pass(self) :: output_fields => output_fields_ftdss
         procedure, public, pass(self) :: output_history => output_history_ftdss
 
+        procedure, public, pass(self) :: is_active_thermal => is_active_thermal_ftdss
+        procedure, public, pass(self) :: is_active_hydraulic => is_active_hydraulic_ftdss
+
         procedure, public, pass(self) :: run => run_ftdss
 
-        procedure, public, pass(self) :: finalize => finalize_type_ftdss
     end type type_ftdss
 
     interface
@@ -317,6 +321,21 @@ module main_ftdss
             class(type_ftdss), intent(inout) :: self
 
         end subroutine finalize_type_ftdss
+
+        module function is_active_thermal_ftdss(self) result(is_active)
+            implicit none
+            class(type_ftdss), intent(in) :: self
+            logical :: is_active
+
+        end function is_active_thermal_ftdss
+
+        module function is_active_hydraulic_ftdss(self) result(is_active)
+            implicit none
+            class(type_ftdss), intent(in) :: self
+            logical :: is_active
+
+        end function is_active_hydraulic_ftdss
+
     end interface
 
 end module main_ftdss
