@@ -3,12 +3,19 @@ submodule(inout_output) inout_output_system_logger
 
 contains
 
-    module subroutine output_system_log(self, control)
+    module subroutine output_system_log(self, start_time_str, end_time_str, &
+                                        sec_labels, sec_total_times, sec_call_counts, sec_percentages)
         implicit none
         class(type_output), intent(inout) :: self
-        type(type_controls), intent(in) :: control
+        ! Receive primitive data instead of control object
+        character(*), intent(in) :: start_time_str
+        character(*), intent(in) :: end_time_str
+        character(*), intent(in) :: sec_labels(:)
+        real(real64), intent(in) :: sec_total_times(:)
+        integer(int32), intent(in) :: sec_call_counts(:)
+        real(real64), intent(in) :: sec_percentages(:)
 
-        ! システム情報用
+        ! For system information
         character(:), allocatable :: username
         character(:), allocatable :: hostname
         character(:), allocatable :: compiler
@@ -16,19 +23,16 @@ contains
         character(:), allocatable :: architecture
         character(:), allocatable :: os_name
 
-        integer(int32) :: num_unit, ios
+        integer(int32) :: num_unit, ios, i
         integer(int32) :: width
         real(real64) :: rss_mb
         character(len=32) :: fmt
         integer(int32), parameter :: n_repeat = 50
 
-        ! 既存メソッドから受け取るための文字列バッファ
-        character(:), allocatable :: time_record_str
-
-        ! --- 初期化 ---
+        ! --- Initialization ---
         fmt = ''
 
-        ! --- システム情報の取得 ---
+        ! --- Get system information ---
         username = get_username()
         hostname = get_hostname()
         compiler = get_compiler_name()
@@ -37,7 +41,7 @@ contains
         os_name = get_os()
         rss_mb = get_memory_usage()
 
-        ! --- フォーマットの動的生成 ---
+        ! --- Dynamic generation of format ---
         if (rss_mb > 0.0d0) then
             width = max(6, int(log10(rss_mb)) + 6)
         else
@@ -45,13 +49,13 @@ contains
         end if
         write (fmt, '(a,i0,a)') '(a,f', width, '.4,a)'
 
-        ! --- ログファイルのオープン ---
+        ! --- Open log file ---
         open (newunit=num_unit, file=self%log_file_name, status='replace', action='write', iostat=ios)
         if (ios /= 0) then
             call raise_error(ERROR_CODES%OPEN_FILE_FAILED, opt=self%log_file_name)
         end if
 
-        ! --- ヘッダー出力 ---
+        ! --- Output header ---
         write (num_unit, '(a)') repeat('=', n_repeat)
         write (num_unit, '(a)') "FTDSS System Log"
         write (num_unit, '(a)') repeat('=', n_repeat)
@@ -69,28 +73,50 @@ contains
         write (num_unit, fmt) "RSS Memory Usage   : ", rss_mb, " MB"
         write (num_unit, '(a)') repeat('=', n_repeat)
 
-        ! --- 時間情報出力 ---
+        ! --- Output time information ---
         write (num_unit, '(a)') "Time Information"
         write (num_unit, '(a)') repeat('=', n_repeat)
 
         ! Start Time
-        call control%profiler%get_record(TIME_RECORD_START, time_record_str)
-        if (allocated(time_record_str)) then
-            write (num_unit, '(a)') strip(time_record_str)
+        if (len_trim(start_time_str) > 0) then
+            write (num_unit, '(a)') strip(start_time_str)
+        else
+            write (num_unit, '(a)') "Start Time : (Not recorded)"
         end if
 
         ! End Time
-        call control%profiler%get_record(TIME_RECORD_END, time_record_str)
-        if (allocated(time_record_str)) then
-            write (num_unit, '(a)') strip(time_record_str)
+        if (len_trim(end_time_str) > 0) then
+            write (num_unit, '(a)') strip(end_time_str)
+        else
+            write (num_unit, '(a)') "End Time   : (Not recorded)"
         end if
 
-        ! --- プロファイリング集計出力 ---
+        ! --- Output profiling report ---
         write (num_unit, '(a)') repeat('=', n_repeat)
         write (num_unit, '(a)') "Performance Profiling Report"
         write (num_unit, '(a)') repeat('=', n_repeat)
+        write (num_unit, '(a)') ""
+        write (num_unit, '(a)') "## Time Profiler Results"
+        write (num_unit, '(a)') ""
 
-        call control%profiler%display(unit=num_unit)
+        if (size(sec_labels) > 0) then
+            ! Table Header
+            write (num_unit, '(a)') "| Section            | Time (s)   | Calls | Percentage |"
+            write (num_unit, '(a)') "|:-------------------|:----------:|:-----:|:----------:|"
+
+            ! Table Body
+            do i = 1, size(sec_labels)
+                write (num_unit, '("|", a20, "|", es10.3, "|", i5, "|", f6.1, "%   |")') &
+                    sec_labels(i), &
+                    sec_total_times(i), &
+                    sec_call_counts(i), &
+                    sec_percentages(i)
+            end do
+        else
+            write (num_unit, '(a)') "(No sections recorded)"
+        end if
+        
+        write (num_unit, '(a)') ""
 
         close (num_unit)
 

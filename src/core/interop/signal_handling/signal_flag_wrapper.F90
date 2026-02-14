@@ -3,14 +3,14 @@
 !> (e.g., Ctrl+C), allowing for graceful program termination.
 !>
 module core_fortran_utils_signal_flag_wrapper
-    use, intrinsic :: iso_c_binding, only: c_ptr, c_associated
     use :: stdlib_logger
     use :: core_c_utils_signal_flag, only:c_setup_signal_handler, c_get_interrupted_flag
     implicit none
 
     private
 
-    public :: setup_handler, was_interrupted
+    public :: setup_handler
+    public :: was_interrupted
 
 contains
 
@@ -20,6 +20,8 @@ contains
     !> interrupt detection.
     !>
     subroutine setup_handler()
+        implicit none
+
         call c_setup_signal_handler()
     end subroutine setup_handler
 

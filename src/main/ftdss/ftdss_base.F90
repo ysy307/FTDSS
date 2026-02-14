@@ -28,7 +28,6 @@ contains
 
         ! call setup_handler()
 
-        
         call self%controls%profiler%start("IO")
         call input%initialize()
         call self%controls%profiler%stop("IO")
@@ -447,9 +446,43 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
+        ! Local variables for data extraction
+        character(:), allocatable :: start_time_str
+        character(:), allocatable :: end_time_str
+        character(20), allocatable :: sec_labels(:)
+        real(real64), allocatable :: sec_total_times(:)
+        integer(int32), allocatable :: sec_call_counts(:)
+        real(real64), allocatable :: sec_percentages(:)
+
+        integer(int32) :: ierr
+
+        ! --- Stop and Record Profiler ---
         call self%controls%profiler%stop("Total")
         call self%controls%profiler%record(TIME_RECORD_END)
-        call self%output%output_system_log(self%controls)
+
+        ! --- Extract Profiling Data ---
+        ! Get primitive data from the profiler to avoid dependency in the logger
+        call self%controls%profiler%get_data(str_start=start_time_str, &
+                                             str_end=end_time_str, &
+                                             sec_labels=sec_labels, &
+                                             sec_total_times=sec_total_times, &
+                                             sec_call_counts=sec_call_counts, &
+                                             sec_percentages=sec_percentages &
+                                             )
+
+        ! --- Output System Log ---
+        ! Pass the extracted data to the logger
+        call self%output%output_system_log(start_time_str=start_time_str, &
+                                           end_time_str=end_time_str, &
+                                           sec_labels=sec_labels, &
+                                           sec_total_times=sec_total_times, &
+                                           sec_call_counts=sec_call_counts, &
+                                           sec_percentages=sec_percentages &
+                                           )
+
+#ifdef _MI
+        call MPI_Finalize(ierr)
+#endif
 
     end subroutine finalize_type_ftdss
 end submodule ftdss_base

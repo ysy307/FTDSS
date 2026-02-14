@@ -194,10 +194,18 @@ module inout_output
     end interface
 
     interface
-        module subroutine output_system_log(self, control)
-            implicit none
-            class(type_output), intent(inout) :: self
-            type(type_controls), intent(in) :: control
+    module subroutine output_system_log(self, start_time_str, end_time_str, &
+                                        sec_labels, sec_total_times, sec_call_counts, sec_percentages)
+        implicit none
+        class(type_output), intent(inout) :: self
+        ! Receive primitive data instead of control object
+        character(*), intent(in) :: start_time_str
+        character(*), intent(in) :: end_time_str
+        character(*), intent(in) :: sec_labels(:)
+        real(real64), intent(in) :: sec_total_times(:)
+        integer(int32), intent(in) :: sec_call_counts(:)
+        real(real64), intent(in) :: sec_percentages(:)
+
         end subroutine output_system_log
     end interface
 

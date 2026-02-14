@@ -46,6 +46,9 @@ module control_time_profiler
         procedure, pass(self), public :: record => record_profiler
         procedure, pass(self), public :: get_record => get_record_profiler
 
+        ! > Getter for exporting data to logger (Updated with percentage)
+        procedure, pass(self), public :: get_data => get_profiling_data
+
         procedure, pass(self), public :: display => display_profiler
 
     end type type_profiler
@@ -74,12 +77,12 @@ contains
 
     end subroutine initialize_profiler
 
-    subroutine format_profiler_section(self, formated_string)
+    subroutine format_profiler_section(self, formatted_string)
         implicit none
         class(type_time_record), intent(in) :: self
-        character(:), allocatable, intent(inout) :: formated_string
+        character(:), allocatable, intent(inout) :: formatted_string
 
-        formated_string = &
+        formatted_string = &
             self%date(1:4)//"-"//self%date(5:6)//"-"//self%date(7:8)//"T"// &
             self%time(1:2)//":"//self%time(3:4)//":"//self%time(5:6)//strip(self%zone)
 
@@ -92,10 +95,10 @@ contains
 
         character(:), allocatable :: time_stamp
 
-        ! まず日時文字列を作成
+        ! First, create date-time string
         call self%format(time_stamp)
 
-        ! ラベルと結合
+        ! Combine with label
         log_string = strip(self%label)//" Time : "//time_stamp
     end subroutine get_log_formatted
 
@@ -186,7 +189,7 @@ contains
     subroutine get_current_wall_time(self, current_time)
         implicit none
         class(type_profiler), intent(in) :: self
-        real(real64) :: current_time
+        real(real64), intent(inout) :: current_time
         integer(int32) :: count, rate
 
 #ifdef _OPENMP
@@ -218,7 +221,7 @@ contains
         implicit none
         class(type_profiler), intent(in) :: self
         integer(int32), intent(in) :: label
-        character(:), allocatable :: record
+        character(:), allocatable, intent(inout) :: record
 
         select case (label)
         case (TIME_RECORD_START)
@@ -228,6 +231,83 @@ contains
         end select
     end subroutine get_record_profiler
 
+!> Extracts all profiling data including percentage
+    !> Logic: If "Total" section exists, use its time as 100%. Otherwise, sum of all sections is 100%.
+    subroutine get_profiling_data(self, str_start, str_end, sec_labels, sec_total_times, sec_call_counts, sec_percentages)
+        implicit none
+        class(type_profiler), intent(in) :: self
+        character(:), allocatable, intent(inout) :: str_start
+        character(:), allocatable, intent(inout) :: str_end
+        character(20), allocatable, intent(inout) :: sec_labels(:)
+        real(real64), allocatable, intent(inout) :: sec_total_times(:)
+        integer(int32), allocatable, intent(inout) :: sec_call_counts(:)
+        real(real64), allocatable, intent(inout) :: sec_percentages(:)
+
+        integer(int32) :: n, i, idx_total
+        real(real64) :: total_basis
+
+        ! --- Export Time Records ---
+        call self%record_start%format(str_start)
+        call self%record_end%format(str_end)
+
+        ! --- Export Section Arrays ---
+        if (allocated(self%sections)) then
+            n = size(self%sections)
+
+            ! Reallocate output arrays
+            if (allocated(sec_labels)) deallocate (sec_labels)
+            if (allocated(sec_total_times)) deallocate (sec_total_times)
+            if (allocated(sec_call_counts)) deallocate (sec_call_counts)
+            if (allocated(sec_percentages)) deallocate (sec_percentages)
+
+            allocate (sec_labels(n))
+            allocate (sec_total_times(n))
+            allocate (sec_call_counts(n))
+            allocate (sec_percentages(n))
+
+            ! Copy Data
+            sec_labels = self%sections%label
+            sec_total_times = self%sections%total_time
+            sec_call_counts = self%sections%call_count
+
+            ! --- Calculate Percentages ---
+            total_basis = 0.0d0
+            idx_total = -1
+
+            ! 1. Search for "Total" section
+            do i = 1, n
+                if (strip(self%sections(i)%label) == 'Total') then
+                    idx_total = i
+                    exit
+                end if
+            end do
+
+            ! 2. Determine the basis (denominator)
+            if (idx_total > 0) then
+                ! If "Total" exists, use its time as the basis
+                total_basis = self%sections(idx_total)%total_time
+            else
+                ! If not, use the sum of all sections
+                total_basis = sum(self%sections%total_time)
+            end if
+
+            ! 3. Compute percentage
+            if (total_basis > 1.0d-12) then
+                sec_percentages = (self%sections%total_time / total_basis) * 100.0d0
+            else
+                sec_percentages = 0.0d0
+            end if
+
+        else
+            ! Deallocate if no sections
+            if (allocated(sec_labels)) deallocate (sec_labels)
+            if (allocated(sec_total_times)) deallocate (sec_total_times)
+            if (allocated(sec_call_counts)) deallocate (sec_call_counts)
+            if (allocated(sec_percentages)) deallocate (sec_percentages)
+        end if
+
+    end subroutine get_profiling_data
+
     subroutine display_profiler(self, unit)
         implicit none
         class(type_profiler), intent(in) :: self
@@ -235,38 +315,33 @@ contains
 
         integer(int32) :: i, out_unit
         character(:), allocatable :: str_start, str_end
+        real(real64) :: sum_total_time, percentage
 
         logical :: is_opened
         character(20) :: write_action
 
-        ! --- 出力先の設定と検証 ---
-        out_unit = output_unit ! デフォルト設定
+        ! --- Output destination setting and validation ---
+        out_unit = output_unit
         if (present(unit)) then
             if (unit /= output_unit) then
-                ! 1. ユニットが開かれているか (opened)
-                ! 2. 書き込み可能か (write) -> 'YES', 'NO', 'UNKNOWN'
                 inquire (unit=unit, opened=is_opened, write=write_action)
-
                 if (is_opened .and. strip(write_action) == 'YES') then
                     out_unit = unit
                 else
-                    ! 書き込めない場合は警告を出して標準出力に戻す
                     out_unit = output_unit
                 end if
             else
-                ! 指定が output_unit そのものだった場合
                 out_unit = unit
             end if
         end if
-        ! --- 日時文字列の取得 ---
-        ! type_time_record の format 手続き (intent(inout) allocatable) を使用
+
         call self%record_start%format(str_start)
         call self%record_end%format(str_end)
 
-        ! --- Markdown形式で出力 ---
+        ! --- Output in Markdown format ---
         write (out_unit, '(a)') "## Time Profiler Results"
         write (out_unit, '(a)') ""
-        ! Start/End 時間の表示 (未割り付け時のガード付き)
+
         if (allocated(str_start)) then
             write (out_unit, '(a, a)') "- **Start:** ", str_start
         else
@@ -281,17 +356,28 @@ contains
 
         write (out_unit, '(a)') ""
 
-        ! --- セクションテーブルの表示 ---
+        ! --- Display section table with Percentage ---
         if (allocated(self%sections)) then
             if (size(self%sections) > 0) then
-                write (out_unit, '(a)') "| Section            | Time (s)    | Calls |"
-                write (out_unit, '(a)') "|:-------------------|:-----------:|:-----:|"
+                sum_total_time = sum(self%sections%total_time)
+
+                ! Header adjusted for Percentage column
+                write (out_unit, '(a)') "| Section            | Time (s)   | Calls | Percentage |"
+                write (out_unit, '(a)') "|:-------------------|:----------:|:-----:|:----------:|"
 
                 do i = 1, size(self%sections)
-                    write (out_unit, '("| ", a18, " | ", es10.3, " | ", i5, " |")') &
+                    ! Calculate percentage for display
+                    percentage = 0.0d0
+                    if (sum_total_time > 1.0d-12) then
+                        percentage = (self%sections(i)%total_time / sum_total_time) * 100.0d0
+                    end if
+
+                    ! f6.1 format for percentage (e.g. 100.0 or 12.5)
+                    write (out_unit, '("| ", a20, " | ", es10.3, " | ", i5, " | ", f6.1, "%    |")') &
                         self%sections(i)%label, &
                         self%sections(i)%total_time, &
-                        self%sections(i)%call_count
+                        self%sections(i)%call_count, &
+                        percentage
                 end do
             else
                 write (out_unit, '(a)') "(No sections recorded)"
