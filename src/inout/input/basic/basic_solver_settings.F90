@@ -269,24 +269,24 @@ contains
     !     if (allocated(local_buffer)) deallocate (local_buffer)
     ! end subroutine read_parameters_solver_settings_linear_local
 
-    subroutine read_parameters_solver_parallel_settings(self, json)
+subroutine read_parameters_solver_parallel_settings(self, json)
         !> Reads parallel processing settings.
         implicit none
         class(type_input_basic), intent(inout) :: self
         type(json_file), intent(inout) :: json
-        character(256) :: buffer(4)
+        character(256) :: buffer(3)
 
-        buffer(1) = solver_settings
-        buffer(2) = parallel_settings
-        buffer(3) = threads
+        buffer(1) = parallel_settings
+        buffer(2) = threads
 
-        buffer(4) = is_parallel
-        call get_json_value(json, join(buffer), self%solver_settings%parallel_settings%threads%is_parallel, &
+        buffer(3) = is_parallel
+        call get_json_value(json, join(buffer(1:3)), self%solver_settings%parallel_settings%threads%is_parallel, &
                             is_required=.true., default_value=.false.)
 
         if (self%solver_settings%parallel_settings%threads%is_parallel) then
-            buffer(4) = num_threads
-            call get_json_value(json, join(buffer), self%solver_settings%parallel_settings%threads%num_threads, &
+            
+            buffer(3) = num_threads
+            call get_json_value(json, join(buffer(1:3)), self%solver_settings%parallel_settings%threads%num_threads, &
                                 is_required=.true., valid_range=[1, huge(1)])
 
             ! Cap the number of threads to the maximum available if OpenMP is used
@@ -296,12 +296,12 @@ contains
                 self%solver_settings%parallel_settings%threads%num_threads = omp_get_max_threads()
             end if
 
-            buffer(4) = schedule
-            call get_json_value(json, join(buffer), self%solver_settings%parallel_settings%threads%schedule, &
+            buffer(3) = schedule
+            call get_json_value(json, join(buffer(1:3)), self%solver_settings%parallel_settings%threads%schedule, &
                                 is_required=.true., default_value=SCHEDULE_TYPE_STATIC, valid_list=valid_schedule_types)
 
-            buffer(4) = max_active_levels
-            call get_json_value(json, join(buffer), self%solver_settings%parallel_settings%threads%max_active_levels, &
+            buffer(3) = max_active_levels
+            call get_json_value(json, join(buffer(1:3)), self%solver_settings%parallel_settings%threads%max_active_levels, &
                                 is_required=.true., default_value=1, valid_range=[1, huge(1)])
         end if
     end subroutine read_parameters_solver_parallel_settings

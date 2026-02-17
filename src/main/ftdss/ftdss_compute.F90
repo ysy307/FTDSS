@@ -12,8 +12,9 @@ contains
         integer(int32) :: num_nodes, num_neighbors, material_id
         integer(int32), pointer, contiguous :: element_list(:)
 
-        ! 状態量計算用のワーク変数
-        type(type_state) :: state
+        ! [修正] 並列化対応: スレッドごとの状態量ワーク変数
+        ! PRIVATE変数にすると内部ポインタの初期化(SAVE属性)問題が出る恐れがあるため配列で管理
+        type(type_state), allocatable :: states(:)
 
         ! 値の一時保管用
         real(real64) :: elem_qw, elem_qi, elem_qa, elem_qv
@@ -23,71 +24,93 @@ contains
         real(real64) :: sum_vol
         real(real64) :: sum_qw_vol, sum_qi_vol, sum_qa_vol, sum_qv_vol
 
+        ! OpenMP用
+        integer(int32) :: num_threads, tid
+
         call self%controls%profiler%start("Setup")
-        nullify (element_list)
+        
         call self%domain%get_num_nodes(num_nodes)
 
+        ! [修正] スレッド数分のワーク領域を確保
+        num_threads = omp_get_max_threads()
+        allocate(states(num_threads))
+
         ! ----------------------------------------------------------------------
-        ! 節点ループ
+        ! 節点ループ (並列化)
         ! ----------------------------------------------------------------------
-        do i_node = 1, num_nodes
+        !$OMP PARALLEL DEFAULT(NONE) &
+        !$OMP SHARED(self, num_nodes, states) &
+        !$OMP PRIVATE(i_node, element_list, num_neighbors, j, i_elem, &
+        !$OMP         elem_vol, material_id, elem_qw, elem_qi, elem_qa, elem_qv, &
+        !$OMP         sum_vol, sum_qw_vol, sum_qi_vol, sum_qa_vol, sum_qv_vol, &
+        !$OMP         tid)
+            
+            ! スレッドID取得 (1始まり)
+            tid = omp_get_thread_num() + 1
+            
+            ! ポインタ変数は念のため初期化
+            nullify(element_list)
 
-            ! 1. 隣接要素リストの取得
-            call self%domain%element_adjacency%get_list(i_node, element_list)
+            !$OMP DO SCHEDULE(STATIC)
+            do i_node = 1, num_nodes
 
-            ! 初期化
-            sum_vol = 0.0d0
-            sum_qw_vol = 0.0d0
-            sum_qi_vol = 0.0d0
-            sum_qa_vol = 0.0d0
-            sum_qv_vol = 0.0d0
+                ! 1. 隣接要素リストの取得
+                call self%domain%element_adjacency%get_list(i_node, element_list)
 
-            if (associated(element_list)) then
-                num_neighbors = size(element_list)
+                ! 初期化
+                sum_vol = 0.0d0
+                sum_qw_vol = 0.0d0
+                sum_qi_vol = 0.0d0
+                sum_qa_vol = 0.0d0
+                sum_qv_vol = 0.0d0
 
-                ! 2. 隣接要素ループ
-                do j = 1, num_neighbors
-                    i_elem = element_list(j)
+                if (associated(element_list)) then
+                    num_neighbors = size(element_list)
 
-                    ! 要素体積の取得 (これが抜けると重み付けできません)
-                    call self%domain%calc_measure(i_elem, elem_vol)
+                    ! 2. 隣接要素ループ
+                    do j = 1, num_neighbors
+                        i_elem = element_list(j)
 
-                    ! 状態変数の更新と取得
-                    call self%domain%get_material_id(i_elem, material_id)
-                    call self%set_state(i_node, i_elem, state)
+                        ! 要素体積の取得 (これが抜けると重み付けできません)
+                        call self%domain%calc_measure(i_elem, elem_vol)
 
-                    ! Stateから各相の体積含水率などを取得
-                    call state%get(water_content=elem_qw, ice_content=elem_qi, &
-                                   air_content=elem_qa, vapor_content=elem_qv)
-                    ! write (*, '("Qw: ", F8.4, " Qi: ", F8.4, " Qa: ", F8.4, " Qv: ", F8.4, "measure: ", F8.4)') &
-                    !     elem_qw, elem_qi, elem_qa, elem_qv, elem_vol
+                        ! 状態変数の更新と取得 (スレッド固有の states(tid) を使用)
+                        call self%domain%get_material_id(i_elem, material_id)
+                        call self%set_state(i_node, i_elem, states(tid))
 
-                    ! 重み付き加算
-                    sum_vol = sum_vol + elem_vol
-                    sum_qw_vol = sum_qw_vol + (elem_qw * elem_vol)
-                    sum_qi_vol = sum_qi_vol + (elem_qi * elem_vol)
-                    sum_qa_vol = sum_qa_vol + (elem_qa * elem_vol)
-                    sum_qv_vol = sum_qv_vol + (elem_qv * elem_vol)
-                end do
-            end if
+                        ! Stateから各相の体積含水率などを取得
+                        call states(tid)%get(water_content=elem_qw, ice_content=elem_qi, &
+                                       air_content=elem_qa, vapor_content=elem_qv)
+                        
+                        ! 重み付き加算
+                        sum_vol = sum_vol + elem_vol
+                        sum_qw_vol = sum_qw_vol + (elem_qw * elem_vol)
+                        sum_qi_vol = sum_qi_vol + (elem_qi * elem_vol)
+                        sum_qa_vol = sum_qa_vol + (elem_qa * elem_vol)
+                        sum_qv_vol = sum_qv_vol + (elem_qv * elem_vol)
+                    end do
+                end if
 
-            ! 3. 正規化して節点へ格納
-            if (abs(sum_vol) > epsilon(1.0d0)) then
-                ! write (*, '(" Node ", I6, ": sum_vol=", F8.4, " Qw=", F8.4, " Qi=", F8.4, " Qa=", F8.4, " Qv=", F8.4)') &
-                !     i_node, sum_vol, sum_qw_vol / sum_vol, sum_qi_vol / sum_vol, sum_qa_vol / sum_vol, sum_qv_vol / sum_vol
-                call self%Qw%set_current(i_node, sum_qw_vol / sum_vol)
-                call self%Qi%set_current(i_node, sum_qi_vol / sum_vol)
-                call self%Qa%set_current(i_node, sum_qa_vol / sum_vol)
-                call self%Qv%set_current(i_node, sum_qv_vol / sum_vol)
-            else
-                ! 孤立節点等の処理
-                call self%Qw%set_current(i_node, 0.0d0)
-                call self%Qi%set_current(i_node, 0.0d0)
-                call self%Qa%set_current(i_node, 0.0d0)
-                call self%Qv%set_current(i_node, 0.0d0)
-            end if
+                ! 3. 正規化して節点へ格納 (setterはスレッドセーフと仮定: i_nodeが異なるため)
+                if (abs(sum_vol) > epsilon(1.0d0)) then
+                    call self%Qw%set_current(i_node, sum_qw_vol / sum_vol)
+                    call self%Qi%set_current(i_node, sum_qi_vol / sum_vol)
+                    call self%Qa%set_current(i_node, sum_qa_vol / sum_vol)
+                    call self%Qv%set_current(i_node, sum_qv_vol / sum_vol)
+                else
+                    ! 孤立節点等の処理
+                    call self%Qw%set_current(i_node, 0.0d0)
+                    call self%Qi%set_current(i_node, 0.0d0)
+                    call self%Qa%set_current(i_node, 0.0d0)
+                    call self%Qv%set_current(i_node, 0.0d0)
+                end if
 
-        end do
+            end do
+            !$OMP END DO
+
+        !$OMP END PARALLEL
+
+        if (allocated(states)) deallocate(states)
 
         call self%controls%profiler%stop("Setup")
 
@@ -97,15 +120,11 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
-        class(abst_matrix), pointer :: K_ptr
-        type(type_vector_dp), pointer :: F_ptr
-        type(type_vector_dp), pointer :: du_ptr
+        class(abst_matrix), pointer :: K_ptr => null()
+        type(type_vector_dp), pointer :: F_ptr => null()
+        type(type_vector_dp), pointer :: du_ptr => null()
 
         call self%controls%profiler%start("Solve")
-
-        nullify (K_ptr)
-        nullify (F_ptr)
-        nullify (du_ptr)
 
         K_ptr => self%K%get_matrix()
         F_ptr => self%F%get_vector()
@@ -244,12 +263,10 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
-        real(real64), pointer, contiguous, dimension(:) :: temperature
+        real(real64), pointer, contiguous, dimension(:) :: temperature => null()
         type(type_coordinate_array_dp), pointer :: grad_T
 
         if (.not. self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) return
-
-        nullify (temperature)
 
         call self%temperature%get_current(temperature)
         call self%temperature%get_current_gradient(grad_T)
@@ -265,12 +282,10 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
-        real(real64), pointer, contiguous, dimension(:) :: pressure
+        real(real64), pointer, contiguous, dimension(:) :: pressure => null()
         type(type_coordinate_array_dp), pointer :: grad_P
 
-        if (.not. self%is_active_hydraulic()) return
-
-        nullify (pressure)
+        if (.not. self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) return
 
         call self%pressure%get_current(pressure)
         call self%pressure%get_current_gradient(grad_P)

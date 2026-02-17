@@ -1,7 +1,9 @@
 module main_ftdss
     use, intrinsic :: iso_fortran_env
-    use :: stdlib_optval, only:optval
+!$  use :: omp_lib
     use :: mpi_f08
+
+    use :: stdlib_optval, only:optval
     use :: stdlib_logger
     use :: module_core
     use :: module_input, only:type_input
@@ -78,7 +80,6 @@ module main_ftdss
         procedure, public, pass(self) :: assemble => assemble_ftdss
         procedure, private, pass(self) :: assemble_initialize => assemble_initialize_ftdss
         procedure, private, pass(self) :: assemble_finalize => assemble_finalize_ftdss
-
 
         procedure, private, pass(self) :: get_variable_increment => get_variable_increment_ftdss
         procedure, private, pass(self) :: get_variable_residual => get_variable_residual_ftdss

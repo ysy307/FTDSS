@@ -69,6 +69,7 @@ contains
         write (num_unit, '(a)') "- **Compiler**: "//strip(compiler)
         write (num_unit, '(a)') "- **Compiler Version**: "//strip(compiler_version)
 #ifdef _OPENMP
+        write (num_unit, '(a, i0)') "- **Number of Processors**: ", omp_get_num_procs()
         write (num_unit, '(a, i0)') "- **OpenMP Threads**: ", omp_get_max_threads()
 #else
         write (num_unit, '(a)') "- **OpenMP Threads**: 1 (Serial)"
@@ -106,10 +107,7 @@ contains
             ! Table Body
             do i = 1, size(sec_labels)
                 write (num_unit, '("|", a20, "| ", es10.3, " | ", i5, " |   ", f6.1, " % |")') &
-                    sec_labels(i), &
-                    sec_total_times(i), &
-                    sec_call_counts(i), &
-                    sec_percentages(i)
+                    sec_labels(i), sec_total_times(i), sec_call_counts(i), sec_percentages(i)
             end do
         else
             write (num_unit, '(a)') "(No sections recorded)"
