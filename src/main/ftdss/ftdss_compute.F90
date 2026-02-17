@@ -10,7 +10,7 @@ contains
 
         integer(int32) :: i_node, i_elem, j
         integer(int32) :: num_nodes, num_neighbors, material_id
-        integer(int32), pointer, contiguous :: element_list(:) => null()
+        integer(int32), pointer, contiguous :: element_list(:)
 
         ! 状態量計算用のワーク変数
         type(type_state) :: state
@@ -24,6 +24,7 @@ contains
         real(real64) :: sum_qw_vol, sum_qi_vol, sum_qa_vol, sum_qv_vol
 
         call self%controls%profiler%start("Setup")
+        nullify (element_list)
         call self%domain%get_num_nodes(num_nodes)
 
         ! ----------------------------------------------------------------------
@@ -96,11 +97,15 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
-        class(abst_matrix), pointer :: K_ptr => null()
-        type(type_vector_dp), pointer :: F_ptr => null()
-        type(type_vector_dp), pointer :: du_ptr => null()
+        class(abst_matrix), pointer :: K_ptr
+        type(type_vector_dp), pointer :: F_ptr
+        type(type_vector_dp), pointer :: du_ptr
 
         call self%controls%profiler%start("Solve")
+
+        nullify (K_ptr)
+        nullify (F_ptr)
+        nullify (du_ptr)
 
         K_ptr => self%K%get_matrix()
         F_ptr => self%F%get_vector()
@@ -239,10 +244,12 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
-        real(real64), pointer, contiguous, dimension(:) :: temperature => null()
+        real(real64), pointer, contiguous, dimension(:) :: temperature
         type(type_coordinate_array_dp), pointer :: grad_T
 
         if (.not. self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) return
+
+        nullify (temperature)
 
         call self%temperature%get_current(temperature)
         call self%temperature%get_current_gradient(grad_T)
@@ -258,10 +265,12 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
-        real(real64), pointer, contiguous, dimension(:) :: pressure => null()
+        real(real64), pointer, contiguous, dimension(:) :: pressure
         type(type_coordinate_array_dp), pointer :: grad_P
 
-        if (.not. self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) return
+        if (.not. self%is_active_hydraulic()) return
+
+        nullify (pressure)
 
         call self%pressure%get_current(pressure)
         call self%pressure%get_current_gradient(grad_P)

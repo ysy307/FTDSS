@@ -15,8 +15,8 @@ module physics_models_phase_change_liquid_solid_fusion
     !>
     type, extends(abst_physics) :: type_fusion
         private
-        class(abst_wrf), pointer :: wrf => null()
-        class(abst_gcc), pointer :: gcc => null()
+        class(abst_wrf), pointer :: wrf
+        class(abst_gcc), pointer :: gcc
     contains
         procedure, pass(self), public :: initialize => initialize_type_fusion
         procedure, pass(self), public :: calc_ice_content

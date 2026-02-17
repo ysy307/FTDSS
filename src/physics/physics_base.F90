@@ -18,9 +18,9 @@ module physics_base
     !> @details 水、氷、水蒸気の熱力学的物性値の参照・計算を管理します。
     type, abstract :: abst_physics
         !> IAPWS-97 水物性計算オブジェクトへのポインタ
-        type(type_iapws97), pointer :: water => null()
+        type(type_iapws97), pointer :: water
         !> IAPWS-06 氷物性計算オブジェクトへのポインタ
-        type(type_iapws06), pointer :: ice => null()
+        type(type_iapws06), pointer :: ice
         !> 初期化済みフラグ
         logical :: initialized = .false.
     contains

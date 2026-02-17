@@ -85,7 +85,7 @@ contains
         type(type_thc_dispersivity), intent(inout) :: lambda
 
         real(real64) :: lambda_0
-        type(type_coordinate_dp), pointer :: water_flux => null()
+        type(type_coordinate_dp), pointer :: water_flux
 
         real(real64) :: qx, qy, qz
         real(real64) :: htc_water, rho_water, cp_water
@@ -136,7 +136,7 @@ contains
         type(type_thc_dispersivity), intent(inout) :: lambda
 
         real(real64) :: lambda_0
-        type(type_coordinate_dp), pointer :: water_flux => null()
+        type(type_coordinate_dp), pointer :: water_flux
 
         real(real64) :: qx, qy, qz
         real(real64) :: htc_water, rho_water, cp_water

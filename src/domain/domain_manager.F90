@@ -182,6 +182,8 @@ module domain_manager
         procedure, public, pass(self) :: get_element_coordinate => get_element_coordinate_domain
         procedure, public, pass(self) :: get_target_dof => get_target_dof_domain
         procedure, public, pass(self) :: get_material_id => get_material_id_domain
+        procedure, public, pass(self) :: get_num_colors => get_num_colors_domain
+        procedure, public, pass(self) :: get_colored_elements => get_colored_elements_domain
         procedure, public, pass(self) :: calc_measure => calc_measure_domain
 
         procedure, private, pass(self) :: lerp_1d_domain
@@ -897,6 +899,24 @@ contains
 
         material_id = self%elements%fe_material_ids(element_id)
     end subroutine get_material_id_domain
+
+    subroutine get_num_colors_domain(self, num_colors)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(inout) :: num_colors
+
+        call self%elements%colors%get_num_colors(num_colors)
+    end subroutine get_num_colors_domain
+
+    subroutine get_colored_elements_domain(self, color_id, num_elements, elements)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(in) :: color_id
+        integer(int32), intent(inout) :: num_elements
+        integer(int32), pointer, contiguous, dimension(:), intent(inout) :: elements
+
+        call self%elements%colors%get_colored_elements(color_id, num_elements, elements)
+    end subroutine get_colored_elements_domain
 
     subroutine calc_measure_domain(self, element_id, measure)
         implicit none

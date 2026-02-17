@@ -6,7 +6,9 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
-        real(real64), pointer, contiguous, dimension(:) :: u => null()
+        real(real64), pointer, contiguous, dimension(:) :: u
+
+        nullify (u)
 
         ! 1. 反復管理のリセット
         !    reset() は設定が NONE の場合に計算用も NONE にする可能性があります．
@@ -72,7 +74,7 @@ contains
 
         integer(int32) :: iter
 
-        real(real64), pointer, contiguous, dimension(:) :: current_value => null()
+        real(real64), pointer, contiguous, dimension(:) :: current_value
 
         real(real64), allocatable :: residual(:)
         real(real64), allocatable :: increment(:)
@@ -83,11 +85,13 @@ contains
 
         logical :: is_compute_newton, is_compute_picard, is_config_none
 
+        nullify (current_value)
+
         ! 計算用(Dynamic)の状態を取得
         is_compute_newton = self%controls%iteration%is_compute_newton()
         is_compute_picard = self%controls%iteration%is_compute_picard()
         ! 設定(Static)がNONEかどうかも取得しておく
-        is_config_none    = self%controls%iteration%is_none()
+        is_config_none = self%controls%iteration%is_none()
 
         ! ----------------------------------------------------------------------
         ! Thermal Convergence Check
@@ -183,7 +187,7 @@ contains
         class(type_ftdss), intent(inout) :: self
         logical, intent(inout) :: is_step_converged
         logical :: prescribe_bc
-        
+
         is_step_converged = .false.
 
         ! 1. 初期化セットアップ (ここで計算用ソルバーは必ず PICARD に設定される)

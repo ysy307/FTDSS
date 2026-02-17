@@ -23,8 +23,10 @@ contains
         real(real64) :: w, det_J, A_val
         type(type_coordinate_dp) :: r
 
-        real(real64), pointer :: p_psi(:) => null()
+        real(real64), pointer, dimension(:) :: p_psi
         real(real64), allocatable, target :: local_psi(:)
+
+        nullify (p_psi)
 
         call self%get_dimension(dim)
         call self%get_num_nodes(num_nodes)
@@ -79,8 +81,10 @@ contains
         real(real64) :: w, det_J, A_val
         type(type_coordinate_dp) :: r
 
-        real(real64), pointer :: p_psi(:) => null()
+        real(real64), pointer, dimension(:) :: p_psi
         real(real64), allocatable, target :: local_psi(:)
+
+        nullify (p_psi)
 
         call self%get_dimension(dim)
         call self%get_num_nodes(num_nodes)
@@ -140,13 +144,17 @@ contains
         real(real64) :: w, det_J
         type(type_coordinate_dp) :: r
 
-        real(real64), pointer :: p_psi(:) => null()
-        real(real64), pointer :: p_dpsi_dx(:, :) => null()
-        real(real64), pointer :: p_M_grad_psi_j(:) => null()
+        real(real64), pointer :: p_psi(:)
+        real(real64), pointer :: p_dpsi_dx(:, :)
+        real(real64), pointer :: p_M_grad_psi_j(:)
 
         real(real64), allocatable, target :: local_psi(:)
         real(real64), allocatable, target :: local_dpsi_dx(:, :)
         real(real64), allocatable, target :: local_vec_dim(:)
+
+        nullify (p_psi)
+        nullify (p_dpsi_dx)
+        nullify (p_M_grad_psi_j)
 
         call self%get_dimension(dim)
         call self%get_num_nodes(num_nodes)
@@ -223,8 +231,8 @@ contains
         real(real64) :: w, det_J, M_val, grad_dot
         type(type_coordinate_dp) :: r
 
-        real(real64), pointer :: p_psi(:) => null()
-        real(real64), pointer :: p_dpsi_dx(:, :) => null()
+        real(real64), pointer :: p_psi(:)
+        real(real64), pointer :: p_dpsi_dx(:, :)
 
         real(real64), allocatable, target :: local_psi(:)
         real(real64), allocatable, target :: local_dpsi_dx(:, :)
@@ -293,8 +301,8 @@ contains
         real(real64) :: w, det_J, grad_psi_j_dot_V
         type(type_coordinate_dp) :: r
 
-        real(real64), pointer :: p_psi(:) => null()
-        real(real64), pointer :: p_dpsi_dx(:, :) => null()
+        real(real64), pointer :: p_psi(:)
+        real(real64), pointer :: p_dpsi_dx(:, :)
 
         real(real64), allocatable, target :: local_psi(:)
         real(real64), allocatable, target :: local_dpsi_dx(:, :)
@@ -361,7 +369,7 @@ contains
         real(real64) :: w, det_J, S_val
         type(type_coordinate_dp) :: r
 
-        real(real64), pointer :: p_psi(:) => null()
+        real(real64), pointer :: p_psi(:)
 
         real(real64), allocatable, target :: local_psi(:)
 
@@ -420,7 +428,7 @@ contains
         real(real64) :: w, det_J
         type(type_coordinate_dp) :: r
 
-        real(real64), pointer :: p_psi(:) => null()
+        real(real64), pointer :: p_psi(:)
         real(real64), allocatable, target :: local_psi(:)
 
         call self%get_dimension(dim)
@@ -475,7 +483,7 @@ contains
         real(real64) :: w, det_J, grad_psi_i_dot_F
         type(type_coordinate_dp) :: r
 
-        real(real64), pointer :: p_dpsi_dx(:, :) => null()
+        real(real64), pointer :: p_dpsi_dx(:, :)
 
         real(real64), allocatable, target :: local_dpsi_dx(:, :)
 

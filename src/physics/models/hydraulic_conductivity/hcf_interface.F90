@@ -88,7 +88,7 @@ module physics_models_hcf
 
     type, extends(abst_physics) :: type_hcf_vapor
         private
-        class(abst_hcf), pointer :: parent => null()
+        class(abst_hcf), pointer :: parent
     contains
         procedure, pass(self), private :: calc_diffusivity => calc_diffusivity_vapor_in_air
         procedure, pass(self), private :: calc_tortuosity_factor => calc_tortuosity_factor_vapor
@@ -308,7 +308,7 @@ module physics_models_hcf
 
     type, abstract :: abst_hcf_base
         private
-        class(abst_hcf), pointer :: parent => null()
+        class(abst_hcf), pointer :: parent
     contains
         procedure(abst_calc_base_kr), pass(self), public, deferred :: calc_kr
     end type abst_hcf_base
@@ -406,7 +406,7 @@ module physics_models_hcf
 
     type, abstract :: abst_hcf_impedance
         private
-        class(abst_hcf), pointer :: parent => null()
+        class(abst_hcf), pointer :: parent
     contains
         procedure(abst_calc_impedance_kr), pass(self), public, deferred :: calc_impedance
     end type abst_hcf_impedance
@@ -440,7 +440,7 @@ module physics_models_hcf
     type, abstract :: abst_hcf_viscosity
         private
         real(real64) :: mu_zero
-        class(abst_hcf), pointer :: parent => null()
+        class(abst_hcf), pointer :: parent
     contains
         procedure, pass(self), public :: initialize => initialize_abst_hcf_viscosity
         procedure(abst_calc_mu), pass(self), public, deferred :: calc_mu

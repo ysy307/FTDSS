@@ -15,7 +15,7 @@ module main_base
         integer(int32) :: num_fe_gauss = -1
         integer(int32) :: num_fe_dimension = -1
 
-        class(abst_fe), pointer :: fe => null()
+        class(abst_fe), pointer :: fe
 
         real(real64), allocatable :: coordinates(:, :)
 
@@ -42,6 +42,7 @@ module main_base
         real(real64), allocatable :: work_C(:)
         real(real64), allocatable :: work_D(:, :, :)
         real(real64), allocatable :: work_V(:, :)
+
         real(real64), allocatable :: work_L(:)
         real(real64), allocatable :: work_d_dt(:)
         real(real64), allocatable :: work_matrix(:, :)
@@ -52,7 +53,7 @@ module main_base
 
         logical, private :: associated_bdf = .false.
         integer(int32) :: bdf_order = -1
-        real(real64), pointer, contiguous, dimension(:) :: bdf_coeffs => null()
+        real(real64), pointer, contiguous, dimension(:) :: bdf_coeffs
 
     contains
         procedure, public, pass(self) :: initialize => initialize_type_assemble_workspace
@@ -111,9 +112,17 @@ contains
         self%element_id = element_id
         self%computation_type = computation_type
 
-        ! [修正] 直前の deallocate を削除。
-        ! allocate_array 内でサイズチェックが行われ、同じならメモリ再利用されます。
-        call allocate_array(self%coordinates, source=coordinates)
+        ! [修正] 標準 allocate を使用し、サイズ変更時のみ再確保
+        if (allocated(self%coordinates)) then
+            if (size(self%coordinates, 1) /= size(coordinates, 1) .or. &
+                size(self%coordinates, 2) /= size(coordinates, 2)) then
+                deallocate (self%coordinates)
+                allocate (self%coordinates(size(coordinates, 1), size(coordinates, 2)))
+            end if
+        else
+            allocate (self%coordinates(size(coordinates, 1), size(coordinates, 2)))
+        end if
+        self%coordinates = coordinates
 
     end subroutine initialize_type_assemble_workspace
 
@@ -128,7 +137,7 @@ contains
         call self%fe%get_num_gauss(self%num_fe_gauss)
         call self%fe%get_dimension(self%num_fe_dimension)
 
-        ! [修正] 構造体配列は core_allocate が対応外なので、ここで手動最適化
+        ! [修正] 構造体配列の手動最適化
         if (allocated(self%state)) then
             if (size(self%state) /= self%num_fe_nodes) then
                 deallocate (self%state)
@@ -167,7 +176,7 @@ contains
             end do
         end if
 
-        ! [修正] ヘルパー経由で core_allocate の allocate_array を使用する形に変更
+        ! [修正] 以下、内部サブルーチン呼び出し（標準 allocate 使用）
         call allocate_and_init(self%T_node, self%num_fe_nodes)
         call allocate_and_init(self%P_node, self%num_fe_nodes)
         call allocate_and_init(self%phi_node, self%num_fe_nodes)
@@ -191,25 +200,49 @@ contains
         call allocate_and_init_2d(self%work_matrix, self%num_fe_nodes, self%num_fe_nodes)
 
     contains
-        ! [修正] 自前で allocate せず、最適化済みの allocate_array に委譲する
+        ! [修正] スレッドセーフな標準 allocate を使用する内部手続き
         subroutine allocate_and_init(arr, sz)
             real(real64), allocatable, intent(inout) :: arr(:)
             integer(int32), intent(in) :: sz
-            call allocate_array(arr, sz) ! サイズが同じなら何もしない（高速）
-            arr = 0.0d0 ! 値の初期化のみ行う
+
+            if (allocated(arr)) then
+                if (size(arr) == sz) then
+                    arr = 0.0d0
+                    return
+                end if
+                deallocate (arr)
+            end if
+            allocate (arr(sz))
+            arr = 0.0d0
         end subroutine allocate_and_init
 
         subroutine allocate_and_init_2d(arr, d1, d2)
             real(real64), allocatable, intent(inout) :: arr(:, :)
             integer(int32), intent(in) :: d1, d2
-            call allocate_array(arr, d1, d2)
+
+            if (allocated(arr)) then
+                if (size(arr, 1) == d1 .and. size(arr, 2) == d2) then
+                    arr = 0.0d0
+                    return
+                end if
+                deallocate (arr)
+            end if
+            allocate (arr(d1, d2))
             arr = 0.0d0
         end subroutine allocate_and_init_2d
 
         subroutine allocate_and_init_3d(arr, d1, d2, d3)
             real(real64), allocatable, intent(inout) :: arr(:, :, :)
             integer(int32), intent(in) :: d1, d2, d3
-            call allocate_array(arr, d1, d2, d3)
+
+            if (allocated(arr)) then
+                if (size(arr, 1) == d1 .and. size(arr, 2) == d2 .and. size(arr, 3) == d3) then
+                    arr = 0.0d0
+                    return
+                end if
+                deallocate (arr)
+            end if
+            allocate (arr(d1, d2, d3))
             arr = 0.0d0
         end subroutine allocate_and_init_3d
 
@@ -231,14 +264,17 @@ contains
         class(type_assemble_workspace), intent(inout) :: self
 
         integer(int32) :: i, j, k
-        type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gp => null()
+        type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gp
         type(type_coordinate_dp) :: dlerped_value
 
-        real(real64), pointer, contiguous, dimension(:) :: work_history_ptr => null()
+        real(real64), pointer, contiguous, dimension(:) :: work_history_ptr
         real(real64) :: work_value
 
         logical :: is_set
         integer(int32) :: history_len
+
+        nullify (gp)
+        nullify (work_history_ptr)
 
         ! GP座標の取得
         call self%fe%get_gauss(gp)
@@ -254,9 +290,8 @@ contains
             self%work_node(:, :) = 0.0d0
 
             do i = 1, self%num_fe_nodes
-                work_history_ptr => null()
+                nullify (work_history_ptr)
                 is_set = .false.
-
                 call self%state(i)%temperature%get(work_value, is_set=is_set)
                 if (is_set) self%T_node(i) = work_value
 
@@ -290,9 +325,8 @@ contains
         self%work_node(:, :) = 0.0d0
 
         do i = 1, self%num_fe_nodes
-            work_history_ptr => null()
+            nullify (work_history_ptr)
             is_set = .false.
-
             call self%state(i)%pressure%get(work_value, is_set=is_set)
             if (is_set) self%P_node(i) = work_value
 
@@ -325,9 +359,8 @@ contains
         self%work_node(:, :) = 0.0d0
 
         do i = 1, self%num_fe_nodes
-            work_history_ptr => null()
+            nullify (work_history_ptr)
             is_set = .false.
-
             call self%state(i)%porosity%get(work_value, is_set=is_set)
             if (is_set) self%phi_node(i) = work_value
 
@@ -464,26 +497,26 @@ contains
             if (allocated(self%state)) deallocate (self%state)
             if (allocated(self%state_gp)) deallocate (self%state_gp)
 
-            call deallocate_array(self%T_node)
-            call deallocate_array(self%P_node)
-            call deallocate_array(self%phi_node)
-            call deallocate_array(self%T_gp)
-            call deallocate_array(self%P_gp)
-            call deallocate_array(self%phi_gp)
-            call deallocate_array(self%coordinates)
+            if (allocated(self%T_node)) deallocate (self%T_node)
+            if (allocated(self%P_node)) deallocate (self%P_node)
+            if (allocated(self%phi_node)) deallocate (self%phi_node)
+            if (allocated(self%T_gp)) deallocate (self%T_gp)
+            if (allocated(self%P_gp)) deallocate (self%P_gp)
+            if (allocated(self%phi_gp)) deallocate (self%phi_gp)
+            if (allocated(self%coordinates)) deallocate (self%coordinates)
 
-            call deallocate_array(self%work_node)
-            call deallocate_array(self%work_bdf_buffer)
-            call deallocate_array(self%work_psi)
-            call deallocate_array(self%work_dpsi_dx)
-            call deallocate_array(self%work_vec)
+            if (allocated(self%work_node)) deallocate (self%work_node)
+            if (allocated(self%work_bdf_buffer)) deallocate (self%work_bdf_buffer)
+            if (allocated(self%work_psi)) deallocate (self%work_psi)
+            if (allocated(self%work_dpsi_dx)) deallocate (self%work_dpsi_dx)
+            if (allocated(self%work_vec)) deallocate (self%work_vec)
 
-            call deallocate_array(self%work_C)
-            call deallocate_array(self%work_D)
-            call deallocate_array(self%work_V)
-            call deallocate_array(self%work_L)
-            call deallocate_array(self%work_d_dt)
-            call deallocate_array(self%work_matrix)
+            if (allocated(self%work_C)) deallocate (self%work_C)
+            if (allocated(self%work_D)) deallocate (self%work_D)
+            if (allocated(self%work_V)) deallocate (self%work_V)
+            if (allocated(self%work_L)) deallocate (self%work_L)
+            if (allocated(self%work_d_dt)) deallocate (self%work_d_dt)
+            if (allocated(self%work_matrix)) deallocate (self%work_matrix)
 
             nullify (self%fe)
             self%is_initialized = .false.

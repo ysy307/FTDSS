@@ -106,12 +106,17 @@ contains
         integer(int32) :: iter
         real(real64) :: current_time
 
-        real(real64), pointer, contiguous, dimension(:) :: porosity => null()
-        real(real64), pointer, contiguous, dimension(:) :: temperature => null()
-        real(real64), pointer, contiguous, dimension(:) :: pressure => null()
-        real(real64), pointer, contiguous, dimension(:) :: ice_content => null()
+        real(real64), pointer, contiguous, dimension(:) :: porosity
+        real(real64), pointer, contiguous, dimension(:) :: temperature
+        real(real64), pointer, contiguous, dimension(:) :: pressure
+        real(real64), pointer, contiguous, dimension(:) :: ice_content
 
         call self%controls%profiler%start("IO")
+
+        nullify (porosity)
+        nullify (temperature)
+        nullify (pressure)
+        nullify (ice_content)
 
         call self%controls%time%get_time(current_time)
 
@@ -143,11 +148,15 @@ contains
         class(type_ftdss), intent(inout) :: self
 
         real(real64) :: current_time, current_time_converted
-        real(real64), pointer, contiguous, dimension(:) :: porosity => null()
-        real(real64), pointer, contiguous, dimension(:) :: temperature => null()
-        real(real64), pointer, contiguous, dimension(:) :: pressure => null()
+        real(real64), pointer, contiguous, dimension(:) :: porosity
+        real(real64), pointer, contiguous, dimension(:) :: temperature
+        real(real64), pointer, contiguous, dimension(:) :: pressure
 
         call self%controls%profiler%start("IO")
+
+        nullify (porosity)
+        nullify (temperature)
+        nullify (pressure)
 
         call self%controls%time%get_time(current_time)
 
@@ -178,12 +187,13 @@ contains
         type(type_constant_id), intent(in) :: variable_id
         real(real64), intent(inout), allocatable :: variable(:)
 
-        real(real64), pointer, contiguous, dimension(:) :: du => null()
+        real(real64), pointer, contiguous, dimension(:) :: du
 
         integer(int32) :: target_dof
         integer(int32) :: num_nodes, num_dofs_per_node
         integer(int32) :: start_idx, end_idx
 
+        nullify (du)
         call deallocate_array(variable)
 
         if (.not. PHYSICS_TYPES%is_valid(variable_id)) then
@@ -222,12 +232,13 @@ contains
         type(type_constant_id), intent(in) :: variable_id
         real(real64), intent(inout), allocatable :: variable(:)
 
-        real(real64), pointer, contiguous, dimension(:) :: F => null()
+        real(real64), pointer, contiguous, dimension(:) :: F
 
         integer(int32) :: target_dof
         integer(int32) :: num_nodes, num_dofs_per_node
         integer(int32) :: start_idx, end_idx
 
+        nullify (F)
         call deallocate_array(variable)
 
         if (.not. PHYSICS_TYPES%is_valid(variable_id)) then
@@ -369,15 +380,18 @@ contains
         class(type_ftdss), intent(inout) :: self
 
         integer(int32) :: iter
-        real(real64), pointer, dimension(:) :: bdf_coeffs => null()
+        real(real64), pointer, dimension(:) :: bdf_coeffs
         integer(int32) :: bdf_order
-        real(real64), pointer, contiguous, dimension(:) :: current => null()
+        real(real64), pointer, contiguous, dimension(:) :: current
         real(real64), allocatable :: du(:)
 
         real(real64) :: relaxation_factor
         logical :: is_none
 
         call self%controls%profiler%start("Setup")
+
+        nullify (current)
+        nullify (bdf_coeffs)
 
         call self%controls%iteration%get_nonlinear_iter(iter)
 

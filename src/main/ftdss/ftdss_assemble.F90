@@ -3,7 +3,7 @@ submodule(main_ftdss) ftdss_assemble
 
 contains
 
-    !> Perform the global assembly for the FTDSS solver.
+!> Perform the global assembly for the FTDSS solver using multicoloring.
     module subroutine assemble_ftdss(self)
         implicit none
         class(type_ftdss), intent(inout) :: self
@@ -12,47 +12,65 @@ contains
         type(type_vector_dp) :: local_F_T, local_F_H
         type(type_assemble_workspace) :: workspace
 
-        integer(int32) :: num_elements
-        integer(int32), pointer, contiguous, dimension(:) :: p_connectivity => null()
-        integer(int32) :: i
+        integer(int32) :: i_color, i_elem, elem_id
+        integer(int32), pointer, contiguous, dimension(:) :: p_connectivity
         integer(int32) :: thermal_dof, hydraulic_dof
 
+        integer(int32) :: num_colors, num_elements_in_color
+        integer(int32), pointer, contiguous, dimension(:) :: elements_list
+
         call self%controls%profiler%start("Assemble")
+
+        nullify (p_connectivity)
+        nullify (elements_list)
 
         call self%K%zero()
         call self%F%zero()
 
-        call self%domain%get_num_elements(num_elements)
+        call self%domain%get_num_colors(num_colors)
+        call self%domain%get_target_dof(PHYSICS_TYPE_THERMAL, thermal_dof)
+        call self%domain%get_target_dof(PHYSICS_TYPE_HYDRAULIC, hydraulic_dof)
 
-        ! --- [重要] 要素ループ ---
-        do i = 1, num_elements
-            ! 1. 初期化・準備 (Allocateは初回またはサイズ変更時のみ。値はゼロクリアされる)
-            call self%assemble_initialize(element_id=i, workspace=workspace, &
-                                          local_K_TT=local_K_TT, local_K_TH=local_K_TH, &
-                                          local_K_HH=local_K_HH, local_K_HT=local_K_HT, &
-                                          local_F_T=local_F_T, local_F_H=local_F_H)
+        do i_color = 1, num_colors
 
-            ! 2. 局所行列の計算
-            call self%assemble_local(workspace, local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
-                                     local_F_T, local_F_H)
+            call self%domain%get_colored_elements(i_color, num_elements_in_color, elements_list)
 
-            ! 3. 全体行列への組み込み
-            call self%domain%get_element_connectivity(i, p_connectivity)
-            call self%domain%get_target_dof(PHYSICS_TYPE_THERMAL, thermal_dof)
-            call self%domain%get_target_dof(PHYSICS_TYPE_HYDRAULIC, hydraulic_dof)
+            if (num_elements_in_color <= 0) cycle
 
-            call self%K%add(thermal_dof, thermal_dof, p_connectivity, local_K_TT)
-            ! call self%K%add(thermal_dof, hydraulic_dof, p_connectivity, local_K_TH)
-            ! call self%K%add(hydraulic_dof, hydraulic_dof, p_connectivity, local_K_HH)
-            ! call self%K%add(hydraulic_dof, thermal_dof, p_connectivity, local_K_HT)
+            !$OMP PARALLEL DEFAULT(NONE) &
+            !$OMP SHARED(self, elements_list, num_elements_in_color, &
+            !$OMP        thermal_dof) &
+            !$OMP PRIVATE(i_elem, elem_id, p_connectivity, &
+            !$OMP         workspace, &
+            !$OMP         local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
+            !$OMP         local_F_T, local_F_H)
 
-            call self%F%add(thermal_dof, p_connectivity, local_F_T)
-            ! call self%F%add(hydraulic_dof, p_connectivity, local_F_H)
+            !$OMP DO SCHEDULE(STATIC)
+            do i_elem = 1, num_elements_in_color
+
+                elem_id = elements_list(i_elem)
+
+                call self%assemble_initialize(element_id=elem_id, workspace=workspace, &
+                                              local_K_TT=local_K_TT, local_K_TH=local_K_TH, &
+                                              local_K_HH=local_K_HH, local_K_HT=local_K_HT, &
+                                              local_F_T=local_F_T, local_F_H=local_F_H)
+
+                call self%assemble_local(workspace, local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
+                                         local_F_T, local_F_H)
+
+                call self%domain%get_element_connectivity(elem_id, p_connectivity)
+
+                call self%K%add(thermal_dof, thermal_dof, p_connectivity, local_K_TT)
+
+                call self%F%add(thermal_dof, p_connectivity, local_F_T)
+
+            end do
+            !$OMP END DO
+            call self%assemble_finalize(workspace, local_K_TT, local_K_TH, &
+                                        local_K_HH, local_K_HT, local_F_T, local_F_H)
+            !$OMP END PARALLEL
 
         end do
-
-        call self%assemble_finalize(workspace, local_K_TT, local_K_TH, &
-                                    local_K_HH, local_K_HT, local_F_T, local_F_H)
 
         call self%controls%profiler%stop("Assemble")
 
@@ -67,14 +85,17 @@ contains
         type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
         type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
 
-        class(abst_fe), pointer :: fe => null()
-        integer(int32), pointer, contiguous, dimension(:) :: connectivity => null()
+        class(abst_fe), pointer :: fe
+        integer(int32), pointer, contiguous, dimension(:) :: connectivity
         real(real64), allocatable :: coordinates(:, :)
         integer(int32) :: material_id
         integer(int32) :: computation_type
         integer(int32) :: num_nodes
 
         integer(int32) :: i
+
+        nullify (fe)
+        nullify (connectivity)
 
         ! 要素情報の取得
         call self%domain%get_material_id(element_id, material_id)
