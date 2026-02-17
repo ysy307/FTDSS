@@ -76,25 +76,45 @@ contains
 
         integer(int32) :: i
 
+        ! 要素情報の取得
         call self%domain%get_material_id(element_id, material_id)
         call self%domain%get_element(element_id, fe)
         call self%domain%get_element_connectivity(element_id, connectivity)
         call self%domain%get_computation_type(computation_type)
         call self%domain%get_element_coordinate(element_id, coordinates)
 
+        ! ワークスペースの初期化 (座標のコピー含む)
         call workspace%initialize(fe, material_id, element_id, computation_type, coordinates, self%controls)
 
+        ! ---------------------------------------------------------------------
+        ! 1. 節点状態の取得 (物理計算スキップ)
+        ! ---------------------------------------------------------------------
+        ! calc_physics=.false. を渡すことで、節点での重い物理計算(相変化等)を回避します。
+        ! ここでは T, P, Phi およびそれらの履歴と勾配のみが workspace%state にロードされます。
         do i = 1, size(connectivity)
-            call self%set_state(connectivity(i), element_id, workspace%state(i))
+            call self%set_state(connectivity(i), element_id, workspace%state(i), calc_physics=.false.)
         end do
 
+        ! ---------------------------------------------------------------------
+        ! 2. 状態変数の補間
+        ! ---------------------------------------------------------------------
+        ! 節点の T, P, Phi, grad_T, grad_P から、ガウス積分点の値を計算します。
         call workspace%lerp()
+
+        ! ---------------------------------------------------------------------
+        ! 3. ガウス積分点での物理量更新 (高精度評価)
+        ! ---------------------------------------------------------------------
+        ! 補間された T_gp, P_gp を用いて、その場での相状態、物性値、流束を一括計算します。
+        ! これにより、非線形性の強い物性値も積分点で正しく評価されます。
         do i = 1, workspace%num_fe_gauss
-            call self%thermal%update_water_phases(material_id, workspace%state_gp(i))
+            call self%update_physical_properties(material_id, workspace%state_gp(i))
         end do
 
-        workspace%coordinates = coordinates
+        ! (注: workspace%coordinates = coordinates は initialize 内で行われているため削除)
 
+        ! ---------------------------------------------------------------------
+        ! 4. 局所行列・ベクトルの初期化
+        ! ---------------------------------------------------------------------
         call fe%get_num_nodes(num_nodes)
 
         if (present(local_K_TT)) call check_initialize_matrix(local_K_TT, num_nodes)

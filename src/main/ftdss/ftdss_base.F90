@@ -258,28 +258,31 @@ contains
 
     end subroutine get_variable_residual_ftdss
 
-    module subroutine set_state_ftdss(self, node_id, element_id, state)
+    module subroutine set_state_ftdss(self, node_id, element_id, state, calc_physics)
         implicit none
         class(type_ftdss), intent(inout) :: self
         integer(int32), intent(in) :: node_id
         integer(int32), intent(in) :: element_id
         type(type_state), intent(inout) :: state
+        logical, intent(in), optional :: calc_physics ! [追加]
 
         integer(int32) :: material_id
         integer(int32) :: bdf_order
         real(real64) :: temperature, pressure, porosity
         type(type_coordinate_dp) :: grad_T, grad_P
-        type(type_coordinate_dp) :: water_flux, vapor_flux
-        real(real64) :: K_wT, K_wP, K_vT, K_vP
         real(real64) :: temperature_history(8), pressure_history(8), porosity_history(8)
-        ! real(real64), pointer, contiguous, dimension(:) :: temperature_history => null()
-        ! real(real64), pointer, contiguous, dimension(:) :: pressure_history => null()
-        ! real(real64), pointer, contiguous, dimension(:) :: porosity_history => null()
+
+        logical :: do_calc
+
+        ! デフォルトは計算する（互換性維持のため）
+        do_calc = .true.
+        if (present(calc_physics)) do_calc = calc_physics
 
         call state%reset()
 
         call self%controls%time%get_bdf_order(bdf_order)
 
+        ! --- 基本変数と履歴の取得 (ここは常に実行) ---
         if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             call self%temperature%get_current(node_id, temperature)
             call self%temperature%get_current_gradient(node_id, grad_T)
@@ -301,10 +304,33 @@ contains
         call state%set(porosity=porosity, &
                        porosity_history=porosity_history(1:bdf_order + 1))
 
-        call self%domain%get_material_id(element_id, material_id)
+        ! --- [修正] 重い物理計算はフラグがTrueの時だけ実行 ---
+        if (do_calc) then
+            call self%domain%get_material_id(element_id, material_id)
+            ! update_physical_properties に委譲
+            call self%update_physical_properties(material_id, state)
+        end if
+
+    end subroutine set_state_ftdss
+
+    ! [追加] 任意のStateに対して全物理量(相・流束)を更新する
+    module subroutine update_physical_properties_ftdss(self, material_id, state)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(inout) :: state
+
+        type(type_coordinate_dp) :: water_flux, vapor_flux
+        type(type_coordinate_dp), pointer :: grad_T, grad_P
+
+        ! 1. 相変化計算 (Ice/Water Content)
         call self%thermal%update_water_phases(material_id, state)
 
+        ! 2. 流束計算 (advectionやdiffusionで使用)
+        !    Stateに入っている勾配(grad_T, grad_P)を使用
         if (self%controls%is_target(PHYSICS_TYPE_HYDRAULIC, material_id)) then
+            call state%grad_T%get(grad_T)
+            call state%grad_P%get(grad_P)
             call self%calc_water_flux(material_id, state, grad_T, grad_P, water_flux)
             call self%calc_vapor_flux(material_id, state, grad_T, grad_P, vapor_flux)
         else
@@ -313,7 +339,7 @@ contains
         end if
 
         call state%set(water_flux=water_flux, vapor_flux=vapor_flux)
-    end subroutine set_state_ftdss
+    end subroutine update_physical_properties_ftdss
 
     module subroutine shift_ftdss(self)
         implicit none

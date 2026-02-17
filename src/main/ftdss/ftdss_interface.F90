@@ -69,6 +69,7 @@ module main_ftdss
         procedure, public, pass(self) :: solve => solve_ftdss
 
         procedure, public, pass(self) :: set_state => set_state_ftdss
+        procedure, public, pass(self) :: update_physical_properties => update_physical_properties_ftdss
 
         procedure, public, pass(self) :: reflect_variables => reflect_variables_ftdss
 
@@ -78,7 +79,6 @@ module main_ftdss
         procedure, private, pass(self) :: assemble_initialize => assemble_initialize_ftdss
         procedure, private, pass(self) :: assemble_finalize => assemble_finalize_ftdss
 
-        procedure, public, pass(self) :: precompute => precompute_physics_states_ftdss
 
         procedure, private, pass(self) :: get_variable_increment => get_variable_increment_ftdss
         procedure, private, pass(self) :: get_variable_residual => get_variable_residual_ftdss
@@ -149,19 +149,21 @@ module main_ftdss
 
         end subroutine solve_ftdss
 
-        module subroutine set_state_ftdss(self, node_id, element_id, state)
+        module subroutine set_state_ftdss(self, node_id, element_id, state, calc_physics)
             implicit none
             class(type_ftdss), intent(inout) :: self
             integer(int32), intent(in) :: node_id
             integer(int32), intent(in) :: element_id
             type(type_state), intent(inout) :: state
-
+            logical, intent(in), optional :: calc_physics
         end subroutine set_state_ftdss
 
-        module subroutine precompute_physics_states_ftdss(self)
+        module subroutine update_physical_properties_ftdss(self, material_id, state)
             implicit none
             class(type_ftdss), intent(inout) :: self
-        end subroutine precompute_physics_states_ftdss
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(inout) :: state
+        end subroutine update_physical_properties_ftdss
 
         module subroutine shift_ftdss(self)
             implicit none
