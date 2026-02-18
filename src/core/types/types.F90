@@ -17,6 +17,9 @@ module core_types
         type_state
     use :: core_types_physics_info, only: &
         type_physics_info
+    use :: core_types_physics_meteorology, only: &
+        type_meteorology, &
+        type_meteorology_data
     use :: module_type_matrix, only: &
         abst_matrix, &
         type_matrix_coo, &
