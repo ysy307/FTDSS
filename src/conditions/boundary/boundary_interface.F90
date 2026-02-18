@@ -9,7 +9,6 @@ module conditions_boundary
 
     ! --- Public Types ---
     public :: abst_bc
-    ! 具体的クラス (Managerがallocateするために公開)
     public :: type_bc_dirichlet
     public :: type_bc_neumann
     public :: type_bc_robin

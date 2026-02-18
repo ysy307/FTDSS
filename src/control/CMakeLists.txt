@@ -9,9 +9,9 @@
 # --- Control Library ---
 # This library contains all core control logic.
 set(CONTROL_SOURCES
-    ats.F90
-    time.F90
-    time_profiler.F90
+    time/ats.F90
+    time/time.F90
+    time/time_profiler.F90
     iteration.F90
     openmp.F90
     output.F90

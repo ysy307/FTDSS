@@ -2,280 +2,202 @@ submodule(main_hydraulic) hydraulic_matrix
     implicit none
 contains
 
-    module subroutine compute_C_H(self, target_id, state, C_HH, C_HT)
+    !> @brief Assemble Local Matrix and Vector (Wrapper)
+    module subroutine assemble_local_hydraulic(self, controls, workspace, K_HH, K_HT, F_H)
         implicit none
         class(type_hydraulic), intent(in) :: self
-        integer(int32), intent(in) :: target_id
-        type(type_state), intent(inout) :: state
-        real(real64), intent(inout), optional :: C_HH
-        real(real64), intent(inout), optional :: C_HT
+        type(type_controls), intent(in) :: controls
+        type(type_assemble_workspace), intent(inout) :: workspace
+        type(type_matrix_dense), intent(inout), optional :: K_HH
+        type(type_matrix_dense), intent(inout), optional :: K_HT
+        type(type_vector_dp), intent(inout), optional :: F_H
 
-        real(real64) :: Qw, Qi, Qv
-        real(real64) :: rho_w, rho_i
-        real(real64) :: drho_w_dT, drho_ice_dT
-        real(real64) :: drho_w_dP, drho_ice_dP
-        real(real64) :: dP_ice_dP_water
-
-        real(real64) :: dQw_dT, dQi_dT, dQv_dT
-        real(real64) :: dQw_dP, dQi_dP, dQv_dP
-
-        ! Get state variables
-        call self%physics%update_water_phases(target_id, state)
-        call state%water_content%get(Qw)
-        call state%ice_content%get(Qi)
-        call state%vapor_content%get(Qv)
-
-        ! Get derivatives of contents (from retention curve / freezing curve)
-        call state%dQw_dT%get(dQw_dT)
-        call state%dQi_dT%get(dQi_dT)
-        call state%dQv_dT%get(dQv_dT)
-        call state%dQw_dP%get(dQw_dP)
-        call state%dQi_dP%get(dQi_dP)
-        call state%dQv_dP%get(dQv_dP)
-
-        ! Get densities and their derivatives
-        call self%physics%calc_density_water(state, rho_w)
-        call self%physics%calc_density_ice(state, rho_i)
-        call self%physics%calc_density_water_derivatives(target_id, state, drho_w_dT, drho_w_dP)
-        call self%physics%calc_density_ice_derivatives(target_id, state, drho_ice_dT, drho_ice_dP)
-        call self%physics%calc_pressure_ice_water_derivative(target_id, state, dP_ice_dP_water)
-
-        if (present(C_HH)) then
-            ! C_HH = d(rho_void)/dP_w
-            C_HH = rho_w * dQw_dP + Qw * drho_w_dP &
-                   + rho_i * dQi_dP + Qi * drho_ice_dP * dP_ice_dP_water &
-                   + rho_w * dQv_dP + Qv * drho_w_dP
+        if (controls%iteration%is_compute_newton()) then
+            call self%assemble_local_newton(controls, workspace, K_HH, K_HT, F_H)
+        else if (controls%iteration%is_compute_picard()) then
+            call self%assemble_local_picard(controls, workspace, K_HH, K_HT, F_H)
         end if
 
-        if (present(C_HT)) then
-            ! C_HT = d(rho_void)/dT
-            C_HT = rho_w * dQw_dT + Qw * drho_w_dT &
-                   + rho_i * dQi_dT + Qi * drho_ice_dT &
-                   + rho_w * dQv_dT + Qv * drho_w_dT
-        end if
+    end subroutine assemble_local_hydraulic
 
-    end subroutine compute_C_H
-
-    module subroutine compute_D_H(self, target_id, state, D_HH, D_HT)
+    !> @brief Assemble Newton-Raphson Local Components
+    module subroutine assemble_local_newton_hydraulic(self, controls, workspace, K_HH, K_HT, F_H)
         implicit none
         class(type_hydraulic), intent(in) :: self
-        integer(int32), intent(in) :: target_id
-        type(type_state), intent(inout) :: state
-        real(real64), intent(inout), optional :: D_HH(:, :)
-        real(real64), intent(inout), optional :: D_HT(:, :)
+        type(type_controls), intent(in) :: controls
+        type(type_assemble_workspace), intent(inout) :: workspace
+        type(type_matrix_dense), intent(inout), optional :: K_HH
+        type(type_matrix_dense), intent(inout), optional :: K_HT
+        type(type_vector_dp), intent(inout), optional :: F_H
 
-        real(real64) :: rho_w
-        real(real64) :: K_flh, K_wT
-        real(real64) :: K_vP, K_vT
-        real(real64) :: coeff_mass_HH, coeff_mass_HT
-        integer(int32) :: i
+        integer(int32) :: i, j, ierr
+        real(real64) :: bdf0
 
-        ! 1. Get Properties
-        call self%physics%calc_density_water(state, rho_w)
+        bdf0 = workspace%bdf_coeffs(1)
 
-        ! 2. Get Transport Coefficients
-        ! K_flh: Liquid Hydraulic (K_P)
-        ! K_wT : Liquid Thermal Osmosis (K_T)
-        ! K_vP : Vapor Hydraulic
-        ! K_vT : Vapor Thermal
-        call self%physics%calc_Kflh(target_id, state, K_flh)
-        call self%physics%calc_KlT(target_id, state, K_wT)
-        call self%physics%calc_Kvh(target_id, state, K_vP)
-        call self%physics%calc_KvT(target_id, state, K_vT)
+        ! Initialize Workspaces
+        workspace%work_C(:) = 0.0d0 ! Mass Term (C_HH)
+        workspace%work_D(:, :, :) = 0.0d0 ! Diffusion Term (D_HH)
+        workspace%work_V(:, :) = 0.0d0 ! Advective/Gravity Term (V_H)
+        workspace%work_d_dt(:) = 0.0d0 ! Transient Term (drho/dt)
 
-        ! 3. Calculate D_HH (Pressure Gradient Term)
-        ! D_HH = rho_w * (K_P + K_vP) * I
-        if (present(D_HH)) then
-            D_HH(:, :) = 0.0d0
-            coeff_mass_HH = rho_w * (K_flh + K_vP)
+        ! 1. Gauss Point Loop: Compute Physics Terms
+        do i = 1, workspace%num_fe_gauss
+            ! (A) Mass Term: C_HH
+            call self%compute_mass_term(workspace%material_id, workspace%state_gp(i), &
+                                        workspace%work_C(i))
 
-            do i = 1, self%computation_dimension
-                D_HH(i, i) = coeff_mass_HH
+            ! (B) Diffusion Term: D_HH
+            call self%compute_diffusion_term(workspace%material_id, workspace%state_gp(i), &
+                                             workspace%work_D(:, :, i))
+
+            ! (C) Advective/Gravity Term: V_H
+            call self%compute_advective_term(workspace%material_id, workspace%state_gp(i), &
+                                             workspace%work_V(:, i))
+
+            ! (D) Transient Term: drho/dt
+            call self%compute_transient_term(workspace%material_id, workspace%state_gp(i), &
+                                             workspace%bdf_coeffs(1:workspace%bdf_order + 1), &
+                                             workspace%work_d_dt(i))
+        end do
+
+        ! 2. Mass Matrix Contribution (Accumulate to K_HH)
+        ! K += bdf0 * MassMatrix
+        call workspace%compute_K1(workspace%work_C, workspace%work_matrix)
+        if (present(K_HH)) then
+            do j = 1, workspace%num_fe_nodes
+                do i = 1, workspace%num_fe_nodes
+                    call K_HH%set(OP_ADD, i, j, bdf0 * workspace%work_matrix(i, j))
+                end do
             end do
         end if
 
-        ! 4. Calculate D_HT (Temperature Gradient Term)
-        ! D_HT = rho_w * (K_T + K_vT) * I
-        if (present(D_HT)) then
-            D_HT(:, :) = 0.0d0
-            coeff_mass_HT = rho_w * (K_wT + K_vT)
-
-            do i = 1, self%computation_dimension
-                D_HT(i, i) = coeff_mass_HT
+        ! 3. Transient Residual Contribution (Accumulate to F_H)
+        ! F += - Integral(N^T * drho/dt)
+        if (present(F_H)) then
+            workspace%work_vec(:) = 0.0d0
+            call workspace%compute_R1(workspace%work_d_dt, workspace%work_vec)
+            do i = 1, workspace%num_fe_nodes
+                call F_H%set(OP_ADD, i, -workspace%work_vec(i))
             end do
         end if
 
-    end subroutine compute_D_H
-
-    module subroutine compute_V_H(self, target_id, state, V_HH, V_HT)
-        implicit none
-        class(type_hydraulic), intent(in) :: self
-        integer(int32), intent(in) :: target_id
-        type(type_state), intent(inout) :: state
-        real(real64), intent(inout), optional :: V_HH(:)
-        real(real64), intent(inout), optional :: V_HT(:)
-
-        real(real64) :: rho_w, drho_w_dT, drho_w_dP
-        real(real64) :: K_P, K_T, K_wP
-        ! Derivatives of conductivities w.r.t Temperature
-        real(real64) :: dKp_dT, dKwP_dT, dKT_dT
-        ! Derivatives of conductivities w.r.t Pressure
-        real(real64) :: dKp_dP, dKwP_dP, dKT_dP
-
-        real(real64) :: gravity_mag
-        type(type_coordinate_dp), pointer :: grad_P, grad_T, grad_z
-
-        ! Initialize gradients
-        call state%grad_P%get(grad_P)
-        call state%grad_T%get(grad_T)
-
-        ! Set gravity vector
-        gravity_mag = 9.81d0
-        select case (self%computation_type)
-        case (COMP_TYPE_2D_XY)
-            grad_z%x = 0.0d0
-            grad_z%y = 1.0d0
-        case (COMP_TYPE_2D_XZ)
-            grad_z%x = 0.0d0
-            grad_z%z = 1.0d0
-        case (COMP_TYPE_3D)
-            grad_z%x = 0.0d0
-            grad_z%y = 0.0d0
-            grad_z%z = 1.0d0
-        end select
-
-        ! Get properties
-        call self%physics%calc_density_water(state, rho_w)
-        call self%physics%calc_density_water_derivatives(target_id, state, drho_w_dT, drho_w_dP)
-
-        call self%physics%calc_Kflh(target_id, state, K_P)
-        call self%physics%calc_KlT(target_id, state, K_T)
-
-        ! K_wP calculation
-        K_wP = K_P / max(rho_w * gravity_mag, 1.0d-10)
-
-        ! ----------------------------------------------------------------------
-        ! Note: Derivatives of K (Conductivity)
-        ! For now, these are set to 0.0.
-        ! In unsaturated soil, dKp_dP is significant (slope of K-function).
-        ! ----------------------------------------------------------------------
-        dKp_dT = 0.0d0
-        dKwP_dT = 0.0d0
-        dKT_dT = 0.0d0
-        dKp_dP = 0.0d0
-        dKwP_dP = 0.0d0
-        dKT_dP = 0.0d0
-
-        ! V_HH: Pressure sensitivity vector
-        ! V_PP = (drho/dP * K_P + rho * dKP/dP) * grad P
-        !        - (2*rho*drho/dP * K_wP + rho^2 * dKwP/dP) * g * grad z
-        !        + (drho/dP * K_T + rho * dKT/dP) * grad T
-        if (present(V_HH)) then
-            select case (self%computation_type)
-            case (COMP_TYPE_2D_XY)
-                V_HH(1) = (drho_w_dP * K_P + rho_w * dKp_dP) * grad_P%x &
-                          - (2.0d0 * rho_w * drho_w_dP * K_wP + rho_w**2 * dKwP_dP) * gravity_mag * grad_z%x &
-                          + (drho_w_dP * K_T + rho_w * dKT_dP) * grad_T%x
-
-                V_HH(2) = (drho_w_dP * K_P + rho_w * dKp_dP) * grad_P%y &
-                          - (2.0d0 * rho_w * drho_w_dP * K_wP + rho_w**2 * dKwP_dP) * gravity_mag * grad_z%y &
-                          + (drho_w_dP * K_T + rho_w * dKT_dP) * grad_T%y
-
-            case (COMP_TYPE_2D_XZ)
-                V_HH(1) = (drho_w_dP * K_P + rho_w * dKp_dP) * grad_P%x &
-                          - (2.0d0 * rho_w * drho_w_dP * K_wP + rho_w**2 * dKwP_dP) * gravity_mag * grad_z%x &
-                          + (drho_w_dP * K_T + rho_w * dKT_dP) * grad_T%x
-
-                V_HH(2) = (drho_w_dP * K_P + rho_w * dKp_dP) * grad_P%z &
-                          - (2.0d0 * rho_w * drho_w_dP * K_wP + rho_w**2 * dKwP_dP) * gravity_mag * grad_z%z &
-                          + (drho_w_dP * K_T + rho_w * dKT_dP) * grad_T%z
-
-            case (COMP_TYPE_3D)
-                V_HH(1) = (drho_w_dP * K_P + rho_w * dKp_dP) * grad_P%x &
-                          - (2.0d0 * rho_w * drho_w_dP * K_wP + rho_w**2 * dKwP_dP) * gravity_mag * grad_z%x &
-                          + (drho_w_dP * K_T + rho_w * dKT_dP) * grad_T%x
-
-                V_HH(2) = (drho_w_dP * K_P + rho_w * dKp_dP) * grad_P%y &
-                          - (2.0d0 * rho_w * drho_w_dP * K_wP + rho_w**2 * dKwP_dP) * gravity_mag * grad_z%y &
-                          + (drho_w_dP * K_T + rho_w * dKT_dP) * grad_T%y
-
-                V_HH(3) = (drho_w_dP * K_P + rho_w * dKp_dP) * grad_P%z &
-                          - (2.0d0 * rho_w * drho_w_dP * K_wP + rho_w**2 * dKwP_dP) * gravity_mag * grad_z%z &
-                          + (drho_w_dP * K_T + rho_w * dKT_dP) * grad_T%z
-            end select
+        ! 4. Diffusion Stiffness Contribution (Accumulate to K_HH)
+        ! K += Integral(gradN^T * D * gradN)
+        call workspace%compute_K2(workspace%work_D, workspace%work_matrix)
+        if (present(K_HH)) then
+            do j = 1, workspace%num_fe_nodes
+                do i = 1, workspace%num_fe_nodes
+                    call K_HH%set(OP_ADD, i, j, workspace%work_matrix(i, j))
+                end do
+            end do
         end if
 
-        ! V_HT: Temperature sensitivity vector
-        if (present(V_HT)) then
-            select case (self%computation_type)
-            case (COMP_TYPE_2D_XY)
-                V_HT(1) = (drho_w_dT * K_P + rho_w * dKp_dT) * grad_P%x &
-                          - (2.0d0 * rho_w * drho_w_dT * K_wP + rho_w**2 * dKwP_dT) * gravity_mag * grad_z%x &
-                          + (drho_w_dT * K_T + rho_w * dKT_dT) * grad_T%x
-
-                V_HT(2) = (drho_w_dT * K_P + rho_w * dKp_dT) * grad_P%y &
-                          - (2.0d0 * rho_w * drho_w_dT * K_wP + rho_w**2 * dKwP_dT) * gravity_mag * grad_z%y &
-                          + (drho_w_dT * K_T + rho_w * dKT_dT) * grad_T%y
-
-            case (COMP_TYPE_2D_XZ)
-                V_HT(1) = (drho_w_dT * K_P + rho_w * dKp_dT) * grad_P%x &
-                          - (2.0d0 * rho_w * drho_w_dT * K_wP + rho_w**2 * dKwP_dT) * gravity_mag * grad_z%x &
-                          + (drho_w_dT * K_T + rho_w * dKT_dT) * grad_T%x
-
-                V_HT(2) = (drho_w_dT * K_P + rho_w * dKp_dT) * grad_P%z &
-                          - (2.0d0 * rho_w * drho_w_dT * K_wP + rho_w**2 * dKwP_dT) * gravity_mag * grad_z%z &
-                          + (drho_w_dT * K_T + rho_w * dKT_dT) * grad_T%z
-
-            case (COMP_TYPE_3D)
-                V_HT(1) = (drho_w_dT * K_P + rho_w * dKp_dT) * grad_P%x &
-                          - (2.0d0 * rho_w * drho_w_dT * K_wP + rho_w**2 * dKwP_dT) * gravity_mag * grad_z%x &
-                          + (drho_w_dT * K_T + rho_w * dKT_dT) * grad_T%x
-
-                V_HT(2) = (drho_w_dT * K_P + rho_w * dKp_dT) * grad_P%y &
-                          - (2.0d0 * rho_w * drho_w_dT * K_wP + rho_w**2 * dKwP_dT) * gravity_mag * grad_z%y &
-                          + (drho_w_dT * K_T + rho_w * dKT_dT) * grad_T%y
-
-                V_HT(3) = (drho_w_dT * K_P + rho_w * dKp_dT) * grad_P%z &
-                          - (2.0d0 * rho_w * drho_w_dT * K_wP + rho_w**2 * dKwP_dT) * gravity_mag * grad_z%z &
-                          + (drho_w_dT * K_T + rho_w * dKT_dT) * grad_T%z
-            end select
+        ! 5. Diffusion Internal Force Contribution (Accumulate to F_H)
+        ! F += - K_diffusion * P_node
+        if (present(F_H)) then
+            workspace%work_vec(:) = 0.0d0
+            call matvec(workspace%work_matrix, workspace%P_node, workspace%work_vec, ierr)
+            do i = 1, workspace%num_fe_nodes
+                call F_H%set(OP_ADD, i, -workspace%work_vec(i))
+            end do
         end if
 
-    end subroutine compute_V_H
+        ! 6. Gravity/Advection Flux Contribution (Accumulate to F_H)
+        ! F += Integral(gradN^T * V_H)
+        ! Note: Weak form term for flux J is -Integral(gradPsi * J).
+        ! J_grav = V_H. So term is -Integral(gradPsi * V_H).
+        ! compute_R2 computes Integral(gradPsi * V).
+        ! So we subtract the result.
+        if (present(F_H)) then
+            workspace%work_vec(:) = 0.0d0
+            call workspace%compute_R2(workspace%work_V, workspace%work_vec)
+            do i = 1, workspace%num_fe_nodes
+                call F_H%set(OP_ADD, i, -workspace%work_vec(i))
+            end do
+        end if
 
-    module subroutine compute_R_H(self, target_id, state, bdf_coeffs, R_H_C, R_H_D)
+    end subroutine assemble_local_newton_hydraulic
+
+    !> @brief Assemble Picard Local Components
+    module subroutine assemble_local_picard_hydraulic(self, controls, workspace, K_HH, K_HT, F_H)
         implicit none
         class(type_hydraulic), intent(in) :: self
-        integer(int32), intent(in) :: target_id
-        type(type_state), intent(inout) :: state
-        real(real64), intent(in) :: bdf_coeffs(:)
-        real(real64), intent(inout) :: R_H_C
-        real(real64), intent(inout) :: R_H_D(:)
+        type(type_controls), intent(in) :: controls
+        type(type_assemble_workspace), intent(inout) :: workspace
+        type(type_matrix_dense), intent(inout), optional :: K_HH
+        type(type_matrix_dense), intent(inout), optional :: K_HT
+        type(type_vector_dp), intent(inout), optional :: F_H
 
-        real(real64) :: rho_w
-        type(type_coordinate_dp), pointer :: water_flux, vapor_flux
+        integer(int32) :: i, j
+        real(real64) :: bdf0
+        real(real64) :: local_vec_res(workspace%num_fe_nodes)
 
-        ! --- Storage term (BDF, not dot_P/dot_T) ---
-        call self%calc_effective_density(target_id, state, bdf_coeffs, R_H_C)
+        bdf0 = workspace%bdf_coeffs(1)
 
-        ! --- Flux term ---
-        call state%water_flux%get(water_flux)
-        call state%vapor_flux%get(vapor_flux)
-        call self%physics%calc_density_water(state, rho_w)
+        workspace%work_C(:) = 0.0d0
+        workspace%work_D(:, :, :) = 0.0d0
+        workspace%work_V(:, :) = 0.0d0
+        workspace%work_d_dt(:) = 0.0d0
+        local_vec_res(:) = 0.0d0
 
-        R_H_D(:) = 0.0d0
-        select case (self%computation_type)
-        case (COMP_TYPE_2D_XY)
-            R_H_D(1) = rho_w * (water_flux%x + vapor_flux%x)
-            R_H_D(2) = rho_w * (water_flux%y + vapor_flux%y)
-        case (COMP_TYPE_2D_XZ)
-            R_H_D(1) = rho_w * (water_flux%x + vapor_flux%x)
-            R_H_D(2) = rho_w * (water_flux%z + vapor_flux%z)
-        case (COMP_TYPE_3D)
-            R_H_D(1) = rho_w * (water_flux%x + vapor_flux%x)
-            R_H_D(2) = rho_w * (water_flux%y + vapor_flux%y)
-            R_H_D(3) = rho_w * (water_flux%z + vapor_flux%z)
-        end select
-    end subroutine compute_R_H
+        ! 1. Gauss Loop
+        do i = 1, workspace%num_fe_gauss
+            call self%compute_mass_term(workspace%material_id, workspace%state_gp(i), workspace%work_C(i))
+            call self%compute_diffusion_term(workspace%material_id, workspace%state_gp(i), workspace%work_D(:, :, i))
+            call self%compute_advective_term(workspace%material_id, workspace%state_gp(i), workspace%work_V(:, i))
+            call self%compute_transient_term(workspace%material_id, workspace%state_gp(i), &
+                                             workspace%bdf_coeffs(1:workspace%bdf_order + 1), &
+                                             workspace%work_d_dt(i))
+        end do
+
+        ! 2. Mass Matrix (LHS)
+        call workspace%compute_K1(workspace%work_C, workspace%work_matrix)
+        if (present(K_HH)) then
+            do j = 1, workspace%num_fe_nodes
+                do i = 1, workspace%num_fe_nodes
+                    call K_HH%set(OP_ADD, i, j, bdf0 * workspace%work_matrix(i, j))
+                end do
+            end do
+        end if
+
+        ! 3. Diffusion Matrix (LHS) & Flux Calculation
+        call workspace%compute_K2(workspace%work_D, workspace%work_matrix)
+        if (present(K_HH)) then
+            do j = 1, workspace%num_fe_nodes
+                do i = 1, workspace%num_fe_nodes
+                    call K_HH%set(OP_ADD, i, j, workspace%work_matrix(i, j))
+                end do
+            end do
+        end if
+
+        ! Calculate Diffusion Flux (Current K * Current P)
+        if (present(F_H)) then
+            do i = 1, workspace%num_fe_nodes
+                do j = 1, workspace%num_fe_nodes
+                    local_vec_res(i) = local_vec_res(i) + workspace%work_matrix(i, j) * workspace%P_node(j)
+                end do
+            end do
+        end if
+
+        ! 4. Residual Assembly
+        if (present(F_H)) then
+            ! Add Transient Term
+            workspace%work_vec(:) = 0.0d0
+            call workspace%compute_R1(workspace%work_d_dt, workspace%work_vec)
+            local_vec_res(:) = local_vec_res(:) + workspace%work_vec(:)
+
+            ! Add Gravity Term
+            workspace%work_vec(:) = 0.0d0
+            call workspace%compute_R2(workspace%work_V, workspace%work_vec)
+            local_vec_res(:) = local_vec_res(:) + workspace%work_vec(:)
+
+            ! F = - Residual
+            do i = 1, workspace%num_fe_nodes
+                call F_H%set(OP_ADD, i, -local_vec_res(i))
+            end do
+        end if
+
+    end subroutine assemble_local_picard_hydraulic
 
 end submodule hydraulic_matrix
