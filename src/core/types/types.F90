@@ -23,6 +23,7 @@ module core_types
         type_matrix_csr, &
         type_matrix_dense, &
         type_matrix_bsr, &
+        type_matrix_dia, &
         create_matrix, &
         type_matrix_info
     use :: module_type_vector, only: &

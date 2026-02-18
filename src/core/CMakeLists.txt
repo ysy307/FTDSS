@@ -83,6 +83,7 @@ list(APPEND CORE_SOURCES
     types/matrix/matrix_coo.F90
     types/matrix/matrix_csr.F90
     types/matrix/matrix_bsr.F90
+    types/matrix/matrix_dia.F90
     types/matrix/matrix_factory.F90
     types/matrix/matrix.F90
     types/vector/vector_interface.F90

@@ -20,6 +20,7 @@ module core_types_matrix
     public :: type_matrix_coo
     public :: type_matrix_csr
     public :: type_matrix_bsr
+    public :: type_matrix_dia
 
     public :: type_matrix_info
 
@@ -888,6 +889,157 @@ module core_types_matrix
             class(type_matrix_bsr), intent(in) :: self
             integer(int32), intent(in), optional :: unit_in
         end subroutine display_bsr
+    end interface
+
+    ! ==========================================================
+    ! DIA Matrix Implementation
+    ! ==========================================================
+
+    !>
+    !> Represents a sparse matrix in Diagonal (DIA) storage format.
+    !> Stores values in a 2D array where each column represents a diagonal.
+    !>
+    type, extends(abst_matrix) :: type_matrix_dia
+        !> Number of non-zero elements.
+        integer(int32) :: nnz = 0
+        !> Number of rows.
+        integer(int32) :: num_rows = 0
+        !> Number of columns.
+        integer(int32) :: num_cols = 0
+        !> Number of diagonals stored.
+        integer(int32) :: num_diags = 0
+        !> Offsets of the diagonals from the main diagonal.
+        !> 0: main, <0: lower, >0: upper.
+        integer(int32), allocatable :: offsets(:)
+        !> Matrix values stored as (row, diagonal_index).
+        real(real64), allocatable :: val(:, :)
+    contains
+        procedure, pass(self) :: initialize => initialize_type_matrix_dia
+        procedure, pass(self) :: destroy => destroy_dia
+        procedure, pass(self) :: get_info => get_info_dia
+        procedure, pass(self) :: get_diagonal => get_diagonal_dia
+        procedure, pass(self) :: get_val => get_val_dia
+        procedure, pass(self) :: get_offsets => get_offsets_dia
+        procedure, pass(self) :: set_value => set_value_dia
+        procedure, pass(self) :: set_value_block => set_value_block_dia
+        procedure, pass(self) :: set_row => set_row_dia
+        procedure, pass(self) :: set_all => set_all_dia
+        procedure, pass(self) :: scale => scale_dia
+        procedure, pass(self) :: zero_all => zero_all_dia
+        procedure, pass(self) :: zero_row => zero_row_dia
+        procedure, pass(self), private :: find => find_dia
+        procedure, pass(self) :: display => display_dia
+    end type type_matrix_dia
+
+    interface
+        !> Initializes a DIA matrix from a node-level sparsity pattern.
+        module subroutine initialize_type_matrix_dia(self, num_nodes, row, col, row_blocks, col_blocks)
+            implicit none
+            class(type_matrix_dia), intent(inout) :: self
+            integer(int32), intent(in) :: num_nodes
+            integer(int32), intent(in), optional :: row(:)
+            integer(int32), intent(in), optional :: col(:)
+            integer(int32), intent(in), optional :: row_blocks
+            integer(int32), intent(in), optional :: col_blocks
+        end subroutine initialize_type_matrix_dia
+
+        !> Deallocates the DIA matrix.
+        module subroutine destroy_dia(self)
+            implicit none
+            class(type_matrix_dia), intent(inout) :: self
+        end subroutine destroy_dia
+
+        module subroutine get_info_dia(self, info)
+            implicit none
+            class(type_matrix_dia), intent(in) :: self
+            type(type_matrix_info), intent(inout) :: info
+        end subroutine get_info_dia
+
+        module subroutine get_diagonal_dia(self, diagonal)
+            implicit none
+            class(type_matrix_dia), intent(in) :: self
+            type(type_vector_dp), intent(inout) :: diagonal
+        end subroutine get_diagonal_dia
+
+        !> Returns a pointer to the `val` array.
+        module function get_val_dia(self) result(val)
+            implicit none
+            class(type_matrix_dia), intent(in), target :: self
+            real(real64), dimension(:, :), pointer :: val
+        end function get_val_dia
+
+        !> Returns a pointer to the `offsets` array.
+        module function get_offsets_dia(self) result(offsets)
+            implicit none
+            class(type_matrix_dia), intent(in), target :: self
+            integer(int32), dimension(:), pointer :: offsets
+        end function get_offsets_dia
+
+        !> Finds the storage index (diagonal index) of a matrix entry.
+        module pure function find_dia(self, row, col) result(index)
+            implicit none
+            class(type_matrix_dia), intent(in) :: self
+            integer(int32), intent(in) :: row, col
+            integer(int32) :: index
+        end function find_dia
+
+        module subroutine set_value_dia(self, op, row, col, value)
+            implicit none
+            class(type_matrix_dia), intent(inout) :: self
+            integer(int32), intent(in) :: op
+            integer(int32), intent(in) :: row, col
+            real(real64), intent(in) :: value
+        end subroutine set_value_dia
+
+        module subroutine set_value_block_dia(self, op, row, col, row_block, col_block, value)
+            implicit none
+            class(type_matrix_dia), intent(inout) :: self
+            integer(int32), intent(in) :: op
+            integer(int32), intent(in) :: row, col
+            integer(int32), intent(in) :: row_block, col_block
+            real(real64), intent(in) :: value
+        end subroutine set_value_block_dia
+
+        module subroutine set_row_dia(self, op, row, value, row_block)
+            implicit none
+            class(type_matrix_dia), intent(inout) :: self
+            integer(int32), intent(in) :: op
+            integer(int32), intent(in) :: row
+            real(real64), intent(in) :: value
+            integer(int32), intent(in), optional :: row_block
+        end subroutine set_row_dia
+
+        module subroutine set_all_dia(self, op, value)
+            implicit none
+            class(type_matrix_dia), intent(inout) :: self
+            integer(int32), intent(in) :: op
+            real(real64), intent(in) :: value
+        end subroutine set_all_dia
+
+        module subroutine scale_dia(self, op, alpha)
+            implicit none
+            class(type_matrix_dia), intent(inout) :: self
+            integer(int32), intent(in) :: op
+            type(type_vector_dp), intent(in) :: alpha
+        end subroutine scale_dia
+
+        module subroutine zero_all_dia(self)
+            implicit none
+            class(type_matrix_dia), intent(inout) :: self
+        end subroutine zero_all_dia
+
+        module subroutine zero_row_dia(self, row, row_block)
+            implicit none
+            class(type_matrix_dia), intent(inout) :: self
+            integer(int32), intent(in) :: row
+            integer(int32), intent(in), optional :: row_block
+        end subroutine zero_row_dia
+
+        module subroutine display_dia(self, unit_in)
+            implicit none
+            class(type_matrix_dia), intent(in) :: self
+            integer(int32), intent(in), optional :: unit_in
+        end subroutine display_dia
     end interface
 
 contains

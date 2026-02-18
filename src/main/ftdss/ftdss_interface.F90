@@ -234,14 +234,16 @@ module main_ftdss
 
         end subroutine assemble_local_ftdss
         module subroutine assemble_initialize_ftdss(self, element_id, workspace, local_K_TT, local_K_TH, &
-                                                    local_K_HH, local_K_HT, local_F_T, local_F_H)
+                                                    local_K_HH, local_K_HT, local_F_T, local_F_H, &
+                                                    coordinates)
             implicit none
+
             class(type_ftdss), intent(inout) :: self
             integer(int32), intent(in) :: element_id
             type(type_assemble_workspace), intent(inout) :: workspace
             type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
             type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
-
+            real(real64), allocatable, intent(inout) :: coordinates(:, :)
         end subroutine assemble_initialize_ftdss
 
         module subroutine assemble_finalize_ftdss(self, workspace, local_K_TT, local_K_TH, &

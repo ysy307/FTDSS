@@ -9,6 +9,7 @@ module module_type_matrix
     public :: type_matrix_csr
     public :: type_matrix_coo
     public :: type_matrix_bsr
+    public :: type_matrix_dia
 
     public :: type_matrix_info
     public :: create_matrix

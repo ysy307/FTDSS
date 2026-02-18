@@ -11,6 +11,9 @@ contains
         type(type_matrix_dense) :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
         type(type_vector_dp) :: local_F_T, local_F_H
         type(type_assemble_workspace) :: workspace
+        
+        ! 【修正1】座標用のバッファ変数を定義（allocatableで自動管理させる）
+        real(real64), allocatable :: elem_coords(:, :)
 
         integer(int32) :: i_color, i_elem, elem_id
         integer(int32), pointer, contiguous, dimension(:) :: p_connectivity
@@ -43,17 +46,18 @@ contains
             !$OMP PRIVATE(i_elem, elem_id, p_connectivity, &
             !$OMP         workspace, &
             !$OMP         local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
-            !$OMP         local_F_T, local_F_H)
+            !$OMP         local_F_T, local_F_H, &
+            !$OMP         elem_coords)
 
             !$OMP DO SCHEDULE(STATIC)
             do i_elem = 1, num_elements_in_color
 
                 elem_id = elements_list(i_elem)
-
                 call self%assemble_initialize(element_id=elem_id, workspace=workspace, &
                                               local_K_TT=local_K_TT, local_K_TH=local_K_TH, &
                                               local_K_HH=local_K_HH, local_K_HT=local_K_HT, &
-                                              local_F_T=local_F_T, local_F_H=local_F_H)
+                                              local_F_T=local_F_T, local_F_H=local_F_H, &
+                                              coordinates=elem_coords)
 
                 call self%assemble_local(workspace, local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
                                          local_F_T, local_F_H)
@@ -66,8 +70,11 @@ contains
 
             end do
             !$OMP END DO
+            
             call self%assemble_finalize(workspace, local_K_TT, local_K_TH, &
                                         local_K_HH, local_K_HT, local_F_T, local_F_H)
+            if (allocated(elem_coords)) deallocate(elem_coords)
+            
             !$OMP END PARALLEL
 
         end do
@@ -77,17 +84,20 @@ contains
     end subroutine assemble_ftdss
 
     module subroutine assemble_initialize_ftdss(self, element_id, workspace, local_K_TT, local_K_TH, &
-                                                local_K_HH, local_K_HT, local_F_T, local_F_H)
+                                                local_K_HH, local_K_HT, local_F_T, local_F_H, &
+                                                coordinates)
         implicit none
+    
         class(type_ftdss), intent(inout) :: self
         integer(int32), intent(in) :: element_id
         type(type_assemble_workspace), intent(inout) :: workspace
         type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
         type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
+        real(real64), allocatable, intent(inout) :: coordinates(:, :)
 
         class(abst_fe), pointer :: fe
         integer(int32), pointer, contiguous, dimension(:) :: connectivity
-        real(real64), allocatable :: coordinates(:, :)
+
         integer(int32) :: material_id
         integer(int32) :: computation_type
         integer(int32) :: num_nodes
@@ -102,6 +112,8 @@ contains
         call self%domain%get_element(element_id, fe)
         call self%domain%get_element_connectivity(element_id, connectivity)
         call self%domain%get_computation_type(computation_type)
+        
+        ! ここで渡される coordinates が allocated でサイズが同じなら再利用される(domain側実装)
         call self%domain%get_element_coordinate(element_id, coordinates)
 
         ! ワークスペースの初期化 (座標のコピー含む)
@@ -188,6 +200,7 @@ contains
 
     module subroutine assemble_local_ftdss(self, workspace, local_K_TT, local_K_TH, &
                                            local_K_HH, local_K_HT, local_F_T, local_F_H)
+ 
         implicit none
         class(type_ftdss), intent(inout) :: self
         type(type_assemble_workspace), intent(inout) :: workspace
