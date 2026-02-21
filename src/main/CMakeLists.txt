@@ -47,6 +47,7 @@ set(MAIN_HYDRAULIC_SOURCES
 add_library(Main_Hydraulic STATIC ${MAIN_HYDRAULIC_SOURCES})
 target_include_directories(Main_Hydraulic PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Main_Hydraulic PUBLIC
+    Main_Base
     Solver::Core
     Solver::Control
     Solver::Input

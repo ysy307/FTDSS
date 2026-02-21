@@ -15,6 +15,8 @@ module core_types
         type_gauss_integration_rule
     use :: core_types_physics_state, only: &
         type_state
+    use :: core_types_physics_state_bc, only: &
+        type_state_bc
     use :: core_types_physics_info, only: &
         type_physics_info
     use :: core_types_physics_meteorology, only: &

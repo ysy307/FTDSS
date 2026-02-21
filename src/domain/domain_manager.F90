@@ -296,7 +296,6 @@ contains
 
         num_total_cells = input%geometry%vtk%num_total_cells
 
-        ! Pass 1: Count elements and total connectivity size
         self%num_elements = 0
         num_total_connectivity = 0
         do i = 1, num_total_cells
@@ -306,7 +305,6 @@ contains
             end if
         end do
 
-        ! Allocation with safe cleanup
         if (allocated(self%fe_types)) deallocate (self%fe_types)
         if (allocated(self%fe_material_ids)) deallocate (self%fe_material_ids)
         if (allocated(self%connectivity%ind)) deallocate (self%connectivity%ind)
@@ -319,7 +317,6 @@ contains
             call allocate_array(self%connectivity%val, num_total_connectivity)
         end if
 
-        ! Pass 2: Store element data
         if (self%num_elements > 0) then
             self%connectivity%ind(1) = 1
             ind = 0
@@ -341,6 +338,7 @@ contains
 
     !> Initializes the boundary manager by processing BCs for all active physics.
     subroutine initialize_boundary_manager(self, input, controls)
+        implicit none
         class(type_boundary_manager), intent(inout) :: self
         type(type_input), intent(in) :: input
         type(type_controls), intent(in) :: controls
@@ -360,7 +358,7 @@ contains
     ! Refactored Boundary Condition Processing
     ! --------------------------------------------------------------------------
 
-    !> Processes, sorts, and groups all boundary conditions for a single physics type.
+    !> Processes and groups all boundary conditions for a single physics type.
     subroutine process_single_physics_bcs(self, physics_type_id, input, controls)
         implicit none
         class(type_boundary_manager), intent(inout) :: self
@@ -369,7 +367,7 @@ contains
         type(type_controls), intent(in) :: controls
 
         integer(int32) :: target_dimension, num_groups
-        integer(int32), allocatable :: bc_idx_list(:), bc_key(:)
+        integer(int32), allocatable :: bc_idx_list(:)
         integer(int32), allocatable :: entity_id_to_group_idx_map(:)
         integer(int32), allocatable :: group_to_cell_types(:)
 
@@ -380,10 +378,7 @@ contains
         call self%filter_active_bcs(physics_type_id, input, target_dimension, bc_idx_list)
         if (.not. allocated(bc_idx_list)) return
 
-        ! Step 2: Sort BCs
-        call sort_by_key_wrapper(physics_type_id, input, bc_idx_list, bc_key)
-
-        ! Step 3: Create map
+        ! Step 2: Create map
         num_groups = size(bc_idx_list)
         self%physics(physics_type_id)%num_bcs = num_groups
 
@@ -392,19 +387,18 @@ contains
 
         call self%create_entity_id_to_group_map(input, bc_idx_list, entity_id_to_group_idx_map)
 
-        ! Step 4 & 5: Measure and Store
+        ! Step 3 & 4: Measure and Store
         call self%measure_and_allocate_bc_geometry(input, target_dimension, entity_id_to_group_idx_map, &
                                                    self%physics(physics_type_id)%bcs)
         call self%store_bc_geometry(input, target_dimension, entity_id_to_group_idx_map, &
                                     self%physics(physics_type_id)%bcs, group_to_cell_types)
 
-        ! Step 6: Create instances
+        ! Step 5: Create instances
         call self%create_bc_instances(physics_type_id, input, controls, bc_idx_list, group_to_cell_types, &
                                       self%physics(physics_type_id)%bcs)
 
         ! Cleanup
         if (allocated(entity_id_to_group_idx_map)) call deallocate_array(entity_id_to_group_idx_map)
-        if (allocated(bc_key)) call deallocate_array(bc_key)
         if (allocated(bc_idx_list)) call deallocate_array(bc_idx_list)
         if (allocated(group_to_cell_types)) call deallocate_array(group_to_cell_types)
     end subroutine process_single_physics_bcs
@@ -427,7 +421,6 @@ contains
         call input%geometry%vtk%get_active_region_info(active_region_id, target_dimension)
         if (.not. allocated(active_region_id)) return
 
-        ! Pass 1: Count active BCs
         num_active_bcs = 0
         do i = 1, input%conditions%num_boundaries
             is_bc_active = is_boundary_condition_active(i, physics_type_id, input, active_region_id)
@@ -436,7 +429,6 @@ contains
             end if
         end do
 
-        ! Pass 2: Allocate and store indices
         if (num_active_bcs > 0) then
             allocate (bc_idx_list(num_active_bcs))
             num_active_bcs = 0
@@ -452,7 +444,7 @@ contains
         call deallocate_array(active_region_id)
     end subroutine filter_active_bcs
 
-    !> Step 3: Creates a mapping.
+    !> Step 2: Creates a mapping.
     subroutine create_entity_id_to_group_map(self, input, bc_idx_list, entity_map)
         implicit none
         class(type_boundary_manager), intent(in) :: self
@@ -473,7 +465,7 @@ contains
         end do
     end subroutine create_entity_id_to_group_map
 
-    !> Step 4: Measures connectivity size.
+    !> Step 3: Measures connectivity size.
     subroutine measure_and_allocate_bc_geometry(self, input, target_dimension, entity_map, bcs)
         implicit none
         class(type_boundary_manager), intent(in) :: self
@@ -488,7 +480,6 @@ contains
         call allocate_array(total_conn_per_group, size(bcs))
         total_conn_per_group = 0
 
-        ! Pass 1: Measure
         num_total_cells = input%geometry%vtk%num_total_cells
         do i = 1, num_total_cells
             if (input%geometry%vtk%cells(i)%cell_dimension == target_dimension) then
@@ -503,7 +494,6 @@ contains
             end if
         end do
 
-        ! Pass 2: Allocate
         do i = 1, size(bcs)
             if (bcs(i)%num_elements > 0) then
                 if (allocated(bcs(i)%element_types)) deallocate (bcs(i)%element_types)
@@ -520,7 +510,7 @@ contains
         call deallocate_array(total_conn_per_group)
     end subroutine measure_and_allocate_bc_geometry
 
-    !> Step 5: Stores connectivity.
+    !> Step 4: Stores connectivity.
     subroutine store_bc_geometry(self, input, target_dimension, entity_map, bcs, group_cell_types)
         implicit none
         class(type_boundary_manager), intent(in) :: self
@@ -564,7 +554,7 @@ contains
         call deallocate_array(current_elem_indices)
     end subroutine store_bc_geometry
 
-    !> Step 6: Creates instances of the polymorphic boundary condition objects.
+    !> Step 5: Creates instances of the polymorphic boundary condition objects.
     subroutine create_bc_instances(self, physics_type_id, input, controls, bc_idx_list, group_cell_types, bcs)
         implicit none
         class(type_boundary_manager), intent(in) :: self
@@ -579,22 +569,17 @@ contains
         do i = 1, size(bcs)
             original_input_idx = bc_idx_list(i)
 
-            ! [修正] インデックスから正しい境界条件IDを取得する
             bc_id = input%conditions%boundary_conditions(original_input_idx)%id
+            bcs(i)%type_id = bc_type
 
             select case (physics_type_id)
             case (PHYSICS_TYPE_THERMAL)
-                bc_type = input%conditions%boundary_conditions(original_input_idx)%physics(PHYSICS_TYPE_THERMAL)%type
+                bcs(i)%condition = create_boundary_conditions( &
+                                   bc_id, input%conditions%boundary_conditions(original_input_idx)%physics(PHYSICS_TYPE_THERMAL)%state)
             case (PHYSICS_TYPE_HYDRAULIC)
-                bc_type = input%conditions%boundary_conditions(original_input_idx)%physics(PHYSICS_TYPE_HYDRAULIC)%type
-            case default
-                bc_type = -1
+                bcs(i)%condition = create_boundary_conditions( &
+                                   bc_id, input%conditions%boundary_conditions(original_input_idx)%physics(PHYSICS_TYPE_HYDRAULIC)%state)
             end select
-
-            bcs(i)%type_id = bc_type
-
-            ! [修正] original_input_idx ではなく bc_id を渡す
-            bcs(i)%condition = create_boundary_conditions(bc_type, bc_id, input, controls)
 
             call bcs(i)%fe_manager%initialize(input%basic%geometry_settings%integration_order, 1, group_cell_types)
         end do
@@ -606,6 +591,7 @@ contains
 
     !> Checks if a given boundary condition is active for the current physics and region.
     pure function is_boundary_condition_active(idx, physics_type_id, input, active_region_id) result(is_active)
+        implicit none
         integer(int32), intent(in) :: idx, physics_type_id
         type(type_input), intent(in) :: input
         integer(int32), intent(in) :: active_region_id(:)
@@ -627,87 +613,6 @@ contains
             ! Not implemented
         end select
     end function is_boundary_condition_active
-
-    !> Wrapper for sorting.
-    subroutine sort_by_key_wrapper(physics_type_id, input, bc_idx_list, bc_key)
-        implicit none
-        integer(int32), intent(in) :: physics_type_id
-        type(type_input), intent(in) :: input
-        integer(int32), intent(inout) :: bc_idx_list(:)
-        integer(int32), allocatable, intent(inout) :: bc_key(:)
-
-        integer(int32) :: i
-        integer(int32), allocatable :: bc_sequence(:)
-
-        if (allocated(bc_key)) deallocate (bc_key)
-
-        select case (physics_type_id)
-        case (PHYSICS_TYPE_THERMAL)
-            allocate (bc_sequence, source=THERMAL_BC_SEQUENCE)
-        case (PHYSICS_TYPE_HYDRAULIC)
-            allocate (bc_sequence, source=HYDRAULIC_BC_SEQUENCE)
-        case (PHYSICS_TYPE_MECHANICAL)
-            return
-        end select
-
-        call allocate_array(bc_key, size(bc_idx_list))
-        do i = 1, size(bc_idx_list)
-            select case (physics_type_id)
-            case (PHYSICS_TYPE_THERMAL)
-                bc_key(i) = get_bc_seq_pos( &
-                            input%conditions%boundary_conditions(bc_idx_list(i))%physics(PHYSICS_TYPE_THERMAL)%type, &
-                            bc_sequence)
-            case (PHYSICS_TYPE_HYDRAULIC)
-                bc_key(i) = get_bc_seq_pos( &
-                            input%conditions%boundary_conditions(bc_idx_list(i))%physics(PHYSICS_TYPE_HYDRAULIC)%type, &
-                            bc_sequence)
-            end select
-        end do
-
-        call sort_by_key(bc_idx_list, bc_key)
-        call deallocate_array(bc_sequence)
-    end subroutine sort_by_key_wrapper
-
-    !> Finds the position of a BC ID within a predefined sequence array.
-    pure function get_bc_seq_pos(bc_id, bc_sequence) result(pos)
-        implicit none
-        integer(int32), intent(in) :: bc_id
-        integer(int32), intent(in) :: bc_sequence(:)
-        integer(int32) :: pos, k
-        pos = size(bc_sequence) + 1
-        do k = 1, size(bc_sequence)
-            if (bc_sequence(k) == bc_id) then
-                pos = k
-                exit
-            end if
-        end do
-    end function get_bc_seq_pos
-
-    !> Sorts an index array based on a corresponding key array using insertion sort.
-    subroutine sort_by_key(idx, key)
-        implicit none
-        integer(int32), intent(inout) :: idx(:)
-        integer(int32), intent(inout) :: key(:)
-        integer(int32) :: i, j, tmp_idx, tmp_key
-
-        if (size(idx) < 2) return
-
-        do i = 2, size(idx)
-            j = i
-            ! [FIX] 分割して評価することで、Short-circuit evaluation が効かない環境でも
-            ! 配列外参照 (key(0)) を防ぐ
-            do
-                if (j <= 1) exit
-                if (key(j) >= key(j - 1)) exit
-
-                ! Swap
-                tmp_idx = idx(j); idx(j) = idx(j - 1); idx(j - 1) = tmp_idx
-                tmp_key = key(j); key(j) = key(j - 1); key(j - 1) = tmp_key
-
-                j = j - 1
-            end do
-        end do
-    end subroutine sort_by_key
 
     ! --------------------------------------------------------------------------
     ! Getter Functions
@@ -791,27 +696,16 @@ contains
 
         integer(int32) :: type_id
 
-        ! 1. Validate the element ID
         if (elem_id < 1 .or. elem_id > self%elements%num_elements) then
-            ! Invalid ID: return null pointer
             element => null()
             return
         end if
 
-        ! 2. Get the finite element type ID for this specific element
-        !    (fe_types maps Element Index -> Type ID)
         type_id = self%elements%fe_types(elem_id)
-
-        ! 3. Retrieve the FE object pointer from the FE manager
-        !    (Delegate the lookup to fe_manager)
         element => self%elements%fe_manager%get_fe(type_id)
 
     end subroutine get_element_domain
 
-    !>
-    !> 指定された要素IDに対応するコネクティビティ（節点番号リスト）へのポインタを返す。
-    !> データのコピーを行わず、内部配列を直接参照するため高速である。
-    !>
     subroutine get_element_connectivity_domain(self, element_id, connectivity)
         implicit none
         class(type_domain), intent(in), target :: self
@@ -820,18 +714,14 @@ contains
 
         integer(int32) :: istart, iend
 
-        ! 1. IDの範囲チェック
         if (element_id < 1 .or. element_id > self%elements%num_elements) then
             connectivity => null()
             return
         end if
 
-        ! 2. CSR形式から開始位置と終了位置を取得
-        !    ind(i) が開始インデックス、ind(i+1)-1 が終了インデックス
         istart = self%elements%connectivity%ind(element_id)
         iend = self%elements%connectivity%ind(element_id + 1) - 1
 
-        ! 3. 内部配列へのポインタ結合 (データのコピーは発生しない)
         connectivity => self%elements%connectivity%val(istart:iend)
 
     end subroutine get_element_connectivity_domain
@@ -840,30 +730,24 @@ contains
         implicit none
         class(type_domain), intent(in), target :: self
         integer(int32), intent(in) :: element_id
-        ! ルール通り intent(inout) を使用
         real(real64), intent(inout), allocatable :: coordinates(:, :)
 
         integer(int32), pointer, contiguous :: connectivity(:)
         integer(int32) :: num_nodes, n_dim
         logical :: need_reallocate
 
-        ! 1. コネクティビティを取得
         call self%get_element_connectivity(element_id, connectivity)
 
         if (.not. associated(connectivity)) then
-            ! エラー処理: 必要であれば deallocate するか、そのまま戻る
             return
         end if
 
-        ! 2. 必要なサイズを計算
         num_nodes = size(connectivity)
-        n_dim = size(self%nodes%coordinates, 1) ! 空間次元数(2 or 3)
+        n_dim = size(self%nodes%coordinates, 1)
 
-        ! 3. メモリ再利用の判定 (Smart Allocation)
         need_reallocate = .true.
 
         if (allocated(coordinates)) then
-            ! サイズがぴったり同じなら再利用する (再確保コストをカット)
             if (size(coordinates, 1) == n_dim .and. size(coordinates, 2) == num_nodes) then
                 need_reallocate = .false.
             end if
@@ -874,7 +758,6 @@ contains
             allocate (coordinates(n_dim, num_nodes))
         end if
 
-        ! 4. データのコピー (ベクトル添字使用)
         coordinates = self%nodes%coordinates(:, connectivity)
 
     end subroutine get_element_coordinate_domain
@@ -885,8 +768,6 @@ contains
         integer(int32), intent(in) :: physics_type_id
         integer(int32), intent(inout) :: target_dof
 
-        ! select case (physics_type_id)
-        ! case (PHYSICS_TYPE_THERMAL)
         target_dof = self%dof_map%num_dof_of_physics(physics_type_id)
 
     end subroutine get_target_dof_domain
@@ -1091,6 +972,7 @@ contains
     end subroutine display_boundary_patch
 
     subroutine display_connectivity(self, title)
+        implicit none
         class(type_fe_connectivity), intent(in) :: self
         character(len=*), intent(in) :: title
         write (*, '(A,A,A)') '        - **Connectivity (', strip(title), ')**:'

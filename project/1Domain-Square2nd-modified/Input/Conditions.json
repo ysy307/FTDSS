@@ -18,11 +18,7 @@
             "scale_up": 1.25,
             "scale_down": 0.8,
             "scale_retry": 0.5
-        },
-        "boundary_condition_time_points": [
-            0.0,
-            1.0
-        ]
+        }
     },
     "boundary_conditions": [
         {
@@ -34,8 +30,8 @@
                 "type": "dirichlet",
                 "is_uniform": true,
                 "values": [
-                    -20.0,
-                    -20.0
+                    {"time": 0.0, "value": -20.0},
+                    {"time": 1.0, "value": -20.0}
                 ]
             },
             "hydraulic": {

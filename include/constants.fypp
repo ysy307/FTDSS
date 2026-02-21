@@ -69,17 +69,18 @@
         'suffix'     : 'thermal_bc_type', &
         'description': 'Thermal boundary condition types', &
         'items'      : [ &
-            ('DIRICHLET',  101, 'dirichlet'), &
-            ('NEUMANN',    102, 'neumann'), &
-            ('FLUX',       103, 'flux'), &
-            ('ROBIN',      104, 'robin'), &
-            ('CONVECTIVE', 105, 'convective'), &
-            ('RADIATION',  106, 'radiation'), &
-            ('ADIABATIC',  107, 'adiabatic'), &
-            ('FREE',       108, 'free') &
+            ('DIRICHLET',   101, 'dirichlet'), &
+            ('NEUMANN',     102, 'neumann'), &
+            ('FLUX',        103, 'flux'), &
+            ('ROBIN',       104, 'robin'), &
+            ('CONVECTIVE',  105, 'convective'), &
+            ('RADIATION',   106, 'radiation'), &
+            ('ADIABATIC',   107, 'adiabatic'), &
+            ('FREE',        108, 'free'), &
+            ('ATMOSPHERIC', 109, 'atmospheric') &
         ], &
-        'num' : 8, &
-        'id_range' : [101, 108] &
+        'num' : 9, &
+        'id_range' : [101, 109] &
     }
 
     #:set HYDRAULIC_BC_TYPES = { &
@@ -93,10 +94,11 @@
             ('NEUMANN',     202, 'neumann'), &
             ('FLUX',        203, 'flux'), &
             ('IMPERMEABLE', 204, 'impermeable'), &
-            ('SEEPAGE',     205, 'seepage') &
+            ('SEEPAGE',     205, 'seepage'), &
+            ('ATMOSPHERIC', 206, 'atmospheric') &
         ], &
-        'num' : 5, &
-        'id_range' : [201, 205] &
+        'num' : 6, &
+        'id_range' : [201, 206] &
     }
 
     #:set IC_TARGETS = { &

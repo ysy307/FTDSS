@@ -32,7 +32,7 @@ contains
         call read_conditions_time_controls_simulation_period(self, json)
         call read_conditions_time_controls_time_stepping(self, json)
         call read_conditions_time_controls_adaptive_stepping(self, json)
-        call read_conditions_time_controls_boundary_time_points(self, json)
+        ! call read_conditions_time_controls_boundary_time_points(self, json)
     end subroutine read_conditions_time_controls
 
     subroutine read_conditions_time_controls_simulation_period(self, json)
@@ -139,44 +139,44 @@ contains
                             is_required=.true., valid_range=[epsilon(0.0d0), 1.0d0])
     end subroutine read_conditions_time_controls_adaptive_stepping
 
-    subroutine read_conditions_time_controls_boundary_time_points(self, json)
-        !> Load the boundary condition time points from the JSON file
-        implicit none
-        class(type_conditions), intent(inout) :: self
-        type(json_file), intent(inout) :: json !! JSON parser
-        character(256) :: buffer(2)
-        integer(int32) :: i
-        real(real64), parameter :: machine_epsilon = 1.0d-9
+    ! subroutine read_conditions_time_controls_boundary_time_points(self, json)
+    !     !> Load the boundary condition time points from the JSON file
+    !     implicit none
+    !     class(type_conditions), intent(inout) :: self
+    !     type(json_file), intent(inout) :: json !! JSON parser
+    !     character(256) :: buffer(2)
+    !     integer(int32) :: i
+    !     real(real64), parameter :: machine_epsilon = 1.0d-9
 
-        buffer(1) = time_controls
-        buffer(2) = boundary_condition_time_points
+    !     buffer(1) = time_controls
+    !     buffer(2) = boundary_condition_time_points
 
-        call get_json_value(json, join(buffer), self%time_control%boundary_time_points, &
-                            is_required=.true.)
+    !     call get_json_value(json, join(buffer), self%time_control%boundary_time_points, &
+    !                         is_required=.true.)
 
-        ! --- Custom Validations for the time points array ---
-        if (size(self%time_control%boundary_time_points) < 2) then
-            call raise_error(ERROR_CODES%VAR_INVALID, opt="Key '"//join(buffer)//"' must contain at least two time points.")
-        end if
+    !     ! --- Custom Validations for the time points array ---
+    !     if (size(self%time_control%boundary_time_points) < 2) then
+    !         call raise_error(ERROR_CODES%VAR_INVALID, opt="Key '"//join(buffer)//"' must contain at least two time points.")
+    !     end if
 
-        ! Check if the time points are sorted in strictly ascending order
-        do i = 1, size(self%time_control%boundary_time_points) - 1
-            if (self%time_control%boundary_time_points(i) >= self%time_control%boundary_time_points(i + 1)) then
-                call raise_error(ERROR_CODES%VAR_INVALID, opt="Time points for key '"//join(buffer)//"' must be in strictly ascending order.")
-            end if
-        end do
+    !     ! Check if the time points are sorted in strictly ascending order
+    !     do i = 1, size(self%time_control%boundary_time_points) - 1
+    !         if (self%time_control%boundary_time_points(i) >= self%time_control%boundary_time_points(i + 1)) then
+    !             call raise_error(ERROR_CODES%VAR_INVALID, opt="Time points for key '"//join(buffer)//"' must be in strictly ascending order.")
+    !         end if
+    !     end do
 
-        ! Check if the first and last time points match the simulation period
-        if (abs(self%time_control%boundary_time_points(1) - &
-                self%time_control%simulation_period%start) > machine_epsilon) then
-            call raise_error(ERROR_CODES%VAR_INVALID, opt="The first boundary time point must match the simulation start time.")
-        end if
-        if (abs(self%time_control%boundary_time_points(size(self%time_control%boundary_time_points)) - &
-                self%time_control%simulation_period%end) > machine_epsilon) then
-            call raise_error(ERROR_CODES%VAR_INVALID, opt="The last boundary time point must match the simulation end time.")
-        end if
+    !     ! Check if the first and last time points match the simulation period
+    !     if (abs(self%time_control%boundary_time_points(1) - &
+    !             self%time_control%simulation_period%start) > machine_epsilon) then
+    !         call raise_error(ERROR_CODES%VAR_INVALID, opt="The first boundary time point must match the simulation start time.")
+    !     end if
+    !     if (abs(self%time_control%boundary_time_points(size(self%time_control%boundary_time_points)) - &
+    !             self%time_control%simulation_period%end) > machine_epsilon) then
+    !         call raise_error(ERROR_CODES%VAR_INVALID, opt="The last boundary time point must match the simulation end time.")
+    !     end if
 
-    end subroutine read_conditions_time_controls_boundary_time_points
+    ! end subroutine read_conditions_time_controls_boundary_time_points
 
     module subroutine display_time_controls(self)
         !> Displays all settings for this time_control object.
@@ -202,23 +202,23 @@ contains
         write (*, '(a, es12.4e2)') "    Min Step            : ", self%time_stepping%min_step
         write (*, '(a, es12.4e2)') "    Max Step            : ", self%time_stepping%max_step
 
-        ! --- Boundary Condition Time Points ---
-        write (*, '(/a)') "  --- Boundary Condition Time Points ---"
-        if (.not. allocated(self%boundary_time_points)) then
-            write (*, '(a)') "    Points              : Not allocated"
-        else
-            n_points = size(self%boundary_time_points)
-            write (*, '(a, i0, a)') "    Total Points        : ", n_points, " points defined."
-            if (n_points > 0) then
-                if (n_points <= 6) then
-                    write (*, '(a, *(es12.4e2, :, ", "))') "    Values              : ", self%boundary_time_points
-                else
-                    write (*, '(a, 3(es12.4e2, :, ", "), a, 3(es12.4e2, :, ", "))') &
-                        "    Values (summary)    : ", self%boundary_time_points(1:3), " ... ", &
-                        self%boundary_time_points(n_points - 2:n_points)
-                end if
-            end if
-        end if
+        ! ! --- Boundary Condition Time Points ---
+        ! write (*, '(/a)') "  --- Boundary Condition Time Points ---"
+        ! if (.not. allocated(self%boundary_time_points)) then
+        !     write (*, '(a)') "    Points              : Not allocated"
+        ! else
+        !     n_points = size(self%boundary_time_points)
+        !     write (*, '(a, i0, a)') "    Total Points        : ", n_points, " points defined."
+        !     if (n_points > 0) then
+        !         if (n_points <= 6) then
+        !             write (*, '(a, *(es12.4e2, :, ", "))') "    Values              : ", self%boundary_time_points
+        !         else
+        !             write (*, '(a, 3(es12.4e2, :, ", "), a, 3(es12.4e2, :, ", "))') &
+        !                 "    Values (summary)    : ", self%boundary_time_points(1:3), " ... ", &
+        !                 self%boundary_time_points(n_points - 2:n_points)
+        !         end if
+        !     end if
+        ! end if
 
         write (*, '(a)') "======================================================================"
     end subroutine display_time_controls

@@ -27,7 +27,7 @@ contains
         logical :: found
         integer(int32) :: i, j
         character(256) :: buffer(2)
-        character(:), dimension(:), pointer :: valid_lists
+        character(:), dimension(:), pointer :: valid_list
 
         call json%info(boundary_conditions, found=found, n_children=self%num_boundaries)
         if (.not. found .or. self%num_boundaries <= 0) then
@@ -43,35 +43,42 @@ contains
                 buffer(1) = boundary_conditions//"("//to_string(i)//")"
                 ! 必須のIDを読み込む
                 buffer(2) = id
-                call get_json_value(json, join(buffer), self%boundary_conditions(i)%id, is_required=.true.)
+                call get_json_value(json, join(buffer(1:2)), self%boundary_conditions(i)%id, is_required=.true.)
 
-                do j = 1, NUM_PHYSICS_TYPES
+                do j = 1, PHYSICS_TYPES%NUM_ID
+                    ! do j = 1, NUM_PHYSICS_TYPES
                     if (p%basic%analysis_controls%is_active(j)) then
                         select case (j)
-                        case (PHYSICS_TYPE_THERMAL)
+                        case (PHYSICS_TYPES%THERMAL%id)
                             buffer(2) = calculate_thermal
-                        case (PHYSICS_TYPE_HYDRAULIC)
+                        case (PHYSICS_TYPES%HYDRAULIC%id)
                             buffer(2) = calculate_hydraulic
-                        case (PHYSICS_TYPE_MECHANICAL)
+                        case (PHYSICS_TYPES%MECHANICAL%id)
                             buffer(2) = calculate_mechanical
                         end select
-                        call get_json_value(json, join(buffer), self%boundary_conditions(i)%physics(j)%is_active, &
+                        call get_json_value(json, join(buffer(1:2)), self%boundary_conditions(i)%physics(j)%is_active, &
                                             is_required=.true.)
                         if (self%boundary_conditions(i)%physics(j)%is_active) then
                             select case (j)
-                            case (PHYSICS_TYPE_THERMAL)
+                            case (PHYSICS_TYPES%THERMAL%id)
+                                self%boundary_conditions(i)%physics(j)%state%physics_type = PHYSICS_TYPES%THERMAL
                                 buffer(2) = thermal
-                                valid_lists => valid_thermal_boundary_types
-                            case (PHYSICS_TYPE_HYDRAULIC)
+                                valid_list => valid_thermal_boundary_types
+                            case (PHYSICS_TYPES%HYDRAULIC%id)
+                                self%boundary_conditions(i)%physics(j)%state%physics_type = PHYSICS_TYPES%HYDRAULIC
                                 buffer(2) = hydraulic
-                                valid_lists => valid_hydraulic_boundary_types
-                            case (PHYSICS_TYPE_MECHANICAL)
+                                valid_list => valid_hydraulic_boundary_types
+                            case (PHYSICS_TYPES%MECHANICAL%id)
+                                self%boundary_conditions(i)%physics(j)%state%physics_type = PHYSICS_TYPES%MECHANICAL
                                 buffer(2) = mechanical
                             end select
 
                             call read_conditions_boundary_conditions_local( &
-                                self%boundary_conditions(i)%physics(j), json, buffer, 2, &
-                                j, valid_lists, size(self%time_control%boundary_time_points))
+                                self%boundary_conditions(i)%physics(j), json, buffer, 2)
+
+                            ! call read_conditions_boundary_conditions_local( &
+                            !     self%boundary_conditions(i)%physics(j), json, buffer, 2, &
+                            !     j, valid_list, size(self%time_control%boundary_time_points))
                         end if
                     end if
                 end do
@@ -81,81 +88,118 @@ contains
 
     end subroutine read_conditions_boundary_conditions
 
-    ! ------------------------------------------------------------------
-    ! NOTE: ヘルパーサブルーチン read_conditions_boundary_conditions_local
-    ! は、この変更による修正は不要です。
-    ! ------------------------------------------------------------------
-    subroutine read_conditions_boundary_conditions_local(boundary, json, buffer, end_index, physics_type_id, valid_types, num_time_points)
+    subroutine read_conditions_boundary_conditions_local(boundary, json, buffer, end_index)
         implicit none
         type(type_boundary_local), intent(inout) :: boundary
         type(json_file), intent(inout) :: json
         character(*), intent(in) :: buffer(:)
         integer(int32), intent(in) :: end_index
-        integer(int32), intent(in) :: physics_type_id
-        character(len=*), intent(in) :: valid_types(:)
-        integer(int32), intent(in) :: num_time_points
+
         character(len=256), allocatable :: local_buffer(:)
         character(:), allocatable :: tmp_string
+        character(:), pointer, contiguous, dimension(:) :: valid_list => null()
 
-        procedure(get_value), pointer :: p_get_value
-        procedure(get_string), pointer :: p_get_string
+        real(real64) :: tmp_value
 
-        allocate (local_buffer(size(buffer) + 1))
+        logical :: found
+        integer(int32) :: i
+
+        allocate (local_buffer(size(buffer) + 2))
         local_buffer(1:end_index) = buffer(1:end_index)
 
-        select case (physics_type_id)
-        case (PHYSICS_TYPE_THERMAL)
-            p_get_value => get_thermal_bc_type
-            p_get_string => get_thermal_bc_type_string
-        case (PHYSICS_TYPE_HYDRAULIC)
-            p_get_value => get_hydraulic_bc_type
-            p_get_string => get_hydraulic_bc_type_string
-        end select
-        local_buffer(end_index + 1) = type
-        call get_json_value(json, join(local_buffer), tmp_string, is_required=.true., valid_list=valid_types)
-        boundary%type = p_get_value(tmp_string)
-        select case (p_get_string(boundary%type))
-        case ("Dirichlet", "Neumann", "Flux", "Robin", "Convective", "Radiation")
-            local_buffer(end_index + 1) = values
-            call get_json_value(json, join(local_buffer), boundary%values, &
-                                is_required=.true., array_size=num_time_points)
+        if (boundary%state%physics_type == PHYSICS_TYPES%THERMAL) then
+            valid_list => valid_thermal_boundary_types
+            local_buffer(end_index) = thermal
+        else if (boundary%state%physics_type == PHYSICS_TYPES%HYDRAULIC) then
+            valid_list => valid_hydraulic_boundary_types
+            local_buffer(end_index) = hydraulic
+        end if
 
-        case ("Adiabatic", "Impermeable", "Free")
-            if (allocated(boundary%values)) deallocate (boundary%values)
-        end select
+        local_buffer(end_index + 1) = type
+        call get_json_value(json, join(local_buffer(1:end_index + 1)), tmp_string, is_required=.true., valid_list=valid_list)
+        if (boundary%state%physics_type == PHYSICS_TYPES%THERMAL) then
+            boundary%state%bc_kind = THERMAL_BC_TYPES%to_object(tmp_string)
+        else if (boundary%state%physics_type == PHYSICS_TYPES%HYDRAULIC) then
+            boundary%state%bc_kind = HYDRAULIC_BC_TYPES%to_object(tmp_string)
+        end if
+        if (boundary%state%bc_kind == THERMAL_BC_TYPES%DIRICHLET .or. &
+            boundary%state%bc_kind == THERMAL_BC_TYPES%NEUMANN .or. &
+            boundary%state%bc_kind == THERMAL_BC_TYPES%FLUX .or. &
+            boundary%state%bc_kind == HYDRAULIC_BC_TYPES%DIRICHLET .or. &
+            boundary%state%bc_kind == HYDRAULIC_BC_TYPES%NEUMANN .or. &
+            boundary%state%bc_kind == HYDRAULIC_BC_TYPES%FLUX) then
+
+            boundary%state%num_variables = 1
+        elseif (boundary%state%bc_kind == THERMAL_BC_TYPES%ROBIN .or. &
+                boundary%state%bc_kind == THERMAL_BC_TYPES%CONVECTIVE .or. &
+                boundary%state%bc_kind == THERMAL_BC_TYPES%RADIATION) then
+            boundary%state%num_variables = 2
+        else
+            boundary%state%num_variables = 0
+        end if
+
+        if (boundary%state%bc_kind == THERMAL_BC_TYPES%DIRICHLET .or. &
+            boundary%state%bc_kind == THERMAL_BC_TYPES%NEUMANN .or. &
+            boundary%state%bc_kind == THERMAL_BC_TYPES%FLUX .or. &
+            boundary%state%bc_kind == THERMAL_BC_TYPES%ROBIN .or. &
+            boundary%state%bc_kind == THERMAL_BC_TYPES%CONVECTIVE .or. &
+            boundary%state%bc_kind == THERMAL_BC_TYPES%RADIATION .or. &
+            boundary%state%bc_kind == HYDRAULIC_BC_TYPES%DIRICHLET .or. &
+            boundary%state%bc_kind == HYDRAULIC_BC_TYPES%NEUMANN .or. &
+            boundary%state%bc_kind == HYDRAULIC_BC_TYPES%FLUX) then
+
+            call json%info(boundary_conditions, found=found, n_children=boundary%state%num_time_points)
+            if (.not. found .or. boundary%state%num_time_points <= 0) then
+                call raise_error(ERROR_CODES%VAR_INVALID, opt=join(local_buffer))
+            end if
+
+            call allocate_array(boundary%state%time_points, boundary%state%num_time_points)
+            call allocate_array(boundary%state%values, boundary%state%num_variables, boundary%state%num_time_points)
+
+            do i = 1, boundary%state%num_time_points
+                local_buffer(end_index + 1) = values//"("//to_string(i)//")"
+                local_buffer(end_index + 2) = "time"
+                call get_json_value(json, join(local_buffer(1:end_index + 2)), boundary%state%time_points(i), is_required=.true.)
+                local_buffer(end_index + 2) = "value"
+                call get_json_value(json, join(local_buffer(1:end_index + 2)), boundary%state%values(1, i), is_required=.true.)
+            end do
+        else
+            if (allocated(boundary%state%values)) deallocate (boundary%state%values)
+        end if
+
     end subroutine read_conditions_boundary_conditions_local
 
     module subroutine display_boundary_conditions(self)
         implicit none
         class(type_boundary_conditions), intent(in) :: self
 
-        write (*, '(a, i0, a)') "  ■ Boundary Condition (ID: ", self%id, ") -------------------"
-        if (associated(self%parent)) then
-            ! 次に、祖父母ポインタが有効かチェックする
-            if (associated(self%parent%parent)) then
-                select type (p => self%parent%parent)
-                type is (type_input)
-                    if (p%basic%analysis_controls%is_active(PHYSICS_TYPE_THERMAL)) then
-                        call display_boundary_local(self%physics, "Thermal", PHYSICS_TYPE_THERMAL)
-                    end if
-                    if (p%basic%analysis_controls%is_active(PHYSICS_TYPE_HYDRAULIC)) then
-                        call display_boundary_local(self%physics, "Hydraulic", PHYSICS_TYPE_HYDRAULIC)
-                    end if
-                    if (p%basic%analysis_controls%is_active(PHYSICS_TYPE_MECHANICAL)) then
-                        call display_boundary_local(self%physics, "Mechanical", PHYSICS_TYPE_MECHANICAL)
-                    end if
+        ! write (*, '(a, i0, a)') "  ■ Boundary Condition (ID: ", self%id, ") -------------------"
+        ! if (associated(self%parent)) then
+        !     ! 次に、祖父母ポインタが有効かチェックする
+        !     if (associated(self%parent%parent)) then
+        !         select type (p => self%parent%parent)
+        !         type is (type_input)
+        !             if (p%basic%analysis_controls%is_active(PHYSICS_TYPE_THERMAL)) then
+        !                 call display_boundary_local(self%physics, "Thermal", PHYSICS_TYPE_THERMAL)
+        !             end if
+        !             if (p%basic%analysis_controls%is_active(PHYSICS_TYPE_HYDRAULIC)) then
+        !                 call display_boundary_local(self%physics, "Hydraulic", PHYSICS_TYPE_HYDRAULIC)
+        !             end if
+        !             if (p%basic%analysis_controls%is_active(PHYSICS_TYPE_MECHANICAL)) then
+        !                 call display_boundary_local(self%physics, "Mechanical", PHYSICS_TYPE_MECHANICAL)
+        !             end if
 
-                end select
+        !         end select
 
-            else
-                ! (任意) 祖父母ポインタが null の場合のエラー処理
-                write (*, *) "Grandparent pointer is not associated."
-            end if
+        !     else
+        !         ! (任意) 祖父母ポインタが null の場合のエラー処理
+        !         write (*, *) "Grandparent pointer is not associated."
+        !     end if
 
-        else
-            ! (任意) 親ポインタが null の場合のエラー処理
-            write (*, *) "Parent pointer is not associated."
-        end if
+        ! else
+        !     ! (任意) 親ポインタが null の場合のエラー処理
+        !     write (*, *) "Parent pointer is not associated."
+        ! end if
 
     end subroutine display_boundary_conditions
 
@@ -166,36 +210,36 @@ contains
         integer(int32), intent(in) :: target_physics
         integer(int32) :: n_vals
 
-        procedure(get_string), pointer :: p_get_string => null()
+        ! procedure(get_string), pointer :: p_get_string => null()
 
-        select case (target_physics)
-        case (PHYSICS_TYPE_THERMAL)
-            p_get_string => get_thermal_bc_type_string
-        case (PHYSICS_TYPE_HYDRAULIC)
-            p_get_string => get_hydraulic_bc_type_string
-        end select
+        ! select case (target_physics)
+        ! case (PHYSICS_TYPE_THERMAL)
+        !     p_get_string => get_thermal_bc_type_string
+        ! case (PHYSICS_TYPE_HYDRAULIC)
+        !     p_get_string => get_hydraulic_bc_type_string
+        ! end select
 
-        write (*, '(a, a, a)') "    --- ", trim(title), " ---"
-        write (*, '(a, a)') "      Type                : ", p_get_string(boundary(target_physics)%type)
+        ! write (*, '(a, a, a)') "    --- ", trim(title), " ---"
+        ! write (*, '(a, a)') "      Type                : ", p_get_string(boundary(target_physics)%type)
 
-        select case (p_get_string(boundary(target_physics)%type))
-        case ("dirichlet", "neumann", "flux", "robin", "heat_transfer", "head_radiation")
-            if (allocated(boundary(target_physics)%values)) then
-                n_vals = size(boundary(target_physics)%values)
-                if (n_vals == 0) then
-                    write (*, '(a)') "      Values              : (0 points defined)"
-                else if (n_vals <= 6) then
-                    write (*, '(a, *(es12.4e2, :, " "))') "      Values              : ", boundary(target_physics)%values
-                else
-                    write (*, '(a, 3(es12.4e2, :, " "), a, 3(es12.4e2, :, " "))') &
-                        "      Values (summary)    : ", boundary(target_physics)%values(1:3), " ... ", boundary(target_physics)%values(n_vals - 2:n_vals)
-                end if
-            else
-                write (*, '(a)') "      Values              : Not allocated"
-            end if
-        case default
-            ! "adiabatic"のようなタイプは追加フィールドなし
-        end select
+        ! select case (p_get_string(boundary(target_physics)%type))
+        ! case ("dirichlet", "neumann", "flux", "robin", "heat_transfer", "head_radiation")
+        !     if (allocated(boundary(target_physics)%values)) then
+        !         n_vals = size(boundary(target_physics)%values)
+        !         if (n_vals == 0) then
+        !             write (*, '(a)') "      Values              : (0 points defined)"
+        !         else if (n_vals <= 6) then
+        !             write (*, '(a, *(es12.4e2, :, " "))') "      Values              : ", boundary(target_physics)%values
+        !         else
+        !             write (*, '(a, 3(es12.4e2, :, " "), a, 3(es12.4e2, :, " "))') &
+        !                 "      Values (summary)    : ", boundary(target_physics)%values(1:3), " ... ", boundary(target_physics)%values(n_vals - 2:n_vals)
+        !         end if
+        !     else
+        !         write (*, '(a)') "      Values              : Not allocated"
+        !     end if
+        ! case default
+        !     ! "adiabatic"のようなタイプは追加フィールドなし
+        ! end select
     end subroutine display_boundary_local
 
 end submodule inout_input_conditions_boundry

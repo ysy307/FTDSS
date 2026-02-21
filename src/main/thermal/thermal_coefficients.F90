@@ -20,6 +20,7 @@ contains
         real(real64) :: rho_s, rho_w, rho_i
         real(real64) :: c_s, c_w, c_i, c_v
         real(real64) :: Lf, Lv
+        logical :: has_rho_w
 
         call state%temperature%get(temperature)
         call state%porosity%get(porosity)
@@ -28,6 +29,7 @@ contains
         call state%vapor_content%get(Qv)
 
         U = 0.0d0
+        has_rho_w = .false.
 
         ! Solid phase
         if (porosity > 0.0d0) then
@@ -39,6 +41,7 @@ contains
         ! Water phase
         if (Qw > 0.0d0) then
             call self%physics%calc_density_water(state, rho_w)
+            has_rho_w = .true.
             call self%physics%calc_specific_heat_water(state, c_w)
             U = U + rho_w * c_w * Qw * temperature
         end if
@@ -54,7 +57,10 @@ contains
 
         ! Vapor phase (Include Latent Heat of Vaporization)
         if (Qv > 0.0d0) then
-            call self%physics%calc_density_water(state, rho_w) ! 通常、蒸気の基準密度は液相
+            if (.not. has_rho_w) then
+                call self%physics%calc_density_water(state, rho_w) ! 通常、蒸気の基準密度は液相
+                has_rho_w = .true.
+            end if
             call self%physics%calc_specific_heat_vapor(state, c_v)
             call self%physics%calc_latent_heat_vaporization(material_id, state, Lv)
             U = U + rho_w * c_v * Qv * temperature + Lv * rho_w * Qv
@@ -120,20 +126,23 @@ contains
         real(real64), pointer, contiguous, dimension(:) :: pressure_history
         real(real64), pointer, contiguous, dimension(:) :: porosity_history
         real(real64) :: Uj
-        integer(int32) :: j
+        integer(int32) :: j, n_hist
 
         call state%get(temperature_history=temperature_history, &
                        pressure_history=pressure_history, &
                        porosity_history=porosity_history)
 
         dU_dt = 0.0d0
-        do j = 1, size(bdf_coeffs)
+        if (.not. associated(temperature_history)) return
+        if (.not. associated(pressure_history)) return
+        if (.not. associated(porosity_history)) return
+        n_hist = min(size(bdf_coeffs), size(temperature_history), size(pressure_history), size(porosity_history))
+        do j = 1, n_hist
             ! 履歴データから状態を復元してエンタルピーを再計算
             ! Note: 計算コスト削減のため、本来はUの履歴をstateに持たせることが望ましい
-            call local_state%reset()
-            call local_state%set(temperature=temperature_history(j), &
-                                 pressure=pressure_history(j), &
-                                 porosity=porosity_history(j))
+            call local_state%temperature%set(temperature_history(j))
+            call local_state%pressure%set(pressure_history(j))
+            call local_state%porosity%set(porosity_history(j))
             call self%update_water_phases(material_id, local_state)
             call self%calc_enthalpy_density(material_id, local_state, Uj)
 
@@ -167,6 +176,7 @@ contains
         real(real64) :: rho_s, rho_w, rho_i
         real(real64) :: c_s, c_w, c_i, c_v
         real(real64) :: dQi_dT, dQv_dT, Lf, Lv
+        logical :: has_rho_w
 
         ! Secant用
         real(real64) :: C_TT_current, C_TT_old, dT
@@ -174,8 +184,27 @@ contains
         integer(int32) :: use_scheme
 
         ! デフォルトの挙動決定（指定がなければ自動判定）
-        call state%get(temperature=temperature, temperature_history=temperature_history)
-        dT = temperature - temperature_history(2)
+        call state%get(temperature=temperature, temperature_history=temperature_history, &
+                       pressure_history=pressure_history, porosity_history=porosity_history)
+
+        if (.not. associated(temperature_history)) then
+            C_TT = 0.0d0
+            return
+        end if
+        if (.not. associated(pressure_history)) then
+            C_TT = 0.0d0
+            return
+        end if
+        if (.not. associated(porosity_history)) then
+            C_TT = 0.0d0
+            return
+        end if
+
+        if (size(temperature_history) >= 2) then
+            dT = temperature - temperature_history(2)
+        else
+            dT = 0.0d0
+        end if
 
         if (present(scheme_opt)) then
             use_scheme = scheme_opt
@@ -189,21 +218,27 @@ contains
         end if
 
         C_TT = 0.0d0
+        has_rho_w = .false.
 
         if (use_scheme == SCHEME_SECANT) then
             ! --- Secant Method (Average/Effective Heat Capacity) ---
             ! C_eff = (U(T) - U(T_old)) / (T - T_old)
 
-            call state%get(pressure_history=pressure_history, porosity_history=porosity_history)
+            if (size(temperature_history) < 2 .or. size(pressure_history) < 2 .or. size(porosity_history) < 2) then
+                use_scheme = SCHEME_TANGENT
+            end if
+
+        end if
+
+        if (use_scheme == SCHEME_SECANT) then
 
             ! Current U
             call self%calc_enthalpy_density(material_id, state, C_TT_current)
 
             ! Old U (from previous time step)
-            call temp_state%copy(state)
-            call temp_state%set(temperature=temperature_history(2), &
-                                pressure=pressure_history(2), &
-                                porosity=porosity_history(2))
+            call temp_state%temperature%set(temperature_history(2))
+            call temp_state%pressure%set(pressure_history(2))
+            call temp_state%porosity%set(porosity_history(2))
             call self%update_water_phases(material_id, temp_state)
             call self%calc_enthalpy_density(material_id, temp_state, C_TT_old)
 
@@ -228,6 +263,7 @@ contains
             ! Water
             if (Qw > 0.0d0) then
                 call self%physics%calc_density_water(state, rho_w)
+                has_rho_w = .true.
                 call self%physics%calc_specific_heat_water(state, c_w)
                 C_TT = C_TT + rho_w * c_w * Qw
             end if
@@ -243,7 +279,10 @@ contains
 
             ! Vapor (including latent heat derivative)
             if (Qv > 0.0d0) then
-                call self%physics%calc_density_water(state, rho_w)
+                if (.not. has_rho_w) then
+                    call self%physics%calc_density_water(state, rho_w)
+                    has_rho_w = .true.
+                end if
                 call self%physics%calc_specific_heat_vapor(state, c_v)
                 call self%physics%calc_latent_heat_vaporization(material_id, state, Lv)
                 call state%dQv_dT%get(dQv_dT)
@@ -304,13 +343,19 @@ contains
 
         type(type_coordinate_dp), pointer :: water_flux, vapor_flux
         real(real64) :: rho_w, c_w, c_v
+        real(real64) :: flux_norm1
 
         call state%get(water_flux=water_flux, vapor_flux=vapor_flux)
+
+        V_TT(:) = 0.0d0
+        flux_norm1 = abs(water_flux%x) + abs(water_flux%y) + abs(water_flux%z) + &
+                 abs(vapor_flux%x) + abs(vapor_flux%y) + abs(vapor_flux%z)
+        if (flux_norm1 <= epsilon(1.0d0)) return
+
         call self%physics%calc_density_water(state, rho_w)
         call self%physics%calc_specific_heat_water(state, c_w)
         call self%physics%calc_specific_heat_vapor(state, c_v)
 
-        V_TT(:) = 0.0d0
         select case (self%computation_type)
         case (COMP_TYPE_2D_XY)
             V_TT(1) = rho_w * (c_w * water_flux%x + c_v * vapor_flux%x)

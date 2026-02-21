@@ -12,7 +12,7 @@ module conditions_boundary
     public :: type_bc_dirichlet
     public :: type_bc_neumann
     public :: type_bc_robin
-    public :: type_bc_adiabatic
+    public :: type_bc_zero_flux
 
     ! --- Public Constants ---
     integer(int32), public, parameter :: ERR_BC_UNKNOWN = 801
@@ -27,14 +27,8 @@ module conditions_boundary
     ! ==========================================================================
     type, abstract :: abst_bc
         integer(int32) :: boundary_id = -1
-        integer(int32) :: physics_type = -1
-        integer(int32) :: bc_kind = -1
-
-        real(real64), allocatable :: time_points(:)
-        real(real64), allocatable :: values(:, :) ! (成分, 時間)
-
-        integer(int32) :: num_time_points = 0
-        integer(int32) :: num_variables = 0
+        type(type_state_bc) :: state
+        integer(int32), private :: current_idx = 0
         logical :: initialized = .false.
     contains
         ! 初期化・破棄
@@ -55,18 +49,16 @@ module conditions_boundary
 
     interface
         ! --- Method Interfaces ---
-        module subroutine initialize_bc(self, cell_id, target_bc, input, controls)
+        module subroutine initialize_bc(self, cell_id, state_bc)
             implicit none
             class(abst_bc), intent(inout) :: self
             integer(int32), intent(in) :: cell_id
-            integer(int32), intent(in) :: target_bc ! BCの種類ID (これで物理タイプ等を決定)
-            type(type_input), intent(in) :: input
-            type(type_controls), intent(in) :: controls
+            type(type_state_bc), intent(in) :: state_bc
         end subroutine initialize_bc
 
         module subroutine calc_time_coefficient_bc(self, current_time, coef, idx)
             implicit none
-            class(abst_bc), intent(in) :: self
+            class(abst_bc), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(inout) :: coef
             integer(int32), intent(inout) :: idx
@@ -74,14 +66,14 @@ module conditions_boundary
 
         module subroutine calc_values_raw_bc(self, current_time, out_values)
             implicit none
-            class(abst_bc), intent(in) :: self
+            class(abst_bc), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(inout) :: out_values(:)
         end subroutine calc_values_raw_bc
 
         module subroutine calc_flux_and_derivative_bc(self, current_time, u_curr, q_flux, dq_du)
             implicit none
-            class(abst_bc), intent(in) :: self
+            class(abst_bc), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(in) :: u_curr
             real(real64), intent(out) :: q_flux, dq_du
@@ -89,7 +81,7 @@ module conditions_boundary
 
         module subroutine calc_dirichlet_value_bc(self, current_time, val_fixed, is_active)
             implicit none
-            class(abst_bc), intent(in) :: self
+            class(abst_bc), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(out) :: val_fixed
             logical, intent(out) :: is_active
@@ -115,7 +107,7 @@ module conditions_boundary
     type, extends(abst_bc) :: type_bc_robin
     end type type_bc_robin
 
-    type, extends(abst_bc) :: type_bc_adiabatic
-    end type type_bc_adiabatic
+    type, extends(abst_bc) :: type_bc_zero_flux
+    end type type_bc_zero_flux
 
 end module conditions_boundary

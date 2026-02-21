@@ -44,7 +44,7 @@ module inout_input_conditions
         type(type_time_controls_simulation_period) :: simulation_period
         type(type_time_controls_time_stepping) :: time_stepping
         type(type_time_controls_ats) :: adaptive_stepping
-        real(real64), allocatable :: boundary_time_points(:)
+        ! real(real64), allocatable :: boundary_time_points(:)
     contains
         procedure, pass(self) :: display => display_time_controls
     end type type_time_controls
@@ -59,8 +59,9 @@ module inout_input_conditions
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_boundary_local
         logical :: is_active = .false.
-        integer(int32) :: type = -1
-        real(real64), allocatable :: values(:)
+        type(type_state_bc) :: state
+        ! integer(int32) :: type = -1
+        ! real(real64), allocatable :: values(:)
     end type type_boundary_local
 
     type :: type_boundary_conditions
