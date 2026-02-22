@@ -15,10 +15,8 @@ graph: true
 coloured_edges: true
 print_creation_date: true
 creation_date: %Y-%m-%d %H:%M %z
-predocmark_alt: >
-predocmark: <
-docmark_alt: *
 docmark: !
+predocmark: >
 display: public
          protected
          private

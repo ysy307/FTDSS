@@ -93,7 +93,7 @@
     ],
     "solver_settings": {
         "bdf_order": 2,
-        "reordering": "none",
+        "reordering": "cm",
         "coloring": "dsatur",
         "nonlinear_solver": {
             "method": "none",
@@ -138,9 +138,9 @@
         },
         "parallel_settings": {
             "threads": {
-                "is_parallel": false,
-                "num_threads": 1,
-                "schedule": "static",
+                "is_parallel": true,
+                "num_threads": 4,
+                "schedule": "guided",
                 "max_active_levels": 1
             }
         }

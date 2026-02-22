@@ -1,14 +1,17 @@
 module module_type_matrix
-    use :: core_types_matrix, only:abst_matrix
-    use :: core_types_matrix_coo, only:type_coo
-    use :: core_types_matrix_crs, only:type_crs
-    use :: core_types_matrix_dense, only:type_dense
+    use :: core_types_matrix
+    use :: core_types_matrix_factory
     implicit none
     private
 
     public :: abst_matrix
-    public :: type_coo
-    public :: type_crs
-    public :: type_dense
+    public :: type_matrix_dense
+    public :: type_matrix_csr
+    public :: type_matrix_coo
+    public :: type_matrix_bsr
+    public :: type_matrix_dia
+
+    public :: type_matrix_info
+    public :: create_matrix
 
 end module module_type_matrix

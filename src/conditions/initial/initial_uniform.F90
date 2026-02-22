@@ -8,33 +8,26 @@ submodule(conditions_initial) conditions_initial_uniform
 
 contains
 
-    module subroutine initialize_type_ic_uniform(self, input, initial_target)
+    module subroutine initialize_type_ic_uniform(self, input, initial_target_id)
         implicit none
         class(type_ic_uniform), intent(inout) :: self
         type(type_input), intent(in) :: input
-        character(*), intent(in) :: initial_target
+        integer(int32), intent(in) :: initial_target_id
 
-        select case (trim(adjustl(initial_target)))
-        case ('thermal')
-            self%type = input%conditions%initial_conditions%thermal%type
-            self%value = input%conditions%initial_conditions%thermal%value
-        case ('hydraulic')
-            self%type = input%conditions%initial_conditions%hydraulic%type
-            self%value = input%conditions%initial_conditions%hydraulic%value
-        case ('porosity')
-            self%type = input%conditions%initial_conditions%porosity%type
-            self%value = input%conditions%initial_conditions%porosity%value
-        end select
+        if (initial_target_id > 0) then
+            self%target_id = initial_target_id
+            self%type = IC_METHOD_UNIFORM
+            self%value = input%conditions%initial_conditions%physics(initial_target_id)%value
+        end if
     end subroutine initialize_type_ic_uniform
 
-    module subroutine apply_uniform(self, domain, variable)
+    module subroutine apply_uniform(self, variable)
         implicit none
         class(type_ic_uniform), intent(in) :: self
-        type(type_domain), intent(in) :: domain
         type(type_variable), intent(inout) :: variable
 
-        variable%new(:) = self%value
-        variable%pre(:) = self%value
+        call variable%set_current(self%value)
+        call variable%set_previous(self%value)
     end subroutine
 
-end submodule conditions_initial_Uniform
+end submodule conditions_initial_uniform

@@ -1,0 +1,146 @@
+#:set INT_KINDS = [ &
+    ('int8',  'int32'), &
+    ('int16', 'int32'), &
+    ('int32', 'int32'), &
+    ('int64', 'int64')  &
+    ]
+
+#:set REAL_KINDS = [ &
+    ('real32',  'int32', '1.0e-6'), &
+    ('real64',  'int32', '1.0d-12'), &
+    ('real128', 'int32', '1.0q-24') &
+    ]
+
+!>
+!> Provides a generic binary search function for finding a value in a sorted
+!> integer/real array.
+!>
+!> Algorithm: Lower Bound (finds the first occurrence or first insertion point).
+!>
+module core_findings
+    use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, real64, real128
+    use :: stdlib_optval, only:optval
+    implicit none
+    private
+
+    public :: binary_find
+
+    !>
+    !> A generic interface for performing a binary search.
+    !>
+    interface binary_find
+        ! Integer implementations
+        #:for k, idx_k in INT_KINDS
+            module procedure :: binary_find_${k}$
+        #:endfor
+
+        ! Real implementations
+        #:for k, idx_k, _ in REAL_KINDS
+            module procedure :: binary_find_${k}$
+        #:endfor
+    end interface
+
+contains
+
+    ! ==========================================================================
+    ! INTEGER IMPLEMENTATIONS
+    ! ==========================================================================
+    #:for k, idx_k in INT_KINDS
+        !> Finds an ${k}$ value (Lower Bound).
+        pure function binary_find_${k}$ (value, array, start_index, end_index, &
+                                         max_iter, return_insertion) result(idx)
+            integer(${k}$), intent(in) :: value
+            integer(${k}$), intent(in) :: array(:)
+            ! インデックス用の型も idx_k に合わせて変更
+            integer(${idx_k}$), intent(in), optional :: start_index, end_index, max_iter
+            logical, intent(in), optional :: return_insertion
+            integer(${idx_k}$) :: idx
+
+            integer(${idx_k}$) :: low, high, mid, iter, limit
+            logical :: mode_ins
+
+            ! lbound の返り値も型を合わせる
+            low = optval(start_index, lbound(array, 1, kind=${idx_k}$))
+            high = optval(end_index, ubound(array, 1, kind=${idx_k}$))
+            limit = optval(max_iter, huge(0_${idx_k}$))
+            mode_ins = optval(return_insertion, .false.)
+
+            iter = 0
+            idx = 0
+
+            do while (low <= high)
+                if (iter >= limit) return
+                iter = iter + 1
+                mid = low + (high - low) / 2
+
+                ! 完全一致ロジック
+                if (array(mid) < value) then
+                    low = mid + 1
+                else
+                    high = mid - 1
+                end if
+            end do
+
+            if (mode_ins) then
+                idx = low
+            else
+                if (low >= lbound(array, 1, kind=${idx_k}$) .and. low <= ubound(array, 1, kind=${idx_k}$)) then
+                    if (array(low) == value) idx = low
+                end if
+            end if
+        end function binary_find_${k}$
+
+    #:endfor
+
+    ! ==========================================================================
+    ! REAL IMPLEMENTATIONS
+    ! ==========================================================================
+    #:for k, idx_k, def_tol in REAL_KINDS
+        !> Finds a ${k}$ value (Lower Bound) with tolerance.
+        pure function binary_find_${k}$ (value, array, start_index, end_index, &
+                                         tol, max_iter, return_insertion) result(idx)
+            real(${k}$), intent(in) :: value
+            real(${k}$), intent(in) :: array(:)
+            integer(${idx_k}$), intent(in), optional :: start_index, end_index, max_iter
+            real(${k}$), intent(in), optional :: tol
+            logical, intent(in), optional :: return_insertion
+            integer(${idx_k}$) :: idx
+
+            integer(${idx_k}$) :: low, high, mid, iter, limit
+            real(${k}$) :: epsilon
+            logical :: mode_ins
+
+            low = optval(start_index, lbound(array, 1, kind=${idx_k}$))
+            high = optval(end_index, ubound(array, 1, kind=${idx_k}$))
+            epsilon = abs(optval(tol, ${def_tol}$))
+            limit = optval(max_iter, huge(0_${idx_k}$))
+            mode_ins = optval(return_insertion, .false.)
+
+            iter = 0
+            idx = 0
+
+            do while (low <= high)
+                if (iter >= limit) return
+                iter = iter + 1
+                mid = low + (high - low) / 2
+
+                ! 許容誤差を考慮したロジック
+                if (array(mid) < value - epsilon) then
+                    low = mid + 1
+                else
+                    high = mid - 1
+                end if
+            end do
+
+            if (mode_ins) then
+                idx = low
+            else
+                if (low >= lbound(array, 1, kind=${idx_k}$) .and. low <= ubound(array, 1, kind=${idx_k}$)) then
+                    if (abs(array(low) - value) <= epsilon) idx = low
+                end if
+            end if
+        end function binary_find_${k}$
+
+    #:endfor
+
+end module core_findings

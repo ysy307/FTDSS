@@ -1,0 +1,70 @@
+{
+    "time_controls": {
+        "simulation_period": {
+            "unit": "day",
+            "start": 0.0,
+            "end": 1.0
+        },
+        "time_stepping": {
+            "unit": "second",
+            "initial_step": 300.0,
+            "min_step": 1.0,
+            "max_step": 300000.0            
+        },
+        "adaptive_stepping": {
+            "is_active": true,
+            "iter_min": 4,
+            "iter_max": 8,
+            "scale_up": 1.25,
+            "scale_down": 0.8,
+            "scale_retry": 0.5
+        }
+    },
+    "boundary_conditions": [
+        {
+            "id": 2,
+            "calculate_thermal": true,
+            "calculate_hydraulic": true,
+            "calculate_mechanical": false,
+            "thermal": {
+                "type": "dirichlet",
+                "is_uniform": true,
+                "values": [
+                    {"time": 0.0, "value": -20.0},
+                    {"time": 1.0, "value": -20.0}
+                ]
+            },
+            "hydraulic": {
+                "type": "impermeable"
+            }
+        },
+        {
+            "id": 3,
+            "calculate_thermal": true,
+            "calculate_hydraulic": true,
+            "calculate_mechanical": false,
+            "thermal": {
+                "type": "adiabatic"
+            },
+            "hydraulic": {
+                "type": "impermeable"
+            }
+        }
+    ],
+    "initial_conditions": {
+        "thermal": {
+            "type": "uniform",
+            "value": 18.0,
+            "field_name": "Temperature"
+        },
+        "hydraulic": {
+            "type": "uniform",
+            "value": 100.0,
+            "field_name": "Pressure"
+        },
+        "porosity": {
+            "type": "uniform",
+            "value": 0.3
+        }
+    }
+}

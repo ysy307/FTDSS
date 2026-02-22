@@ -1,149 +1,193 @@
 module main_thermal
-    use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: stdlib_logger
-    use :: stdlib_strings
-    use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_state, type_crs
-    use :: module_domain, only:type_domain
-    use :: module_calculate, only:abst_den
-    use :: module_properties, only:type_properties_manager, type_phase_property
+    use, intrinsic :: iso_fortran_env
+    use :: module_core
+    use :: module_control, only:type_controls
     use :: module_input, only:type_input
-    use :: module_calculate, only:gemv, add
-    use :: module_boundary, only:type_bc, mode_value, mode_nr
-    use :: module_solver
-    use :: module_control
-    use :: thermal_thermal_assemble
+    use :: module_physics, only:type_physics_manager, type_wrf_params, type_hcf_params, type_thc_dispersivity
+    use :: module_linalg
+    use :: main_base, only:type_assemble_workspace
     implicit none
     private
 
-    public :: abst_thermal
-    public :: type_thermal_crs
+    public :: type_thermal
 
-    type, abstract :: abst_thermal
-        type(type_variable) :: Qw
-        type(type_variable) :: Qice
-        type(type_variable) :: Si
+    ! 定数定義（可読性のため）
+    integer, parameter :: SCHEME_TANGENT = 0 ! 厳密な微分（NR法推奨）
+    integer, parameter :: SCHEME_SECANT = 1 ! 差分近似（Picard法/相変化安定化用）
 
-        type(type_crs) :: KT_star
-        real(real64), allocatable :: FT(:)
-        real(real64), allocatable :: PHIT(:)
-
-        !! Nonlinear solver
-        character(:), allocatable :: algorithm
-
-        !! Solver
-        class(abst_solver), allocatable :: solver
-        integer(int32) :: order
-
-        procedure(abst_assemble_global_thermal), nopass, pointer :: assemble_global => null()
+    type :: type_thermal
+        private
+        integer(int32) :: computation_type
+        integer(int32) :: computation_dimension
+        type(type_physics_manager) :: physics
     contains
-        procedure(abst_update), pass(self), deferred :: update
-        procedure(abst_shift), pass(self), deferred :: shift
-        procedure(abst_solve), pass(self), deferred :: solve
-        procedure(abst_compute), pass(self), deferred :: compute
-    end type abst_thermal
+        procedure, pass(self), public :: initialize => initialize_type_thermal
+        procedure, pass(self), public :: destroy => destroy_type_thermal
 
-    type, extends(abst_thermal) :: type_thermal_crs
-    contains
-        procedure :: update => update_type_thermal_crs
-        procedure :: shift => shift_type_thermal_crs
-        procedure :: solve => solve_type_thermal_crs
-        procedure :: compute => compute_type_thermal_crs
-    end type type_thermal_crs
+        procedure, pass(self), public :: assemble_local => assemble_local_thermal
+        procedure, pass(self), private :: assemble_local_newton => assemble_local_newton_thermal
+        procedure, pass(self), private :: assemble_local_picard => assemble_local_picard_thermal
 
-    abstract interface
-        subroutine abst_update(self, domain, property, temperature, porosity, controls)
-            import :: abst_thermal, type_domain, type_properties_manager, real64, type_controls
+        procedure, pass(self), private :: compute_mass_term => compute_mass_term_thermal
+        procedure, pass(self), private :: compute_diffusion_term => compute_diffusion_term_thermal
+        procedure, pass(self), private :: compute_advective_term => compute_advective_term_thermal
+        procedure, pass(self), private :: compute_latent_term => compute_latent_term_thermal
+        procedure, pass(self), private :: compute_transient_term => compute_transient_term_thermal
+        procedure, pass(self), private :: compute_history_term => compute_history_term_thermal
+
+        procedure, pass(self), public :: calc_enthalpy_density => calc_enthalpy_density_thermal
+        procedure, pass(self), public :: calc_density_water => calc_density_water_thermal
+        procedure, pass(self), public :: calc_density_ice => calc_density_ice_thermal
+        procedure, pass(self), public :: calc_density_vapor_saturation => calc_density_vapor_saturation_thermal
+        procedure, pass(self), public :: update_water_phases => update_water_phases_thermal
+    end type type_thermal
+
+    interface
+        module subroutine calc_enthalpy_density_thermal(self, material_id, state, U)
             implicit none
-            class(abst_thermal), intent(inout) :: self
-            type(type_domain), intent(inout), target :: domain
-            type(type_properties_manager), intent(inout) :: property
-            real(real64), intent(in) :: temperature(:)
-            real(real64), intent(in) :: porosity(:)
-            type(type_controls), intent(in) :: controls
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: U
+        end subroutine calc_enthalpy_density_thermal
 
-        end subroutine abst_update
-
-        subroutine abst_shift(self)
-            import :: abst_thermal
+        module subroutine calc_density_water_thermal(self, state, rho_water)
             implicit none
-            class(abst_thermal), intent(inout) :: self
+            class(type_thermal), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: rho_water
 
-        end subroutine abst_shift
+        end subroutine calc_density_water_thermal
 
-        subroutine abst_solve(self, temperature, controls)
-            import :: abst_thermal, type_controls, type_variable
+        module subroutine calc_density_ice_thermal(self, state, rho_ice)
             implicit none
-            class(abst_thermal), intent(inout) :: self
-            type(type_variable), intent(inout) :: temperature
-            type(type_controls), intent(in) :: controls
+            class(type_thermal), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: rho_ice
 
-        end subroutine abst_solve
+        end subroutine calc_density_ice_thermal
 
-        subroutine abst_compute(self, domain, property, temperature, porosity, controls, bc)
-            import :: abst_thermal, type_domain, type_properties_manager, type_variable, type_controls, type_bc
+        module subroutine calc_density_vapor_saturation_thermal(self, state, rho_vapor_sat)
             implicit none
-            class(abst_thermal), intent(inout) :: self
-            type(type_domain), intent(inout) :: domain
-            type(type_properties_manager), intent(in) :: property
-            type(type_variable), intent(inout) :: temperature
-            type(type_variable), intent(inout) :: porosity
-            type(type_controls), intent(inout) :: controls
-            type(type_bc), intent(inout) :: bc
+            class(type_thermal), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: rho_vapor_sat
 
-        end subroutine abst_compute
+        end subroutine calc_density_vapor_saturation_thermal
+
+        module subroutine update_water_phases_thermal(self, material_id, state)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(inout) :: state
+
+        end subroutine update_water_phases_thermal
+
+        module subroutine compute_transient_term_thermal(self, material_id, state, bdf_coeffs, dU_dt)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(in) :: bdf_coeffs(:)
+            real(real64), intent(inout) :: dU_dt
+
+        end subroutine compute_transient_term_thermal
+        module subroutine compute_mass_term_thermal(self, material_id, state, C_TT, scheme_opt)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: C_TT
+            integer(int32), intent(in), optional :: scheme_opt
+
+        end subroutine compute_mass_term_thermal
+        module subroutine compute_diffusion_term_thermal(self, material_id, state, D_TT)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(inout) :: state
+            real(real64), intent(inout) :: D_TT(:, :)
+            type(type_thc_dispersivity) :: lambda
+
+        end subroutine compute_diffusion_term_thermal
+
+        module subroutine compute_advective_term_thermal(self, material_id, state, V_TT)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(inout) :: state
+            real(real64), intent(inout) :: V_TT(:)
+
+        end subroutine compute_advective_term_thermal
+
+        module subroutine compute_latent_term_thermal(self, material_id, state, L_TT)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(inout) :: state
+            real(real64), intent(inout) :: L_TT
+
+        end subroutine compute_latent_term_thermal
+
+        module subroutine compute_history_term_thermal(self, material_id, state, bdf_coeffs, history_term)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(in) :: bdf_coeffs(:)
+            real(real64), intent(inout) :: history_term
+
+        end subroutine compute_history_term_thermal
     end interface
 
     interface
-        module function construct_type_thermal_crs(input, coordinate, domain) result(structure)
+        module subroutine initialize_type_thermal(self, input, active_region_ids)
             implicit none
-            class(abst_thermal), allocatable :: structure
-            type(type_input), intent(inout) :: input
-            type(type_dp_3d), intent(inout), pointer :: coordinate
-            type(type_domain), intent(inout) :: domain
+            class(type_thermal), intent(inout) :: self
+            type(type_input), intent(in) :: input
+            integer(int32), intent(in) :: active_region_ids(:)
 
-        end function construct_type_thermal_crs
+        end subroutine initialize_type_thermal
 
-        module subroutine update_type_thermal_crs(self, domain, property, temperature, porosity, controls)
+        module subroutine destroy_type_thermal(self)
             implicit none
-            class(type_thermal_crs), intent(inout) :: self
-            type(type_domain), intent(inout), target :: domain
-            type(type_properties_manager), intent(inout) :: property
-            real(real64), intent(in) :: temperature(:)
-            real(real64), intent(in) :: porosity(:)
+            class(type_thermal), intent(inout) :: self
+
+        end subroutine destroy_type_thermal
+
+        module subroutine assemble_local_thermal(self, controls, workspace, K_TT, K_TH, F_T)
+            implicit none
+            class(type_thermal), intent(in) :: self
             type(type_controls), intent(in) :: controls
+            type(type_assemble_workspace), intent(inout) :: workspace
+            type(type_matrix_dense), intent(inout), optional :: K_TT
+            type(type_matrix_dense), intent(inout), optional :: K_TH
+            type(type_vector_dp), intent(inout), optional :: F_T
 
-        end subroutine update_type_thermal_crs
+        end subroutine assemble_local_thermal
 
-        module subroutine shift_type_thermal_crs(self)
+        module subroutine assemble_local_newton_thermal(self, controls, workspace, K_TT, K_TH, F_T)
             implicit none
-            class(type_thermal_crs), intent(inout) :: self
-
-        end subroutine shift_type_thermal_crs
-
-        module subroutine solve_type_thermal_crs(self, temperature, controls)
-            implicit none
-            class(type_thermal_crs), intent(inout) :: self
-            type(type_variable), intent(inout) :: temperature
+            class(type_thermal), intent(in) :: self
             type(type_controls), intent(in) :: controls
+            type(type_assemble_workspace), intent(inout) :: workspace
+            type(type_matrix_dense), intent(inout), optional :: K_TT
+            type(type_matrix_dense), intent(inout), optional :: K_TH
+            type(type_vector_dp), intent(inout), optional :: F_T
 
-        end subroutine solve_type_thermal_crs
+        end subroutine assemble_local_newton_thermal
 
-        module subroutine compute_type_thermal_crs(self, domain, property, temperature, porosity, controls, bc)
+        module subroutine assemble_local_picard_thermal(self, controls, workspace, K_TT, K_TH, F_T)
             implicit none
-            class(type_thermal_crs), intent(inout) :: self
-            type(type_domain), intent(inout) :: domain
-            type(type_properties_manager), intent(in) :: property
-            type(type_variable), intent(inout) :: temperature
-            type(type_variable), intent(inout) :: porosity
-            type(type_controls), intent(inout) :: controls
-            type(type_bc), intent(inout) :: bc
+            class(type_thermal), intent(in) :: self
+            type(type_controls), intent(in) :: controls
+            type(type_assemble_workspace), intent(inout) :: workspace
+            type(type_matrix_dense), intent(inout), optional :: K_TT
+            type(type_matrix_dense), intent(inout), optional :: K_TH
+            type(type_vector_dp), intent(inout), optional :: F_T
 
-        end subroutine compute_type_thermal_crs
+        end subroutine assemble_local_picard_thermal
 
-    end interface
-
-    interface type_thermal_crs
-        module procedure :: construct_type_thermal_crs
     end interface
 
 contains

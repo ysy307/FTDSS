@@ -1,235 +1,988 @@
+!>
+!> Manages the computational domain, including mesh, boundary conditions, and parallel data.
+!>
 module domain_manager
-    use, intrinsic :: iso_fortran_env, only: int32
+    use, intrinsic :: iso_fortran_env
+    use :: mpi_f08
     use :: stdlib_logger
-    use :: module_core, only:type_dp_3d, allocate_array, deallocate_array
-    use :: module_input, only:type_input
-    use :: module_mesh
-    use :: domain_adjacency, only:type_node_adjacency, type_crs_adjacency_element, type_map_node_to_element
-    use :: domain_multicoloring, only:type_coloring, type_colored_info
-    use :: domain_reordering, only:type_reordering
+    use :: stdlib_strings, only:strip
+    use :: module_core
+    use :: module_input, only:type_input, input_translator
+    use :: module_control, only:type_controls
+    use :: module_fe, only:type_fe_manager, abst_fe
+    use :: module_boundary
+    use :: domain_multicoloring, only:type_coloring
+    use :: domain_adjacency, only:type_node_adjacency, type_map_node_to_element
+
     implicit none
     private
 
     public :: type_domain
 
-    type :: type_domain
-        integer(int32), private :: num_sides
-        integer(int32), private :: num_elements
-        integer(int32), private :: num_volumes
-        integer(int32), private :: num_nodes
-        integer(int32), private :: num_materials
-        type(holder_elements), allocatable :: elements(:) !&
-        type(holder_sides),    allocatable :: sides(:) !&
-
-        type(type_coloring) :: colors
-        type(type_reordering) :: reordering
-        type(type_node_adjacency) :: node_adjacency
-        type(type_crs_adjacency_element) :: element_adjacency
-        type(type_map_node_to_element) :: map_node_to_element
-
-        integer(int32), private :: computation_dimension
-        ! ...
+    !>
+    !> Stores element connectivity in Compressed Sparse Row (CSR) format.
+    !>
+    type :: type_fe_connectivity
+        !> Index array for CSR format. Stores the starting position of each element's nodes in 'val'.
+        !> Size is (num_elements + 1).
+        integer(int32), allocatable :: ind(:)
+        !> Value array for CSR format. Stores the concatenated node IDs for all elements.
+        integer(int32), allocatable :: val(:)
     contains
-        procedure, pass(self) :: initialize => initialize_type_domain
-        procedure, pass(self) :: apply_reordering
+        procedure, public, pass(self) :: display => display_connectivity
+    end type type_fe_connectivity
 
-        procedure, pass(self) :: get_num_elements
-        procedure, pass(self) :: get_num_sides
-        procedure, pass(self) :: get_num_nodes
-        procedure, pass(self) :: get_num_materials
-        procedure, pass(self) :: get_computation_dimension
+    !>
+    !> Represents a single, unique boundary condition applied to a set of geometric entities.
+    !>
+    type :: type_boundary_patch
+        !> The integer ID representing the type of boundary condition (e.g., Dirichlet, Neumann).
+        integer(int32) :: type_id = -1
+        !> The number of elements (sides) this boundary condition applies to.
+        integer(int32) :: num_elements = 0
+        !> Array of finite element type IDs for each element in this BC set.
+        integer(int32), allocatable :: element_types(:)
+        !> Manager for FE type-specific operations (shape functions, etc.).
+        type(type_fe_manager) :: fe_manager
+        !> Connectivity data for the elements in this BC set.
+        type(type_fe_connectivity) :: connectivity
+        !> The polymorphic boundary condition logic.
+        class(abst_bc), allocatable :: condition
+    contains
+        procedure, public, pass(self) :: display => display_boundary_patch
+    end type type_boundary_patch
+
+    !>
+    !> Manages all boundary conditions for a single physics type.
+    !>
+    type :: type_physics_bc_manager
+        !> The number of unique boundary conditions for this physics.
+        integer(int32) :: num_bcs = 0
+        !> Array of unique boundary condition sets.
+        type(type_boundary_patch), allocatable :: bcs(:)
+    contains
+        procedure, public, pass(self) :: display => display_physics_bc_manager
+    end type type_physics_bc_manager
+
+    !>
+    !> Top-level manager for all boundary conditions across all physics types.
+    !>
+    type :: type_boundary_manager
+        !> Pointer to the parent domain object.
+        type(type_domain), pointer, private :: parent => null()
+        !> Array of BC managers, one for each physics type.
+        type(type_physics_bc_manager) :: physics(NUM_PHYSICS_TYPES)
+    contains
+        procedure, public, pass(self) :: initialize => initialize_boundary_manager
+        procedure, private, pass(self) :: process_single_physics_bcs
+        procedure, private, pass(self) :: filter_active_bcs
+        procedure, private, pass(self) :: create_entity_id_to_group_map
+        procedure, private, pass(self) :: measure_and_allocate_bc_geometry
+        procedure, private, pass(self) :: store_bc_geometry
+        procedure, private, pass(self) :: create_bc_instances
+        procedure, public, pass(self) :: display => display_boundary_manager
+    end type type_boundary_manager
+
+    !>
+    !> Stores the mapping and layout of degrees of freedom (DOF) per node.
+    !>
+    type :: type_dof_map
+        !> Total number of degrees of freedom per node for the active physics.
+        integer(int32) :: num_dof_per_node = 0
+        !> Number of DOFs for each individual physics type.
+        integer(int32) :: num_dof_of_physics(NUM_PHYSICS_TYPES) = 0
+        !> The starting index for each physics' DOFs within the block of DOFs for a single node.
+        integer(int32) :: start_dof_index(NUM_PHYSICS_TYPES) = 0
+    contains
+        procedure, public, pass(self) :: display => display_dof_map
+    end type type_dof_map
+
+    !>
+    !> Manages all data related to nodes (points) in the domain.
+    !>
+    type :: type_node_manager
+        !> Pointer to the parent domain object.
+        type(type_domain), pointer, private :: parent => null()
+        !> Number of nodes in this subdomain.
+        integer(int32) :: num_nodes = 0
+        !> Nodal coordinates. Size: (computation_dimension, num_nodes).
+        real(real64), allocatable :: coordinates(:, :)
+        !> Global ID for each node in this subdomain.
+        integer(int32), allocatable :: node_global_ids(:)
+    contains
+        procedure, public, pass(self) :: initialize => initialize_node_manager
+        procedure, public, pass(self) :: display => display_node_manager
+    end type type_node_manager
+
+    !>
+    !> Manages all data related to volume elements in the domain.
+    !>
+    type :: type_element_manager
+        !> Pointer to the parent domain object.
+        type(type_domain), pointer, private :: parent => null()
+        !> Number of elements in this subdomain.
+        integer(int32) :: num_elements = 0
+        !> Finite element type ID for each element.
+        integer(int32), allocatable :: fe_types(:)
+        !> Material ID for each element.
+        integer(int32), allocatable :: fe_material_ids(:)
+        !> Manager for FE type-specific operations.
+        type(type_fe_manager) :: fe_manager
+        !> Connectivity data for all elements.
+        type(type_fe_connectivity) :: connectivity
+        !> Coloring information for parallel element processing.
+        type(type_coloring) :: colors
+    contains
+        procedure, public, pass(self) :: initialize => initialize_element_manager
+        procedure, public, pass(self) :: display => display_element_manager
+    end type type_element_manager
+
+    !>
+    !> The main container for all simulation domain data.
+    !>
+    type :: type_domain
+        !> MPI rank of the current process.
+        integer(int32) :: my_rank = -1
+        !> Total number of MPI processes.
+        integer(int32) :: num_procs = -1
+        !> The spatial dimension of the computation (e.g., 2 for 2D, 3 for 3D).
+        integer(int32) :: computation_dimension
+        !> The type of computation (e.g., 1 for XY-plane, 2 for XZ-plane, 3 for 3D).
+        integer(int32), private :: computation_type
+        !> The type of coupling (e.g., staggered or monolithic).
+        integer(int32) :: coupling_mode
+        !> Manages the degree of freedom layout.
+        type(type_dof_map) :: dof_map
+        !> Manages all nodal data.
+        type(type_node_manager) :: nodes
+        !> Manages all element data.
+        type(type_element_manager) :: elements
+        !> Node adjacency information for all nodes in the domain.
+        type(type_node_adjacency) :: node_adjacency
+        !> Element-to-node adjacency information.
+        type(type_map_node_to_element) :: element_adjacency
+        !> Manages all boundary condition data.
+        type(type_boundary_manager) :: boundaries
+        !> Indicates whether the domain is associated with a parent.
+        logical, private :: is_associated = .false.
+    contains
+        procedure, public, pass(self) :: initialize => initialize_type_domain
+        procedure, private, pass(self) :: associate_parent
+        procedure, private, pass(self) :: set_basic_info_and_dof_map
+        procedure, public, pass(self) :: get_num_nodes => get_num_nodes_domain
+        procedure, public, pass(self) :: get_num_elements => get_num_elements_domain
+        procedure, public, pass(self) :: get_num_dofs_per_node => get_num_dofs_per_node_domain
+        procedure, public, pass(self) :: get_total_dofs => get_total_dofs_domain
+        procedure, public, pass(self) :: get_computation_dimension => get_computation_dimension_domain
+        procedure, public, pass(self) :: get_computation_type => get_computation_type_domain
+        procedure, public, pass(self) :: get_coupling_mode => get_coupling_mode_domain
+        procedure, public, pass(self) :: get_node_adjacency => get_node_adjacency_domain
+        procedure, public, pass(self) :: get_element => get_element_domain
+        procedure, public, pass(self) :: get_element_connectivity => get_element_connectivity_domain
+        procedure, public, pass(self) :: get_element_coordinate => get_element_coordinate_domain
+        procedure, public, pass(self) :: get_target_dof => get_target_dof_domain
+        procedure, public, pass(self) :: get_material_id => get_material_id_domain
+        procedure, public, pass(self) :: get_num_colors => get_num_colors_domain
+        procedure, public, pass(self) :: get_colored_elements => get_colored_elements_domain
+        procedure, public, pass(self) :: calc_measure => calc_measure_domain
+
+        procedure, private, pass(self) :: lerp_1d_domain
+        procedure, private, pass(self) :: lerp_2d_domain
+        procedure, private, pass(self) :: lerp_3d_domain
+        generic, public :: lerp => lerp_1d_domain, lerp_2d_domain, lerp_3d_domain
+        procedure, public, pass(self) :: dlerp => dlerp_domain
+        procedure, public, pass(self) :: display => display_domain
     end type type_domain
 
 contains
-    subroutine initialize_type_domain(self, input, Coordinate)
+
+    !> Initializes the entire domain object and its components.
+    subroutine initialize_type_domain(self, input, controls)
         implicit none
         class(type_domain), intent(inout) :: self
         type(type_input), intent(in) :: input
-        type(type_dp_3d), intent(inout), pointer :: Coordinate
+        type(type_controls), intent(in) :: controls
 
-        integer(int32) :: count_sides, count_elements, count_volumes
-        integer(int32) :: iCell, iElem, iSide
-        integer(int32) :: cell_dimension
+        if (.not. self%is_associated) call self%associate_parent(self%nodes, self%elements, self%boundaries)
+        call self%set_basic_info_and_dof_map(input)
 
-        ! -----------------------------------------------------------------------------------
-        ! 初期化処理
-        ! -----------------------------------------------------------------------------------
-        count_sides = 0
-        count_elements = 0
-        count_volumes = 0
-
-        do iCell = 1, input%geometry%vtk%num_total_cells
-            cell_dimension = input%geometry%vtk%cells(iCell)%get_dimension()
-            select case (cell_dimension)
-            case (1)
-                count_sides = count_sides + 1
-            case (2)
-                count_elements = count_elements + 1
-            case (3)
-                count_volumes = count_volumes + 1
-            end select
-        end do
-
-        self%num_elements = count_elements
-        self%num_sides = count_sides
-        self%num_nodes = input%geometry%vtk%num_points
-        self%num_materials = input%basic%num_materials
-
-        if (allocated(self%elements)) deallocate (self%elements)
-        allocate (self%elements(self%num_elements))
-        if (allocated(self%sides)) deallocate (self%sides)
-        allocate (self%sides(self%num_sides))
-
-        iElem = 1
-        iSide = 1
-        do iCell = 1, input%geometry%vtk%num_total_cells
-            cell_dimension = input%geometry%vtk%cells(iCell)%get_dimension()
-            select case (cell_dimension)
-            case (1)
-                self%sides(iSide)%s = create_side(id=iCell, &
-                                                  global_coordinate=Coordinate, &
-                                                  input=input)
-                iSide = iSide + 1
-            case (2)
-                self%elements(iElem)%e = create_element(id=iCell, &
-                                                        global_coordinate=Coordinate, &
-                                                        input=input)
-                iElem = iElem + 1
-            case (3)
-                !!TBI
-            end select
-
-        end do
-
-        self%computation_dimension = input%basic%simulation_settings%calculate_dimension
-
-        !===============================================================
-        ! 3. 隣接行列の構築
-        !===============================================================
-        call self%node_adjacency%initialize(self%num_nodes, self%computation_dimension, self%sides, self%elements)
-        call self%element_adjacency%initialize(self%elements)
-        call self%map_node_to_element%initialize(self%num_nodes, self%elements, "fast")
-
-        !===============================================================
-        ! 4. RCM並べ替えの実行
-        !===============================================================
-        call self%reordering%initialize(input%basic%solver_settings%reordering, self%node_adjacency)
-        if (input%basic%solver_settings%reordering /= "none") then
-            call self%apply_reordering()
-            call global_logger%log_information(message="RCM reordering completed.")
-        end if
-
-        !===============================================================
-        ! 5. グラフ彩色の実行
-        !===============================================================
-        call self%colors%initialize(input%basic%solver_settings%coloring, self%element_adjacency)
-        call global_logger%log_information(message="Graph coloring completed using " &
-                                           //trim(self%colors%algorithm_name)//" algorithm.")
-
-        call global_logger%log_information(message="Initialization process completed successfully.")
-
+        call self%nodes%initialize(input)
+        call self%elements%initialize(input)
+        call self%node_adjacency%initialize(self%nodes%num_nodes, self%elements%connectivity%ind, self%elements%connectivity%val)
+        call self%element_adjacency%initialize(self%nodes%num_nodes, self%elements%num_elements, &
+                                               self%elements%connectivity%ind, self%elements%connectivity%val)
+        call self%boundaries%initialize(input, controls)
     end subroutine initialize_type_domain
 
-    function get_num_elements(self) result(num_elements)
+    !> Associates child manager components with this parent domain object.
+    subroutine associate_parent(self, node, element, boundary)
         implicit none
-        class(type_domain), intent(in) :: self
-        integer(int32) :: num_elements
+        class(type_domain), intent(inout), target :: self
+        class(type_node_manager), intent(inout) :: node
+        class(type_element_manager), intent(inout) :: element
+        class(type_boundary_manager), intent(inout) :: boundary
 
-        num_elements = self%num_elements
+        node%parent => self
+        element%parent => self
+        boundary%parent => self
+        self%is_associated = .true.
+    end subroutine associate_parent
 
-    end function get_num_elements
-
-    function get_num_sides(self) result(num_sides)
-        implicit none
-        class(type_domain), intent(in) :: self
-        integer(int32) :: num_sides
-
-        num_sides = self%num_sides
-
-    end function get_num_sides
-
-    function get_num_nodes(self) result(num_nodea)
-        implicit none
-        class(type_domain), intent(in) :: self
-        integer(int32) :: num_nodea
-
-        num_nodea = self%num_nodes
-
-    end function get_num_nodes
-
-    function get_num_materials(self) result(num_materials)
-        implicit none
-        class(type_domain), intent(in) :: self
-        integer(int32) :: num_materials
-
-        num_materials = self%num_materials
-
-    end function get_num_materials
-
-    function get_computation_dimension(self) result(computation_dimension)
-        implicit none
-        class(type_domain), intent(in) :: self
-        integer(int32) :: computation_dimension
-
-        computation_dimension = self%computation_dimension
-
-    end function get_computation_dimension
-
-    subroutine apply_reordering(self)
+    !> Sets basic simulation info and configures the DOF map based on input settings.
+    subroutine set_basic_info_and_dof_map(self, input)
         implicit none
         class(type_domain), intent(inout) :: self
+        type(type_input), intent(in) :: input
+        integer(int32) :: current_dof_index
 
-        integer(int32) :: iElem, iSide, i
-        integer(int32), dimension(:), pointer :: ptr_connectivity => null()
-        integer(int32), allocatable :: connectivity(:)
-        integer(int32), allocatable :: connectivity_reordered(:)
-        integer(int32) :: node_per_mesh
+        call MPI_Comm_rank(MPI_COMM_WORLD, self%my_rank)
+        call MPI_Comm_size(MPI_COMM_WORLD, self%num_procs)
+        self%computation_dimension = input%basic%simulation_settings%calculate_dimension
+        self%computation_type = input%basic%simulation_settings%calculate_type
 
-        if (self%computation_dimension >= 3) then
-            !! TBI: Handle 3D reordering if necessary
+        self%dof_map%num_dof_of_physics(PHYSICS_TYPE_THERMAL) = 1
+        self%dof_map%num_dof_of_physics(PHYSICS_TYPE_HYDRAULIC) = 1
+        self%dof_map%num_dof_of_physics(PHYSICS_TYPE_MECHANICAL) = self%computation_dimension
+
+        current_dof_index = 1
+        if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_THERMAL)) then
+            self%dof_map%start_dof_index(PHYSICS_TYPE_THERMAL) = current_dof_index
+            current_dof_index = current_dof_index + self%dof_map%num_dof_of_physics(PHYSICS_TYPE_THERMAL)
+        end if
+        if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_HYDRAULIC)) then
+            self%dof_map%start_dof_index(PHYSICS_TYPE_HYDRAULIC) = current_dof_index
+            current_dof_index = current_dof_index + self%dof_map%num_dof_of_physics(PHYSICS_TYPE_HYDRAULIC)
+        end if
+        if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_MECHANICAL)) then
+            self%dof_map%start_dof_index(PHYSICS_TYPE_MECHANICAL) = current_dof_index
+            current_dof_index = current_dof_index + self%dof_map%num_dof_of_physics(PHYSICS_TYPE_MECHANICAL)
+        end if
+        self%dof_map%num_dof_per_node = current_dof_index - 1
+
+        select case (input%basic%analysis_controls%coupling_mode)
+        case (COUPLING_MODE_STAGGERED)
+            self%coupling_mode = COUPLING_MODE_STAGGERED
+        case (COUPLING_MODE_MONOLITHIC)
+            self%coupling_mode = COUPLING_MODE_MONOLITHIC
+        end select
+    end subroutine set_basic_info_and_dof_map
+
+    !> Initializes the node manager by reading data from the input object.
+    subroutine initialize_node_manager(self, input)
+        implicit none
+        class(type_node_manager), intent(inout) :: self
+        type(type_input), intent(in) :: input
+
+        self%num_nodes = input%geometry%vtk%num_points
+
+        if (allocated(self%coordinates)) deallocate (self%coordinates)
+        allocate (self%coordinates(3, self%num_nodes))
+
+        self%coordinates(1, :) = input%geometry%vtk%points%x(1:self%num_nodes)
+        self%coordinates(2, :) = input%geometry%vtk%points%y(1:self%num_nodes)
+        self%coordinates(3, :) = input%geometry%vtk%points%z(1:self%num_nodes)
+
+        if (allocated(self%node_global_ids)) deallocate (self%node_global_ids)
+        call allocate_array(self%node_global_ids, self%num_nodes)
+        self%node_global_ids(:) = input%geometry%vtk%global_node_ids(1:self%num_nodes)
+    end subroutine initialize_node_manager
+
+    !> Initializes the element manager by reading and organizing element data.
+    subroutine initialize_element_manager(self, input)
+        implicit none
+        class(type_element_manager), intent(inout) :: self
+        type(type_input), intent(in) :: input
+        integer(int32) :: i, ind, num_total_cells, num_total_connectivity
+
+        num_total_cells = input%geometry%vtk%num_total_cells
+
+        self%num_elements = 0
+        num_total_connectivity = 0
+        do i = 1, num_total_cells
+            if (input%geometry%vtk%cells(i)%get_dimension() == self%parent%computation_dimension) then
+                self%num_elements = self%num_elements + 1
+                num_total_connectivity = num_total_connectivity + input%geometry%vtk%cells(i)%num_nodes_in_cell
+            end if
+        end do
+
+        if (allocated(self%fe_types)) deallocate (self%fe_types)
+        if (allocated(self%fe_material_ids)) deallocate (self%fe_material_ids)
+        if (allocated(self%connectivity%ind)) deallocate (self%connectivity%ind)
+        if (allocated(self%connectivity%val)) deallocate (self%connectivity%val)
+
+        if (self%num_elements > 0) then
+            call allocate_array(self%fe_types, self%num_elements)
+            call allocate_array(self%fe_material_ids, self%num_elements)
+            call allocate_array(self%connectivity%ind, self%num_elements + 1)
+            call allocate_array(self%connectivity%val, num_total_connectivity)
         end if
 
-        if (self%computation_dimension >= 2) then
-            do iElem = 1, self%get_num_elements()
-                ptr_connectivity => self%elements(iElem)%e%get_connectivity()
-                node_per_mesh = self%elements(iElem)%e%get_num_nodes()
-                call allocate_array(connectivity, node_per_mesh)
-                call allocate_array(connectivity_reordered, node_per_mesh)
-
-                do i = 1, node_per_mesh
-                    connectivity(i) = ptr_connectivity(i)
-                end do
-                call self%reordering%to_reordered(connectivity, connectivity_reordered)
-                do i = 1, node_per_mesh
-                    ptr_connectivity(i) = connectivity_reordered(i)
-                end do
-
-                call deallocate_array(connectivity)
-                call deallocate_array(connectivity_reordered)
+        if (self%num_elements > 0) then
+            self%connectivity%ind(1) = 1
+            ind = 0
+            do i = 1, num_total_cells
+                if (input%geometry%vtk%cells(i)%get_dimension() == self%parent%computation_dimension) then
+                    ind = ind + 1
+                    self%fe_types(ind) = input%geometry%vtk%cells(i)%cell_type
+                    self%fe_material_ids(ind) = input%geometry%vtk%cells(i)%cell_entity_id
+                    self%connectivity%ind(ind + 1) = self%connectivity%ind(ind) + input%geometry%vtk%cells(i)%num_nodes_in_cell
+                    self%connectivity%val(self%connectivity%ind(ind):self%connectivity%ind(ind + 1) - 1) = &
+                        input%geometry%vtk%cells(i)%connectivity(1:input%geometry%vtk%cells(i)%num_nodes_in_cell)
+                end if
             end do
         end if
 
-        if (self%computation_dimension >= 1) then
-            do iSide = 1, self%get_num_sides()
-                ptr_connectivity => self%sides(iSide)%s%get_connectivity()
-                node_per_mesh = self%sides(iSide)%s%get_num_nodes()
-                call allocate_array(connectivity, node_per_mesh)
-                call allocate_array(connectivity_reordered, node_per_mesh)
+        call self%fe_manager%initialize(input%basic%geometry_settings%integration_order, self%num_elements, self%fe_types)
+        call self%colors%initialize(input)
+    end subroutine initialize_element_manager
 
-                do i = 1, node_per_mesh
-                    connectivity(i) = ptr_connectivity(i)
-                end do
-                call self%reordering%to_reordered(connectivity, connectivity_reordered)
-                do i = 1, node_per_mesh
-                    ptr_connectivity(i) = connectivity_reordered(i)
-                end do
+    !> Initializes the boundary manager by processing BCs for all active physics.
+    subroutine initialize_boundary_manager(self, input, controls)
+        implicit none
+        class(type_boundary_manager), intent(inout) :: self
+        type(type_input), intent(in) :: input
+        type(type_controls), intent(in) :: controls
 
-                call deallocate_array(connectivity)
-                call deallocate_array(connectivity_reordered)
+        if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_THERMAL)) then
+            call self%process_single_physics_bcs(PHYSICS_TYPE_THERMAL, input, controls)
+        end if
+        if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_HYDRAULIC)) then
+            call self%process_single_physics_bcs(PHYSICS_TYPE_HYDRAULIC, input, controls)
+        end if
+        if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_MECHANICAL)) then
+            call self%process_single_physics_bcs(PHYSICS_TYPE_MECHANICAL, input, controls)
+        end if
+    end subroutine initialize_boundary_manager
 
+    ! --------------------------------------------------------------------------
+    ! Refactored Boundary Condition Processing
+    ! --------------------------------------------------------------------------
+
+    !> Processes and groups all boundary conditions for a single physics type.
+    subroutine process_single_physics_bcs(self, physics_type_id, input, controls)
+        implicit none
+        class(type_boundary_manager), intent(inout) :: self
+        integer(int32), intent(in) :: physics_type_id
+        type(type_input), intent(in) :: input
+        type(type_controls), intent(in) :: controls
+
+        integer(int32) :: target_dimension, num_groups
+        integer(int32), allocatable :: bc_idx_list(:)
+        integer(int32), allocatable :: entity_id_to_group_idx_map(:)
+        integer(int32), allocatable :: group_to_cell_types(:)
+
+        target_dimension = self%parent%computation_dimension - 1
+        if (target_dimension < 1) return
+
+        ! Step 1: Filter active BCs
+        call self%filter_active_bcs(physics_type_id, input, target_dimension, bc_idx_list)
+        if (.not. allocated(bc_idx_list)) return
+
+        ! Step 2: Create map
+        num_groups = size(bc_idx_list)
+        self%physics(physics_type_id)%num_bcs = num_groups
+
+        if (allocated(self%physics(physics_type_id)%bcs)) deallocate (self%physics(physics_type_id)%bcs)
+        allocate (self%physics(physics_type_id)%bcs(num_groups))
+
+        call self%create_entity_id_to_group_map(input, bc_idx_list, entity_id_to_group_idx_map)
+
+        ! Step 3 & 4: Measure and Store
+        call self%measure_and_allocate_bc_geometry(input, target_dimension, entity_id_to_group_idx_map, &
+                                                   self%physics(physics_type_id)%bcs)
+        call self%store_bc_geometry(input, target_dimension, entity_id_to_group_idx_map, &
+                                    self%physics(physics_type_id)%bcs, group_to_cell_types)
+
+        ! Step 5: Create instances
+        call self%create_bc_instances(physics_type_id, input, controls, bc_idx_list, group_to_cell_types, &
+                                      self%physics(physics_type_id)%bcs)
+
+        ! Cleanup
+        if (allocated(entity_id_to_group_idx_map)) call deallocate_array(entity_id_to_group_idx_map)
+        if (allocated(bc_idx_list)) call deallocate_array(bc_idx_list)
+        if (allocated(group_to_cell_types)) call deallocate_array(group_to_cell_types)
+    end subroutine process_single_physics_bcs
+
+    !> Step 1: Filters boundary conditions.
+    subroutine filter_active_bcs(self, physics_type_id, input, target_dimension, bc_idx_list)
+        implicit none
+        class(type_boundary_manager), intent(in) :: self
+        integer(int32), intent(in) :: physics_type_id
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: target_dimension
+        integer(int32), allocatable, intent(inout) :: bc_idx_list(:)
+
+        integer(int32) :: i, num_active_bcs
+        integer(int32), allocatable :: active_region_id(:)
+        logical :: is_bc_active
+
+        if (allocated(bc_idx_list)) deallocate (bc_idx_list)
+
+        call input%geometry%vtk%get_active_region_info(active_region_id, target_dimension)
+        if (.not. allocated(active_region_id)) return
+
+        num_active_bcs = 0
+        do i = 1, input%conditions%num_boundaries
+            is_bc_active = is_boundary_condition_active(i, physics_type_id, input, active_region_id)
+            if (is_bc_active) then
+                num_active_bcs = num_active_bcs + 1
+            end if
+        end do
+
+        if (num_active_bcs > 0) then
+            allocate (bc_idx_list(num_active_bcs))
+            num_active_bcs = 0
+            do i = 1, input%conditions%num_boundaries
+                is_bc_active = is_boundary_condition_active(i, physics_type_id, input, active_region_id)
+                if (is_bc_active) then
+                    num_active_bcs = num_active_bcs + 1
+                    bc_idx_list(num_active_bcs) = i
+                end if
             end do
         end if
 
-    end subroutine apply_reordering
+        call deallocate_array(active_region_id)
+    end subroutine filter_active_bcs
+
+    !> Step 2: Creates a mapping.
+    subroutine create_entity_id_to_group_map(self, input, bc_idx_list, entity_map)
+        implicit none
+        class(type_boundary_manager), intent(in) :: self
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: bc_idx_list(:)
+        integer(int32), allocatable, intent(inout) :: entity_map(:)
+
+        integer(int32) :: i, max_id, bc_id
+
+        if (allocated(entity_map)) deallocate (entity_map)
+
+        max_id = maxval(input%conditions%boundary_conditions(:)%id)
+        call allocate_array(entity_map, max_id)
+        entity_map = 0
+        do i = 1, size(bc_idx_list)
+            bc_id = input%conditions%boundary_conditions(bc_idx_list(i))%id
+            entity_map(bc_id) = i
+        end do
+    end subroutine create_entity_id_to_group_map
+
+    !> Step 3: Measures connectivity size.
+    subroutine measure_and_allocate_bc_geometry(self, input, target_dimension, entity_map, bcs)
+        implicit none
+        class(type_boundary_manager), intent(in) :: self
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: target_dimension
+        integer(int32), intent(in) :: entity_map(:)
+        class(type_boundary_patch), intent(inout) :: bcs(:)
+
+        integer(int32) :: i, cell_entity_id, group_idx, num_total_cells
+        integer(int32), allocatable :: total_conn_per_group(:)
+
+        call allocate_array(total_conn_per_group, size(bcs))
+        total_conn_per_group = 0
+
+        num_total_cells = input%geometry%vtk%num_total_cells
+        do i = 1, num_total_cells
+            if (input%geometry%vtk%cells(i)%cell_dimension == target_dimension) then
+                cell_entity_id = input%geometry%vtk%cells(i)%cell_entity_id
+                if (cell_entity_id > size(entity_map)) cycle
+                if (entity_map(cell_entity_id) == 0) cycle
+
+                group_idx = entity_map(cell_entity_id)
+                bcs(group_idx)%num_elements = bcs(group_idx)%num_elements + 1
+                total_conn_per_group(group_idx) = total_conn_per_group(group_idx) &
+                                                  + input%geometry%vtk%cells(i)%num_nodes_in_cell
+            end if
+        end do
+
+        do i = 1, size(bcs)
+            if (bcs(i)%num_elements > 0) then
+                if (allocated(bcs(i)%element_types)) deallocate (bcs(i)%element_types)
+                if (allocated(bcs(i)%connectivity%ind)) deallocate (bcs(i)%connectivity%ind)
+                if (allocated(bcs(i)%connectivity%val)) deallocate (bcs(i)%connectivity%val)
+
+                call allocate_array(bcs(i)%element_types, bcs(i)%num_elements)
+                call allocate_array(bcs(i)%connectivity%ind, bcs(i)%num_elements + 1)
+                call allocate_array(bcs(i)%connectivity%val, total_conn_per_group(i))
+                bcs(i)%connectivity%ind(1) = 1
+            end if
+        end do
+
+        call deallocate_array(total_conn_per_group)
+    end subroutine measure_and_allocate_bc_geometry
+
+    !> Step 4: Stores connectivity.
+    subroutine store_bc_geometry(self, input, target_dimension, entity_map, bcs, group_cell_types)
+        implicit none
+        class(type_boundary_manager), intent(in) :: self
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: target_dimension
+        integer(int32), intent(in) :: entity_map(:)
+        class(type_boundary_patch), intent(inout) :: bcs(:)
+        integer(int32), allocatable, intent(inout) :: group_cell_types(:)
+
+        integer(int32) :: i, cell_entity_id, group_idx, num_nodes, num_total_cells
+        integer(int32), allocatable :: current_elem_indices(:)
+
+        if (allocated(group_cell_types)) deallocate (group_cell_types)
+
+        allocate (current_elem_indices(size(bcs)), group_cell_types(size(bcs)))
+        current_elem_indices = 0
+        group_cell_types = -1
+
+        num_total_cells = input%geometry%vtk%num_total_cells
+        do i = 1, num_total_cells
+            if (input%geometry%vtk%cells(i)%cell_dimension == target_dimension) then
+                cell_entity_id = input%geometry%vtk%cells(i)%cell_entity_id
+                if (cell_entity_id > size(entity_map)) cycle
+                if (entity_map(cell_entity_id) == 0) cycle
+
+                group_idx = entity_map(cell_entity_id)
+                current_elem_indices(group_idx) = current_elem_indices(group_idx) + 1
+                num_nodes = input%geometry%vtk%cells(i)%num_nodes_in_cell
+
+                bcs(group_idx)%element_types(current_elem_indices(group_idx)) = input%geometry%vtk%cells(i)%cell_type
+                bcs(group_idx)%connectivity%ind(current_elem_indices(group_idx) + 1) = &
+                    bcs(group_idx)%connectivity%ind(current_elem_indices(group_idx)) + num_nodes
+                bcs(group_idx)%connectivity%val( &
+                    bcs(group_idx)%connectivity%ind(current_elem_indices(group_idx)): &
+                    bcs(group_idx)%connectivity%ind(current_elem_indices(group_idx) + 1) - 1) = &
+                    input%geometry%vtk%cells(i)%connectivity(1:num_nodes)
+
+                if (group_cell_types(group_idx) < 0) group_cell_types(group_idx) = input%geometry%vtk%cells(i)%cell_type
+            end if
+        end do
+        call deallocate_array(current_elem_indices)
+    end subroutine store_bc_geometry
+
+    !> Step 5: Creates instances of the polymorphic boundary condition objects.
+    subroutine create_bc_instances(self, physics_type_id, input, controls, bc_idx_list, group_cell_types, bcs)
+        implicit none
+        class(type_boundary_manager), intent(in) :: self
+        integer(int32), intent(in) :: physics_type_id
+        type(type_input), intent(in) :: input
+        type(type_controls), intent(in) :: controls
+        integer(int32), intent(in) :: bc_idx_list(:), group_cell_types(:)
+        class(type_boundary_patch), intent(inout) :: bcs(:)
+
+        integer(int32) :: i, original_input_idx, bc_type, bc_id
+
+        type(type_config_bc) :: config
+
+        do i = 1, size(bcs)
+            original_input_idx = bc_idx_list(i)
+
+            ! bc_id = input%conditions%boundary_conditions(original_input_idx)%id
+            bcs(i)%type_id = bc_type
+
+            select case (physics_type_id)
+            case (PHYSICS_TYPE_THERMAL)
+                call input_translator%execute(input, original_input_idx, PHYSICS_TYPES%THERMAL, config)
+                bcs(i)%condition = create_boundary_conditions(config)
+            case (PHYSICS_TYPE_HYDRAULIC)
+                call input_translator%execute(input, original_input_idx, PHYSICS_TYPES%HYDRAULIC, config)
+                bcs(i)%condition = create_boundary_conditions(config)
+            end select
+
+            call bcs(i)%fe_manager%initialize(input%basic%geometry_settings%integration_order, 1, group_cell_types)
+        end do
+    end subroutine create_bc_instances
+
+    ! --------------------------------------------------------------------------
+    ! Helper Functions for BC Processing
+    ! --------------------------------------------------------------------------
+
+    !> Checks if a given boundary condition is active for the current physics and region.
+    pure function is_boundary_condition_active(idx, physics_type_id, input, active_region_id) result(is_active)
+        implicit none
+        integer(int32), intent(in) :: idx, physics_type_id
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: active_region_id(:)
+        logical :: is_active
+
+        is_active = .false.
+        select case (physics_type_id)
+        case (PHYSICS_TYPE_THERMAL)
+            if (input%conditions%boundary_conditions(idx)%physics(PHYSICS_TYPE_THERMAL)%is_active .and. &
+                any(active_region_id == input%conditions%boundary_conditions(idx)%id)) then
+                is_active = .true.
+            end if
+        case (PHYSICS_TYPE_HYDRAULIC)
+            if (input%conditions%boundary_conditions(idx)%physics(PHYSICS_TYPE_HYDRAULIC)%is_active .and. &
+                any(active_region_id == input%conditions%boundary_conditions(idx)%id)) then
+                is_active = .true.
+            end if
+        case (PHYSICS_TYPE_MECHANICAL)
+            ! Not implemented
+        end select
+    end function is_boundary_condition_active
+
+    ! --------------------------------------------------------------------------
+    ! Getter Functions
+    ! --------------------------------------------------------------------------
+
+    pure subroutine get_num_nodes_domain(self, num_nodes)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(inout) :: num_nodes
+
+        num_nodes = self%nodes%num_nodes
+    end subroutine get_num_nodes_domain
+
+    pure subroutine get_num_elements_domain(self, num_elements)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(inout) :: num_elements
+
+        num_elements = self%elements%num_elements
+    end subroutine get_num_elements_domain
+
+    pure subroutine get_num_dofs_per_node_domain(self, num_dofs_per_node)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(inout) :: num_dofs_per_node
+
+        num_dofs_per_node = self%dof_map%num_dof_per_node
+    end subroutine get_num_dofs_per_node_domain
+
+    pure subroutine get_total_dofs_domain(self, total_dofs)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(inout) :: total_dofs
+
+        total_dofs = self%nodes%num_nodes * self%dof_map%num_dof_per_node
+    end subroutine get_total_dofs_domain
+
+    pure subroutine get_computation_dimension_domain(self, computation_dimension)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(inout) :: computation_dimension
+
+        computation_dimension = self%computation_dimension
+    end subroutine get_computation_dimension_domain
+
+    pure subroutine get_computation_type_domain(self, computation_type)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(inout) :: computation_type
+
+        computation_type = self%computation_type
+    end subroutine get_computation_type_domain
+
+    pure subroutine get_coupling_mode_domain(self, coupling_mode)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(inout) :: coupling_mode
+
+        coupling_mode = self%coupling_mode
+    end subroutine get_coupling_mode_domain
+
+    subroutine get_node_adjacency_domain(self, matrix_type, row, col)
+        implicit none
+        class(type_domain), intent(in), target :: self
+        integer(int32), intent(in) :: matrix_type
+        integer(int32), allocatable, intent(inout) :: row(:), col(:)
+
+        select case (matrix_type)
+        case (MATRIX_COO)
+            call self%node_adjacency%get_coo(row, col)
+        case (MATRIX_CSR)
+            call self%node_adjacency%get_csr(row, col)
+        end select
+    end subroutine get_node_adjacency_domain
+
+    subroutine get_element_domain(self, elem_id, element)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(in) :: elem_id
+        class(abst_fe), pointer, intent(inout) :: element
+
+        integer(int32) :: type_id
+
+        if (elem_id < 1 .or. elem_id > self%elements%num_elements) then
+            element => null()
+            return
+        end if
+
+        type_id = self%elements%fe_types(elem_id)
+        element => self%elements%fe_manager%get_fe(type_id)
+
+    end subroutine get_element_domain
+
+    subroutine get_element_connectivity_domain(self, element_id, connectivity)
+        implicit none
+        class(type_domain), intent(in), target :: self
+        integer(int32), intent(in) :: element_id
+        integer(int32), intent(inout), pointer, contiguous, dimension(:) :: connectivity
+
+        integer(int32) :: istart, iend
+
+        if (element_id < 1 .or. element_id > self%elements%num_elements) then
+            connectivity => null()
+            return
+        end if
+
+        istart = self%elements%connectivity%ind(element_id)
+        iend = self%elements%connectivity%ind(element_id + 1) - 1
+
+        connectivity => self%elements%connectivity%val(istart:iend)
+
+    end subroutine get_element_connectivity_domain
+
+    subroutine get_element_coordinate_domain(self, element_id, coordinates)
+        implicit none
+        class(type_domain), intent(in), target :: self
+        integer(int32), intent(in) :: element_id
+        real(real64), intent(inout), allocatable :: coordinates(:, :)
+
+        integer(int32), pointer, contiguous :: connectivity(:)
+        integer(int32) :: num_nodes, n_dim
+        logical :: need_reallocate
+
+        call self%get_element_connectivity(element_id, connectivity)
+
+        if (.not. associated(connectivity)) then
+            return
+        end if
+
+        num_nodes = size(connectivity)
+        n_dim = size(self%nodes%coordinates, 1)
+
+        need_reallocate = .true.
+
+        if (allocated(coordinates)) then
+            if (size(coordinates, 1) == n_dim .and. size(coordinates, 2) == num_nodes) then
+                need_reallocate = .false.
+            end if
+        end if
+
+        if (need_reallocate) then
+            if (allocated(coordinates)) deallocate (coordinates)
+            allocate (coordinates(n_dim, num_nodes))
+        end if
+
+        coordinates = self%nodes%coordinates(:, connectivity)
+
+    end subroutine get_element_coordinate_domain
+
+    subroutine get_target_dof_domain(self, physics_type_id, target_dof)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(in) :: physics_type_id
+        integer(int32), intent(inout) :: target_dof
+
+        target_dof = self%dof_map%num_dof_of_physics(physics_type_id)
+
+    end subroutine get_target_dof_domain
+
+    subroutine get_material_id_domain(self, element_id, material_id)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(in) :: element_id
+        integer(int32), intent(inout) :: material_id
+
+        material_id = self%elements%fe_material_ids(element_id)
+    end subroutine get_material_id_domain
+
+    subroutine get_num_colors_domain(self, num_colors)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(inout) :: num_colors
+
+        call self%elements%colors%get_num_colors(num_colors)
+    end subroutine get_num_colors_domain
+
+    subroutine get_colored_elements_domain(self, color_id, num_elements, elements)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(in) :: color_id
+        integer(int32), intent(inout) :: num_elements
+        integer(int32), pointer, contiguous, dimension(:), intent(inout) :: elements
+
+        call self%elements%colors%get_colored_elements(color_id, num_elements, elements)
+    end subroutine get_colored_elements_domain
+
+    subroutine calc_measure_domain(self, element_id, measure)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(in) :: element_id
+        real(real64), intent(inout) :: measure
+
+        class(abst_fe), pointer :: fe
+        real(real64), allocatable :: coordinates(:, :)
+
+        call self%get_element(element_id, fe)
+        call self%get_element_coordinate(element_id, coordinates)
+
+        call fe%calc_measure(coordinates, measure)
+
+    end subroutine calc_measure_domain
+
+    subroutine lerp_1d_domain(self, element_id, r, value, lerped_value)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(in) :: element_id
+        type(type_coordinate_dp), intent(in) :: r
+        real(real64), intent(in) :: value(:)
+        real(real64), intent(inout) :: lerped_value
+
+        class(abst_fe), pointer :: fe
+
+        call self%get_element(element_id, fe)
+
+        call fe%lerp(r, value, lerped_value)
+
+    end subroutine lerp_1d_domain
+
+    subroutine lerp_2d_domain(self, element_id, r, value, lerped_value)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(in) :: element_id
+        type(type_coordinate_dp), intent(in) :: r
+        real(real64), intent(in) :: value(:, :)
+        real(real64), intent(inout) :: lerped_value(:)
+
+        class(abst_fe), pointer :: fe
+
+        call self%get_element(element_id, fe)
+
+        call fe%lerp(r, value, lerped_value)
+
+    end subroutine lerp_2d_domain
+
+    subroutine lerp_3d_domain(self, element_id, r, value, lerped_value)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(in) :: element_id
+        type(type_coordinate_dp), intent(in) :: r
+        real(real64), intent(in) :: value(:, :, :)
+        real(real64), intent(inout) :: lerped_value(:, :)
+
+        class(abst_fe), pointer :: fe
+
+        call self%get_element(element_id, fe)
+
+        call fe%lerp(r, value, lerped_value)
+
+    end subroutine lerp_3d_domain
+
+    subroutine dlerp_domain(self, element_id, r, values, dlerped_value)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(in) :: element_id
+        type(type_coordinate_dp), intent(in) :: r
+        real(real64), intent(in) :: values(:)
+        type(type_coordinate_dp) :: dlerped_value
+
+        class(abst_fe), pointer :: fe
+        real(real64), allocatable :: coordinates(:, :)
+
+        call self%get_element(element_id, fe)
+        call self%get_element_coordinate(element_id, coordinates)
+
+        call fe%dlerp(r, values, coordinates, self%computation_type, dlerped_value)
+
+    end subroutine dlerp_domain
+
+    ! --------------------------------------------------------------------------
+    ! Display Procedures for Debugging
+    ! --------------------------------------------------------------------------
+
+    subroutine display_domain(self)
+        implicit none
+        class(type_domain), intent(in) :: self
+
+        write (*, '(A)') '##  Domain Information'
+        write (*, '(A)') '| Property                | Value |'
+        write (*, '(A)') '|:------------------------|:------|'
+        write (*, '(A, I0, 2A)') '| MPI Rank / Procs        | ', self%my_rank, ' / '//achar(48 + self%num_procs), '|'
+        write (*, '(A, I0, 2A)') '| Computation Dimension   | ', self%computation_dimension, 'D', '|'
+        write (*, '(A, I0, A)') '| Coupling Mode           | ', self%coupling_mode, '|'
+        write (*, '(A)')
+
+        call self%dof_map%display()
+        call self%nodes%display()
+        call self%elements%display()
+        call self%boundaries%display()
+    end subroutine display_domain
+
+    subroutine display_dof_map(self)
+        implicit none
+        class(type_dof_map), intent(in) :: self
+        write (*, '(A)') '### DOF Map'
+        write (*, '(A)')
+        write (*, '(A, I0)') '  - **Total DOFs per Node**: ', self%num_dof_per_node
+        write (*, '(A)')
+    end subroutine display_dof_map
+
+    subroutine display_node_manager(self)
+        implicit none
+        class(type_node_manager), intent(in) :: self
+        write (*, '(A)') '### Node Manager'
+        write (*, '(A)')
+        write (*, '(A, I0)') '  - **Number of Nodes**: ', self%num_nodes
+        write (*, '(A)')
+    end subroutine display_node_manager
+
+    subroutine display_element_manager(self)
+        implicit none
+        class(type_element_manager), intent(in) :: self
+        write (*, '(A)') '### Element Manager'
+        write (*, '(A)')
+        write (*, '(A, I0)') '  - **Number of Elements**: ', self%num_elements
+        call self%connectivity%display('Volume Elements')
+        write (*, '(A)')
+    end subroutine display_element_manager
+
+    subroutine display_boundary_manager(self)
+        implicit none
+        class(type_boundary_manager), intent(in) :: self
+        integer(int32) :: i
+        character(len=20) :: physics_name
+
+        write (*, '(A)') '### Boundary Manager'
+        do i = 1, NUM_PHYSICS_TYPES
+            if (self%physics(i)%num_bcs > 0) then
+                select case (i)
+                case (PHYSICS_TYPE_THERMAL); physics_name = 'Thermal'
+                case (PHYSICS_TYPE_HYDRAULIC); physics_name = 'Hydraulic'
+                case (PHYSICS_TYPE_MECHANICAL); physics_name = 'Mechanical'
+                end select
+                write (*, '(A, A, A)') '  - **Physics**: ', strip(physics_name)
+                call self%physics(i)%display()
+            end if
+        end do
+        write (*, '(A)')
+    end subroutine display_boundary_manager
+
+    subroutine display_physics_bc_manager(self)
+        implicit none
+        class(type_physics_bc_manager), intent(in) :: self
+        integer(int32) :: i
+        write (*, '(A, I0, A)') '    - **Number of BCs**: ', self%num_bcs
+        do i = 1, self%num_bcs
+            write (*, '(A, I0, A)') '    - **BC Group**: ', i
+            call self%bcs(i)%display()
+        end do
+    end subroutine display_physics_bc_manager
+
+    subroutine display_boundary_patch(self)
+        implicit none
+        class(type_boundary_patch), intent(in) :: self
+        write (*, '(A, I0)') '        - **Type ID**: ', self%type_id
+        write (*, '(A, I0)') '        - **Num Elements**: ', self%num_elements
+        call self%connectivity%display('BC Elements')
+    end subroutine display_boundary_patch
+
+    subroutine display_connectivity(self, title)
+        implicit none
+        class(type_fe_connectivity), intent(in) :: self
+        character(len=*), intent(in) :: title
+        write (*, '(A,A,A)') '        - **Connectivity (', strip(title), ')**:'
+        if (allocated(self%ind)) then
+            write (*, '(A, I0, A, I0, A)') '          - Ind Size: ', size(self%ind), ', Val Size: ', size(self%val)
+        else
+            write (*, '(A)') '          - Not allocated'
+        end if
+    end subroutine display_connectivity
 
 end module domain_manager

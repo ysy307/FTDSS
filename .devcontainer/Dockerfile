@@ -19,8 +19,8 @@ RUN apt-get update -y && \
     wget gnupg htop lsb-release curl build-essential ca-certificates sudo vim git \
     gfortran python3 python3-pip python3-dev zsh sed software-properties-common \
     ninja-build graphviz linux-tools-common linux-tools-generic \
-    libx11-dev libxext-dev libxrender-dev libxt-dev \
-    adwaita-icon-theme-full gnuplot valgrind kcachegrind && \
+    libx11-dev libxext-dev libxrender-dev libxt-dev pkg-config \
+    adwaita-icon-theme-full gnuplot valgrind kcachegrind gdb tree  && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # --- 2. 外部リポジトリの追加 ---
@@ -86,9 +86,10 @@ RUN echo 'export PS1="%~ %# "' >> .zshrc && \
     echo "export MPIF77=mpiifx" >> .zshrc && \
     echo "export MPICC=mpiicc" >> .zshrc && \
     echo "export MPICXX=mpiicpc" >> .zshrc && \
+    echo "export PETSC_DIR=/workspaces/FTDSS/third_party/.local" && \
     echo "ulimit -s unlimited" >> .zshrc && \
-    echo '[ -f /etc/profile.d/oneapi.sh ] && source /etc/profile.d/oneapi.sh' >> .zprofile && \
-    echo '[ -f /etc/profile.d/nvhpc.sh ] && source /etc/profile.d/nvhpc.sh' >> .zprofile
+    echo '[ -f /etc/profile.d/nvhpc.sh ] && source /etc/profile.d/nvhpc.sh' >> .zprofile && \
+    echo '[ -f /etc/profile.d/oneapi.sh ] && source /etc/profile.d/oneapi.sh' >> .zprofile 
 
 # --- 8. 所有権の修正（重要）---
 USER root

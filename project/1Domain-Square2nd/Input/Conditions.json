@@ -1,5 +1,5 @@
 {
-    "time_control": {
+    "time_controls": {
         "simulation_period": {
             "unit": "day",
             "start": 0.0,
@@ -8,8 +8,8 @@
         "time_stepping": {
             "unit": "second",
             "initial_step": 300.0,
-            "min_step": 300.0,
-            "max_step": 300.0
+            "min_step": 1.0,
+            "max_step": 300000.0
         },
         "boundary_condition_time_points": [
             0.0,
@@ -19,6 +19,9 @@
     "boundary_conditions": [
         {
             "id": 2,
+            "calculate_thermal": true,
+            "calculate_hydraulic": true,
+            "calculate_mechanical": false,
             "thermal": {
                 "type": "dirichlet",
                 "is_uniform": true,
@@ -33,39 +36,14 @@
         },
         {
             "id": 3,
-            "thermal": {
-                "type": "adiabatic"
-            },
-            "hydraulic": {
-                "type": "dirichlet",
-                "is_uniform": true,
-                "values": [
-                    0.1,
-                    0.1
-                ]
-            }
-        },
-        {
-            "id": 4,
+            "calculate_thermal": true,
+            "calculate_hydraulic": true,
+            "calculate_mechanical": false,
             "thermal": {
                 "type": "adiabatic"
             },
             "hydraulic": {
                 "type": "impermeable"
-            }
-        },
-        {
-            "id": 5,
-            "thermal": {
-                "type": "adiabatic"
-            },
-            "hydraulic": {
-                "type": "dirichlet",
-                "is_uniform": true,
-                "values": [
-                    0.0,
-                    0.0
-                ]
             }
         }
     ],
@@ -76,33 +54,9 @@
             "field_name": "Temperature"
         },
         "hydraulic": {
-            "type": "laplace",
-            "boundary_conditions": [
-                {
-                    "id": 2,
-                    "type": "impermeable"
-                },
-                {
-                    "id": 3,
-                    "type": "dirichlet",
-                    "is_uniform": true,
-                    "values": [
-                        0.1
-                    ]
-                },
-                {
-                    "id": 4,
-                    "type": "impermeable"
-                },
-                {
-                    "id": 5,
-                    "type": "dirichlet",
-                    "is_uniform": true,
-                    "values": [
-                        0.0
-                    ]
-                }
-            ]
+            "type": "uniform",
+            "value": 100.0,
+            "field_name": "Pressure"
         },
         "porosity": {
             "type": "uniform",

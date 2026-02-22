@@ -1,5 +1,5 @@
 {
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
     "editor.detectIndentation": false,
@@ -12,7 +12,39 @@
         "*.f95": "FortranFreeForm",
         "*.f03": "FortranFreeForm",
         "*.f90": "FortranFreeForm",
-        "*.F90": "FortranFreeForm"
+        "*.py": "python",
+        "*.vtu": "xml",
+        ".fortls": "json",
+        ".VERSION": "plaintext",
+        "*.F90": "FortranFreeForm",
+        "complex": "cpp",
+        "algorithm": "cpp",
+        "memory": "cpp",
+        "numeric": "cpp",
+        "cctype": "cpp",
+        "cfenv": "cpp",
+        "cinttypes": "cpp",
+        "clocale": "cpp",
+        "compare": "cpp",
+        "csetjmp": "cpp",
+        "csignal": "cpp",
+        "cstdarg": "cpp",
+        "cstddef": "cpp",
+        "cstdint": "cpp",
+        "cstdio": "cpp",
+        "cstdlib": "cpp",
+        "ctime": "cpp",
+        "cwchar": "cpp",
+        "cwctype": "cpp",
+        "exception": "cpp",
+        "memory_resource": "cpp",
+        "random": "cpp",
+        "source_location": "cpp",
+        "utility": "cpp",
+        "initializer_list": "cpp",
+        "new": "cpp",
+        "typeinfo": "cpp",
+        "*.in": "cpp"
     },
     "fortran.fortls.path": "/usr/local/bin/fortls",
     "fortran.linter.extraArgs": [
@@ -20,10 +52,11 @@
         "-module",
         "/workspaces/FTDSS/CMakeBuild/.mod",
         "-module",
-        "/opt/intel/oneapi/mpi/2021.14/include/mpi",
+        "/opt/intel/oneapi/mkl/latest/include",
         "-module",
-        "/opt/intel/oneapi/2025.1/include/mpi",
-        "-D_MKL"
+        "/opt/intel/oneapi/mpi/latest/include",
+        "-D_MKL",
+        "-D_MPI"
     ],
     "fortran.linter.compiler": "ifx",
     "fortran.linter.compilerPath": "/opt/intel/oneapi/compiler/latest/bin/ifx",
@@ -47,23 +80,24 @@
         "${workspaceFolder}/docs",
         "${workspaceFolder}/fpm",
         "${workspaceFolder}/Inout",
-        "${workspaceFolder}/log"
+        "${workspaceFolder}/log",
+        "${workspaceFolder}/third_party",
+        "${workspaceFolder}/test"
     ],
-    // "fortran.fortls.preprocessor.definitions": {
-    //     "_MKL": "1"
-    // },
     "fortran.fortls.notifyInit": true,
     "fortran.fortls.sortKeywords": true,
-    "fortran.linter.fypp.path": "",
     "fortran.linter.includePaths": [
         "/workspaces/FTDSS/CMakeBuild/.mod",
         "/opt/intel/oneapi/mkl/latest/include",
-        "/opt/intel/oneapi/mpi/latest/include",
-        "/opt/intel/oneapi/2025.1/include",
+        "/opt/intel/oneapi/mpi/latest/include/mpi",
         "/workspaces/FTDSS/third_party/.local/include/fortran_stdlib/IntelLLVM-2025.2.0",
         "/workspaces/FTDSS/third_party/.local/include/VTKFortran",
-        "/workspaces/FTDSS/third_party/.local/jsonfortran-intelllvm-9.0.3/lib"
+        "/workspaces/FTDSS/third_party/.local/include/iapws",
+        "/workspaces/FTDSS/third_party/.local/jsonfortran-intelllvm-9.0.3/lib",
+        "/workspaces/FTDSS/third_party/.local/include/petsc/finclude",
+        "/workspaces/FTDSS/third_party/.local/include/"
     ],
+    "fortran.fortls.disableDiagnostics": true,
     "fortran.formatting.formatter": "fprettify",
     "fortran.formatting.fprettifyArgs": [
         "--indent",
@@ -92,16 +126,18 @@
         "false",
         "--strip-comments",
         "--case",
+        "0",
         "1",
         "1",
         "1",
-        "1",
+        // "--disable-fypp",
         "--line-length",
         "256",
         "--silent",
         "--enable-decl",
         "--whitespace-decl",
-        "true"
+        "true",
+        "--strict-indent",
     ],
     "fortran.preferredCase": "lowercase",
     "[FortranFreeForm]": {
@@ -110,9 +146,17 @@
     },
     "files.exclude": {
         "**/.git": true,
-        "**/.tmp.drive*": true
+        "**/.tmp.drive*": true,
+        "**/.devcontainer": true,
+        "**/.github": true,
+        "**/CMakeBuild": true,
+        "**/build": true,
+        "**/docs": true,
+        "**/fpm": true,
+        "**/bin": true,
+        "**/include": false,
+        "**/third_party/": true,
     },
-    "docker.commands.attach": "${containerCommand} exec -it ${containerId} zsh",
     "workbench.colorCustomizations": {
         "editor.background": "#2e282c"
     },
@@ -132,8 +176,11 @@
         132
     ],
     "containers.commands.attach": "${containerCommand} exec -it ${containerId} zsh",
-    "fortran.linter.fypp.lineNumberingMode": "nocontlines",
     "python.analysis.include": [
         "scripts/*"
-    ]
+    ],
+    "fortran.fortls.preprocessor.directories": [
+        "/workspaces/FTDSS/third_party/.local/include/petsc/finclude",
+        "/workspaces/FTDSS/third_party/.local/include/"
+    ],
 }

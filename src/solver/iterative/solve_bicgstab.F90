@@ -1,193 +1,203 @@
-submodule(solver_solve) solve_bicgstab
+submodule(solver_solve) solve_type_solver_bicgstab
     implicit none
 contains
-    module function construct_type_solver_sparse_crs_bicgstab(size, tolerance, max_iterations, preconditioner) result(structure)
+
+    !> Initialize the BiCGSTAB solver instance.
+    !> It sets up internal vectors, parameters, and the preconditioner.
+    module subroutine initialize_type_solver_bicgstab(self, solver_settings, preconditioner_settings)
         implicit none
-        integer(int32), intent(in) :: size
-        real(real64), intent(in) :: tolerance
-        integer(int32), intent(in) :: max_iterations
-        integer(int32), intent(in) :: preconditioner
-        class(abst_solver), allocatable :: structure
+        !> Solver instance to be initialized
+        class(type_solver_bicgstab), intent(inout) :: self
+        !> Configuration settings for the solver
+        type(type_solver_settings), intent(in) :: solver_settings
+        !> Configuration settings for the preconditioner
+        type(type_preconditioner_settings), intent(in) :: preconditioner_settings
 
-        allocate (type_solver_sparse_crs_bicgstab :: structure)
-        select type (this => structure)
-        type is (type_solver_sparse_crs_bicgstab)
+        integer(int32) :: ierr
 
-            this%size = size
-            this%tolerance = tolerance
-            this%max_iterations = max_iterations
-            this%preconditioner = preconditioner
+        self%id = solver_settings%id
+        self%name = "BiCGSTAB"
 
-            ! 配列の確保
-            call allocate_array(this%M, this%size)
-            call allocate_array(this%p, this%size)
-            call allocate_array(this%phat, this%size)
-            call allocate_array(this%s, this%size)
-            call allocate_array(this%shat, this%size)
-            call allocate_array(this%r, this%size)
-            call allocate_array(this%r0, this%size)
-            call allocate_array(this%t, this%size)
-            call allocate_array(this%v, this%size)
-            call allocate_array(this%x, this%size)
+        self%num_nodes = solver_settings%num_nodes
+        self%tolerance = solver_settings%tolerance
+        self%max_iterations = solver_settings%max_iterations
 
-        end select
+        call self%p%initialize(self%num_nodes)
+        call self%phat%initialize(self%num_nodes)
+        call self%s%initialize(self%num_nodes)
+        call self%shat%initialize(self%num_nodes)
+        call self%r%initialize(self%num_nodes)
+        call self%r0%initialize(self%num_nodes)
+        call self%t%initialize(self%num_nodes)
+        call self%v%initialize(self%num_nodes)
+        call self%x%initialize(self%num_nodes)
+        call self%residual_history%initialize(self%max_iterations)
+        self%current_iteration = 0
 
-    end function construct_type_solver_sparse_crs_bicgstab
+        self%status = SOLVER_STATUS_SUCCESS
 
-    module subroutine solve_sparse_crs_bicgstab(self, A, b, x, status)
+        ! Setup preconditioner
+        call create_preconditioner(self%pc, preconditioner_settings, ierr)
+        self%status = ierr
+
+    end subroutine initialize_type_solver_bicgstab
+
+    !> Solve the linear system \( Ax = b \) using the BiCGSTAB method.
+    module subroutine solve_type_solver_bicgstab(self, A, b, x)
         implicit none
-        class(type_solver_sparse_crs_bicgstab), intent(inout) :: self
+        !> Solver instance
+        class(type_solver_bicgstab), intent(inout) :: self
+        !> System matrix
         class(abst_matrix), intent(in) :: A
-        real(real64), intent(inout) :: b(:)
-        real(real64), intent(inout) :: x(:)
-        integer(int32), intent(inout) :: status
+        !> Right-hand side vector
+        type(type_vector_dp), intent(in) :: b
+        !> Solution vector (initial guess on input, result on output)
+        type(type_vector_dp), intent(inout) :: x
 
         real(real64) :: rho, rho_old, alpha, beta, omega
         real(real64) :: resid
-        integer(int32) :: iter, iN, vector_size
+        integer(int32) :: iter
 
-        select type (matrix => A)
-        type is (type_crs)
+        real(real64), dimension(:), pointer :: x_ptr
+        integer(int32) :: ierr
 
-            ! 1:Initialize
-            rho = 1.0d0
-            rho_old = 1.0d0
-            alpha = 1.0d0
-            beta = 1.0d0
-            omega = 1.0d0
+        ! ==========================================================
+        ! 1: Initialize
+        ! ==========================================================
+        rho = 1.0d0
+        rho_old = 1.0d0
+        alpha = 1.0d0
+        beta = 1.0d0
+        omega = 1.0d0
 
-            do iN = 1, self%size
-                self%p(iN) = 0.0d0
-                self%s(iN) = 0.0d0
-                self%phat(iN) = 0.0d0
-                self%shat(iN) = 0.0d0
+        call self%p%zero()
+        call self%s%zero()
+        call self%phat%zero()
+        call self%shat%zero()
 
-                ! 2: Set an initial value x0
-                self%x(iN) = 0.0d0
-            end do
+        call self%residual_history%zero()
 
-            ! 3: r0 = b-Ax0
-            call gemv(1.0d0, matrix, self%x(:), 0.0d0, self%r(:))
-            ! self%r(:) = matrix * self%x(:)
-            do iN = 1, self%size
-                self%r(iN) = b(iN) - self%r(iN)
-            end do
-            ! 4: Create preconditioned matrix
-            call self%Create_Preconditioner(matrix)
+        ! ==========================================================
+        ! 2: Set an initial value x0
+        ! ==========================================================
+        call self%x%zero()
 
-            ! 5: ^r0 = r0, (r*0, r0)!=0
-            do iN = 1, self%size
-                self%r0(iN) = self%r(iN)
-            end do
+        ! ==========================================================
+        ! 3: r0 = b - Ax0
+        ! ==========================================================
+        call self%r%zero()
+        call matvec(A, self%x, self%r, ierr)
+        call vector_axpyz(-1.0d0, self%r, b, self%r)
 
-            do iter = 1, self%max_iterations
-                ! 7: (^r0, rk)
-                rho = dot(self%r(:), self%r0(:))
-                ! 8: rho check
-                if (rho == 0.0d0) then
-                    status = 0
-                    do iN = 1, self%size
-                        x(iN) = self%x(iN)
-                    end do
-                    return
-                end if
+        ! ==========================================================
+        ! 4: Create preconditioned matrix
+        ! ==========================================================
+        call self%pc%setup(A)
 
-                if (iter == 1) then
-                    ! 10: p0 = r0
-                    do iN = 1, self%size
-                        self%p(iN) = self%r(iN)
-                    end do
-                else
-                    ! 12: beta = (rho / rho_old) * (alpha_k / omega_k)
-                    beta = (rho / rho_old) * (alpha / omega)
-                    ! 13: p_k = r_k + beta_k(p_(k-1) - omega_k * Av)
-                    do iN = 1, self%size
-                        self%p(iN) = self%r(iN) + beta * (self%p(iN) - omega * self%v(iN))
-                    end do
-                end if
-                ! 15: phat = M^-1 * p
-                call self%Apply_Preconditioner(self%p(:), self%phat(:))
-                ! 16: v = A * phat
-                call gemv(1.0d0, matrix, self%phat(:), 0.0d0, self%v(:))
-                ! call SpMV(self%CRS_A, self%phat, self%v)
-                ! 17: alpha_k = rho / (^r0, v)
-                alpha = rho / dot(self%r0(:), self%v(:))
-                ! 18: s = r_k - alpha_k * v
-                do iN = 1, self%size
-                    self%s(iN) = self%r(iN) - alpha * self%v(iN)
-                end do
+        ! ==========================================================
+        ! 5: ^r0 = r0 such that (r*0, r0) != 0
+        ! ==========================================================
+        call self%r0%copy(self%r)
 
-                ! 19: shat = M^-1 * s
-                call self%Apply_Preconditioner(self%s(:), self%shat(:))
-                ! 20: t = A * shat
-                call gemv(1.0d0, matrix, self%shat(:), 0.0d0, self%t(:))
-
-                ! 21: omega_k = (t,s)/(t,t)
-                omega = dot(self%t(:), self%s(:)) / dot(self%t(:), self%t(:))
-
-                ! 22: omega breakdown check
-                if (omega == 0.0d0) then
-                    status = -1
-                    return
-                end if
-
-                ! 23: x(i) = x(i-1) + alpha * M^-1 p(i-1) + omega * M^-1 s(i)
-                ! 24: r(i) = s(i-1) - omega * AM^-1 s(i-1)
-                do iN = 1, self%size
-                    self%x(iN) = self%x(iN) + alpha * self%phat(iN) + omega * self%shat(iN)
-                    self%r(iN) = self%s(iN) - omega * self%t(iN)
-                end do
-
-                ! 25: ||r_k+1||_2
-                resid = norm_2(self%r(:))
-                if (resid < self%tolerance) then
-                    status = 0
-                    do iN = 1, self%size
-                        x(iN) = self%x(iN)
-                    end do
-                    return
-                end if
-
-                rho_old = rho
-
-                if (was_interrupted()) stop
-            end do
-            status = -2
-
-        end select
-    end subroutine solve_sparse_crs_bicgstab
-
-    module subroutine check_sparse_crs_bicgstab(self, status, time)
-        implicit none
-        class(type_solver_sparse_crs_bicgstab), intent(inout) :: self
-        integer(int32), intent(in) :: status
-        real(real64), intent(in) :: time
-
-        if (status /= 0) then
-            if (status == -1) then
-                write (*, '(a,es13.4,a)'), "BiCGSTAB:", time, " Day: Temperature solver occures BREAKDOWN."
-            else if (status == -2) then
-                write (*, '(a,es13.4,a)'), "BiCGSTAB:", time, " Day: Temperature solver occures MAXITER."
+        do iter = 1, self%max_iterations
+            ! 7: (^r0, rk)
+            rho = vector_dot(self%r0, self%r)
+            ! 8: rho check
+            if (rho == 0.0d0) then
+                self%current_iteration = iter
+                call self%residual_history%set(OP_INS, iter, vector_norm2(self%r))
+                call x%copy(self%x)
+                self%status = SOLVER_STATUS_SUCCESS
+                return
             end if
-            stop
+
+            if (iter == 1) then
+                ! 10: p0 = r0
+                call self%p%copy(self%r)
+            else
+                ! 12: beta = (rho / rho_old) * (alpha_k / omega_k)
+                beta = (rho / rho_old) * (alpha / omega)
+                ! 13: p_k = r_k + beta_k(p_(k-1) - omega_k * Av)
+                call vector_axpy(-omega, self%v, self%p)
+                call vector_scale(beta, self%p)
+                call vector_axpy(1.0d0, self%r, self%p)
+            end if
+            ! 15: phat = M^-1 * p
+            call self%pc%apply(self%p, self%phat)
+            ! 16: v = A * phat
+            call matvec(A, self%phat, self%v, ierr)
+            ! 17: alpha_k = rho / (^r0, v)
+            alpha = rho / vector_dot(self%r0, self%v)
+            ! 18: s = r_k - alpha_k * v
+            call vector_axpyz(-alpha, self%v, self%r, self%s)
+
+            ! 19: shat = M^-1 * s
+            call self%pc%apply(self%s, self%shat)
+            ! 20: t = A * shat
+            call matvec(A, self%shat, self%t, ierr)
+
+            ! 21: omega_k = (t,s)/(t,t)
+            omega = vector_dot(self%t, self%s) / vector_dot(self%t, self%t)
+
+            ! 22: omega breakdown check
+            if (omega == 0.0d0) then
+                self%status = SOLVER_STATUS_BREAKDOWN
+                return
+            end if
+
+            ! 23: x(i) = x(i-1) + alpha * M^-1 p(i-1) + omega * M^-1 s(i)
+            ! 24: r(i) = s(i-1) - omega * AM^-1 s(i-1)
+            call vector_axpy(alpha, self%phat, self%x)
+            call vector_axpy(omega, self%shat, self%x)
+            call vector_axpyz(-omega, self%t, self%s, self%r)
+
+            ! 25: ||r_k+1||_2
+            resid = vector_norm2(self%r)
+            call self%residual_history%set(OP_INS, iter, resid)
+            if (resid < self%tolerance) then
+                self%current_iteration = iter
+                self%status = SOLVER_STATUS_SUCCESS
+                call x%copy(self%x)
+                return
+            end if
+
+            rho_old = rho
+
+            if (was_interrupted()) stop
+        end do
+        self%current_iteration = iter
+        self%status = SOLVER_STATUS_MAXITER
+        call x%copy(self%x)
+
+    end subroutine solve_type_solver_bicgstab
+
+    !> Finalize the solver instance and release memory.
+    module subroutine destroy_type_solver_bicgstab(self)
+        implicit none
+        !> Solver instance to be destroyed
+        class(type_solver_bicgstab), intent(inout) :: self
+
+        self%id = -1
+        if (allocated(self%name)) deallocate (self%name)
+        self%num_nodes = -1
+        self%tolerance = 0.0d0
+        self%max_iterations = 0
+
+        call self%p%destroy()
+        call self%phat%destroy()
+        call self%s%destroy()
+        call self%shat%destroy()
+        call self%r%destroy()
+        call self%r0%destroy()
+        call self%t%destroy()
+        call self%v%destroy()
+        call self%x%destroy()
+
+        if (allocated(self%pc)) then
+            call self%pc%destroy()
+            deallocate (self%pc)
         end if
 
-    end subroutine check_sparse_crs_bicgstab
-
-    module subroutine destruct_type_solver_sparse_crs_bicgstab(self)
-        implicit none
-        type(type_solver_sparse_crs_bicgstab), intent(inout) :: self
-
-        call deallocate_array(self%m)
-        call deallocate_array(self%p)
-        call deallocate_array(self%phat)
-        call deallocate_array(self%s)
-        call deallocate_array(self%shat)
-        call deallocate_array(self%r)
-        call deallocate_array(self%r0)
-        call deallocate_array(self%t)
-        call deallocate_array(self%v)
-        call deallocate_array(self%x)
-
-    end subroutine destruct_type_solver_sparse_crs_bicgstab
-end submodule solve_bicgstab
+        self%status = SOLVER_STATUS_SUCCESS
+    end subroutine destroy_type_solver_bicgstab
+end submodule solve_type_solver_bicgstab
