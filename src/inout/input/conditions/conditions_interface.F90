@@ -57,11 +57,18 @@ module inout_input_conditions
     end interface
 
     !!------------------------------------------------------------------------------------------------------------------------------
+    type :: type_boundary_local_time_dependent
+        real(real64) :: time
+        character(:), allocatable :: time_iso
+        real(real64) :: value
+    end type type_boundary_local_time_dependent
+
     type :: type_boundary_local
         logical :: is_active = .false.
-        type(type_state_bc) :: state
-        ! integer(int32) :: type = -1
-        ! real(real64), allocatable :: values(:)
+        character(:), allocatable :: bc_type
+        integer(int32) :: num_time_points
+        type(type_boundary_local_time_dependent), allocatable :: values(:)
+        
     end type type_boundary_local
 
     type :: type_boundary_conditions

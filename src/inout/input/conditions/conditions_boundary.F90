@@ -29,6 +29,8 @@ contains
         character(256) :: buffer(2)
         character(:), dimension(:), pointer :: valid_list
 
+        type(type_constant_id) :: physics_type
+
         call json%info(boundary_conditions, found=found, n_children=self%num_boundaries)
         if (.not. found .or. self%num_boundaries <= 0) then
             call raise_error(ERROR_CODES%VAR_INVALID, opt=boundary_conditions)
@@ -61,20 +63,23 @@ contains
                         if (self%boundary_conditions(i)%physics(j)%is_active) then
                             select case (j)
                             case (PHYSICS_TYPES%THERMAL%id)
-                                self%boundary_conditions(i)%physics(j)%state%physics_type = PHYSICS_TYPES%THERMAL
+                                physics_type = PHYSICS_TYPES%THERMAL
+                                ! self%boundary_conditions(i)%physics(j)%state%physics_type = PHYSICS_TYPES%THERMAL
                                 buffer(2) = thermal
                                 valid_list => valid_thermal_boundary_types
                             case (PHYSICS_TYPES%HYDRAULIC%id)
-                                self%boundary_conditions(i)%physics(j)%state%physics_type = PHYSICS_TYPES%HYDRAULIC
+                                physics_type = PHYSICS_TYPES%HYDRAULIC
+                                ! self%boundary_conditions(i)%physics(j)%state%physics_type = PHYSICS_TYPES%HYDRAULIC
                                 buffer(2) = hydraulic
                                 valid_list => valid_hydraulic_boundary_types
                             case (PHYSICS_TYPES%MECHANICAL%id)
-                                self%boundary_conditions(i)%physics(j)%state%physics_type = PHYSICS_TYPES%MECHANICAL
+                                physics_type = PHYSICS_TYPES%MECHANICAL
+                                ! self%boundary_conditions(i)%physics(j)%state%physics_type = PHYSICS_TYPES%MECHANICAL
                                 buffer(2) = mechanical
                             end select
 
                             call read_conditions_boundary_conditions_local( &
-                                self%boundary_conditions(i)%physics(j), json, buffer, 2)
+                                self%boundary_conditions(i)%physics(j), json, buffer, 2, physics_type)
 
                             ! call read_conditions_boundary_conditions_local( &
                             !     self%boundary_conditions(i)%physics(j), json, buffer, 2, &
@@ -88,16 +93,19 @@ contains
 
     end subroutine read_conditions_boundary_conditions
 
-    subroutine read_conditions_boundary_conditions_local(boundary, json, buffer, end_index)
+    subroutine read_conditions_boundary_conditions_local(boundary, json, buffer, end_index, physics_type)
         implicit none
         type(type_boundary_local), intent(inout) :: boundary
         type(json_file), intent(inout) :: json
         character(*), intent(in) :: buffer(:)
         integer(int32), intent(in) :: end_index
+        type(type_constant_id), intent(in) :: physics_type
 
         character(len=256), allocatable :: local_buffer(:)
         character(:), allocatable :: tmp_string
         character(:), pointer, contiguous, dimension(:) :: valid_list => null()
+
+        type(type_constant_id) :: bc_kind
 
         real(real64) :: tmp_value
 
@@ -107,64 +115,66 @@ contains
         allocate (local_buffer(size(buffer) + 2))
         local_buffer(1:end_index) = buffer(1:end_index)
 
-        if (boundary%state%physics_type == PHYSICS_TYPES%THERMAL) then
+        if (physics_type == PHYSICS_TYPES%THERMAL) then
             valid_list => valid_thermal_boundary_types
             local_buffer(end_index) = thermal
-        else if (boundary%state%physics_type == PHYSICS_TYPES%HYDRAULIC) then
+        else if (physics_type == PHYSICS_TYPES%HYDRAULIC) then
             valid_list => valid_hydraulic_boundary_types
             local_buffer(end_index) = hydraulic
         end if
 
         local_buffer(end_index + 1) = type
-        call get_json_value(json, join(local_buffer(1:end_index + 1)), tmp_string, is_required=.true., valid_list=valid_list)
-        if (boundary%state%physics_type == PHYSICS_TYPES%THERMAL) then
-            boundary%state%bc_kind = THERMAL_BC_TYPES%to_object(tmp_string)
-        else if (boundary%state%physics_type == PHYSICS_TYPES%HYDRAULIC) then
-            boundary%state%bc_kind = HYDRAULIC_BC_TYPES%to_object(tmp_string)
+        call get_json_value(json, join(local_buffer(1:end_index + 1)), boundary%bc_type, is_required=.true., valid_list=valid_list)
+        if (physics_type == PHYSICS_TYPES%THERMAL) then
+            bc_kind = THERMAL_BC_TYPES%to_object(boundary%bc_type)
+        else if (physics_type == PHYSICS_TYPES%HYDRAULIC) then
+            bc_kind = HYDRAULIC_BC_TYPES%to_object(boundary%bc_type)
         end if
-        if (boundary%state%bc_kind == THERMAL_BC_TYPES%DIRICHLET .or. &
-            boundary%state%bc_kind == THERMAL_BC_TYPES%NEUMANN .or. &
-            boundary%state%bc_kind == THERMAL_BC_TYPES%FLUX .or. &
-            boundary%state%bc_kind == HYDRAULIC_BC_TYPES%DIRICHLET .or. &
-            boundary%state%bc_kind == HYDRAULIC_BC_TYPES%NEUMANN .or. &
-            boundary%state%bc_kind == HYDRAULIC_BC_TYPES%FLUX) then
+        ! if (bc_kind == THERMAL_BC_TYPES%DIRICHLET .or. &
+        !     bc_kind == THERMAL_BC_TYPES%NEUMANN .or. &
+        !     bc_kind == THERMAL_BC_TYPES%FLUX .or. &
+        !     bc_kind == HYDRAULIC_BC_TYPES%DIRICHLET .or. &
+        !     bc_kind == HYDRAULIC_BC_TYPES%NEUMANN .or. &
+        !     bc_kind == HYDRAULIC_BC_TYPES%FLUX) then
 
-            boundary%state%num_variables = 1
-        elseif (boundary%state%bc_kind == THERMAL_BC_TYPES%ROBIN .or. &
-                boundary%state%bc_kind == THERMAL_BC_TYPES%CONVECTIVE .or. &
-                boundary%state%bc_kind == THERMAL_BC_TYPES%RADIATION) then
-            boundary%state%num_variables = 2
-        else
-            boundary%state%num_variables = 0
-        end if
+        !     ! boundary%state%num_variables = 1
+        ! elseif (bc_kind == THERMAL_BC_TYPES%ROBIN .or. &
+        !         bc_kind == THERMAL_BC_TYPES%CONVECTIVE .or. &
+        !         bc_kind == THERMAL_BC_TYPES%RADIATION) then
+        !     ! boundary%state%num_variables = 2
+        ! else
+        !     ! boundary%state%num_variables = 0
+        ! end if
 
-        if (boundary%state%bc_kind == THERMAL_BC_TYPES%DIRICHLET .or. &
-            boundary%state%bc_kind == THERMAL_BC_TYPES%NEUMANN .or. &
-            boundary%state%bc_kind == THERMAL_BC_TYPES%FLUX .or. &
-            boundary%state%bc_kind == THERMAL_BC_TYPES%ROBIN .or. &
-            boundary%state%bc_kind == THERMAL_BC_TYPES%CONVECTIVE .or. &
-            boundary%state%bc_kind == THERMAL_BC_TYPES%RADIATION .or. &
-            boundary%state%bc_kind == HYDRAULIC_BC_TYPES%DIRICHLET .or. &
-            boundary%state%bc_kind == HYDRAULIC_BC_TYPES%NEUMANN .or. &
-            boundary%state%bc_kind == HYDRAULIC_BC_TYPES%FLUX) then
+        if (bc_kind == THERMAL_BC_TYPES%DIRICHLET .or. &
+            bc_kind == THERMAL_BC_TYPES%NEUMANN .or. &
+            bc_kind == THERMAL_BC_TYPES%FLUX .or. &
+            bc_kind == THERMAL_BC_TYPES%ROBIN .or. &
+            bc_kind == THERMAL_BC_TYPES%CONVECTIVE .or. &
+            bc_kind == THERMAL_BC_TYPES%RADIATION .or. &
+            bc_kind == HYDRAULIC_BC_TYPES%DIRICHLET .or. &
+            bc_kind == HYDRAULIC_BC_TYPES%NEUMANN .or. &
+            bc_kind == HYDRAULIC_BC_TYPES%FLUX) then
 
-            call json%info(boundary_conditions, found=found, n_children=boundary%state%num_time_points)
-            if (.not. found .or. boundary%state%num_time_points <= 0) then
+            call json%info(boundary_conditions, found=found, n_children=boundary%num_time_points)
+            if (.not. found .or. boundary%num_time_points <= 0) then
                 call raise_error(ERROR_CODES%VAR_INVALID, opt=join(local_buffer))
             end if
 
-            call allocate_array(boundary%state%time_points, boundary%state%num_time_points)
-            call allocate_array(boundary%state%values, boundary%state%num_variables, boundary%state%num_time_points)
+            allocate (boundary%values(boundary%num_time_points))
 
-            do i = 1, boundary%state%num_time_points
+            ! call allocate_array(boundary%state%time_points, boundary%num_time_points)
+            ! call allocate_array(boundary%state%values, boundary%state%num_variables, boundary%num_time_points)
+
+            do i = 1, boundary%num_time_points
                 local_buffer(end_index + 1) = values//"("//to_string(i)//")"
                 local_buffer(end_index + 2) = "time"
-                call get_json_value(json, join(local_buffer(1:end_index + 2)), boundary%state%time_points(i), is_required=.true.)
+                call get_json_value(json, join(local_buffer(1:end_index + 2)), boundary%values(i)%time, is_required=.true.)
                 local_buffer(end_index + 2) = "value"
-                call get_json_value(json, join(local_buffer(1:end_index + 2)), boundary%state%values(1, i), is_required=.true.)
+                call get_json_value(json, join(local_buffer(1:end_index + 2)), boundary%values(i)%value, is_required=.true.)
             end do
         else
-            if (allocated(boundary%state%values)) deallocate (boundary%state%values)
+            if (allocated(boundary%values)) deallocate (boundary%values)
         end if
 
     end subroutine read_conditions_boundary_conditions_local

@@ -76,9 +76,9 @@ list(APPEND CORE_SOURCES
     types/datetime.F90
     types/solar.F90
     types/physics/state.F90
-    types/physics/state_bc.F90
     types/physics/physics_info.F90
     types/physics/meteorology.F90
+    types/config/config_bc.F90
     types/math/gauss.F90
     types/matrix/matrix_interface.F90
     types/matrix/matrix_dense.F90

@@ -26,8 +26,7 @@ module conditions_boundary
     ! Abstract Base Class
     ! ==========================================================================
     type, abstract :: abst_bc
-        integer(int32) :: boundary_id = -1
-        type(type_state_bc) :: state
+        type(type_config_bc) :: config
         integer(int32), private :: current_idx = 0
         logical :: initialized = .false.
     contains
@@ -49,11 +48,10 @@ module conditions_boundary
 
     interface
         ! --- Method Interfaces ---
-        module subroutine initialize_bc(self, cell_id, state_bc)
+        module subroutine initialize_bc(self, config_bc)
             implicit none
             class(abst_bc), intent(inout) :: self
-            integer(int32), intent(in) :: cell_id
-            type(type_state_bc), intent(in) :: state_bc
+            type(type_config_bc), intent(in) :: config_bc
         end subroutine initialize_bc
 
         module subroutine calc_time_coefficient_bc(self, current_time, coef, idx)

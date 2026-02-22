@@ -21,6 +21,8 @@ set(INPUT_SOURCES
     geometry/geometry_base.F90
     geometry/geometry_interface.F90
     input_interface.F90
+    translator/translator_interface.F90
+    translator/translator_conditions.F90
     input.F90
 )
 add_library(Input_Main STATIC ${INPUT_SOURCES})

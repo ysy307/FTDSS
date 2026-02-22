@@ -7,7 +7,7 @@ module domain_manager
     use :: stdlib_logger
     use :: stdlib_strings, only:strip
     use :: module_core
-    use :: module_input, only:type_input
+    use :: module_input, only:type_input, input_translator
     use :: module_control, only:type_controls
     use :: module_fe, only:type_fe_manager, abst_fe
     use :: module_boundary
@@ -566,19 +566,21 @@ contains
 
         integer(int32) :: i, original_input_idx, bc_type, bc_id
 
+        type(type_config_bc) :: config
+
         do i = 1, size(bcs)
             original_input_idx = bc_idx_list(i)
 
-            bc_id = input%conditions%boundary_conditions(original_input_idx)%id
+            ! bc_id = input%conditions%boundary_conditions(original_input_idx)%id
             bcs(i)%type_id = bc_type
 
             select case (physics_type_id)
             case (PHYSICS_TYPE_THERMAL)
-                bcs(i)%condition = create_boundary_conditions( &
-                                   bc_id, input%conditions%boundary_conditions(original_input_idx)%physics(PHYSICS_TYPE_THERMAL)%state)
+                call input_translator%execute(input, original_input_idx, PHYSICS_TYPES%THERMAL, config)
+                bcs(i)%condition = create_boundary_conditions(config)
             case (PHYSICS_TYPE_HYDRAULIC)
-                bcs(i)%condition = create_boundary_conditions( &
-                                   bc_id, input%conditions%boundary_conditions(original_input_idx)%physics(PHYSICS_TYPE_HYDRAULIC)%state)
+                call input_translator%execute(input, original_input_idx, PHYSICS_TYPES%HYDRAULIC, config)
+                bcs(i)%condition = create_boundary_conditions(config)
             end select
 
             call bcs(i)%fe_manager%initialize(input%basic%geometry_settings%integration_order, 1, group_cell_types)
