@@ -208,7 +208,7 @@ contains
         !> Vector to store the scaling factors (diagonal elements)
         type(type_vector_dp), intent(inout) :: d
         !> Scaling operation identifier
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         !> Error status
         integer(int32), intent(inout) :: ierr
 

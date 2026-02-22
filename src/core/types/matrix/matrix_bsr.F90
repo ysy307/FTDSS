@@ -25,19 +25,19 @@ contains
         ! Argument validation
         if (.not. present(row) .or. .not. present(col)) then
             print *, "Error: row (node_ptr) and col (node_ind) must be provided."
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
             return
         end if
 
         if (.not. present(row_blocks) .or. .not. present(col_blocks)) then
             print *, "Error: row_blocks and col_blocks must be provided for bsr matrix."
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
             return
         end if
 
         if (size(row) /= num_nodes + 1) then
             print *, "Error: The size of row (node_ptr) array must be num_nodes + 1."
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
             return
         end if
 
@@ -58,7 +58,7 @@ contains
         call self%zero()
 
         self%is_initialized_matrix = .true.
-        self%status = MATRIX_STATUS_SUCCESS
+        self%status = MATRIX_STATUS%SUCCESS
     end subroutine initialize_type_matrix_bsr
 
     !>
@@ -78,7 +78,7 @@ contains
         self%nnz = 0
 
         self%is_initialized_matrix = .false.
-        self%status = MATRIX_STATUS_SUCCESS
+        self%status = MATRIX_STATUS%SUCCESS
     end subroutine destroy_bsr
 
     !>
@@ -115,7 +115,7 @@ contains
                         do m = 1, self%num_block_cols
                             if (k == m) then
                                 ! Access val(row_in_block, col_in_block, block_index)
-                                call diagonal%set(OP_INS, (i - 1) * self%num_block_rows + k, self%val(k, m, j))
+                                call diagonal%set(MATRIX_OPS%INS, (i - 1) * self%num_block_rows + k, self%val(k, m, j))
                             end if
                         end do
                     end do
@@ -178,12 +178,12 @@ contains
     module subroutine set_value_bsr(self, op, row, col, value)
         implicit none
         class(type_matrix_bsr), intent(inout) :: self
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         integer(int32), intent(in) :: row
         integer(int32), intent(in) :: col
         real(real64), intent(in) :: value
 
-        self%status = MATRIX_STATUS_NOT_IMPLEMENTED
+        self%status = MATRIX_STATUS%NOT_IMPLEMENTED
     end subroutine set_value_bsr
 
     !>
@@ -192,7 +192,7 @@ contains
     module subroutine set_value_block_bsr(self, op, row, col, row_block, col_block, value)
         implicit none
         class(type_matrix_bsr), intent(inout) :: self
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         integer(int32), intent(in) :: row ! Block row index (Node index)
         integer(int32), intent(in) :: col ! Block col index (Node index)
         integer(int32), intent(in) :: row_block ! Local row index within block
@@ -201,10 +201,15 @@ contains
 
         integer(int32) :: index
 
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
+
 #ifdef USE_DEBUG
         if (.not. value_in_range(row_block, 1, self%num_block_rows) .or. &
             .not. value_in_range(col_block, 1, self%num_block_cols)) then
-            self%status = MATRIX_STATUS_OUT_OF_MEMORY
+            self%status = MATRIX_STATUS%OUT_OF_MEMORY
             return
         end if
 #endif
@@ -213,20 +218,19 @@ contains
 
 #ifdef USE_DEBUG
         if (index < 0) then
-            self%status = MATRIX_STATUS_OUT_OF_MEMORY
+            self%status = MATRIX_STATUS%OUT_OF_MEMORY
             return
         end if
 #endif
 
-        select case (op)
-        case (OP_INS)
-            ! Access val(row_in_block, col_in_block, block_index)
+        if (op == MATRIX_OPS%INS) then
+            ! Access val(rKow_in_block, col_in_block, block_index)
             self%val(row_block, col_block, index) = value
-        case (OP_ADD)
+        else if (op == MATRIX_OPS%ADD) then
             self%val(row_block, col_block, index) = self%val(row_block, col_block, index) + value
-        case default
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
-        end select
+        else
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end if
 
     end subroutine set_value_block_bsr
 
@@ -236,7 +240,7 @@ contains
     module subroutine set_row_bsr(self, op, row, value, row_block)
         implicit none
         class(type_matrix_bsr), intent(inout) :: self
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         integer(int32), intent(in) :: row
         real(real64), intent(in) :: value
         integer(int32), intent(in), optional :: row_block
@@ -244,9 +248,14 @@ contains
         integer(int32) :: is, ie, k, col_node
         integer(int32) :: r_start, r_end, r
 
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
+
         ! 範囲チェック
         if (.not. value_in_range(row, 1, self%num_rows)) then
-            self%status = MATRIX_STATUS_OUT_OF_MEMORY
+            self%status = MATRIX_STATUS%OUT_OF_MEMORY
             return
         end if
 
@@ -255,7 +264,7 @@ contains
 
         if (present(row_block)) then
             if (row_block < 1 .or. row_block > self%num_block_rows) then
-                self%status = MATRIX_STATUS_OUT_OF_MEMORY
+                self%status = MATRIX_STATUS%OUT_OF_MEMORY
                 return
             end if
             r_start = row_block
@@ -265,38 +274,26 @@ contains
             r_end = self%num_block_rows
         end if
 
-        select case (op)
-        case (OP_INS)
+        if (op == MATRIX_OPS%INS) then
             do k = is, ie
                 col_node = self%ind(k)
                 ! Access val(row_in_block, col_in_block, block_index)
-                self%val(r_start:r_end, :, k) = 0.0d0
-                if (col_node == row) then
-                    do r = r_start, r_end
-                        if (r <= self%num_block_cols) then
-                            self%val(r, r, k) = value
-                        end if
-                    end do
-                end if
+                self%val(r_start:r_end, :, k) = value
             end do
-
-        case (OP_ADD)
+        else if (op == MATRIX_OPS%ADD) then
             do k = is, ie
                 if (self%ind(k) == row) then
                     do r = r_start, r_end
-                        if (r <= self%num_block_cols) then
-                            self%val(r, r, k) = self%val(r, r, k) + value
-                        end if
+                        self%val(r, :, k) = self%val(r, :, k) + value
                     end do
                     exit
                 end if
             end do
+        else
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end if
 
-        case default
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
-        end select
-
-        self%status = MATRIX_STATUS_SUCCESS
+        self%status = MATRIX_STATUS%SUCCESS
     end subroutine set_row_bsr
 
     !>
@@ -305,25 +302,29 @@ contains
     module subroutine set_all_bsr(self, op, value)
         implicit none
         class(type_matrix_bsr), intent(inout) :: self
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         real(real64), intent(in) :: value
 
-        select case (op)
-        case (OP_INS)
-            self%val(:, :, :) = value
-        case (OP_ADD)
-            self%val(:, :, :) = self%val(:, :, :) + value
-        case default
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
-        end select
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
 
-        self%status = MATRIX_STATUS_SUCCESS
+        if (op == MATRIX_OPS%INS) then
+            self%val(:, :, :) = value
+        else if (op == MATRIX_OPS%ADD) then
+            self%val(:, :, :) = self%val(:, :, :) + value
+        else
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end if
+
+        self%status = MATRIX_STATUS%SUCCESS
     end subroutine set_all_bsr
 
     module subroutine scale_bsr(self, op, alpha)
         implicit none
         class(type_matrix_bsr), intent(inout) :: self
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         type(type_vector_dp), intent(in) :: alpha
 
         real(real64), dimension(:), pointer :: alpha_data
@@ -333,6 +334,11 @@ contains
         integer(int32) :: row_dof, col_dof
         integer(int32) :: nrequired
         integer(int32) :: bnr, bnc ! ブロックサイズを保持する一時変数
+
+        if (.not. self%is_initialized()) then
+            self%status = MATRIX_STATUS%NOT_INITIALIZED
+            return
+        end if
 
         ! ポインタの関連付け
         alpha_data => alpha%get_data()
@@ -345,8 +351,8 @@ contains
         bnc = self%num_block_cols
 
         ! 正方ブロックチェック (Symmetric Scalingの場合に必須)
-        if (op == OP_SCALE_SYMM_DIAG .and. bnr /= bnc) then
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
+        if (op == MATRIX_OPS%SCALE_SYMM_DIAG .and. bnr /= bnc) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
             return
         end if
 
@@ -355,16 +361,14 @@ contains
         nrequired = bnr * self%num_nodes
 
         if (size(alpha_data) /= nrequired) then
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
             return
         end if
 
-        select case (op)
-            !-------------------------------------------
-            ! Symmetric Scaling: A <- D^{-1/2} A D^{-1/2}
-            !-------------------------------------------
-        case (OP_SCALE_SYMM_DIAG)
-
+        !-------------------------------------------
+        ! Symmetric Scaling: A <- D^{-1/2} A D^{-1/2}
+        !-------------------------------------------
+        if (op == MATRIX_OPS%SCALE_SYMM_DIAG) then
             ! private変数に bnr, bnc は不要(read only sharedで良い)
             !$omp parallel do default(shared) private(i,j,rb,cb,col,row_start,row_end,row_dof,col_dof)
             do i = 1, self%num_ptrs - 1
@@ -393,12 +397,12 @@ contains
                 end do
             end do
             !$omp end parallel do
-            self%status = MATRIX_STATUS_SUCCESS
+            self%status = MATRIX_STATUS%SUCCESS
 
             !-------------------------------------------
             ! Jacobi Scaling: A <- D^{-1} A
             !-------------------------------------------
-        case (OP_SCALE_JACOBI)
+        else if (op == MATRIX_OPS%SCALE_JACOBI) then
 
             !$omp parallel do default(shared) private(i,j,rb,cb,row_start,row_end,row_dof)
             do i = 1, self%num_ptrs - 1
@@ -418,11 +422,11 @@ contains
                 end do
             end do
             !$omp end parallel do
-            self%status = MATRIX_STATUS_SUCCESS
+            self%status = MATRIX_STATUS%SUCCESS
 
-        case default
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
-        end select
+        else
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end if
 
     end subroutine scale_bsr
     !>
@@ -433,7 +437,7 @@ contains
         class(type_matrix_bsr), intent(inout) :: self
 
         self%val(:, :, :) = 0.0d0
-        self%status = MATRIX_STATUS_SUCCESS
+        self%status = MATRIX_STATUS%SUCCESS
     end subroutine zero_all_bsr
 
     !> Sets all values in a specified row of the bsr matrix to zero.
@@ -446,7 +450,7 @@ contains
         integer(int32) :: is, ie, k, r_start, r_end, r
         ! 範囲チェック
         if (.not. value_in_range(row, 1, self%num_rows)) then
-            self%status = MATRIX_STATUS_OUT_OF_MEMORY
+            self%status = MATRIX_STATUS%OUT_OF_MEMORY
             return
         end if
 
@@ -455,7 +459,7 @@ contains
 
         if (present(row_block)) then
             if (row_block < 1 .or. row_block > self%num_block_rows) then
-                self%status = MATRIX_STATUS_OUT_OF_MEMORY
+                self%status = MATRIX_STATUS%OUT_OF_MEMORY
                 return
             end if
             r_start = row_block
@@ -472,7 +476,7 @@ contains
             end do
         end do
 
-        self%status = MATRIX_STATUS_SUCCESS
+        self%status = MATRIX_STATUS%SUCCESS
     end subroutine zero_row_bsr
 
     !>

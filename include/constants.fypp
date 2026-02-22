@@ -11,9 +11,10 @@
             ('CSR',   2, 'csr'), &
             ('COO',   3, 'coo'), &
             ('BSR',   4, 'bsr') &
+            ('DIA',   5, 'dia') &
         ], &
-        'num' : 4, &
-        'id_range' : [1, 4] &
+        'num' : 5, &
+        'id_range' : [1, 5] &
     }
 
     #:set COUPLING_MODES = { &
@@ -319,6 +320,22 @@
         'id_range' : [1, 4] &
     }
 
+    #:set VECTOR_OPS = { &
+        'type_name'  : 'type_vector_ops', &
+        'obj_name'   : 'VECTOR_OPS', &
+        'category'   : 'VECTOR_OP', &
+        'suffix'     : 'vector_op', &
+        'description': 'Vector operations', &
+        'items'      : [ &
+            ('INS',             1, 'ins'), &
+            ('ADD',             2, 'add'), &
+            ('SCALE_SYMM_DIAG', 3, 'scale_symm_diag'), &
+            ('SCALE_JACOBI',    4, 'scale_jacobi')&
+        ], &
+        'num' : 4, &
+        'id_range' : [1, 4] &
+    }
+
     #:set MATRIX_STATUS = { &
         'type_name'  : 'type_matrix_status_codes', &
         'obj_name'   : 'MATRIX_STATUS', &
@@ -490,6 +507,7 @@
         PRECONDITIONER_TYPES, &
         SOLVER_STATUS, &
         MATRIX_OPS, &
+        VECTOR_OPS, &
         MATRIX_STATUS, &
         VECTOR_STATUS, &
         NODE_TYPES, &

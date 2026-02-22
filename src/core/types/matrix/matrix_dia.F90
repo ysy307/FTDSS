@@ -35,7 +35,7 @@ contains
             call allocate_array(self%val, self%num_rows, self%num_diags)
             call self%zero()
             self%is_initialized_matrix = .true.
-            self%status = MATRIX_STATUS_SUCCESS
+            self%status = MATRIX_STATUS%SUCCESS
             return
         end if
 
@@ -89,7 +89,7 @@ contains
         self%nnz = self%num_rows * self%num_diags
 
         self%is_initialized_matrix = .true.
-        self%status = MATRIX_STATUS_SUCCESS
+        self%status = MATRIX_STATUS%SUCCESS
     end subroutine initialize_type_matrix_dia
 
     !>
@@ -142,11 +142,11 @@ contains
         if (main_diag_idx /= -1) then
             ! Use type_vector_dp's set method instead of direct access
             do i = 1, self%num_rows
-                call diagonal%set(OP_INS, i, self%val(i, main_diag_idx))
+                call diagonal%set(MATRIX_OPS%INS, i, self%val(i, main_diag_idx))
             end do
         else
             ! No main diagonal stored, set to zero
-            call diagonal%set(OP_INS, 0.0_real64)
+            call diagonal%set(MATRIX_OPS%INS, 0.0_real64)
         end if
     end subroutine get_diagonal_dia
 
@@ -194,28 +194,32 @@ contains
     module subroutine set_value_dia(self, op, row, col, value)
         implicit none
         class(type_matrix_dia), intent(inout) :: self
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         integer(int32), intent(in) :: row, col
         real(real64), intent(in) :: value
         integer(int32) :: diag_idx
+
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
 
         diag_idx = self%find(row, col)
 
 #ifdef USE_DEBUG
         if (diag_idx > 0) then
 #endif
-            select case (op)
-            case (OP_INS)
+            if (op == MATRIX_OPS%INS) then
                 self%val(row, diag_idx) = value
-            case (OP_ADD)
+            else if (op == MATRIX_OPS%ADD) then
                 self%val(row, diag_idx) = self%val(row, diag_idx) + value
-            case default
-                self%status = MATRIX_STATUS_ILL_OPERATIONS
-            end select
+            else
+                self%status = MATRIX_STATUS%ILL_OPERATIONS
+            end if
 #ifdef USE_DEBUG
         else
             ! Attempted to set value in a non-allocated diagonal
-            self%status = MATRIX_STATUS_OUT_OF_MEMORY
+            self%status = MATRIX_STATUS%OUT_OF_MEMORY
         end if
 #endif
     end subroutine set_value_dia
@@ -223,7 +227,7 @@ contains
     module subroutine set_value_block_dia(self, op, row, col, row_block, col_block, value)
         implicit none
         class(type_matrix_dia), intent(inout) :: self
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         integer(int32), intent(in) :: row, col
         integer(int32), intent(in) :: row_block, col_block
         real(real64), intent(in) :: value
@@ -238,40 +242,49 @@ contains
     module subroutine set_row_dia(self, op, row, value, row_block)
         implicit none
         class(type_matrix_dia), intent(inout) :: self
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         integer(int32), intent(in) :: row
         real(real64), intent(in) :: value
         integer(int32), intent(in), optional :: row_block
         integer(int32) :: i
 
-        select case (op)
-        case (OP_INS)
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
+
+        if (op == MATRIX_OPS%INS) then
             do i = 1, self%num_diags
                 self%val(row, i) = value
             end do
-        case (OP_ADD)
+        else if (op == MATRIX_OPS%ADD) then
             do i = 1, self%num_diags
                 self%val(row, i) = self%val(row, i) + value
             end do
-        case default
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
-        end select
+        else
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end if
     end subroutine set_row_dia
 
     module subroutine set_all_dia(self, op, value)
         implicit none
         class(type_matrix_dia), intent(inout) :: self
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         real(real64), intent(in) :: value
 
-        select case (op)
-        case (OP_INS)
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
+
+        if (op == MATRIX_OPS%INS) then
             self%val(:, :) = value
-        case (OP_ADD)
+        else if (op == MATRIX_OPS%ADD) then
             self%val(:, :) = self%val(:, :) + value
-        case default
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
-        end select
+        else
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end if
+
     end subroutine set_all_dia
 
     !>
@@ -280,27 +293,30 @@ contains
     module subroutine scale_dia(self, op, alpha)
         implicit none
         class(type_matrix_dia), intent(inout) :: self
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         type(type_vector_dp), intent(in) :: alpha
 
         integer(int32) :: i, j, col_idx
         real(real64), dimension(:), pointer :: alpha_data
+
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
 
         ! Get direct access to vector data
         alpha_data => alpha%get_data()
 
         ! Check size
         if (size(alpha_data) /= self%num_nodes) then
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
             return
         end if
 
-        select case (op)
-
-            !-------------------------------------------------
-            ! Symmetric Scaling: A_ij <- A_ij * alpha(i) * alpha(j)
-            !-------------------------------------------------
-        case (OP_SCALE_SYMM_DIAG)
+        !-------------------------------------------------
+        ! Symmetric Scaling: A_ij <- A_ij * alpha(i) * alpha(j)
+        !-------------------------------------------------
+        if (op == MATRIX_OPS%SCALE_SYMM_DIAG) then
             !$omp parallel do default(shared) private(i, j, col_idx) schedule(static)
             do j = 1, self%num_diags
                 do i = 1, self%num_rows
@@ -312,12 +328,12 @@ contains
                 end do
             end do
             !$omp end parallel do
-            self%status = MATRIX_STATUS_SUCCESS
+            self%status = MATRIX_STATUS%SUCCESS
 
             !-------------------------------------------------
             ! Jacobi Scaling: A_ij <- A_ij * alpha(i)
             !-------------------------------------------------
-        case (OP_SCALE_JACOBI)
+        else if (op == MATRIX_OPS%SCALE_JACOBI) then
             !$omp parallel do default(shared) private(i, j) schedule(static)
             do j = 1, self%num_diags
                 do i = 1, self%num_rows
@@ -325,12 +341,10 @@ contains
                 end do
             end do
             !$omp end parallel do
-            self%status = MATRIX_STATUS_SUCCESS
-
-        case default
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
-        end select
-
+            self%status = MATRIX_STATUS%SUCCESS
+        else
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end if
     end subroutine scale_dia
 
     module subroutine zero_all_dia(self)

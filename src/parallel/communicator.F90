@@ -167,7 +167,7 @@ contains
     subroutine exchange_and_operate_scalar_impl(self, data_array, operation)
         class(type_halo_communicator), intent(inout) :: self
         real(real64), intent(inout) :: data_array(:)
-        integer(int32), intent(in) :: operation
+        type(type_constant_id), intent(in) :: operation
         integer(int32) :: i, ierr, total_send_nodes, total_recv_nodes
         type(MPI_Request), allocatable :: reqs(:)
         type(MPI_Status), allocatable :: statuses(:)
@@ -217,7 +217,7 @@ contains
         class(type_halo_communicator), intent(inout) :: self
         real(real64), intent(inout) :: data_array(:, :)
         integer(int32), intent(in) :: num_components
-        integer(int32), intent(in) :: operation
+        type(type_constant_id), intent(in) :: operation
         integer(int32) :: i, total_send_nodes, total_recv_nodes, total_send_values, total_recv_values, ierr
         type(MPI_Request), allocatable :: reqs(:)
         type(MPI_Status), allocatable :: statuses(:)
