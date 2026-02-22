@@ -1,0 +1,935 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>type_coordinate_array_dp &ndash; FTDSS </title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>type_coordinate_array_dp
+      <small>Derived Type</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title="<p> 0.6% of total for derived types.</p>Including implementation: 79 statements,  0.5% of total for derived types.">14 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/coordinate_array.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/coordinate_array.f90.html'>coordinate_array.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_types_coordinate_array.html'>core_types_coordinate_array</a></li>
+            <li class="breadcrumb-item active" aria-current="page">type_coordinate_array_dp</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#vars-0"
+         aria-expanded="false" aria-controls="vars-0">
+         <h4 class="card-header bg-primary text-white">Variables</h4>
+      </a>
+      <div id="vars-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/type_coordinate_array_dp.html#variable-is_allocated">is_allocated</a>
+            <a class="list-group-item" href="../type/type_coordinate_array_dp.html#variable-length">length</a>
+            <a class="list-group-item" href="../type/type_coordinate_array_dp.html#variable-x">x</a>
+            <a class="list-group-item" href="../type/type_coordinate_array_dp.html#variable-y">y</a>
+            <a class="list-group-item" href="../type/type_coordinate_array_dp.html#variable-z">z</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#boundprocs-0"
+         aria-expanded="false" aria-controls="boundprocs-0">
+         <h4 class="card-header bg-primary text-white">Type-Bound Procedures</h4>
+      </a>
+      <div id="boundprocs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/type_coordinate_array_dp.html#boundprocedure-destroy">destroy</a>
+            <a class="list-group-item" href="../type/type_coordinate_array_dp.html#boundprocedure-get_coordinate">get_coordinate</a>
+            <a class="list-group-item" href="../type/type_coordinate_array_dp.html#boundprocedure-get_length">get_length</a>
+            <a class="list-group-item" href="../type/type_coordinate_array_dp.html#boundprocedure-initialize~5">initialize</a>
+            <a class="list-group-item" href="../type/type_coordinate_array_dp.html#boundprocedure-is_initialized">is_initialized</a>
+            <a class="list-group-item" href="../type/type_coordinate_array_dp.html#boundprocedure-zero">zero</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2 id="type-def-statement">
+        type, public :: type_coordinate_array_dp</h2>
+    <p>Represents an array of 3D coordinates using double precision values.</p>
+<br>      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Inherited by</h3>
+        </div>
+        <div class="card-body">
+          <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: type~~type_coordinate_array_dp~~InheritedByGraph Pages: 1 -->
+<svg id="typetype_coordinate_array_dpInheritedByGraph" width="641pt" height="81pt"
+ viewBox="0.00 0.00 641.00 80.96" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_coordinate_array_dp~~InheritedByGraph" class="graph" transform="scale(0.67 0.67) rotate(0) translate(4 117)">
+<title>type~~type_coordinate_array_dp~~InheritedByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-117 954,-117 954,4 -4,4"/>
+<!-- type~type_coordinate_array_dp -->
+<g id="type~~type_coordinate_array_dp~~InheritedByGraph_node1" class="node">
+<title>type~type_coordinate_array_dp</title>
+<polygon fill="none" stroke="black" points="151,-66 0,-66 0,-42 151,-42 151,-66"/>
+<text text-anchor="middle" x="75.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_coordinate_array_dp</text>
+</g>
+<!-- type~type_output_observation -->
+<g id="type~~type_coordinate_array_dp~~InheritedByGraph_node2" class="node">
+<title>type~type_output_observation</title>
+<g id="a_type~~type_coordinate_array_dp~~InheritedByGraph_node2"><a xlink:href="../type/type_output_observation.html" xlink:title="type_output_observation">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="498,-113 354,-113 354,-89 498,-89 498,-113"/>
+<text text-anchor="middle" x="426" y="-98.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output_observation</text>
+</a>
+</g>
+</g>
+<!-- type~type_output_observation&#45;&gt;type~type_coordinate_array_dp -->
+<g id="type~~type_coordinate_array_dp~~InheritedByGraph_edge2" class="edge">
+<title>type~type_output_observation&#45;&gt;type~type_coordinate_array_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M353.77,-92.24C302.37,-85.82 231.35,-76.74 169,-68 166.47,-67.65 163.89,-67.28 161.3,-66.91"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="161.6,-63.42 151.2,-65.45 160.59,-70.34 161.6,-63.42"/>
+<text text-anchor="middle" x="287.5" y="-91.4" font-family="Helvetica,sans-Serif" font-size="9.50">coordinate</text>
+</g>
+<!-- type~type_output_vtk -->
+<g id="type~~type_coordinate_array_dp~~InheritedByGraph_node3" class="node">
+<title>type~type_output_vtk</title>
+<g id="a_type~~type_coordinate_array_dp~~InheritedByGraph_node3"><a xlink:href="../type/type_output_vtk.html" xlink:title="type_output_vtk">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="336,-66 239,-66 239,-42 336,-42 336,-66"/>
+<text text-anchor="middle" x="287.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output_vtk</text>
+</a>
+</g>
+</g>
+<!-- type~type_output_vtk&#45;&gt;type~type_coordinate_array_dp -->
+<g id="type~~type_coordinate_array_dp~~InheritedByGraph_edge3" class="edge">
+<title>type~type_output_vtk&#45;&gt;type~type_coordinate_array_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M238.85,-54C215.88,-54 187.64,-54 161.19,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="161.15,-50.5 151.15,-54 161.15,-57.5 161.15,-50.5"/>
+<text text-anchor="middle" x="195" y="-56.4" font-family="Helvetica,sans-Serif" font-size="9.50">coordinate</text>
+</g>
+<!-- type~type_vtk -->
+<g id="type~~type_coordinate_array_dp~~InheritedByGraph_node4" class="node">
+<title>type~type_vtk</title>
+<g id="a_type~~type_coordinate_array_dp~~InheritedByGraph_node4"><a xlink:href="../type/type_vtk.html" xlink:title="type_vtk">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="316,-24 259,-24 259,0 316,0 316,-24"/>
+<text text-anchor="middle" x="287.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vtk</text>
+</a>
+</g>
+</g>
+<!-- type~type_vtk&#45;&gt;type~type_coordinate_array_dp -->
+<g id="type~~type_coordinate_array_dp~~InheritedByGraph_edge1" class="edge">
+<title>type~type_vtk&#45;&gt;type~type_coordinate_array_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M258.61,-17.58C230.24,-23.25 185.14,-32.27 146.91,-39.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="145.97,-36.54 136.85,-41.93 147.34,-43.4 145.97,-36.54"/>
+<text text-anchor="middle" x="195" y="-37.4" font-family="Helvetica,sans-Serif" font-size="9.50">points</text>
+</g>
+<!-- type~type_input_geometry -->
+<g id="type~~type_coordinate_array_dp~~InheritedByGraph_node5" class="node">
+<title>type~type_input_geometry</title>
+<g id="a_type~~type_coordinate_array_dp~~InheritedByGraph_node5"><a xlink:href="../type/type_input_geometry.html" xlink:title="type_input_geometry">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="641,-24 516,-24 516,0 641,0 641,-24"/>
+<text text-anchor="middle" x="578.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input_geometry</text>
+</a>
+</g>
+</g>
+<!-- type~type_input_geometry&#45;&gt;type~type_vtk -->
+<g id="type~~type_coordinate_array_dp~~InheritedByGraph_edge6" class="edge">
+<title>type~type_input_geometry&#45;&gt;type~type_vtk</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M515.86,-12C458.37,-12 374.46,-12 326.29,-12"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="326,-8.5 316,-12 326,-15.5 326,-8.5"/>
+<text text-anchor="middle" x="426" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">vtk</text>
+</g>
+<!-- type~type_output -->
+<g id="type~~type_coordinate_array_dp~~InheritedByGraph_node6" class="node">
+<title>type~type_output</title>
+<g id="a_type~~type_coordinate_array_dp~~InheritedByGraph_node6"><a xlink:href="../type/type_output.html" xlink:title="type_output">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="816,-92 740,-92 740,-68 816,-68 816,-92"/>
+<text text-anchor="middle" x="778" y="-77.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output</text>
+</a>
+</g>
+</g>
+<!-- type~type_output&#45;&gt;type~type_output_observation -->
+<g id="type~~type_coordinate_array_dp~~InheritedByGraph_edge4" class="edge">
+<title>type~type_output&#45;&gt;type~type_output_observation</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M739.88,-82.23C685.1,-85.51 581.24,-91.75 508.25,-96.12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="507.94,-92.64 498.17,-96.73 508.36,-99.62 507.94,-92.64"/>
+<text text-anchor="middle" x="690.5" y="-88.4" font-family="Helvetica,sans-Serif" font-size="9.50">observations</text>
+</g>
+<!-- type~type_output_overall -->
+<g id="type~~type_coordinate_array_dp~~InheritedByGraph_node7" class="node">
+<title>type~type_output_overall</title>
+<g id="a_type~~type_coordinate_array_dp~~InheritedByGraph_node7"><a xlink:href="../type/type_output_overall.html" xlink:title="type_output_overall">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="637.5,-72 519.5,-72 519.5,-48 637.5,-48 637.5,-72"/>
+<text text-anchor="middle" x="578.5" y="-57.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output_overall</text>
+</a>
+</g>
+</g>
+<!-- type~type_output&#45;&gt;type~type_output_overall -->
+<g id="type~~type_coordinate_array_dp~~InheritedByGraph_edge9" class="edge">
+<title>type~type_output&#45;&gt;type~type_output_overall</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M739.87,-71.06C733.92,-69.87 727.81,-68.79 722,-68 697.94,-64.72 671.42,-62.78 647.85,-61.63"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="647.74,-58.13 637.59,-61.17 647.43,-65.12 647.74,-58.13"/>
+<text text-anchor="middle" x="690.5" y="-70.4" font-family="Helvetica,sans-Serif" font-size="9.50">overall</text>
+</g>
+<!-- type~type_output_overall&#45;&gt;type~type_output_vtk -->
+<g id="type~~type_coordinate_array_dp~~InheritedByGraph_edge5" class="edge">
+<title>type~type_output_overall&#45;&gt;type~type_output_vtk</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M519.36,-58.79C468.94,-57.75 396.35,-56.24 346.09,-55.2"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="346.1,-51.7 336.03,-54.99 345.96,-58.69 346.1,-51.7"/>
+<text text-anchor="middle" x="426" y="-60.4" font-family="Helvetica,sans-Serif" font-size="9.50">vtk</text>
+</g>
+<!-- type~type_ftdss -->
+<g id="type~~type_coordinate_array_dp~~InheritedByGraph_node8" class="node">
+<title>type~type_ftdss</title>
+<g id="a_type~~type_coordinate_array_dp~~InheritedByGraph_node8"><a xlink:href="../type/type_ftdss.html" xlink:title="type_ftdss">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="950,-92 884,-92 884,-68 950,-68 950,-92"/>
+<text text-anchor="middle" x="917" y="-77.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss</text>
+</a>
+</g>
+</g>
+<!-- type~type_ftdss&#45;&gt;type~type_output -->
+<g id="type~~type_coordinate_array_dp~~InheritedByGraph_edge8" class="edge">
+<title>type~type_ftdss&#45;&gt;type~type_output</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M883.88,-80C866.8,-80 845.46,-80 826.5,-80"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="826.25,-76.5 816.25,-80 826.25,-83.5 826.25,-76.5"/>
+<text text-anchor="middle" x="850" y="-82.4" font-family="Helvetica,sans-Serif" font-size="9.50">output</text>
+</g>
+<!-- type~type_input -->
+<g id="type~~type_coordinate_array_dp~~InheritedByGraph_node9" class="node">
+<title>type~type_input</title>
+<g id="a_type~~type_coordinate_array_dp~~InheritedByGraph_node9"><a xlink:href="../type/type_input.html" xlink:title="type_input">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="812,-24 744,-24 744,0 812,0 812,-24"/>
+<text text-anchor="middle" x="778" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input</text>
+</a>
+</g>
+</g>
+<!-- type~type_input&#45;&gt;type~type_input_geometry -->
+<g id="type~~type_coordinate_array_dp~~InheritedByGraph_edge7" class="edge">
+<title>type~type_input&#45;&gt;type~type_input_geometry</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M743.94,-12C718.68,-12 682.91,-12 651.18,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="651.04,-8.5 641.04,-12 651.04,-15.5 651.04,-8.5"/>
+<text text-anchor="middle" x="690.5" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">geometry</text>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var pantypetype_coordinate_array_dpInheritedByGraph = svgPanZoom('#typetype_coordinate_array_dpInheritedByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#InheritedByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="InheritedByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="186pt" height="32pt"
+ viewBox="0.00 0.00 185.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 181.5,-28 181.5,4 -4,4"/>
+<!-- Type -->
+<g id="node1" class="node">
+<title>Type</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="177.5,-24 72.5,-24 72.5,0 177.5,0 177.5,-24"/>
+<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a derived type to the parent type which it
+extends. Dashed arrows point from a derived type to the other
+types it contains as a components, with a label listing the name(s) of
+said component(s).
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    <br>
+
+    <section>
+    <h2>Components</h2>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-is_allocated"></span>
+              logical,
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>is_allocated</strong></td>
+<td> =</td>
+                <td>.false.</td>
+            <td>
+                <p>Flag indicating whether the coordinate array is allocated.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-length"></span>
+              integer(kind=int32),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>length</strong></td>
+<td> =</td>
+                <td>0</td>
+            <td>
+                <p>The number of coordinate points in the array.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-x"></span>
+              real(kind=real64),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>x</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                <p>Array of x-coordinates.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-y"></span>
+              real(kind=real64),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>y</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                <p>Array of y-coordinates.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-z"></span>
+              real(kind=real64),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>z</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                <p>Array of z-coordinates.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    </section>
+    <br>
+    
+
+
+      <section>
+        <h2>Type-Bound Procedures</h2>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-destroy"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>destroy</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/destroy_type_coordinate_array_dp.html'>destroy_type_coordinate_array_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/destroy_type_coordinate_array_dp.html'>destroy_type_coordinate_array_dp</a>(self)  
+</h3>
+    
+
+  <p>Deallocates the coordinate component arrays.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_coordinate_array_dp.html'>type_coordinate_array_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>The coordinate array object to destroy.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_coordinate"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_coordinate</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/get_coordinate_type_coordinate_array_dp.html'>get_coordinate_type_coordinate_array_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/get_coordinate_type_coordinate_array_dp.html'>get_coordinate_type_coordinate_array_dp</a>(self, index, coordinate)  
+</h3>
+    
+
+  <p>Returns the coordinate components as three separate arrays.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_coordinate_array_dp.html'>type_coordinate_array_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>The coordinate array object.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>index</strong></td>
+            <td>
+<p>The index of the coordinate point to retrieve.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_coordinate_dp.html'>type_coordinate_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>coordinate</strong></td>
+            <td>
+<p>The output coordinate object to populate.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_length"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_length</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/get_length_type_coordinate_array_dp.html'>get_length_type_coordinate_array_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/get_length_type_coordinate_array_dp.html'>get_length_type_coordinate_array_dp</a>(self) result(length)  
+</h3>
+    
+
+  <p>Returns the number of coordinate points in the array.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_coordinate_array_dp.html'>type_coordinate_array_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>The coordinate array object.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>integer(kind=int32)</small>
+    </h4>
+    <p>The number of coordinate points.</p>
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-initialize~5"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>initialize</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/initialize_type_coordinate_array_dp.html'>initialize_type_coordinate_array_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/initialize_type_coordinate_array_dp.html'>initialize_type_coordinate_array_dp</a>(self, length, initialize_value)  
+</h3>
+    
+
+  <p>Allocates and initializes the coordinate component arrays.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_coordinate_array_dp.html'>type_coordinate_array_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>The coordinate array object to initialize.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>length</strong></td>
+            <td>
+<p>The number of coordinate points to allocate.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>initialize_value</strong></td>
+            <td>
+<p>An optional value to assign to all components. Defaults to zero.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_initialized"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_initialized</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/is_initialized_type_coordinate_array_dp.html'>is_initialized_type_coordinate_array_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_initialized_type_coordinate_array_dp.html'>is_initialized_type_coordinate_array_dp</a>(self) result(initialized)  
+</h3>
+    
+
+  <p>Checks if the coordinate arrays are allocated.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_coordinate_array_dp.html'>type_coordinate_array_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>The coordinate array object to check.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    <p>Logical result indicating if the arrays are allocated.</p>
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-zero"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>zero</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/zero_type_coordinate_array_dp.html'>zero_type_coordinate_array_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/zero_type_coordinate_array_dp.html'>zero_type_coordinate_array_dp</a>(self)  
+</h3>
+    
+
+  <p>Sets all coordinate components to zero.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_coordinate_array_dp.html'>type_coordinate_array_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>The coordinate array object to zero.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+      </section>
+
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

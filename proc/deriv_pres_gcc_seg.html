@@ -1,0 +1,643 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>deriv_pres_gcc_seg &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>deriv_pres_gcc_seg
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">16 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/gcc_base.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/gcc_base.f90.html'>gcc_base.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/gcc_base.html'>gcc_base</a></li>
+            <li class="breadcrumb-item active" aria-current="page">deriv_pres_gcc_seg</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/deriv_pres_gcc_seg.html#src">deriv_pres_gcc_seg</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine deriv_pres_gcc_seg(self, state, suction_derivative)  
+    <a href="../interface/deriv_pres_gcc_seg.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~857"></span>
+              class(<a href='../type/type_gcc_segregation.html'>type_gcc_segregation</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-state~159"></span>
+              type(<a href='../type/type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-suction_derivative~14"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>suction_derivative</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~deriv_pres_gcc_seg~~CallsGraph Pages: 1 -->
+<svg id="procderiv_pres_gcc_segCallsGraph" width="641pt" height="83pt"
+ viewBox="0.00 0.00 641.00 82.62" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~deriv_pres_gcc_seg~~CallsGraph" class="graph" transform="scale(0.65 0.65) rotate(0) translate(4 122.19)">
+<title>proc~~deriv_pres_gcc_seg~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-122.19 975,-122.19 975,4 -4,4"/>
+<!-- proc~deriv_pres_gcc_seg -->
+<g id="proc~~deriv_pres_gcc_seg~~CallsGraph_node1" class="node">
+<title>proc~deriv_pres_gcc_seg</title>
+<polygon fill="none" stroke="black" points="115,-44.19 0,-44.19 0,-20.19 115,-20.19 115,-44.19"/>
+<text text-anchor="middle" x="57.5" y="-29.79" font-family="Helvetica,sans-Serif" font-size="10.50">deriv_pres_gcc_seg</text>
+</g>
+<!-- proc~calc_rho_ice_abst_physics -->
+<g id="proc~~deriv_pres_gcc_seg~~CallsGraph_node2" class="node">
+<title>proc~calc_rho_ice_abst_physics</title>
+<g id="a_proc~~deriv_pres_gcc_seg~~CallsGraph_node2"><a xlink:href="../proc/calc_rho_ice_abst_physics.html" xlink:title="abst_physics%calc_rho_ice_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="385,-44.19 158,-44.19 158,-20.19 385,-20.19 385,-44.19"/>
+<text text-anchor="middle" x="271.5" y="-29.79" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_rho_ice_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~deriv_pres_gcc_seg&#45;&gt;proc~calc_rho_ice_abst_physics -->
+<g id="proc~~deriv_pres_gcc_seg~~CallsGraph_edge1" class="edge">
+<title>proc~deriv_pres_gcc_seg&#45;&gt;proc~calc_rho_ice_abst_physics</title>
+<path fill="none" stroke="#ff0000" d="M115.03,-32.19C125.18,-32.19 136.1,-32.19 147.28,-32.19"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="147.61,-35.69 157.61,-32.19 147.61,-28.69 147.61,-35.69"/>
+</g>
+<!-- proc~calc_rho_water_abst_physics -->
+<g id="proc~~deriv_pres_gcc_seg~~CallsGraph_node3" class="node">
+<title>proc~calc_rho_water_abst_physics</title>
+<g id="a_proc~~deriv_pres_gcc_seg~~CallsGraph_node3"><a xlink:href="../proc/calc_rho_water_abst_physics.html" xlink:title="abst_physics%calc_rho_water_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="392,-86.19 151,-86.19 151,-62.19 392,-62.19 392,-86.19"/>
+<text text-anchor="middle" x="271.5" y="-71.79" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_rho_water_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~deriv_pres_gcc_seg&#45;&gt;proc~calc_rho_water_abst_physics -->
+<g id="proc~~deriv_pres_gcc_seg~~CallsGraph_edge2" class="edge">
+<title>proc~deriv_pres_gcc_seg&#45;&gt;proc~calc_rho_water_abst_physics</title>
+<path fill="none" stroke="#ff0000" d="M109.29,-44.2C122.82,-47.26 137.44,-50.46 151,-53.19 163.14,-55.64 176,-58.06 188.62,-60.36"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="188.21,-63.84 198.67,-62.16 189.45,-56.95 188.21,-63.84"/>
+</g>
+<!-- proc~get_field_dp -->
+<g id="proc~~deriv_pres_gcc_seg~~CallsGraph_node4" class="node">
+<title>proc~get_field_dp</title>
+<g id="a_proc~~deriv_pres_gcc_seg~~CallsGraph_node4"><a xlink:href="../proc/get_field_dp.html" xlink:title="type_field_dp%get_field_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="896,-24.19 739,-24.19 739,-0.19 896,-0.19 896,-24.19"/>
+<text text-anchor="middle" x="817.5" y="-9.79" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_field_dp%get_field_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~deriv_pres_gcc_seg&#45;&gt;proc~get_field_dp -->
+<g id="proc~~deriv_pres_gcc_seg~~CallsGraph_edge3" class="edge">
+<title>proc~deriv_pres_gcc_seg&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#ff0000" d="M102.38,-20.12C117.65,-16.49 134.96,-12.99 151,-11.19 361.68,12.42 416,-10.63 628,-11.19 660.78,-11.28 696.76,-11.45 728.43,-11.63"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="728.53,-15.13 738.55,-11.69 728.57,-8.13 728.53,-15.13"/>
+</g>
+<!-- calc_rho -->
+<g id="proc~~deriv_pres_gcc_seg~~CallsGraph_node5" class="node">
+<title>calc_rho</title>
+<polygon fill="#777777" stroke="#777777" points="557,-44.19 499,-44.19 499,-20.19 557,-20.19 557,-44.19"/>
+<text text-anchor="middle" x="528" y="-29.79" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_rho</text>
+</g>
+<!-- proc~calc_rho_ice_abst_physics&#45;&gt;calc_rho -->
+<g id="proc~~deriv_pres_gcc_seg~~CallsGraph_edge4" class="edge">
+<title>proc~calc_rho_ice_abst_physics&#45;&gt;calc_rho</title>
+<path fill="none" stroke="#ff0000" d="M385.24,-32.19C422.38,-32.19 461.18,-32.19 488.79,-32.19"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="488.79,-35.69 498.79,-32.19 488.79,-28.69 488.79,-35.69"/>
+</g>
+<!-- proc~get_thermo_state_tp -->
+<g id="proc~~deriv_pres_gcc_seg~~CallsGraph_node6" class="node">
+<title>proc~get_thermo_state_tp</title>
+<g id="a_proc~~deriv_pres_gcc_seg~~CallsGraph_node6"><a xlink:href="../proc/get_thermo_state_tp.html" xlink:title="abst_physics%get_thermo_state_TP">
+<polygon fill="#d9534f" stroke="#d9534f" points="628,-86.19 428,-86.19 428,-62.19 628,-62.19 628,-86.19"/>
+<text text-anchor="middle" x="528" y="-71.79" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%get_thermo_state_TP</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_rho_ice_abst_physics&#45;&gt;proc~get_thermo_state_tp -->
+<g id="proc~~deriv_pres_gcc_seg~~CallsGraph_edge5" class="edge">
+<title>proc~calc_rho_ice_abst_physics&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#ff0000" d="M345.43,-44.23C376.18,-49.3 412.14,-55.24 443.9,-60.48"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="443.62,-63.98 454.06,-62.16 444.76,-57.07 443.62,-63.98"/>
+</g>
+<!-- proc~calc_rho_water_abst_physics&#45;&gt;calc_rho -->
+<g id="proc~~deriv_pres_gcc_seg~~CallsGraph_edge6" class="edge">
+<title>proc~calc_rho_water_abst_physics&#45;&gt;calc_rho</title>
+<path fill="none" stroke="#00ff00" d="M345.43,-62.16C392.15,-54.45 450.9,-44.75 488.7,-38.51"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="489.48,-41.93 498.78,-36.85 488.34,-35.02 489.48,-41.93"/>
+</g>
+<!-- proc~calc_rho_water_abst_physics&#45;&gt;proc~get_thermo_state_tp -->
+<g id="proc~~deriv_pres_gcc_seg~~CallsGraph_edge7" class="edge">
+<title>proc~calc_rho_water_abst_physics&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#00ff00" d="M392.3,-74.19C400.73,-74.19 409.21,-74.19 417.58,-74.19"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="417.73,-77.69 427.73,-74.19 417.73,-70.69 417.73,-77.69"/>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp -->
+<g id="proc~~deriv_pres_gcc_seg~~CallsGraph_edge8" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#00ffff" d="M588.55,-62.18C601.59,-59.38 615.29,-56.3 628,-53.19 644.13,-49.25 647.85,-47.07 664,-43.19 689.28,-37.12 717.11,-31.23 741.99,-26.25"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="742.97,-29.62 752.1,-24.24 741.61,-22.76 742.97,-29.62"/>
+</g>
+<!-- proc~shift_pressure_absolute_abst_physics -->
+<g id="proc~~deriv_pres_gcc_seg~~CallsGraph_node7" class="node">
+<title>proc~shift_pressure_absolute_abst_physics</title>
+<g id="a_proc~~deriv_pres_gcc_seg~~CallsGraph_node7"><a xlink:href="../proc/shift_pressure_absolute_abst_physics.html" xlink:title="abst_physics%shift_pressure_absolute_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="960,-76.19 675,-76.19 675,-52.19 960,-52.19 960,-76.19"/>
+<text text-anchor="middle" x="817.5" y="-61.79" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%shift_pressure_absolute_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_physics -->
+<g id="proc~~deriv_pres_gcc_seg~~CallsGraph_edge9" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_physics</title>
+<path fill="none" stroke="#00ffff" d="M628.34,-70.74C640.07,-70.33 652.24,-69.91 664.49,-69.48"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="664.91,-72.97 674.78,-69.12 664.67,-65.97 664.91,-72.97"/>
+</g>
+<!-- proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~deriv_pres_gcc_seg~~CallsGraph_node8" class="node">
+<title>proc~shift_temperature_absolute_abst_physics</title>
+<g id="a_proc~~deriv_pres_gcc_seg~~CallsGraph_node8"><a xlink:href="../proc/shift_temperature_absolute_abst_physics.html" xlink:title="abst_physics%shift_temperature_absolute_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="971,-118.19 664,-118.19 664,-94.19 971,-94.19 971,-118.19"/>
+<text text-anchor="middle" x="817.5" y="-103.79" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%shift_temperature_absolute_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~deriv_pres_gcc_seg~~CallsGraph_edge10" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#00ffff" d="M628.34,-85.25C650.82,-87.75 674.91,-90.43 698.09,-93.01"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="697.99,-96.52 708.31,-94.15 698.76,-89.57 697.99,-96.52"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocderiv_pres_gcc_segCallsGraph = svgPanZoom('#procderiv_pres_gcc_segCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~deriv_pres_gcc_seg~~CalledByGraph Pages: 1 -->
+<svg id="procderiv_pres_gcc_segCalledByGraph" width="400pt" height="32pt"
+ viewBox="0.00 0.00 400.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~deriv_pres_gcc_seg~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~deriv_pres_gcc_seg~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 396,-28 396,4 -4,4"/>
+<!-- proc~deriv_pres_gcc_seg -->
+<g id="proc~~deriv_pres_gcc_seg~~CalledByGraph_node1" class="node">
+<title>proc~deriv_pres_gcc_seg</title>
+<polygon fill="none" stroke="black" points="392,-24 277,-24 277,0 392,0 392,-24"/>
+<text text-anchor="middle" x="334.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">deriv_pres_gcc_seg</text>
+</g>
+<!-- interface~deriv_pres_gcc_seg -->
+<g id="proc~~deriv_pres_gcc_seg~~CalledByGraph_node2" class="node">
+<title>interface~deriv_pres_gcc_seg</title>
+<g id="a_proc~~deriv_pres_gcc_seg~~CalledByGraph_node2"><a xlink:href="../interface/deriv_pres_gcc_seg.html" xlink:title="type_gcc_segregation%deriv_pres_gcc_seg">
+<polygon fill="#a7506f" stroke="#a7506f" points="241,-24 0,-24 0,0 241,0 241,-24"/>
+<text text-anchor="middle" x="120.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_gcc_segregation%deriv_pres_gcc_seg</text>
+</a>
+</g>
+</g>
+<!-- interface~deriv_pres_gcc_seg&#45;&gt;proc~deriv_pres_gcc_seg -->
+<g id="proc~~deriv_pres_gcc_seg~~CalledByGraph_edge1" class="edge">
+<title>interface~deriv_pres_gcc_seg&#45;&gt;proc~deriv_pres_gcc_seg</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M241.13,-12C249.85,-12 258.44,-12 266.67,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="266.87,-15.5 276.87,-12 266.87,-8.5 266.87,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">deriv_pres_gcc_seg</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">suction_derivative</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_gcc_segregation</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_state</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">state</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">suction_derivative</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">temperature</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">rho_water</span><span class="p">,</span><span class="w"> </span><span class="n">rho_ice</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">state</span><span class="p">%</span><span class="n">temperature</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! 凍結状態でのみ圧力微分が値を持ちます（非凍結時はサクション0固定のため微分0）</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">temperature</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">Tf0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">calc_rho_water</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">rho_water</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">calc_rho_ice</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">rho_ice</span><span class="p">)</span>
+<span class="w">            </span><span class="c">! d(Suction)/dP = (rho_ice / rho_water - 1.0)</span>
+<span class="w">            </span><span class="n">suction_derivative</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">rho_ice</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">rho_water</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">)</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            </span><span class="n">suction_derivative</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="k">end if</span>
+<span class="k">    end subroutine </span><span class="n">deriv_pres_gcc_seg</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

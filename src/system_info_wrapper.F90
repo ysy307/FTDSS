@@ -1,8 +1,10 @@
 module core_fortran_utils_system_info_wrapper
     use, intrinsic :: iso_fortran_env, only: int32
     use, intrinsic :: iso_c_binding, only: c_ptr, c_associated
-    use :: stdlib_strings, only:to_string
-    use :: core_c_utils, only:c_get_os, c_get_cpu_architecture, c_ptr_to_string
+    use :: stdlib_strings, only:to_string, strip
+    use :: core_c_utils_system_info, only:c_get_os, c_get_cpu_architecture
+    use :: core_c_utils, only:c_ptr_to_string
+    use :: core_system_env, only:get_env_string
     implicit none
 
     private
@@ -46,7 +48,7 @@ contains
         implicit none
         character(:), allocatable :: user_name
 
-        character(64) :: tmp_user_name
+        character(:), allocatable :: tmp_user_name
         integer(int32) :: len, status
         integer(int32) :: i
 
@@ -61,14 +63,14 @@ contains
         user_name_lists(4) = "USERNAME"
 
         do i = 1, user_name_lists_length
-            call get_environment_variable(user_name_lists(i), &
-                                          tmp_user_name, &
-                                          len, &
-                                          status)
-            if (status == 0 .and. len > 0) then
-                user_name = trim(adjustl(tmp_user_name))
-                deallocate (user_name_lists)
-                return
+            call get_env_string(user_name_lists(i), &
+                                tmp_user_name)
+            if (allocated(tmp_user_name)) then
+                if (len_trim(tmp_user_name) > 0) then
+                    user_name = strip(tmp_user_name)
+                    deallocate (user_name_lists)
+                    return
+                end if
             end if
         end do
 
@@ -105,7 +107,7 @@ contains
         implicit none
         character(:), allocatable :: host_name
 
-        character(64) :: tmp_host_name
+        character(:), allocatable :: tmp_host_name
         integer(int32) :: len, status
         integer(int32) :: i
 
@@ -117,14 +119,14 @@ contains
         host_name_lists(2) = "COMPUTERNAME"
 
         do i = 1, host_name_lists_length
-            call get_environment_variable(host_name_lists(i), &
-                                          tmp_host_name, &
-                                          len, &
-                                          status)
-            if (status == 0 .and. len > 0) then
-                host_name = trim(adjustl(tmp_host_name))
-                deallocate (host_name_lists)
-                return
+            call get_env_string(host_name_lists(i), &
+                                tmp_host_name)
+            if (allocated(tmp_host_name)) then
+                if (len_trim(tmp_host_name) > 0) then
+                    host_name = strip(tmp_host_name)
+                    deallocate (host_name_lists)
+                    return
+                end if
             end if
         end do
 

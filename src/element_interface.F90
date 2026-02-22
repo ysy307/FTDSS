@@ -1,395 +1,392 @@
-module domain_mesh_element
+!>
+!> Defines 2D finite element types (triangles, quadrilaterals) and their
+!> associated operations, such as shape functions and Jacobians.
+!> Definition part using interfaces for submodule implementation.
+!>
+module domain_fe_element
     use, intrinsic :: iso_fortran_env, only: int32, real64
+    use :: stdlib_strings, only:strip
     use :: stdlib_logger
-    use :: module_core, only:type_dp_3d, type_dp_vector_3d, assignment(=), operator(+), & !&
-                             type_dp_pointer, type_vtk_cell, allocate_array, deallocate_array
-    use :: module_input, only:type_input
-    use :: domain_mesh, only:abst_mesh
+    use :: module_core
+    use :: domain_base_fe, only:abst_fe
     implicit none
     private
 
-    public :: abst_element
     public :: type_triangle_first
     public :: type_triangle_second
     public :: type_square_first
     public :: type_square_second
-    public :: holder_elements
 
-    !--------------------------------------------------------------------------------------
-    ! Holder for polymorphic element objects
-    !--------------------------------------------------------------------------------------
-    type :: holder_elements
-        class(abst_element), allocatable :: e
-    end type holder_elements
+    public :: construct_triangle_first
+    public :: construct_square_first
+    public :: construct_triangle_second
+    public :: construct_square_second
 
-    !--------------------------------------------------------------------------------------
-    !   Abstract base type for 2D elementss
-    !--------------------------------------------------------------------------------------
-    type, abstract, extends(abst_mesh) :: abst_element
+    ! ====================================================================================
+    !   Type Definitions
+    ! ====================================================================================
+
+    !>
+    !> Represents a first-order triangular element (3 nodes).
+    !>
+    type, extends(abst_fe) :: type_triangle_first
     contains
-        procedure(abst_is_inside), pass(self), deferred :: is_inside
-    end type abst_element
-
-    !--------------------------------------------------------------------------------------
-    !   Triangle First Order Element Type
-    !--------------------------------------------------------------------------------------
-    type, extends(abst_element) :: type_triangle_first
-    contains
-        procedure, pass(self) :: get_geometry => get_area_triangle_first !&
-        procedure, pass(self) :: psi          => psi_triangle_first !&
-        procedure, pass(self) :: dpsi         => dpsi_triangle_first !&
-        procedure, pass(self) :: jacobian     => jacobian_triangle_first !&
-        procedure, pass(self) :: jacobian_det => jacobian_det_triangle_first !&
-        procedure, pass(self) :: is_inside    => is_in_triangle_first !&
+        procedure, pass(self) :: calc_measure => calc_area_triangle_first
+        procedure, pass(self) :: calc_psi => calc_psi_triangle_first
+        procedure, pass(self) :: calc_dpsi => calc_dpsi_triangle_first
+        procedure, pass(self) :: calc_jacobian => calc_jacobian_triangle_first
+        procedure, pass(self) :: is_inside => is_in_triangle_first
     end type type_triangle_first
 
-    !--------------------------------------------------------------------------------------
-    !   Square First Order Element Type
-    !--------------------------------------------------------------------------------------
-    type, extends(abst_element) :: type_square_first
+    !>
+    !> Represents a first-order quadrilateral element (4 nodes).
+    !>
+    type, extends(abst_fe) :: type_square_first
     contains
-        procedure, pass(self) :: get_geometry => get_area_square_first !&
-        procedure, pass(self) :: psi          => psi_square_first !&
-        procedure, pass(self) :: dpsi         => dpsi_square_first !&
-        procedure, pass(self) :: jacobian     => jacobian_square_first !&
-        procedure, pass(self) :: jacobian_det => jacobian_det_square_first !&
-        procedure, pass(self) :: is_inside    => is_in_square_first !&
+        procedure, pass(self) :: calc_measure => calc_area_square_first
+        procedure, pass(self) :: calc_psi => calc_psi_square_first
+        procedure, pass(self) :: calc_dpsi => calc_dpsi_square_first
+        procedure, pass(self) :: calc_jacobian => calc_jacobian_square_first
+        procedure, pass(self) :: is_inside => is_in_square_first
     end type type_square_first
 
-    !--------------------------------------------------------------------------------------
-    !   Triangle Second Order Element Type
-    !--------------------------------------------------------------------------------------
-    type, extends(abst_element) :: type_triangle_second
+    !>
+    !> Represents a second-order triangular element (6 nodes).
+    !>
+    type, extends(abst_fe) :: type_triangle_second
     contains
-        procedure, pass(self) :: get_geometry => get_area_triangle_second !&
-        procedure, pass(self) :: psi          => psi_triangle_second !&
-        procedure, pass(self) :: dpsi         => dpsi_triangle_second !&
-        procedure, pass(self) :: jacobian     => jacobian_triangle_second !&
-        procedure, pass(self) :: jacobian_det => jacobian_det_triangle_second !&
-        procedure, pass(self) :: is_inside    => is_in_triangle_second !&
+        procedure, pass(self) :: calc_measure => calc_area_triangle_second
+        procedure, pass(self) :: calc_psi => calc_psi_triangle_second
+        procedure, pass(self) :: calc_dpsi => calc_dpsi_triangle_second
+        procedure, pass(self) :: calc_jacobian => calc_jacobian_triangle_second
+        procedure, pass(self) :: is_inside => is_in_triangle_second
     end type type_triangle_second
 
-    !--------------------------------------------------------------------------------------
-    !   Square Second Order Element Type
-    !--------------------------------------------------------------------------------------
-    type, extends(abst_element) :: type_square_second
+    !>
+    !> Represents a second-order quadrilateral element (8 nodes).
+    !>
+    type, extends(abst_fe) :: type_square_second
     contains
-        procedure, pass(self) :: get_geometry => get_area_square_second !&
-        procedure, pass(self) :: psi          => psi_square_second !&
-        procedure, pass(self) :: dpsi         => dpsi_square_second !&
-        procedure, pass(self) :: jacobian     => jacobian_square_second !&
-        procedure, pass(self) :: jacobian_det => jacobian_det_square_second !&
-        procedure, pass(self) :: is_inside    => is_in_square_second !&
+        procedure, pass(self) :: calc_measure => calc_area_square_second
+        procedure, pass(self) :: calc_psi => calc_psi_square_second
+        procedure, pass(self) :: calc_dpsi => calc_dpsi_square_second
+        procedure, pass(self) :: calc_jacobian => calc_jacobian_square_second
+        procedure, pass(self) :: is_inside => is_in_square_second
     end type type_square_second
 
-    !
-    !----- 抽象インターフェース定義 -----
-    !
-    abstract interface
-        subroutine abst_is_inside(self, cartesian, normalized, is_in)
-            import abst_element, type_dp_vector_3d
-            implicit none
-            class(abst_element), intent(in) :: self
-            type(type_dp_vector_3d), intent(in) :: cartesian
-            type(type_dp_vector_3d), intent(inout) :: normalized
-            logical, intent(inout) :: is_in
-        end subroutine abst_is_inside
-
-    end interface
-
-    !--------------------------------------------------------------------------------------
-    !   三角形一次要素型 procedures interface
-    !--------------------------------------------------------------------------------------
+    ! ====================================================================================
+    !   Interface Definitions for Submodule Implementation
+    ! ====================================================================================
     interface
-        module function construct_triangle_first(id, global_coordinate, input) result(element)
+        ! --- Constructors ---
+        !> Constructs an instance of a first-order triangular element.
+        module function construct_triangle_first(integration_order) result(fe)
             implicit none
-            integer(int32), intent(in) :: id
-            type(type_dp_3d), pointer, intent(in) :: global_coordinate
-            type(type_input), intent(in) :: input
-            class(abst_element), allocatable :: element
-
+            !> The integration order for the element.
+            integer(int32), intent(in) :: integration_order
+            !> The newly created and allocated finite element object.
+            class(abst_fe), allocatable :: fe
         end function construct_triangle_first
 
-        pure module function get_area_triangle_first(self) result(area)
+        !> Constructs an instance of a first-order quadrilateral element.
+        module function construct_square_first(integration_order) result(fe)
             implicit none
-            class(type_triangle_first), intent(in) :: self
-            real(real64) :: area
-
-        end function get_area_triangle_first
-
-        pure elemental module function psi_triangle_first(self, i, r) result(psi)
-            implicit none
-            class(type_triangle_first), intent(in) :: self
-            integer(int32), intent(in) :: i
-            type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: psi
-
-        end function psi_triangle_first
-
-        pure elemental module function dpsi_triangle_first(self, i, j, r) result(dpsi)
-            implicit none
-            class(type_triangle_first), intent(in) :: self
-            integer(int32), intent(in) :: i
-            integer(int32), intent(in) :: j
-            type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: dpsi
-
-        end function dpsi_triangle_first
-
-        pure elemental module function jacobian_triangle_first(self, i, j, r) result(jacobian)
-            implicit none
-            class(type_triangle_first), intent(in) :: self
-            integer(int32), intent(in) :: i
-            integer(int32), intent(in) :: j
-            type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: jacobian
-
-        end function jacobian_triangle_first
-
-        pure elemental module function jacobian_det_triangle_first(self, r) result(jacobian_det)
-            implicit none
-            class(type_triangle_first), intent(in) :: self
-            type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: jacobian_det
-
-        end function jacobian_det_triangle_first
-
-        module subroutine is_in_triangle_first(self, cartesian, normalized, is_in)
-            implicit none
-            class(type_triangle_first), intent(in) :: self
-            type(type_dp_vector_3d), intent(in) :: cartesian
-            type(type_dp_vector_3d), intent(inout) :: normalized
-            logical, intent(inout) :: is_in
-
-        end subroutine is_in_triangle_first
-    end interface
-
-    !--------------------------------------------------------------------------------------
-    !   四角形一次要素型 procedures interface
-    !--------------------------------------------------------------------------------------
-    interface
-        module function construct_square_first(id, global_coordinate, input) result(element)
-            implicit none
-            integer(int32), intent(in) :: id
-            type(type_dp_3d), pointer, intent(in) :: global_coordinate
-            type(type_input), intent(in) :: input
-            class(abst_element), allocatable :: element
-
+            !> The integration order for the element.
+            integer(int32), intent(in) :: integration_order
+            !> The newly created and allocated finite element object.
+            class(abst_fe), allocatable :: fe
         end function construct_square_first
 
-        pure module function get_area_square_first(self) result(area)
+        !> Constructs an instance of a second-order triangular element.
+        module function construct_triangle_second(integration_order) result(fe)
             implicit none
-            class(type_square_first), intent(in) :: self
-            real(real64) :: area
-
-        end function get_area_square_first
-
-        pure elemental module function psi_square_first(self, i, r) result(psi)
-            implicit none
-            class(type_square_first), intent(in) :: self
-            integer(int32), intent(in) :: i
-            type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: psi
-
-        end function psi_square_first
-
-        pure elemental module function dpsi_square_first(self, i, j, r) result(dpsi)
-            implicit none
-            class(type_square_first), intent(in) :: self
-            integer(int32), intent(in) :: i
-            integer(int32), intent(in) :: j
-            type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: dpsi
-
-        end function dpsi_square_first
-
-        pure elemental module function jacobian_square_first(self, i, j, r) result(jacobian)
-            implicit none
-            class(type_square_first), intent(in) :: self
-            integer(int32), intent(in) :: i
-            integer(int32), intent(in) :: j
-            type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: jacobian
-
-        end function jacobian_square_first
-
-        pure elemental module function jacobian_det_square_first(self, r) result(jacobian_det)
-            implicit none
-            class(type_square_first), intent(in) :: self
-            type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: jacobian_det
-
-        end function jacobian_det_square_first
-
-        module subroutine is_in_square_first(self, cartesian, normalized, is_in)
-            implicit none
-            class(type_square_first), intent(in) :: self
-            type(type_dp_vector_3d), intent(in) :: cartesian
-            type(type_dp_vector_3d), intent(inout) :: normalized
-            logical, intent(inout) :: is_in
-
-        end subroutine is_in_square_first
-    end interface
-
-    !--------------------------------------------------------------------------------------
-    !   三角形二次要素型 procedures interface
-    !--------------------------------------------------------------------------------------
-    interface
-        module function construct_triangle_second(id, global_coordinate, input) result(element)
-            implicit none
-            integer(int32), intent(in) :: id
-            type(type_dp_3d), pointer, intent(in) :: global_coordinate
-            type(type_input), intent(in) :: input
-            class(abst_element), allocatable :: element
-
+            !> The integration order for the element.
+            integer(int32), intent(in) :: integration_order
+            !> The newly created and allocated finite element object.
+            class(abst_fe), allocatable :: fe
         end function construct_triangle_second
 
-        pure module function get_area_triangle_second(self) result(area)
+        !> Constructs an instance of a second-order quadrilateral element.
+        module function construct_square_second(integration_order) result(fe)
             implicit none
-            class(type_triangle_second), intent(in) :: self
-            real(real64) :: area
-
-        end function get_area_triangle_second
-
-        pure elemental module function psi_triangle_second(self, i, r) result(psi)
-            implicit none
-            class(type_triangle_second), intent(in) :: self
-            integer(int32), intent(in) :: i
-            type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: psi
-
-        end function psi_triangle_second
-
-        pure elemental module function dpsi_triangle_second(self, i, j, r) result(dpsi)
-            implicit none
-            class(type_triangle_second), intent(in) :: self
-            integer(int32), intent(in) :: i
-            integer(int32), intent(in) :: j
-            type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: dpsi
-
-        end function dpsi_triangle_second
-
-        pure elemental module function dpsi_deta_triangle_second(self, i, j, r) result(dpsi)
-            implicit none
-            class(type_triangle_second), intent(in) :: self
-            integer(int32), intent(in) :: i
-            integer(int32), intent(in) :: j
-            type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: dpsi
-
-        end function dpsi_deta_triangle_second
-
-        pure elemental module function jacobian_triangle_second(self, i, j, r) result(jacobian)
-            implicit none
-            class(type_triangle_second), intent(in) :: self
-            integer(int32), intent(in) :: i
-            integer(int32), intent(in) :: j
-            type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: jacobian
-
-        end function jacobian_triangle_second
-
-        pure elemental module function jacobian_det_triangle_second(self, r) result(jacobian_det)
-            implicit none
-            class(type_triangle_second), intent(in) :: self
-            type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: jacobian_det
-
-        end function jacobian_det_triangle_second
-
-        module subroutine is_in_triangle_second(self, cartesian, normalized, is_in)
-            implicit none
-            class(type_triangle_second), intent(in) :: self
-            type(type_dp_vector_3d), intent(in) :: cartesian
-            type(type_dp_vector_3d), intent(inout) :: normalized
-            logical, intent(inout) :: is_in
-
-        end subroutine is_in_triangle_second
-
-    end interface
-
-    !--------------------------------------------------------------------------------------
-    !   四角形二次要素型 procedures interface
-    !--------------------------------------------------------------------------------------
-    interface
-        module function construct_square_second(id, global_coordinate, input) result(element)
-            implicit none
-            integer(int32), intent(in) :: id
-            type(type_dp_3d), pointer, intent(in) :: global_coordinate
-            type(type_input), intent(in) :: input
-            class(abst_element), allocatable :: element
-
+            !> The integration order for the element.
+            integer(int32), intent(in) :: integration_order
+            !> The newly created and allocated finite element object.
+            class(abst_fe), allocatable :: fe
         end function construct_square_second
 
-        pure module function get_area_square_second(self) result(area)
+        ! --- Triangle First Order ---
+        !> Calculates the area of a first-order triangular element.
+        module subroutine calc_area_triangle_first(self, node_coords, measure)
             implicit none
-            class(type_square_second), intent(in) :: self
-            real(real64) :: area
+            !> The element instance.
+            class(type_triangle_first), intent(in) :: self
+            !> Global coordinates of the nodes.
+            real(real64), intent(in) :: node_coords(:, :)
+            !> Calculated measure (area).
+            real(real64), intent(inout) :: measure
+        end subroutine calc_area_triangle_first
 
-        end function get_area_square_second
-
-        pure elemental module function psi_square_second(self, i, r) result(psi)
+        !> Evaluates the shape function psi.
+        pure elemental module subroutine calc_psi_triangle_first(self, i, r, psi_val)
             implicit none
-            class(type_square_second), intent(in) :: self
+            !> The element instance.
+            class(type_triangle_first), intent(in) :: self
+            !> Shape function index.
             integer(int32), intent(in) :: i
-            type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: psi
+            !> Local coordinate.
+            type(type_coordinate_dp), intent(in) :: r
+            !> Output value.
+            real(real64), intent(inout) :: psi_val
+        end subroutine calc_psi_triangle_first
 
-        end function psi_square_second
-
-        pure elemental module function dpsi_square_second(self, i, j, r) result(dpsi)
+        !> Evaluates the derivative of the shape function dpsi.
+        pure elemental module subroutine calc_dpsi_triangle_first(self, i, j, r, dpsi_val)
             implicit none
-            class(type_square_second), intent(in) :: self
+            !> The element instance.
+            class(type_triangle_first), intent(in) :: self
+            !> Shape function index.
             integer(int32), intent(in) :: i
+            !> Derivative direction index.
             integer(int32), intent(in) :: j
-            type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: dpsi
+            !> Local coordinate.
+            type(type_coordinate_dp), intent(in) :: r
+            !> Output value.
+            real(real64), intent(inout) :: dpsi_val
+        end subroutine calc_dpsi_triangle_first
 
-        end function dpsi_square_second
-
-        pure elemental module function jacobian_square_second(self, i, j, r) result(jacobian)
+        !> Calculates the Jacobian matrix.
+        pure module subroutine calc_jacobian_triangle_first(self, r, node_coords, jac)
             implicit none
-            class(type_square_second), intent(in) :: self
-            integer(int32), intent(in) :: i
-            integer(int32), intent(in) :: j
-            type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: jacobian
+            !> The element instance.
+            class(type_triangle_first), intent(in) :: self
+            !> Local coordinate.
+            type(type_coordinate_dp), intent(in) :: r
+            !> Global coordinates of the nodes.
+            real(real64), intent(in) :: node_coords(:, :)
+            !> Output Jacobian matrix.
+            real(real64), intent(inout) :: jac(:, :)
+        end subroutine calc_jacobian_triangle_first
 
-        end function jacobian_square_second
-
-        pure elemental module function jacobian_det_square_second(self, r) result(jacobian_det)
+        !> Checks if a point is inside the element.
+        module subroutine is_in_triangle_first(self, cartesian, normalized, node_coords, is_in)
             implicit none
-            class(type_square_second), intent(in) :: self
-            type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: jacobian_det
-
-        end function jacobian_det_square_second
-
-        module subroutine is_in_square_second(self, cartesian, normalized, is_in)
-            implicit none
-            class(type_square_second), intent(in) :: self
-            type(type_dp_vector_3d), intent(in) :: cartesian
-            type(type_dp_vector_3d), intent(inout) :: normalized
+            !> The element instance.
+            class(type_triangle_first), intent(in) :: self
+            !> Cartesian coordinate to check.
+            type(type_coordinate_dp), intent(in) :: cartesian
+            !> Output normalized coordinate.
+            type(type_coordinate_dp), intent(inout) :: normalized
+            !> Global coordinates of the nodes.
+            real(real64), intent(in) :: node_coords(:, :)
+            !> Output flag.
             logical, intent(inout) :: is_in
+        end subroutine is_in_triangle_first
 
+        ! --- Square First Order ---
+        !> Calculates the area of a first-order square element.
+        module subroutine calc_area_square_first(self, node_coords, measure)
+            implicit none
+            !> The element instance.
+            class(type_square_first), intent(in) :: self
+            !> Global coordinates of the nodes.
+            real(real64), intent(in) :: node_coords(:, :)
+            !> Output area.
+            real(real64), intent(inout) :: measure
+        end subroutine calc_area_square_first
+
+        !> Evaluates the shape function psi.
+        pure elemental module subroutine calc_psi_square_first(self, i, r, psi_val)
+            implicit none
+            !> The element instance.
+            class(type_square_first), intent(in) :: self
+            !> Shape function index.
+            integer(int32), intent(in) :: i
+            !> Local coordinate.
+            type(type_coordinate_dp), intent(in) :: r
+            !> Output value.
+            real(real64), intent(inout) :: psi_val
+        end subroutine calc_psi_square_first
+
+        !> Evaluates the derivative of the shape function dpsi.
+        pure elemental module subroutine calc_dpsi_square_first(self, i, j, r, dpsi_val)
+            implicit none
+            !> The element instance.
+            class(type_square_first), intent(in) :: self
+            !> Shape function index.
+            integer(int32), intent(in) :: i
+            !> Derivative direction index.
+            integer(int32), intent(in) :: j
+            !> Local coordinate.
+            type(type_coordinate_dp), intent(in) :: r
+            !> Output value.
+            real(real64), intent(inout) :: dpsi_val
+        end subroutine calc_dpsi_square_first
+
+        !> Calculates the Jacobian matrix.
+        pure module subroutine calc_jacobian_square_first(self, r, node_coords, jac)
+            implicit none
+            !> The element instance.
+            class(type_square_first), intent(in) :: self
+            !> Local coordinate.
+            type(type_coordinate_dp), intent(in) :: r
+            !> Global coordinates of the nodes.
+            real(real64), intent(in) :: node_coords(:, :)
+            !> Output Jacobian matrix.
+            real(real64), intent(inout) :: jac(:, :)
+        end subroutine calc_jacobian_square_first
+
+        !> Checks if a point is inside the element.
+        module subroutine is_in_square_first(self, cartesian, normalized, node_coords, is_in)
+            implicit none
+            !> The element instance.
+            class(type_square_first), intent(in) :: self
+            !> Cartesian coordinate to check.
+            type(type_coordinate_dp), intent(in) :: cartesian
+            !> Output normalized coordinate.
+            type(type_coordinate_dp), intent(inout) :: normalized
+            !> Global coordinates of the nodes.
+            real(real64), intent(in) :: node_coords(:, :)
+            !> Output flag.
+            logical, intent(inout) :: is_in
+        end subroutine is_in_square_first
+
+        ! --- Triangle Second Order ---
+        !> Calculates the area of a second-order triangular element.
+        module subroutine calc_area_triangle_second(self, node_coords, measure)
+            implicit none
+            !> The element instance.
+            class(type_triangle_second), intent(in) :: self
+            !> Global coordinates of the nodes.
+            real(real64), intent(in) :: node_coords(:, :)
+            !> Output area.
+            real(real64), intent(inout) :: measure
+        end subroutine calc_area_triangle_second
+
+        !> Evaluates the shape function psi.
+        pure elemental module subroutine calc_psi_triangle_second(self, i, r, psi_val)
+            implicit none
+            !> The element instance.
+            class(type_triangle_second), intent(in) :: self
+            !> Shape function index.
+            integer(int32), intent(in) :: i
+            !> Local coordinate.
+            type(type_coordinate_dp), intent(in) :: r
+            !> Output value.
+            real(real64), intent(inout) :: psi_val
+        end subroutine calc_psi_triangle_second
+
+        !> Evaluates the derivative of the shape function dpsi.
+        pure elemental module subroutine calc_dpsi_triangle_second(self, i, j, r, dpsi_val)
+            implicit none
+            !> The element instance.
+            class(type_triangle_second), intent(in) :: self
+            !> Shape function index.
+            integer(int32), intent(in) :: i
+            !> Derivative direction index.
+            integer(int32), intent(in) :: j
+            !> Local coordinate.
+            type(type_coordinate_dp), intent(in) :: r
+            !> Output value.
+            real(real64), intent(inout) :: dpsi_val
+        end subroutine calc_dpsi_triangle_second
+
+        !> Calculates the Jacobian matrix.
+        pure module subroutine calc_jacobian_triangle_second(self, r, node_coords, jac)
+            implicit none
+            !> The element instance.
+            class(type_triangle_second), intent(in) :: self
+            !> Local coordinate.
+            type(type_coordinate_dp), intent(in) :: r
+            !> Global coordinates of the nodes.
+            real(real64), intent(in) :: node_coords(:, :)
+            !> Output Jacobian matrix.
+            real(real64), intent(inout) :: jac(:, :)
+        end subroutine calc_jacobian_triangle_second
+
+        !> Checks if a point is inside the element.
+        module subroutine is_in_triangle_second(self, cartesian, normalized, node_coords, is_in)
+            implicit none
+            !> The element instance.
+            class(type_triangle_second), intent(in) :: self
+            !> Cartesian coordinate to check.
+            type(type_coordinate_dp), intent(in) :: cartesian
+            !> Output normalized coordinate.
+            type(type_coordinate_dp), intent(inout) :: normalized
+            !> Global coordinates of the nodes.
+            real(real64), intent(in) :: node_coords(:, :)
+            !> Output flag.
+            logical, intent(inout) :: is_in
+        end subroutine is_in_triangle_second
+
+        ! --- Square Second Order ---
+        !> Calculates the area of a second-order square element.
+        module subroutine calc_area_square_second(self, node_coords, measure)
+            implicit none
+            !> The element instance.
+            class(type_square_second), intent(in) :: self
+            !> Global coordinates of the nodes.
+            real(real64), intent(in) :: node_coords(:, :)
+            !> Output area.
+            real(real64), intent(inout) :: measure
+        end subroutine calc_area_square_second
+
+        !> Evaluates the shape function psi.
+        pure elemental module subroutine calc_psi_square_second(self, i, r, psi_val)
+            implicit none
+            !> The element instance.
+            class(type_square_second), intent(in) :: self
+            !> Shape function index.
+            integer(int32), intent(in) :: i
+            !> Local coordinate.
+            type(type_coordinate_dp), intent(in) :: r
+            !> Output value.
+            real(real64), intent(inout) :: psi_val
+        end subroutine calc_psi_square_second
+
+        !> Evaluates the derivative of the shape function dpsi.
+        pure elemental module subroutine calc_dpsi_square_second(self, i, j, r, dpsi_val)
+            implicit none
+            !> The element instance.
+            class(type_square_second), intent(in) :: self
+            !> Shape function index.
+            integer(int32), intent(in) :: i
+            !> Derivative direction index.
+            integer(int32), intent(in) :: j
+            !> Local coordinate.
+            type(type_coordinate_dp), intent(in) :: r
+            !> Output value.
+            real(real64), intent(inout) :: dpsi_val
+        end subroutine calc_dpsi_square_second
+
+        !> Calculates the Jacobian matrix.
+        pure module subroutine calc_jacobian_square_second(self, r, node_coords, jac)
+            implicit none
+            !> The element instance.
+            class(type_square_second), intent(in) :: self
+            !> Local coordinate.
+            type(type_coordinate_dp), intent(in) :: r
+            !> Global coordinates of the nodes.
+            real(real64), intent(in) :: node_coords(:, :)
+            !> Output Jacobian matrix.
+            real(real64), intent(inout) :: jac(:, :)
+        end subroutine calc_jacobian_square_second
+
+        !> Checks if a point is inside the element.
+        module subroutine is_in_square_second(self, cartesian, normalized, node_coords, is_in)
+            implicit none
+            !> The element instance.
+            class(type_square_second), intent(in) :: self
+            !> Cartesian coordinate to check.
+            type(type_coordinate_dp), intent(in) :: cartesian
+            !> Output normalized coordinate.
+            type(type_coordinate_dp), intent(inout) :: normalized
+            !> Global coordinates of the nodes.
+            real(real64), intent(in) :: node_coords(:, :)
+            !> Output flag.
+            logical, intent(inout) :: is_in
         end subroutine is_in_square_second
+
     end interface
 
-    interface type_triangle_first
-        module procedure :: construct_triangle_first
-    end interface
-
-    interface type_square_first
-        module procedure :: construct_square_first
-    end interface
-
-    interface type_triangle_second
-        module procedure :: construct_triangle_second
-    end interface
-
-    interface type_square_second
-        module procedure :: construct_square_second
-    end interface
-
-end module domain_mesh_element
+end module domain_fe_element

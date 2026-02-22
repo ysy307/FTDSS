@@ -1,0 +1,848 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>copy_vector_dp &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>copy_vector_dp
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">13 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/vector_dp.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/vector_dp.f90.html'>vector_dp.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_types_vector_dp.html'>core_types_vector_dp</a></li>
+            <li class="breadcrumb-item active" aria-current="page">copy_vector_dp</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/copy_vector_dp.html#src">copy_vector_dp</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine copy_vector_dp(self, source_vector)  
+    <a href="../interface/copy_vector_dp.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+    <p>Optimized Copy.</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~769"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-source_vector~3"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>source_vector</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~copy_vector_dp~~CallsGraph Pages: 1 -->
+<svg id="proccopy_vector_dpCallsGraph" width="635pt" height="74pt"
+ viewBox="0.00 0.00 635.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~copy_vector_dp~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 70)">
+<title>proc~~copy_vector_dp~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 631,-70 631,4 -4,4"/>
+<!-- proc~copy_vector_dp -->
+<g id="proc~~copy_vector_dp~~CallsGraph_node1" class="node">
+<title>proc~copy_vector_dp</title>
+<polygon fill="none" stroke="black" points="96,-45 0,-45 0,-21 96,-21 96,-45"/>
+<text text-anchor="middle" x="48" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">copy_vector_dp</text>
+</g>
+<!-- interface~destroy_vector_dp -->
+<g id="proc~~copy_vector_dp~~CallsGraph_node2" class="node">
+<title>interface~destroy_vector_dp</title>
+<g id="a_proc~~copy_vector_dp~~CallsGraph_node2"><a xlink:href="../interface/destroy_vector_dp.html" xlink:title="type_vector_dp%destroy_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="334.5,-66 134.5,-66 134.5,-42 334.5,-42 334.5,-66"/>
+<text text-anchor="middle" x="234.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%destroy_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~copy_vector_dp&#45;&gt;interface~destroy_vector_dp -->
+<g id="proc~~copy_vector_dp~~CallsGraph_edge1" class="edge">
+<title>proc~copy_vector_dp&#45;&gt;interface~destroy_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M96.03,-38.35C104.92,-39.37 114.55,-40.46 124.45,-41.59"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="124.09,-45.07 134.42,-42.72 124.88,-38.11 124.09,-45.07"/>
+</g>
+<!-- interface~initialize_vector_dp -->
+<g id="proc~~copy_vector_dp~~CallsGraph_node3" class="node">
+<title>interface~initialize_vector_dp</title>
+<g id="a_proc~~copy_vector_dp~~CallsGraph_node3"><a xlink:href="../interface/initialize_vector_dp.html" xlink:title="type_vector_dp%initialize_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="337,-24 132,-24 132,0 337,0 337,-24"/>
+<text text-anchor="middle" x="234.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%initialize_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~copy_vector_dp&#45;&gt;interface~initialize_vector_dp -->
+<g id="proc~~copy_vector_dp~~CallsGraph_edge2" class="edge">
+<title>proc~copy_vector_dp&#45;&gt;interface~initialize_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M96.03,-27.65C104.1,-26.73 112.78,-25.74 121.72,-24.72"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="122.36,-28.17 131.9,-23.56 121.57,-21.22 122.36,-28.17"/>
+</g>
+<!-- proc~destroy_vector_dp -->
+<g id="proc~~copy_vector_dp~~CallsGraph_node4" class="node">
+<title>proc~destroy_vector_dp</title>
+<g id="a_proc~~copy_vector_dp~~CallsGraph_node4"><a xlink:href="../proc/destroy_vector_dp.html" xlink:title="destroy_vector_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="485,-66 376,-66 376,-42 485,-42 485,-66"/>
+<text text-anchor="middle" x="430.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">destroy_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~destroy_vector_dp&#45;&gt;proc~destroy_vector_dp -->
+<g id="proc~~copy_vector_dp~~CallsGraph_edge3" class="edge">
+<title>interface~destroy_vector_dp&#45;&gt;proc~destroy_vector_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M334.77,-54C345.29,-54 355.77,-54 365.72,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="365.88,-57.5 375.88,-54 365.88,-50.5 365.88,-57.5"/>
+</g>
+<!-- proc~initialize_vector_dp -->
+<g id="proc~~copy_vector_dp~~CallsGraph_node5" class="node">
+<title>proc~initialize_vector_dp</title>
+<g id="a_proc~~copy_vector_dp~~CallsGraph_node5"><a xlink:href="../proc/initialize_vector_dp.html" xlink:title="initialize_vector_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="488,-24 373,-24 373,0 488,0 488,-24"/>
+<text text-anchor="middle" x="430.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_vector_dp&#45;&gt;proc~initialize_vector_dp -->
+<g id="proc~~copy_vector_dp~~CallsGraph_edge4" class="edge">
+<title>interface~initialize_vector_dp&#45;&gt;proc~initialize_vector_dp</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M337.05,-12C345.78,-12 354.46,-12 362.81,-12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="362.82,-15.5 372.82,-12 362.82,-8.5 362.82,-15.5"/>
+</g>
+<!-- deallocate_array -->
+<g id="proc~~copy_vector_dp~~CallsGraph_node7" class="node">
+<title>deallocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="627,-66 524,-66 524,-42 627,-42 627,-66"/>
+<text text-anchor="middle" x="575.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_array</text>
+</g>
+<!-- proc~destroy_vector_dp&#45;&gt;deallocate_array -->
+<g id="proc~~copy_vector_dp~~CallsGraph_edge5" class="edge">
+<title>proc~destroy_vector_dp&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#ff0000" d="M485.15,-54C494.47,-54 504.21,-54 513.7,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="513.86,-57.5 523.86,-54 513.86,-50.5 513.86,-57.5"/>
+</g>
+<!-- allocate_array -->
+<g id="proc~~copy_vector_dp~~CallsGraph_node6" class="node">
+<title>allocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="620,-24 531,-24 531,0 620,0 620,-24"/>
+<text text-anchor="middle" x="575.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</g>
+<!-- proc~initialize_vector_dp&#45;&gt;allocate_array -->
+<g id="proc~~copy_vector_dp~~CallsGraph_edge6" class="edge">
+<title>proc~initialize_vector_dp&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#00ffff" d="M488.02,-12C498.78,-12 510.03,-12 520.71,-12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="520.74,-15.5 530.74,-12 520.74,-8.5 520.74,-15.5"/>
+</g>
+<!-- proc~initialize_vector_dp&#45;&gt;deallocate_array -->
+<g id="proc~~copy_vector_dp~~CallsGraph_edge7" class="edge">
+<title>proc~initialize_vector_dp&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#00ffff" d="M472.48,-24.04C488.48,-28.74 507,-34.18 523.83,-39.12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="522.93,-42.5 533.52,-41.96 524.91,-35.79 522.93,-42.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~copy_vector_dp~~CalledByGraph Pages: 1 -->
+<svg id="proccopy_vector_dpCalledByGraph" width="641pt" height="169pt"
+ viewBox="0.00 0.00 641.00 169.24" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~copy_vector_dp~~CalledByGraph" class="graph" transform="scale(0.44 0.44) rotate(0) translate(4 383.85)">
+<title>proc~~copy_vector_dp~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-383.85 1465,-383.85 1465,4 -4,4"/>
+<!-- proc~copy_vector_dp -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_node1" class="node">
+<title>proc~copy_vector_dp</title>
+<polygon fill="none" stroke="black" points="1461,-192 1365,-192 1365,-168 1461,-168 1461,-192"/>
+<text text-anchor="middle" x="1413" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50">copy_vector_dp</text>
+</g>
+<!-- interface~copy_vector_dp -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_node2" class="node">
+<title>interface~copy_vector_dp</title>
+<g id="a_proc~~copy_vector_dp~~CalledByGraph_node2"><a xlink:href="../interface/copy_vector_dp.html" xlink:title="type_vector_dp%copy_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="1329,-192 1142,-192 1142,-168 1329,-168 1329,-192"/>
+<text text-anchor="middle" x="1235.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%copy_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~copy_vector_dp&#45;&gt;proc~copy_vector_dp -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_edge1" class="edge">
+<title>interface~copy_vector_dp&#45;&gt;proc~copy_vector_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1329.13,-180C1337.82,-180 1346.45,-180 1354.67,-180"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1354.84,-183.5 1364.84,-180 1354.84,-176.5 1354.84,-183.5"/>
+</g>
+<!-- proc~apply_bsr_ilu0 -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_node3" class="node">
+<title>proc~apply_bsr_ilu0</title>
+<g id="a_proc~~copy_vector_dp~~CalledByGraph_node3"><a xlink:href="../proc/apply_bsr_ilu0.html" xlink:title="apply_bsr_ilu0">
+<polygon fill="#d9534f" stroke="#d9534f" points="1028,-318 940,-318 940,-294 1028,-294 1028,-318"/>
+<text text-anchor="middle" x="984" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">apply_bsr_ilu0</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_bsr_ilu0&#45;&gt;interface~copy_vector_dp -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_edge2" class="edge">
+<title>proc~apply_bsr_ilu0&#45;&gt;interface~copy_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M1028.01,-303.89C1051.87,-301.42 1081.56,-296.16 1106,-285 1151.2,-264.35 1193.83,-223.86 1216.83,-199.64"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1219.6,-201.8 1223.86,-192.1 1214.48,-197.03 1219.6,-201.8"/>
+</g>
+<!-- proc~apply_csr_ilu0 -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_node4" class="node">
+<title>proc~apply_csr_ilu0</title>
+<g id="a_proc~~copy_vector_dp~~CalledByGraph_node4"><a xlink:href="../proc/apply_csr_ilu0.html" xlink:title="apply_csr_ilu0">
+<polygon fill="#d9534f" stroke="#d9534f" points="1028,-276 940,-276 940,-252 1028,-252 1028,-276"/>
+<text text-anchor="middle" x="984" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">apply_csr_ilu0</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_csr_ilu0&#45;&gt;interface~copy_vector_dp -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_edge3" class="edge">
+<title>proc~apply_csr_ilu0&#45;&gt;interface~copy_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M1028.28,-259.52C1051.68,-256.34 1080.85,-251.16 1106,-243 1141.78,-231.39 1180.19,-211.47 1205.6,-197.14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1207.4,-200.14 1214.34,-192.14 1203.92,-194.07 1207.4,-200.14"/>
+</g>
+<!-- proc~apply_preconditioner_iluk -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_node5" class="node">
+<title>proc~apply_preconditioner_iluk</title>
+<g id="a_proc~~copy_vector_dp~~CalledByGraph_node5"><a xlink:href="../proc/apply_preconditioner_iluk.html" xlink:title="apply_preconditioner_iluk">
+<polygon fill="#d9534f" stroke="#d9534f" points="474,-318 325,-318 325,-294 474,-294 474,-318"/>
+<text text-anchor="middle" x="399.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">apply_preconditioner_iluk</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_preconditioner_iluk&#45;&gt;interface~copy_vector_dp -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_edge4" class="edge">
+<title>proc~apply_preconditioner_iluk&#45;&gt;interface~copy_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M437.96,-318.1C547.06,-351.1 871.69,-433.39 1106,-327 1163.31,-300.98 1205.08,-235.38 1223.71,-201.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1226.94,-202.67 1228.54,-192.19 1220.76,-199.38 1226.94,-202.67"/>
+</g>
+<!-- interface~apply_bsr_ilu0 -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_node12" class="node">
+<title>interface~apply_bsr_ilu0</title>
+<g id="a_proc~~copy_vector_dp~~CalledByGraph_node12"><a xlink:href="../interface/apply_bsr_ilu0.html" xlink:title="type_preconditioner_iluk%apply_bsr_ilu0">
+<polygon fill="#a7506f" stroke="#a7506f" points="782.5,-318 553.5,-318 553.5,-294 782.5,-294 782.5,-318"/>
+<text text-anchor="middle" x="668" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_preconditioner_iluk%apply_bsr_ilu0</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_preconditioner_iluk&#45;&gt;interface~apply_bsr_ilu0 -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_edge18" class="edge">
+<title>proc~apply_preconditioner_iluk&#45;&gt;interface~apply_bsr_ilu0</title>
+<path fill="none" stroke="#ff0000" d="M474.03,-306C495.53,-306 519.65,-306 543.36,-306"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="543.49,-309.5 553.49,-306 543.49,-302.5 543.49,-309.5"/>
+</g>
+<!-- interface~apply_csr_ilu0 -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_node13" class="node">
+<title>interface~apply_csr_ilu0</title>
+<g id="a_proc~~copy_vector_dp~~CalledByGraph_node13"><a xlink:href="../interface/apply_csr_ilu0.html" xlink:title="type_preconditioner_iluk%apply_csr_ilu0">
+<polygon fill="#a7506f" stroke="#a7506f" points="782,-276 554,-276 554,-252 782,-252 782,-276"/>
+<text text-anchor="middle" x="668" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_preconditioner_iluk%apply_csr_ilu0</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_preconditioner_iluk&#45;&gt;interface~apply_csr_ilu0 -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_edge19" class="edge">
+<title>proc~apply_preconditioner_iluk&#45;&gt;interface~apply_csr_ilu0</title>
+<path fill="none" stroke="#ffda00" d="M459.78,-294C476.03,-290.88 493.66,-287.66 510,-285 526.34,-282.34 543.67,-279.77 560.63,-277.4"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="561.13,-280.86 570.56,-276.03 560.17,-273.93 561.13,-280.86"/>
+</g>
+<!-- proc~apply_preconditioner_jacobi -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_node6" class="node">
+<title>proc~apply_preconditioner_jacobi</title>
+<g id="a_proc~~copy_vector_dp~~CalledByGraph_node6"><a xlink:href="../proc/apply_preconditioner_jacobi.html" xlink:title="apply_preconditioner_jacobi">
+<polygon fill="#d9534f" stroke="#d9534f" points="1065.5,-234 902.5,-234 902.5,-210 1065.5,-210 1065.5,-234"/>
+<text text-anchor="middle" x="984" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">apply_preconditioner_jacobi</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_preconditioner_jacobi&#45;&gt;interface~copy_vector_dp -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_edge5" class="edge">
+<title>proc~apply_preconditioner_jacobi&#45;&gt;interface~copy_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M1056.5,-209.96C1086.64,-204.89 1121.89,-198.96 1153.04,-193.71"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1153.71,-197.15 1162.99,-192.04 1152.55,-190.25 1153.71,-197.15"/>
+</g>
+<!-- proc~apply_preconditioner_none -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_node7" class="node">
+<title>proc~apply_preconditioner_none</title>
+<g id="a_proc~~copy_vector_dp~~CalledByGraph_node7"><a xlink:href="../proc/apply_preconditioner_none.html" xlink:title="apply_preconditioner_none">
+<polygon fill="#d9534f" stroke="#d9534f" points="1062.5,-192 905.5,-192 905.5,-168 1062.5,-168 1062.5,-192"/>
+<text text-anchor="middle" x="984" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">apply_preconditioner_none</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_preconditioner_none&#45;&gt;interface~copy_vector_dp -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_edge6" class="edge">
+<title>proc~apply_preconditioner_none&#45;&gt;interface~copy_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M1062.58,-180C1084.38,-180 1108.44,-180 1131.49,-180"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1131.64,-183.5 1141.64,-180 1131.64,-176.5 1131.64,-183.5"/>
+</g>
+<!-- proc~copy_residual_vector -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_node8" class="node">
+<title>proc~copy_residual_vector</title>
+<g id="a_proc~~copy_vector_dp~~CalledByGraph_node8"><a xlink:href="../proc/copy_residual_vector.html" xlink:title="type_residual_vector%copy_residual_vector">
+<polygon fill="#d9534f" stroke="#d9534f" points="1106,-150 862,-150 862,-126 1106,-126 1106,-150"/>
+<text text-anchor="middle" x="984" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_residual_vector%copy_residual_vector</text>
+</a>
+</g>
+</g>
+<!-- proc~copy_residual_vector&#45;&gt;interface~copy_vector_dp -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_edge7" class="edge">
+<title>proc~copy_residual_vector&#45;&gt;interface~copy_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M1056.5,-150.04C1086.64,-155.11 1121.89,-161.04 1153.04,-166.29"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1152.55,-169.75 1162.99,-167.96 1153.71,-162.85 1152.55,-169.75"/>
+</g>
+<!-- proc~matrix_scale -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_node9" class="node">
+<title>proc~matrix_scale</title>
+<g id="a_proc~~copy_vector_dp~~CalledByGraph_node9"><a xlink:href="../proc/matrix_scale.html" xlink:title="matrix_scale">
+<polygon fill="#d9534f" stroke="#d9534f" points="1024,-108 944,-108 944,-84 1024,-84 1024,-108"/>
+<text text-anchor="middle" x="984" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_scale</text>
+</a>
+</g>
+</g>
+<!-- proc~matrix_scale&#45;&gt;interface~copy_vector_dp -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_edge8" class="edge">
+<title>proc~matrix_scale&#45;&gt;interface~copy_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M1024.1,-99.93C1048.13,-103.04 1079.33,-108.34 1106,-117 1141.78,-128.61 1180.19,-148.53 1205.6,-162.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1203.92,-165.93 1214.34,-167.86 1207.4,-159.86 1203.92,-165.93"/>
+</g>
+<!-- proc~solve_type_solver_bicgstab -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_node10" class="node">
+<title>proc~solve_type_solver_bicgstab</title>
+<g id="a_proc~~copy_vector_dp~~CalledByGraph_node10"><a xlink:href="../proc/solve_type_solver_bicgstab.html" xlink:title="solve_type_solver_bicgstab">
+<polygon fill="#d9534f" stroke="#d9534f" points="1062.5,-66 905.5,-66 905.5,-42 1062.5,-42 1062.5,-66"/>
+<text text-anchor="middle" x="984" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_bicgstab</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_bicgstab&#45;&gt;interface~copy_vector_dp -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_edge9" class="edge">
+<title>proc~solve_type_solver_bicgstab&#45;&gt;interface~copy_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M1062.63,-61.39C1077.44,-64.48 1092.52,-68.84 1106,-75 1151.2,-95.65 1193.83,-136.14 1216.83,-160.36"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1214.48,-162.97 1223.86,-167.9 1219.6,-158.2 1214.48,-162.97"/>
+</g>
+<!-- proc~solve_type_solver_gmres -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_node11" class="node">
+<title>proc~solve_type_solver_gmres</title>
+<g id="a_proc~~copy_vector_dp~~CalledByGraph_node11"><a xlink:href="../proc/solve_type_solver_gmres.html" xlink:title="solve_type_solver_gmres">
+<polygon fill="#d9534f" stroke="#d9534f" points="1056.5,-24 911.5,-24 911.5,0 1056.5,0 1056.5,-24"/>
+<text text-anchor="middle" x="984" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_gmres</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;interface~copy_vector_dp -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_edge10" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;interface~copy_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M1056.54,-16.22C1073.52,-19.39 1091.04,-24.59 1106,-33 1160.32,-63.54 1202.9,-126.03 1222.58,-158.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1219.65,-160.76 1227.73,-167.62 1225.69,-157.22 1219.65,-160.76"/>
+</g>
+<!-- interface~apply_bsr_ilu0&#45;&gt;proc~apply_bsr_ilu0 -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_edge11" class="edge">
+<title>interface~apply_bsr_ilu0&#45;&gt;proc~apply_bsr_ilu0</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M782.81,-306C833.02,-306 889.62,-306 929.8,-306"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="929.9,-309.5 939.9,-306 929.9,-302.5 929.9,-309.5"/>
+</g>
+<!-- interface~apply_csr_ilu0&#45;&gt;proc~apply_csr_ilu0 -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_edge12" class="edge">
+<title>interface~apply_csr_ilu0&#45;&gt;proc~apply_csr_ilu0</title>
+<path fill="none" stroke="#ffaa00" stroke-dasharray="5,2" d="M782.36,-264C832.62,-264 889.36,-264 929.64,-264"/>
+<polygon fill="#ffaa00" stroke="#ffaa00" points="929.77,-267.5 939.77,-264 929.77,-260.5 929.77,-267.5"/>
+</g>
+<!-- interface~apply_preconditioner_iluk -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_node14" class="node">
+<title>interface~apply_preconditioner_iluk</title>
+<g id="a_proc~~copy_vector_dp~~CalledByGraph_node14"><a xlink:href="../interface/apply_preconditioner_iluk.html" xlink:title="type_preconditioner_iluk%apply_preconditioner_iluk">
+<polygon fill="#a7506f" stroke="#a7506f" points="289,-318 0,-318 0,-294 289,-294 289,-318"/>
+<text text-anchor="middle" x="144.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_preconditioner_iluk%apply_preconditioner_iluk</text>
+</a>
+</g>
+</g>
+<!-- interface~apply_preconditioner_iluk&#45;&gt;proc~apply_preconditioner_iluk -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_edge13" class="edge">
+<title>interface~apply_preconditioner_iluk&#45;&gt;proc~apply_preconditioner_iluk</title>
+<path fill="none" stroke="#aaff00" stroke-dasharray="5,2" d="M289,-306C297.8,-306 306.49,-306 314.9,-306"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="314.99,-309.5 324.99,-306 314.99,-302.5 314.99,-309.5"/>
+</g>
+<!-- interface~apply_preconditioner_jacobi -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_node15" class="node">
+<title>interface~apply_preconditioner_jacobi</title>
+<g id="a_proc~~copy_vector_dp~~CalledByGraph_node15"><a xlink:href="../interface/apply_preconditioner_jacobi.html" xlink:title="type_preconditioner_jacobi%apply_preconditioner_jacobi">
+<polygon fill="#a7506f" stroke="#a7506f" points="826,-234 510,-234 510,-210 826,-210 826,-234"/>
+<text text-anchor="middle" x="668" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_preconditioner_jacobi%apply_preconditioner_jacobi</text>
+</a>
+</g>
+</g>
+<!-- interface~apply_preconditioner_jacobi&#45;&gt;proc~apply_preconditioner_jacobi -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_edge14" class="edge">
+<title>interface~apply_preconditioner_jacobi&#45;&gt;proc~apply_preconditioner_jacobi</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M826,-222C848.66,-222 871.33,-222 892.1,-222"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="892.14,-225.5 902.14,-222 892.14,-218.5 892.14,-225.5"/>
+</g>
+<!-- interface~apply_preconditioner_none -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_node16" class="node">
+<title>interface~apply_preconditioner_none</title>
+<g id="a_proc~~copy_vector_dp~~CalledByGraph_node16"><a xlink:href="../interface/apply_preconditioner_none.html" xlink:title="type_preconditioner_none%apply_preconditioner_none">
+<polygon fill="#a7506f" stroke="#a7506f" points="821,-192 515,-192 515,-168 821,-168 821,-192"/>
+<text text-anchor="middle" x="668" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_preconditioner_none%apply_preconditioner_none</text>
+</a>
+</g>
+</g>
+<!-- interface~apply_preconditioner_none&#45;&gt;proc~apply_preconditioner_none -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_edge15" class="edge">
+<title>interface~apply_preconditioner_none&#45;&gt;proc~apply_preconditioner_none</title>
+<path fill="none" stroke="#00ffa9" stroke-dasharray="5,2" d="M821.4,-180C846.72,-180 872.19,-180 895.19,-180"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="895.23,-183.5 905.23,-180 895.23,-176.5 895.23,-183.5"/>
+</g>
+<!-- interface~solve_type_solver_bicgstab -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_node17" class="node">
+<title>interface~solve_type_solver_bicgstab</title>
+<g id="a_proc~~copy_vector_dp~~CalledByGraph_node17"><a xlink:href="../interface/solve_type_solver_bicgstab.html" xlink:title="type_solver_bicgstab%solve_type_solver_bicgstab">
+<polygon fill="#a7506f" stroke="#a7506f" points="806.5,-66 529.5,-66 529.5,-42 806.5,-42 806.5,-66"/>
+<text text-anchor="middle" x="668" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_solver_bicgstab%solve_type_solver_bicgstab</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_type_solver_bicgstab&#45;&gt;proc~solve_type_solver_bicgstab -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_edge16" class="edge">
+<title>interface~solve_type_solver_bicgstab&#45;&gt;proc~solve_type_solver_bicgstab</title>
+<path fill="none" stroke="#aa00ff" stroke-dasharray="5,2" d="M806.72,-54C836.68,-54 867.58,-54 894.99,-54"/>
+<polygon fill="#aa00ff" stroke="#aa00ff" points="895.31,-57.5 905.31,-54 895.31,-50.5 895.31,-57.5"/>
+</g>
+<!-- interface~solve_type_solver_gmres -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_node18" class="node">
+<title>interface~solve_type_solver_gmres</title>
+<g id="a_proc~~copy_vector_dp~~CalledByGraph_node18"><a xlink:href="../interface/solve_type_solver_gmres.html" xlink:title="type_solver_gmres%solve_type_solver_gmres">
+<polygon fill="#a7506f" stroke="#a7506f" points="794.5,-24 541.5,-24 541.5,0 794.5,0 794.5,-24"/>
+<text text-anchor="middle" x="668" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_solver_gmres%solve_type_solver_gmres</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_type_solver_gmres&#45;&gt;proc~solve_type_solver_gmres -->
+<g id="proc~~copy_vector_dp~~CalledByGraph_edge17" class="edge">
+<title>interface~solve_type_solver_gmres&#45;&gt;proc~solve_type_solver_gmres</title>
+<path fill="none" stroke="#ff00aa" stroke-dasharray="5,2" d="M794.91,-12C830.62,-12 868.58,-12 900.97,-12"/>
+<polygon fill="#ff00aa" stroke="#ff00aa" points="901.28,-15.5 911.28,-12 901.28,-8.5 901.28,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccopy_vector_dpCalledByGraph = svgPanZoom('#proccopy_vector_dpCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">copy_vector_dp</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">source_vector</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_vector_dp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">type_vector_dp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">source_vector</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">is_initialized_vector</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">num_nodes</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">source_vector</span><span class="p">%</span><span class="n">num_nodes</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">num_blocks</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">source_vector</span><span class="p">%</span><span class="n">num_blocks</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+
+<span class="k">            </span><span class="n">self</span><span class="p">%</span><span class="n">val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">source_vector</span><span class="p">%</span><span class="n">val</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">is_initialized_vector</span><span class="p">)</span><span class="w"> </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">destroy</span><span class="p">()</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">initialize</span><span class="p">(</span><span class="n">source_vector</span><span class="p">%</span><span class="n">num_nodes</span><span class="p">,</span><span class="w"> </span><span class="n">source_vector</span><span class="p">%</span><span class="n">num_blocks</span><span class="p">)</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">source_vector</span><span class="p">%</span><span class="n">val</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">VECTOR_STATUS_SUCCESS</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">copy_vector_dp</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

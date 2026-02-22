@@ -1,0 +1,776 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>get_cell_info_from_cell_name &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>get_cell_info_from_cell_name
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">14 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/vtk_constants.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/vtk_constants.f90.html'>vtk_constants.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_vtk_vtk_constants.html'>core_vtk_vtk_constants</a></li>
+            <li class="breadcrumb-item active" aria-current="page">get_cell_info_from_cell_name</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/get_cell_info_from_cell_name.html#src">get_cell_info_from_cell_name</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine get_cell_info_from_cell_name(self, cell_name, cell_type, num_nodes_in_cell, cell_dimension, cell_order)  
+</h2>
+    
+
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_vtk_constants.html'>type_vtk_constants</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~222"></span>
+              class(<a href='../type/type_vtk_constants.html'>type_vtk_constants</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cell_name~5"></span>
+              character(len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>cell_name</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cell_type~3"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>cell_type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_nodes_in_cell~2"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_nodes_in_cell</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cell_dimension~2"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>cell_dimension</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cell_order~2"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>cell_order</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~get_cell_info_from_cell_name~~CallsGraph Pages: 1 -->
+<svg id="procget_cell_info_from_cell_nameCallsGraph" width="641pt" height="72pt"
+ viewBox="0.00 0.00 641.00 72.09" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_cell_info_from_cell_name~~CallsGraph" class="graph" transform="scale(0.97 0.97) rotate(0) translate(4 70)">
+<title>proc~~get_cell_info_from_cell_name~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 654,-70 654,4 -4,4"/>
+<!-- proc~get_cell_info_from_cell_name -->
+<g id="proc~~get_cell_info_from_cell_name~~CallsGraph_node1" class="node">
+<title>proc~get_cell_info_from_cell_name</title>
+<polygon fill="none" stroke="black" points="280,-45 0,-45 0,-21 280,-21 280,-45"/>
+<text text-anchor="middle" x="140" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_vtk_constants%get_cell_info_from_cell_name</text>
+</g>
+<!-- proc~get_cell_type -->
+<g id="proc~~get_cell_info_from_cell_name~~CallsGraph_node2" class="node">
+<title>proc~get_cell_type</title>
+<g id="a_proc~~get_cell_info_from_cell_name~~CallsGraph_node2"><a xlink:href="../proc/get_cell_type.html" xlink:title="type_vtk_constants%get_cell_type">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="534.5,-66 341.5,-66 341.5,-42 534.5,-42 534.5,-66"/>
+<text text-anchor="middle" x="438" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vtk_constants%get_cell_type</text>
+</a>
+</g>
+</g>
+<!-- proc~get_cell_info_from_cell_name&#45;&gt;proc~get_cell_type -->
+<g id="proc~~get_cell_info_from_cell_name~~CallsGraph_edge1" class="edge">
+<title>proc~get_cell_info_from_cell_name&#45;&gt;proc~get_cell_type</title>
+<path fill="none" stroke="#ff0000" d="M280.33,-42.89C297.47,-44.1 314.76,-45.33 331.28,-46.5"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="331.24,-50.01 341.47,-47.22 331.74,-43.02 331.24,-50.01"/>
+</g>
+<!-- proc~initialize_vtk_constants -->
+<g id="proc~~get_cell_info_from_cell_name~~CallsGraph_node3" class="node">
+<title>proc~initialize_vtk_constants</title>
+<g id="a_proc~~get_cell_info_from_cell_name~~CallsGraph_node3"><a xlink:href="../proc/initialize_vtk_constants.html" xlink:title="type_vtk_constants%initialize_vtk_constants">
+<polygon fill="#d9534f" stroke="#d9534f" points="560,-24 316,-24 316,0 560,0 560,-24"/>
+<text text-anchor="middle" x="438" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vtk_constants%initialize_vtk_constants</text>
+</a>
+</g>
+</g>
+<!-- proc~get_cell_info_from_cell_name&#45;&gt;proc~initialize_vtk_constants -->
+<g id="proc~~get_cell_info_from_cell_name~~CallsGraph_edge2" class="edge">
+<title>proc~get_cell_info_from_cell_name&#45;&gt;proc~initialize_vtk_constants</title>
+<path fill="none" stroke="#ff0000" d="M280.33,-23.11C288.75,-22.52 297.21,-21.92 305.6,-21.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="306.06,-24.8 315.79,-20.6 305.57,-17.82 306.06,-24.8"/>
+</g>
+<!-- strip -->
+<g id="proc~~get_cell_info_from_cell_name~~CallsGraph_node4" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="650,-66 596,-66 596,-42 650,-42 650,-66"/>
+<text text-anchor="middle" x="623" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~get_cell_type&#45;&gt;strip -->
+<g id="proc~~get_cell_info_from_cell_name~~CallsGraph_edge3" class="edge">
+<title>proc~get_cell_type&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M534.52,-54C552.65,-54 570.57,-54 585.43,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="585.66,-57.5 595.66,-54 585.66,-50.5 585.66,-57.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocget_cell_info_from_cell_nameCallsGraph = svgPanZoom('#procget_cell_info_from_cell_nameCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~get_cell_info_from_cell_name~~CalledByGraph Pages: 1 -->
+<svg id="procget_cell_info_from_cell_nameCalledByGraph" width="641pt" height="234pt"
+ viewBox="0.00 0.00 641.00 233.62" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph" class="graph" transform="scale(0.97 0.97) rotate(0) translate(4 238)">
+<title>proc~~get_cell_info_from_cell_name~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-238 660,-238 660,4 -4,4"/>
+<!-- proc~get_cell_info_from_cell_name -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_node1" class="node">
+<title>proc~get_cell_info_from_cell_name</title>
+<polygon fill="none" stroke="black" points="656,-129 376,-129 376,-105 656,-105 656,-129"/>
+<text text-anchor="middle" x="516" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_vtk_constants%get_cell_info_from_cell_name</text>
+</g>
+<!-- proc~construct_side_first -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_node2" class="node">
+<title>proc~construct_side_first</title>
+<g id="a_proc~~get_cell_info_from_cell_name~~CalledByGraph_node2"><a xlink:href="../proc/construct_side_first.html" xlink:title="construct_side_first">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="321.5,-234 206.5,-234 206.5,-210 321.5,-210 321.5,-234"/>
+<text text-anchor="middle" x="264" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_side_first</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_side_first&#45;&gt;proc~get_cell_info_from_cell_name -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_edge1" class="edge">
+<title>proc~construct_side_first&#45;&gt;proc~get_cell_info_from_cell_name</title>
+<path fill="none" stroke="#ff0000" d="M313.01,-209.9C322.07,-207.24 331.4,-204.24 340,-201 392.03,-181.4 449.69,-152.17 484.1,-133.87"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="486,-136.82 493.17,-129.01 482.7,-130.65 486,-136.82"/>
+</g>
+<!-- proc~construct_side_second -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_node3" class="node">
+<title>proc~construct_side_second</title>
+<g id="a_proc~~get_cell_info_from_cell_name~~CalledByGraph_node3"><a xlink:href="../proc/construct_side_second.html" xlink:title="construct_side_second">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="330.5,-192 197.5,-192 197.5,-168 330.5,-168 330.5,-192"/>
+<text text-anchor="middle" x="264" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_side_second</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_side_second&#45;&gt;proc~get_cell_info_from_cell_name -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_edge2" class="edge">
+<title>proc~construct_side_second&#45;&gt;proc~get_cell_info_from_cell_name</title>
+<path fill="none" stroke="#ff0000" d="M312.91,-167.93C354.08,-157.55 413.55,-142.56 457.33,-131.53"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="458.41,-134.87 467.26,-129.03 456.7,-128.08 458.41,-134.87"/>
+</g>
+<!-- proc~construct_square_first -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_node4" class="node">
+<title>proc~construct_square_first</title>
+<g id="a_proc~~get_cell_info_from_cell_name~~CalledByGraph_node4"><a xlink:href="../proc/construct_square_first.html" xlink:title="construct_square_first">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="328.5,-150 199.5,-150 199.5,-126 328.5,-126 328.5,-150"/>
+<text text-anchor="middle" x="264" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_square_first</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_square_first&#45;&gt;proc~get_cell_info_from_cell_name -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_edge3" class="edge">
+<title>proc~construct_square_first&#45;&gt;proc~get_cell_info_from_cell_name</title>
+<path fill="none" stroke="#ff0000" d="M328.73,-132.65C340.26,-131.68 352.71,-130.63 365.52,-129.56"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="366.19,-133.01 375.86,-128.69 365.61,-126.04 366.19,-133.01"/>
+</g>
+<!-- proc~construct_square_second -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_node5" class="node">
+<title>proc~construct_square_second</title>
+<g id="a_proc~~get_cell_info_from_cell_name~~CalledByGraph_node5"><a xlink:href="../proc/construct_square_second.html" xlink:title="construct_square_second">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="337.5,-108 190.5,-108 190.5,-84 337.5,-84 337.5,-108"/>
+<text text-anchor="middle" x="264" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_square_second</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_square_second&#45;&gt;proc~get_cell_info_from_cell_name -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_edge4" class="edge">
+<title>proc~construct_square_second&#45;&gt;proc~get_cell_info_from_cell_name</title>
+<path fill="none" stroke="#ff0000" d="M337.65,-102.1C346.63,-102.86 356.06,-103.65 365.69,-104.46"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="365.53,-107.96 375.79,-105.31 366.12,-100.98 365.53,-107.96"/>
+</g>
+<!-- proc~construct_triangle_first -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_node6" class="node">
+<title>proc~construct_triangle_first</title>
+<g id="a_proc~~get_cell_info_from_cell_name~~CalledByGraph_node6"><a xlink:href="../proc/construct_triangle_first.html" xlink:title="construct_triangle_first">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="331,-66 197,-66 197,-42 331,-42 331,-66"/>
+<text text-anchor="middle" x="264" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_triangle_first</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_triangle_first&#45;&gt;proc~get_cell_info_from_cell_name -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_edge5" class="edge">
+<title>proc~construct_triangle_first&#45;&gt;proc~get_cell_info_from_cell_name</title>
+<path fill="none" stroke="#ff0000" d="M312.91,-66.07C354.08,-76.45 413.55,-91.44 457.33,-102.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="456.7,-105.92 467.26,-104.97 458.41,-99.13 456.7,-105.92"/>
+</g>
+<!-- proc~construct_triangle_second -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_node7" class="node">
+<title>proc~construct_triangle_second</title>
+<g id="a_proc~~get_cell_info_from_cell_name~~CalledByGraph_node7"><a xlink:href="../proc/construct_triangle_second.html" xlink:title="construct_triangle_second">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="340,-24 188,-24 188,0 340,0 340,-24"/>
+<text text-anchor="middle" x="264" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_triangle_second</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_triangle_second&#45;&gt;proc~get_cell_info_from_cell_name -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_edge6" class="edge">
+<title>proc~construct_triangle_second&#45;&gt;proc~get_cell_info_from_cell_name</title>
+<path fill="none" stroke="#ff0000" d="M313.01,-24.1C322.07,-26.76 331.4,-29.76 340,-33 392.03,-52.6 449.69,-81.83 484.1,-100.13"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="482.7,-103.35 493.17,-104.99 486,-97.18 482.7,-103.35"/>
+</g>
+<!-- interface~construct_side_first -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_node8" class="node">
+<title>interface~construct_side_first</title>
+<g id="a_proc~~get_cell_info_from_cell_name~~CalledByGraph_node8"><a xlink:href="../interface/construct_side_first.html" xlink:title="construct_side_first">
+<polygon fill="#a7506f" stroke="#a7506f" points="133.5,-234 18.5,-234 18.5,-210 133.5,-210 133.5,-234"/>
+<text text-anchor="middle" x="76" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_side_first</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_side_first&#45;&gt;proc~construct_side_first -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_edge7" class="edge">
+<title>interface~construct_side_first&#45;&gt;proc~construct_side_first</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M133.56,-222C153.31,-222 175.67,-222 196.17,-222"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="196.38,-225.5 206.38,-222 196.38,-218.5 196.38,-225.5"/>
+</g>
+<!-- interface~construct_side_second -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_node9" class="node">
+<title>interface~construct_side_second</title>
+<g id="a_proc~~get_cell_info_from_cell_name~~CalledByGraph_node9"><a xlink:href="../interface/construct_side_second.html" xlink:title="construct_side_second">
+<polygon fill="#a7506f" stroke="#a7506f" points="142.5,-192 9.5,-192 9.5,-168 142.5,-168 142.5,-192"/>
+<text text-anchor="middle" x="76" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_side_second</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_side_second&#45;&gt;proc~construct_side_second -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_edge8" class="edge">
+<title>interface~construct_side_second&#45;&gt;proc~construct_side_second</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M142.58,-180C157.02,-180 172.44,-180 187.25,-180"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="187.39,-183.5 197.39,-180 187.39,-176.5 187.39,-183.5"/>
+</g>
+<!-- interface~construct_square_first -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_node10" class="node">
+<title>interface~construct_square_first</title>
+<g id="a_proc~~get_cell_info_from_cell_name~~CalledByGraph_node10"><a xlink:href="../interface/construct_square_first.html" xlink:title="construct_square_first">
+<polygon fill="#a7506f" stroke="#a7506f" points="140.5,-150 11.5,-150 11.5,-126 140.5,-126 140.5,-150"/>
+<text text-anchor="middle" x="76" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_square_first</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_square_first&#45;&gt;proc~construct_square_first -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_edge9" class="edge">
+<title>interface~construct_square_first&#45;&gt;proc~construct_square_first</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M140.75,-138C156.28,-138 173.02,-138 188.98,-138"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="189.33,-141.5 199.33,-138 189.33,-134.5 189.33,-141.5"/>
+</g>
+<!-- interface~construct_square_second -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_node11" class="node">
+<title>interface~construct_square_second</title>
+<g id="a_proc~~get_cell_info_from_cell_name~~CalledByGraph_node11"><a xlink:href="../interface/construct_square_second.html" xlink:title="construct_square_second">
+<polygon fill="#a7506f" stroke="#a7506f" points="149.5,-108 2.5,-108 2.5,-84 149.5,-84 149.5,-108"/>
+<text text-anchor="middle" x="76" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_square_second</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_square_second&#45;&gt;proc~construct_square_second -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_edge10" class="edge">
+<title>interface~construct_square_second&#45;&gt;proc~construct_square_second</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M149.71,-96C159.72,-96 170.06,-96 180.24,-96"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="180.34,-99.5 190.34,-96 180.34,-92.5 180.34,-99.5"/>
+</g>
+<!-- interface~construct_triangle_first -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_node12" class="node">
+<title>interface~construct_triangle_first</title>
+<g id="a_proc~~get_cell_info_from_cell_name~~CalledByGraph_node12"><a xlink:href="../interface/construct_triangle_first.html" xlink:title="construct_triangle_first">
+<polygon fill="#a7506f" stroke="#a7506f" points="143,-66 9,-66 9,-42 143,-42 143,-66"/>
+<text text-anchor="middle" x="76" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_triangle_first</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_triangle_first&#45;&gt;proc~construct_triangle_first -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_edge11" class="edge">
+<title>interface~construct_triangle_first&#45;&gt;proc~construct_triangle_first</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M143.1,-54C157.13,-54 172.06,-54 186.44,-54"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="186.8,-57.5 196.8,-54 186.8,-50.5 186.8,-57.5"/>
+</g>
+<!-- interface~construct_triangle_second -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_node13" class="node">
+<title>interface~construct_triangle_second</title>
+<g id="a_proc~~get_cell_info_from_cell_name~~CalledByGraph_node13"><a xlink:href="../interface/construct_triangle_second.html" xlink:title="construct_triangle_second">
+<polygon fill="#a7506f" stroke="#a7506f" points="152,-24 0,-24 0,0 152,0 152,-24"/>
+<text text-anchor="middle" x="76" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_triangle_second</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_triangle_second&#45;&gt;proc~construct_triangle_second -->
+<g id="proc~~get_cell_info_from_cell_name~~CalledByGraph_edge12" class="edge">
+<title>interface~construct_triangle_second&#45;&gt;proc~construct_triangle_second</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M152.12,-12C160.6,-12 169.28,-12 177.87,-12"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="177.9,-15.5 187.9,-12 177.9,-8.5 177.9,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocget_cell_info_from_cell_nameCalledByGraph = svgPanZoom('#procget_cell_info_from_cell_nameCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">get_cell_info_from_cell_name</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">cell_name</span><span class="p">,</span><span class="w"> </span><span class="n">cell_type</span><span class="p">,</span><span class="w"> </span><span class="n">num_nodes_in_cell</span><span class="p">,</span><span class="w"> </span><span class="n">cell_dimension</span><span class="p">,</span><span class="w"> </span><span class="n">cell_order</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_vtk_constants</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">cell_name</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">cell_type</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_nodes_in_cell</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">cell_dimension</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">cell_order</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">is_initialized</span><span class="p">)</span><span class="w"> </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">initialize</span><span class="p">()</span>
+
+<span class="w">        </span><span class="n">cell_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">get_cell_type</span><span class="p">(</span><span class="nb">trim</span><span class="p">(</span><span class="nb">adjustl</span><span class="p">(</span><span class="n">cell_name</span><span class="p">)))</span>
+<span class="w">        </span><span class="n">num_nodes_in_cell</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">cell</span><span class="p">(</span><span class="n">cell_type</span><span class="p">)%</span><span class="n">num_nodes_in_cell</span>
+<span class="w">        </span><span class="n">cell_dimension</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">cell</span><span class="p">(</span><span class="n">cell_type</span><span class="p">)%</span><span class="n">cell_dimension</span>
+<span class="w">        </span><span class="n">cell_order</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">cell</span><span class="p">(</span><span class="n">cell_type</span><span class="p">)%</span><span class="n">cell_order</span>
+
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">get_cell_info_from_cell_name</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,722 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>zero_vector_dp &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>zero_vector_dp
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.4% of total for procedures.">163 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/vector_interface.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/vector_interface.f90.html'>vector_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_types_vector.html'>core_types_vector</a></li>
+            <li class="breadcrumb-item active" aria-current="page">zero_vector_dp</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+    <em>None</em>
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>interface</h2>
+      
+      <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~zero_vector_dp~~CallsGraph Pages: 1 -->
+<svg id="interfacezero_vector_dpCallsGraph" width="321pt" height="32pt"
+ viewBox="0.00 0.00 321.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~zero_vector_dp~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>interface~~zero_vector_dp~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 317,-28 317,4 -4,4"/>
+<!-- interface~zero_vector_dp -->
+<g id="interface~~zero_vector_dp~~CallsGraph_node1" class="node">
+<title>interface~zero_vector_dp</title>
+<polygon fill="none" stroke="black" points="184,-24 0,-24 0,0 184,0 184,-24"/>
+<text text-anchor="middle" x="92" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_vector_dp%zero_vector_dp</text>
+</g>
+<!-- proc~zero_vector_dp -->
+<g id="interface~~zero_vector_dp~~CallsGraph_node2" class="node">
+<title>proc~zero_vector_dp</title>
+<g id="a_interface~~zero_vector_dp~~CallsGraph_node2"><a xlink:href="../proc/zero_vector_dp.html" xlink:title="zero_vector_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="313,-24 220,-24 220,0 313,0 313,-24"/>
+<text text-anchor="middle" x="266.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">zero_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~zero_vector_dp&#45;&gt;proc~zero_vector_dp -->
+<g id="interface~~zero_vector_dp~~CallsGraph_edge1" class="edge">
+<title>interface~zero_vector_dp&#45;&gt;proc~zero_vector_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M184.05,-12C192.7,-12 201.3,-12 209.47,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="209.58,-15.5 219.58,-12 209.58,-8.5 209.58,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~zero_vector_dp~~CalledByGraph Pages: 1 -->
+<svg id="interfacezero_vector_dpCalledByGraph" width="641pt" height="56pt"
+ viewBox="0.00 0.00 641.00 56.06" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~zero_vector_dp~~CalledByGraph" class="graph" transform="scale(0.28 0.28) rotate(0) translate(4 196)">
+<title>interface~~zero_vector_dp~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-196 2283,-196 2283,4 -4,4"/>
+<!-- interface~zero_vector_dp -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_node1" class="node">
+<title>interface~zero_vector_dp</title>
+<polygon fill="none" stroke="black" points="2279,-108 2095,-108 2095,-84 2279,-84 2279,-108"/>
+<text text-anchor="middle" x="2187" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_vector_dp%zero_vector_dp</text>
+</g>
+<!-- proc~check_initialize_vector -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_node2" class="node">
+<title>proc~check_initialize_vector</title>
+<g id="a_interface~~zero_vector_dp~~CalledByGraph_node2"><a xlink:href="../proc/check_initialize_vector.html" xlink:title="check_initialize_vector">
+<polygon fill="#d9534f" stroke="#d9534f" points="2005,-192 1872,-192 1872,-168 2005,-168 2005,-192"/>
+<text text-anchor="middle" x="1938.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">check_initialize_vector</text>
+</a>
+</g>
+</g>
+<!-- proc~check_initialize_vector&#45;&gt;interface~zero_vector_dp -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_edge1" class="edge">
+<title>proc~check_initialize_vector&#45;&gt;interface~zero_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M2005.14,-171.94C2022.88,-168.83 2041.89,-164.62 2059,-159 2094.25,-147.43 2132.02,-127.64 2157.12,-113.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2159.19,-116.17 2166.09,-108.13 2155.68,-110.11 2159.19,-116.17"/>
+</g>
+<!-- proc~initialize_type_solver_gmres -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_node3" class="node">
+<title>proc~initialize_type_solver_gmres</title>
+<g id="a_interface~~zero_vector_dp~~CalledByGraph_node3"><a xlink:href="../proc/initialize_type_solver_gmres.html" xlink:title="initialize_type_solver_gmres">
+<polygon fill="#d9534f" stroke="#d9534f" points="2019,-150 1858,-150 1858,-126 2019,-126 2019,-150"/>
+<text text-anchor="middle" x="1938.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_type_solver_gmres</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_solver_gmres&#45;&gt;interface~zero_vector_dp -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_edge2" class="edge">
+<title>proc~initialize_type_solver_gmres&#45;&gt;interface~zero_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M2010.14,-125.96C2039.79,-120.91 2074.45,-115.01 2105.12,-109.78"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2106.08,-113.17 2115.35,-108.04 2104.91,-106.27 2106.08,-113.17"/>
+</g>
+<!-- proc~setup_preconditioner_jacobi_point -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_node4" class="node">
+<title>proc~setup_preconditioner_jacobi_point</title>
+<g id="a_interface~~zero_vector_dp~~CalledByGraph_node4"><a xlink:href="../proc/setup_preconditioner_jacobi_point.html" xlink:title="setup_preconditioner_jacobi_point">
+<polygon fill="#d9534f" stroke="#d9534f" points="2036,-108 1841,-108 1841,-84 2036,-84 2036,-108"/>
+<text text-anchor="middle" x="1938.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">setup_preconditioner_jacobi_point</text>
+</a>
+</g>
+</g>
+<!-- proc~setup_preconditioner_jacobi_point&#45;&gt;interface~zero_vector_dp -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_edge3" class="edge">
+<title>proc~setup_preconditioner_jacobi_point&#45;&gt;interface~zero_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M2036.22,-96C2052.04,-96 2068.47,-96 2084.41,-96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2084.8,-99.5 2094.8,-96 2084.8,-92.5 2084.8,-99.5"/>
+</g>
+<!-- proc~solve_type_solver_bicgstab -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_node5" class="node">
+<title>proc~solve_type_solver_bicgstab</title>
+<g id="a_interface~~zero_vector_dp~~CalledByGraph_node5"><a xlink:href="../proc/solve_type_solver_bicgstab.html" xlink:title="solve_type_solver_bicgstab">
+<polygon fill="#d9534f" stroke="#d9534f" points="2017,-66 1860,-66 1860,-42 2017,-42 2017,-66"/>
+<text text-anchor="middle" x="1938.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_bicgstab</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_bicgstab&#45;&gt;interface~zero_vector_dp -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_edge4" class="edge">
+<title>proc~solve_type_solver_bicgstab&#45;&gt;interface~zero_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M2010.14,-66.04C2039.79,-71.09 2074.45,-76.99 2105.12,-82.22"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2104.91,-85.73 2115.35,-83.96 2106.08,-78.83 2104.91,-85.73"/>
+</g>
+<!-- proc~zero_residual_vector -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_node6" class="node">
+<title>proc~zero_residual_vector</title>
+<g id="a_interface~~zero_vector_dp~~CalledByGraph_node6"><a xlink:href="../proc/zero_residual_vector.html" xlink:title="type_residual_vector%zero_residual_vector">
+<polygon fill="#d9534f" stroke="#d9534f" points="2059,-24 1818,-24 1818,0 2059,0 2059,-24"/>
+<text text-anchor="middle" x="1938.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_residual_vector%zero_residual_vector</text>
+</a>
+</g>
+</g>
+<!-- proc~zero_residual_vector&#45;&gt;interface~zero_vector_dp -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_edge5" class="edge">
+<title>proc~zero_residual_vector&#45;&gt;interface~zero_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M2025.43,-24.03C2036.84,-26.52 2048.29,-29.48 2059,-33 2094.25,-44.57 2132.02,-64.36 2157.12,-78.68"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2155.68,-81.89 2166.09,-83.87 2159.19,-75.83 2155.68,-81.89"/>
+</g>
+<!-- interface~initialize_type_solver_gmres -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_node7" class="node">
+<title>interface~initialize_type_solver_gmres</title>
+<g id="a_interface~~zero_vector_dp~~CalledByGraph_node7"><a xlink:href="../interface/initialize_type_solver_gmres.html" xlink:title="type_solver_gmres%initialize_type_solver_gmres">
+<polygon fill="#a7506f" stroke="#a7506f" points="1742.5,-150 1472.5,-150 1472.5,-126 1742.5,-126 1742.5,-150"/>
+<text text-anchor="middle" x="1607.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_solver_gmres%initialize_type_solver_gmres</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_solver_gmres&#45;&gt;proc~initialize_type_solver_gmres -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_edge7" class="edge">
+<title>interface~initialize_type_solver_gmres&#45;&gt;proc~initialize_type_solver_gmres</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M1742.79,-138C1778.06,-138 1815.25,-138 1847.57,-138"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1847.89,-141.5 1857.89,-138 1847.89,-134.5 1847.89,-141.5"/>
+</g>
+<!-- interface~setup_preconditioner_jacobi_point -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_node8" class="node">
+<title>interface~setup_preconditioner_jacobi_point</title>
+<g id="a_interface~~zero_vector_dp~~CalledByGraph_node8"><a xlink:href="../interface/setup_preconditioner_jacobi_point.html" xlink:title="type_preconditioner_jacobi%setup_preconditioner_jacobi_point">
+<polygon fill="#a7506f" stroke="#a7506f" points="1782,-108 1433,-108 1433,-84 1782,-84 1782,-108"/>
+<text text-anchor="middle" x="1607.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_preconditioner_jacobi%setup_preconditioner_jacobi_point</text>
+</a>
+</g>
+</g>
+<!-- interface~setup_preconditioner_jacobi_point&#45;&gt;proc~setup_preconditioner_jacobi_point -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_edge8" class="edge">
+<title>interface~setup_preconditioner_jacobi_point&#45;&gt;proc~setup_preconditioner_jacobi_point</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M1782.15,-96C1798.63,-96 1814.98,-96 1830.54,-96"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1830.65,-99.5 1840.65,-96 1830.65,-92.5 1830.65,-99.5"/>
+</g>
+<!-- interface~solve_type_solver_bicgstab -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_node9" class="node">
+<title>interface~solve_type_solver_bicgstab</title>
+<g id="a_interface~~zero_vector_dp~~CalledByGraph_node9"><a xlink:href="../interface/solve_type_solver_bicgstab.html" xlink:title="type_solver_bicgstab%solve_type_solver_bicgstab">
+<polygon fill="#a7506f" stroke="#a7506f" points="1746,-66 1469,-66 1469,-42 1746,-42 1746,-66"/>
+<text text-anchor="middle" x="1607.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_solver_bicgstab%solve_type_solver_bicgstab</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_type_solver_bicgstab&#45;&gt;proc~solve_type_solver_bicgstab -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_edge9" class="edge">
+<title>interface~solve_type_solver_bicgstab&#45;&gt;proc~solve_type_solver_bicgstab</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M1746.12,-54C1781.07,-54 1817.69,-54 1849.43,-54"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1849.56,-57.5 1859.56,-54 1849.56,-50.5 1849.56,-57.5"/>
+</g>
+<!-- proc~assemble_initialize_ftdss -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_node10" class="node">
+<title>proc~assemble_initialize_ftdss</title>
+<g id="a_interface~~zero_vector_dp~~CalledByGraph_node10"><a xlink:href="../proc/assemble_initialize_ftdss.html" xlink:title="assemble_initialize_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1679,-192 1536,-192 1536,-168 1679,-168 1679,-192"/>
+<text text-anchor="middle" x="1607.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_initialize_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_initialize_ftdss&#45;&gt;proc~check_initialize_vector -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_edge6" class="edge">
+<title>proc~assemble_initialize_ftdss&#45;&gt;proc~check_initialize_vector</title>
+<path fill="none" stroke="#ff0000" d="M1679.08,-180C1732.85,-180 1806.75,-180 1861.75,-180"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1861.8,-183.5 1871.8,-180 1861.8,-176.5 1861.8,-183.5"/>
+</g>
+<!-- interface~assemble_initialize_ftdss -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_node11" class="node">
+<title>interface~assemble_initialize_ftdss</title>
+<g id="a_interface~~zero_vector_dp~~CalledByGraph_node11"><a xlink:href="../interface/assemble_initialize_ftdss.html" xlink:title="type_ftdss%assemble_initialize_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1397,-192 1191,-192 1191,-168 1397,-168 1397,-192"/>
+<text text-anchor="middle" x="1294" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_initialize_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_initialize_ftdss&#45;&gt;proc~assemble_initialize_ftdss -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_edge11" class="edge">
+<title>interface~assemble_initialize_ftdss&#45;&gt;proc~assemble_initialize_ftdss</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1397.43,-180C1438.94,-180 1486.19,-180 1525.26,-180"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1525.53,-183.5 1535.53,-180 1525.53,-176.5 1525.53,-183.5"/>
+</g>
+<!-- proc~setup_preconditioner_jacobi -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_node12" class="node">
+<title>proc~setup_preconditioner_jacobi</title>
+<g id="a_interface~~zero_vector_dp~~CalledByGraph_node12"><a xlink:href="../proc/setup_preconditioner_jacobi.html" xlink:title="setup_preconditioner_jacobi">
+<polygon fill="#d9534f" stroke="#d9534f" points="1375.5,-108 1212.5,-108 1212.5,-84 1375.5,-84 1375.5,-108"/>
+<text text-anchor="middle" x="1294" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">setup_preconditioner_jacobi</text>
+</a>
+</g>
+</g>
+<!-- proc~setup_preconditioner_jacobi&#45;&gt;interface~setup_preconditioner_jacobi_point -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_edge10" class="edge">
+<title>proc~setup_preconditioner_jacobi&#45;&gt;interface~setup_preconditioner_jacobi_point</title>
+<path fill="none" stroke="#7fff00" d="M1375.62,-96C1390.33,-96 1406.21,-96 1422.51,-96"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1422.72,-99.5 1432.72,-96 1422.72,-92.5 1422.72,-99.5"/>
+</g>
+<!-- interface~setup_preconditioner_jacobi -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_node13" class="node">
+<title>interface~setup_preconditioner_jacobi</title>
+<g id="a_interface~~zero_vector_dp~~CalledByGraph_node13"><a xlink:href="../interface/setup_preconditioner_jacobi.html" xlink:title="type_preconditioner_jacobi%setup_preconditioner_jacobi">
+<polygon fill="#a7506f" stroke="#a7506f" points="1155,-108 839,-108 839,-84 1155,-84 1155,-108"/>
+<text text-anchor="middle" x="997" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_preconditioner_jacobi%setup_preconditioner_jacobi</text>
+</a>
+</g>
+</g>
+<!-- interface~setup_preconditioner_jacobi&#45;&gt;proc~setup_preconditioner_jacobi -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_edge13" class="edge">
+<title>interface~setup_preconditioner_jacobi&#45;&gt;proc~setup_preconditioner_jacobi</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1155,-96C1171.1,-96 1187.05,-96 1202.07,-96"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1202.32,-99.5 1212.32,-96 1202.32,-92.5 1202.32,-99.5"/>
+</g>
+<!-- proc~assemble_ftdss -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_node14" class="node">
+<title>proc~assemble_ftdss</title>
+<g id="a_interface~~zero_vector_dp~~CalledByGraph_node14"><a xlink:href="../proc/assemble_ftdss.html" xlink:title="assemble_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1044,-192 950,-192 950,-168 1044,-168 1044,-192"/>
+<text text-anchor="middle" x="997" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_ftdss&#45;&gt;interface~assemble_initialize_ftdss -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_edge12" class="edge">
+<title>proc~assemble_ftdss&#45;&gt;interface~assemble_initialize_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M1044.09,-180C1080.63,-180 1133.25,-180 1180.71,-180"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1180.75,-183.5 1190.75,-180 1180.75,-176.5 1180.75,-183.5"/>
+</g>
+<!-- interface~assemble_ftdss -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_node15" class="node">
+<title>interface~assemble_ftdss</title>
+<g id="a_interface~~zero_vector_dp~~CalledByGraph_node15"><a xlink:href="../interface/assemble_ftdss.html" xlink:title="type_ftdss%assemble_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="803,-192 646,-192 646,-168 803,-168 803,-192"/>
+<text text-anchor="middle" x="724.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_edge14" class="edge">
+<title>interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M803.01,-180C846.67,-180 900.21,-180 939.82,-180"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="939.83,-183.5 949.83,-180 939.83,-176.5 939.83,-183.5"/>
+</g>
+<!-- proc~solve_time_step_ftdss -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_node16" class="node">
+<title>proc~solve_time_step_ftdss</title>
+<g id="a_interface~~zero_vector_dp~~CalledByGraph_node16"><a xlink:href="../proc/solve_time_step_ftdss.html" xlink:title="solve_time_step_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="610,-192 483,-192 483,-168 610,-168 610,-192"/>
+<text text-anchor="middle" x="546.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_edge15" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M610.05,-180C618.36,-180 627,-180 635.63,-180"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="635.75,-183.5 645.75,-180 635.75,-176.5 635.75,-183.5"/>
+</g>
+<!-- interface~solve_time_step_ftdss -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_node17" class="node">
+<title>interface~solve_time_step_ftdss</title>
+<g id="a_interface~~zero_vector_dp~~CalledByGraph_node17"><a xlink:href="../interface/solve_time_step_ftdss.html" xlink:title="type_ftdss%solve_time_step_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="447,-192 257,-192 257,-168 447,-168 447,-192"/>
+<text text-anchor="middle" x="352" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_edge16" class="edge">
+<title>interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M447.28,-180C455.88,-180 464.5,-180 472.87,-180"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="472.93,-183.5 482.93,-180 472.93,-176.5 472.93,-183.5"/>
+</g>
+<!-- proc~run_ftdss -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_node18" class="node">
+<title>proc~run_ftdss</title>
+<g id="a_interface~~zero_vector_dp~~CalledByGraph_node18"><a xlink:href="../proc/run_ftdss.html" xlink:title="run_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-192 160,-192 160,-168 221,-168 221,-192"/>
+<text text-anchor="middle" x="190.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_edge17" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M221.13,-180C228.8,-180 237.52,-180 246.72,-180"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="246.86,-183.5 256.86,-180 246.86,-176.5 246.86,-183.5"/>
+</g>
+<!-- interface~run_ftdss -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_node19" class="node">
+<title>interface~run_ftdss</title>
+<g id="a_interface~~zero_vector_dp~~CalledByGraph_node19"><a xlink:href="../interface/run_ftdss.html" xlink:title="type_ftdss%run_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="124,-192 0,-192 0,-168 124,-168 124,-192"/>
+<text text-anchor="middle" x="62" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftdss&#45;&gt;proc~run_ftdss -->
+<g id="interface~~zero_vector_dp~~CalledByGraph_edge18" class="edge">
+<title>interface~run_ftdss&#45;&gt;proc~run_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M124.03,-180C132.82,-180 141.68,-180 149.91,-180"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="149.94,-183.5 159.94,-180 149.94,-176.5 149.94,-183.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacezero_vector_dpCalledByGraph = svgPanZoom('#interfacezero_vector_dpCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+      <h2>public module subroutine zero_vector_dp(self)  
+    <a href="../proc/zero_vector_dp.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h2>
+
+    
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~134"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+
+ </div>
+</div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

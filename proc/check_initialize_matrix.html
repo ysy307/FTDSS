@@ -1,0 +1,829 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>check_initialize_matrix &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>check_initialize_matrix
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">17 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/ftdss_assemble.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/ftdss_assemble.f90.html'>ftdss_assemble.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/ftdss_assemble.html'>ftdss_assemble</a></li>
+            <li class="breadcrumb-item active" aria-current="page">check_initialize_matrix</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/check_initialize_matrix.html#src">check_initialize_matrix</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2> subroutine check_initialize_matrix(matrix, num_nodes)  
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-matrix"></span>
+              type(<a href='../type/type_matrix_dense.html'>type_matrix_dense</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>matrix</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_nodes~9"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_nodes</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~check_initialize_matrix~~CallsGraph Pages: 1 -->
+<svg id="proccheck_initialize_matrixCallsGraph" width="641pt" height="123pt"
+ viewBox="0.00 0.00 641.00 123.05" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~check_initialize_matrix~~CallsGraph" class="graph" transform="scale(0.63 0.63) rotate(0) translate(4 192)">
+<title>proc~~check_initialize_matrix~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-192 1017,-192 1017,4 -4,4"/>
+<!-- proc~check_initialize_matrix -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_node1" class="node">
+<title>proc~check_initialize_matrix</title>
+<polygon fill="none" stroke="black" points="133,-104 0,-104 0,-80 133,-80 133,-104"/>
+<text text-anchor="middle" x="66.5" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50">check_initialize_matrix</text>
+</g>
+<!-- interface~destroy_dense -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_node2" class="node">
+<title>interface~destroy_dense</title>
+<g id="a_proc~~check_initialize_matrix~~CallsGraph_node2"><a xlink:href="../interface/destroy_dense.html" xlink:title="type_matrix_dense%destroy_dense">
+<polygon fill="#a7506f" stroke="#a7506f" points="371,-188 172,-188 172,-164 371,-164 371,-188"/>
+<text text-anchor="middle" x="271.5" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dense%destroy_dense</text>
+</a>
+</g>
+</g>
+<!-- proc~check_initialize_matrix&#45;&gt;interface~destroy_dense -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_edge1" class="edge">
+<title>proc~check_initialize_matrix&#45;&gt;interface~destroy_dense</title>
+<path fill="none" stroke="#ff0000" d="M83.08,-104.13C102.24,-118.44 136.25,-141.93 169,-155 174.81,-157.32 180.92,-159.4 187.13,-161.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="186.39,-164.68 196.96,-164 188.27,-157.94 186.39,-164.68"/>
+</g>
+<!-- interface~get_info_dense -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_node3" class="node">
+<title>interface~get_info_dense</title>
+<g id="a_proc~~check_initialize_matrix~~CallsGraph_node3"><a xlink:href="../interface/get_info_dense.html" xlink:title="type_matrix_dense%get_info_dense">
+<polygon fill="#a7506f" stroke="#a7506f" points="373,-146 170,-146 170,-122 373,-122 373,-146"/>
+<text text-anchor="middle" x="271.5" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dense%get_info_dense</text>
+</a>
+</g>
+</g>
+<!-- proc~check_initialize_matrix&#45;&gt;interface~get_info_dense -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_edge2" class="edge">
+<title>proc~check_initialize_matrix&#45;&gt;interface~get_info_dense</title>
+<path fill="none" stroke="#ff0000" d="M125.67,-104.04C149.56,-108.98 177.39,-114.74 202.24,-119.88"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="201.82,-123.36 212.32,-121.96 203.24,-116.51 201.82,-123.36"/>
+</g>
+<!-- interface~initialize_dense -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_node4" class="node">
+<title>interface~initialize_dense</title>
+<g id="a_proc~~check_initialize_matrix~~CallsGraph_node4"><a xlink:href="../interface/initialize_dense.html" xlink:title="type_matrix_dense%initialize_dense">
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-104 169,-104 169,-80 374,-80 374,-104"/>
+<text text-anchor="middle" x="271.5" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dense%initialize_dense</text>
+</a>
+</g>
+</g>
+<!-- proc~check_initialize_matrix&#45;&gt;interface~initialize_dense -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_edge3" class="edge">
+<title>proc~check_initialize_matrix&#45;&gt;interface~initialize_dense</title>
+<path fill="none" stroke="#ff0000" d="M133.13,-92C141.37,-92 149.98,-92 158.68,-92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="158.94,-95.5 168.94,-92 158.94,-88.5 158.94,-95.5"/>
+</g>
+<!-- none~zero~8 -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_node5" class="node">
+<title>none~zero~8</title>
+<g id="a_proc~~check_initialize_matrix~~CallsGraph_node5"><a xlink:href="../type/type_matrix_dense.html#boundprocedure-zero~8" xlink:title="type_matrix_dense%zero">
+<polygon fill="#a7506f" stroke="#a7506f" points="685,-64 540,-64 540,-40 685,-40 685,-64"/>
+<text text-anchor="middle" x="612.5" y="-49.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dense%zero</text>
+</a>
+</g>
+</g>
+<!-- proc~check_initialize_matrix&#45;&gt;none~zero~8 -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_edge4" class="edge">
+<title>proc~check_initialize_matrix&#45;&gt;none~zero~8</title>
+<path fill="none" stroke="#ff0000" d="M117.57,-79.97C133.88,-76.5 152.12,-73.09 169,-71 294.28,-55.45 440.86,-52.03 529.9,-51.58"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="529.95,-55.08 539.93,-51.54 529.92,-48.08 529.95,-55.08"/>
+</g>
+<!-- proc~is_initialized -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_node6" class="node">
+<title>proc~is_initialized</title>
+<g id="a_proc~~check_initialize_matrix~~CallsGraph_node6"><a xlink:href="../proc/is_initialized.html" xlink:title="abst_matrix%is_initialized">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="346,-24 197,-24 197,0 346,0 346,-24"/>
+<text text-anchor="middle" x="271.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_matrix%is_initialized</text>
+</a>
+</g>
+</g>
+<!-- proc~check_initialize_matrix&#45;&gt;proc~is_initialized -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_edge5" class="edge">
+<title>proc~check_initialize_matrix&#45;&gt;proc~is_initialized</title>
+<path fill="none" stroke="#ff0000" d="M87.05,-79.78C107.02,-67.75 139.22,-49.54 169,-38 180.06,-33.71 192.08,-29.92 203.84,-26.65"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="204.89,-29.99 213.64,-24.03 203.08,-23.23 204.89,-29.99"/>
+</g>
+<!-- proc~destroy_dense -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_node9" class="node">
+<title>proc~destroy_dense</title>
+<g id="a_proc~~check_initialize_matrix~~CallsGraph_node9"><a xlink:href="../proc/destroy_dense.html" xlink:title="destroy_dense">
+<polygon fill="#d9534f" stroke="#d9534f" points="501.5,-188 412.5,-188 412.5,-164 501.5,-164 501.5,-188"/>
+<text text-anchor="middle" x="457" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">destroy_dense</text>
+</a>
+</g>
+</g>
+<!-- interface~destroy_dense&#45;&gt;proc~destroy_dense -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_edge6" class="edge">
+<title>interface~destroy_dense&#45;&gt;proc~destroy_dense</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M371.23,-176C381.82,-176 392.29,-176 402.06,-176"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="402.37,-179.5 412.37,-176 402.37,-172.5 402.37,-179.5"/>
+</g>
+<!-- proc~get_info_dense -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_node10" class="node">
+<title>proc~get_info_dense</title>
+<g id="a_proc~~check_initialize_matrix~~CallsGraph_node10"><a xlink:href="../proc/get_info_dense.html" xlink:title="get_info_dense">
+<polygon fill="#d9534f" stroke="#d9534f" points="503.5,-146 410.5,-146 410.5,-122 503.5,-122 503.5,-146"/>
+<text text-anchor="middle" x="457" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_info_dense</text>
+</a>
+</g>
+</g>
+<!-- interface~get_info_dense&#45;&gt;proc~get_info_dense -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_edge7" class="edge">
+<title>interface~get_info_dense&#45;&gt;proc~get_info_dense</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M373.11,-134C382.37,-134 391.5,-134 400.14,-134"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="400.39,-137.5 410.39,-134 400.39,-130.5 400.39,-137.5"/>
+</g>
+<!-- proc~initialize_dense -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_node11" class="node">
+<title>proc~initialize_dense</title>
+<g id="a_proc~~check_initialize_matrix~~CallsGraph_node11"><a xlink:href="../proc/initialize_dense.html" xlink:title="initialize_dense">
+<polygon fill="#d9534f" stroke="#d9534f" points="504,-104 410,-104 410,-80 504,-80 504,-104"/>
+<text text-anchor="middle" x="457" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_dense</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_dense&#45;&gt;proc~initialize_dense -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_edge8" class="edge">
+<title>interface~initialize_dense&#45;&gt;proc~initialize_dense</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M374.18,-92C382.9,-92 391.5,-92 399.66,-92"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="399.73,-95.5 409.73,-92 399.73,-88.5 399.73,-95.5"/>
+</g>
+<!-- interface~zero_all_dia -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_node7" class="node">
+<title>interface~zero_all_dia</title>
+<g id="a_proc~~check_initialize_matrix~~CallsGraph_node7"><a xlink:href="../interface/zero_all_dia.html" xlink:title="type_matrix_dia%zero_all_dia">
+<polygon fill="#a7506f" stroke="#a7506f" points="893,-85 724,-85 724,-61 893,-61 893,-85"/>
+<text text-anchor="middle" x="808.5" y="-70.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dia%zero_all_dia</text>
+</a>
+</g>
+</g>
+<!-- none~zero~8&#45;&gt;interface~zero_all_dia -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_edge9" class="edge">
+<title>none~zero~8&#45;&gt;interface~zero_all_dia</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M685.19,-59.76C694.56,-60.77 704.27,-61.83 713.94,-62.87"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="713.66,-66.36 723.98,-63.96 714.41,-59.4 713.66,-66.36"/>
+</g>
+<!-- interface~zero_row_dia -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_node8" class="node">
+<title>interface~zero_row_dia</title>
+<g id="a_proc~~check_initialize_matrix~~CallsGraph_node8"><a xlink:href="../interface/zero_row_dia.html" xlink:title="type_matrix_dia%zero_row_dia">
+<polygon fill="#a7506f" stroke="#a7506f" points="896,-43 721,-43 721,-19 896,-19 896,-43"/>
+<text text-anchor="middle" x="808.5" y="-28.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dia%zero_row_dia</text>
+</a>
+</g>
+</g>
+<!-- none~zero~8&#45;&gt;interface~zero_row_dia -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_edge10" class="edge">
+<title>none~zero~8&#45;&gt;interface~zero_row_dia</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M685.19,-44.24C693.57,-43.33 702.22,-42.4 710.86,-41.46"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="711.43,-44.92 720.99,-40.36 710.67,-37.96 711.43,-44.92"/>
+</g>
+<!-- proc~zero_all_dia -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_node14" class="node">
+<title>proc~zero_all_dia</title>
+<g id="a_proc~~check_initialize_matrix~~CallsGraph_node14"><a xlink:href="../proc/zero_all_dia.html" xlink:title="zero_all_dia">
+<polygon fill="#d9534f" stroke="#d9534f" points="1010,-85 935,-85 935,-61 1010,-61 1010,-85"/>
+<text text-anchor="middle" x="972.5" y="-70.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">zero_all_dia</text>
+</a>
+</g>
+</g>
+<!-- interface~zero_all_dia&#45;&gt;proc~zero_all_dia -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_edge11" class="edge">
+<title>interface~zero_all_dia&#45;&gt;proc~zero_all_dia</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M893.35,-73C904.01,-73 914.6,-73 924.39,-73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="924.66,-76.5 934.66,-73 924.66,-69.5 924.66,-76.5"/>
+</g>
+<!-- proc~zero_row_dia -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_node15" class="node">
+<title>proc~zero_row_dia</title>
+<g id="a_proc~~check_initialize_matrix~~CallsGraph_node15"><a xlink:href="../proc/zero_row_dia.html" xlink:title="zero_row_dia">
+<polygon fill="#d9534f" stroke="#d9534f" points="1013,-43 932,-43 932,-19 1013,-19 1013,-43"/>
+<text text-anchor="middle" x="972.5" y="-28.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">zero_row_dia</text>
+</a>
+</g>
+</g>
+<!-- interface~zero_row_dia&#45;&gt;proc~zero_row_dia -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_edge12" class="edge">
+<title>interface~zero_row_dia&#45;&gt;proc~zero_row_dia</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M896.19,-31C904.97,-31 913.66,-31 921.85,-31"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="921.92,-34.5 931.92,-31 921.92,-27.5 921.92,-34.5"/>
+</g>
+<!-- deallocate_array -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_node13" class="node">
+<title>deallocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="664,-168 561,-168 561,-144 664,-144 664,-168"/>
+<text text-anchor="middle" x="612.5" y="-153.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_array</text>
+</g>
+<!-- proc~destroy_dense&#45;&gt;deallocate_array -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_edge13" class="edge">
+<title>proc~destroy_dense&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#00ff66" d="M501.58,-170.32C516.84,-168.33 534.28,-166.06 550.7,-163.92"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="551.3,-167.37 560.76,-162.61 550.39,-160.43 551.3,-167.37"/>
+</g>
+<!-- proc~initialize_dense&#45;&gt;none~zero~8 -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_edge16" class="edge">
+<title>proc~initialize_dense&#45;&gt;none~zero~8</title>
+<path fill="none" stroke="#cc00ff" d="M504.06,-80C520.22,-75.79 538.56,-71.01 555.46,-66.6"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="556.42,-69.97 565.21,-64.06 554.65,-63.2 556.42,-69.97"/>
+</g>
+<!-- allocate_array -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_node12" class="node">
+<title>allocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="657,-106 568,-106 568,-82 657,-82 657,-106"/>
+<text text-anchor="middle" x="612.5" y="-91.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</g>
+<!-- proc~initialize_dense&#45;&gt;allocate_array -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_edge14" class="edge">
+<title>proc~initialize_dense&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#cc00ff" d="M504.06,-92.6C520.96,-92.82 540.24,-93.07 557.76,-93.3"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="557.8,-96.8 567.85,-93.43 557.89,-89.8 557.8,-96.8"/>
+</g>
+<!-- proc~initialize_dense&#45;&gt;deallocate_array -->
+<g id="proc~~check_initialize_matrix~~CallsGraph_edge15" class="edge">
+<title>proc~initialize_dense&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#cc00ff" d="M486.87,-104.04C511.24,-114.2 546.32,-128.82 573.06,-139.97"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="571.92,-143.29 582.5,-143.91 574.61,-136.83 571.92,-143.29"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccheck_initialize_matrixCallsGraph = svgPanZoom('#proccheck_initialize_matrixCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~check_initialize_matrix~~CalledByGraph Pages: 1 -->
+<svg id="proccheck_initialize_matrixCalledByGraph" width="641pt" height="13pt"
+ viewBox="0.00 0.00 641.00 13.40" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~check_initialize_matrix~~CalledByGraph" class="graph" transform="scale(0.42 0.42) rotate(0) translate(4 28)">
+<title>proc~~check_initialize_matrix~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 1527,-28 1527,4 -4,4"/>
+<!-- proc~check_initialize_matrix -->
+<g id="proc~~check_initialize_matrix~~CalledByGraph_node1" class="node">
+<title>proc~check_initialize_matrix</title>
+<polygon fill="none" stroke="black" points="1523,-24 1390,-24 1390,0 1523,0 1523,-24"/>
+<text text-anchor="middle" x="1456.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">check_initialize_matrix</text>
+</g>
+<!-- proc~assemble_initialize_ftdss -->
+<g id="proc~~check_initialize_matrix~~CalledByGraph_node2" class="node">
+<title>proc~assemble_initialize_ftdss</title>
+<g id="a_proc~~check_initialize_matrix~~CalledByGraph_node2"><a xlink:href="../proc/assemble_initialize_ftdss.html" xlink:title="assemble_initialize_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1354,-24 1211,-24 1211,0 1354,0 1354,-24"/>
+<text text-anchor="middle" x="1282.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_initialize_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_initialize_ftdss&#45;&gt;proc~check_initialize_matrix -->
+<g id="proc~~check_initialize_matrix~~CalledByGraph_edge1" class="edge">
+<title>proc~assemble_initialize_ftdss&#45;&gt;proc~check_initialize_matrix</title>
+<path fill="none" stroke="#ff0000" d="M1354.45,-12C1362.81,-12 1371.36,-12 1379.78,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1379.95,-15.5 1389.95,-12 1379.95,-8.5 1379.95,-15.5"/>
+</g>
+<!-- interface~assemble_initialize_ftdss -->
+<g id="proc~~check_initialize_matrix~~CalledByGraph_node3" class="node">
+<title>interface~assemble_initialize_ftdss</title>
+<g id="a_proc~~check_initialize_matrix~~CalledByGraph_node3"><a xlink:href="../interface/assemble_initialize_ftdss.html" xlink:title="type_ftdss%assemble_initialize_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1175,-24 969,-24 969,0 1175,0 1175,-24"/>
+<text text-anchor="middle" x="1072" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_initialize_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_initialize_ftdss&#45;&gt;proc~assemble_initialize_ftdss -->
+<g id="proc~~check_initialize_matrix~~CalledByGraph_edge2" class="edge">
+<title>interface~assemble_initialize_ftdss&#45;&gt;proc~assemble_initialize_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1175.11,-12C1183.69,-12 1192.3,-12 1200.68,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1200.79,-15.5 1210.79,-12 1200.79,-8.5 1200.79,-15.5"/>
+</g>
+<!-- proc~assemble_ftdss -->
+<g id="proc~~check_initialize_matrix~~CalledByGraph_node4" class="node">
+<title>proc~assemble_ftdss</title>
+<g id="a_proc~~check_initialize_matrix~~CalledByGraph_node4"><a xlink:href="../proc/assemble_ftdss.html" xlink:title="assemble_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="933,-24 839,-24 839,0 933,0 933,-24"/>
+<text text-anchor="middle" x="886" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_ftdss&#45;&gt;interface~assemble_initialize_ftdss -->
+<g id="proc~~check_initialize_matrix~~CalledByGraph_edge3" class="edge">
+<title>proc~assemble_ftdss&#45;&gt;interface~assemble_initialize_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M933.43,-12C941.4,-12 949.98,-12 958.81,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="958.89,-15.5 968.89,-12 958.89,-8.5 958.89,-15.5"/>
+</g>
+<!-- interface~assemble_ftdss -->
+<g id="proc~~check_initialize_matrix~~CalledByGraph_node5" class="node">
+<title>interface~assemble_ftdss</title>
+<g id="a_proc~~check_initialize_matrix~~CalledByGraph_node5"><a xlink:href="../interface/assemble_ftdss.html" xlink:title="type_ftdss%assemble_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="803,-24 646,-24 646,0 803,0 803,-24"/>
+<text text-anchor="middle" x="724.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss -->
+<g id="proc~~check_initialize_matrix~~CalledByGraph_edge4" class="edge">
+<title>interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M803.38,-12C811.94,-12 820.54,-12 828.76,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="828.95,-15.5 838.95,-12 828.95,-8.5 828.95,-15.5"/>
+</g>
+<!-- proc~solve_time_step_ftdss -->
+<g id="proc~~check_initialize_matrix~~CalledByGraph_node6" class="node">
+<title>proc~solve_time_step_ftdss</title>
+<g id="a_proc~~check_initialize_matrix~~CalledByGraph_node6"><a xlink:href="../proc/solve_time_step_ftdss.html" xlink:title="solve_time_step_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="610,-24 483,-24 483,0 610,0 610,-24"/>
+<text text-anchor="middle" x="546.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss -->
+<g id="proc~~check_initialize_matrix~~CalledByGraph_edge5" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M610.05,-12C618.36,-12 627,-12 635.63,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="635.75,-15.5 645.75,-12 635.75,-8.5 635.75,-15.5"/>
+</g>
+<!-- interface~solve_time_step_ftdss -->
+<g id="proc~~check_initialize_matrix~~CalledByGraph_node7" class="node">
+<title>interface~solve_time_step_ftdss</title>
+<g id="a_proc~~check_initialize_matrix~~CalledByGraph_node7"><a xlink:href="../interface/solve_time_step_ftdss.html" xlink:title="type_ftdss%solve_time_step_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="447,-24 257,-24 257,0 447,0 447,-24"/>
+<text text-anchor="middle" x="352" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss -->
+<g id="proc~~check_initialize_matrix~~CalledByGraph_edge6" class="edge">
+<title>interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M447.28,-12C455.88,-12 464.5,-12 472.87,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="472.93,-15.5 482.93,-12 472.93,-8.5 472.93,-15.5"/>
+</g>
+<!-- proc~run_ftdss -->
+<g id="proc~~check_initialize_matrix~~CalledByGraph_node8" class="node">
+<title>proc~run_ftdss</title>
+<g id="a_proc~~check_initialize_matrix~~CalledByGraph_node8"><a xlink:href="../proc/run_ftdss.html" xlink:title="run_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-24 160,-24 160,0 221,0 221,-24"/>
+<text text-anchor="middle" x="190.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss -->
+<g id="proc~~check_initialize_matrix~~CalledByGraph_edge7" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M221.13,-12C228.8,-12 237.52,-12 246.72,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="246.86,-15.5 256.86,-12 246.86,-8.5 246.86,-15.5"/>
+</g>
+<!-- interface~run_ftdss -->
+<g id="proc~~check_initialize_matrix~~CalledByGraph_node9" class="node">
+<title>interface~run_ftdss</title>
+<g id="a_proc~~check_initialize_matrix~~CalledByGraph_node9"><a xlink:href="../interface/run_ftdss.html" xlink:title="type_ftdss%run_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="124,-24 0,-24 0,0 124,0 124,-24"/>
+<text text-anchor="middle" x="62" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftdss&#45;&gt;proc~run_ftdss -->
+<g id="proc~~check_initialize_matrix~~CalledByGraph_edge8" class="edge">
+<title>interface~run_ftdss&#45;&gt;proc~run_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M124.03,-12C132.82,-12 141.68,-12 149.91,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="149.94,-15.5 159.94,-12 149.94,-8.5 149.94,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccheck_initialize_matrixCalledByGraph = svgPanZoom('#proccheck_initialize_matrixCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">check_initialize_matrix</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="n">num_nodes</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        type</span><span class="p">(</span><span class="n">type_matrix_dense</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">matrix</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_nodes</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_matrix_info</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">matrix_info</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">matrix</span><span class="p">%</span><span class="n">is_initialized</span><span class="p">())</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">matrix</span><span class="p">%</span><span class="n">initialize</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">)</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            call </span><span class="n">matrix</span><span class="p">%</span><span class="n">get_info</span><span class="p">(</span><span class="n">matrix_info</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">matrix_info</span><span class="p">%</span><span class="n">num_nodes</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">num_nodes</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                call </span><span class="n">matrix</span><span class="p">%</span><span class="n">destroy</span><span class="p">()</span>
+<span class="w">                </span><span class="k">call </span><span class="n">matrix</span><span class="p">%</span><span class="n">initialize</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">)</span>
+<span class="w">            </span><span class="k">else</span>
+<span class="k">                call </span><span class="n">matrix</span><span class="p">%</span><span class="n">zero</span><span class="p">()</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        end if</span>
+<span class="k">    end subroutine </span><span class="n">check_initialize_matrix</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

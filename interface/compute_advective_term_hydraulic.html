@@ -1,0 +1,741 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>compute_advective_term_hydraulic &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>compute_advective_term_hydraulic
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.2% of total for procedures.">110 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/hydraulic_interface.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/hydraulic_interface.f90.html'>hydraulic_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/main_hydraulic.html'>main_hydraulic</a></li>
+            <li class="breadcrumb-item active" aria-current="page">compute_advective_term_hydraulic</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+    <em>None</em>
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>interface</h2>
+      
+      <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~compute_advective_term_hydraulic~~CallsGraph Pages: 1 -->
+<svg id="interfacecompute_advective_term_hydraulicCallsGraph" width="641pt" height="44pt"
+ viewBox="0.00 0.00 641.00 44.47" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph" class="graph" transform="scale(0.38 0.38) rotate(0) translate(4 112)">
+<title>interface~~compute_advective_term_hydraulic~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-112 1668,-112 1668,4 -4,4"/>
+<!-- interface~compute_advective_term_hydraulic -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_node1" class="node">
+<title>interface~compute_advective_term_hydraulic</title>
+<polygon fill="none" stroke="black" points="290,-45 0,-45 0,-21 290,-21 290,-45"/>
+<text text-anchor="middle" x="145" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_hydraulic%compute_advective_term_hydraulic</text>
+</g>
+<!-- proc~compute_advective_term_hydraulic -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_node2" class="node">
+<title>proc~compute_advective_term_hydraulic</title>
+<g id="a_interface~~compute_advective_term_hydraulic~~CallsGraph_node2"><a xlink:href="../proc/compute_advective_term_hydraulic.html" xlink:title="compute_advective_term_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="528,-45 326,-45 326,-21 528,-21 528,-45"/>
+<text text-anchor="middle" x="427" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">compute_advective_term_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~compute_advective_term_hydraulic&#45;&gt;proc~compute_advective_term_hydraulic -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_edge1" class="edge">
+<title>interface~compute_advective_term_hydraulic&#45;&gt;proc~compute_advective_term_hydraulic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M290.1,-33C298.67,-33 307.23,-33 315.63,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="315.8,-36.5 325.8,-33 315.8,-29.5 315.8,-36.5"/>
+</g>
+<!-- proc~calc_density_water -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_node3" class="node">
+<title>proc~calc_density_water</title>
+<g id="a_interface~~compute_advective_term_hydraulic~~CallsGraph_node3"><a xlink:href="../proc/calc_density_water.html" xlink:title="type_physics_manager%calc_density_water">
+<polygon fill="#d9534f" stroke="#d9534f" points="808,-66 564,-66 564,-42 808,-42 808,-66"/>
+<text text-anchor="middle" x="686" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%calc_density_water</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_advective_term_hydraulic&#45;&gt;proc~calc_density_water -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_edge2" class="edge">
+<title>proc~compute_advective_term_hydraulic&#45;&gt;proc~calc_density_water</title>
+<path fill="none" stroke="#ff0000" d="M528.1,-41.18C536.51,-41.87 545.09,-42.57 553.68,-43.27"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="553.52,-46.77 563.77,-44.09 554.09,-39.79 553.52,-46.77"/>
+</g>
+<!-- proc~calc_kflh~2 -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_node4" class="node">
+<title>proc~calc_kflh~2</title>
+<g id="a_interface~~compute_advective_term_hydraulic~~CallsGraph_node4"><a xlink:href="../proc/calc_kflh~2.html" xlink:title="type_physics_manager%calc_Kflh">
+<polygon fill="#d9534f" stroke="#d9534f" points="781.5,-24 590.5,-24 590.5,0 781.5,0 781.5,-24"/>
+<text text-anchor="middle" x="686" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%calc_Kflh</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_advective_term_hydraulic&#45;&gt;proc~calc_kflh~2 -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_edge3" class="edge">
+<title>proc~compute_advective_term_hydraulic&#45;&gt;proc~calc_kflh~2</title>
+<path fill="none" stroke="#ff0000" d="M528.1,-24.82C545.18,-23.42 562.97,-21.97 580.17,-20.57"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="580.54,-24.05 590.22,-19.74 579.97,-17.07 580.54,-24.05"/>
+</g>
+<!-- proc~calc_rho_water_abst_physics -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_node6" class="node">
+<title>proc~calc_rho_water_abst_physics</title>
+<g id="a_interface~~compute_advective_term_hydraulic~~CallsGraph_node6"><a xlink:href="../proc/calc_rho_water_abst_physics.html" xlink:title="abst_physics%calc_rho_water_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="1085,-66 844,-66 844,-42 1085,-42 1085,-66"/>
+<text text-anchor="middle" x="964.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_rho_water_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_density_water&#45;&gt;proc~calc_rho_water_abst_physics -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_edge4" class="edge">
+<title>proc~calc_density_water&#45;&gt;proc~calc_rho_water_abst_physics</title>
+<path fill="none" stroke="#ff0000" d="M808.28,-54C816.63,-54 825.07,-54 833.47,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="833.69,-57.5 843.69,-54 833.69,-50.5 833.69,-57.5"/>
+</g>
+<!-- proc~calc_kflh -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_node5" class="node">
+<title>proc~calc_kflh</title>
+<g id="a_interface~~compute_advective_term_hydraulic~~CallsGraph_node5"><a xlink:href="../proc/calc_kflh.html" xlink:title="type_models_manager%calc_Kflh">
+<polygon fill="#d9534f" stroke="#d9534f" points="1060,-24 869,-24 869,0 1060,0 1060,-24"/>
+<text text-anchor="middle" x="964.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_models_manager%calc_Kflh</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_kflh~2&#45;&gt;proc~calc_kflh -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_edge5" class="edge">
+<title>proc~calc_kflh~2&#45;&gt;proc~calc_kflh</title>
+<path fill="none" stroke="#00ffff" d="M781.77,-12C806.5,-12 833.3,-12 858.53,-12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="858.86,-15.5 868.86,-12 858.86,-8.5 858.86,-15.5"/>
+</g>
+<!-- calc_Kflh -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_node7" class="node">
+<title>calc_Kflh</title>
+<polygon fill="#777777" stroke="#777777" points="1251,-24 1191,-24 1191,0 1251,0 1251,-24"/>
+<text text-anchor="middle" x="1221" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_Kflh</text>
+</g>
+<!-- proc~calc_kflh&#45;&gt;calc_Kflh -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_edge6" class="edge">
+<title>proc~calc_kflh&#45;&gt;calc_Kflh</title>
+<path fill="none" stroke="#ff0000" d="M1060.27,-12C1101.91,-12 1148.53,-12 1180.61,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1180.9,-15.5 1190.9,-12 1180.9,-8.5 1180.9,-15.5"/>
+</g>
+<!-- calc_rho -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_node8" class="node">
+<title>calc_rho</title>
+<polygon fill="#777777" stroke="#777777" points="1250,-108 1192,-108 1192,-84 1250,-84 1250,-108"/>
+<text text-anchor="middle" x="1221" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_rho</text>
+</g>
+<!-- proc~calc_rho_water_abst_physics&#45;&gt;calc_rho -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_edge7" class="edge">
+<title>proc~calc_rho_water_abst_physics&#45;&gt;calc_rho</title>
+<path fill="none" stroke="#00ffff" d="M1038.43,-66.04C1085.15,-73.75 1143.9,-83.44 1181.7,-89.68"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1181.34,-93.17 1191.78,-91.34 1182.48,-86.26 1181.34,-93.17"/>
+</g>
+<!-- proc~get_thermo_state_tp -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_node9" class="node">
+<title>proc~get_thermo_state_tp</title>
+<g id="a_interface~~compute_advective_term_hydraulic~~CallsGraph_node9"><a xlink:href="../proc/get_thermo_state_tp.html" xlink:title="abst_physics%get_thermo_state_TP">
+<polygon fill="#d9534f" stroke="#d9534f" points="1321,-66 1121,-66 1121,-42 1321,-42 1321,-66"/>
+<text text-anchor="middle" x="1221" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%get_thermo_state_TP</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_rho_water_abst_physics&#45;&gt;proc~get_thermo_state_tp -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_edge8" class="edge">
+<title>proc~calc_rho_water_abst_physics&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#00ffff" d="M1085.3,-54C1093.73,-54 1102.21,-54 1110.58,-54"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1110.73,-57.5 1120.73,-54 1110.73,-50.5 1110.73,-57.5"/>
+</g>
+<!-- proc~get_field_dp -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_node10" class="node">
+<title>proc~get_field_dp</title>
+<g id="a_interface~~compute_advective_term_hydraulic~~CallsGraph_node10"><a xlink:href="../proc/get_field_dp.html" xlink:title="type_field_dp%get_field_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="1589,-108 1432,-108 1432,-84 1589,-84 1589,-108"/>
+<text text-anchor="middle" x="1510.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_field_dp%get_field_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_edge9" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#0000ff" d="M1297.65,-66.01C1316.99,-69.01 1337.76,-72.18 1357,-75 1378,-78.08 1400.65,-81.27 1421.9,-84.2"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1421.5,-87.68 1431.88,-85.58 1422.45,-80.75 1421.5,-87.68"/>
+</g>
+<!-- proc~shift_pressure_absolute_abst_physics -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_node11" class="node">
+<title>proc~shift_pressure_absolute_abst_physics</title>
+<g id="a_interface~~compute_advective_term_hydraulic~~CallsGraph_node11"><a xlink:href="../proc/shift_pressure_absolute_abst_physics.html" xlink:title="abst_physics%shift_pressure_absolute_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="1653,-66 1368,-66 1368,-42 1653,-42 1653,-66"/>
+<text text-anchor="middle" x="1510.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%shift_pressure_absolute_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_physics -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_edge10" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_physics</title>
+<path fill="none" stroke="#0000ff" d="M1321.34,-54C1333.07,-54 1345.24,-54 1357.49,-54"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1357.78,-57.5 1367.78,-54 1357.78,-50.5 1357.78,-57.5"/>
+</g>
+<!-- proc~shift_temperature_absolute_abst_physics -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_node12" class="node">
+<title>proc~shift_temperature_absolute_abst_physics</title>
+<g id="a_interface~~compute_advective_term_hydraulic~~CallsGraph_node12"><a xlink:href="../proc/shift_temperature_absolute_abst_physics.html" xlink:title="abst_physics%shift_temperature_absolute_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="1664,-24 1357,-24 1357,0 1664,0 1664,-24"/>
+<text text-anchor="middle" x="1510.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%shift_temperature_absolute_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="interface~~compute_advective_term_hydraulic~~CallsGraph_edge11" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#0000ff" d="M1297.65,-41.99C1316.99,-38.99 1337.76,-35.82 1357,-33 1374.13,-30.49 1392.36,-27.9 1410.03,-25.44"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1410.93,-28.85 1420.36,-24.01 1409.97,-21.92 1410.93,-28.85"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacecompute_advective_term_hydraulicCallsGraph = svgPanZoom('#interfacecompute_advective_term_hydraulicCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~compute_advective_term_hydraulic~~CalledByGraph Pages: 1 -->
+<svg id="interfacecompute_advective_term_hydraulicCalledByGraph" width="641pt" height="36pt"
+ viewBox="0.00 0.00 641.00 36.43" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~compute_advective_term_hydraulic~~CalledByGraph" class="graph" transform="scale(0.49 0.49) rotate(0) translate(4 70)">
+<title>interface~~compute_advective_term_hydraulic~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 1298,-70 1298,4 -4,4"/>
+<!-- interface~compute_advective_term_hydraulic -->
+<g id="interface~~compute_advective_term_hydraulic~~CalledByGraph_node1" class="node">
+<title>interface~compute_advective_term_hydraulic</title>
+<polygon fill="none" stroke="black" points="1294,-45 1004,-45 1004,-21 1294,-21 1294,-45"/>
+<text text-anchor="middle" x="1149" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_hydraulic%compute_advective_term_hydraulic</text>
+</g>
+<!-- proc~assemble_local_newton_hydraulic -->
+<g id="interface~~compute_advective_term_hydraulic~~CalledByGraph_node2" class="node">
+<title>proc~assemble_local_newton_hydraulic</title>
+<g id="a_interface~~compute_advective_term_hydraulic~~CalledByGraph_node2"><a xlink:href="../proc/assemble_local_newton_hydraulic.html" xlink:title="assemble_local_newton_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="968,-66 775,-66 775,-42 968,-42 968,-66"/>
+<text text-anchor="middle" x="871.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_newton_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_newton_hydraulic&#45;&gt;interface~compute_advective_term_hydraulic -->
+<g id="interface~~compute_advective_term_hydraulic~~CalledByGraph_edge1" class="edge">
+<title>proc~assemble_local_newton_hydraulic&#45;&gt;interface~compute_advective_term_hydraulic</title>
+<path fill="none" stroke="#ff0000" d="M968.08,-46.71C976.35,-46.08 984.84,-45.44 993.42,-44.78"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="993.82,-48.26 1003.52,-44.01 993.28,-41.28 993.82,-48.26"/>
+</g>
+<!-- proc~assemble_local_picard_hydraulic -->
+<g id="interface~~compute_advective_term_hydraulic~~CalledByGraph_node3" class="node">
+<title>proc~assemble_local_picard_hydraulic</title>
+<g id="a_interface~~compute_advective_term_hydraulic~~CalledByGraph_node3"><a xlink:href="../proc/assemble_local_picard_hydraulic.html" xlink:title="assemble_local_picard_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="965.5,-24 777.5,-24 777.5,0 965.5,0 965.5,-24"/>
+<text text-anchor="middle" x="871.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_picard_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_picard_hydraulic&#45;&gt;interface~compute_advective_term_hydraulic -->
+<g id="interface~~compute_advective_term_hydraulic~~CalledByGraph_edge2" class="edge">
+<title>proc~assemble_local_picard_hydraulic&#45;&gt;interface~compute_advective_term_hydraulic</title>
+<path fill="none" stroke="#ff0000" d="M965.77,-19.11C974.92,-19.81 984.37,-20.53 993.92,-21.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="993.67,-24.75 1003.91,-22.02 994.2,-17.77 993.67,-24.75"/>
+</g>
+<!-- interface~assemble_local_newton_hydraulic -->
+<g id="interface~~compute_advective_term_hydraulic~~CalledByGraph_node4" class="node">
+<title>interface~assemble_local_newton_hydraulic</title>
+<g id="a_interface~~compute_advective_term_hydraulic~~CalledByGraph_node4"><a xlink:href="../interface/assemble_local_newton_hydraulic.html" xlink:title="type_hydraulic%assemble_local_newton_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="739,-66 458,-66 458,-42 739,-42 739,-66"/>
+<text text-anchor="middle" x="598.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%assemble_local_newton_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_newton_hydraulic&#45;&gt;proc~assemble_local_newton_hydraulic -->
+<g id="interface~~compute_advective_term_hydraulic~~CalledByGraph_edge3" class="edge">
+<title>interface~assemble_local_newton_hydraulic&#45;&gt;proc~assemble_local_newton_hydraulic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M739.37,-54C747.92,-54 756.46,-54 764.83,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="764.96,-57.5 774.96,-54 764.96,-50.5 764.96,-57.5"/>
+</g>
+<!-- interface~assemble_local_picard_hydraulic -->
+<g id="interface~~compute_advective_term_hydraulic~~CalledByGraph_node5" class="node">
+<title>interface~assemble_local_picard_hydraulic</title>
+<g id="a_interface~~compute_advective_term_hydraulic~~CalledByGraph_node5"><a xlink:href="../interface/assemble_local_picard_hydraulic.html" xlink:title="type_hydraulic%assemble_local_picard_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="736.5,-24 460.5,-24 460.5,0 736.5,0 736.5,-24"/>
+<text text-anchor="middle" x="598.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%assemble_local_picard_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_picard_hydraulic&#45;&gt;proc~assemble_local_picard_hydraulic -->
+<g id="interface~~compute_advective_term_hydraulic~~CalledByGraph_edge4" class="edge">
+<title>interface~assemble_local_picard_hydraulic&#45;&gt;proc~assemble_local_picard_hydraulic</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M736.59,-12C746.82,-12 757.04,-12 767.01,-12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="767.31,-15.5 777.31,-12 767.31,-8.5 767.31,-15.5"/>
+</g>
+<!-- proc~assemble_local_hydraulic -->
+<g id="interface~~compute_advective_term_hydraulic~~CalledByGraph_node6" class="node">
+<title>proc~assemble_local_hydraulic</title>
+<g id="a_interface~~compute_advective_term_hydraulic~~CalledByGraph_node6"><a xlink:href="../proc/assemble_local_hydraulic.html" xlink:title="assemble_local_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="422,-45 273,-45 273,-21 422,-21 422,-45"/>
+<text text-anchor="middle" x="347.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_newton_hydraulic -->
+<g id="interface~~compute_advective_term_hydraulic~~CalledByGraph_edge5" class="edge">
+<title>proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_newton_hydraulic</title>
+<path fill="none" stroke="#ff0000" d="M422.2,-39.22C430.34,-39.9 438.83,-40.62 447.5,-41.35"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="447.48,-44.86 457.74,-42.21 448.07,-37.88 447.48,-44.86"/>
+</g>
+<!-- proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_picard_hydraulic -->
+<g id="interface~~compute_advective_term_hydraulic~~CalledByGraph_edge6" class="edge">
+<title>proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_picard_hydraulic</title>
+<path fill="none" stroke="#00ffff" d="M422.2,-26.78C431.14,-26.03 440.5,-25.24 450.05,-24.44"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="450.39,-27.92 460.06,-23.59 449.8,-20.94 450.39,-27.92"/>
+</g>
+<!-- interface~assemble_local_hydraulic -->
+<g id="interface~~compute_advective_term_hydraulic~~CalledByGraph_node7" class="node">
+<title>interface~assemble_local_hydraulic</title>
+<g id="a_interface~~compute_advective_term_hydraulic~~CalledByGraph_node7"><a xlink:href="../interface/assemble_local_hydraulic.html" xlink:title="type_hydraulic%assemble_local_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="237,-45 0,-45 0,-21 237,-21 237,-45"/>
+<text text-anchor="middle" x="118.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%assemble_local_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_hydraulic&#45;&gt;proc~assemble_local_hydraulic -->
+<g id="interface~~compute_advective_term_hydraulic~~CalledByGraph_edge7" class="edge">
+<title>interface~assemble_local_hydraulic&#45;&gt;proc~assemble_local_hydraulic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M237.32,-33C245.92,-33 254.48,-33 262.81,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="262.85,-36.5 272.85,-33 262.85,-29.5 262.85,-36.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacecompute_advective_term_hydraulicCalledByGraph = svgPanZoom('#interfacecompute_advective_term_hydraulicCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+      <h2>private module subroutine compute_advective_term_hydraulic(self, material_id, state, V_H)  
+    <a href="../proc/compute_advective_term_hydraulic.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h2>
+
+    
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~549"></span>
+              class(<a href='../type/type_hydraulic.html'>type_hydraulic</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-material_id~37"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>material_id</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-state~63"></span>
+              type(<a href='../type/type_state.html'>type_state</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-v_h"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>V_H</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+
+ </div>
+</div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,830 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>compute_latent_term_thermal &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>compute_latent_term_thermal
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.2% of total for procedures.">79 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/thermal_interface.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/thermal_interface.f90.html'>thermal_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/main_thermal.html'>main_thermal</a></li>
+            <li class="breadcrumb-item active" aria-current="page">compute_latent_term_thermal</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+    <em>None</em>
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>interface</h2>
+      
+      <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~compute_latent_term_thermal~~CallsGraph Pages: 1 -->
+<svg id="interfacecompute_latent_term_thermalCallsGraph" width="641pt" height="100pt"
+ viewBox="0.00 0.00 641.00 100.33" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~compute_latent_term_thermal~~CallsGraph" class="graph" transform="scale(0.22 0.22) rotate(0) translate(4 452.09)">
+<title>interface~~compute_latent_term_thermal~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-452.09 2910,-452.09 2910,4 -4,4"/>
+<!-- interface~compute_latent_term_thermal -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node1" class="node">
+<title>interface~compute_latent_term_thermal</title>
+<polygon fill="none" stroke="black" points="254,-185 0,-185 0,-161 254,-161 254,-185"/>
+<text text-anchor="middle" x="127" y="-170.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_thermal%compute_latent_term_thermal</text>
+</g>
+<!-- proc~compute_latent_term_thermal -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node2" class="node">
+<title>proc~compute_latent_term_thermal</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node2"><a xlink:href="../proc/compute_latent_term_thermal.html" xlink:title="compute_latent_term_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="464,-185 290,-185 290,-161 464,-161 464,-185"/>
+<text text-anchor="middle" x="377" y="-170.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">compute_latent_term_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~compute_latent_term_thermal&#45;&gt;proc~compute_latent_term_thermal -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge1" class="edge">
+<title>interface~compute_latent_term_thermal&#45;&gt;proc~compute_latent_term_thermal</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M254.18,-173C262.77,-173 271.35,-173 279.75,-173"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="279.89,-176.5 289.89,-173 279.89,-169.5 279.89,-176.5"/>
+</g>
+<!-- proc~calc_density_water -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node3" class="node">
+<title>proc~calc_density_water</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node3"><a xlink:href="../proc/calc_density_water.html" xlink:title="type_physics_manager%calc_density_water">
+<polygon fill="#d9534f" stroke="#d9534f" points="1082,-185 838,-185 838,-161 1082,-161 1082,-185"/>
+<text text-anchor="middle" x="960" y="-170.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%calc_density_water</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_latent_term_thermal&#45;&gt;proc~calc_density_water -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge2" class="edge">
+<title>proc~compute_latent_term_thermal&#45;&gt;proc~calc_density_water</title>
+<path fill="none" stroke="#ff0000" d="M464.04,-173C560,-173 716.32,-173 827.6,-173"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="827.88,-176.5 837.88,-173 827.88,-169.5 827.88,-176.5"/>
+</g>
+<!-- proc~calc_kvt~2 -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node4" class="node">
+<title>proc~calc_kvt~2</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node4"><a xlink:href="../proc/calc_kvt~2.html" xlink:title="type_physics_manager%calc_KvT">
+<polygon fill="#d9534f" stroke="#d9534f" points="746,-228 556,-228 556,-204 746,-204 746,-228"/>
+<text text-anchor="middle" x="651" y="-213.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%calc_KvT</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_latent_term_thermal&#45;&gt;proc~calc_kvt~2 -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge3" class="edge">
+<title>proc~compute_latent_term_thermal&#45;&gt;proc~calc_kvt~2</title>
+<path fill="none" stroke="#ff0000" d="M454.13,-185.04C488.17,-190.42 528.47,-196.79 563.64,-202.35"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="563.47,-205.86 573.89,-203.97 564.56,-198.95 563.47,-205.86"/>
+</g>
+<!-- proc~calc_latent_heat_vaporization~4 -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node5" class="node">
+<title>proc~calc_latent_heat_vaporization~4</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node5"><a xlink:href="../proc/calc_latent_heat_vaporization~4.html" xlink:title="type_physics_manager%calc_latent_heat_vaporization">
+<polygon fill="#d9534f" stroke="#d9534f" points="802,-144 500,-144 500,-120 802,-120 802,-144"/>
+<text text-anchor="middle" x="651" y="-129.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%calc_latent_heat_vaporization</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_latent_term_thermal&#45;&gt;proc~calc_latent_heat_vaporization~4 -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge4" class="edge">
+<title>proc~compute_latent_term_thermal&#45;&gt;proc~calc_latent_heat_vaporization~4</title>
+<path fill="none" stroke="#ff0000" d="M457.77,-160.98C489.88,-156.14 527.06,-150.53 560.11,-145.55"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="560.86,-148.98 570.23,-144.02 559.82,-142.05 560.86,-148.98"/>
+</g>
+<!-- proc~calc_rho_water_abst_physics -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node8" class="node">
+<title>proc~calc_rho_water_abst_physics</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node8"><a xlink:href="../proc/calc_rho_water_abst_physics.html" xlink:title="abst_physics%calc_rho_water_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="2210,-185 1969,-185 1969,-161 2210,-161 2210,-185"/>
+<text text-anchor="middle" x="2089.5" y="-170.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_rho_water_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_density_water&#45;&gt;proc~calc_rho_water_abst_physics -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge5" class="edge">
+<title>proc~calc_density_water&#45;&gt;proc~calc_rho_water_abst_physics</title>
+<path fill="none" stroke="#ff0000" d="M1082.27,-173C1190.6,-173 1353.64,-173 1495.5,-173 1495.5,-173 1495.5,-173 1667,-173 1764.74,-173 1875.24,-173 1958.56,-173"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1958.59,-176.5 1968.59,-173 1958.59,-169.5 1958.59,-176.5"/>
+</g>
+<!-- proc~calc_kvt -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node6" class="node">
+<title>proc~calc_kvt</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node6"><a xlink:href="../proc/calc_kvt.html" xlink:title="type_models_manager%calc_KvT">
+<polygon fill="#d9534f" stroke="#d9534f" points="1055,-231 865,-231 865,-207 1055,-207 1055,-231"/>
+<text text-anchor="middle" x="960" y="-216.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_models_manager%calc_KvT</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_kvt~2&#45;&gt;proc~calc_kvt -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge6" class="edge">
+<title>proc~calc_kvt~2&#45;&gt;proc~calc_kvt</title>
+<path fill="none" stroke="#00ff00" d="M746.2,-216.92C780.53,-217.26 819.53,-217.64 854.69,-217.98"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="854.95,-221.48 864.98,-218.08 855.02,-214.48 854.95,-221.48"/>
+</g>
+<!-- proc~calc_latent_heat_vaporization -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node7" class="node">
+<title>proc~calc_latent_heat_vaporization</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node7"><a xlink:href="../proc/calc_latent_heat_vaporization.html" xlink:title="type_models_manager%calc_latent_heat_vaporization">
+<polygon fill="#d9534f" stroke="#d9534f" points="1420,-104 1118,-104 1118,-80 1420,-80 1420,-104"/>
+<text text-anchor="middle" x="1269" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_models_manager%calc_latent_heat_vaporization</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_latent_heat_vaporization~4&#45;&gt;proc~calc_latent_heat_vaporization -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge7" class="edge">
+<title>proc~calc_latent_heat_vaporization~4&#45;&gt;proc~calc_latent_heat_vaporization</title>
+<path fill="none" stroke="#0000ff" d="M802.3,-122.24C894.82,-116.23 1013.35,-108.54 1107.67,-102.41"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1108.13,-105.89 1117.88,-101.75 1107.67,-98.9 1108.13,-105.89"/>
+</g>
+<!-- interface~calc_kvt_hcf -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node10" class="node">
+<title>interface~calc_kvt_hcf</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node10"><a xlink:href="../interface/calc_kvt_hcf.html" xlink:title="abst_hcf%calc_KvT_hcf">
+<polygon fill="#a7506f" stroke="#a7506f" points="1336.5,-239 1201.5,-239 1201.5,-215 1336.5,-215 1336.5,-239"/>
+<text text-anchor="middle" x="1269" y="-224.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_hcf%calc_KvT_hcf</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_kvt&#45;&gt;interface~calc_kvt_hcf -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge8" class="edge">
+<title>proc~calc_kvt&#45;&gt;interface~calc_kvt_hcf</title>
+<path fill="none" stroke="#ff0000" d="M1055.2,-221.45C1098.74,-222.59 1149.81,-223.92 1191.01,-224.99"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1191.17,-228.5 1201.26,-225.26 1191.35,-221.5 1191.17,-228.5"/>
+</g>
+<!-- proc~calc_latent_heat_vaporization~2 -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node11" class="node">
+<title>proc~calc_latent_heat_vaporization~2</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node11"><a xlink:href="../proc/calc_latent_heat_vaporization~2.html" xlink:title="type_phase_manager%calc_latent_heat_vaporization">
+<polygon fill="#d9534f" stroke="#d9534f" points="2237,-104 1942,-104 1942,-80 2237,-80 2237,-104"/>
+<text text-anchor="middle" x="2089.5" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_phase_manager%calc_latent_heat_vaporization</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_latent_heat_vaporization&#45;&gt;proc~calc_latent_heat_vaporization~2 -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge9" class="edge">
+<title>proc~calc_latent_heat_vaporization&#45;&gt;proc~calc_latent_heat_vaporization~2</title>
+<path fill="none" stroke="#00ff00" d="M1420.13,-92C1565.28,-92 1784.32,-92 1931.69,-92"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1931.74,-95.5 1941.74,-92 1931.74,-88.5 1931.74,-95.5"/>
+</g>
+<!-- calc_rho -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node9" class="node">
+<title>calc_rho</title>
+<polygon fill="#777777" stroke="#777777" points="2455,-185 2397,-185 2397,-161 2455,-161 2455,-185"/>
+<text text-anchor="middle" x="2426" y="-170.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_rho</text>
+</g>
+<!-- proc~calc_rho_water_abst_physics&#45;&gt;calc_rho -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge10" class="edge">
+<title>proc~calc_rho_water_abst_physics&#45;&gt;calc_rho</title>
+<path fill="none" stroke="#0000ff" d="M2210.32,-173C2272.36,-173 2343.89,-173 2386.73,-173"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2386.97,-176.5 2396.97,-173 2386.97,-169.5 2386.97,-176.5"/>
+</g>
+<!-- proc~get_thermo_state_tp -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node12" class="node">
+<title>proc~get_thermo_state_tp</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node12"><a xlink:href="../proc/get_thermo_state_tp.html" xlink:title="abst_physics%get_thermo_state_TP">
+<polygon fill="#d9534f" stroke="#d9534f" points="2526,-105 2326,-105 2326,-81 2526,-81 2526,-105"/>
+<text text-anchor="middle" x="2426" y="-90.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%get_thermo_state_TP</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_rho_water_abst_physics&#45;&gt;proc~get_thermo_state_tp -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge11" class="edge">
+<title>proc~calc_rho_water_abst_physics&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#0000ff" d="M2140.94,-160.94C2200.88,-146.6 2300.81,-122.7 2364.75,-107.41"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2365.79,-110.76 2374.7,-105.03 2364.16,-103.95 2365.79,-110.76"/>
+</g>
+<!-- proc~calc_kvt_hcf -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node13" class="node">
+<title>proc~calc_kvt_hcf</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node13"><a xlink:href="../proc/calc_kvt_hcf.html" xlink:title="calc_KvT_hcf">
+<polygon fill="#d9534f" stroke="#d9534f" points="1537,-255 1456,-255 1456,-231 1537,-231 1537,-255"/>
+<text text-anchor="middle" x="1496.5" y="-240.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_KvT_hcf</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_kvt_hcf&#45;&gt;proc~calc_kvt_hcf -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge12" class="edge">
+<title>interface~calc_kvt_hcf&#45;&gt;proc~calc_kvt_hcf</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M1336.74,-231.74C1371.66,-234.21 1413.69,-237.2 1445.73,-239.47"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1445.54,-242.96 1455.76,-240.18 1446.04,-235.98 1445.54,-242.96"/>
+</g>
+<!-- proc~calc_latent_heat_vaporization~3 -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node14" class="node">
+<title>proc~calc_latent_heat_vaporization~3</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node14"><a xlink:href="../proc/calc_latent_heat_vaporization~3.html" xlink:title="type_evaporation%calc_latent_heat_vaporization">
+<polygon fill="#d9534f" stroke="#d9534f" points="2563,-25 2289,-25 2289,-1 2563,-1 2563,-25"/>
+<text text-anchor="middle" x="2426" y="-10.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_evaporation%calc_latent_heat_vaporization</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_latent_heat_vaporization~2&#45;&gt;proc~calc_latent_heat_vaporization~3 -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge13" class="edge">
+<title>proc~calc_latent_heat_vaporization~2&#45;&gt;proc~calc_latent_heat_vaporization~3</title>
+<path fill="none" stroke="#00ffff" d="M2132.11,-79.95C2172.12,-68.59 2234.41,-51.49 2289,-39 2307.76,-34.71 2328.08,-30.56 2347.16,-26.88"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2347.84,-30.32 2357.01,-25 2346.53,-23.44 2347.84,-30.32"/>
+</g>
+<!-- proc~get_field_dp -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node15" class="node">
+<title>proc~get_field_dp</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node15"><a xlink:href="../proc/get_field_dp.html" xlink:title="type_field_dp%get_field_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="2831,-209 2674,-209 2674,-185 2831,-185 2831,-209"/>
+<text text-anchor="middle" x="2752.5" y="-194.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_field_dp%get_field_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_latent_heat_vaporization~2&#45;&gt;proc~get_field_dp -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge14" class="edge">
+<title>proc~calc_latent_heat_vaporization~2&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#00ffff" d="M2195.65,-104.01C2312.8,-117.63 2494.72,-139.55 2563,-152 2608.73,-160.34 2660,-172.78 2697.51,-182.47"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2696.67,-185.87 2707.23,-185 2698.43,-179.09 2696.67,-185.87"/>
+</g>
+<!-- proc~shift_temperature_absolute_abst_physics -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node17" class="node">
+<title>proc~shift_temperature_absolute_abst_physics</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node17"><a xlink:href="../proc/shift_temperature_absolute_abst_physics.html" xlink:title="abst_physics%shift_temperature_absolute_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="2906,-66 2599,-66 2599,-42 2906,-42 2906,-66"/>
+<text text-anchor="middle" x="2752.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%shift_temperature_absolute_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_latent_heat_vaporization~2&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge15" class="edge">
+<title>proc~calc_latent_heat_vaporization~2&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#00ffff" d="M2197.54,-80C2227.13,-77.01 2259.29,-74.07 2289,-72 2388.38,-65.07 2499.97,-60.63 2588.64,-57.89"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2588.89,-61.39 2598.78,-57.58 2588.68,-54.39 2588.89,-61.39"/>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge16" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#7f00ff" d="M2504.62,-105.02C2523.88,-108.77 2544.35,-113.42 2563,-119 2618.6,-135.63 2680.25,-162.93 2717.43,-180.42"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="2716.25,-183.74 2726.79,-184.86 2719.25,-177.41 2716.25,-183.74"/>
+</g>
+<!-- proc~shift_pressure_absolute_abst_physics -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node16" class="node">
+<title>proc~shift_pressure_absolute_abst_physics</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node16"><a xlink:href="../proc/shift_pressure_absolute_abst_physics.html" xlink:title="abst_physics%shift_pressure_absolute_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="2895,-108 2610,-108 2610,-84 2895,-84 2895,-108"/>
+<text text-anchor="middle" x="2752.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%shift_pressure_absolute_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_physics -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge17" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_physics</title>
+<path fill="none" stroke="#7f00ff" d="M2526.12,-93.92C2549.39,-94.13 2574.7,-94.37 2599.68,-94.6"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="2599.95,-98.1 2609.98,-94.69 2600.01,-91.1 2599.95,-98.1"/>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge18" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#7f00ff" d="M2526.12,-81.09C2562.5,-76.72 2603.89,-71.74 2641.18,-67.26"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="2642.07,-70.68 2651.58,-66.01 2641.24,-63.73 2642.07,-70.68"/>
+</g>
+<!-- interface~calc_kvt_vapor -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node19" class="node">
+<title>interface~calc_kvt_vapor</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node19"><a xlink:href="../interface/calc_kvt_vapor.html" xlink:title="type_hcf_vapor%calc_KvT_vapor">
+<polygon fill="#a7506f" stroke="#a7506f" points="1759,-259 1573,-259 1573,-235 1759,-235 1759,-259"/>
+<text text-anchor="middle" x="1666" y="-244.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_vapor%calc_KvT_vapor</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_kvt_hcf&#45;&gt;interface~calc_kvt_vapor -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge19" class="edge">
+<title>proc~calc_kvt_hcf&#45;&gt;interface~calc_kvt_vapor</title>
+<path fill="none" stroke="#ff0000" d="M1537.2,-243.95C1545.07,-244.14 1553.67,-244.34 1562.56,-244.55"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1562.63,-248.06 1572.71,-244.8 1562.79,-241.06 1562.63,-248.06"/>
+</g>
+<!-- proc~calc_latent_heat_vaporization~3&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge21" class="edge">
+<title>proc~calc_latent_heat_vaporization~3&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#cbff00" d="M2522.17,-25.02C2561.13,-29.95 2606.36,-35.66 2646.3,-40.71"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="2645.97,-44.19 2656.33,-41.98 2646.85,-37.25 2645.97,-44.19"/>
+</g>
+<!-- calc_latent_heat -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node18" class="node">
+<title>calc_latent_heat</title>
+<polygon fill="#777777" stroke="#777777" points="2802.5,-24 2702.5,-24 2702.5,0 2802.5,0 2802.5,-24"/>
+<text text-anchor="middle" x="2752.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_latent_heat</text>
+</g>
+<!-- proc~calc_latent_heat_vaporization~3&#45;&gt;calc_latent_heat -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge20" class="edge">
+<title>proc~calc_latent_heat_vaporization~3&#45;&gt;calc_latent_heat</title>
+<path fill="none" stroke="#cbff00" d="M2563.21,-12.58C2608.2,-12.44 2655.93,-12.29 2692.08,-12.18"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="2692.44,-15.68 2702.43,-12.15 2692.42,-8.68 2692.44,-15.68"/>
+</g>
+<!-- proc~calc_kvt_vapor -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node20" class="node">
+<title>proc~calc_kvt_vapor</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node20"><a xlink:href="../proc/calc_kvt_vapor.html" xlink:title="calc_KvT_vapor">
+<polygon fill="#d9534f" stroke="#d9534f" points="1890,-290 1795,-290 1795,-266 1890,-266 1890,-290"/>
+<text text-anchor="middle" x="1842.5" y="-275.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_KvT_vapor</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_kvt_vapor&#45;&gt;proc~calc_kvt_vapor -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge22" class="edge">
+<title>interface~calc_kvt_vapor&#45;&gt;proc~calc_kvt_vapor</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1734.97,-259.07C1751.37,-261.99 1768.74,-265.07 1784.58,-267.89"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1784.28,-271.39 1794.74,-269.69 1785.51,-264.5 1784.28,-271.39"/>
+</g>
+<!-- proc~calc_kvt_vapor&#45;&gt;proc~calc_rho_water_abst_physics -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge27" class="edge">
+<title>proc~calc_kvt_vapor&#45;&gt;proc~calc_rho_water_abst_physics</title>
+<path fill="none" stroke="#ff0000" d="M1855.85,-265.98C1871.11,-251.78 1898.45,-228.4 1926,-215 1951.1,-202.8 1980.16,-193.85 2006.7,-187.42"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2007.8,-190.76 2016.74,-185.08 2006.21,-183.95 2007.8,-190.76"/>
+</g>
+<!-- proc~calc_kvt_vapor&#45;&gt;proc~get_field_dp -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge28" class="edge">
+<title>proc~calc_kvt_vapor&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#ff0000" d="M1847.46,-290.15C1856.55,-315.82 1881.65,-375.17 1926,-399 2050.7,-466.01 2433.52,-461.21 2563,-404 2651.04,-365.1 2715.66,-262.52 2740.42,-218.06"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2743.64,-219.47 2745.35,-209.02 2737.49,-216.12 2743.64,-219.47"/>
+</g>
+<!-- interface~calc_diffusivity_vapor_in_air -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node21" class="node">
+<title>interface~calc_diffusivity_vapor_in_air</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node21"><a xlink:href="../interface/calc_diffusivity_vapor_in_air.html" xlink:title="type_hcf_vapor%calc_diffusivity_vapor_in_air">
+<polygon fill="#a7506f" stroke="#a7506f" points="2215.5,-248 1963.5,-248 1963.5,-224 2215.5,-224 2215.5,-248"/>
+<text text-anchor="middle" x="2089.5" y="-233.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_vapor%calc_diffusivity_vapor_in_air</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_kvt_vapor&#45;&gt;interface~calc_diffusivity_vapor_in_air -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge23" class="edge">
+<title>proc~calc_kvt_vapor&#45;&gt;interface~calc_diffusivity_vapor_in_air</title>
+<path fill="none" stroke="#ff0000" d="M1886.95,-265.89C1899.48,-262.69 1913.23,-259.44 1926,-257 1940.55,-254.22 1955.91,-251.7 1971.15,-249.45"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1971.73,-252.9 1981.13,-248.01 1970.73,-245.97 1971.73,-252.9"/>
+</g>
+<!-- interface~calc_enhancement_factor_vapor -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node22" class="node">
+<title>interface~calc_enhancement_factor_vapor</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node22"><a xlink:href="../interface/calc_enhancement_factor_vapor.html" xlink:title="type_hcf_vapor%calc_enhancement_factor_vapor">
+<polygon fill="#a7506f" stroke="#a7506f" points="2228,-390 1951,-390 1951,-366 2228,-366 2228,-390"/>
+<text text-anchor="middle" x="2089.5" y="-375.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_vapor%calc_enhancement_factor_vapor</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_kvt_vapor&#45;&gt;interface~calc_enhancement_factor_vapor -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge24" class="edge">
+<title>proc~calc_kvt_vapor&#45;&gt;interface~calc_enhancement_factor_vapor</title>
+<path fill="none" stroke="#ff0000" d="M1854.18,-290.15C1868.76,-305.9 1896.47,-333.01 1926,-347 1940.62,-353.93 1956.66,-359.3 1972.81,-363.48"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1972.32,-366.96 1982.86,-365.93 1973.97,-360.16 1972.32,-366.96"/>
+</g>
+<!-- interface~calc_tortuosity_factor_vapor -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node23" class="node">
+<title>interface~calc_tortuosity_factor_vapor</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node23"><a xlink:href="../interface/calc_tortuosity_factor_vapor.html" xlink:title="type_hcf_vapor%calc_tortuosity_factor_vapor">
+<polygon fill="#a7506f" stroke="#a7506f" points="2216,-338 1963,-338 1963,-314 2216,-314 2216,-338"/>
+<text text-anchor="middle" x="2089.5" y="-323.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_vapor%calc_tortuosity_factor_vapor</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_kvt_vapor&#45;&gt;interface~calc_tortuosity_factor_vapor -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge25" class="edge">
+<title>proc~calc_kvt_vapor&#45;&gt;interface~calc_tortuosity_factor_vapor</title>
+<path fill="none" stroke="#ff0000" d="M1887.87,-290.03C1900.17,-293.16 1913.56,-296.39 1926,-299 1949.14,-303.86 1974.29,-308.4 1997.73,-312.31"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1997.22,-315.78 2007.66,-313.95 1998.36,-308.87 1997.22,-315.78"/>
+</g>
+<!-- proc~calc_drho_vapor_saturation_dt_abst_physics -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node24" class="node">
+<title>proc~calc_drho_vapor_saturation_dt_abst_physics</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node24"><a xlink:href="../proc/calc_drho_vapor_saturation_dt_abst_physics.html" xlink:title="abst_physics%calc_drho_vapor_saturation_dT_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="2253,-290 1926,-290 1926,-266 2253,-266 2253,-290"/>
+<text text-anchor="middle" x="2089.5" y="-275.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_drho_vapor_saturation_dT_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_kvt_vapor&#45;&gt;proc~calc_drho_vapor_saturation_dt_abst_physics -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge26" class="edge">
+<title>proc~calc_kvt_vapor&#45;&gt;proc~calc_drho_vapor_saturation_dt_abst_physics</title>
+<path fill="none" stroke="#ff0000" d="M1890.16,-278C1898.11,-278 1906.77,-278 1915.87,-278"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1915.91,-281.5 1925.91,-278 1915.91,-274.5 1915.91,-281.5"/>
+</g>
+<!-- proc~calc_diffusivity_vapor_in_air -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node26" class="node">
+<title>proc~calc_diffusivity_vapor_in_air</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node26"><a xlink:href="../proc/calc_diffusivity_vapor_in_air.html" xlink:title="calc_diffusivity_vapor_in_air">
+<polygon fill="#d9534f" stroke="#d9534f" points="2506.5,-227 2345.5,-227 2345.5,-203 2506.5,-203 2506.5,-227"/>
+<text text-anchor="middle" x="2426" y="-212.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_diffusivity_vapor_in_air</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_diffusivity_vapor_in_air&#45;&gt;proc~calc_diffusivity_vapor_in_air -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge29" class="edge">
+<title>interface~calc_diffusivity_vapor_in_air&#45;&gt;proc~calc_diffusivity_vapor_in_air</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2215.53,-228.15C2255.22,-225.66 2298.31,-222.95 2335.02,-220.65"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2335.44,-224.13 2345.2,-220.01 2335,-217.14 2335.44,-224.13"/>
+</g>
+<!-- proc~calc_enhancement_factor_vapor -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node27" class="node">
+<title>proc~calc_enhancement_factor_vapor</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node27"><a xlink:href="../proc/calc_enhancement_factor_vapor.html" xlink:title="calc_enhancement_factor_vapor">
+<polygon fill="#d9534f" stroke="#d9534f" points="2519.5,-395 2332.5,-395 2332.5,-371 2519.5,-371 2519.5,-395"/>
+<text text-anchor="middle" x="2426" y="-380.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_enhancement_factor_vapor</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_enhancement_factor_vapor&#45;&gt;proc~calc_enhancement_factor_vapor -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge30" class="edge">
+<title>interface~calc_enhancement_factor_vapor&#45;&gt;proc~calc_enhancement_factor_vapor</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M2228,-380.06C2259.43,-380.53 2292.31,-381.02 2322.01,-381.46"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="2322.32,-384.97 2332.37,-381.62 2322.42,-377.97 2322.32,-384.97"/>
+</g>
+<!-- proc~calc_tortuosity_factor_vapor -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node28" class="node">
+<title>proc~calc_tortuosity_factor_vapor</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node28"><a xlink:href="../proc/calc_tortuosity_factor_vapor.html" xlink:title="calc_tortuosity_factor_vapor">
+<polygon fill="#d9534f" stroke="#d9534f" points="2507.5,-353 2344.5,-353 2344.5,-329 2507.5,-329 2507.5,-353"/>
+<text text-anchor="middle" x="2426" y="-338.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_tortuosity_factor_vapor</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_tortuosity_factor_vapor&#45;&gt;proc~calc_tortuosity_factor_vapor -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge31" class="edge">
+<title>interface~calc_tortuosity_factor_vapor&#45;&gt;proc~calc_tortuosity_factor_vapor</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M2216.01,-331.63C2255.32,-333.39 2297.92,-335.3 2334.34,-336.93"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2334.29,-340.44 2344.44,-337.39 2334.61,-333.44 2334.29,-340.44"/>
+</g>
+<!-- calc_saturation_drho_dt -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node25" class="node">
+<title>calc_saturation_drho_dt</title>
+<polygon fill="#777777" stroke="#777777" points="2495.5,-311 2356.5,-311 2356.5,-287 2495.5,-287 2495.5,-311"/>
+<text text-anchor="middle" x="2426" y="-296.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_saturation_drho_dt</text>
+</g>
+<!-- proc~calc_drho_vapor_saturation_dt_abst_physics&#45;&gt;calc_saturation_drho_dt -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge32" class="edge">
+<title>proc~calc_drho_vapor_saturation_dt_abst_physics&#45;&gt;calc_saturation_drho_dt</title>
+<path fill="none" stroke="#7f00ff" d="M2253.34,-288.22C2285.75,-290.26 2318.38,-292.31 2346.35,-294.06"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="2346.24,-297.56 2356.44,-294.7 2346.68,-290.58 2346.24,-297.56"/>
+</g>
+<!-- proc~get_thermo_state_t -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_node29" class="node">
+<title>proc~get_thermo_state_t</title>
+<g id="a_interface~~compute_latent_term_thermal~~CallsGraph_node29"><a xlink:href="../proc/get_thermo_state_t.html" xlink:title="abst_physics%get_thermo_state_T">
+<polygon fill="#d9534f" stroke="#d9534f" points="2523,-269 2329,-269 2329,-245 2523,-245 2523,-269"/>
+<text text-anchor="middle" x="2426" y="-254.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%get_thermo_state_T</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_drho_vapor_saturation_dt_abst_physics&#45;&gt;proc~get_thermo_state_t -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge33" class="edge">
+<title>proc~calc_drho_vapor_saturation_dt_abst_physics&#45;&gt;proc~get_thermo_state_t</title>
+<path fill="none" stroke="#7f00ff" d="M2253.34,-267.78C2275.47,-266.39 2297.71,-264.99 2318.49,-263.69"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="2318.81,-267.17 2328.57,-263.05 2318.37,-260.19 2318.81,-267.17"/>
+</g>
+<!-- proc~get_thermo_state_t&#45;&gt;proc~get_field_dp -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge34" class="edge">
+<title>proc~get_thermo_state_t&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#cc00ff" d="M2509.46,-244.96C2527.15,-242.18 2545.72,-239.12 2563,-236 2604.33,-228.54 2650.52,-219 2686.82,-211.23"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="2687.75,-214.61 2696.79,-209.09 2686.28,-207.77 2687.75,-214.61"/>
+</g>
+<!-- proc~get_thermo_state_t&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="interface~~compute_latent_term_thermal~~CallsGraph_edge35" class="edge">
+<title>proc~get_thermo_state_t&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#cc00ff" d="M2523.25,-256.81C2537.97,-252.88 2551.92,-246.36 2563,-236 2616.55,-185.91 2545.04,-124.65 2599,-75 2600.14,-73.95 2601.3,-72.94 2602.49,-71.97"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="2604.62,-74.74 2610.67,-66.04 2600.52,-69.08 2604.62,-74.74"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacecompute_latent_term_thermalCallsGraph = svgPanZoom('#interfacecompute_latent_term_thermalCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+      <h2>private module subroutine compute_latent_term_thermal(self, material_id, state, L_TT)  
+    <a href="../proc/compute_latent_term_thermal.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h2>
+
+    
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~174"></span>
+              class(<a href='../type/type_thermal.html'>type_thermal</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-material_id~9"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>material_id</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-state~10"></span>
+              type(<a href='../type/type_state.html'>type_state</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-l_tt"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>L_TT</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+
+ </div>
+</div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,717 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>initialize_type_matrix_dia &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>initialize_type_matrix_dia
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">63 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/matrix_dia.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/matrix_dia.f90.html'>matrix_dia.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_types_matrix_dia.html'>core_types_matrix_dia</a></li>
+            <li class="breadcrumb-item active" aria-current="page">initialize_type_matrix_dia</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/initialize_type_matrix_dia.html#src">initialize_type_matrix_dia</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine initialize_type_matrix_dia(self, num_nodes, row, col, row_blocks, col_blocks)  
+    <a href="../interface/initialize_type_matrix_dia.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+    <p>Initializes the DIA matrix structure from a node-level sparsity pattern.
+Detects unique diagonals automatically from the provided row/col indices.</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~320"></span>
+              class(<a href='../type/type_matrix_dia.html'>type_matrix_dia</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_nodes~30"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_nodes</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row~16"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-col~16"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row_blocks~3"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_blocks</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-col_blocks~3"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col_blocks</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~initialize_type_matrix_dia~~CallsGraph Pages: 1 -->
+<svg id="procinitialize_type_matrix_diaCallsGraph" width="641pt" height="94pt"
+ viewBox="0.00 0.00 641.00 93.83" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~initialize_type_matrix_dia~~CallsGraph" class="graph" transform="scale(0.99 0.99) rotate(0) translate(4 91)">
+<title>proc~~initialize_type_matrix_dia~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-91 645,-91 645,4 -4,4"/>
+<!-- proc~initialize_type_matrix_dia -->
+<g id="proc~~initialize_type_matrix_dia~~CallsGraph_node1" class="node">
+<title>proc~initialize_type_matrix_dia</title>
+<polygon fill="none" stroke="black" points="147,-66 0,-66 0,-42 147,-42 147,-66"/>
+<text text-anchor="middle" x="73.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50">initialize_type_matrix_dia</text>
+</g>
+<!-- allocate_array -->
+<g id="proc~~initialize_type_matrix_dia~~CallsGraph_node2" class="node">
+<title>allocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="292.5,-87 203.5,-87 203.5,-63 292.5,-63 292.5,-87"/>
+<text text-anchor="middle" x="248" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</g>
+<!-- proc~initialize_type_matrix_dia&#45;&gt;allocate_array -->
+<g id="proc~~initialize_type_matrix_dia~~CallsGraph_edge1" class="edge">
+<title>proc~initialize_type_matrix_dia&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#ff0000" d="M147.16,-62.85C162.57,-64.72 178.57,-66.67 193.14,-68.44"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="193.11,-71.96 203.46,-69.7 193.95,-65.02 193.11,-71.96"/>
+</g>
+<!-- none~zero~12 -->
+<g id="proc~~initialize_type_matrix_dia~~CallsGraph_node3" class="node">
+<title>none~zero~12</title>
+<g id="a_proc~~initialize_type_matrix_dia~~CallsGraph_node3"><a xlink:href="../type/type_matrix_dia.html#boundprocedure-zero~12" xlink:title="type_matrix_dia%zero">
+<polygon fill="#a7506f" stroke="#a7506f" points="313,-45 183,-45 183,-21 313,-21 313,-45"/>
+<text text-anchor="middle" x="248" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dia%zero</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_matrix_dia&#45;&gt;none~zero~12 -->
+<g id="proc~~initialize_type_matrix_dia~~CallsGraph_edge2" class="edge">
+<title>proc~initialize_type_matrix_dia&#45;&gt;none~zero~12</title>
+<path fill="none" stroke="#ff0000" d="M147.16,-45.15C155.69,-44.12 164.41,-43.05 172.97,-42.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="173.41,-45.48 182.92,-40.8 172.57,-38.54 173.41,-45.48"/>
+</g>
+<!-- interface~zero_all_dia -->
+<g id="proc~~initialize_type_matrix_dia~~CallsGraph_node4" class="node">
+<title>interface~zero_all_dia</title>
+<g id="a_proc~~initialize_type_matrix_dia~~CallsGraph_node4"><a xlink:href="../interface/zero_all_dia.html" xlink:title="type_matrix_dia%zero_all_dia">
+<polygon fill="#a7506f" stroke="#a7506f" points="521,-66 352,-66 352,-42 521,-42 521,-66"/>
+<text text-anchor="middle" x="436.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dia%zero_all_dia</text>
+</a>
+</g>
+</g>
+<!-- none~zero~12&#45;&gt;interface~zero_all_dia -->
+<g id="proc~~initialize_type_matrix_dia~~CallsGraph_edge3" class="edge">
+<title>none~zero~12&#45;&gt;interface~zero_all_dia</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M313.18,-40.23C322.41,-41.27 332.06,-42.35 341.72,-43.44"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="341.44,-46.93 351.77,-44.57 342.22,-39.97 341.44,-46.93"/>
+</g>
+<!-- interface~zero_row_dia -->
+<g id="proc~~initialize_type_matrix_dia~~CallsGraph_node5" class="node">
+<title>interface~zero_row_dia</title>
+<g id="a_proc~~initialize_type_matrix_dia~~CallsGraph_node5"><a xlink:href="../interface/zero_row_dia.html" xlink:title="type_matrix_dia%zero_row_dia">
+<polygon fill="#a7506f" stroke="#a7506f" points="524,-24 349,-24 349,0 524,0 524,-24"/>
+<text text-anchor="middle" x="436.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dia%zero_row_dia</text>
+</a>
+</g>
+</g>
+<!-- none~zero~12&#45;&gt;interface~zero_row_dia -->
+<g id="proc~~initialize_type_matrix_dia~~CallsGraph_edge4" class="edge">
+<title>none~zero~12&#45;&gt;interface~zero_row_dia</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M313.18,-25.77C321.44,-24.84 330.03,-23.88 338.66,-22.9"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="339.25,-26.36 348.8,-21.76 338.47,-19.4 339.25,-26.36"/>
+</g>
+<!-- proc~zero_all_dia -->
+<g id="proc~~initialize_type_matrix_dia~~CallsGraph_node6" class="node">
+<title>proc~zero_all_dia</title>
+<g id="a_proc~~initialize_type_matrix_dia~~CallsGraph_node6"><a xlink:href="../proc/zero_all_dia.html" xlink:title="zero_all_dia">
+<polygon fill="#d9534f" stroke="#d9534f" points="638,-66 563,-66 563,-42 638,-42 638,-66"/>
+<text text-anchor="middle" x="600.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">zero_all_dia</text>
+</a>
+</g>
+</g>
+<!-- interface~zero_all_dia&#45;&gt;proc~zero_all_dia -->
+<g id="proc~~initialize_type_matrix_dia~~CallsGraph_edge5" class="edge">
+<title>interface~zero_all_dia&#45;&gt;proc~zero_all_dia</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M521.35,-54C532.01,-54 542.6,-54 552.39,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="552.66,-57.5 562.66,-54 552.66,-50.5 552.66,-57.5"/>
+</g>
+<!-- proc~zero_row_dia -->
+<g id="proc~~initialize_type_matrix_dia~~CallsGraph_node7" class="node">
+<title>proc~zero_row_dia</title>
+<g id="a_proc~~initialize_type_matrix_dia~~CallsGraph_node7"><a xlink:href="../proc/zero_row_dia.html" xlink:title="zero_row_dia">
+<polygon fill="#d9534f" stroke="#d9534f" points="641,-24 560,-24 560,0 641,0 641,-24"/>
+<text text-anchor="middle" x="600.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">zero_row_dia</text>
+</a>
+</g>
+</g>
+<!-- interface~zero_row_dia&#45;&gt;proc~zero_row_dia -->
+<g id="proc~~initialize_type_matrix_dia~~CallsGraph_edge6" class="edge">
+<title>interface~zero_row_dia&#45;&gt;proc~zero_row_dia</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M524.19,-12C532.97,-12 541.66,-12 549.85,-12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="549.92,-15.5 559.92,-12 549.92,-8.5 549.92,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocinitialize_type_matrix_diaCallsGraph = svgPanZoom('#procinitialize_type_matrix_diaCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~initialize_type_matrix_dia~~CalledByGraph Pages: 1 -->
+<svg id="procinitialize_type_matrix_diaCalledByGraph" width="432pt" height="32pt"
+ viewBox="0.00 0.00 432.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~initialize_type_matrix_dia~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~initialize_type_matrix_dia~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 428,-28 428,4 -4,4"/>
+<!-- proc~initialize_type_matrix_dia -->
+<g id="proc~~initialize_type_matrix_dia~~CalledByGraph_node1" class="node">
+<title>proc~initialize_type_matrix_dia</title>
+<polygon fill="none" stroke="black" points="424,-24 277,-24 277,0 424,0 424,-24"/>
+<text text-anchor="middle" x="350.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">initialize_type_matrix_dia</text>
+</g>
+<!-- interface~initialize_type_matrix_dia -->
+<g id="proc~~initialize_type_matrix_dia~~CalledByGraph_node2" class="node">
+<title>interface~initialize_type_matrix_dia</title>
+<g id="a_proc~~initialize_type_matrix_dia~~CalledByGraph_node2"><a xlink:href="../interface/initialize_type_matrix_dia.html" xlink:title="type_matrix_dia%initialize_type_matrix_dia">
+<polygon fill="#a7506f" stroke="#a7506f" points="241,-24 0,-24 0,0 241,0 241,-24"/>
+<text text-anchor="middle" x="120.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dia%initialize_type_matrix_dia</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_matrix_dia&#45;&gt;proc~initialize_type_matrix_dia -->
+<g id="proc~~initialize_type_matrix_dia~~CalledByGraph_edge1" class="edge">
+<title>interface~initialize_type_matrix_dia&#45;&gt;proc~initialize_type_matrix_dia</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M241.18,-12C249.81,-12 258.41,-12 266.76,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="266.81,-15.5 276.81,-12 266.81,-8.5 266.81,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">initialize_type_matrix_dia</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">num_nodes</span><span class="p">,</span><span class="w"> </span><span class="n">row</span><span class="p">,</span><span class="w"> </span><span class="n">col</span><span class="p">,</span><span class="w"> </span><span class="n">row_blocks</span><span class="p">,</span><span class="w"> </span><span class="n">col_blocks</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_matrix_dia</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_nodes</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">row</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">col</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">row_blocks</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">col_blocks</span>
+
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">temp_offsets</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">current_offset</span><span class="p">,</span><span class="w"> </span><span class="n">n_entries</span><span class="p">,</span><span class="w"> </span><span class="n">n_unique</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">found</span>
+
+<span class="w">        </span><span class="c">! Argument validation</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">present</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="p">.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">present</span><span class="p">(</span><span class="n">col</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="w">            </span><span class="c">! Default to main diagonal only if no pattern provided</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">num_nodes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">num_nodes</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">num_nodes</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">num_cols</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">num_nodes</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">num_diags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">            </span><span class="k">call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">offsets</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">offsets</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">            </span><span class="k">call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_diags</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">zero</span><span class="p">()</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">is_initialized_matrix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MATRIX_STATUS_SUCCESS</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+
+<span class="k">        </span><span class="n">self</span><span class="p">%</span><span class="n">num_nodes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">num_nodes</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">num_nodes</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">num_cols</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">num_nodes</span>
+
+<span class="w">        </span><span class="n">n_entries</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">temp_offsets</span><span class="p">(</span><span class="n">n_entries</span><span class="p">))</span>
+<span class="w">        </span><span class="n">n_unique</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+
+<span class="w">        </span><span class="c">! Identify unique diagonals (offsets = col - row)</span>
+<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n_entries</span>
+<span class="w">            </span><span class="n">current_offset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">col</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">row</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="w">            </span><span class="n">found</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">            </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n_unique</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">temp_offsets</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">current_offset</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    </span><span class="n">found</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">                    </span><span class="k">exit</span>
+<span class="k">                end if</span>
+<span class="k">            end do</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">found</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">n_unique</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n_unique</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">                </span><span class="n">temp_offsets</span><span class="p">(</span><span class="n">n_unique</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_offset</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        end do</span>
+
+<span class="k">        </span><span class="n">self</span><span class="p">%</span><span class="n">num_diags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n_unique</span>
+<span class="w">        </span><span class="k">call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">offsets</span><span class="p">,</span><span class="w"> </span><span class="n">n_unique</span><span class="p">)</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">offsets</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">temp_offsets</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">n_unique</span><span class="p">)</span>
+<span class="w">        </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">temp_offsets</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Sort offsets (Bubble sort is sufficient for small num_diags)</span>
+<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n_unique</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">            </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n_unique</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">offsets</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">offsets</span><span class="p">(</span><span class="n">k</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    </span><span class="n">current_offset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">offsets</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">offsets</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">offsets</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+<span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">offsets</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_offset</span>
+<span class="w">                </span><span class="k">end if</span>
+<span class="k">            end do</span>
+<span class="k">        end do</span>
+
+<span class="w">        </span><span class="c">! Allocate values (Rows x Diags)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_diags</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Initialize value array to zero</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">zero</span><span class="p">()</span>
+
+<span class="w">        </span><span class="c">! Approximate nnz (actual stored elements including padding)</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">nnz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_diags</span>
+
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">is_initialized_matrix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MATRIX_STATUS_SUCCESS</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">initialize_type_matrix_dia</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

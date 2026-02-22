@@ -1,0 +1,722 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>calc_vhc_gp_2phase &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>calc_vhc_gp_2phase
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">15 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/heat_capacity_multiphase.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/heat_capacity_multiphase.f90.html'>heat_capacity_multiphase.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/heat_capacity_multiphase.html'>heat_capacity_multiphase</a></li>
+            <li class="breadcrumb-item active" aria-current="page">calc_vhc_gp_2phase</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/calc_vhc_gp_2phase.html#src">calc_vhc_gp_2phase</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine calc_vhc_gp_2phase(self, state, vhc)  
+    <a href="../interface/calc_vhc_gp_2phase.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~383"></span>
+              class(<a href='../type/type_vhc_2phase.html'>type_vhc_2phase</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-state~47"></span>
+              type(<a href='../type/type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-vhc~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>vhc</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~calc_vhc_gp_2phase~~CallsGraph Pages: 1 -->
+<svg id="proccalc_vhc_gp_2phaseCallsGraph" width="641pt" height="78pt"
+ viewBox="0.00 0.00 641.00 78.21" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph" class="graph" transform="scale(0.49 0.49) rotate(0) translate(4 154)">
+<title>proc~~calc_vhc_gp_2phase~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-154 1291,-154 1291,4 -4,4"/>
+<!-- proc~calc_vhc_gp_2phase -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_node1" class="node">
+<title>proc~calc_vhc_gp_2phase</title>
+<polygon fill="none" stroke="black" points="121,-87 0,-87 0,-63 121,-63 121,-87"/>
+<text text-anchor="middle" x="60.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50">calc_vhc_gp_2phase</text>
+</g>
+<!-- interface~calc_vhc_2 -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_node2" class="node">
+<title>interface~calc_vhc_2</title>
+<g id="a_proc~~calc_vhc_gp_2phase~~CallsGraph_node2"><a xlink:href="../interface/calc_vhc_2.html" xlink:title="calc_vhc_2">
+<polygon fill="#a7506f" stroke="#a7506f" points="329,-150 259,-150 259,-126 329,-126 329,-150"/>
+<text text-anchor="middle" x="294" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_vhc_2</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_vhc_gp_2phase&#45;&gt;interface~calc_vhc_2 -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_edge1" class="edge">
+<title>proc~calc_vhc_gp_2phase&#45;&gt;interface~calc_vhc_2</title>
+<path fill="none" stroke="#ff0000" d="M84.41,-87.11C103.37,-96.63 131.27,-109.49 157,-117 186.97,-125.74 221.77,-131.03 248.67,-134.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="248.61,-137.63 258.93,-135.23 249.37,-130.67 248.61,-137.63"/>
+</g>
+<!-- proc~calc_water_cp_abst_material -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_node3" class="node">
+<title>proc~calc_water_cp_abst_material</title>
+<g id="a_proc~~calc_vhc_gp_2phase~~CallsGraph_node3"><a xlink:href="../proc/calc_water_cp_abst_material.html" xlink:title="abst_material%calc_water_cp_abst_material">
+<polygon fill="#d9534f" stroke="#d9534f" points="418,-108 170,-108 170,-84 418,-84 418,-108"/>
+<text text-anchor="middle" x="294" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_material%calc_water_cp_abst_material</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_vhc_gp_2phase&#45;&gt;proc~calc_water_cp_abst_material -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_edge2" class="edge">
+<title>proc~calc_vhc_gp_2phase&#45;&gt;proc~calc_water_cp_abst_material</title>
+<path fill="none" stroke="#ff0000" d="M121.12,-80.41C133.07,-81.49 146.08,-82.67 159.42,-83.88"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="159.39,-87.39 169.67,-84.81 160.02,-80.42 159.39,-87.39"/>
+</g>
+<!-- proc~calc_water_density_abst_material -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_node4" class="node">
+<title>proc~calc_water_density_abst_material</title>
+<g id="a_proc~~calc_vhc_gp_2phase~~CallsGraph_node4"><a xlink:href="../proc/calc_water_density_abst_material.html" xlink:title="abst_material%calc_water_density_abst_material">
+<polygon fill="#d9534f" stroke="#d9534f" points="431,-66 157,-66 157,-42 431,-42 431,-66"/>
+<text text-anchor="middle" x="294" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_material%calc_water_density_abst_material</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_vhc_gp_2phase&#45;&gt;proc~calc_water_density_abst_material -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_edge3" class="edge">
+<title>proc~calc_vhc_gp_2phase&#45;&gt;proc~calc_water_density_abst_material</title>
+<path fill="none" stroke="#ff0000" d="M121.12,-69.59C130.36,-68.75 140.23,-67.86 150.4,-66.94"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="151.01,-70.39 160.65,-66.01 150.38,-63.42 151.01,-70.39"/>
+</g>
+<!-- proc~get_material_phi -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_node5" class="node">
+<title>proc~get_material_phi</title>
+<g id="a_proc~~calc_vhc_gp_2phase~~CallsGraph_node5"><a xlink:href="../proc/get_material_phi.html" xlink:title="abst_material%get_material_phi">
+<polygon fill="#d9534f" stroke="#d9534f" points="679.5,-24 495.5,-24 495.5,0 679.5,0 679.5,-24"/>
+<text text-anchor="middle" x="587.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_material%get_material_phi</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_vhc_gp_2phase&#45;&gt;proc~get_material_phi -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_edge4" class="edge">
+<title>proc~calc_vhc_gp_2phase&#45;&gt;proc~get_material_phi</title>
+<path fill="none" stroke="#ff0000" d="M82.71,-62.97C101.56,-52.94 130.2,-39.32 157,-33 266.91,-7.08 396.88,-4.46 484.84,-6.65"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="484.99,-10.16 495.08,-6.94 485.18,-3.16 484.99,-10.16"/>
+</g>
+<!-- proc~calc_vhc_2 -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_node8" class="node">
+<title>proc~calc_vhc_2</title>
+<g id="a_proc~~calc_vhc_gp_2phase~~CallsGraph_node8"><a xlink:href="../proc/calc_vhc_2.html" xlink:title="calc_vhc_2">
+<polygon fill="#d9534f" stroke="#d9534f" points="622.5,-150 552.5,-150 552.5,-126 622.5,-126 622.5,-150"/>
+<text text-anchor="middle" x="587.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_vhc_2</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_vhc_2&#45;&gt;proc~calc_vhc_2 -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_edge5" class="edge">
+<title>interface~calc_vhc_2&#45;&gt;proc~calc_vhc_2</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M329.01,-138C381.86,-138 483.68,-138 542.2,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="542.26,-141.5 552.26,-138 542.26,-134.5 542.26,-141.5"/>
+</g>
+<!-- proc~calc_cp_water_abst_physics -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_node6" class="node">
+<title>proc~calc_cp_water_abst_physics</title>
+<g id="a_proc~~calc_vhc_gp_2phase~~CallsGraph_node6"><a xlink:href="../proc/calc_cp_water_abst_physics.html" xlink:title="abst_physics%calc_cp_water_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="705.5,-108 469.5,-108 469.5,-84 705.5,-84 705.5,-108"/>
+<text text-anchor="middle" x="587.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_cp_water_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_water_cp_abst_material&#45;&gt;proc~calc_cp_water_abst_physics -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_edge6" class="edge">
+<title>proc~calc_water_cp_abst_material&#45;&gt;proc~calc_cp_water_abst_physics</title>
+<path fill="none" stroke="#7fff00" d="M418.2,-96C431.7,-96 445.46,-96 459,-96"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="459.31,-99.5 469.31,-96 459.31,-92.5 459.31,-99.5"/>
+</g>
+<!-- proc~calc_rho_water_abst_physics -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_node7" class="node">
+<title>proc~calc_rho_water_abst_physics</title>
+<g id="a_proc~~calc_vhc_gp_2phase~~CallsGraph_node7"><a xlink:href="../proc/calc_rho_water_abst_physics.html" xlink:title="abst_physics%calc_rho_water_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="708,-66 467,-66 467,-42 708,-42 708,-66"/>
+<text text-anchor="middle" x="587.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_rho_water_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_water_density_abst_material&#45;&gt;proc~calc_rho_water_abst_physics -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_edge7" class="edge">
+<title>proc~calc_water_density_abst_material&#45;&gt;proc~calc_rho_water_abst_physics</title>
+<path fill="none" stroke="#00ffff" d="M431.36,-54C439.79,-54 448.26,-54 456.66,-54"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="456.86,-57.5 466.86,-54 456.86,-50.5 456.86,-57.5"/>
+</g>
+<!-- proc~get_field_dp -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_node9" class="node">
+<title>proc~get_field_dp</title>
+<g id="a_proc~~calc_vhc_gp_2phase~~CallsGraph_node9"><a xlink:href="../proc/get_field_dp.html" xlink:title="type_field_dp%get_field_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="1212,-44 1055,-44 1055,-20 1212,-20 1212,-44"/>
+<text text-anchor="middle" x="1133.5" y="-29.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_field_dp%get_field_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~get_material_phi&#45;&gt;proc~get_field_dp -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_edge8" class="edge">
+<title>proc~get_material_phi&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#7f00ff" d="M679.55,-15.35C781.17,-19.08 944.45,-25.09 1044.72,-28.77"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1044.7,-32.27 1054.83,-29.14 1044.96,-25.28 1044.7,-32.27"/>
+</g>
+<!-- calc_cp -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_node10" class="node">
+<title>calc_cp</title>
+<polygon fill="#777777" stroke="#777777" points="871,-148 817,-148 817,-124 871,-124 871,-148"/>
+<text text-anchor="middle" x="844" y="-133.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_cp</text>
+</g>
+<!-- proc~calc_cp_water_abst_physics&#45;&gt;calc_cp -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_edge9" class="edge">
+<title>proc~calc_cp_water_abst_physics&#45;&gt;calc_cp</title>
+<path fill="none" stroke="#ff0000" d="M664.86,-108C711.77,-115.37 769.72,-124.48 806.53,-130.27"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="806.36,-133.78 816.78,-131.88 807.45,-126.87 806.36,-133.78"/>
+</g>
+<!-- proc~get_thermo_state_tp -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_node12" class="node">
+<title>proc~get_thermo_state_tp</title>
+<g id="a_proc~~calc_vhc_gp_2phase~~CallsGraph_node12"><a xlink:href="../proc/get_thermo_state_tp.html" xlink:title="abst_physics%get_thermo_state_TP">
+<polygon fill="#d9534f" stroke="#d9534f" points="944,-106 744,-106 744,-82 944,-82 944,-106"/>
+<text text-anchor="middle" x="844" y="-91.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%get_thermo_state_TP</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_cp_water_abst_physics&#45;&gt;proc~get_thermo_state_tp -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_edge10" class="edge">
+<title>proc~calc_cp_water_abst_physics&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#ff0000" d="M705.69,-95.08C715.08,-95.01 724.54,-94.93 733.87,-94.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="733.96,-98.36 743.94,-94.78 733.91,-91.36 733.96,-98.36"/>
+</g>
+<!-- calc_rho -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_node11" class="node">
+<title>calc_rho</title>
+<polygon fill="#777777" stroke="#777777" points="873,-64 815,-64 815,-40 873,-40 873,-64"/>
+<text text-anchor="middle" x="844" y="-49.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_rho</text>
+</g>
+<!-- proc~calc_rho_water_abst_physics&#45;&gt;calc_rho -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_edge11" class="edge">
+<title>proc~calc_rho_water_abst_physics&#45;&gt;calc_rho</title>
+<path fill="none" stroke="#7fff00" d="M708.3,-53.06C743.2,-52.78 778.85,-52.5 804.7,-52.3"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="804.83,-55.8 814.8,-52.22 804.77,-48.8 804.83,-55.8"/>
+</g>
+<!-- proc~calc_rho_water_abst_physics&#45;&gt;proc~get_thermo_state_tp -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_edge12" class="edge">
+<title>proc~calc_rho_water_abst_physics&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#7fff00" d="M664.86,-66C693.67,-70.53 726.64,-75.71 756.33,-80.38"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="755.83,-83.84 766.26,-81.94 756.92,-76.93 755.83,-83.84"/>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_edge13" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#0000ff" d="M904.55,-81.99C917.59,-79.19 931.29,-76.11 944,-73 960.13,-69.05 963.85,-66.88 980,-63 1005.28,-56.93 1033.11,-51.04 1057.99,-46.05"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1058.97,-49.43 1068.1,-44.05 1057.61,-42.56 1058.97,-49.43"/>
+</g>
+<!-- proc~shift_pressure_absolute_abst_physics -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_node13" class="node">
+<title>proc~shift_pressure_absolute_abst_physics</title>
+<g id="a_proc~~calc_vhc_gp_2phase~~CallsGraph_node13"><a xlink:href="../proc/shift_pressure_absolute_abst_physics.html" xlink:title="abst_physics%shift_pressure_absolute_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="1276,-138 991,-138 991,-114 1276,-114 1276,-138"/>
+<text text-anchor="middle" x="1133.5" y="-123.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%shift_pressure_absolute_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_physics -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_edge14" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_physics</title>
+<path fill="none" stroke="#0000ff" d="M944.34,-105.06C966.82,-107.56 990.91,-110.24 1014.09,-112.82"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1013.99,-116.33 1024.31,-113.96 1014.76,-109.37 1013.99,-116.33"/>
+</g>
+<!-- proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_node14" class="node">
+<title>proc~shift_temperature_absolute_abst_physics</title>
+<g id="a_proc~~calc_vhc_gp_2phase~~CallsGraph_node14"><a xlink:href="../proc/shift_temperature_absolute_abst_physics.html" xlink:title="abst_physics%shift_temperature_absolute_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="1287,-96 980,-96 980,-72 1287,-72 1287,-96"/>
+<text text-anchor="middle" x="1133.5" y="-81.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%shift_temperature_absolute_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~calc_vhc_gp_2phase~~CallsGraph_edge15" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#0000ff" d="M944.34,-90.54C952.63,-90.26 961.13,-89.96 969.72,-89.66"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="969.97,-93.16 979.84,-89.31 969.73,-86.16 969.97,-93.16"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccalc_vhc_gp_2phaseCallsGraph = svgPanZoom('#proccalc_vhc_gp_2phaseCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~calc_vhc_gp_2phase~~CalledByGraph Pages: 1 -->
+<svg id="proccalc_vhc_gp_2phaseCalledByGraph" width="388pt" height="32pt"
+ viewBox="0.00 0.00 388.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~calc_vhc_gp_2phase~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~calc_vhc_gp_2phase~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 384,-28 384,4 -4,4"/>
+<!-- proc~calc_vhc_gp_2phase -->
+<g id="proc~~calc_vhc_gp_2phase~~CalledByGraph_node1" class="node">
+<title>proc~calc_vhc_gp_2phase</title>
+<polygon fill="none" stroke="black" points="380,-24 259,-24 259,0 380,0 380,-24"/>
+<text text-anchor="middle" x="319.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">calc_vhc_gp_2phase</text>
+</g>
+<!-- interface~calc_vhc_gp_2phase -->
+<g id="proc~~calc_vhc_gp_2phase~~CalledByGraph_node2" class="node">
+<title>interface~calc_vhc_gp_2phase</title>
+<g id="a_proc~~calc_vhc_gp_2phase~~CalledByGraph_node2"><a xlink:href="../interface/calc_vhc_gp_2phase.html" xlink:title="type_vhc_2phase%calc_vhc_gp_2phase">
+<polygon fill="#a7506f" stroke="#a7506f" points="223,-24 0,-24 0,0 223,0 223,-24"/>
+<text text-anchor="middle" x="111.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vhc_2phase%calc_vhc_gp_2phase</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_vhc_gp_2phase&#45;&gt;proc~calc_vhc_gp_2phase -->
+<g id="proc~~calc_vhc_gp_2phase~~CalledByGraph_edge1" class="edge">
+<title>interface~calc_vhc_gp_2phase&#45;&gt;proc~calc_vhc_gp_2phase</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M223.04,-12C231.79,-12 240.47,-12 248.82,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="248.83,-15.5 258.83,-12 248.83,-8.5 248.83,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">calc_vhc_gp_2phase</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">vhc</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_vhc_2phase</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_state</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">state</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">vhc</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">phi1</span><span class="p">,</span><span class="w"> </span><span class="n">phi2</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">sph_water</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">density_water</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">vhc_water</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">get_phi</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">phi1</span><span class="p">,</span><span class="w"> </span><span class="n">phi2</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">calc_water_density</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">density_water</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">calc_water_cp</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">sph_water</span><span class="p">)</span>
+<span class="w">        </span><span class="n">vhc_water</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">density_water</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sph_water</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">calc_vhc_2</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">material1</span><span class="p">,</span><span class="w"> </span><span class="n">phi1</span><span class="p">,</span><span class="w"> </span><span class="n">vhc_water</span><span class="p">,</span><span class="w"> </span><span class="n">phi2</span><span class="p">,</span><span class="w"> </span><span class="n">vhc</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">calc_vhc_gp_2phase</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

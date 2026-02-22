@@ -1,0 +1,1999 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>compute_mass_term_thermal &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>compute_mass_term_thermal
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.2% of total for procedures.">95 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/thermal_coefficients.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/thermal_coefficients.f90.html'>thermal_coefficients.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/thermal_coefficients.html'>thermal_coefficients</a></li>
+            <li class="breadcrumb-item active" aria-current="page">compute_mass_term_thermal</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/compute_mass_term_thermal.html#src">compute_mass_term_thermal</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine compute_mass_term_thermal(self, material_id, state, C_TT, scheme_opt)  
+    <a href="../interface/compute_mass_term_thermal.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+    <p>@details
+  NR法のヤコビアン、またはPicard法の質量行列に使用します。
+  dTが小さい、または scheme_opt=TANGENT 指定時は接線熱容量。
+  dTが大きい、または scheme_opt=SECANT 指定時は割線熱容量(有効熱容量)。</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~680"></span>
+              class(<a href='../type/type_thermal.html'>type_thermal</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-material_id~50"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>material_id</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-state~112"></span>
+              type(<a href='../type/type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-c_tt~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>C_TT</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-scheme_opt~2"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>scheme_opt</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~compute_mass_term_thermal~~CallsGraph Pages: 1 -->
+<svg id="proccompute_mass_term_thermalCallsGraph" width="641pt" height="186pt"
+ viewBox="0.00 0.00 641.00 185.68" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~compute_mass_term_thermal~~CallsGraph" class="graph" transform="scale(0.21 0.21) rotate(0) translate(4 892.55)">
+<title>proc~~compute_mass_term_thermal~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-892.55 3091,-892.55 3091,4 -4,4"/>
+<!-- proc~compute_mass_term_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node1" class="node">
+<title>proc~compute_mass_term_thermal</title>
+<polygon fill="none" stroke="black" points="171,-309.86 0,-309.86 0,-285.86 171,-285.86 171,-309.86"/>
+<text text-anchor="middle" x="85.5" y="-295.46" font-family="Helvetica,sans-Serif" font-size="10.50">compute_mass_term_thermal</text>
+</g>
+<!-- interface~calc_enthalpy_density_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node2" class="node">
+<title>interface~calc_enthalpy_density_thermal</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node2"><a xlink:href="../interface/calc_enthalpy_density_thermal.html" xlink:title="type_thermal%calc_enthalpy_density_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="464,-269.86 207,-269.86 207,-245.86 464,-245.86 464,-269.86"/>
+<text text-anchor="middle" x="335.5" y="-255.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%calc_enthalpy_density_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_mass_term_thermal&#45;&gt;interface~calc_enthalpy_density_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge1" class="edge">
+<title>proc~compute_mass_term_thermal&#45;&gt;interface~calc_enthalpy_density_thermal</title>
+<path fill="none" stroke="#ff0000" d="M160.91,-285.86C188.86,-281.35 220.83,-276.19 249.66,-271.54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="250.4,-274.97 259.72,-269.92 249.29,-268.06 250.4,-274.97"/>
+</g>
+<!-- interface~update_water_phases_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node3" class="node">
+<title>interface~update_water_phases_thermal</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node3"><a xlink:href="../interface/update_water_phases_thermal.html" xlink:title="type_thermal%update_water_phases_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="463.5,-611.86 207.5,-611.86 207.5,-587.86 463.5,-587.86 463.5,-611.86"/>
+<text text-anchor="middle" x="335.5" y="-597.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%update_water_phases_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_mass_term_thermal&#45;&gt;interface~update_water_phases_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge2" class="edge">
+<title>proc~compute_mass_term_thermal&#45;&gt;interface~update_water_phases_thermal</title>
+<path fill="none" stroke="#ff0000" d="M88.11,-310.12C94.41,-352.99 121.41,-497.43 207,-568.86 214.33,-574.98 222.69,-579.93 231.53,-583.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="230.31,-587.21 240.89,-587.75 232.96,-580.73 230.31,-587.21"/>
+</g>
+<!-- proc~calc_density_ice -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node4" class="node">
+<title>proc~calc_density_ice</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node4"><a xlink:href="../proc/calc_density_ice.html" xlink:title="type_physics_manager%calc_density_ice">
+<polygon fill="#d9534f" stroke="#d9534f" points="979,-228.86 749,-228.86 749,-204.86 979,-204.86 979,-228.86"/>
+<text text-anchor="middle" x="864" y="-214.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%calc_density_ice</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_mass_term_thermal&#45;&gt;proc~calc_density_ice -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge3" class="edge">
+<title>proc~compute_mass_term_thermal&#45;&gt;proc~calc_density_ice</title>
+<path fill="none" stroke="#ff0000" d="M104.28,-285.68C126.96,-270.93 167.92,-246.82 207,-236.86 387.51,-190.85 605.02,-195.45 738.64,-204.78"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="738.68,-208.3 748.91,-205.52 739.19,-201.31 738.68,-208.3"/>
+</g>
+<!-- proc~calc_density_water -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node5" class="node">
+<title>proc~calc_density_water</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node5"><a xlink:href="../proc/calc_density_water.html" xlink:title="type_physics_manager%calc_density_water">
+<polygon fill="#d9534f" stroke="#d9534f" points="986,-392.86 742,-392.86 742,-368.86 986,-368.86 986,-392.86"/>
+<text text-anchor="middle" x="864" y="-378.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%calc_density_water</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_mass_term_thermal&#45;&gt;proc~calc_density_water -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge4" class="edge">
+<title>proc~compute_mass_term_thermal&#45;&gt;proc~calc_density_water</title>
+<path fill="none" stroke="#ff0000" d="M129.4,-309.89C152.26,-315.86 180.97,-322.68 207,-326.86 387.48,-355.83 598.53,-369.68 731.49,-375.99"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="731.57,-379.5 741.72,-376.47 731.9,-372.51 731.57,-379.5"/>
+</g>
+<!-- proc~calc_latent_heat_fusion~3 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node6" class="node">
+<title>proc~calc_latent_heat_fusion~3</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node6"><a xlink:href="../proc/calc_latent_heat_fusion~3.html" xlink:title="type_physics_manager%calc_latent_heat_fusion">
+<polygon fill="#d9534f" stroke="#d9534f" points="998,-144.86 730,-144.86 730,-120.86 998,-120.86 998,-144.86"/>
+<text text-anchor="middle" x="864" y="-130.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%calc_latent_heat_fusion</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_mass_term_thermal&#45;&gt;proc~calc_latent_heat_fusion~3 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge5" class="edge">
+<title>proc~compute_mass_term_thermal&#45;&gt;proc~calc_latent_heat_fusion~3</title>
+<path fill="none" stroke="#ff0000" d="M92.9,-285.6C108.21,-257.74 149.97,-189.98 207,-162.86 294.42,-121.29 554.53,-121.67 719.75,-126.64"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="719.89,-130.14 730,-126.95 720.11,-123.15 719.89,-130.14"/>
+</g>
+<!-- proc~calc_latent_heat_vaporization~4 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node7" class="node">
+<title>proc~calc_latent_heat_vaporization~4</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node7"><a xlink:href="../proc/calc_latent_heat_vaporization~4.html" xlink:title="type_physics_manager%calc_latent_heat_vaporization">
+<polygon fill="#d9534f" stroke="#d9534f" points="1015,-186.86 713,-186.86 713,-162.86 1015,-162.86 1015,-186.86"/>
+<text text-anchor="middle" x="864" y="-172.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%calc_latent_heat_vaporization</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_mass_term_thermal&#45;&gt;proc~calc_latent_heat_vaporization~4 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge6" class="edge">
+<title>proc~compute_mass_term_thermal&#45;&gt;proc~calc_latent_heat_vaporization~4</title>
+<path fill="none" stroke="#ff0000" d="M96.15,-285.59C114.75,-263.04 158.05,-215.59 207,-196.86 294.11,-163.52 538.04,-163.82 702.63,-168.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="702.76,-171.88 712.86,-168.67 702.96,-164.88 702.76,-171.88"/>
+</g>
+<!-- proc~calc_specific_heat_ice -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node8" class="node">
+<title>proc~calc_specific_heat_ice</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node8"><a xlink:href="../proc/calc_specific_heat_ice.html" xlink:title="type_physics_manager%calc_specific_heat_ice">
+<polygon fill="#d9534f" stroke="#d9534f" points="995,-270.86 733,-270.86 733,-246.86 995,-246.86 995,-270.86"/>
+<text text-anchor="middle" x="864" y="-256.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%calc_specific_heat_ice</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_mass_term_thermal&#45;&gt;proc~calc_specific_heat_ice -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge7" class="edge">
+<title>proc~compute_mass_term_thermal&#45;&gt;proc~calc_specific_heat_ice</title>
+<path fill="none" stroke="#ff0000" d="M171.19,-297.13C285.94,-295.68 497.17,-291.4 677,-278.86 702.03,-277.11 728.89,-274.6 754.19,-271.94"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="754.61,-275.42 764.18,-270.88 753.86,-268.46 754.61,-275.42"/>
+</g>
+<!-- proc~calc_specific_heat_vapor -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node9" class="node">
+<title>proc~calc_specific_heat_vapor</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node9"><a xlink:href="../proc/calc_specific_heat_vapor.html" xlink:title="type_physics_manager%calc_specific_heat_vapor">
+<polygon fill="#d9534f" stroke="#d9534f" points="1002.5,-434.86 725.5,-434.86 725.5,-410.86 1002.5,-410.86 1002.5,-434.86"/>
+<text text-anchor="middle" x="864" y="-420.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%calc_specific_heat_vapor</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_mass_term_thermal&#45;&gt;proc~calc_specific_heat_vapor -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge8" class="edge">
+<title>proc~compute_mass_term_thermal&#45;&gt;proc~calc_specific_heat_vapor</title>
+<path fill="none" stroke="#ff0000" d="M106.12,-309.95C129.3,-323.59 169.46,-345.26 207,-355.86 376.92,-403.84 580.21,-418.32 714.98,-422.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="715.28,-425.77 725.37,-422.55 715.47,-418.77 715.28,-425.77"/>
+</g>
+<!-- proc~calc_specific_heat_water -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node10" class="node">
+<title>proc~calc_specific_heat_water</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node10"><a xlink:href="../proc/calc_specific_heat_water.html" xlink:title="type_physics_manager%calc_specific_heat_water">
+<polygon fill="#d9534f" stroke="#d9534f" points="1002,-350.86 726,-350.86 726,-326.86 1002,-326.86 1002,-350.86"/>
+<text text-anchor="middle" x="864" y="-336.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%calc_specific_heat_water</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_mass_term_thermal&#45;&gt;proc~calc_specific_heat_water -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge9" class="edge">
+<title>proc~compute_mass_term_thermal&#45;&gt;proc~calc_specific_heat_water</title>
+<path fill="none" stroke="#ff0000" d="M171.08,-304.45C183.13,-305.31 195.38,-306.14 207,-306.86 381.7,-317.64 582.75,-327 715.74,-332.76"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="715.85,-336.27 725.99,-333.21 716.15,-329.28 715.85,-336.27"/>
+</g>
+<!-- proc~get_all_state -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node11" class="node">
+<title>proc~get_all_state</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node11"><a xlink:href="../proc/get_all_state.html" xlink:title="type_state%get_all_state">
+<polygon fill="#d9534f" stroke="#d9534f" points="660.5,-765.86 516.5,-765.86 516.5,-741.86 660.5,-741.86 660.5,-765.86"/>
+<text text-anchor="middle" x="588.5" y="-751.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_state%get_all_state</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_mass_term_thermal&#45;&gt;proc~get_all_state -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge10" class="edge">
+<title>proc~compute_mass_term_thermal&#45;&gt;proc~get_all_state</title>
+<path fill="none" stroke="#ff0000" d="M87.43,-310.08C91.65,-357.19 113.14,-528.94 207,-620.86 288.67,-700.85 421.05,-732.91 506.16,-745.64"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="505.91,-749.14 516.3,-747.1 506.9,-742.21 505.91,-749.14"/>
+</g>
+<!-- proc~get_density_solid~2 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node12" class="node">
+<title>proc~get_density_solid~2</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node12"><a xlink:href="../proc/get_density_solid~2.html" xlink:title="type_physics_manager%get_density_solid">
+<polygon fill="#d9534f" stroke="#d9534f" points="981.5,-102.86 746.5,-102.86 746.5,-78.86 981.5,-78.86 981.5,-102.86"/>
+<text text-anchor="middle" x="864" y="-88.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%get_density_solid</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_mass_term_thermal&#45;&gt;proc~get_density_solid~2 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge11" class="edge">
+<title>proc~compute_mass_term_thermal&#45;&gt;proc~get_density_solid~2</title>
+<path fill="none" stroke="#ff0000" d="M90.53,-285.57C102.23,-252.12 139.73,-159.38 207,-121.86 294.53,-73.03 571.26,-76.65 736.01,-83.71"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="736.07,-87.21 746.21,-84.16 736.38,-80.22 736.07,-87.21"/>
+</g>
+<!-- proc~get_specific_heat_solid~2 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node13" class="node">
+<title>proc~get_specific_heat_solid~2</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node13"><a xlink:href="../proc/get_specific_heat_solid~2.html" xlink:title="type_physics_manager%get_specific_heat_solid">
+<polygon fill="#d9534f" stroke="#d9534f" points="997,-60.86 731,-60.86 731,-36.86 997,-36.86 997,-60.86"/>
+<text text-anchor="middle" x="864" y="-46.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%get_specific_heat_solid</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_mass_term_thermal&#45;&gt;proc~get_specific_heat_solid~2 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge12" class="edge">
+<title>proc~compute_mass_term_thermal&#45;&gt;proc~get_specific_heat_solid~2</title>
+<path fill="none" stroke="#ff0000" d="M88.81,-285.69C96.89,-246.95 127.81,-126.19 207,-76.86 399.26,42.91 688.29,-6.38 808.03,-34.44"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="807.52,-37.92 818.06,-36.84 809.14,-31.11 807.52,-37.92"/>
+</g>
+<!-- proc~set_field_dp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node14" class="node">
+<title>proc~set_field_dp</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node14"><a xlink:href="../proc/set_field_dp.html" xlink:title="type_field_dp%set_field_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="1920,-586.86 1764,-586.86 1764,-562.86 1920,-562.86 1920,-586.86"/>
+<text text-anchor="middle" x="1842" y="-572.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_field_dp%set_field_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_mass_term_thermal&#45;&gt;proc~set_field_dp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge13" class="edge">
+<title>proc~compute_mass_term_thermal&#45;&gt;proc~set_field_dp</title>
+<path fill="none" stroke="#ff0000" d="M98.82,-309.91C152.12,-360.72 369.99,-554.86 587.5,-554.86 587.5,-554.86 587.5,-554.86 1188,-554.86 1390.44,-554.86 1628.01,-564.58 1753.32,-570.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1753.47,-573.98 1763.62,-570.96 1753.8,-566.99 1753.47,-573.98"/>
+</g>
+<!-- proc~calc_enthalpy_density_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node18" class="node">
+<title>proc~calc_enthalpy_density_thermal</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node18"><a xlink:href="../proc/calc_enthalpy_density_thermal.html" xlink:title="calc_enthalpy_density_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="677,-269.86 500,-269.86 500,-245.86 677,-245.86 677,-269.86"/>
+<text text-anchor="middle" x="588.5" y="-255.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_enthalpy_density_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_enthalpy_density_thermal&#45;&gt;proc~calc_enthalpy_density_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge14" class="edge">
+<title>interface~calc_enthalpy_density_thermal&#45;&gt;proc~calc_enthalpy_density_thermal</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M464.21,-257.86C472.73,-257.86 481.24,-257.86 489.58,-257.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="489.66,-261.36 499.66,-257.86 489.66,-254.36 489.66,-261.36"/>
+</g>
+<!-- proc~update_water_phases_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node26" class="node">
+<title>proc~update_water_phases_thermal</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node26"><a xlink:href="../proc/update_water_phases_thermal.html" xlink:title="update_water_phases_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="676,-614.86 501,-614.86 501,-590.86 676,-590.86 676,-614.86"/>
+<text text-anchor="middle" x="588.5" y="-600.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">update_water_phases_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~update_water_phases_thermal&#45;&gt;proc~update_water_phases_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge15" class="edge">
+<title>interface~update_water_phases_thermal&#45;&gt;proc~update_water_phases_thermal</title>
+<path fill="none" stroke="#ff7500" stroke-dasharray="5,2" d="M463.84,-601.38C472.82,-601.49 481.79,-601.6 490.57,-601.7"/>
+<polygon fill="#ff7500" stroke="#ff7500" points="490.73,-605.2 500.77,-601.82 490.81,-598.2 490.73,-605.2"/>
+</g>
+<!-- proc~calc_rho_ice_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node21" class="node">
+<title>proc~calc_rho_ice_abst_physics</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node21"><a xlink:href="../proc/calc_rho_ice_abst_physics.html" xlink:title="abst_physics%calc_rho_ice_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="2327,-194.86 2100,-194.86 2100,-170.86 2327,-170.86 2327,-194.86"/>
+<text text-anchor="middle" x="2213.5" y="-180.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_rho_ice_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_density_ice&#45;&gt;proc~calc_rho_ice_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge16" class="edge">
+<title>proc~calc_density_ice&#45;&gt;proc~calc_rho_ice_abst_physics</title>
+<path fill="none" stroke="#ffeb00" d="M979.02,-213.98C1230.29,-207.64 1829.96,-192.51 2089.4,-185.97"/>
+<polygon fill="#ffeb00" stroke="#ffeb00" points="2089.71,-189.46 2099.62,-185.71 2089.53,-182.46 2089.71,-189.46"/>
+</g>
+<!-- proc~calc_rho_water_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node22" class="node">
+<title>proc~calc_rho_water_abst_physics</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node22"><a xlink:href="../proc/calc_rho_water_abst_physics.html" xlink:title="abst_physics%calc_rho_water_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="2334,-312.86 2093,-312.86 2093,-288.86 2334,-288.86 2334,-312.86"/>
+<text text-anchor="middle" x="2213.5" y="-298.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_rho_water_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_density_water&#45;&gt;proc~calc_rho_water_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge17" class="edge">
+<title>proc~calc_density_water&#45;&gt;proc~calc_rho_water_abst_physics</title>
+<path fill="none" stroke="#9cff00" d="M986.06,-373.67C1239,-358.66 1821.6,-324.07 2082.28,-308.59"/>
+<polygon fill="#9cff00" stroke="#9cff00" points="2082.78,-312.07 2092.55,-307.98 2082.36,-305.08 2082.78,-312.07"/>
+</g>
+<!-- proc~calc_latent_heat_fusion -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node19" class="node">
+<title>proc~calc_latent_heat_fusion</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node19"><a xlink:href="../proc/calc_latent_heat_fusion.html" xlink:title="type_models_manager%calc_latent_heat_fusion">
+<polygon fill="#d9534f" stroke="#d9534f" points="1321,-118.86 1053,-118.86 1053,-94.86 1321,-94.86 1321,-118.86"/>
+<text text-anchor="middle" x="1187" y="-104.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_models_manager%calc_latent_heat_fusion</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_latent_heat_fusion~3&#45;&gt;proc~calc_latent_heat_fusion -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge18" class="edge">
+<title>proc~calc_latent_heat_fusion~3&#45;&gt;proc~calc_latent_heat_fusion</title>
+<path fill="none" stroke="#27ff00" d="M998.34,-122.06C1012.97,-120.87 1027.91,-119.66 1042.65,-118.47"/>
+<polygon fill="#27ff00" stroke="#27ff00" points="1043.13,-121.94 1052.81,-117.65 1042.56,-114.97 1043.13,-121.94"/>
+</g>
+<!-- proc~calc_latent_heat_vaporization -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node20" class="node">
+<title>proc~calc_latent_heat_vaporization</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node20"><a xlink:href="../proc/calc_latent_heat_vaporization.html" xlink:title="type_models_manager%calc_latent_heat_vaporization">
+<polygon fill="#d9534f" stroke="#d9534f" points="1661,-156.86 1359,-156.86 1359,-132.86 1661,-132.86 1661,-156.86"/>
+<text text-anchor="middle" x="1510" y="-142.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_models_manager%calc_latent_heat_vaporization</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_latent_heat_vaporization~4&#45;&gt;proc~calc_latent_heat_vaporization -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge19" class="edge">
+<title>proc~calc_latent_heat_vaporization~4&#45;&gt;proc~calc_latent_heat_vaporization</title>
+<path fill="none" stroke="#00ff4e" d="M1015.18,-167.86C1115.26,-163.2 1246.67,-157.08 1348.76,-152.32"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="1349.04,-155.82 1358.86,-151.85 1348.71,-148.82 1349.04,-155.82"/>
+</g>
+<!-- proc~calc_cp_ice_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node15" class="node">
+<title>proc~calc_cp_ice_abst_physics</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node15"><a xlink:href="../proc/calc_cp_ice_abst_physics.html" xlink:title="abst_physics%calc_cp_ice_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="1298,-270.86 1076,-270.86 1076,-246.86 1298,-246.86 1298,-270.86"/>
+<text text-anchor="middle" x="1187" y="-256.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_cp_ice_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_specific_heat_ice&#45;&gt;proc~calc_cp_ice_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge20" class="edge">
+<title>proc~calc_specific_heat_ice&#45;&gt;proc~calc_cp_ice_abst_physics</title>
+<path fill="none" stroke="#00ffc4" d="M995.1,-258.86C1018.41,-258.86 1042.62,-258.86 1065.64,-258.86"/>
+<polygon fill="#00ffc4" stroke="#00ffc4" points="1065.78,-262.36 1075.78,-258.86 1065.78,-255.36 1065.78,-262.36"/>
+</g>
+<!-- proc~calc_cp_vapor_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node16" class="node">
+<title>proc~calc_cp_vapor_abst_physics</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node16"><a xlink:href="../proc/calc_cp_vapor_abst_physics.html" xlink:title="abst_physics%calc_cp_vapor_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="1305.5,-434.86 1068.5,-434.86 1068.5,-410.86 1305.5,-410.86 1305.5,-434.86"/>
+<text text-anchor="middle" x="1187" y="-420.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_cp_vapor_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_specific_heat_vapor&#45;&gt;proc~calc_cp_vapor_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge21" class="edge">
+<title>proc~calc_specific_heat_vapor&#45;&gt;proc~calc_cp_vapor_abst_physics</title>
+<path fill="none" stroke="#00c4ff" d="M1002.53,-422.86C1021.05,-422.86 1039.99,-422.86 1058.33,-422.86"/>
+<polygon fill="#00c4ff" stroke="#00c4ff" points="1058.45,-426.36 1068.45,-422.86 1058.45,-419.36 1058.45,-426.36"/>
+</g>
+<!-- proc~calc_cp_water_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node17" class="node">
+<title>proc~calc_cp_water_abst_physics</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node17"><a xlink:href="../proc/calc_cp_water_abst_physics.html" xlink:title="abst_physics%calc_cp_water_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="1305,-314.86 1069,-314.86 1069,-290.86 1305,-290.86 1305,-314.86"/>
+<text text-anchor="middle" x="1187" y="-300.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_cp_water_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_specific_heat_water&#45;&gt;proc~calc_cp_water_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge22" class="edge">
+<title>proc~calc_specific_heat_water&#45;&gt;proc~calc_cp_water_abst_physics</title>
+<path fill="none" stroke="#004eff" d="M972.33,-326.82C1003.25,-323.35 1037.14,-319.55 1068.63,-316.02"/>
+<polygon fill="#004eff" stroke="#004eff" points="1069.22,-319.48 1078.77,-314.89 1068.44,-312.52 1069.22,-319.48"/>
+</g>
+<!-- proc~get_field_dp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node24" class="node">
+<title>proc~get_field_dp</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node24"><a xlink:href="../proc/get_field_dp.html" xlink:title="type_field_dp%get_field_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="3012,-596.86 2855,-596.86 2855,-572.86 3012,-572.86 3012,-596.86"/>
+<text text-anchor="middle" x="2933.5" y="-582.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_field_dp%get_field_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~get_all_state&#45;&gt;proc~get_field_dp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge23" class="edge">
+<title>proc~get_all_state&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#2700ff" d="M628.14,-765.94C722.43,-794.32 972.29,-862.86 1186,-862.86 1186,-862.86 1186,-862.86 2214.5,-862.86 2450.35,-862.86 2535.74,-938.55 2744,-827.86 2838.85,-777.45 2901.04,-656.19 2923.32,-606.57"/>
+<polygon fill="#2700ff" stroke="#2700ff" points="2926.65,-607.69 2927.47,-597.13 2920.24,-604.88 2926.65,-607.69"/>
+</g>
+<!-- proc~get_density_solid -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node23" class="node">
+<title>proc~get_density_solid</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node23"><a xlink:href="../proc/get_density_solid.html" xlink:title="type_material_manager%get_density_solid">
+<polygon fill="#d9534f" stroke="#d9534f" points="1307.5,-76.86 1066.5,-76.86 1066.5,-52.86 1307.5,-52.86 1307.5,-76.86"/>
+<text text-anchor="middle" x="1187" y="-62.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_material_manager%get_density_solid</text>
+</a>
+</g>
+</g>
+<!-- proc~get_density_solid~2&#45;&gt;proc~get_density_solid -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge24" class="edge">
+<title>proc~get_density_solid~2&#45;&gt;proc~get_density_solid</title>
+<path fill="none" stroke="#9c00ff" d="M981.8,-81.4C1005.98,-79.44 1031.6,-77.37 1056.21,-75.37"/>
+<polygon fill="#9c00ff" stroke="#9c00ff" points="1056.64,-78.85 1066.33,-74.55 1056.08,-71.87 1056.64,-78.85"/>
+</g>
+<!-- proc~get_specific_heat_solid -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node25" class="node">
+<title>proc~get_specific_heat_solid</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node25"><a xlink:href="../proc/get_specific_heat_solid.html" xlink:title="type_material_manager%get_specific_heat_solid">
+<polygon fill="#d9534f" stroke="#d9534f" points="1323,-34.86 1051,-34.86 1051,-10.86 1323,-10.86 1323,-34.86"/>
+<text text-anchor="middle" x="1187" y="-20.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_material_manager%get_specific_heat_solid</text>
+</a>
+</g>
+</g>
+<!-- proc~get_specific_heat_solid~2&#45;&gt;proc~get_specific_heat_solid -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge25" class="edge">
+<title>proc~get_specific_heat_solid~2&#45;&gt;proc~get_specific_heat_solid</title>
+<path fill="none" stroke="#ff00eb" d="M997.42,-38.13C1011.73,-36.98 1026.35,-35.79 1040.8,-34.62"/>
+<polygon fill="#ff00eb" stroke="#ff00eb" points="1041.09,-38.11 1050.78,-33.81 1040.53,-31.13 1041.09,-38.11"/>
+</g>
+<!-- calc_cp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node27" class="node">
+<title>calc_cp</title>
+<polygon fill="#777777" stroke="#777777" points="1537,-274.86 1483,-274.86 1483,-250.86 1537,-250.86 1537,-274.86"/>
+<text text-anchor="middle" x="1510" y="-260.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_cp</text>
+</g>
+<!-- proc~calc_cp_ice_abst_physics&#45;&gt;calc_cp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge26" class="edge">
+<title>proc~calc_cp_ice_abst_physics&#45;&gt;calc_cp</title>
+<path fill="none" stroke="#ff0000" d="M1298.02,-260.23C1358.92,-260.99 1430.62,-261.88 1472.8,-262.41"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1472.82,-265.91 1482.87,-262.53 1472.91,-258.91 1472.82,-265.91"/>
+</g>
+<!-- proc~get_thermo_state_tp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node34" class="node">
+<title>proc~get_thermo_state_tp</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node34"><a xlink:href="../proc/get_thermo_state_tp.html" xlink:title="abst_physics%get_thermo_state_TP">
+<polygon fill="#d9534f" stroke="#d9534f" points="2692,-278.86 2492,-278.86 2492,-254.86 2692,-254.86 2692,-278.86"/>
+<text text-anchor="middle" x="2592" y="-264.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%get_thermo_state_TP</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_cp_ice_abst_physics&#45;&gt;proc~get_thermo_state_tp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge27" class="edge">
+<title>proc~calc_cp_ice_abst_physics&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#ff0000" d="M1292.32,-246.83C1314.32,-244.76 1337.4,-242.93 1359,-241.86 1535.02,-233.13 2158.78,-232.96 2404,-246.86 2430.59,-248.37 2459.23,-250.95 2485.9,-253.76"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2485.7,-257.26 2496.02,-254.85 2486.45,-250.3 2485.7,-257.26"/>
+</g>
+<!-- calc_saturation_cp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node29" class="node">
+<title>calc_saturation_cp</title>
+<polygon fill="#777777" stroke="#777777" points="1566,-468.86 1454,-468.86 1454,-444.86 1566,-444.86 1566,-468.86"/>
+<text text-anchor="middle" x="1510" y="-454.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_saturation_cp</text>
+</g>
+<!-- proc~calc_cp_vapor_abst_physics&#45;&gt;calc_saturation_cp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge28" class="edge">
+<title>proc~calc_cp_vapor_abst_physics&#45;&gt;calc_saturation_cp</title>
+<path fill="none" stroke="#ff7f00" d="M1301.62,-434.89C1349.18,-439.93 1402.75,-445.61 1443.52,-449.92"/>
+<polygon fill="#ff7f00" stroke="#ff7f00" points="1443.29,-453.42 1453.61,-450.99 1444.03,-446.46 1443.29,-453.42"/>
+</g>
+<!-- proc~get_thermo_state_t -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node33" class="node">
+<title>proc~get_thermo_state_t</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node33"><a xlink:href="../proc/get_thermo_state_t.html" xlink:title="abst_physics%get_thermo_state_T">
+<polygon fill="#d9534f" stroke="#d9534f" points="2689,-716.86 2495,-716.86 2495,-692.86 2689,-692.86 2689,-716.86"/>
+<text text-anchor="middle" x="2592" y="-702.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%get_thermo_state_T</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_cp_vapor_abst_physics&#45;&gt;proc~get_thermo_state_t -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge29" class="edge">
+<title>proc~calc_cp_vapor_abst_physics&#45;&gt;proc~get_thermo_state_t</title>
+<path fill="none" stroke="#ff7f00" d="M1241.97,-410.85C1333.36,-393.35 1522.15,-369.67 1661,-435.86 1683.19,-446.44 1676.16,-464.82 1697,-477.86 1809.94,-548.55 1892.13,-460.3 1987,-553.86 2029.69,-595.96 1975.96,-646.69 2023,-683.86 2058.23,-711.7 2330.46,-710.57 2484.9,-707.59"/>
+<polygon fill="#ff7f00" stroke="#ff7f00" points="2484.97,-711.09 2494.9,-707.39 2484.83,-704.09 2484.97,-711.09"/>
+</g>
+<!-- proc~calc_cp_water_abst_physics&#45;&gt;calc_cp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge30" class="edge">
+<title>proc~calc_cp_water_abst_physics&#45;&gt;calc_cp</title>
+<path fill="none" stroke="#ffff00" d="M1284.31,-290.86C1347.87,-282.94 1427.52,-273.01 1472.9,-267.36"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="1473.36,-270.83 1482.85,-266.12 1472.5,-263.88 1473.36,-270.83"/>
+</g>
+<!-- proc~calc_cp_water_abst_physics&#45;&gt;proc~get_thermo_state_tp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge31" class="edge">
+<title>proc~calc_cp_water_abst_physics&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#ffff00" d="M1305.19,-299.46C1466.74,-294.81 1766.94,-286.32 2023,-279.86 2182.61,-275.83 2367.46,-271.7 2481.82,-269.21"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="2482.06,-272.7 2491.98,-268.99 2481.91,-265.71 2482.06,-272.7"/>
+</g>
+<!-- proc~calc_enthalpy_density_thermal&#45;&gt;proc~calc_density_ice -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge32" class="edge">
+<title>proc~calc_enthalpy_density_thermal&#45;&gt;proc~calc_density_ice</title>
+<path fill="none" stroke="#7fff00" d="M662.27,-245.81C678.93,-243.12 696.57,-240.34 713,-237.86 729.74,-235.33 747.54,-232.75 764.81,-230.3"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="765.5,-233.74 774.91,-228.87 764.52,-226.8 765.5,-233.74"/>
+</g>
+<!-- proc~calc_enthalpy_density_thermal&#45;&gt;proc~calc_density_water -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge33" class="edge">
+<title>proc~calc_enthalpy_density_thermal&#45;&gt;proc~calc_density_water</title>
+<path fill="none" stroke="#7fff00" d="M599.94,-270.11C619.57,-292.21 664.39,-338.46 713,-359.86 719.14,-362.56 725.56,-364.94 732.12,-367.02"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="731.25,-370.41 741.83,-369.87 733.22,-363.7 731.25,-370.41"/>
+</g>
+<!-- proc~calc_enthalpy_density_thermal&#45;&gt;proc~calc_latent_heat_fusion~3 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge34" class="edge">
+<title>proc~calc_enthalpy_density_thermal&#45;&gt;proc~calc_latent_heat_fusion~3</title>
+<path fill="none" stroke="#7fff00" d="M599.58,-245.72C618.95,-223.32 663.85,-175.78 713,-153.86 717.76,-151.74 722.67,-149.82 727.7,-148.09"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="729.02,-151.34 737.49,-144.97 726.9,-144.67 729.02,-151.34"/>
+</g>
+<!-- proc~calc_enthalpy_density_thermal&#45;&gt;proc~calc_latent_heat_vaporization~4 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge35" class="edge">
+<title>proc~calc_enthalpy_density_thermal&#45;&gt;proc~calc_latent_heat_vaporization~4</title>
+<path fill="none" stroke="#7fff00" d="M608.77,-245.68C632.38,-231.36 674.06,-208 713,-195.86 721.3,-193.27 729.96,-191 738.74,-189.01"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="739.65,-192.4 748.7,-186.88 738.19,-185.55 739.65,-192.4"/>
+</g>
+<!-- proc~calc_enthalpy_density_thermal&#45;&gt;proc~calc_specific_heat_ice -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge36" class="edge">
+<title>proc~calc_enthalpy_density_thermal&#45;&gt;proc~calc_specific_heat_ice</title>
+<path fill="none" stroke="#7fff00" d="M677.17,-258.18C691.78,-258.23 707.25,-258.29 722.78,-258.35"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="722.98,-261.85 732.99,-258.38 723,-254.85 722.98,-261.85"/>
+</g>
+<!-- proc~calc_enthalpy_density_thermal&#45;&gt;proc~calc_specific_heat_vapor -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge37" class="edge">
+<title>proc~calc_enthalpy_density_thermal&#45;&gt;proc~calc_specific_heat_vapor</title>
+<path fill="none" stroke="#7fff00" d="M595.88,-270.12C611.48,-298.73 654.63,-369.94 713,-401.86 716.37,-403.7 719.84,-405.4 723.4,-406.97"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="722.4,-410.34 732.98,-410.83 725.01,-403.85 722.4,-410.34"/>
+</g>
+<!-- proc~calc_enthalpy_density_thermal&#45;&gt;proc~calc_specific_heat_water -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge38" class="edge">
+<title>proc~calc_enthalpy_density_thermal&#45;&gt;proc~calc_specific_heat_water</title>
+<path fill="none" stroke="#7fff00" d="M612.06,-269.95C636.34,-282.47 676.4,-301.73 713,-312.86 728.6,-317.61 745.39,-321.57 761.9,-324.86"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="761.64,-328.38 772.12,-326.83 762.96,-321.5 761.64,-328.38"/>
+</g>
+<!-- proc~calc_enthalpy_density_thermal&#45;&gt;proc~get_density_solid~2 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge39" class="edge">
+<title>proc~calc_enthalpy_density_thermal&#45;&gt;proc~get_density_solid~2</title>
+<path fill="none" stroke="#7fff00" d="M595.83,-245.43C611.33,-216.42 654.27,-144.24 713,-111.86 720.45,-107.75 728.41,-104.35 736.63,-101.54"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="737.89,-104.81 746.39,-98.5 735.81,-98.13 737.89,-104.81"/>
+</g>
+<!-- proc~calc_enthalpy_density_thermal&#45;&gt;proc~get_specific_heat_solid~2 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge41" class="edge">
+<title>proc~calc_enthalpy_density_thermal&#45;&gt;proc~get_specific_heat_solid~2</title>
+<path fill="none" stroke="#7fff00" d="M593.49,-245.59C605.36,-211.19 644.04,-113.51 713,-69.86 715.83,-68.07 718.76,-66.4 721.75,-64.85"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="723.37,-67.96 730.95,-60.55 720.41,-61.62 723.37,-67.96"/>
+</g>
+<!-- proc~calc_enthalpy_density_thermal&#45;&gt;proc~get_field_dp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge40" class="edge">
+<title>proc~calc_enthalpy_density_thermal&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#7fff00" d="M653.5,-269.9C672.6,-273.32 693.62,-276.92 713,-279.86 779.87,-290.02 963.65,-273.83 1015,-317.86 1059.21,-355.77 1006.63,-406.13 1051,-443.86 1210.54,-579.54 1801.59,-456.48 1987,-553.86 2008.47,-565.14 2001.07,-584.52 2023,-594.86 2190.71,-673.96 2254.6,-604.97 2440,-607.86 2575.09,-609.96 2609.14,-616.06 2744,-607.86 2776.96,-605.86 2812.98,-601.9 2844.63,-597.83"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="2845.28,-601.27 2854.74,-596.5 2844.37,-594.33 2845.28,-601.27"/>
+</g>
+<!-- proc~calc_latent_heat_fusion~2 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node30" class="node">
+<title>proc~calc_latent_heat_fusion~2</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node30"><a xlink:href="../proc/calc_latent_heat_fusion~2.html" xlink:title="type_phase_manager%calc_latent_heat_fusion">
+<polygon fill="#d9534f" stroke="#d9534f" points="1641,-114.86 1379,-114.86 1379,-90.86 1641,-90.86 1641,-114.86"/>
+<text text-anchor="middle" x="1510" y="-100.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_phase_manager%calc_latent_heat_fusion</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_latent_heat_fusion&#45;&gt;proc~calc_latent_heat_fusion~2 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge42" class="edge">
+<title>proc~calc_latent_heat_fusion&#45;&gt;proc~calc_latent_heat_fusion~2</title>
+<path fill="none" stroke="#00ff00" d="M1321.34,-105.2C1336.96,-105 1352.93,-104.8 1368.63,-104.61"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1368.95,-108.11 1378.91,-104.48 1368.87,-101.11 1368.95,-108.11"/>
+</g>
+<!-- proc~calc_latent_heat_vaporization~2 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node31" class="node">
+<title>proc~calc_latent_heat_vaporization~2</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node31"><a xlink:href="../proc/calc_latent_heat_vaporization~2.html" xlink:title="type_phase_manager%calc_latent_heat_vaporization">
+<polygon fill="#d9534f" stroke="#d9534f" points="2361,-114.86 2066,-114.86 2066,-90.86 2361,-90.86 2361,-114.86"/>
+<text text-anchor="middle" x="2213.5" y="-100.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_phase_manager%calc_latent_heat_vaporization</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_latent_heat_vaporization&#45;&gt;proc~calc_latent_heat_vaporization~2 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge43" class="edge">
+<title>proc~calc_latent_heat_vaporization&#45;&gt;proc~calc_latent_heat_vaporization~2</title>
+<path fill="none" stroke="#00ff7f" d="M1661.06,-135.88C1777.31,-128.92 1937.89,-119.3 2055.79,-112.24"/>
+<polygon fill="#00ff7f" stroke="#00ff7f" points="2056.21,-115.72 2065.99,-111.63 2055.8,-108.74 2056.21,-115.72"/>
+</g>
+<!-- calc_rho -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node28" class="node">
+<title>calc_rho</title>
+<polygon fill="#777777" stroke="#777777" points="2621,-233.86 2563,-233.86 2563,-209.86 2621,-209.86 2621,-233.86"/>
+<text text-anchor="middle" x="2592" y="-219.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_rho</text>
+</g>
+<!-- proc~calc_rho_ice_abst_physics&#45;&gt;calc_rho -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge44" class="edge">
+<title>proc~calc_rho_ice_abst_physics&#45;&gt;calc_rho</title>
+<path fill="none" stroke="#00ffff" d="M2327.21,-194.53C2403.62,-202.45 2499.93,-212.43 2552.47,-217.87"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2552.38,-221.38 2562.69,-218.93 2553.1,-214.42 2552.38,-221.38"/>
+</g>
+<!-- proc~calc_rho_ice_abst_physics&#45;&gt;proc~get_thermo_state_tp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge45" class="edge">
+<title>proc~calc_rho_ice_abst_physics&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#00ffff" d="M2327.07,-186.71C2353.24,-190.72 2380.34,-197.53 2404,-208.86 2423.85,-218.36 2420.25,-233.14 2440,-242.86 2452.97,-249.24 2467.25,-253.99 2481.69,-257.52"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2481.18,-260.99 2491.71,-259.77 2482.72,-254.16 2481.18,-260.99"/>
+</g>
+<!-- proc~calc_rho_water_abst_physics&#45;&gt;calc_rho -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge46" class="edge">
+<title>proc~calc_rho_water_abst_physics&#45;&gt;calc_rho</title>
+<path fill="none" stroke="#007fff" d="M2259.18,-288.82C2304.51,-276.88 2376.79,-258.57 2440,-245.86 2478.06,-238.21 2521.92,-231.46 2552.53,-227.09"/>
+<polygon fill="#007fff" stroke="#007fff" points="2553.36,-230.51 2562.77,-225.64 2552.38,-223.58 2553.36,-230.51"/>
+</g>
+<!-- proc~calc_rho_water_abst_physics&#45;&gt;proc~get_thermo_state_tp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge47" class="edge">
+<title>proc~calc_rho_water_abst_physics&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#007fff" d="M2334.14,-290.06C2381.49,-285.78 2435.53,-280.9 2481.8,-276.72"/>
+<polygon fill="#007fff" stroke="#007fff" points="2482.21,-280.2 2491.85,-275.81 2481.58,-273.23 2482.21,-280.2"/>
+</g>
+<!-- proc~get_solid_abst_material -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node32" class="node">
+<title>proc~get_solid_abst_material</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node32"><a xlink:href="../proc/get_solid_abst_material.html" xlink:title="abst_material%get_solid_abst_material">
+<polygon fill="#d9534f" stroke="#d9534f" points="1620,-53.86 1400,-53.86 1400,-29.86 1620,-29.86 1620,-53.86"/>
+<text text-anchor="middle" x="1510" y="-39.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_material%get_solid_abst_material</text>
+</a>
+</g>
+</g>
+<!-- proc~get_density_solid&#45;&gt;proc~get_solid_abst_material -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge48" class="edge">
+<title>proc~get_density_solid&#45;&gt;proc~get_solid_abst_material</title>
+<path fill="none" stroke="#0000ff" d="M1307.53,-56.3C1334.4,-54.37 1362.91,-52.33 1389.77,-50.4"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1390.25,-53.88 1399.97,-49.67 1389.75,-46.9 1390.25,-53.88"/>
+</g>
+<!-- proc~get_specific_heat_solid&#45;&gt;proc~get_solid_abst_material -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge49" class="edge">
+<title>proc~get_specific_heat_solid&#45;&gt;proc~get_solid_abst_material</title>
+<path fill="none" stroke="#ff00ff" d="M1323.2,-30.86C1345.24,-32.17 1367.93,-33.51 1389.56,-34.79"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="1389.56,-38.3 1399.75,-35.39 1389.97,-31.31 1389.56,-38.3"/>
+</g>
+<!-- proc~update_water_phases~3 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node35" class="node">
+<title>proc~update_water_phases~3</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node35"><a xlink:href="../proc/update_water_phases~3.html" xlink:title="type_physics_manager%update_water_phases">
+<polygon fill="#d9534f" stroke="#d9534f" points="993.5,-617.86 734.5,-617.86 734.5,-593.86 993.5,-593.86 993.5,-617.86"/>
+<text text-anchor="middle" x="864" y="-603.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%update_water_phases</text>
+</a>
+</g>
+</g>
+<!-- proc~update_water_phases_thermal&#45;&gt;proc~update_water_phases~3 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge50" class="edge">
+<title>proc~update_water_phases_thermal&#45;&gt;proc~update_water_phases~3</title>
+<path fill="none" stroke="#ff007f" d="M676.04,-603.81C691.39,-603.98 707.73,-604.16 724.11,-604.34"/>
+<polygon fill="#ff007f" stroke="#ff007f" points="724.27,-607.84 734.31,-604.45 724.35,-600.84 724.27,-607.84"/>
+</g>
+<!-- proc~calc_latent_heat_vaporization~2&#45;&gt;proc~get_field_dp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge52" class="edge">
+<title>proc~calc_latent_heat_vaporization~2&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#00ffa9" d="M2311.05,-114.86C2455.25,-133.65 2713.33,-170.97 2744,-200.86 2799.31,-254.76 2748.94,-300.15 2780,-370.86 2814.65,-449.74 2881.17,-528.71 2913.68,-564.7"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="2911.48,-567.48 2920.81,-572.5 2916.65,-562.76 2911.48,-567.48"/>
+</g>
+<!-- proc~calc_latent_heat_vaporization~3 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node36" class="node">
+<title>proc~calc_latent_heat_vaporization~3</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node36"><a xlink:href="../proc/calc_latent_heat_vaporization~3.html" xlink:title="type_evaporation%calc_latent_heat_vaporization">
+<polygon fill="#d9534f" stroke="#d9534f" points="2729,-74.86 2455,-74.86 2455,-50.86 2729,-50.86 2729,-74.86"/>
+<text text-anchor="middle" x="2592" y="-60.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_evaporation%calc_latent_heat_vaporization</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_latent_heat_vaporization~2&#45;&gt;proc~calc_latent_heat_vaporization~3 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge51" class="edge">
+<title>proc~calc_latent_heat_vaporization~2&#45;&gt;proc~calc_latent_heat_vaporization~3</title>
+<path fill="none" stroke="#00ffa9" d="M2327.46,-90.86C2371.66,-86.16 2422.5,-80.76 2467.65,-75.96"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="2468.22,-79.42 2477.79,-74.89 2467.48,-72.46 2468.22,-79.42"/>
+</g>
+<!-- proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node38" class="node">
+<title>proc~shift_temperature_absolute_abst_physics</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node38"><a xlink:href="../proc/shift_temperature_absolute_abst_physics.html" xlink:title="abst_physics%shift_temperature_absolute_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="3087,-361.86 2780,-361.86 2780,-337.86 3087,-337.86 3087,-361.86"/>
+<text text-anchor="middle" x="2933.5" y="-347.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%shift_temperature_absolute_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_latent_heat_vaporization~2&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge53" class="edge">
+<title>proc~calc_latent_heat_vaporization~2&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#00ffa9" d="M2352.51,-90.85C2489.42,-82.08 2686.81,-78.88 2744,-126.86 2800.17,-173.99 2732.63,-231.89 2780,-287.86 2799.57,-310.99 2829.08,-325.59 2856.94,-334.77"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="2856.12,-338.18 2866.71,-337.79 2858.19,-331.49 2856.12,-338.18"/>
+</g>
+<!-- proc~get_thermo_state_t&#45;&gt;proc~get_field_dp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge54" class="edge">
+<title>proc~get_thermo_state_t&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#0000ff" d="M2689.17,-696.56C2707.63,-693.55 2726.61,-689.45 2744,-683.86 2805.38,-664.14 2870.62,-625.34 2905.97,-602.61"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2908.23,-605.31 2914.71,-596.92 2904.42,-599.44 2908.23,-605.31"/>
+</g>
+<!-- proc~get_thermo_state_t&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge55" class="edge">
+<title>proc~get_thermo_state_t&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#0000ff" d="M2689.33,-707.73C2709.22,-704.12 2728.73,-696.95 2744,-683.86 2786.27,-647.62 2755.52,-613.87 2780,-563.86 2818.07,-486.1 2883.51,-406.02 2914.81,-369.8"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2917.72,-371.79 2921.65,-361.95 2912.44,-367.19 2917.72,-371.79"/>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge56" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#aa00ff" d="M2692.16,-266.1C2710.76,-269.81 2729.04,-276.49 2744,-287.86 2776.01,-312.19 2760.22,-335.85 2780,-370.86 2822.58,-446.25 2885.84,-527.47 2915.72,-564.45"/>
+<polygon fill="#aa00ff" stroke="#aa00ff" points="2913.21,-566.91 2922.23,-572.46 2918.64,-562.49 2913.21,-566.91"/>
+</g>
+<!-- proc~shift_pressure_absolute_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node37" class="node">
+<title>proc~shift_pressure_absolute_abst_physics</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node37"><a xlink:href="../proc/shift_pressure_absolute_abst_physics.html" xlink:title="abst_physics%shift_pressure_absolute_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="3076,-278.86 2791,-278.86 2791,-254.86 3076,-254.86 3076,-278.86"/>
+<text text-anchor="middle" x="2933.5" y="-264.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%shift_pressure_absolute_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge57" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_physics</title>
+<path fill="none" stroke="#aa00ff" d="M2692.11,-266.86C2719.81,-266.86 2750.55,-266.86 2780.55,-266.86"/>
+<polygon fill="#aa00ff" stroke="#aa00ff" points="2780.69,-270.36 2790.69,-266.86 2780.69,-263.36 2780.69,-270.36"/>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge58" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#aa00ff" d="M2692.16,-278.06C2709.53,-280.75 2727.37,-284 2744,-287.86 2796.06,-299.94 2854.25,-320.15 2892.02,-334.2"/>
+<polygon fill="#aa00ff" stroke="#aa00ff" points="2891.04,-337.57 2901.64,-337.8 2893.5,-331.01 2891.04,-337.57"/>
+</g>
+<!-- proc~update_water_phases -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node39" class="node">
+<title>proc~update_water_phases</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node39"><a xlink:href="../proc/update_water_phases.html" xlink:title="type_models_manager%update_water_phases">
+<polygon fill="#d9534f" stroke="#d9534f" points="1316.5,-659.86 1057.5,-659.86 1057.5,-635.86 1316.5,-635.86 1316.5,-659.86"/>
+<text text-anchor="middle" x="1187" y="-645.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_models_manager%update_water_phases</text>
+</a>
+</g>
+</g>
+<!-- proc~update_water_phases~3&#45;&gt;proc~update_water_phases -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge59" class="edge">
+<title>proc~update_water_phases~3&#45;&gt;proc~update_water_phases</title>
+<path fill="none" stroke="#ff00aa" d="M956.99,-617.9C996.78,-623.1 1043.49,-629.21 1084.31,-634.55"/>
+<polygon fill="#ff00aa" stroke="#ff00aa" points="1083.91,-638.03 1094.28,-635.86 1084.82,-631.09 1083.91,-638.03"/>
+</g>
+<!-- proc~calc_latent_heat_vaporization~3&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge61" class="edge">
+<title>proc~calc_latent_heat_vaporization~3&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#ff0000" d="M2725.36,-74.93C2732.13,-78.74 2738.43,-83.33 2744,-88.86 2807.82,-152.15 2723.36,-218.07 2780,-287.86 2798.85,-311.08 2827.78,-325.68 2855.39,-334.82"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2854.49,-338.21 2865.08,-337.84 2856.57,-331.53 2854.49,-338.21"/>
+</g>
+<!-- calc_latent_heat -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node40" class="node">
+<title>calc_latent_heat</title>
+<polygon fill="#777777" stroke="#777777" points="2983.5,-74.86 2883.5,-74.86 2883.5,-50.86 2983.5,-50.86 2983.5,-74.86"/>
+<text text-anchor="middle" x="2933.5" y="-60.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_latent_heat</text>
+</g>
+<!-- proc~calc_latent_heat_vaporization~3&#45;&gt;calc_latent_heat -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge60" class="edge">
+<title>proc~calc_latent_heat_vaporization~3&#45;&gt;calc_latent_heat</title>
+<path fill="none" stroke="#ff0000" d="M2729.13,-62.86C2779.19,-62.86 2833.32,-62.86 2873.14,-62.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2873.2,-66.36 2883.2,-62.86 2873.2,-59.36 2873.2,-66.36"/>
+</g>
+<!-- proc~update_water_phases~2 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node41" class="node">
+<title>proc~update_water_phases~2</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node41"><a xlink:href="../proc/update_water_phases~2.html" xlink:title="type_phase_manager%update_water_phases">
+<polygon fill="#d9534f" stroke="#d9534f" points="1636.5,-670.86 1383.5,-670.86 1383.5,-646.86 1636.5,-646.86 1636.5,-670.86"/>
+<text text-anchor="middle" x="1510" y="-656.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_phase_manager%update_water_phases</text>
+</a>
+</g>
+</g>
+<!-- proc~update_water_phases&#45;&gt;proc~update_water_phases~2 -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge62" class="edge">
+<title>proc~update_water_phases&#45;&gt;proc~update_water_phases~2</title>
+<path fill="none" stroke="#7f00ff" d="M1316.71,-652.27C1335.34,-652.91 1354.57,-653.57 1373.33,-654.21"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1373.28,-657.71 1383.39,-654.56 1373.52,-650.71 1373.28,-657.71"/>
+</g>
+<!-- proc~update_water_phases~2&#45;&gt;proc~set_field_dp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge70" class="edge">
+<title>proc~update_water_phases~2&#45;&gt;proc~set_field_dp</title>
+<path fill="none" stroke="#00ffff" d="M1541.11,-646.76C1577.49,-632.6 1640.81,-609.35 1697,-595.86 1715.22,-591.48 1734.97,-587.88 1753.83,-584.97"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1754.53,-588.4 1763.91,-583.47 1753.5,-581.48 1754.53,-588.4"/>
+</g>
+<!-- proc~update_water_phases~2&#45;&gt;proc~get_field_dp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge69" class="edge">
+<title>proc~update_water_phases~2&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#00ffff" d="M1521.09,-671.18C1546.67,-701.32 1617.69,-778.3 1697,-805.86 1782.35,-835.51 2591.99,-864.01 2744,-794.86 2832.49,-754.6 2897.06,-650.58 2921.62,-605.83"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2924.72,-607.45 2926.37,-596.99 2918.55,-604.14 2924.72,-607.45"/>
+</g>
+<!-- calc_ice_content -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node42" class="node">
+<title>calc_ice_content</title>
+<polygon fill="#777777" stroke="#777777" points="1892.5,-670.86 1791.5,-670.86 1791.5,-646.86 1892.5,-646.86 1892.5,-670.86"/>
+<text text-anchor="middle" x="1842" y="-656.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_ice_content</text>
+</g>
+<!-- proc~update_water_phases~2&#45;&gt;calc_ice_content -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge63" class="edge">
+<title>proc~update_water_phases~2&#45;&gt;calc_ice_content</title>
+<path fill="none" stroke="#00ffff" d="M1636.7,-658.86C1686.3,-658.86 1740.92,-658.86 1781.2,-658.86"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1781.38,-662.36 1791.38,-658.86 1781.38,-655.36 1781.38,-662.36"/>
+</g>
+<!-- calc_ice_content_derivatives -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node43" class="node">
+<title>calc_ice_content_derivatives</title>
+<polygon fill="#777777" stroke="#777777" points="1924.5,-796.86 1759.5,-796.86 1759.5,-772.86 1924.5,-772.86 1924.5,-796.86"/>
+<text text-anchor="middle" x="1842" y="-782.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_ice_content_derivatives</text>
+</g>
+<!-- proc~update_water_phases~2&#45;&gt;calc_ice_content_derivatives -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge64" class="edge">
+<title>proc~update_water_phases~2&#45;&gt;calc_ice_content_derivatives</title>
+<path fill="none" stroke="#00ffff" d="M1527.43,-670.95C1558.69,-693.28 1629.63,-740.83 1697,-763.86 1713.49,-769.5 1731.54,-773.62 1749.12,-776.64"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1748.98,-780.16 1759.4,-778.29 1750.09,-773.24 1748.98,-780.16"/>
+</g>
+<!-- calc_water_content -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node44" class="node">
+<title>calc_water_content</title>
+<polygon fill="#777777" stroke="#777777" points="1899.5,-754.86 1784.5,-754.86 1784.5,-730.86 1899.5,-730.86 1899.5,-754.86"/>
+<text text-anchor="middle" x="1842" y="-740.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_water_content</text>
+</g>
+<!-- proc~update_water_phases~2&#45;&gt;calc_water_content -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge65" class="edge">
+<title>proc~update_water_phases~2&#45;&gt;calc_water_content</title>
+<path fill="none" stroke="#00ffff" d="M1541.11,-670.95C1577.49,-685.12 1640.81,-708.36 1697,-721.86 1722.05,-727.87 1749.98,-732.43 1774.53,-735.73"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1774.1,-739.21 1784.47,-737.03 1775.01,-732.27 1774.1,-739.21"/>
+</g>
+<!-- calc_water_content_derivatives -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node45" class="node">
+<title>calc_water_content_derivatives</title>
+<polygon fill="#777777" stroke="#777777" points="1931.5,-712.86 1752.5,-712.86 1752.5,-688.86 1931.5,-688.86 1931.5,-712.86"/>
+<text text-anchor="middle" x="1842" y="-698.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_water_content_derivatives</text>
+</g>
+<!-- proc~update_water_phases~2&#45;&gt;calc_water_content_derivatives -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge66" class="edge">
+<title>proc~update_water_phases~2&#45;&gt;calc_water_content_derivatives</title>
+<path fill="none" stroke="#00ffff" d="M1605.56,-670.9C1648.41,-676.35 1699.06,-682.79 1742.39,-688.31"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1742.01,-691.79 1752.37,-689.58 1742.89,-684.84 1742.01,-691.79"/>
+</g>
+<!-- proc~calc_vapor_content_derivatives -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node46" class="node">
+<title>proc~calc_vapor_content_derivatives</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node46"><a xlink:href="../proc/calc_vapor_content_derivatives.html" xlink:title="type_evaporation%calc_vapor_content_derivatives">
+<polygon fill="#d9534f" stroke="#d9534f" points="1983.5,-468.86 1700.5,-468.86 1700.5,-444.86 1983.5,-444.86 1983.5,-468.86"/>
+<text text-anchor="middle" x="1842" y="-454.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_evaporation%calc_vapor_content_derivatives</text>
+</a>
+</g>
+</g>
+<!-- proc~update_water_phases~2&#45;&gt;proc~calc_vapor_content_derivatives -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge67" class="edge">
+<title>proc~update_water_phases~2&#45;&gt;proc~calc_vapor_content_derivatives</title>
+<path fill="none" stroke="#00ffff" d="M1530.65,-646.83C1586.58,-612.6 1746.77,-514.54 1812.42,-474.36"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1814.33,-477.29 1821.03,-469.08 1810.67,-471.32 1814.33,-477.29"/>
+</g>
+<!-- proc~calc_vapor_content_vaporization -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node47" class="node">
+<title>proc~calc_vapor_content_vaporization</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node47"><a xlink:href="../proc/calc_vapor_content_vaporization.html" xlink:title="type_evaporation%calc_vapor_content_vaporization">
+<polygon fill="#d9534f" stroke="#d9534f" points="1987,-628.86 1697,-628.86 1697,-604.86 1987,-604.86 1987,-628.86"/>
+<text text-anchor="middle" x="1842" y="-614.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_evaporation%calc_vapor_content_vaporization</text>
+</a>
+</g>
+</g>
+<!-- proc~update_water_phases~2&#45;&gt;proc~calc_vapor_content_vaporization -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge68" class="edge">
+<title>proc~update_water_phases~2&#45;&gt;proc~calc_vapor_content_vaporization</title>
+<path fill="none" stroke="#00ffff" d="M1605.56,-646.82C1646.56,-641.61 1694.7,-635.48 1736.72,-630.13"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1737.23,-633.6 1746.71,-628.86 1736.35,-626.65 1737.23,-633.6"/>
+</g>
+<!-- proc~calc_vapor_content_derivatives&#45;&gt;proc~calc_rho_water_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge76" class="edge">
+<title>proc~calc_vapor_content_derivatives&#45;&gt;proc~calc_rho_water_abst_physics</title>
+<path fill="none" stroke="#0000ff" d="M1872.57,-444.86C1903.6,-431.23 1952.56,-406.68 1987,-374.86 2007.91,-355.54 1998.61,-336.55 2023,-321.86 2040.99,-311.02 2061.7,-304.26 2082.69,-300.23"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2083.4,-303.66 2092.66,-298.52 2082.22,-296.76 2083.4,-303.66"/>
+</g>
+<!-- proc~calc_vapor_content_derivatives&#45;&gt;proc~get_field_dp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge79" class="edge">
+<title>proc~calc_vapor_content_derivatives&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#0000ff" d="M1963.38,-468.88C1971.83,-472.58 1979.83,-477.18 1987,-482.86 2018.51,-507.83 1989.62,-543.45 2023,-565.86 2089.97,-610.82 2629.18,-596.12 2844.33,-588.35"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2844.77,-591.84 2854.64,-587.98 2844.52,-584.84 2844.77,-591.84"/>
+</g>
+<!-- proc~calc_vapor_content_derivatives&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge80" class="edge">
+<title>proc~calc_vapor_content_derivatives&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#0000ff" d="M1845.85,-444.83C1857.69,-397.89 1907.9,-226.46 2023,-161.86 2092.96,-122.59 2679.95,-152.54 2744,-200.86 2777.41,-226.06 2750.32,-258.36 2780,-287.86 2802.95,-310.67 2835.42,-325.43 2864.51,-334.8"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2863.64,-338.19 2874.22,-337.77 2865.69,-331.5 2863.64,-338.19"/>
+</g>
+<!-- proc~calc_drho_vapor_saturation_dt_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node48" class="node">
+<title>proc~calc_drho_vapor_saturation_dt_abst_physics</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node48"><a xlink:href="../proc/calc_drho_vapor_saturation_dt_abst_physics.html" xlink:title="abst_physics%calc_drho_vapor_saturation_dT_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="2377,-674.86 2050,-674.86 2050,-650.86 2377,-650.86 2377,-674.86"/>
+<text text-anchor="middle" x="2213.5" y="-660.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_drho_vapor_saturation_dT_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_vapor_content_derivatives&#45;&gt;proc~calc_drho_vapor_saturation_dt_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge71" class="edge">
+<title>proc~calc_vapor_content_derivatives&#45;&gt;proc~calc_drho_vapor_saturation_dt_abst_physics</title>
+<path fill="none" stroke="#0000ff" d="M1891.81,-468.97C1922.38,-478.67 1960.8,-495.03 1987,-520.86 2014.19,-547.67 1994.6,-573.34 2023,-598.86 2050.5,-623.58 2087.92,-638.8 2122.23,-648.16"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2121.74,-651.65 2132.29,-650.76 2123.49,-644.87 2121.74,-651.65"/>
+</g>
+<!-- proc~calc_drho_water_dp_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node49" class="node">
+<title>proc~calc_drho_water_dp_abst_physics</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node49"><a xlink:href="../proc/calc_drho_water_dp_abst_physics.html" xlink:title="abst_physics%calc_drho_water_dP_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="2346.5,-396.86 2080.5,-396.86 2080.5,-372.86 2346.5,-372.86 2346.5,-396.86"/>
+<text text-anchor="middle" x="2213.5" y="-382.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_drho_water_dP_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_vapor_content_derivatives&#45;&gt;proc~calc_drho_water_dp_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge72" class="edge">
+<title>proc~calc_vapor_content_derivatives&#45;&gt;proc~calc_drho_water_dp_abst_physics</title>
+<path fill="none" stroke="#0000ff" d="M1878.78,-444.82C1914.8,-433.16 1972.16,-415.81 2023,-405.86 2038.27,-402.87 2054.31,-400.27 2070.34,-398.02"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2070.87,-401.48 2080.31,-396.67 2069.93,-394.55 2070.87,-401.48"/>
+</g>
+<!-- proc~calc_drho_water_dt_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node50" class="node">
+<title>proc~calc_drho_water_dt_abst_physics</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node50"><a xlink:href="../proc/calc_drho_water_dt_abst_physics.html" xlink:title="abst_physics%calc_drho_water_dT_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="2347,-354.86 2080,-354.86 2080,-330.86 2347,-330.86 2347,-354.86"/>
+<text text-anchor="middle" x="2213.5" y="-340.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_drho_water_dT_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_vapor_content_derivatives&#45;&gt;proc~calc_drho_water_dt_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge73" class="edge">
+<title>proc~calc_vapor_content_derivatives&#45;&gt;proc~calc_drho_water_dt_abst_physics</title>
+<path fill="none" stroke="#0000ff" d="M1860.96,-444.71C1892.3,-424.18 1959.7,-383 2023,-363.86 2038.02,-359.32 2053.98,-355.74 2070.01,-352.92"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2070.7,-356.35 2079.99,-351.26 2069.55,-349.45 2070.7,-356.35"/>
+</g>
+<!-- proc~calc_relative_humidity_evaporation -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node51" class="node">
+<title>proc~calc_relative_humidity_evaporation</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node51"><a xlink:href="../proc/calc_relative_humidity_evaporation.html" xlink:title="type_evaporation%calc_relative_humidity_evaporation">
+<polygon fill="#d9534f" stroke="#d9534f" points="2744,-480.86 2440,-480.86 2440,-456.86 2744,-456.86 2744,-480.86"/>
+<text text-anchor="middle" x="2592" y="-466.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_evaporation%calc_relative_humidity_evaporation</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_vapor_content_derivatives&#45;&gt;proc~calc_relative_humidity_evaporation -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge74" class="edge">
+<title>proc~calc_vapor_content_derivatives&#45;&gt;proc~calc_relative_humidity_evaporation</title>
+<path fill="none" stroke="#0000ff" d="M1983.69,-459.12C2110.42,-461.15 2296.65,-464.14 2429.43,-466.27"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2429.64,-469.77 2439.7,-466.43 2429.75,-462.77 2429.64,-469.77"/>
+</g>
+<!-- proc~calc_rho_vapor_saturation_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node52" class="node">
+<title>proc~calc_rho_vapor_saturation_abst_physics</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node52"><a xlink:href="../proc/calc_rho_vapor_saturation_abst_physics.html" xlink:title="abst_physics%calc_rho_vapor_saturation_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="2364,-754.86 2063,-754.86 2063,-730.86 2364,-730.86 2364,-754.86"/>
+<text text-anchor="middle" x="2213.5" y="-740.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_rho_vapor_saturation_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_vapor_content_derivatives&#45;&gt;proc~calc_rho_vapor_saturation_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge75" class="edge">
+<title>proc~calc_vapor_content_derivatives&#45;&gt;proc~calc_rho_vapor_saturation_abst_physics</title>
+<path fill="none" stroke="#0000ff" d="M1872.15,-468.93C1904.95,-484.01 1957.5,-512.89 1987,-553.86 2022.03,-602.51 1981.28,-640.8 2023,-683.86 2044,-705.54 2072.82,-719.29 2101.64,-728"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2100.83,-731.41 2111.41,-730.76 2102.74,-724.67 2100.83,-731.41"/>
+</g>
+<!-- proc~deriv_relative_humidity_pressure_evaporation -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node53" class="node">
+<title>proc~deriv_relative_humidity_pressure_evaporation</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node53"><a xlink:href="../proc/deriv_relative_humidity_pressure_evaporation.html" xlink:title="type_evaporation%deriv_relative_humidity_pressure_evaporation">
+<polygon fill="#d9534f" stroke="#d9534f" points="2393,-556.86 2034,-556.86 2034,-532.86 2393,-532.86 2393,-556.86"/>
+<text text-anchor="middle" x="2213.5" y="-542.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_evaporation%deriv_relative_humidity_pressure_evaporation</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_vapor_content_derivatives&#45;&gt;proc~deriv_relative_humidity_pressure_evaporation -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge77" class="edge">
+<title>proc~calc_vapor_content_derivatives&#45;&gt;proc~deriv_relative_humidity_pressure_evaporation</title>
+<path fill="none" stroke="#0000ff" d="M1916.88,-468.89C1939.47,-472.92 1964.33,-477.71 1987,-482.86 2048.23,-496.78 2117.78,-516.5 2163.25,-529.95"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2162.27,-533.31 2172.85,-532.8 2164.26,-526.6 2162.27,-533.31"/>
+</g>
+<!-- proc~deriv_relative_humidity_temperature_evaporation -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node54" class="node">
+<title>proc~deriv_relative_humidity_temperature_evaporation</title>
+<g id="a_proc~~compute_mass_term_thermal~~CallsGraph_node54"><a xlink:href="../proc/deriv_relative_humidity_temperature_evaporation.html" xlink:title="type_evaporation%deriv_relative_humidity_temperature_evaporation">
+<polygon fill="#d9534f" stroke="#d9534f" points="2404,-438.86 2023,-438.86 2023,-414.86 2404,-414.86 2404,-438.86"/>
+<text text-anchor="middle" x="2213.5" y="-424.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_evaporation%deriv_relative_humidity_temperature_evaporation</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_vapor_content_derivatives&#45;&gt;proc~deriv_relative_humidity_temperature_evaporation -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge78" class="edge">
+<title>proc~calc_vapor_content_derivatives&#45;&gt;proc~deriv_relative_humidity_temperature_evaporation</title>
+<path fill="none" stroke="#0000ff" d="M1983.75,-445.43C2006.86,-443.56 2030.94,-441.6 2054.44,-439.69"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2054.78,-443.18 2064.47,-438.88 2054.22,-436.2 2054.78,-443.18"/>
+</g>
+<!-- proc~calc_vapor_content_vaporization&#45;&gt;proc~calc_rho_water_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge83" class="edge">
+<title>proc~calc_vapor_content_vaporization&#45;&gt;proc~calc_rho_water_abst_physics</title>
+<path fill="none" stroke="#ff00ff" d="M1976.38,-604.77C1980.16,-602.14 1983.72,-599.19 1987,-595.86 2073.23,-508.4 1935.27,-407.82 2023,-321.86 2039.27,-305.92 2060.49,-297.03 2082.81,-292.55"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="2083.52,-295.98 2092.79,-290.85 2082.34,-289.08 2083.52,-295.98"/>
+</g>
+<!-- proc~calc_vapor_content_vaporization&#45;&gt;proc~get_field_dp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge84" class="edge">
+<title>proc~calc_vapor_content_vaporization&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#ff00ff" d="M1974.8,-629.01C1979.11,-631.6 1983.2,-634.53 1987,-637.86 2030.84,-676.2 1976.67,-728.56 2023,-763.86 2086.73,-812.41 2669.76,-797.97 2744,-767.86 2826.35,-734.46 2892.53,-645.91 2919.46,-605.49"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="2922.49,-607.26 2925.03,-596.98 2916.63,-603.43 2922.49,-607.26"/>
+</g>
+<!-- proc~calc_vapor_content_vaporization&#45;&gt;proc~calc_relative_humidity_evaporation -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge81" class="edge">
+<title>proc~calc_vapor_content_vaporization&#45;&gt;proc~calc_relative_humidity_evaporation</title>
+<path fill="none" stroke="#ff00ff" d="M1972.02,-604.8C1977.27,-602.23 1982.29,-599.26 1987,-595.86 2015.99,-574.9 1993.51,-544.12 2023,-523.86 2055.99,-501.2 2273.61,-485.24 2429.65,-476.54"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="2430.04,-480.02 2439.84,-475.98 2429.66,-473.03 2430.04,-480.02"/>
+</g>
+<!-- proc~calc_vapor_content_vaporization&#45;&gt;proc~calc_rho_vapor_saturation_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge82" class="edge">
+<title>proc~calc_vapor_content_vaporization&#45;&gt;proc~calc_rho_vapor_saturation_abst_physics</title>
+<path fill="none" stroke="#ff00ff" d="M1972.51,-628.88C1977.6,-631.47 1982.45,-634.45 1987,-637.86 2017.86,-661.03 1992.05,-693.82 2023,-716.86 2032.27,-723.76 2042.53,-729.26 2053.32,-733.63"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="2052.35,-737 2062.94,-737.17 2054.77,-730.43 2052.35,-737"/>
+</g>
+<!-- proc~calc_drho_vapor_saturation_dt_abst_physics&#45;&gt;proc~get_thermo_state_t -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge86" class="edge">
+<title>proc~calc_drho_vapor_saturation_dt_abst_physics&#45;&gt;proc~get_thermo_state_t</title>
+<path fill="none" stroke="#ff0000" d="M2322.14,-674.87C2373.17,-680.56 2433.96,-687.34 2484.81,-693.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2484.51,-696.5 2494.84,-694.13 2485.29,-689.55 2484.51,-696.5"/>
+</g>
+<!-- calc_saturation_drho_dt -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node58" class="node">
+<title>calc_saturation_drho_dt</title>
+<polygon fill="#777777" stroke="#777777" points="2661.5,-674.86 2522.5,-674.86 2522.5,-650.86 2661.5,-650.86 2661.5,-674.86"/>
+<text text-anchor="middle" x="2592" y="-660.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_saturation_drho_dt</text>
+</g>
+<!-- proc~calc_drho_vapor_saturation_dt_abst_physics&#45;&gt;calc_saturation_drho_dt -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge85" class="edge">
+<title>proc~calc_drho_vapor_saturation_dt_abst_physics&#45;&gt;calc_saturation_drho_dt</title>
+<path fill="none" stroke="#ff0000" d="M2377.18,-662.86C2424.01,-662.86 2473,-662.86 2512.25,-662.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2512.27,-666.36 2522.27,-662.86 2512.27,-659.36 2512.27,-666.36"/>
+</g>
+<!-- proc~calc_drho_water_dp_abst_physics&#45;&gt;proc~get_thermo_state_tp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge88" class="edge">
+<title>proc~calc_drho_water_dp_abst_physics&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#ffda00" d="M2346.76,-387.59C2367.24,-383.27 2387.16,-375.87 2404,-363.86 2434.43,-342.16 2409.87,-309.98 2440,-287.86 2452.34,-278.8 2466.81,-272.76 2481.82,-268.84"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="2482.78,-272.21 2491.74,-266.56 2481.21,-265.39 2482.78,-272.21"/>
+</g>
+<!-- calc_drho_dp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node55" class="node">
+<title>calc_drho_dp</title>
+<polygon fill="#777777" stroke="#777777" points="2633.5,-362.86 2550.5,-362.86 2550.5,-338.86 2633.5,-338.86 2633.5,-362.86"/>
+<text text-anchor="middle" x="2592" y="-348.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_drho_dp</text>
+</g>
+<!-- proc~calc_drho_water_dp_abst_physics&#45;&gt;calc_drho_dp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge87" class="edge">
+<title>proc~calc_drho_water_dp_abst_physics&#45;&gt;calc_drho_dp</title>
+<path fill="none" stroke="#ffda00" d="M2346.71,-372.92C2413.57,-366.88 2490.81,-359.91 2540.24,-355.44"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="2540.7,-358.92 2550.35,-354.53 2540.07,-351.94 2540.7,-358.92"/>
+</g>
+<!-- proc~calc_drho_water_dt_abst_physics&#45;&gt;proc~get_thermo_state_tp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge90" class="edge">
+<title>proc~calc_drho_water_dt_abst_physics&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#48ff00" d="M2347.21,-339.22C2366.83,-335.56 2386.35,-330.03 2404,-321.86 2423.97,-312.61 2420.16,-297.38 2440,-287.86 2452.99,-281.62 2467.28,-277.09 2481.74,-273.82"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="2482.67,-277.2 2491.76,-271.75 2481.26,-270.35 2482.67,-277.2"/>
+</g>
+<!-- calc_drho_dt -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node56" class="node">
+<title>calc_drho_dt</title>
+<polygon fill="#777777" stroke="#777777" points="2632,-320.86 2552,-320.86 2552,-296.86 2632,-296.86 2632,-320.86"/>
+<text text-anchor="middle" x="2592" y="-306.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_drho_dt</text>
+</g>
+<!-- proc~calc_drho_water_dt_abst_physics&#45;&gt;calc_drho_dt -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge89" class="edge">
+<title>proc~calc_drho_water_dt_abst_physics&#45;&gt;calc_drho_dt</title>
+<path fill="none" stroke="#48ff00" d="M2347.24,-330.87C2414.64,-324.79 2492.47,-317.76 2541.69,-313.31"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="2542.11,-316.79 2551.75,-312.4 2541.48,-309.82 2542.11,-316.79"/>
+</g>
+<!-- proc~calc_relative_humidity_evaporation&#45;&gt;proc~get_field_dp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge91" class="edge">
+<title>proc~calc_relative_humidity_evaporation&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#00ff91" d="M2628.37,-480.95C2690.53,-502.18 2819.23,-546.16 2887.58,-569.51"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="2886.61,-572.88 2897.21,-572.8 2888.88,-566.26 2886.61,-572.88"/>
+</g>
+<!-- proc~calc_relative_humidity_evaporation&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge92" class="edge">
+<title>proc~calc_relative_humidity_evaporation&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#00ff91" d="M2627.42,-456.79C2689.52,-435.03 2820.19,-389.23 2888.61,-365.24"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="2889.96,-368.48 2898.24,-361.87 2887.65,-361.87 2889.96,-368.48"/>
+</g>
+<!-- proc~calc_rho_vapor_saturation_abst_physics&#45;&gt;proc~get_thermo_state_t -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge94" class="edge">
+<title>proc~calc_rho_vapor_saturation_abst_physics&#45;&gt;proc~get_thermo_state_t</title>
+<path fill="none" stroke="#0091ff" d="M2333.63,-730.84C2382.1,-725.94 2437.67,-720.34 2484.74,-715.58"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="2485.36,-719.04 2494.96,-714.55 2484.66,-712.08 2485.36,-719.04"/>
+</g>
+<!-- calc_saturation_density -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_node57" class="node">
+<title>calc_saturation_density</title>
+<polygon fill="#777777" stroke="#777777" points="2660.5,-758.86 2523.5,-758.86 2523.5,-734.86 2660.5,-734.86 2660.5,-758.86"/>
+<text text-anchor="middle" x="2592" y="-744.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_saturation_density</text>
+</g>
+<!-- proc~calc_rho_vapor_saturation_abst_physics&#45;&gt;calc_saturation_density -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge93" class="edge">
+<title>proc~calc_rho_vapor_saturation_abst_physics&#45;&gt;calc_saturation_density</title>
+<path fill="none" stroke="#0091ff" d="M2364.11,-744.45C2415.21,-744.99 2470.28,-745.58 2513.37,-746.03"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="2513.45,-749.54 2523.49,-746.14 2513.53,-742.54 2513.45,-749.54"/>
+</g>
+<!-- proc~deriv_relative_humidity_pressure_evaporation&#45;&gt;proc~get_field_dp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge96" class="edge">
+<title>proc~deriv_relative_humidity_pressure_evaporation&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#4800ff" d="M2393.18,-552.52C2495.85,-557.2 2627.22,-563.66 2744,-570.86 2776.81,-572.88 2812.8,-575.47 2844.46,-577.86"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="2844.34,-581.36 2854.58,-578.63 2844.87,-574.38 2844.34,-581.36"/>
+</g>
+<!-- proc~deriv_relative_humidity_pressure_evaporation&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge97" class="edge">
+<title>proc~deriv_relative_humidity_pressure_evaporation&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#4800ff" d="M2393.2,-549.63C2498.53,-546.81 2632.57,-533.23 2744,-489.86 2814.74,-462.33 2882.31,-400.77 2913.89,-369.26"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="2916.58,-371.51 2921.12,-361.93 2911.6,-366.59 2916.58,-371.51"/>
+</g>
+<!-- proc~deriv_relative_humidity_pressure_evaporation&#45;&gt;proc~calc_relative_humidity_evaporation -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge95" class="edge">
+<title>proc~deriv_relative_humidity_pressure_evaporation&#45;&gt;proc~calc_relative_humidity_evaporation</title>
+<path fill="none" stroke="#4800ff" d="M2355.23,-532.82C2371.95,-529.27 2388.55,-524.71 2404,-518.86 2421.98,-512.05 2422.14,-501.98 2440,-494.86 2451.6,-490.24 2464.03,-486.43 2476.58,-483.31"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="2477.73,-486.63 2486.67,-480.94 2476.13,-479.82 2477.73,-486.63"/>
+</g>
+<!-- proc~deriv_relative_humidity_temperature_evaporation&#45;&gt;proc~get_field_dp -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge99" class="edge">
+<title>proc~deriv_relative_humidity_temperature_evaporation&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#ff00da" d="M2305.5,-414.82C2413.41,-404.06 2597.12,-396.88 2744,-447.86 2815.17,-472.56 2882.54,-533.82 2913.98,-565.38"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="2911.68,-568.03 2921.18,-572.72 2916.68,-563.13 2911.68,-568.03"/>
+</g>
+<!-- proc~deriv_relative_humidity_temperature_evaporation&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge100" class="edge">
+<title>proc~deriv_relative_humidity_temperature_evaporation&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#ff00da" d="M2334.41,-414.84C2441.77,-403.98 2603.45,-387.36 2744,-371.86 2769.01,-369.1 2795.87,-366.03 2821.25,-363.08"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="2821.75,-366.55 2831.28,-361.91 2820.94,-359.59 2821.75,-366.55"/>
+</g>
+<!-- proc~deriv_relative_humidity_temperature_evaporation&#45;&gt;proc~calc_relative_humidity_evaporation -->
+<g id="proc~~compute_mass_term_thermal~~CallsGraph_edge98" class="edge">
+<title>proc~deriv_relative_humidity_temperature_evaporation&#45;&gt;proc~calc_relative_humidity_evaporation</title>
+<path fill="none" stroke="#ff00da" d="M2322.14,-438.87C2369.31,-444.13 2424.81,-450.32 2473.09,-455.71"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="2472.96,-459.21 2483.28,-456.84 2473.73,-452.26 2472.96,-459.21"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccompute_mass_term_thermalCallsGraph = svgPanZoom('#proccompute_mass_term_thermalCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~compute_mass_term_thermal~~CalledByGraph Pages: 1 -->
+<svg id="proccompute_mass_term_thermalCalledByGraph" width="641pt" height="27pt"
+ viewBox="0.00 0.00 641.00 26.77" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph" class="graph" transform="scale(0.23 0.23) rotate(0) translate(4 112)">
+<title>proc~~compute_mass_term_thermal~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-112 2774,-112 2774,4 -4,4"/>
+<!-- proc~compute_mass_term_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_node1" class="node">
+<title>proc~compute_mass_term_thermal</title>
+<polygon fill="none" stroke="black" points="2770,-66 2599,-66 2599,-42 2770,-42 2770,-66"/>
+<text text-anchor="middle" x="2684.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50">compute_mass_term_thermal</text>
+</g>
+<!-- interface~compute_mass_term_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_node2" class="node">
+<title>interface~compute_mass_term_thermal</title>
+<g id="a_proc~~compute_mass_term_thermal~~CalledByGraph_node2"><a xlink:href="../interface/compute_mass_term_thermal.html" xlink:title="type_thermal%compute_mass_term_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="2563,-66 2312,-66 2312,-42 2563,-42 2563,-66"/>
+<text text-anchor="middle" x="2437.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%compute_mass_term_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~compute_mass_term_thermal&#45;&gt;proc~compute_mass_term_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_edge1" class="edge">
+<title>interface~compute_mass_term_thermal&#45;&gt;proc~compute_mass_term_thermal</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2563.15,-54C2571.73,-54 2580.28,-54 2588.66,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2588.77,-57.5 2598.77,-54 2588.77,-50.5 2588.77,-57.5"/>
+</g>
+<!-- proc~assemble_local_newton_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_node3" class="node">
+<title>proc~assemble_local_newton_thermal</title>
+<g id="a_proc~~compute_mass_term_thermal~~CalledByGraph_node3"><a xlink:href="../proc/assemble_local_newton_thermal.html" xlink:title="assemble_local_newton_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="2276,-108 2090,-108 2090,-84 2276,-84 2276,-108"/>
+<text text-anchor="middle" x="2183" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_newton_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_newton_thermal&#45;&gt;interface~compute_mass_term_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_edge2" class="edge">
+<title>proc~assemble_local_newton_thermal&#45;&gt;interface~compute_mass_term_thermal</title>
+<path fill="none" stroke="#ff0000" d="M2256.36,-83.96C2286.86,-78.89 2322.54,-72.96 2354.06,-67.71"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2354.84,-71.13 2364.13,-66.04 2353.69,-64.23 2354.84,-71.13"/>
+</g>
+<!-- proc~assemble_local_picard_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_node4" class="node">
+<title>proc~assemble_local_picard_thermal</title>
+<g id="a_proc~~compute_mass_term_thermal~~CalledByGraph_node4"><a xlink:href="../proc/assemble_local_picard_thermal.html" xlink:title="assemble_local_picard_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="2273.5,-66 2092.5,-66 2092.5,-42 2273.5,-42 2273.5,-66"/>
+<text text-anchor="middle" x="2183" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_picard_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_picard_thermal&#45;&gt;interface~compute_mass_term_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_edge3" class="edge">
+<title>proc~assemble_local_picard_thermal&#45;&gt;interface~compute_mass_term_thermal</title>
+<path fill="none" stroke="#ff0000" d="M2273.73,-54C2282.79,-54 2292.12,-54 2301.52,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2301.73,-57.5 2311.73,-54 2301.73,-50.5 2301.73,-57.5"/>
+</g>
+<!-- proc~compute_history_term_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_node5" class="node">
+<title>proc~compute_history_term_thermal</title>
+<g id="a_proc~~compute_mass_term_thermal~~CalledByGraph_node5"><a xlink:href="../proc/compute_history_term_thermal.html" xlink:title="compute_history_term_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="2272.5,-24 2093.5,-24 2093.5,0 2272.5,0 2272.5,-24"/>
+<text text-anchor="middle" x="2183" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">compute_history_term_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_history_term_thermal&#45;&gt;interface~compute_mass_term_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_edge4" class="edge">
+<title>proc~compute_history_term_thermal&#45;&gt;interface~compute_mass_term_thermal</title>
+<path fill="none" stroke="#ff0000" d="M2256.36,-24.04C2286.86,-29.11 2322.54,-35.04 2354.06,-40.29"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2353.69,-43.77 2364.13,-41.96 2354.84,-36.87 2353.69,-43.77"/>
+</g>
+<!-- interface~assemble_local_newton_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_node6" class="node">
+<title>interface~assemble_local_newton_thermal</title>
+<g id="a_proc~~compute_mass_term_thermal~~CalledByGraph_node6"><a xlink:href="../interface/assemble_local_newton_thermal.html" xlink:title="type_thermal%assemble_local_newton_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="2054,-108 1788,-108 1788,-84 2054,-84 2054,-108"/>
+<text text-anchor="middle" x="1921" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%assemble_local_newton_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_newton_thermal&#45;&gt;proc~assemble_local_newton_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_edge5" class="edge">
+<title>interface~assemble_local_newton_thermal&#45;&gt;proc~assemble_local_newton_thermal</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2054.29,-96C2062.85,-96 2071.4,-96 2079.78,-96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2079.92,-99.5 2089.92,-96 2079.92,-92.5 2079.92,-99.5"/>
+</g>
+<!-- interface~assemble_local_picard_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_node7" class="node">
+<title>interface~assemble_local_picard_thermal</title>
+<g id="a_proc~~compute_mass_term_thermal~~CalledByGraph_node7"><a xlink:href="../interface/assemble_local_picard_thermal.html" xlink:title="type_thermal%assemble_local_picard_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="2051.5,-66 1790.5,-66 1790.5,-42 2051.5,-42 2051.5,-66"/>
+<text text-anchor="middle" x="1921" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%assemble_local_picard_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_picard_thermal&#45;&gt;proc~assemble_local_picard_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_edge6" class="edge">
+<title>interface~assemble_local_picard_thermal&#45;&gt;proc~assemble_local_picard_thermal</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M2051.62,-54C2061.82,-54 2072.01,-54 2081.97,-54"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="2082.24,-57.5 2092.24,-54 2082.24,-50.5 2082.24,-57.5"/>
+</g>
+<!-- interface~compute_history_term_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_node8" class="node">
+<title>interface~compute_history_term_thermal</title>
+<g id="a_proc~~compute_mass_term_thermal~~CalledByGraph_node8"><a xlink:href="../interface/compute_history_term_thermal.html" xlink:title="type_thermal%compute_history_term_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="2050.5,-24 1791.5,-24 1791.5,0 2050.5,0 2050.5,-24"/>
+<text text-anchor="middle" x="1921" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%compute_history_term_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~compute_history_term_thermal&#45;&gt;proc~compute_history_term_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_edge7" class="edge">
+<title>interface~compute_history_term_thermal&#45;&gt;proc~compute_history_term_thermal</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M2050.86,-12C2061.79,-12 2072.74,-12 2083.38,-12"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2083.49,-15.5 2093.49,-12 2083.49,-8.5 2083.49,-15.5"/>
+</g>
+<!-- proc~assemble_local_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_node9" class="node">
+<title>proc~assemble_local_thermal</title>
+<g id="a_proc~~compute_mass_term_thermal~~CalledByGraph_node9"><a xlink:href="../proc/assemble_local_thermal.html" xlink:title="assemble_local_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="1752,-87 1610,-87 1610,-63 1752,-63 1752,-87"/>
+<text text-anchor="middle" x="1681" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_thermal&#45;&gt;interface~assemble_local_newton_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_edge8" class="edge">
+<title>proc~assemble_local_thermal&#45;&gt;interface~assemble_local_newton_thermal</title>
+<path fill="none" stroke="#ff0000" d="M1752.12,-81.19C1760.39,-81.92 1769.04,-82.68 1777.87,-83.46"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1777.63,-86.95 1787.9,-84.34 1778.24,-79.98 1777.63,-86.95"/>
+</g>
+<!-- proc~assemble_local_thermal&#45;&gt;interface~assemble_local_picard_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_edge9" class="edge">
+<title>proc~assemble_local_thermal&#45;&gt;interface~assemble_local_picard_thermal</title>
+<path fill="none" stroke="#00ff00" d="M1752.12,-68.81C1761.08,-68.02 1770.48,-67.19 1780.07,-66.35"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1780.47,-69.83 1790.12,-65.46 1779.85,-62.85 1780.47,-69.83"/>
+</g>
+<!-- interface~assemble_local_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_node10" class="node">
+<title>interface~assemble_local_thermal</title>
+<g id="a_proc~~compute_mass_term_thermal~~CalledByGraph_node10"><a xlink:href="../interface/assemble_local_thermal.html" xlink:title="type_thermal%assemble_local_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="1574,-87 1352,-87 1352,-63 1574,-63 1574,-87"/>
+<text text-anchor="middle" x="1463" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%assemble_local_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_thermal&#45;&gt;proc~assemble_local_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_edge10" class="edge">
+<title>interface~assemble_local_thermal&#45;&gt;proc~assemble_local_thermal</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1574.21,-75C1582.87,-75 1591.5,-75 1599.89,-75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1599.99,-78.5 1609.99,-75 1599.99,-71.5 1599.99,-78.5"/>
+</g>
+<!-- proc~assemble_local_ftdss -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_node11" class="node">
+<title>proc~assemble_local_ftdss</title>
+<g id="a_proc~~compute_mass_term_thermal~~CalledByGraph_node11"><a xlink:href="../proc/assemble_local_ftdss.html" xlink:title="assemble_local_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1316,-87 1192,-87 1192,-63 1316,-63 1316,-87"/>
+<text text-anchor="middle" x="1254" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_ftdss&#45;&gt;interface~assemble_local_thermal -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_edge11" class="edge">
+<title>proc~assemble_local_ftdss&#45;&gt;interface~assemble_local_thermal</title>
+<path fill="none" stroke="#ff0000" d="M1316.27,-75C1324.5,-75 1333.15,-75 1341.98,-75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1341.99,-78.5 1351.99,-75 1341.99,-71.5 1341.99,-78.5"/>
+</g>
+<!-- interface~assemble_local_ftdss -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_node12" class="node">
+<title>interface~assemble_local_ftdss</title>
+<g id="a_proc~~compute_mass_term_thermal~~CalledByGraph_node12"><a xlink:href="../interface/assemble_local_ftdss.html" xlink:title="type_ftdss%assemble_local_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1156,-87 969,-87 969,-63 1156,-63 1156,-87"/>
+<text text-anchor="middle" x="1062.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_local_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_ftdss&#45;&gt;proc~assemble_local_ftdss -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_edge12" class="edge">
+<title>interface~assemble_local_ftdss&#45;&gt;proc~assemble_local_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1156.03,-75C1164.65,-75 1173.29,-75 1181.67,-75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1181.74,-78.5 1191.74,-75 1181.74,-71.5 1181.74,-78.5"/>
+</g>
+<!-- proc~assemble_ftdss -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_node13" class="node">
+<title>proc~assemble_ftdss</title>
+<g id="a_proc~~compute_mass_term_thermal~~CalledByGraph_node13"><a xlink:href="../proc/assemble_ftdss.html" xlink:title="assemble_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="933,-87 839,-87 839,-63 933,-63 933,-87"/>
+<text text-anchor="middle" x="886" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_ftdss&#45;&gt;interface~assemble_local_ftdss -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_edge13" class="edge">
+<title>proc~assemble_ftdss&#45;&gt;interface~assemble_local_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M933.3,-75C941.3,-75 949.89,-75 958.7,-75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="958.72,-78.5 968.72,-75 958.72,-71.5 958.72,-78.5"/>
+</g>
+<!-- interface~assemble_ftdss -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_node14" class="node">
+<title>interface~assemble_ftdss</title>
+<g id="a_proc~~compute_mass_term_thermal~~CalledByGraph_node14"><a xlink:href="../interface/assemble_ftdss.html" xlink:title="type_ftdss%assemble_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="803,-87 646,-87 646,-63 803,-63 803,-87"/>
+<text text-anchor="middle" x="724.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_edge14" class="edge">
+<title>interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M803.38,-75C811.94,-75 820.54,-75 828.76,-75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="828.95,-78.5 838.95,-75 828.95,-71.5 828.95,-78.5"/>
+</g>
+<!-- proc~solve_time_step_ftdss -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_node15" class="node">
+<title>proc~solve_time_step_ftdss</title>
+<g id="a_proc~~compute_mass_term_thermal~~CalledByGraph_node15"><a xlink:href="../proc/solve_time_step_ftdss.html" xlink:title="solve_time_step_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="610,-87 483,-87 483,-63 610,-63 610,-87"/>
+<text text-anchor="middle" x="546.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_edge15" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M610.05,-75C618.36,-75 627,-75 635.63,-75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="635.75,-78.5 645.75,-75 635.75,-71.5 635.75,-78.5"/>
+</g>
+<!-- interface~solve_time_step_ftdss -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_node16" class="node">
+<title>interface~solve_time_step_ftdss</title>
+<g id="a_proc~~compute_mass_term_thermal~~CalledByGraph_node16"><a xlink:href="../interface/solve_time_step_ftdss.html" xlink:title="type_ftdss%solve_time_step_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="447,-87 257,-87 257,-63 447,-63 447,-87"/>
+<text text-anchor="middle" x="352" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_edge16" class="edge">
+<title>interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M447.28,-75C455.88,-75 464.5,-75 472.87,-75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="472.93,-78.5 482.93,-75 472.93,-71.5 472.93,-78.5"/>
+</g>
+<!-- proc~run_ftdss -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_node17" class="node">
+<title>proc~run_ftdss</title>
+<g id="a_proc~~compute_mass_term_thermal~~CalledByGraph_node17"><a xlink:href="../proc/run_ftdss.html" xlink:title="run_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-87 160,-87 160,-63 221,-63 221,-87"/>
+<text text-anchor="middle" x="190.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_edge17" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M221.13,-75C228.8,-75 237.52,-75 246.72,-75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="246.86,-78.5 256.86,-75 246.86,-71.5 246.86,-78.5"/>
+</g>
+<!-- interface~run_ftdss -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_node18" class="node">
+<title>interface~run_ftdss</title>
+<g id="a_proc~~compute_mass_term_thermal~~CalledByGraph_node18"><a xlink:href="../interface/run_ftdss.html" xlink:title="type_ftdss%run_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="124,-87 0,-87 0,-63 124,-63 124,-87"/>
+<text text-anchor="middle" x="62" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftdss&#45;&gt;proc~run_ftdss -->
+<g id="proc~~compute_mass_term_thermal~~CalledByGraph_edge18" class="edge">
+<title>interface~run_ftdss&#45;&gt;proc~run_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M124.03,-75C132.82,-75 141.68,-75 149.91,-75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="149.94,-78.5 159.94,-75 149.94,-71.5 149.94,-78.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccompute_mass_term_thermalCalledByGraph = svgPanZoom('#proccompute_mass_term_thermalCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">compute_mass_term_thermal</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">material_id</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">C_TT</span><span class="p">,</span><span class="w"> </span><span class="n">scheme_opt</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_thermal</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">material_id</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_state</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">state</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">C_TT</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">scheme_opt</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">temperature</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">contiguous</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">temperature_history</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">contiguous</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">pressure_history</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">contiguous</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">porosity_history</span>
+
+<span class="w">        </span><span class="c">! Tangent用</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">porosity</span><span class="p">,</span><span class="w"> </span><span class="n">Qw</span><span class="p">,</span><span class="w"> </span><span class="n">Qi</span><span class="p">,</span><span class="w"> </span><span class="n">Qv</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">rho_s</span><span class="p">,</span><span class="w"> </span><span class="n">rho_w</span><span class="p">,</span><span class="w"> </span><span class="n">rho_i</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">c_s</span><span class="p">,</span><span class="w"> </span><span class="n">c_w</span><span class="p">,</span><span class="w"> </span><span class="n">c_i</span><span class="p">,</span><span class="w"> </span><span class="n">c_v</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dQi_dT</span><span class="p">,</span><span class="w"> </span><span class="n">dQv_dT</span><span class="p">,</span><span class="w"> </span><span class="n">Lf</span><span class="p">,</span><span class="w"> </span><span class="n">Lv</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">has_rho_w</span>
+
+<span class="w">        </span><span class="c">! Secant用</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">C_TT_current</span><span class="p">,</span><span class="w"> </span><span class="n">C_TT_old</span><span class="p">,</span><span class="w"> </span><span class="n">dT</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_state</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">temp_state</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">use_scheme</span>
+
+<span class="w">        </span><span class="c">! デフォルトの挙動決定（指定がなければ自動判定）</span>
+<span class="w">        </span><span class="k">call </span><span class="n">state</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span><span class="w"> </span><span class="n">temperature_history</span><span class="o">=</span><span class="n">temperature_history</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                       </span><span class="n">pressure_history</span><span class="o">=</span><span class="n">pressure_history</span><span class="p">,</span><span class="w"> </span><span class="n">porosity_history</span><span class="o">=</span><span class="n">porosity_history</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">temperature_history</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">C_TT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+<span class="k">        if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">pressure_history</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">C_TT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+<span class="k">        if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">porosity_history</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">C_TT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">temperature_history</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">dT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">temperature</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">temperature_history</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            </span><span class="n">dT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">scheme_opt</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">use_scheme</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">scheme_opt</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="w">            </span><span class="c">! 従来ロジック: 温度変化が大きければSecantで安定化、小さければTangent</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">dT</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">1.0d-6</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">use_scheme</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SCHEME_SECANT</span>
+<span class="w">            </span><span class="k">else</span>
+<span class="k">                </span><span class="n">use_scheme</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SCHEME_TANGENT</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        end if</span>
+
+<span class="k">        </span><span class="n">C_TT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="n">has_rho_w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">use_scheme</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">SCHEME_SECANT</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="w">            </span><span class="c">! --- Secant Method (Average/Effective Heat Capacity) ---</span>
+<span class="w">            </span><span class="c">! C_eff = (U(T) - U(T_old)) / (T - T_old)</span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">temperature_history</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">pressure_history</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">porosity_history</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">use_scheme</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SCHEME_TANGENT</span>
+<span class="w">            </span><span class="k">end if</span>
+
+<span class="k">        end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">use_scheme</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">SCHEME_SECANT</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+
+<span class="w">            </span><span class="c">! Current U</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">calc_enthalpy_density</span><span class="p">(</span><span class="n">material_id</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">C_TT_current</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c">! Old U (from previous time step)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">temp_state</span><span class="p">%</span><span class="n">temperature</span><span class="p">%</span><span class="n">set</span><span class="p">(</span><span class="n">temperature_history</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="w">            </span><span class="k">call </span><span class="n">temp_state</span><span class="p">%</span><span class="n">pressure</span><span class="p">%</span><span class="n">set</span><span class="p">(</span><span class="n">pressure_history</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="w">            </span><span class="k">call </span><span class="n">temp_state</span><span class="p">%</span><span class="n">porosity</span><span class="p">%</span><span class="n">set</span><span class="p">(</span><span class="n">porosity_history</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">update_water_phases</span><span class="p">(</span><span class="n">material_id</span><span class="p">,</span><span class="w"> </span><span class="n">temp_state</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">calc_enthalpy_density</span><span class="p">(</span><span class="n">material_id</span><span class="p">,</span><span class="w"> </span><span class="n">temp_state</span><span class="p">,</span><span class="w"> </span><span class="n">C_TT_old</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c">! ゼロ除算防止</span>
+<span class="w">            </span><span class="n">dT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sign</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">dT</span><span class="p">),</span><span class="w"> </span><span class="mf">1.0d-8</span><span class="p">),</span><span class="w"> </span><span class="n">dT</span><span class="p">)</span>
+<span class="w">            </span><span class="n">C_TT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">C_TT_current</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">C_TT_old</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">dT</span>
+
+<span class="w">        </span><span class="k">else</span>
+<span class="w">            </span><span class="c">! --- Tangent Method (Apparent Heat Capacity) ---</span>
+<span class="w">            </span><span class="c">! C_app = dU/dT</span>
+
+<span class="w">            </span><span class="k">call </span><span class="n">state</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">porosity</span><span class="o">=</span><span class="n">porosity</span><span class="p">,</span><span class="w"> </span><span class="n">water_content</span><span class="o">=</span><span class="n">Qw</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                           </span><span class="n">ice_content</span><span class="o">=</span><span class="n">Qi</span><span class="p">,</span><span class="w"> </span><span class="n">vapor_content</span><span class="o">=</span><span class="n">Qv</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c">! Solid</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">porosity</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                call </span><span class="n">self</span><span class="p">%</span><span class="n">physics</span><span class="p">%</span><span class="n">get_density_solid</span><span class="p">(</span><span class="n">material_id</span><span class="p">,</span><span class="w"> </span><span class="n">rho_s</span><span class="p">)</span>
+<span class="w">                </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">physics</span><span class="p">%</span><span class="n">get_specific_heat_solid</span><span class="p">(</span><span class="n">material_id</span><span class="p">,</span><span class="w"> </span><span class="n">c_s</span><span class="p">)</span>
+<span class="w">                </span><span class="n">C_TT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">C_TT</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">rho_s</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">c_s</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">porosity</span><span class="p">)</span>
+<span class="w">            </span><span class="k">end if</span>
+
+<span class="w">            </span><span class="c">! Water</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Qw</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                call </span><span class="n">self</span><span class="p">%</span><span class="n">physics</span><span class="p">%</span><span class="n">calc_density_water</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">rho_w</span><span class="p">)</span>
+<span class="w">                </span><span class="n">has_rho_w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">                </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">physics</span><span class="p">%</span><span class="n">calc_specific_heat_water</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">c_w</span><span class="p">)</span>
+<span class="w">                </span><span class="n">C_TT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">C_TT</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">rho_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">c_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Qw</span>
+<span class="w">            </span><span class="k">end if</span>
+
+<span class="w">            </span><span class="c">! Ice (including latent heat derivative)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Qi</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                call </span><span class="n">self</span><span class="p">%</span><span class="n">physics</span><span class="p">%</span><span class="n">calc_density_ice</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">rho_i</span><span class="p">)</span>
+<span class="w">                </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">physics</span><span class="p">%</span><span class="n">calc_specific_heat_ice</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">c_i</span><span class="p">)</span>
+<span class="w">                </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">physics</span><span class="p">%</span><span class="n">calc_latent_heat_fusion</span><span class="p">(</span><span class="n">material_id</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">Lf</span><span class="p">)</span>
+<span class="w">                </span><span class="k">call </span><span class="n">state</span><span class="p">%</span><span class="n">dQi_dT</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">dQi_dT</span><span class="p">)</span>
+<span class="w">                </span><span class="n">C_TT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">C_TT</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">rho_i</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">c_i</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Qi</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">Lf</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rho_i</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dQi_dT</span>
+<span class="w">            </span><span class="k">end if</span>
+
+<span class="w">            </span><span class="c">! Vapor (including latent heat derivative)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Qv</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">has_rho_w</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    call </span><span class="n">self</span><span class="p">%</span><span class="n">physics</span><span class="p">%</span><span class="n">calc_density_water</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">rho_w</span><span class="p">)</span>
+<span class="w">                    </span><span class="n">has_rho_w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">                </span><span class="k">end if</span>
+<span class="k">                call </span><span class="n">self</span><span class="p">%</span><span class="n">physics</span><span class="p">%</span><span class="n">calc_specific_heat_vapor</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">c_v</span><span class="p">)</span>
+<span class="w">                </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">physics</span><span class="p">%</span><span class="n">calc_latent_heat_vaporization</span><span class="p">(</span><span class="n">material_id</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">Lv</span><span class="p">)</span>
+<span class="w">                </span><span class="k">call </span><span class="n">state</span><span class="p">%</span><span class="n">dQv_dT</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">dQv_dT</span><span class="p">)</span>
+<span class="w">                </span><span class="n">C_TT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">C_TT</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">rho_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">c_v</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Qv</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Lv</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rho_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dQv_dT</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        end if</span>
+
+<span class="w">        </span><span class="c">! 物理的に負の熱容量はありえないためクリップ</span>
+<span class="w">        </span><span class="n">C_TT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="n">C_TT</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">compute_mass_term_thermal</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

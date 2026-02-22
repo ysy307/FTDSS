@@ -1,697 +1,454 @@
+!> Module for managing time stepping control and BDF (Backward Differentiation Formula) coefficients.
+!> Handles variable time steps, time unit conversions, and history management for high-order time integration schemes.
 module control_time
-    use, intrinsic :: iso_fortran_env, only: int32, real64, int64
-!$  use omp_lib
-    use :: module_core, only:allocate_array, error_message
+    use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
+    use :: stdlib_optval, only:optval
+    use :: module_core
     use :: module_input, only:type_input
+    use :: control_ats, only:type_ats
 
     implicit none
     private
 
     public :: type_time
+    public :: type_ats
 
-    type :: type_time_record
-        character(20) :: label
-        character(10) :: date
-        character(10) :: time
-        character(10) :: zone
-    end type type_time_record
+    ! --- Constants ---
+    !> Maximum supported order for BDF schemes.
+    integer(int32), parameter :: MAX_BDF_ORDER = 6
+    !> Small number for zero-division check
+    real(real64), parameter :: EPS_TIME = 1.0d-14
 
-    type :: type_profiler_section
-        character(20) :: label
-        real(real64) :: total_time = 0.0d0
-        real(real64) :: start_time = 0.0d0
-    end type type_profiler_section
-
+    !> Data structure holding time stepping state and integration parameters.
     type :: type_time
-        real(real64) :: start_time
-        real(real64) :: end_time
-        real(real64) :: time
-        real(real64) :: time_old
-        real(real64) :: dt
-        real(real64), allocatable :: dt_old(:)
-        real(real64) :: dt_min
-        real(real64) :: dt_max
-        real(real64) :: time_conversion = 1.0d0
-        type(type_time_record) :: start
-        type(type_time_record) :: end
-        type(type_profiler_section), allocatable :: sections(:)
+        private
+        ! --- Time Stepping State ---
+        !> Simulation start time [s]
+        real(real64) :: start_time = 0.0d0
+        !> Simulation end time [s]
+        real(real64) :: end_time = 0.0d0
+        !> Current simulation time [s]
+        real(real64) :: current_time_s = 0.0d0
+        !> Time at previous step [s]
+        real(real64) :: time_old = 0.0d0
+        !> Current time step size [s]
+        real(real64) :: dt_s = 0.0d0
+        !> History of time steps
+        real(real64), allocatable :: dt_s_history(:)
+        !> Minimum allowable time step [s]
+        real(real64) :: dt_s_min = 0.0d0
+        !> Maximum allowable time step [s]
+        real(real64) :: dt_s_max = 0.0d0
+
+        ! --- BDF Coefficients ---
+        !> Coefficients $\alpha_j$ for the BDF formula:
+        !> $$ \frac{dy}{dt} \approx \sum_{j=0}^{k} \alpha_j y_{n-j} $$
+        !> Note: Coefficients include the $1/\Delta t$ scaling.
+        real(real64) :: coeffs(0:MAX_BDF_ORDER) = 0.0d0
+        !> Target BDF order set by user
+        integer(int32) :: target_bdf_order = 1
+        !> Currently active BDF order (ramps up from 1 at start)
+        integer(int32) :: current_bdf_order = 1
+
+        type(type_ats) :: ats
     contains
-        procedure, public, pass(self) :: initialize    => initialize_type_time !&
-        procedure, public, pass(self) :: record        => record_timestamp !&
-        procedure, public, pass(self) :: profile_start => profile_start_timer !&
-        procedure, public, pass(self) :: profile_stop  => profile_stop_timer !&
-        procedure, public, pass(self) :: get_record
+        ! --- Public Interfaces ---
+        !> Initialize time control settings from input.
+        procedure, public, pass(self) :: initialize => initialize_type_time
+        !> Update BDF coefficients based on current history.
+        procedure, public, pass(self) :: update_bdf_coefficients
+        !> Get current simulation time.
         procedure, public, pass(self) :: get_time
-        procedure, public, pass(self) :: shift => shift_time
-        procedure, public, pass(self) :: get_time_coefficients
+        !> Get current time step size.
         procedure, public, pass(self) :: get_dt
+        !> Get current BDF order.
+        procedure, public, pass(self) :: get_bdf_order
+        !> Get BDF coefficients array.
+        procedure, public, pass(self) :: get_bdf_coeffs
+        !> Get simulation end time.
+        procedure, public, pass(self) :: get_end_time
+        !> Shift time history for the next step.
+        procedure, public, pass(self) :: shift => shift_time
+        !> Display current time status to standard output.
+        procedure, public, pass(self) :: display => display_status
+        !> Set current time step size.
+        procedure, public, pass(self) :: set_dt
+        !> Check if simulation reached end time.
+        procedure, public, pass(self) :: is_end_time
+        procedure, public, pass(self) :: is_min_dt => is_min_dt_reached
+        procedure, public, pass(self) :: is_max_dt => is_max_dt_reached
+        !> Synchronize time step with output interval.
+        procedure, public, pass(self) :: sync_with_output
+        procedure, public, pass(self) :: update => update_type_time
+
+        ! --- Private Procedures ---
+        !> Compute variable step BDF coefficients.
+        procedure, private, pass(self) :: compute_bdf_coefficients
     end type type_time
 
 contains
 
-    subroutine initialize_type_time(self, input, profiler_sections)
+    ! ==========================================================================
+    ! Initialization
+    ! ==========================================================================
+
+!> Initialize the time control object using input configuration.
+    subroutine initialize_type_time(self, input)
         implicit none
         class(type_time), intent(inout) :: self
-        type(type_input), intent(in), optional :: input
-        character(*), intent(in), optional :: profiler_sections(:)
+        type(type_input), intent(in) :: input
 
-        integer(int32) :: i
+        integer(int32) :: istat
+        real(real64) :: time_conv_coeff
+        type(type_constant_value) :: time_unit
 
-        if (present(input)) then
-            select case (trim(input%conditions%time_control%time_stepping%unit))
-            case ("second")
-                self%dt     = input%conditions%time_control%time_stepping%initial_step !&
-                self%dt_max = input%conditions%time_control%time_stepping%max_step !&
-                self%dt_min = input%conditions%time_control%time_stepping%min_step !&
-            case ("minute")
-                self%dt     = input%conditions%time_control%time_stepping%initial_step * 60.0d0 !&
-                self%dt_max = input%conditions%time_control%time_stepping%max_step     * 60.0d0 !&
-                self%dt_min = input%conditions%time_control%time_stepping%min_step     * 60.0d0 !&
-            case ("hour")
-                self%dt     = input%conditions%time_control%time_stepping%initial_step * 3600.0d0 !&
-                self%dt_max = input%conditions%time_control%time_stepping%max_step     * 3600.0d0 !&
-                self%dt_min = input%conditions%time_control%time_stepping%min_step     * 3600.0d0 !&
-            case ("day")
-                self%dt     = input%conditions%time_control%time_stepping%initial_step * 86400.0d0 !&
-                self%dt_max = input%conditions%time_control%time_stepping%max_step     * 86400.0d0 !&
-                self%dt_min = input%conditions%time_control%time_stepping%min_step     * 86400.0d0 !&
-            case ("year")
-                self%dt     = input%conditions%time_control%time_stepping%initial_step * 31557600.0d0 !&
-                self%dt_max = input%conditions%time_control%time_stepping%max_step     * 31557600.0d0 !&
-                self%dt_min = input%conditions%time_control%time_stepping%min_step     * 31557600.0d0 !&
-            case default
-                call error_message(981, c_opt="calculation time unit")
-            end select
-
-            select case (trim(input%conditions%time_control%simulation_period%unit))
-            case ("second")
-                self%start_time = input%conditions%time_control%simulation_period%start !&
-                self%end_time   = input%conditions%time_control%simulation_period%end !&
-            case ("minute")
-                self%start_time = input%conditions%time_control%simulation_period%start * 60.0d0 !&
-                self%end_time   = input%conditions%time_control%simulation_period%end   * 60.0d0 !&
-            case ("hour")
-                self%start_time = input%conditions%time_control%simulation_period%start * 3600.0d0 !&
-                self%end_time   = input%conditions%time_control%simulation_period%end   * 3600.0d0 !&
-            case ("day")
-                self%start_time = input%conditions%time_control%simulation_period%start * 86400.0d0 !&
-                self%end_time   = input%conditions%time_control%simulation_period%end   * 86400.0d0 !&
-            case ("year")
-                self%start_time = input%conditions%time_control%simulation_period%start * 31557600.0d0 !&
-                self%end_time   = input%conditions%time_control%simulation_period%end   * 31557600.0d0 !&
-            case default
-                call error_message(981, c_opt="simulation period time unit")
-            end select
-
-            call Allocate_Array(self%dt_old, input%basic%solver_settings%bdf_order)
-            self%dt_old(:) = 0.0d0
-
-            if (allocated(input%output_settings%field_output%output_interval_unit)) then
-                select case (trim(input%output_settings%field_output%output_interval_unit))
-                case ("second")
-                    select case (trim(input%conditions%time_control%simulation_period%unit))
-                    case ("second")
-                        self%time_conversion = 1.0d0
-                    case ("minute")
-                        self%time_conversion = 1.0d0 / 60.0d0
-                    case ("hour")
-                        self%time_conversion = 1.0d0 / 3600.0d0
-                    case ("day")
-                        self%time_conversion = 1.0d0 / 86400.0d0
-                    case ("year")
-                        self%time_conversion = 1.0d0 / 31557600.0d0
-                    end select
-                case ("minute")
-                    select case (trim(input%conditions%time_control%simulation_period%unit))
-                    case ("second")
-                        self%time_conversion = 60.0d0
-                    case ("minute")
-                        self%time_conversion = 1.0d0
-                    case ("hour")
-                        self%time_conversion = 1.0d0 / 60.0d0
-                    case ("day")
-                        self%time_conversion = 1.0d0 / 1440.0d0
-                    case ("year")
-                        self%time_conversion = 1.0d0 / 525600.0d0
-                    end select
-                case ("hour")
-                    select case (trim(input%conditions%time_control%simulation_period%unit))
-                    case ("second")
-                        self%time_conversion = 3600.0d0
-                    case ("minute")
-                        self%time_conversion = 60.0d0
-                    case ("hour")
-                        self%time_conversion = 1.0d0
-                    case ("day")
-                        self%time_conversion = 1.0d0 / 24.0d0
-                    case ("year")
-                        self%time_conversion = 1.0d0 / 8760.0d0
-                    end select
-                case ("day")
-                    select case (trim(input%conditions%time_control%simulation_period%unit))
-                    case ("second")
-                        self%time_conversion = 86400.0d0
-                    case ("minute")
-                        self%time_conversion = 1440.0d0
-                    case ("hour")
-                        self%time_conversion = 24.0d0
-                    case ("day")
-                        self%time_conversion = 1.0d0
-                    case ("year")
-                        self%time_conversion = 1.0d0 / 365.0d0
-                    end select
-                case ("year")
-                    select case (trim(input%conditions%time_control%simulation_period%unit))
-                    case ("second")
-                        self%time_conversion = 31557600.0d0
-                    case ("minute")
-                        self%time_conversion = 525600.0d0
-                    case ("hour")
-                        self%time_conversion = 8760.0d0
-                    case ("day")
-                        self%time_conversion = 365.0d0
-                    case ("year")
-                        self%time_conversion = 1.0d0
-                    end select
-                end select
-            end if
+        ! --- BDF Settings ---
+        self%target_bdf_order = input%basic%solver_settings%bdf_order
+        if (self%target_bdf_order > MAX_BDF_ORDER) then
+            self%target_bdf_order = MAX_BDF_ORDER
         end if
+        self%current_bdf_order = 1
 
-        if (present(profiler_sections)) then
-            if (size(profiler_sections) > 0) then
-                allocate (self%sections(size(profiler_sections)))
-                do i = 1, size(profiler_sections)
-                    self%sections(i)%label = trim(profiler_sections(i))
-                end do
+        associate (time_control => input%conditions%time_control)
+            ! --- 1. dt 関連の単位変換 (time_stepping%unit を使用) ---
+            time_unit = TIME_UNITS%to_object(time_control%time_stepping%unit)
+            time_conv_coeff = time_unit%value
+
+            self%dt_s = time_control%time_stepping%initial_step * time_conv_coeff
+            self%dt_s_max = time_control%time_stepping%max_step * time_conv_coeff
+            self%dt_s_min = time_control%time_stepping%min_step * time_conv_coeff
+
+            ! --- Allocate History ---
+            if (allocated(self%dt_s_history)) deallocate (self%dt_s_history)
+            allocate (self%dt_s_history(self%target_bdf_order), stat=istat)
+
+            if (istat == 0) then
+                self%dt_s_history(:) = 0.0d0
+                self%dt_s_history(1) = self%dt_s
             end if
-        end if
 
+            ! --- Compute Initial Coefficients ---
+            call self%compute_bdf_coefficients()
+
+            ! --- 2. シミュレーション期間の単位変換 (simulation_period%unit を使用) ---
+            ! 出力設定に関わらず，期間は simulation_period%unit に基づいて初期化する
+            time_unit = TIME_UNITS%to_object(time_control%simulation_period%unit)
+            self%start_time = time_control%simulation_period%start * time_unit%value
+            self%end_time = time_control%simulation_period%end * time_unit%value
+            self%current_time_s = self%start_time
+
+            ! --- 3. ATS の初期化を追加 ---
+            call self%ats%initialize(input, self%dt_s_min, self%dt_s_max)
+        end associate
     end subroutine initialize_type_time
+    ! ==========================================================================
+    ! Time Stepping & BDF
+    ! ==========================================================================
 
-    subroutine record_timestamp(self, label)
+    !> Shift time history and update current time state after a successful step.
+    !> Also manages the ramping up of BDF order during initial steps.
+    subroutine shift_time(self)
         implicit none
+        !> Time control instance
         class(type_time), intent(inout) :: self
-        character(*), intent(in) :: label
-
-        select case (trim(label))
-        case ("Start")
-            call date_and_time(date=self%start%date, time=self%start%time, zone=self%start%zone)
-            self%start%label = label
-        case ("End")
-            call date_and_time(date=self%end%date, time=self%end%time, zone=self%end%zone)
-            self%end%label = label
-        case default
-            call error_message(982, c_opt=label)
-        end select
-    end subroutine record_timestamp
-
-    subroutine profile_start_timer(self, label)
-        implicit none
-        class(type_time), intent(inout) :: self
-        character(len=*), intent(in) :: label
-        integer(int32) :: i
-
-        do i = 1, size(self%sections)
-            if (trim(self%sections(i)%label) == trim(label)) then
-                self%sections(i)%start_time = get_current_time()
-                return
-            end if
-        end do
-
-        call error_message(982, c_opt=label)
-    end subroutine profile_start_timer
-
-    subroutine profile_stop_timer(self, label)
-        implicit none
-        class(type_time), intent(inout) :: self
-        character(*), intent(in) :: label
-        integer(int32) :: i
-        real(real64) :: end_time
-
-        end_time = get_current_time()
-
-        do i = 1, size(self%sections)
-            if (trim(self%sections(i)%label) == trim(label)) then
-                self%sections(i)%total_time = self%sections(i)%total_time + &
-                                              (end_time - self%sections(i)%start_time)
-                return
-            end if
-        end do
-
-        call error_message(982, c_opt=label)
-    end subroutine profile_stop_timer
-
-    function get_current_time() result(current_time)
-        implicit none
-        real(real64) :: current_time
-#ifdef _OPENMP
-        current_time = omp_get_wtime()
-#else
-        integer(int32) :: count
-        integer(int32) :: rate
-        call system_clock(count=count, count_rate=rate)
-        current_time = real(count, kind=real64) / real(rate, kind=real64)
-#endif
-    end function get_current_time
-
-    function get_record(self, label) result(record)
-        implicit none
-        class(type_time), intent(in) :: self
-        character(*), intent(in) :: label
-        character(:), allocatable :: record
-
-        select case (trim(label))
-        case ("Start")
-            record = trim(self%start%label)//" Time : "// &
-                     self%start%date(1:4)//"-"//self%start%date(5:6)//"-"//self%start%date(7:8)//"T"// &
-                     self%start%time(1:2)//":"//self%start%time(3:4)//":"//self%start%time(5:6)//trim(self%start%zone)
-        case ("End")
-            record = trim(self%end%label)//" Time   : "// &
-                     self%end%date(1:4)//"-"//self%end%date(5:6)//"-"//self%end%date(7:8)//"T"// &
-                     self%end%time(1:2)//":"//self%end%time(3:4)//":"//self%end%time(5:6)//trim(self%end%zone)
-        case default
-            call error_message(982, c_opt=label)
-        end select
-
-    end function get_record
-
-    function get_time(self) result(time)
-        implicit none
-        class(type_time), intent(in) :: self
-        real(real64) :: time
-
-        time = self%time * self%time_conversion
-
-    end function get_time
-
-    subroutine shift_time(self, reverse)
-        implicit none
-        class(type_time), intent(inout) :: self
-        logical, intent(in), optional :: reverse
-
         integer(int32) :: n
-        logical :: do_reverse
 
-        ! reverse引数の有無と値を確認
-        do_reverse = .false.
-        if (present(reverse)) then
-            do_reverse = reverse
+        if (.not. allocated(self%dt_s_history)) return
+        n = size(self%dt_s_history)
+
+        ! Update time
+        self%time_old = self%current_time_s
+        self%current_time_s = self%current_time_s + self%dt_s
+
+        ! Shift history: dt_history(1) becomes current dt_n
+        if (n > 1) then
+            self%dt_s_history(2:n) = self%dt_s_history(1:n - 1)
+        end if
+        self%dt_s_history(1) = self%dt_s
+
+        ! Update available BDF order (Ramp up strategy)
+        if (self%current_bdf_order < self%target_bdf_order) then
+            self%current_bdf_order = self%current_bdf_order + 1
         end if
 
-        ! 配列サイズを取得
-        n = size(self%dt_old)
-
-        if (do_reverse) then
-            ! --- 逆方向の更新 ---
-            ! ★★★ 時間を1ステップ前に戻す処理を追加 ★★★
-            self%time = self%time_old
-
-            ! dtを履歴の先頭の値に戻す
-            self%dt = self%dt_old(1)
-
-            ! dt_old配列を左に1つシフト（配列スライスを使用）
-            if (n > 1) then
-                self%dt_old(1:n - 1) = self%dt_old(2:n)
-            end if
-
-            ! 配列の末尾を0で埋める（元の仕様を踏襲）
-            if (n > 0) then
-                self%dt_old(n) = 0.0d0
-            end if
-
-        else
-            ! --- 順方向の更新 ---
-            ! 時間を更新
-            self%time_old = self%time
-            self%time = self%time + self%dt
-
-            ! dt_old配列を右に1つシフト（配列スライスを使用）
-            if (n > 1) then
-                self%dt_old(2:n) = self%dt_old(1:n - 1)
-            end if
-
-            ! 配列の先頭に現在のdtを格納
-            if (n > 0) then
-                self%dt_old(1) = self%dt
-            end if
-        end if
+        ! Recompute coefficients
+        call self%compute_bdf_coefficients()
 
     end subroutine shift_time
 
-    subroutine get_time_coefficients(self, order, coefficients)
+    !> Explicitly trigger an update of BDF coefficients.
+    subroutine update_bdf_coefficients(self)
+        implicit none
+        class(type_time), intent(inout) :: self
+
+        call self%compute_bdf_coefficients()
+    end subroutine update_bdf_coefficients
+
+    !> Compute variable step-size BDF coefficients.
+    !> Calculates \( \alpha_j \) such that \( \frac{dy}{dt}|_{t_n} \approx \sum_{j=0}^{k} \alpha_j y_{n-j} \).
+    !> Note: Coefficients \( \alpha_j \) inherently include the \( 1/\Delta t \) scaling.
+    subroutine compute_bdf_coefficients(self)
+        implicit none
+        !> Time control instance
+        class(type_time), intent(inout) :: self
+
+        integer(int32) :: k, j, m
+        real(real64) :: tau(0:self%current_bdf_order)
+        real(real64) :: prod_term
+
+        k = self%current_bdf_order
+
+        ! 0. Check for invalid dt
+        if (self%dt_s <= EPS_TIME) then
+            ! Fallback to Backward Euler for safety if dt is extremely small
+            self%coeffs = 0.0d0
+            if (self%dt_s > epsilon(0.0d0)) then
+                self%coeffs(0) = 1.0d0 / self%dt_s
+                self%coeffs(1) = -1.0d0 / self%dt_s
+            end if
+            return
+        end if
+
+        ! 1. Calculate relative time differences tau
+        ! tau(j) = t_n - t_{n-j}
+        tau(0) = 0.0d0
+        do j = 1, k
+            tau(j) = tau(j - 1) + self%dt_s_history(j)
+        end do
+
+        self%coeffs = 0.0d0
+
+        ! 2. Compute derivative of Lagrange interpolating polynomial at t_n
+        ! L_j(t) = prod_{m!=j} (t - t_{n-m}) / (t_{n-j} - t_{n-m})
+
+        ! (A) Case j = 0 (Coefficient for y_n)
+        ! L_0'(t_n) = sum_{m=1}^k (1 / tau(m))
+        do m = 1, k
+            self%coeffs(0) = self%coeffs(0) + (1.0d0 / tau(m))
+        end do
+
+        ! (B) Case j > 0 (Coefficient for y_{n-j})
+        ! Coeff_j = (1 / -tau(j)) * prod_{m!=0, j} (tau(m) / (tau(m) - tau(j)))
+        do j = 1, k
+            prod_term = 1.0d0
+            do m = 1, k
+                if (m == j) cycle
+                prod_term = prod_term * (tau(m) / (tau(m) - tau(j)))
+            end do
+            self%coeffs(j) = (-1.0d0 / tau(j)) * prod_term
+        end do
+
+    end subroutine compute_bdf_coefficients
+
+    ! ==========================================================================
+    ! Getters & Setters
+    ! ==========================================================================
+
+    !> Get current simulation time (seconds) with optional unit conversion.
+    !> If a target time unit is provided, the `current_time` is converted accordingly.
+    subroutine get_time(self, current_time, time_unit)
         implicit none
         class(type_time), intent(in) :: self
-        integer(int32), intent(in) :: order
-        real(real64), intent(inout) :: coefficients(0:)
+        !> Output current time
+        real(real64), intent(inout) :: current_time
+        !> Target time unit (optional)
+        type(type_constant_value), intent(in), optional :: time_unit
 
-        ! Local variables
-        real(real64) :: dt_n, dt_nm1, dt_nm2, dt_nm3, dt_nm4, dt_nm5
-        real(real64) :: rho1, rho2, rho3, rho4, rho5
+        real(real64) :: coeff
 
-        select case (order)
-        case (1) ! BDF1 (Backward Euler)
-            dt_n = self%dt
+        if (present(time_unit)) then
+            coeff = 1.0d0 / time_unit%value
+        else
+            coeff = 1.0d0
+        end if
 
-            coefficients(0) = 1.0d0
-            coefficients(1) = -1.0d0
+        current_time = self%current_time_s * coeff
+    end subroutine get_time
 
-        case (2) ! BDF2
-            dt_n = self%dt
-            dt_nm1 = self%dt_old(1)
-            rho1 = dt_n / dt_nm1
-
-            coefficients(0) = (2.0d0 * rho1 + 1.0d0) / (rho1 + 1.0d0)
-            coefficients(1) = -(rho1 + 1.0d0)
-            coefficients(2) = rho1**2.0d0 / (rho1 + 1.0d0)
-
-        case (3)
-            dt_n = self%dt
-            dt_nm1 = self%dt_old(1)
-            dt_nm2 = self%dt_old(2)
-
-            rho1 = dt_n / dt_nm1
-            rho2 = dt_nm1 / dt_nm2
-
-            coefficients(0) = (3.0d0 * rho1**2.0d0 * rho2 + 4.0d0 * rho1 * rho2 + 2.0d0 * rho1 + rho2 + 1.0d0) &
-                              / ((rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0))
-            coefficients(1) = -(rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) / (rho2 + 1.0d0)
-            coefficients(2) = rho1**2.0d0 * (rho1 * rho2 + rho2 + 1.0d0) / (rho2 + 1.0d0)
-            coefficients(3) = -rho1**2.0d0 * rho2**3.0d0 * (rho1 + 1.0d0) / ((rho2 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0))
-
-        case (4)
-            dt_n = self%dt
-            dt_nm1 = self%dt_old(1)
-            dt_nm2 = self%dt_old(2)
-            dt_nm3 = self%dt_old(3)
-
-            rho1 = dt_n / dt_nm1
-            rho2 = dt_nm1 / dt_nm2
-            rho3 = dt_nm2 / dt_nm3
-            coefficients(0) = (4.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 + 9.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 + &
-                               6.0d0 * rho1**2.0d0 * rho2 * rho3 + 3.0d0 * rho1**2.0d0 * rho2 + &
-                               6.0d0 * rho1 * rho2**2.0d0 * rho3 + 8.0d0 * rho1 * rho2 * rho3 + &
-                               4.0d0 * rho1 * rho2 + 2.0d0 * rho1 * rho3 + 2.0d0 * rho1 + &
-                               rho2**2.0d0 * rho3 + 2.0d0 * rho2 * rho3 + rho2 + rho3 + 1.0d0) &
-                              / ((rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) * (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0))
-            coefficients(1) = -(rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) * (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) &
-                              / ((rho2 + 1.0d0) * (rho2 * rho3 + rho3 + 1.0d0))
-            coefficients(2) = rho1**2.0d0 * (rho1 * rho2 + rho2 + 1.0d0) * (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) &
-                              / ((rho1 + 1.0d0) * (rho3 + 1.0d0))
-            coefficients(3) = -rho1**2.0d0 * rho2**3.0d0 * (rho1 + 1.0d0) * (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) &
-                              / ((rho2 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0))
-            coefficients(4) = rho1**2.0d0 * rho2**3.0d0 * rho3**4.0d0 * (rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) &
-                              / ((rho3 + 1.0d0) * (rho2 * rho3 + rho3 + 1.0d0) * (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0))
-
-        case (5)
-            dt_n = self%dt
-            dt_nm1 = self%dt_old(1)
-            dt_nm2 = self%dt_old(2)
-            dt_nm3 = self%dt_old(3)
-            dt_nm4 = self%dt_old(4)
-
-            rho1 = dt_n / dt_nm1
-            rho2 = dt_nm1 / dt_nm2
-            rho3 = dt_nm2 / dt_nm3
-            rho4 = dt_nm3 / dt_nm4
-            coefficients(0) = (5.0d0 * rho1**4.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
-                               16.0d0 * rho1**3.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
-                               12.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
-                               8.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 * rho4 + &
-                               4.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 + &
-                               18.0d0 * rho1**2.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
-                               27.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
-                               18.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 * rho4 + &
-                               9.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 + &
-                               9.0d0 * rho1**2.0d0 * rho2 * rho3**2.0d0 * rho4 + &
-                               12.0d0 * rho1**2.0d0 * rho2 * rho3 * rho4 + &
-                               6.0d0 * rho1**2.0d0 * rho2 * rho3 + &
-                               3.0d0 * rho1**2.00 * rho2 * rho4 + &
-                               3.0d0 * rho1**2.0d0 * rho2 + &
-                               8.0d0 * rho1 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
-                               18.0d0 * rho1 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
-                               12.0d0 * rho1 * rho2**2.0d0 * rho3 * rho4 + &
-                               6.0d0 * rho1 * rho2**2.0d0 * rho3 + &
-                               12.0d0 * rho1 * rho2 * rho3**2.0d0 * rho4 + &
-                               16.0d0 * rho1 * rho2 * rho3 * rho4 + &
-                               8.0d0 * rho1 * rho2 * rho3 + &
-                               4.0d0 * rho1 * rho2 * rho4 + &
-                               4.0d0 * rho1 * rho2 + &
-                               2.0d0 * rho1 * rho3**2.0d0 * rho4 + &
-                               4.0d0 * rho1 * rho3 * rho4 + &
-                               2.0d0 * rho1 * rho3 + &
-                               2.0d0 * rho1 * rho4 + &
-                               2.0d0 * rho1 + &
-                               rho2**3.0d0 * rho3**2.0d0 * rho4 + &
-                               3.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
-                               2.0d0 * rho2**2.0d0 * rho3 * rho4 + &
-                               rho2**2.0d0 * rho3 + &
-                               3.0d0 * rho2 * rho3**2.0d0 * rho4 + &
-                               4.0d0 * rho2 * rho3 * rho4 + &
-                               2.0d0 * rho2 * rho3 + &
-                               rho2 * rho4 + &
-                               rho2 + &
-                               rho3**2.0d0 * rho4 + &
-                               2.0d0 * rho3 * rho4 + &
-                               rho3 + &
-                               rho4 + 1.0d0) &
-                              / ((rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) * &
-                                 (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
-                                 (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0))
-            coefficients(1) = -(rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) &
-                              / ((rho2 + 1.0d0) * (rho2 * rho3 + rho3 + 1.0d0) * &
-                                 (rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0))
-            coefficients(2) = rho1**2.0d0 * (rho1 * rho2 + rho2 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) &
-                              / ((rho1 + 1.0d0) * (rho3 + 1.0d0) * (rho3 * rho4 + rho4 + 1.0d0))
-            coefficients(3) = -rho1**2.0d0 * rho2**3.0d0 * (rho1 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) &
-                              / ((rho2 + 1.0d0) * (rho4 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0))
-            coefficients(4) = rho1**2.0d0 * rho2**3.0d0 * rho3**4.0d0 * (rho1 + 1.0d0) * &
-                              (rho1 * rho2 + rho2 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) &
-                              / ((rho3 + 1.0d0) * (rho2 * rho3 + rho3 + 1.0d0) * &
-                                 (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0))
-            coefficients(5) = -rho1**2.0d0 * rho2**3.0d0 * rho3**4.0d0 * rho4**5.0d0 * (rho1 + 1.0d0) * &
-                              (rho1 * rho2 + rho2 + 1.0d0) * (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) &
-                              / ((rho4 + 1.0d0) * (rho3 * rho4 + rho4 + 1.0d0) * &
-                                 (rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
-                                 (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0))
-
-        case (6)
-            dt_n = self%dt
-            dt_nm1 = self%dt_old(1)
-            dt_nm2 = self%dt_old(2)
-            dt_nm3 = self%dt_old(3)
-            dt_nm4 = self%dt_old(4)
-            dt_nm5 = self%dt_old(5)
-
-            rho1 = dt_n / dt_nm1
-            rho2 = dt_nm1 / dt_nm2
-            rho3 = dt_nm2 / dt_nm3
-            rho4 = dt_nm3 / dt_nm4
-            rho5 = dt_nm4 / dt_nm5
-
-            coefficients(0) = (6.0d0 * rho1**5.0d0 * rho2**4.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               25.0d0 * rho1**4.0d0 * rho2**4.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               20.0d0 * rho1**4.0d0 * rho2**3.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               15.0d0 * rho1**4.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               10.0d0 * rho1**4.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 * rho5 + &
-                               5.0d0 * rho1**4.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
-                               40.0d0 * rho1**3.0d0 * rho2**4.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               64.0d0 * rho1**3.0d0 * rho2**3.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               48.0d0 * rho1**3.0d0 * rho2**3.0d0 * rho3**2.00 * rho4**2.00 * rho5 + &
-                               32.0d0 * rho1**3.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 * rho5 + &
-                               16.0d0 * rho1**3.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
-                               24.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               36.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               24.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 * rho5 + &
-                               12.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
-                               12.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 * rho4**2.0d0 * rho5 + &
-                               16.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 * rho4 * rho5 + &
-                               8.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 * rho4 + &
-                               4.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 * rho5 + &
-                               4.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 + &
-                               30.0d0 * rho1**2.0d0 * rho2**4.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               72.0d0 * rho1**2.0d0 * rho2**3.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               54.0d0 * rho1**2.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               36.0d0 * rho1**2.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 * rho5 + &
-                               18.0d0 * rho1**2.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
-                               54.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               81.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               54.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 * rho5 + &
-                               27.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
-                               27.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 * rho4**2.0d0 * rho5 + &
-                               36.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 * rho4 * rho5 + &
-                               18.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 * rho4 + &
-                               9.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 * rho5 + &
-                               9.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 + &
-                               12.0d0 * rho1**2.0d0 * rho2 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               27.0d0 * rho1**2.0d0 * rho2 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               18.0d0 * rho1**2.0d0 * rho2 * rho3**2.0d0 * rho4 * rho5 + &
-                               9.0d0 * rho1**2.0d0 * rho2 * rho3**2.0d0 * rho4 + &
-                               18.0d0 * rho1**2.0d0 * rho2 * rho3 * rho4**2.0d0 * rho5 + &
-                               24.0d0 * rho1**2.0d0 * rho2 * rho3 * rho4 * rho5 + &
-                               12.0d0 * rho1**2.0d0 * rho2 * rho3 * rho4 + &
-                               6.0d0 * rho1**2.0d0 * rho2 * rho3 * rho5 + &
-                               6.0d0 * rho1**2.0d0 * rho2 * rho3 + &
-                               3.0d0 * rho1**2.0d0 * rho2 * rho4**2.0d0 * rho5 + &
-                               6.0d0 * rho1**2.0d0 * rho2 * rho4 * rho5 + &
-                               3.0d0 * rho1**2.0d0 * rho2 * rho4 + &
-                               3.0d0 * rho1**2.0d0 * rho2 * rho5 + &
-                               3.0d0 * rho1**2.0d0 * rho2 + &
-                               10.0d0 * rho1 * rho2**4.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               32.0d0 * rho1 * rho2**3.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               24.0d0 * rho1 * rho2**3.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               16.0d0 * rho1 * rho2**3.0d0 * rho3**2.0d0 * rho4 * rho5 + &
-                               8.0d0 * rho1 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
-                               36.0d0 * rho1 * rho2**2.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               54.0d0 * rho1 * rho2**2.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               36.0d0 * rho1 * rho2**2.0d0 * rho3**2.0d0 * rho4 * rho5 + &
-                               18.0d0 * rho1 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
-                               18.0d0 * rho1 * rho2**2.0d0 * rho3 * rho4**2.0d0 * rho5 + &
-                               24.0d0 * rho1 * rho2**2.0d0 * rho3 * rho4 * rho5 + &
-                               12.0d0 * rho1 * rho2**2.0d0 * rho3 * rho4 + &
-                               6.0d0 * rho1 * rho2**2.0d0 * rho3 * rho5 + &
-                               6.0d0 * rho1 * rho2**2.0d0 * rho3 + &
-                               16.0d0 * rho1 * rho2 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               36.0d0 * rho1 * rho2 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               24.0d0 * rho1 * rho2 * rho3**2.d0 * rho4 * rho5 + &
-                               12.0d0 * rho1 * rho2 * rho3**2.0d0 * rho4 + &
-                               24.0d0 * rho1 * rho2 * rho3 * rho4**2.0d0 * rho5 + &
-                               32.0d0 * rho1 * rho2 * rho3 * rho4 * rho5 + &
-                               16.0d0 * rho1 * rho2 * rho3 * rho4 + &
-                               8.0d0 * rho1 * rho2 * rho3 * rho5 + &
-                               8.0d0 * rho1 * rho2 * rho3 + &
-                               4.0d0 * rho1 * rho2 * rho4**2.0d0 * rho5 + &
-                               8.0d0 * rho1 * rho2 * rho4 * rho5 + &
-                               4.0d0 * rho1 * rho2 * rho4 + &
-                               4.0d0 * rho1 * rho2 * rho5 + &
-                               4.0d0 * rho1 * rho2 + &
-                               2.0d0 * rho1 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               6.0d0 * rho1 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               4.0d0 * rho1 * rho3**2.0d0 * rho4 * rho5 + &
-                               2.0d0 * rho1 * rho3**2.0d0 * rho4 + &
-                               6.0d0 * rho1 * rho3 * rho4**2.0d0 * rho5 + &
-                               8.0d0 * rho1 * rho3 * rho4 * rho5 + &
-                               4.0d0 * rho1 * rho3 * rho4 + &
-                               2.0d0 * rho1 * rho3 * rho5 + &
-                               2.0d0 * rho1 * rho3 + &
-                               2.0d0 * rho1 * rho4**2.0d0 * rho5 + &
-                               4.0d0 * rho1 * rho4 * rho5 + &
-                               2.0d0 * rho1 * rho4 + &
-                               2.0d0 * rho1 * rho5 + &
-                               2.0d0 * rho1 + &
-                               rho2**4.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               4.0d0 * rho2**3.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               3.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               2.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 * rho5 + &
-                               rho2**3.0d0 * rho3**2.0d0 * rho4 + &
-                               6.0d0 * rho2**2.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               9.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               6.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 * rho5 + &
-                               3.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
-                               3.0d0 * rho2**2.0d0 * rho3 * rho4**2.0d0 * rho5 + &
-                               4.0d0 * rho2**2.0d0 * rho3 * rho4 * rho5 + &
-                               2.0d0 * rho2**2.0d0 * rho3 * rho4 + &
-                               rho2**2.0d0 * rho3 * rho5 + &
-                               rho2**2.0d0 * rho3 + &
-                               4.0d0 * rho2 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               9.0d0 * rho2 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               6.0d0 * rho2 * rho3**2.0d0 * rho4 * rho5 + &
-                               3.0d0 * rho2 * rho3**2.0d0 * rho4 + &
-                               6.0d0 * rho2 * rho3 * rho4**2.0d0 * rho5 + &
-                               8.0d0 * rho2 * rho3 * rho4 * rho5 + &
-                               4.0d0 * rho2 * rho3 * rho4 + &
-                               2.0d0 * rho2 * rho3 * rho5 + &
-                               2.0d0 * rho2 * rho3 + &
-                               rho2 * rho4**2.0d0 * rho5 + &
-                               2.0d0 * rho2 * rho4 * rho5 + &
-                               rho2 * rho4 + &
-                               rho2 * rho5 + &
-                               rho2 + &
-                               rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               3.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               2.0d0 * rho3**3.0d0 * rho4 * rho5 + &
-                               rho3**3.0d0 * rho4 + &
-                               3.0d0 * rho3 * rho4**2.0d0 * rho5 + &
-                               4.0d0 * rho3 * rho4 * rho5 + &
-                               2.0d0 * rho3 * rho4 + &
-                               rho3 * rho5 + &
-                               rho3 + &
-                               rho4**2.0d0 * rho5 + &
-                               2.0d0 * rho4 * rho5 + &
-                               rho4 + &
-                               rho5 + &
-                               1.0d0) / &
-                              ((rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) * &
-                               (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
-                               (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
-                               (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
-                                rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0))
-
-            coefficients(1) = -(rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
-                               rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0) / &
-                              ((rho2 + 1.0d0) * (rho2 * rho3 + rho3 + 1.0d0) * &
-                               (rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
-                               (rho2 * rho3 * rho4 * rho5 + rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0))
-            coefficients(2) = rho1**2.0d0 * (rho1 * rho2 + rho2 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
-                               rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0) / &
-                              ((rho1 + 1.0d0) * (rho3 + 1.0d0) * &
-                               (rho3 * rho4 + rho4 + 1.0d0) * &
-                               (rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0))
-            coefficients(3) = -rho1**2.0d0 * rho2**3.0d0 * (rho1 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
-                               rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0) / &
-                              ((rho2 + 1.0d0) * (rho4 + 1.0d0) * &
-                               (rho1 * rho2 + rho2 + 1.0d0) * &
-                               (rho4 * rho5 + rho5 + 1.0d0))
-            coefficients(4) = rho1**2.0d0 * rho2**3.0d0 * rho3**4.0d0 * (rho1 + 1.0d0) * &
-                              (rho1 * rho2 + rho2 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
-                               rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0) / &
-                              ((rho3 + 1.0d0) * (rho5 + 1.0d0) * &
-                               (rho2 * rho3 + rho3 + 1.0d0) * &
-                               (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0))
-            coefficients(5) = -rho1**2.0d0 * rho2**3.0d0 * rho3**4.0d0 * rho4**5.0d0 * (rho1 + 1.0d0) * &
-                              (rho1 * rho2 + rho2 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
-                               rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0) / &
-                              ((rho4 + 1.0d0) * (rho3 * rho4 + rho4 + 1.0d0) * &
-                               (rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
-                               (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0))
-            coefficients(6) = rho1**2.0d0 * rho2**3.0d0 * rho3**4.0d0 * rho4**5.0d0 * rho5**6.0d0 * (rho1 + 1.0d0) * &
-                              (rho1 * rho2 + rho2 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) / &
-                              ((rho5 + 1.0d0) * (rho4 * rho5 + rho5 + 1.0d0) * &
-                               (rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0) * &
-                               (rho2 * rho3 * rho4 * rho5 + rho3 * rho4 * rho5 + &
-                                rho4 * rho5 + rho5 + 1.0d0) * &
-                               (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
-                                rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0))
-        end select
-
-    end subroutine get_time_coefficients
-
-    pure function get_dt(self) result(dt)
+    !> Get current time step size (seconds) with optional unit conversion.
+    !> If a target time unit is provided,  `dt` is converted accordingly.
+    subroutine get_dt(self, dt, time_unit)
+        implicit none
         class(type_time), intent(in) :: self
+        !> Output time step
+        real(real64), intent(inout) :: dt
+        !> Target time unit (optional)
+        type(type_constant_value), intent(in), optional :: time_unit
+
+        real(real64) :: coeff
+
+        if (present(time_unit)) then
+            coeff = 1.0d0 / time_unit%value
+        else
+            coeff = 1.0d0
+        end if
+
+        dt = self%dt_s * coeff
+    end subroutine get_dt
+
+    pure subroutine get_end_time(self, end_time)
+        implicit none
+        class(type_time), intent(in) :: self
+        real(real64), intent(inout) :: end_time
+
+        end_time = self%end_time
+    end subroutine get_end_time
+
+    !> Set current time step size (seconds) with optional unit conversion.
+    !> If a target time unit is provided, `dt` is converted accordingly before setting.
+    subroutine set_dt(self, new_dt, time_unit)
+        implicit none
+        class(type_time), intent(inout) :: self
+        !> Input time step
+        real(real64), intent(in) :: new_dt
+        !> Target time unit (optional)
+        type(type_constant_value), intent(in), optional :: time_unit
+
         real(real64) :: dt
 
-        dt = self%dt
-    end function get_dt
+        if (present(time_unit)) then
+            dt = new_dt * time_unit%value
+        else
+            dt = new_dt
+        end if
+
+        if (dt <= self%dt_s_min) then
+            self%dt_s = self%dt_s_min
+        else if (dt >= self%dt_s_max) then
+            self%dt_s = self%dt_s_max
+        else
+            self%dt_s = dt
+        end if
+
+        call self%compute_bdf_coefficients()
+    end subroutine set_dt
+
+    !>
+    !> Check if minimum time step is reached.
+    pure function is_min_dt_reached(self) result(is_min_dt)
+        implicit none
+        !> Time control instance
+        class(type_time), intent(in) :: self
+        !> Result flag
+        logical :: is_min_dt
+
+        is_min_dt = abs(self%dt_s - self%dt_s_min) <= EPS_TIME
+    end function is_min_dt_reached
+
+    !>
+    !> Check if maximum time step is reached.
+    pure function is_max_dt_reached(self) result(is_max_dt)
+        implicit none
+        !> Time control instance
+        class(type_time), intent(in) :: self
+        !> Result flag
+        logical :: is_max_dt
+
+        is_max_dt = abs(self%dt_s_max - self%dt_s) <= EPS_TIME
+    end function is_max_dt_reached
+
+    !> Get current BDF order.
+    subroutine get_bdf_order(self, bdf_order)
+        implicit none
+        class(type_time), intent(in) :: self
+        integer(int32), intent(inout) :: bdf_order
+
+        bdf_order = self%current_bdf_order
+    end subroutine get_bdf_order
+
+    !> Get pointer to current BDF coefficient array.
+    subroutine get_bdf_coeffs(self, coeffs)
+        implicit none
+        class(type_time), intent(in), target :: self
+        real(real64), intent(inout), pointer, dimension(:) :: coeffs
+
+        coeffs => self%coeffs(0:self%current_bdf_order)
+    end subroutine get_bdf_coeffs
+
+    !> Check if the simulation has reached or exceeded the end time.
+    pure function is_end_time(self) result(is_end)
+        implicit none
+        class(type_time), intent(in) :: self
+        logical :: is_end
+
+        is_end = self%current_time_s >= self%end_time
+    end function is_end_time
+
+    !> Display time status summary to stdout.
+    subroutine display_status(self, unit_in)
+        implicit none
+        class(type_time), intent(in) :: self
+        integer(int32), intent(in), optional :: unit_in
+
+        integer(int32) :: unit
+
+        unit = optval(unit_in, output_unit)
+
+        write (unit, '(a)') "## Time Status"
+        write (unit, '(a)') "---"
+        write (unit, *)
+
+        write (unit, '(a)') "### Simulation Period"
+        write (unit, '(" - Start Time       : ", ES12.5)') self%start_time
+        write (unit, '(" - End Time         : ", ES12.5)') self%end_time
+        write (unit, *)
+
+        write (unit, '(a)') "### Current Time Step"
+        write (unit, '(" - Current Time     : ", ES12.5)') self%current_time_s
+        write (unit, '(" - Current dt       : ", ES12.5)') self%dt_s
+        write (unit, '(" - BDF Order        : ", I0)') self%current_bdf_order
+        write (unit, *)
+
+    end subroutine display_status
+
+    !> Perform all time-related updates after a nonlinear solve attempt
+    subroutine update_type_time(self, success, iter_count, next_output_time)
+        implicit none
+        class(type_time), intent(inout) :: self
+        logical, intent(in) :: success
+        integer(int32), intent(in) :: iter_count
+        real(real64), intent(in) :: next_output_time
+        real(real64) :: next_dt
+
+        if (success) then
+            ! Step converged: advance time and predict next step
+            call self%shift()
+
+            call self%ats%predict_next_dt(self%dt_s, iter_count, next_dt)
+            self%dt_s = next_dt
+
+            ! Sync with output time (modifies dt_s if necessary)
+            call self%sync_with_output(next_output_time)
+        else
+            ! Step failed: shrink dt and reset BDF order to 1 for stability
+            call self%ats%calc_retry_dt(self%dt_s, next_dt)
+            self%dt_s = next_dt
+            self%current_bdf_order = 1
+        end if
+        call self%compute_bdf_coefficients()
+    end subroutine update_type_time
+
+    !> Synchronize dt with the next output time.
+    subroutine sync_with_output(self, next_output_time)
+        implicit none
+        class(type_time), intent(inout) :: self
+        real(real64), intent(in) :: next_output_time
+
+        real(real64) :: time_to_output
+
+        ! Remaining time until the next output.
+        time_to_output = next_output_time - self%current_time_s
+
+        ! If "dt proposed by ATS" is longer than "remaining time",
+        ! shorten dt to align exactly with the output time.
+        if (self%dt_s > time_to_output .and. time_to_output > EPS_TIME) then
+
+            ! Note: exercise caution if remaining time is smaller than min_step.
+            ! (Adjustment might have been insufficient in the previous step; decide to force alignment or error.)
+            ! Determine policy: issue warning and force alignment, or ignore if too small.
+
+            self%dt_s = time_to_output
+        end if
+    end subroutine sync_with_output
 
 end module control_time

@@ -1,0 +1,1570 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>preconditioner_iluk.F90 &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>preconditioner_iluk.F90
+      <small>Source File</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 1.0% of total for source files.">287 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/preconditioner_iluk.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+            <li class="breadcrumb-item active" aria-current="page">preconditioner_iluk.F90</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+        <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#submods-0"
+         aria-expanded="false" aria-controls="submods-0">
+         <h4 class="card-header bg-primary text-white">Submodules</h4>
+      </a>
+      <div id="submods-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/solver_preconditioner_iluk.html">solver_preconditioner_iluk</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../sourcefile/preconditioner_iluk.f90.html#src">preconditioner_iluk.F90</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    <div class="col-md-9" id='text'>
+      
+      <br>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">This file depends on</h3>
+          </div>
+          <div class="card-body">
+            <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: sourcefile~~preconditioner_iluk.f90~~EfferentGraph Pages: 1 -->
+<svg id="sourcefilepreconditioner_ilukf90EfferentGraph" width="641pt" height="204pt"
+ viewBox="0.00 0.00 641.00 203.54" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph" class="graph" transform="scale(0.25 0.25) rotate(0) translate(4 808.25)">
+<title>sourcefile~~preconditioner_iluk.f90~~EfferentGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-808.25 2554,-808.25 2554,4 -4,4"/>
+<!-- sourcefile~preconditioner_iluk.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node1" class="node">
+<title>sourcefile~preconditioner_iluk.f90</title>
+<polygon fill="none" stroke="black" points="2550,-534 2413,-534 2413,-510 2550,-510 2550,-534"/>
+<text text-anchor="middle" x="2481.5" y="-519.6" font-family="Helvetica,sans-Serif" font-size="10.50">preconditioner_iluk.F90</text>
+</g>
+<!-- sourcefile~constants.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node2" class="node">
+<title>sourcefile~constants.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node2"><a xlink:href="../sourcefile/constants.f90.html" xlink:title="constants.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="559,-218 473,-218 473,-194 559,-194 559,-218"/>
+<text text-anchor="middle" x="516" y="-203.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">constants.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~preconditioner_iluk.f90&#45;&gt;sourcefile~constants.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge1" class="edge">
+<title>sourcefile~preconditioner_iluk.f90&#45;&gt;sourcefile~constants.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1572,-788C1229.9,-760.64 1134.25,-848.83 800,-771"/>
+</g>
+<!-- sourcefile~matrix_interface.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node3" class="node">
+<title>sourcefile~matrix_interface.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node3"><a xlink:href="../sourcefile/matrix_interface.f90.html" xlink:title="matrix_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1004,-582 881,-582 881,-558 1004,-558 1004,-582"/>
+<text text-anchor="middle" x="942.5" y="-567.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~preconditioner_iluk.f90&#45;&gt;sourcefile~matrix_interface.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge2" class="edge">
+<title>sourcefile~preconditioner_iluk.f90&#45;&gt;sourcefile~matrix_interface.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2473.78,-534.12C2443.95,-586.16 2317.75,-788 2155,-788 2155,-788 2155,-788 1864,-788 1735.11,-788 1702.11,-802.14 1574,-788"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1572,-788C1450.61,-773.05 1099.89,-633.62 982.39,-585.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="983.62,-582.64 973.04,-582.12 980.99,-589.13 983.62,-582.64"/>
+</g>
+<!-- sourcefile~precondition_interface.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node4" class="node">
+<title>sourcefile~precondition_interface.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node4"><a xlink:href="../sourcefile/precondition_interface.f90.html" xlink:title="precondition_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2377,-534 2222,-534 2222,-510 2377,-510 2377,-534"/>
+<text text-anchor="middle" x="2299.5" y="-519.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">precondition_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~preconditioner_iluk.f90&#45;&gt;sourcefile~precondition_interface.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge3" class="edge">
+<title>sourcefile~preconditioner_iluk.f90&#45;&gt;sourcefile~precondition_interface.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2412.96,-522C2404.57,-522 2395.91,-522 2387.28,-522"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2387.19,-518.5 2377.19,-522 2387.19,-525.5 2387.19,-518.5"/>
+</g>
+<!-- sourcefile~vector.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node5" class="node">
+<title>sourcefile~vector.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node5"><a xlink:href="../sourcefile/vector.f90.html" xlink:title="vector.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="832.5,-218 765.5,-218 765.5,-194 832.5,-194 832.5,-218"/>
+<text text-anchor="middle" x="799" y="-203.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~preconditioner_iluk.f90&#45;&gt;sourcefile~vector.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge4" class="edge">
+<title>sourcefile~preconditioner_iluk.f90&#45;&gt;sourcefile~vector.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2479.08,-509.87C2469.21,-431.49 2403.58,0 2155,0 2155,0 2155,0 1094.5,0 965.92,0 853.51,-133.49 814.56,-185.55"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="811.65,-183.6 808.55,-193.73 817.29,-187.75 811.65,-183.6"/>
+</g>
+<!-- sourcefile~constants_base.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node6" class="node">
+<title>sourcefile~constants_base.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node6"><a xlink:href="../sourcefile/constants_base.f90.html" xlink:title="constants_base.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="117,-259 0,-259 0,-235 117,-235 117,-259"/>
+<text text-anchor="middle" x="58.5" y="-244.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">constants_base.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~constants.f90&#45;&gt;sourcefile~constants_base.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge5" class="edge">
+<title>sourcefile~constants.f90&#45;&gt;sourcefile~constants_base.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M379.5,-288C283.79,-302.24 171.53,-278.59 108.64,-261.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="109.55,-258.32 98.98,-259.06 107.7,-265.07 109.55,-258.32"/>
+</g>
+<!-- sourcefile~constants_parallel.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node7" class="node">
+<title>sourcefile~constants_parallel.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node7"><a xlink:href="../sourcefile/constants_parallel.f90.html" xlink:title="constants_parallel.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="286.5,-260 154.5,-260 154.5,-236 286.5,-236 286.5,-260"/>
+<text text-anchor="middle" x="220.5" y="-245.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">constants_parallel.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~constants.f90&#45;&gt;sourcefile~constants_parallel.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge6" class="edge">
+<title>sourcefile~constants.f90&#45;&gt;sourcefile~constants_parallel.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M379.5,-288C357.76,-291.23 304.23,-275.82 265.49,-263.19"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="266.59,-259.87 255.99,-260.05 264.39,-266.51 266.59,-259.87"/>
+</g>
+<!-- sourcefile~constants_physical.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node8" class="node">
+<title>sourcefile~constants_physical.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node8"><a xlink:href="../sourcefile/constants_physical.f90.html" xlink:title="constants_physical.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="288,-218 153,-218 153,-194 288,-194 288,-218"/>
+<text text-anchor="middle" x="220.5" y="-203.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">constants_physical.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~constants.f90&#45;&gt;sourcefile~constants_physical.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge7" class="edge">
+<title>sourcefile~constants.f90&#45;&gt;sourcefile~constants_physical.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M503.15,-218.02C481.4,-238.91 432.62,-280.4 381.5,-288"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M379.5,-288C331.16,-295.19 332.07,-248.12 288,-227 283.96,-225.06 279.7,-223.25 275.37,-221.56"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="276.41,-218.22 265.82,-218.07 274.01,-224.79 276.41,-218.22"/>
+</g>
+<!-- sourcefile~constants_solver.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node9" class="node">
+<title>sourcefile~constants_solver.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node9"><a xlink:href="../sourcefile/constants_solver.f90.html" xlink:title="constants_solver.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="281.5,-176 159.5,-176 159.5,-152 281.5,-152 281.5,-176"/>
+<text text-anchor="middle" x="220.5" y="-161.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">constants_solver.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~constants.f90&#45;&gt;sourcefile~constants_solver.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge8" class="edge">
+<title>sourcefile~constants.f90&#45;&gt;sourcefile~constants_solver.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M475.21,-193.92C463.04,-190.6 449.56,-187.29 437,-185 389,-176.26 334.27,-170.99 291.98,-167.91"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="292.01,-164.4 281.79,-167.19 291.52,-171.38 292.01,-164.4"/>
+</g>
+<!-- sourcefile~constants_utils.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node10" class="node">
+<title>sourcefile~constants_utils.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node10"><a xlink:href="../sourcefile/constants_utils.f90.html" xlink:title="constants_utils.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="437,-218 324,-218 324,-194 437,-194 437,-218"/>
+<text text-anchor="middle" x="380.5" y="-203.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">constants_utils.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~constants.f90&#45;&gt;sourcefile~constants_utils.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge9" class="edge">
+<title>sourcefile~constants.f90&#45;&gt;sourcefile~constants_utils.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M472.76,-206C464.63,-206 455.95,-206 447.28,-206"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="447.15,-202.5 437.15,-206 447.15,-209.5 447.15,-202.5"/>
+</g>
+<!-- sourcefile~matrix_interface.f90&#45;&gt;sourcefile~constants.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge10" class="edge">
+<title>sourcefile~matrix_interface.f90&#45;&gt;sourcefile~constants.f90</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M880.88,-581.28C855.02,-587.55 825.09,-596.82 800,-610"/>
+</g>
+<!-- sourcefile~matrix_interface.f90&#45;&gt;sourcefile~vector.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge11" class="edge">
+<title>sourcefile~matrix_interface.f90&#45;&gt;sourcefile~vector.f90</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M936.79,-557.89C916.31,-505.21 834.82,-295.58 808.35,-227.48"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="811.61,-226.21 804.73,-218.16 805.09,-228.75 811.61,-226.21"/>
+</g>
+<!-- sourcefile~core.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node11" class="node">
+<title>sourcefile~core.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node11"><a xlink:href="../sourcefile/core.f90.html" xlink:title="core.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1894,-554 1836,-554 1836,-530 1894,-530 1894,-554"/>
+<text text-anchor="middle" x="1865" y="-539.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~precondition_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge12" class="edge">
+<title>sourcefile~precondition_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M2221.92,-516.54C2151.91,-512.79 2045.62,-510.22 1954,-521 1937.36,-522.96 1919.32,-526.93 1903.92,-530.9"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1902.99,-527.52 1894.23,-533.48 1904.8,-534.28 1902.99,-527.52"/>
+</g>
+<!-- sourcefile~linalg.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node12" class="node">
+<title>sourcefile~linalg.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node12"><a xlink:href="../sourcefile/linalg.f90.html" xlink:title="linalg.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2186,-554 2122,-554 2122,-530 2186,-530 2186,-554"/>
+<text text-anchor="middle" x="2154" y="-539.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">linalg.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~precondition_interface.f90&#45;&gt;sourcefile~linalg.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge13" class="edge">
+<title>sourcefile~precondition_interface.f90&#45;&gt;sourcefile~linalg.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M2221.71,-532.7C2213,-533.92 2204.39,-535.12 2196.39,-536.23"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2195.7,-532.79 2186.28,-537.64 2196.67,-539.73 2195.7,-532.79"/>
+</g>
+<!-- sourcefile~vector_interface.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node13" class="node">
+<title>sourcefile~vector_interface.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node13"><a xlink:href="../sourcefile/vector_interface.f90.html" xlink:title="vector_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="717,-218 595,-218 595,-194 717,-194 717,-218"/>
+<text text-anchor="middle" x="656" y="-203.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~vector.f90&#45;&gt;sourcefile~vector_interface.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge14" class="edge">
+<title>sourcefile~vector.f90&#45;&gt;sourcefile~vector_interface.f90</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M765.3,-206C753.89,-206 740.6,-206 727.33,-206"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="727.21,-202.5 717.21,-206 727.21,-209.5 727.21,-202.5"/>
+</g>
+<!-- sourcefile~constants_physical.f90&#45;&gt;sourcefile~constants_base.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge15" class="edge">
+<title>sourcefile~constants_physical.f90&#45;&gt;sourcefile~constants_base.f90</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M172.36,-218.08C154.78,-222.58 134.64,-227.75 116.28,-232.45"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="115.4,-229.06 106.58,-234.94 117.14,-235.84 115.4,-229.06"/>
+</g>
+<!-- sourcefile~constants_utils.f90&#45;&gt;sourcefile~constants_parallel.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge16" class="edge">
+<title>sourcefile~constants_utils.f90&#45;&gt;sourcefile~constants_parallel.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M334.22,-218.04C316.29,-222.8 295.5,-228.33 276.7,-233.33"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="275.55,-230.01 266.78,-235.96 277.35,-236.78 275.55,-230.01"/>
+</g>
+<!-- sourcefile~constants_utils.f90&#45;&gt;sourcefile~constants_physical.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge17" class="edge">
+<title>sourcefile~constants_utils.f90&#45;&gt;sourcefile~constants_physical.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M323.8,-206C315.49,-206 306.82,-206 298.17,-206"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="298.07,-202.5 288.07,-206 298.07,-209.5 298.07,-202.5"/>
+</g>
+<!-- sourcefile~constants_utils.f90&#45;&gt;sourcefile~constants_solver.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge18" class="edge">
+<title>sourcefile~constants_utils.f90&#45;&gt;sourcefile~constants_solver.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M334.22,-193.96C316.29,-189.2 295.5,-183.67 276.7,-178.67"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="277.35,-175.22 266.78,-176.04 275.55,-181.99 277.35,-175.22"/>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~constants.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge19" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~constants.f90</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M1835.77,-553.42C1798.86,-568.32 1738.25,-592.67 1733,-594"/>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M1731,-594C1561.36,-637.12 1117.17,-588.21 943.5,-610"/>
+</g>
+<!-- sourcefile~interop.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node14" class="node">
+<title>sourcefile~interop.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node14"><a xlink:href="../sourcefile/interop.f90.html" xlink:title="interop.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1768.5,-503 1695.5,-503 1695.5,-479 1768.5,-479 1768.5,-503"/>
+<text text-anchor="middle" x="1732" y="-488.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interop.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~interop.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge20" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~interop.f90</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M1835.9,-531.06C1817.81,-524.02 1793.99,-514.75 1773.83,-506.9"/>
+<polygon fill="#003fff" stroke="#003fff" points="1774.86,-503.54 1764.27,-503.17 1772.32,-510.06 1774.86,-503.54"/>
+</g>
+<!-- sourcefile~memory.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node16" class="node">
+<title>sourcefile~memory.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node16"><a xlink:href="../sourcefile/memory.f90.html" xlink:title="memory.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1135,-360 1056,-360 1056,-336 1135,-336 1135,-360"/>
+<text text-anchor="middle" x="1095.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">memory.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~memory.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge21" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~memory.f90</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M1572,-262C1476.82,-231.63 1441.05,-244.61 1348,-281 1329.12,-288.38 1330.51,-300.73 1312,-309 1258.05,-333.09 1190.19,-342.31 1145.19,-345.83"/>
+<polygon fill="#003fff" stroke="#003fff" points="1144.83,-342.34 1135.11,-346.55 1145.33,-349.33 1144.83,-342.34"/>
+</g>
+<!-- sourcefile~types.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node17" class="node">
+<title>sourcefile~types.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node17"><a xlink:href="../sourcefile/types.f90.html" xlink:title="types.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1435,-234 1371,-234 1371,-210 1435,-210 1435,-234"/>
+<text text-anchor="middle" x="1403" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">types.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~types.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge22" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~types.f90</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M1858.55,-529.7C1834.22,-476.82 1729.8,-271.13 1574,-262"/>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M1572,-262C1529.42,-248.41 1479.46,-237.09 1445.15,-229.99"/>
+<polygon fill="#003fff" stroke="#003fff" points="1445.53,-226.5 1435.04,-227.93 1444.14,-233.36 1445.53,-226.5"/>
+</g>
+<!-- sourcefile~utils.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node18" class="node">
+<title>sourcefile~utils.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node18"><a xlink:href="../sourcefile/utils.f90.html" xlink:title="utils.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1601.5,-646 1544.5,-646 1544.5,-622 1601.5,-622 1601.5,-646"/>
+<text text-anchor="middle" x="1573" y="-631.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">utils.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~utils.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge23" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~utils.f90</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M1731,-594C1690.04,-604.41 1643.09,-616.38 1611.28,-624.49"/>
+<polygon fill="#003fff" stroke="#003fff" points="1610.33,-621.12 1601.51,-626.98 1612.06,-627.9 1610.33,-621.12"/>
+</g>
+<!-- sourcefile~validation.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node19" class="node">
+<title>sourcefile~validation.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node19"><a xlink:href="../sourcefile/validation.f90.html" xlink:title="validation.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1776,-703 1688,-703 1688,-679 1776,-679 1776,-703"/>
+<text text-anchor="middle" x="1732" y="-688.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">validation.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~validation.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge24" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~validation.f90</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M1835.75,-549.7C1827.49,-552.89 1818.85,-557.22 1812,-563 1793.73,-578.41 1761.19,-637.24 1744.14,-669.5"/>
+<polygon fill="#003fff" stroke="#003fff" points="1740.92,-668.11 1739.37,-678.59 1747.12,-671.36 1740.92,-668.11"/>
+</g>
+<!-- sourcefile~matrix_operations.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node15" class="node">
+<title>sourcefile~matrix_operations.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node15"><a xlink:href="../sourcefile/matrix_operations.f90.html" xlink:title="matrix_operations.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2086,-554 1954,-554 1954,-530 2086,-530 2086,-554"/>
+<text text-anchor="middle" x="2020" y="-539.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_operations.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~linalg.f90&#45;&gt;sourcefile~matrix_operations.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge25" class="edge">
+<title>sourcefile~linalg.f90&#45;&gt;sourcefile~matrix_operations.f90</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M2121.72,-542C2113.91,-542 2105.19,-542 2096.24,-542"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="2096.08,-538.5 2086.08,-542 2096.08,-545.5 2096.08,-538.5"/>
+</g>
+<!-- sourcefile~vector_operations.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node20" class="node">
+<title>sourcefile~vector_operations.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node20"><a xlink:href="../sourcefile/vector_operations.f90.html" xlink:title="vector_operations.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2085.5,-596 1954.5,-596 1954.5,-572 2085.5,-572 2085.5,-596"/>
+<text text-anchor="middle" x="2020" y="-581.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_operations.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~linalg.f90&#45;&gt;sourcefile~vector_operations.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge26" class="edge">
+<title>sourcefile~linalg.f90&#45;&gt;sourcefile~vector_operations.f90</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M2121.72,-551.95C2105.89,-556.99 2086.35,-563.21 2068.7,-568.82"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="2067.59,-565.5 2059.12,-571.87 2069.71,-572.17 2067.59,-565.5"/>
+</g>
+<!-- sourcefile~vector_interface.f90&#45;&gt;sourcefile~constants.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge27" class="edge">
+<title>sourcefile~vector_interface.f90&#45;&gt;sourcefile~constants.f90</title>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M594.87,-206C586.3,-206 577.54,-206 569.14,-206"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="569.1,-202.5 559.1,-206 569.1,-209.5 569.1,-202.5"/>
+</g>
+<!-- sourcefile~memory_stats_wrapper.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node29" class="node">
+<title>sourcefile~memory_stats_wrapper.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node29"><a xlink:href="../sourcefile/memory_stats_wrapper.f90.html" xlink:title="memory_stats_wrapper.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1652,-566 1494,-566 1494,-542 1652,-542 1652,-566"/>
+<text text-anchor="middle" x="1573" y="-551.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">memory_stats_wrapper.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~interop.f90&#45;&gt;sourcefile~memory_stats_wrapper.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge28" class="edge">
+<title>sourcefile~interop.f90&#45;&gt;sourcefile~memory_stats_wrapper.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1711.14,-503.18C1695.51,-512.36 1672.95,-524.73 1652,-533 1646.57,-535.14 1640.84,-537.15 1635.05,-538.99"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1633.86,-535.7 1625.31,-541.96 1635.89,-542.4 1633.86,-535.7"/>
+</g>
+<!-- sourcefile~signal_flag_wrapper.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node34" class="node">
+<title>sourcefile~signal_flag_wrapper.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node34"><a xlink:href="../sourcefile/signal_flag_wrapper.f90.html" xlink:title="signal_flag_wrapper.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1643,-524 1503,-524 1503,-500 1643,-500 1643,-524"/>
+<text text-anchor="middle" x="1573" y="-509.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">signal_flag_wrapper.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~interop.f90&#45;&gt;sourcefile~signal_flag_wrapper.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge29" class="edge">
+<title>sourcefile~interop.f90&#45;&gt;sourcefile~signal_flag_wrapper.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1695.37,-495.77C1682.8,-497.45 1668.12,-499.41 1653.39,-501.38"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1652.66,-497.95 1643.21,-502.74 1653.59,-504.89 1652.66,-497.95"/>
+</g>
+<!-- sourcefile~system_info_wrapper.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node39" class="node">
+<title>sourcefile~system_info_wrapper.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node39"><a xlink:href="../sourcefile/system_info_wrapper.f90.html" xlink:title="system_info_wrapper.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1646,-482 1500,-482 1500,-458 1646,-458 1646,-482"/>
+<text text-anchor="middle" x="1573" y="-467.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">system_info_wrapper.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~interop.f90&#45;&gt;sourcefile~system_info_wrapper.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge30" class="edge">
+<title>sourcefile~interop.f90&#45;&gt;sourcefile~system_info_wrapper.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1695.37,-486.23C1683.58,-484.66 1669.92,-482.83 1656.12,-480.98"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1656.44,-477.5 1646.06,-479.64 1655.51,-484.43 1656.44,-477.5"/>
+</g>
+<!-- sourcefile~vtk.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node40" class="node">
+<title>sourcefile~vtk.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node40"><a xlink:href="../sourcefile/vtk.f90.html" xlink:title="vtk.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1600,-356 1546,-356 1546,-332 1600,-332 1600,-356"/>
+<text text-anchor="middle" x="1573" y="-341.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~interop.f90&#45;&gt;sourcefile~vtk.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge31" class="edge">
+<title>sourcefile~interop.f90&#45;&gt;sourcefile~vtk.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1723.06,-478.93C1709.88,-459.5 1681.98,-420.76 1652,-394 1637.99,-381.49 1620.53,-369.99 1605.69,-361.18"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1607.24,-358.04 1596.84,-356.06 1603.74,-364.1 1607.24,-358.04"/>
+</g>
+<!-- sourcefile~vtk_constants.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node41" class="node">
+<title>sourcefile~vtk_constants.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node41"><a xlink:href="../sourcefile/vtk_constants.f90.html" xlink:title="vtk_constants.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1456.5,-398 1349.5,-398 1349.5,-374 1456.5,-374 1456.5,-398"/>
+<text text-anchor="middle" x="1403" y="-383.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk_constants.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~interop.f90&#45;&gt;sourcefile~vtk_constants.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge32" class="edge">
+<title>sourcefile~interop.f90&#45;&gt;sourcefile~vtk_constants.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1711.49,-478.93C1695.87,-469.68 1673.15,-457.17 1652,-449 1590.81,-425.36 1517.71,-408.03 1466.78,-397.6"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1467.4,-394.15 1456.91,-395.6 1466.02,-401.01 1467.4,-394.15"/>
+</g>
+<!-- sourcefile~matrix_operations.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge33" class="edge">
+<title>sourcefile~matrix_operations.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M1953.67,-542C1936.94,-542 1919.48,-542 1904.59,-542"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="1904.24,-538.5 1894.24,-542 1904.24,-545.5 1904.24,-538.5"/>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~vector.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge46" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~vector.f90</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M1248.5,-206C1101.74,-178.99 923.36,-192.42 842.96,-200.88"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="842.29,-197.43 832.73,-201.98 843.05,-204.39 842.29,-197.43"/>
+</g>
+<!-- sourcefile~config_bc.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node21" class="node">
+<title>sourcefile~config_bc.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node21"><a xlink:href="../sourcefile/config_bc.f90.html" xlink:title="config_bc.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1292.5,-300 1206.5,-300 1206.5,-276 1292.5,-276 1292.5,-300"/>
+<text text-anchor="middle" x="1249.5" y="-285.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">config_bc.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~config_bc.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge34" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~config_bc.f90</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M1376.36,-234.11C1367.36,-238.42 1357.2,-243.36 1348,-248 1331.85,-256.15 1328.61,-259.83 1312,-267 1307.63,-268.88 1303.04,-270.72 1298.4,-272.47"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="1297.11,-269.21 1288.91,-275.92 1299.5,-275.79 1297.11,-269.21"/>
+</g>
+<!-- sourcefile~coordinate.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node22" class="node">
+<title>sourcefile~coordinate.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node22"><a xlink:href="../sourcefile/coordinate.f90.html" xlink:title="coordinate.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1142,-136 1049,-136 1049,-112 1142,-112 1142,-136"/>
+<text text-anchor="middle" x="1095.5" y="-121.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">coordinate.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~coordinate.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge35" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~coordinate.f90</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M1370.75,-220.11C1339.98,-217.91 1291.73,-213.59 1250.5,-206"/>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M1248.5,-206C1220.36,-200.82 1212.71,-199.54 1187,-187 1162.16,-174.88 1136.55,-156.39 1118.95,-142.58"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="1120.98,-139.72 1110.98,-136.22 1116.61,-145.19 1120.98,-139.72"/>
+</g>
+<!-- sourcefile~coordinate_array.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node23" class="node">
+<title>sourcefile~coordinate_array.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node23"><a xlink:href="../sourcefile/coordinate_array.f90.html" xlink:title="coordinate_array.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1312,-258 1187,-258 1187,-234 1312,-234 1312,-258"/>
+<text text-anchor="middle" x="1249.5" y="-243.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">coordinate_array.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~coordinate_array.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge36" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~coordinate_array.f90</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M1370.98,-226.91C1356.79,-229.16 1339.35,-231.92 1322.18,-234.64"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="1321.47,-231.21 1312.14,-236.24 1322.56,-238.13 1321.47,-231.21"/>
+</g>
+<!-- sourcefile~datetime.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node24" class="node">
+<title>sourcefile~datetime.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node24"><a xlink:href="../sourcefile/datetime.f90.html" xlink:title="datetime.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1137,-462 1054,-462 1054,-438 1137,-438 1137,-462"/>
+<text text-anchor="middle" x="1095.5" y="-447.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">datetime.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~datetime.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge37" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~datetime.f90</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M1387.41,-234.07C1375.08,-245.06 1357.9,-262.36 1348,-281 1315.83,-341.55 1363.92,-386.23 1312,-431 1266.99,-469.81 1195.28,-467.9 1147.08,-460.78"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="1147.6,-457.32 1137.17,-459.2 1146.49,-464.23 1147.6,-457.32"/>
+</g>
+<!-- sourcefile~gauss.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node26" class="node">
+<title>sourcefile~gauss.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node26"><a xlink:href="../sourcefile/gauss.f90.html" xlink:title="gauss.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1282.5,-52 1216.5,-52 1216.5,-28 1282.5,-28 1282.5,-52"/>
+<text text-anchor="middle" x="1249.5" y="-37.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gauss.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~gauss.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge38" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~gauss.f90</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M1398.58,-209.95C1389.53,-180.23 1362.17,-102.84 1312,-61 1306.28,-56.23 1299.42,-52.53 1292.39,-49.65"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="1293.39,-46.29 1282.79,-46.23 1291.04,-52.88 1293.39,-46.29"/>
+</g>
+<!-- sourcefile~graph.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node27" class="node">
+<title>sourcefile~graph.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node27"><a xlink:href="../sourcefile/graph.f90.html" xlink:title="graph.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1283,-178 1216,-178 1216,-154 1283,-154 1283,-178"/>
+<text text-anchor="middle" x="1249.5" y="-163.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">graph.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~graph.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge39" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~graph.f90</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M1370.98,-210.53C1348.35,-202.17 1317.44,-190.74 1292.59,-181.56"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="1293.65,-178.22 1283.05,-178.03 1291.22,-184.78 1293.65,-178.22"/>
+</g>
+<!-- sourcefile~matrix.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node28" class="node">
+<title>sourcefile~matrix.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node28"><a xlink:href="../sourcefile/matrix.f90.html" xlink:title="matrix.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1284.5,-544 1214.5,-544 1214.5,-520 1284.5,-520 1284.5,-544"/>
+<text text-anchor="middle" x="1249.5" y="-529.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~matrix.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge40" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~matrix.f90</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M1386.78,-234.1C1374.24,-244.97 1357.09,-262.1 1348,-281 1303.16,-374.25 1378.54,-431.76 1312,-511 1307.26,-516.64 1300.94,-520.77 1294.15,-523.8"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="1292.88,-520.53 1284.7,-527.27 1295.29,-527.1 1292.88,-520.53"/>
+</g>
+<!-- sourcefile~meteorology.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node30" class="node">
+<title>sourcefile~meteorology.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node30"><a xlink:href="../sourcefile/meteorology.f90.html" xlink:title="meteorology.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1300,-380 1199,-380 1199,-356 1300,-356 1300,-380"/>
+<text text-anchor="middle" x="1249.5" y="-365.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">meteorology.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~meteorology.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge41" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~meteorology.f90</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M1389.49,-234.12C1372.12,-250.94 1339.71,-282.32 1312,-309 1298.19,-322.3 1282.6,-337.26 1270.57,-348.78"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="1268.03,-346.37 1263.23,-355.81 1272.88,-351.42 1268.03,-346.37"/>
+</g>
+<!-- sourcefile~physics_info.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node32" class="node">
+<title>sourcefile~physics_info.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node32"><a xlink:href="../sourcefile/physics_info.f90.html" xlink:title="physics_info.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1299,-136 1200,-136 1200,-112 1299,-112 1299,-136"/>
+<text text-anchor="middle" x="1249.5" y="-121.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">physics_info.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~physics_info.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge42" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~physics_info.f90</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M1390.88,-209.96C1374.89,-193.28 1343.79,-163.14 1312,-145 1308.82,-143.19 1305.47,-141.5 1302.02,-139.93"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="1303.36,-136.69 1292.78,-136.06 1300.65,-143.15 1303.36,-136.69"/>
+</g>
+<!-- sourcefile~pointer.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node33" class="node">
+<title>sourcefile~pointer.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node33"><a xlink:href="../sourcefile/pointer.f90.html" xlink:title="pointer.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1285.5,-422 1213.5,-422 1213.5,-398 1285.5,-398 1285.5,-422"/>
+<text text-anchor="middle" x="1249.5" y="-407.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pointer.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~pointer.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge43" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~pointer.f90</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M1387.8,-234.29C1375.73,-245.42 1358.7,-262.81 1348,-281 1322.36,-324.62 1347.65,-353.09 1312,-389 1307.19,-393.84 1301.23,-397.57 1294.92,-400.44"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="1293.59,-397.19 1285.52,-404.05 1296.11,-403.73 1293.59,-397.19"/>
+</g>
+<!-- sourcefile~solar.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node35" class="node">
+<title>sourcefile~solar.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node35"><a xlink:href="../sourcefile/solar.f90.html" xlink:title="solar.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1279.5,-502 1219.5,-502 1219.5,-478 1279.5,-478 1279.5,-502"/>
+<text text-anchor="middle" x="1249.5" y="-487.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solar.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~solar.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge44" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~solar.f90</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M1386.72,-234.41C1374.32,-245.35 1357.39,-262.41 1348,-281 1310.63,-354.99 1364.28,-399.68 1312,-464 1306.04,-471.33 1297.64,-476.63 1288.96,-480.45"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="1287.63,-477.21 1279.53,-484.04 1290.12,-483.75 1287.63,-477.21"/>
+</g>
+<!-- sourcefile~state.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node36" class="node">
+<title>sourcefile~state.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node36"><a xlink:href="../sourcefile/state.f90.html" xlink:title="state.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1280,-94 1219,-94 1219,-70 1280,-70 1280,-94"/>
+<text text-anchor="middle" x="1249.5" y="-79.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">state.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~state.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge45" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~state.f90</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M1396.08,-209.99C1383.72,-186.15 1352.93,-132.6 1312,-103 1305.31,-98.16 1297.41,-94.37 1289.55,-91.42"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="1290.65,-88.1 1280.05,-88.24 1288.42,-94.74 1290.65,-88.1"/>
+</g>
+<!-- sourcefile~string_utils.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node37" class="node">
+<title>sourcefile~string_utils.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node37"><a xlink:href="../sourcefile/string_utils.f90.html" xlink:title="string_utils.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="845,-686 753,-686 753,-662 845,-662 845,-686"/>
+<text text-anchor="middle" x="799" y="-671.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">string_utils.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~utils.f90&#45;&gt;sourcefile~string_utils.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge47" class="edge">
+<title>sourcefile~utils.f90&#45;&gt;sourcefile~string_utils.f90</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M1544.19,-639.82C1488.65,-650.91 1359.9,-674 1250.5,-674 1250.5,-674 1250.5,-674 1094.5,-674 1011.18,-674 914.6,-674 855.4,-674"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="855.15,-670.5 845.15,-674 855.15,-677.5 855.15,-670.5"/>
+</g>
+<!-- sourcefile~system_env.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node38" class="node">
+<title>sourcefile~system_env.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node38"><a xlink:href="../sourcefile/system_env.f90.html" xlink:title="system_env.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1451.5,-646 1354.5,-646 1354.5,-622 1451.5,-622 1451.5,-646"/>
+<text text-anchor="middle" x="1403" y="-631.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">system_env.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~utils.f90&#45;&gt;sourcefile~system_env.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge48" class="edge">
+<title>sourcefile~utils.f90&#45;&gt;sourcefile~system_env.f90</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M1544.26,-634C1521.85,-634 1489.55,-634 1461.59,-634"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="1461.52,-630.5 1451.52,-634 1461.52,-637.5 1461.52,-630.5"/>
+</g>
+<!-- sourcefile~error.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node25" class="node">
+<title>sourcefile~error.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node25"><a xlink:href="../sourcefile/error.f90.html" xlink:title="error.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="972.5,-743 912.5,-743 912.5,-719 972.5,-719 972.5,-743"/>
+<text text-anchor="middle" x="942.5" y="-728.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~validation.f90&#45;&gt;sourcefile~error.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge49" class="edge">
+<title>sourcefile~validation.f90&#45;&gt;sourcefile~error.f90</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M1690.89,-703.01C1629.64,-720.26 1508.85,-750 1404,-750 1404,-750 1404,-750 1248.5,-750 1153.1,-750 1041.25,-740.63 983.12,-735.05"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="983.2,-731.54 972.91,-734.05 982.52,-738.51 983.2,-731.54"/>
+</g>
+<!-- sourcefile~vector_operations.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge50" class="edge">
+<title>sourcefile~vector_operations.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M1975.16,-571.96C1952.74,-565.81 1925.73,-558.4 1904.18,-552.48"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="1904.97,-549.07 1894.4,-549.79 1903.11,-555.82 1904.97,-549.07"/>
+</g>
+<!-- sourcefile~mkl_backend.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node31" class="node">
+<title>sourcefile~mkl_backend.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node31"><a xlink:href="../sourcefile/mkl_backend.f90.html" xlink:title="mkl_backend.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1918,-596 1812,-596 1812,-572 1918,-572 1918,-596"/>
+<text text-anchor="middle" x="1865" y="-581.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mkl_backend.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~vector_operations.f90&#45;&gt;sourcefile~mkl_backend.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge51" class="edge">
+<title>sourcefile~vector_operations.f90&#45;&gt;sourcefile~mkl_backend.f90</title>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M1954.11,-584C1945.54,-584 1936.78,-584 1928.25,-584"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="1928.01,-580.5 1918.01,-584 1928.01,-587.5 1928.01,-580.5"/>
+</g>
+<!-- sourcefile~config_bc.f90&#45;&gt;sourcefile~constants.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge52" class="edge">
+<title>sourcefile~config_bc.f90&#45;&gt;sourcefile~constants.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1206.47,-291.17C1163.42,-295.49 1095.18,-305.32 1040,-327 992.77,-345.55 984.61,-358.26 943.5,-388"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M941.5,-388C846.08,-455.71 903.58,-555.58 800,-610"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M798,-610C737.08,-642.01 710.58,-717.19 657,-674"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M655,-674C582.57,-615.62 532.84,-312.92 520.18,-228.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="523.62,-227.43 518.7,-218.05 516.69,-228.45 523.62,-227.43"/>
+</g>
+<!-- sourcefile~config_bc.f90&#45;&gt;sourcefile~memory.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge53" class="edge">
+<title>sourcefile~config_bc.f90&#45;&gt;sourcefile~memory.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1217.74,-300.14C1194.28,-309.4 1161.78,-322.23 1136.33,-332.28"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1134.97,-329.05 1126.95,-335.98 1137.54,-335.56 1134.97,-329.05"/>
+</g>
+<!-- sourcefile~coordinate_array.f90&#45;&gt;sourcefile~memory.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge55" class="edge">
+<title>sourcefile~coordinate_array.f90&#45;&gt;sourcefile~memory.f90</title>
+<path fill="none" stroke="#ff9100" stroke-dasharray="5,2" d="M1205.83,-258.07C1199.32,-260.61 1192.84,-263.58 1187,-267 1158.59,-283.63 1131.18,-310.09 1114.11,-328.22"/>
+<polygon fill="#ff9100" stroke="#ff9100" points="1111.24,-326.17 1107.03,-335.89 1116.39,-330.91 1111.24,-326.17"/>
+</g>
+<!-- sourcefile~coordinate_array.f90&#45;&gt;sourcefile~coordinate.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge54" class="edge">
+<title>sourcefile~coordinate_array.f90&#45;&gt;sourcefile~coordinate.f90</title>
+<path fill="none" stroke="#ff9100" stroke-dasharray="5,2" d="M1213.03,-233.95C1204.14,-230.16 1194.9,-225.49 1187,-220 1156.25,-198.63 1127.87,-165.4 1111.37,-144.18"/>
+<polygon fill="#ff9100" stroke="#ff9100" points="1114.1,-141.98 1105.25,-136.15 1108.53,-146.23 1114.1,-141.98"/>
+</g>
+<!-- sourcefile~error.f90&#45;&gt;sourcefile~constants.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge56" class="edge">
+<title>sourcefile~error.f90&#45;&gt;sourcefile~constants.f90</title>
+<path fill="none" stroke="#daff00" stroke-dasharray="5,2" d="M912.4,-742.82C877.58,-756.33 821.32,-775.96 800,-771"/>
+<path fill="none" stroke="#daff00" stroke-dasharray="5,2" d="M798,-771C723.92,-753.75 716.22,-721.74 657,-674"/>
+</g>
+<!-- sourcefile~gauss.f90&#45;&gt;sourcefile~constants.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge57" class="edge">
+<title>sourcefile~gauss.f90&#45;&gt;sourcefile~constants.f90</title>
+<path fill="none" stroke="#91ff00" stroke-dasharray="5,2" d="M1216.5,-43.83C1161.01,-50.14 1043.31,-62 943.5,-62 943.5,-62 943.5,-62 798,-62 689.6,-62 580.99,-147.93 537.18,-187.03"/>
+<polygon fill="#91ff00" stroke="#91ff00" points="534.59,-184.66 529.54,-193.97 539.3,-189.84 534.59,-184.66"/>
+</g>
+<!-- sourcefile~gauss.f90&#45;&gt;sourcefile~coordinate.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge58" class="edge">
+<title>sourcefile~gauss.f90&#45;&gt;sourcefile~coordinate.f90</title>
+<path fill="none" stroke="#91ff00" stroke-dasharray="5,2" d="M1216.2,-49.15C1206.58,-52.37 1196.16,-56.36 1187,-61 1162.34,-73.48 1136.71,-91.92 1119.05,-105.63"/>
+<polygon fill="#91ff00" stroke="#91ff00" points="1116.74,-102.99 1111.06,-111.93 1121.08,-108.49 1116.74,-102.99"/>
+</g>
+<!-- sourcefile~matrix.f90&#45;&gt;sourcefile~matrix_interface.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge60" class="edge">
+<title>sourcefile~matrix.f90&#45;&gt;sourcefile~matrix_interface.f90</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1214.24,-520.91C1172.37,-509.09 1099.71,-494.19 1040,-511 1012.1,-518.85 984.29,-537.27 965.74,-551.45"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="963.35,-548.88 957.66,-557.82 967.68,-554.38 963.35,-548.88"/>
+</g>
+<!-- sourcefile~matrix_factory.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node43" class="node">
+<title>sourcefile~matrix_factory.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node43"><a xlink:href="../sourcefile/matrix_factory.f90.html" xlink:title="matrix_factory.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1151,-544 1040,-544 1040,-520 1151,-520 1151,-544"/>
+<text text-anchor="middle" x="1095.5" y="-529.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_factory.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~matrix.f90&#45;&gt;sourcefile~matrix_factory.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge59" class="edge">
+<title>sourcefile~matrix.f90&#45;&gt;sourcefile~matrix_factory.f90</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1214.39,-532C1198.66,-532 1179.45,-532 1161.13,-532"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1161.08,-528.5 1151.08,-532 1161.08,-535.5 1161.08,-528.5"/>
+</g>
+<!-- sourcefile~memory_stats.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node44" class="node">
+<title>sourcefile~memory_stats.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node44"><a xlink:href="../sourcefile/memory_stats.f90.html" xlink:title="memory_stats.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1458,-566 1348,-566 1348,-542 1458,-542 1458,-566"/>
+<text text-anchor="middle" x="1403" y="-551.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">memory_stats.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~memory_stats_wrapper.f90&#45;&gt;sourcefile~memory_stats.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge61" class="edge">
+<title>sourcefile~memory_stats_wrapper.f90&#45;&gt;sourcefile~memory_stats.f90</title>
+<path fill="none" stroke="#00ff48" stroke-dasharray="5,2" d="M1493.9,-554C1485.37,-554 1476.76,-554 1468.43,-554"/>
+<polygon fill="#00ff48" stroke="#00ff48" points="1468.41,-550.5 1458.41,-554 1468.41,-557.5 1468.41,-550.5"/>
+</g>
+<!-- sourcefile~meteorology.f90&#45;&gt;sourcefile~constants.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge62" class="edge">
+<title>sourcefile~meteorology.f90&#45;&gt;sourcefile~constants.f90</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M1198.71,-368.44C1117.56,-369.58 963.76,-373.62 943.5,-388"/>
+</g>
+<!-- sourcefile~meteorology.f90&#45;&gt;sourcefile~memory.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge64" class="edge">
+<title>sourcefile~meteorology.f90&#45;&gt;sourcefile~memory.f90</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M1198.73,-361.45C1181.66,-359.21 1162.59,-356.7 1145.58,-354.46"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="1145.66,-350.94 1135.29,-353.1 1144.75,-357.88 1145.66,-350.94"/>
+</g>
+<!-- sourcefile~meteorology.f90&#45;&gt;sourcefile~datetime.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge63" class="edge">
+<title>sourcefile~meteorology.f90&#45;&gt;sourcefile~datetime.f90</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M1208.18,-380.06C1200.99,-382.69 1193.67,-385.69 1187,-389 1162.79,-401.03 1137.46,-418.59 1119.78,-431.79"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="1117.6,-429.04 1111.75,-437.87 1121.83,-434.62 1117.6,-429.04"/>
+</g>
+<!-- sourcefile~physics_info.f90&#45;&gt;sourcefile~coordinate.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge65" class="edge">
+<title>sourcefile~physics_info.f90&#45;&gt;sourcefile~coordinate.f90</title>
+<path fill="none" stroke="#00daff" stroke-dasharray="5,2" d="M1199.99,-124C1184.81,-124 1167.94,-124 1152.3,-124"/>
+<polygon fill="#00daff" stroke="#00daff" points="1152.22,-120.5 1142.22,-124 1152.22,-127.5 1152.22,-120.5"/>
+</g>
+<!-- sourcefile~signal_flag.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node45" class="node">
+<title>sourcefile~signal_flag.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node45"><a xlink:href="../sourcefile/signal_flag.f90.html" xlink:title="signal_flag.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1449,-524 1357,-524 1357,-500 1449,-500 1449,-524"/>
+<text text-anchor="middle" x="1403" y="-509.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">signal_flag.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~signal_flag_wrapper.f90&#45;&gt;sourcefile~signal_flag.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge66" class="edge">
+<title>sourcefile~signal_flag_wrapper.f90&#45;&gt;sourcefile~signal_flag.f90</title>
+<path fill="none" stroke="#0048ff" stroke-dasharray="5,2" d="M1502.7,-512C1488.29,-512 1473.29,-512 1459.46,-512"/>
+<polygon fill="#0048ff" stroke="#0048ff" points="1459.15,-508.5 1449.15,-512 1459.15,-515.5 1459.15,-508.5"/>
+</g>
+<!-- sourcefile~solar.f90&#45;&gt;sourcefile~datetime.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge67" class="edge">
+<title>sourcefile~solar.f90&#45;&gt;sourcefile~datetime.f90</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M1219.19,-482.29C1198.81,-476.92 1171.12,-469.64 1147.2,-463.34"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1147.77,-459.87 1137.21,-460.71 1145.99,-466.64 1147.77,-459.87"/>
+</g>
+<!-- sourcefile~state.f90&#45;&gt;sourcefile~coordinate.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge68" class="edge">
+<title>sourcefile~state.f90&#45;&gt;sourcefile~coordinate.f90</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M1218.83,-90.2C1199.25,-95.61 1173.04,-102.85 1149.9,-109.24"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="1148.91,-105.89 1140.2,-111.93 1150.77,-112.64 1148.91,-105.89"/>
+</g>
+<!-- sourcefile~string_utils.f90&#45;&gt;sourcefile~constants.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge69" class="edge">
+<title>sourcefile~string_utils.f90&#45;&gt;sourcefile~constants.f90</title>
+<path fill="none" stroke="#9100ff" stroke-dasharray="5,2" d="M759.26,-686.07C728.21,-693.16 685.3,-696.81 657,-674"/>
+</g>
+<!-- sourcefile~system_info_wrapper.f90&#45;&gt;sourcefile~system_env.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge71" class="edge">
+<title>sourcefile~system_info_wrapper.f90&#45;&gt;sourcefile~system_env.f90</title>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M1507.4,-482.15C1502.58,-484.59 1498.03,-487.51 1494,-491 1463.32,-517.61 1480.02,-540.87 1458,-575 1448.67,-589.46 1435.72,-603.74 1424.84,-614.64"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="1422.08,-612.44 1417.36,-621.92 1426.97,-617.45 1422.08,-612.44"/>
+</g>
+<!-- sourcefile~interop_utils.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node42" class="node">
+<title>sourcefile~interop_utils.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node42"><a xlink:href="../sourcefile/interop_utils.f90.html" xlink:title="interop_utils.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1453,-482 1353,-482 1353,-458 1453,-458 1453,-482"/>
+<text text-anchor="middle" x="1403" y="-467.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interop_utils.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~system_info_wrapper.f90&#45;&gt;sourcefile~interop_utils.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge70" class="edge">
+<title>sourcefile~system_info_wrapper.f90&#45;&gt;sourcefile~interop_utils.f90</title>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M1499.78,-470C1487.67,-470 1475.23,-470 1463.49,-470"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="1463.38,-466.5 1453.38,-470 1463.38,-473.5 1463.38,-466.5"/>
+</g>
+<!-- sourcefile~system_info.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node46" class="node">
+<title>sourcefile~system_info.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node46"><a xlink:href="../sourcefile/system_info.f90.html" xlink:title="system_info.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1451.5,-440 1354.5,-440 1354.5,-416 1451.5,-416 1451.5,-440"/>
+<text text-anchor="middle" x="1403" y="-425.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">system_info.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~system_info_wrapper.f90&#45;&gt;sourcefile~system_info.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge72" class="edge">
+<title>sourcefile~system_info_wrapper.f90&#45;&gt;sourcefile~system_info.f90</title>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M1523.86,-457.96C1504.36,-453.09 1481.69,-447.42 1461.34,-442.34"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="1462.12,-438.92 1451.57,-439.89 1460.42,-445.71 1462.12,-438.92"/>
+</g>
+<!-- sourcefile~vtk.f90&#45;&gt;sourcefile~types.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge73" class="edge">
+<title>sourcefile~vtk.f90&#45;&gt;sourcefile~types.f90</title>
+<path fill="none" stroke="#ff0091" stroke-dasharray="5,2" d="M1555.28,-331.86C1525.59,-310.3 1463.55,-265.25 1428.85,-240.05"/>
+<polygon fill="#ff0091" stroke="#ff0091" points="1430.8,-237.14 1420.66,-234.09 1426.69,-242.8 1430.8,-237.14"/>
+</g>
+<!-- sourcefile~vtk.f90&#45;&gt;sourcefile~vtk_constants.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge74" class="edge">
+<title>sourcefile~vtk.f90&#45;&gt;sourcefile~vtk_constants.f90</title>
+<path fill="none" stroke="#ff0091" stroke-dasharray="5,2" d="M1545.75,-350.56C1523.38,-356.16 1490.41,-364.4 1461.9,-371.52"/>
+<polygon fill="#ff0091" stroke="#ff0091" points="1460.88,-368.17 1452.03,-373.99 1462.58,-374.96 1460.88,-368.17"/>
+</g>
+<!-- sourcefile~vtk_wrapper.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node47" class="node">
+<title>sourcefile~vtk_wrapper.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node47"><a xlink:href="../sourcefile/vtk_wrapper.f90.html" xlink:title="vtk_wrapper.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1452.5,-314 1353.5,-314 1353.5,-290 1452.5,-290 1452.5,-314"/>
+<text text-anchor="middle" x="1403" y="-299.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk_wrapper.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~vtk.f90&#45;&gt;sourcefile~vtk_wrapper.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge75" class="edge">
+<title>sourcefile~vtk.f90&#45;&gt;sourcefile~vtk_wrapper.f90</title>
+<path fill="none" stroke="#ff0091" stroke-dasharray="5,2" d="M1545.75,-337.44C1523.38,-331.84 1490.41,-323.6 1461.9,-316.48"/>
+<polygon fill="#ff0091" stroke="#ff0091" points="1462.58,-313.04 1452.03,-314.01 1460.88,-319.83 1462.58,-313.04"/>
+</g>
+<!-- sourcefile~vtu_wrapper.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node48" class="node">
+<title>sourcefile~vtu_wrapper.f90</title>
+<g id="a_sourcefile~~preconditioner_iluk.f90~~EfferentGraph_node48"><a xlink:href="../sourcefile/vtu_wrapper.f90.html" xlink:title="vtu_wrapper.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1453,-356 1353,-356 1353,-332 1453,-332 1453,-356"/>
+<text text-anchor="middle" x="1403" y="-341.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtu_wrapper.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~vtk.f90&#45;&gt;sourcefile~vtu_wrapper.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge76" class="edge">
+<title>sourcefile~vtk.f90&#45;&gt;sourcefile~vtu_wrapper.f90</title>
+<path fill="none" stroke="#ff0091" stroke-dasharray="5,2" d="M1545.75,-344C1523.72,-344 1491.43,-344 1463.22,-344"/>
+<polygon fill="#ff0091" stroke="#ff0091" points="1463.04,-340.5 1453.04,-344 1463.04,-347.5 1463.04,-340.5"/>
+</g>
+<!-- sourcefile~matrix_factory.f90&#45;&gt;sourcefile~constants.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge77" class="edge">
+<title>sourcefile~matrix_factory.f90&#45;&gt;sourcefile~constants.f90</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M1079.85,-544.13C1054.18,-564.27 998.54,-603.1 943.5,-610"/>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M941.5,-610C879.1,-617.83 855.67,-580.75 800,-610"/>
+</g>
+<!-- sourcefile~matrix_factory.f90&#45;&gt;sourcefile~matrix_interface.f90 -->
+<g id="sourcefile~~preconditioner_iluk.f90~~EfferentGraph_edge78" class="edge">
+<title>sourcefile~matrix_factory.f90&#45;&gt;sourcefile~matrix_interface.f90</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M1046.72,-544.02C1032.19,-547.68 1016.07,-551.74 1000.97,-555.54"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="1000.07,-552.15 991.23,-557.99 1001.78,-558.94 1000.07,-552.15"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var pansourcefilepreconditioner_ilukf90EfferentGraph = svgPanZoom('#sourcefilepreconditioner_ilukf90EfferentGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#EfferentGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="EfferentGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="202pt" height="32pt"
+ viewBox="0.00 0.00 201.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 197.5,-28 197.5,4 -4,4"/>
+<!-- Source File -->
+<g id="node1" class="node">
+<title>Source File</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Source File</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="193.5,-24 88.5,-24 88.5,0 193.5,0 193.5,-24"/>
+<text text-anchor="middle" x="141" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a file to a file which it depends on. A file
+is dependent upon another if the latter must be compiled before the former
+can be.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+          </div>
+        </div>
+<br>
+      <section>
+        <h2><span class="anchor" id="src"></span>Source Code</h2>
+        <div class="hl codehilite"><pre><span></span><a id="ln-1" name="ln-1" href="#ln-1"></a><span class="k">submodule</span><span class="p">(</span><span class="n">solver_preconditioner</span><span class="p">)</span><span class="w"> </span><span class="n">solver_preconditioner_iluk</span>
+<a id="ln-2" name="ln-2" href="#ln-2"></a><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">core_constants</span>
+<a id="ln-3" name="ln-3" href="#ln-3"></a><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">core_types_matrix</span>
+<a id="ln-4" name="ln-4" href="#ln-4"></a><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">module_type_vector</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="n">type_vector_dp</span>
+<a id="ln-5" name="ln-5" href="#ln-5"></a><span class="w">    </span><span class="k">implicit none</span>
+<a id="ln-6" name="ln-6" href="#ln-6"></a>
+<a id="ln-7" name="ln-7" href="#ln-7"></a><span class="k">contains</span>
+<a id="ln-8" name="ln-8" href="#ln-8"></a>
+<a id="ln-9" name="ln-9" href="#ln-9"></a><span class="w">    </span><span class="c">!&gt; ILU(k) 前処理インスタンスを初期化する</span>
+<a id="ln-10" name="ln-10" href="#ln-10"></a><span class="w">    </span><span class="k">module subroutine </span><span class="n">initialize_preconditioner_iluk</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">info</span><span class="p">)</span>
+<a id="ln-11" name="ln-11" href="#ln-11"></a><span class="w">        </span><span class="k">implicit none</span>
+<a id="ln-12" name="ln-12" href="#ln-12"></a><span class="k">        class</span><span class="p">(</span><span class="n">type_preconditioner_iluk</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<a id="ln-13" name="ln-13" href="#ln-13"></a><span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_preconditioner_settings</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">info</span>
+<a id="ln-14" name="ln-14" href="#ln-14"></a>
+<a id="ln-15" name="ln-15" href="#ln-15"></a><span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SOLVER_PRECONDITION_ILU</span>
+<a id="ln-16" name="ln-16" href="#ln-16"></a><span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SOLVER_STATUS_SUCCESS</span>
+<a id="ln-17" name="ln-17" href="#ln-17"></a>
+<a id="ln-18" name="ln-18" href="#ln-18"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">name</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">name</span><span class="p">)</span>
+<a id="ln-19" name="ln-19" href="#ln-19"></a><span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ILU(0)&quot;</span>
+<a id="ln-20" name="ln-20" href="#ln-20"></a>
+<a id="ln-21" name="ln-21" href="#ln-21"></a><span class="w">        </span><span class="c">! 初期値としてノード数を設定するが、setup時に行列の実サイズで上書きされる</span>
+<a id="ln-22" name="ln-22" href="#ln-22"></a><span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">info</span><span class="p">%</span><span class="n">num_nodes</span>
+<a id="ln-23" name="ln-23" href="#ln-23"></a>
+<a id="ln-24" name="ln-24" href="#ln-24"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">info</span><span class="p">%</span><span class="n">block_size</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-25" name="ln-25" href="#ln-25"></a><span class="k">            </span><span class="n">self</span><span class="p">%</span><span class="n">is_block</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<a id="ln-26" name="ln-26" href="#ln-26"></a><span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">block_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">info</span><span class="p">%</span><span class="n">block_size</span>
+<a id="ln-27" name="ln-27" href="#ln-27"></a><span class="w">        </span><span class="k">else</span>
+<a id="ln-28" name="ln-28" href="#ln-28"></a><span class="k">            </span><span class="n">self</span><span class="p">%</span><span class="n">is_block</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<a id="ln-29" name="ln-29" href="#ln-29"></a><span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">block_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<a id="ln-30" name="ln-30" href="#ln-30"></a><span class="w">        </span><span class="k">end if</span>
+<a id="ln-31" name="ln-31" href="#ln-31"></a>
+<a id="ln-32" name="ln-32" href="#ln-32"></a><span class="k">        </span><span class="n">self</span><span class="p">%</span><span class="n">fill_level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<a id="ln-33" name="ln-33" href="#ln-33"></a>
+<a id="ln-34" name="ln-34" href="#ln-34"></a><span class="w">    </span><span class="k">end subroutine </span><span class="n">initialize_preconditioner_iluk</span>
+<a id="ln-35" name="ln-35" href="#ln-35"></a>
+<a id="ln-36" name="ln-36" href="#ln-36"></a><span class="w">    </span><span class="c">!&gt; 行列 A に対する ILU(0) 分解のセットアップを行う</span>
+<a id="ln-37" name="ln-37" href="#ln-37"></a><span class="w">    </span><span class="k">module subroutine </span><span class="n">setup_preconditioner_iluk</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="p">)</span>
+<a id="ln-38" name="ln-38" href="#ln-38"></a><span class="w">        </span><span class="k">implicit none</span>
+<a id="ln-39" name="ln-39" href="#ln-39"></a><span class="k">        class</span><span class="p">(</span><span class="n">type_preconditioner_iluk</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<a id="ln-40" name="ln-40" href="#ln-40"></a><span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">abst_matrix</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">A</span>
+<a id="ln-41" name="ln-41" href="#ln-41"></a>
+<a id="ln-42" name="ln-42" href="#ln-42"></a><span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_matrix_info</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">info</span>
+<a id="ln-43" name="ln-43" href="#ln-43"></a>
+<a id="ln-44" name="ln-44" href="#ln-44"></a><span class="w">        </span><span class="k">call </span><span class="n">A</span><span class="p">%</span><span class="n">get_info</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+<a id="ln-45" name="ln-45" href="#ln-45"></a>
+<a id="ln-46" name="ln-46" href="#ln-46"></a><span class="w">        </span><span class="c">! 重要: 前処理のサイズを行列の実サイズに合わせる</span>
+<a id="ln-47" name="ln-47" href="#ln-47"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">info</span><span class="p">%</span><span class="n">num_rows</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-48" name="ln-48" href="#ln-48"></a><span class="k">            </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">info</span><span class="p">%</span><span class="n">num_rows</span>
+<a id="ln-49" name="ln-49" href="#ln-49"></a><span class="w">        </span><span class="k">end if</span>
+<a id="ln-50" name="ln-50" href="#ln-50"></a>
+<a id="ln-51" name="ln-51" href="#ln-51"></a><span class="k">        </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SOLVER_STATUS_NOT_IMPLEMENTED</span>
+<a id="ln-52" name="ln-52" href="#ln-52"></a>
+<a id="ln-53" name="ln-53" href="#ln-53"></a><span class="w">        </span><span class="k">select type</span><span class="w"> </span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<a id="ln-54" name="ln-54" href="#ln-54"></a><span class="w">        </span><span class="k">type is</span><span class="w"> </span><span class="p">(</span><span class="n">type_matrix_csr</span><span class="p">)</span>
+<a id="ln-55" name="ln-55" href="#ln-55"></a><span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">setup_csr_ilu0</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<a id="ln-56" name="ln-56" href="#ln-56"></a>
+<a id="ln-57" name="ln-57" href="#ln-57"></a><span class="w">        </span><span class="k">type is</span><span class="w"> </span><span class="p">(</span><span class="n">type_matrix_bsr</span><span class="p">)</span>
+<a id="ln-58" name="ln-58" href="#ln-58"></a><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">is_block</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-59" name="ln-59" href="#ln-59"></a><span class="k">                call </span><span class="n">self</span><span class="p">%</span><span class="n">setup_bsr_ilu0</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<a id="ln-60" name="ln-60" href="#ln-60"></a><span class="w">            </span><span class="k">else</span>
+<a id="ln-61" name="ln-61" href="#ln-61"></a><span class="k">                </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SOLVER_STATUS_NOT_IMPLEMENTED</span>
+<a id="ln-62" name="ln-62" href="#ln-62"></a><span class="w">            </span><span class="k">end if</span>
+<a id="ln-63" name="ln-63" href="#ln-63"></a>
+<a id="ln-64" name="ln-64" href="#ln-64"></a><span class="k">        class </span><span class="n">default</span>
+<a id="ln-65" name="ln-65" href="#ln-65"></a><span class="w">            </span><span class="k">write</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;Error: ILU(0) preconditioner does not support this matrix type.&quot;</span>
+<a id="ln-66" name="ln-66" href="#ln-66"></a><span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SOLVER_STATUS_NOT_IMPLEMENTED</span>
+<a id="ln-67" name="ln-67" href="#ln-67"></a><span class="w">        </span><span class="k">end select</span>
+<a id="ln-68" name="ln-68" href="#ln-68"></a>
+<a id="ln-69" name="ln-69" href="#ln-69"></a><span class="k">    end subroutine </span><span class="n">setup_preconditioner_iluk</span>
+<a id="ln-70" name="ln-70" href="#ln-70"></a>
+<a id="ln-71" name="ln-71" href="#ln-71"></a><span class="w">    </span><span class="c">!&gt; CSR行列に対するスカラ ILU(0) 分解を実行する</span>
+<a id="ln-72" name="ln-72" href="#ln-72"></a><span class="w">    </span><span class="k">module subroutine </span><span class="n">setup_csr_ilu0</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="p">)</span>
+<a id="ln-73" name="ln-73" href="#ln-73"></a><span class="w">        </span><span class="k">implicit none</span>
+<a id="ln-74" name="ln-74" href="#ln-74"></a><span class="k">        class</span><span class="p">(</span><span class="n">type_preconditioner_iluk</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<a id="ln-75" name="ln-75" href="#ln-75"></a><span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">type_matrix_csr</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">A</span>
+<a id="ln-76" name="ln-76" href="#ln-76"></a>
+<a id="ln-77" name="ln-77" href="#ln-77"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:),</span><span class="w"> </span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">mat_ptr</span><span class="p">,</span><span class="w"> </span><span class="n">mat_ind</span>
+<a id="ln-78" name="ln-78" href="#ln-78"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:),</span><span class="w"> </span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">mat_val</span>
+<a id="ln-79" name="ln-79" href="#ln-79"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="n">jj</span><span class="p">,</span><span class="w"> </span><span class="n">j_stop</span><span class="p">,</span><span class="w"> </span><span class="n">nnz</span><span class="p">,</span><span class="w"> </span><span class="n">col</span>
+<a id="ln-80" name="ln-80" href="#ln-80"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">multiplier</span>
+<a id="ln-81" name="ln-81" href="#ln-81"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">work_row</span><span class="p">(:)</span>
+<a id="ln-82" name="ln-82" href="#ln-82"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">work_pos</span><span class="p">(:)</span>
+<a id="ln-83" name="ln-83" href="#ln-83"></a>
+<a id="ln-84" name="ln-84" href="#ln-84"></a><span class="w">        </span><span class="n">mat_ptr</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">A</span><span class="p">%</span><span class="n">get_ptr</span><span class="p">()</span>
+<a id="ln-85" name="ln-85" href="#ln-85"></a><span class="w">        </span><span class="n">mat_ind</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">A</span><span class="p">%</span><span class="n">get_ind</span><span class="p">()</span>
+<a id="ln-86" name="ln-86" href="#ln-86"></a><span class="w">        </span><span class="n">mat_val</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">A</span><span class="p">%</span><span class="n">get_val</span><span class="p">()</span>
+<a id="ln-87" name="ln-87" href="#ln-87"></a>
+<a id="ln-88" name="ln-88" href="#ln-88"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">mat_ptr</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-89" name="ln-89" href="#ln-89"></a><span class="k">            </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span>
+<a id="ln-90" name="ln-90" href="#ln-90"></a><span class="w">            </span><span class="k">return</span>
+<a id="ln-91" name="ln-91" href="#ln-91"></a><span class="k">        end if</span>
+<a id="ln-92" name="ln-92" href="#ln-92"></a>
+<a id="ln-93" name="ln-93" href="#ln-93"></a><span class="k">        </span><span class="n">nnz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mat_ptr</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<a id="ln-94" name="ln-94" href="#ln-94"></a>
+<a id="ln-95" name="ln-95" href="#ln-95"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val</span><span class="p">)</span>
+<a id="ln-96" name="ln-96" href="#ln-96"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">)</span>
+<a id="ln-97" name="ln-97" href="#ln-97"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">)</span>
+<a id="ln-98" name="ln-98" href="#ln-98"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">)</span>
+<a id="ln-99" name="ln-99" href="#ln-99"></a>
+<a id="ln-100" name="ln-100" href="#ln-100"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val</span><span class="p">(</span><span class="n">nnz</span><span class="p">))</span>
+<a id="ln-101" name="ln-101" href="#ln-101"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span>
+<a id="ln-102" name="ln-102" href="#ln-102"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">nnz</span><span class="p">))</span>
+<a id="ln-103" name="ln-103" href="#ln-103"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="p">))</span>
+<a id="ln-104" name="ln-104" href="#ln-104"></a>
+<a id="ln-105" name="ln-105" href="#ln-105"></a><span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mat_ptr</span>
+<a id="ln-106" name="ln-106" href="#ln-106"></a><span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mat_ind</span>
+<a id="ln-107" name="ln-107" href="#ln-107"></a><span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mat_val</span>
+<a id="ln-108" name="ln-108" href="#ln-108"></a>
+<a id="ln-109" name="ln-109" href="#ln-109"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">work_row</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="p">))</span>
+<a id="ln-110" name="ln-110" href="#ln-110"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">work_pos</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="p">))</span>
+<a id="ln-111" name="ln-111" href="#ln-111"></a><span class="w">        </span><span class="n">work_row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<a id="ln-112" name="ln-112" href="#ln-112"></a><span class="w">        </span><span class="n">work_pos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<a id="ln-113" name="ln-113" href="#ln-113"></a>
+<a id="ln-114" name="ln-114" href="#ln-114"></a><span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span>
+<a id="ln-115" name="ln-115" href="#ln-115"></a><span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span>
+<a id="ln-116" name="ln-116" href="#ln-116"></a><span class="w">            </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<a id="ln-117" name="ln-117" href="#ln-117"></a><span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-118" name="ln-118" href="#ln-118"></a><span class="k">                    </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span>
+<a id="ln-119" name="ln-119" href="#ln-119"></a><span class="w">                    </span><span class="k">exit</span>
+<a id="ln-120" name="ln-120" href="#ln-120"></a><span class="k">                end if</span>
+<a id="ln-121" name="ln-121" href="#ln-121"></a><span class="k">            end do</span>
+<a id="ln-122" name="ln-122" href="#ln-122"></a><span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-123" name="ln-123" href="#ln-123"></a><span class="k">                </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SOLVER_STATUS_DECOMPOSITION_FAILURE</span>
+<a id="ln-124" name="ln-124" href="#ln-124"></a><span class="w">                </span><span class="k">return</span>
+<a id="ln-125" name="ln-125" href="#ln-125"></a><span class="k">            end if</span>
+<a id="ln-126" name="ln-126" href="#ln-126"></a><span class="k">        end do</span>
+<a id="ln-127" name="ln-127" href="#ln-127"></a>
+<a id="ln-128" name="ln-128" href="#ln-128"></a><span class="k">        do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span>
+<a id="ln-129" name="ln-129" href="#ln-129"></a><span class="w">            </span><span class="c">! 1. Scatter</span>
+<a id="ln-130" name="ln-130" href="#ln-130"></a><span class="w">            </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<a id="ln-131" name="ln-131" href="#ln-131"></a><span class="w">                </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+<a id="ln-132" name="ln-132" href="#ln-132"></a><span class="w">                </span><span class="n">work_row</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">val</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+<a id="ln-133" name="ln-133" href="#ln-133"></a><span class="w">                </span><span class="n">work_pos</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span>
+<a id="ln-134" name="ln-134" href="#ln-134"></a><span class="w">            </span><span class="k">end do</span>
+<a id="ln-135" name="ln-135" href="#ln-135"></a>
+<a id="ln-136" name="ln-136" href="#ln-136"></a><span class="w">            </span><span class="c">! 2. Eliminate</span>
+<a id="ln-137" name="ln-137" href="#ln-137"></a><span class="w">            </span><span class="n">j_stop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<a id="ln-138" name="ln-138" href="#ln-138"></a><span class="w">            </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">j_stop</span>
+<a id="ln-139" name="ln-139" href="#ln-139"></a><span class="w">                </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+<a id="ln-140" name="ln-140" href="#ln-140"></a><span class="w">                </span><span class="n">multiplier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">work_row</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">val</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
+<a id="ln-141" name="ln-141" href="#ln-141"></a><span class="w">                </span><span class="n">work_row</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">multiplier</span>
+<a id="ln-142" name="ln-142" href="#ln-142"></a><span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">val</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">multiplier</span>
+<a id="ln-143" name="ln-143" href="#ln-143"></a>
+<a id="ln-144" name="ln-144" href="#ln-144"></a><span class="w">                </span><span class="k">do </span><span class="n">jj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">col</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<a id="ln-145" name="ln-145" href="#ln-145"></a><span class="w">                    </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">jj</span><span class="p">)</span>
+<a id="ln-146" name="ln-146" href="#ln-146"></a><span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">work_pos</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-147" name="ln-147" href="#ln-147"></a><span class="k">                        </span><span class="n">work_row</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">work_row</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">multiplier</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">val</span><span class="p">(</span><span class="n">jj</span><span class="p">)</span>
+<a id="ln-148" name="ln-148" href="#ln-148"></a><span class="w">                    </span><span class="k">end if</span>
+<a id="ln-149" name="ln-149" href="#ln-149"></a><span class="k">                end do</span>
+<a id="ln-150" name="ln-150" href="#ln-150"></a><span class="k">            end do</span>
+<a id="ln-151" name="ln-151" href="#ln-151"></a>
+<a id="ln-152" name="ln-152" href="#ln-152"></a><span class="w">            </span><span class="c">! 3. Gather</span>
+<a id="ln-153" name="ln-153" href="#ln-153"></a><span class="w">            </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<a id="ln-154" name="ln-154" href="#ln-154"></a><span class="w">                </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+<a id="ln-155" name="ln-155" href="#ln-155"></a><span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">val</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">work_row</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+<a id="ln-156" name="ln-156" href="#ln-156"></a><span class="w">                </span><span class="n">work_row</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<a id="ln-157" name="ln-157" href="#ln-157"></a><span class="w">                </span><span class="n">work_pos</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<a id="ln-158" name="ln-158" href="#ln-158"></a><span class="w">            </span><span class="k">end do</span>
+<a id="ln-159" name="ln-159" href="#ln-159"></a><span class="k">        end do</span>
+<a id="ln-160" name="ln-160" href="#ln-160"></a>
+<a id="ln-161" name="ln-161" href="#ln-161"></a><span class="k">        </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SOLVER_STATUS_SUCCESS</span>
+<a id="ln-162" name="ln-162" href="#ln-162"></a><span class="w">    </span><span class="k">end subroutine </span><span class="n">setup_csr_ilu0</span>
+<a id="ln-163" name="ln-163" href="#ln-163"></a>
+<a id="ln-164" name="ln-164" href="#ln-164"></a><span class="w">    </span><span class="c">!&gt; BSR行列に対するブロック ILU(0) 分解を実行する</span>
+<a id="ln-165" name="ln-165" href="#ln-165"></a><span class="w">    </span><span class="k">module subroutine </span><span class="n">setup_bsr_ilu0</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="p">)</span>
+<a id="ln-166" name="ln-166" href="#ln-166"></a><span class="w">        </span><span class="k">implicit none</span>
+<a id="ln-167" name="ln-167" href="#ln-167"></a><span class="k">        class</span><span class="p">(</span><span class="n">type_preconditioner_iluk</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<a id="ln-168" name="ln-168" href="#ln-168"></a><span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">type_matrix_bsr</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">A</span>
+<a id="ln-169" name="ln-169" href="#ln-169"></a>
+<a id="ln-170" name="ln-170" href="#ln-170"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:),</span><span class="w"> </span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">mat_ptr</span><span class="p">,</span><span class="w"> </span><span class="n">mat_ind</span>
+<a id="ln-171" name="ln-171" href="#ln-171"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="p">:),</span><span class="w"> </span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">mat_val</span>
+<a id="ln-172" name="ln-172" href="#ln-172"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">jj</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="n">col</span><span class="p">,</span><span class="w"> </span><span class="n">nnz</span><span class="p">,</span><span class="w"> </span><span class="n">target_idx</span>
+<a id="ln-173" name="ln-173" href="#ln-173"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">bs</span>
+<a id="ln-174" name="ln-174" href="#ln-174"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">info_lapack</span>
+<a id="ln-175" name="ln-175" href="#ln-175"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">work_pos</span><span class="p">(:)</span>
+<a id="ln-176" name="ln-176" href="#ln-176"></a>
+<a id="ln-177" name="ln-177" href="#ln-177"></a><span class="w">        </span><span class="n">bs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">block_size</span>
+<a id="ln-178" name="ln-178" href="#ln-178"></a><span class="w">        </span><span class="n">mat_ptr</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">A</span><span class="p">%</span><span class="n">get_ptr</span><span class="p">()</span>
+<a id="ln-179" name="ln-179" href="#ln-179"></a><span class="w">        </span><span class="n">mat_ind</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">A</span><span class="p">%</span><span class="n">get_ind</span><span class="p">()</span>
+<a id="ln-180" name="ln-180" href="#ln-180"></a><span class="w">        </span><span class="n">mat_val</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">A</span><span class="p">%</span><span class="n">get_val</span><span class="p">()</span>
+<a id="ln-181" name="ln-181" href="#ln-181"></a>
+<a id="ln-182" name="ln-182" href="#ln-182"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">mat_val</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-183" name="ln-183" href="#ln-183"></a><span class="k">            </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span>
+<a id="ln-184" name="ln-184" href="#ln-184"></a><span class="w">            </span><span class="k">return</span>
+<a id="ln-185" name="ln-185" href="#ln-185"></a><span class="k">        end if</span>
+<a id="ln-186" name="ln-186" href="#ln-186"></a><span class="k">        </span><span class="n">nnz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">mat_val</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span>
+<a id="ln-187" name="ln-187" href="#ln-187"></a>
+<a id="ln-188" name="ln-188" href="#ln-188"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">)</span>
+<a id="ln-189" name="ln-189" href="#ln-189"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">)</span>
+<a id="ln-190" name="ln-190" href="#ln-190"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">)</span>
+<a id="ln-191" name="ln-191" href="#ln-191"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">)</span>
+<a id="ln-192" name="ln-192" href="#ln-192"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_pivots</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_pivots</span><span class="p">)</span>
+<a id="ln-193" name="ln-193" href="#ln-193"></a>
+<a id="ln-194" name="ln-194" href="#ln-194"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(</span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">nnz</span><span class="p">))</span>
+<a id="ln-195" name="ln-195" href="#ln-195"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span>
+<a id="ln-196" name="ln-196" href="#ln-196"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">nnz</span><span class="p">))</span>
+<a id="ln-197" name="ln-197" href="#ln-197"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="p">))</span>
+<a id="ln-198" name="ln-198" href="#ln-198"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_pivots</span><span class="p">(</span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="p">))</span>
+<a id="ln-199" name="ln-199" href="#ln-199"></a>
+<a id="ln-200" name="ln-200" href="#ln-200"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">work_pos</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="p">))</span>
+<a id="ln-201" name="ln-201" href="#ln-201"></a><span class="w">        </span><span class="n">work_pos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<a id="ln-202" name="ln-202" href="#ln-202"></a>
+<a id="ln-203" name="ln-203" href="#ln-203"></a><span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mat_ptr</span>
+<a id="ln-204" name="ln-204" href="#ln-204"></a><span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mat_ind</span>
+<a id="ln-205" name="ln-205" href="#ln-205"></a><span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mat_val</span>
+<a id="ln-206" name="ln-206" href="#ln-206"></a>
+<a id="ln-207" name="ln-207" href="#ln-207"></a><span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span>
+<a id="ln-208" name="ln-208" href="#ln-208"></a><span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span>
+<a id="ln-209" name="ln-209" href="#ln-209"></a><span class="w">            </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<a id="ln-210" name="ln-210" href="#ln-210"></a><span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-211" name="ln-211" href="#ln-211"></a><span class="k">                    </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span>
+<a id="ln-212" name="ln-212" href="#ln-212"></a><span class="w">                    </span><span class="k">exit</span>
+<a id="ln-213" name="ln-213" href="#ln-213"></a><span class="k">                end if</span>
+<a id="ln-214" name="ln-214" href="#ln-214"></a><span class="k">            end do</span>
+<a id="ln-215" name="ln-215" href="#ln-215"></a><span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-216" name="ln-216" href="#ln-216"></a><span class="k">                </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SOLVER_STATUS_DECOMPOSITION_FAILURE</span>
+<a id="ln-217" name="ln-217" href="#ln-217"></a><span class="w">                </span><span class="k">return</span>
+<a id="ln-218" name="ln-218" href="#ln-218"></a><span class="k">            end if</span>
+<a id="ln-219" name="ln-219" href="#ln-219"></a><span class="k">        end do</span>
+<a id="ln-220" name="ln-220" href="#ln-220"></a>
+<a id="ln-221" name="ln-221" href="#ln-221"></a><span class="k">        do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span>
+<a id="ln-222" name="ln-222" href="#ln-222"></a><span class="w">            </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<a id="ln-223" name="ln-223" href="#ln-223"></a><span class="w">                </span><span class="n">work_pos</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">k</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span>
+<a id="ln-224" name="ln-224" href="#ln-224"></a><span class="w">            </span><span class="k">end do</span>
+<a id="ln-225" name="ln-225" href="#ln-225"></a>
+<a id="ln-226" name="ln-226" href="#ln-226"></a><span class="k">            do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<a id="ln-227" name="ln-227" href="#ln-227"></a><span class="w">                </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+<a id="ln-228" name="ln-228" href="#ln-228"></a><span class="w">                </span><span class="k">call </span><span class="n">dtrsm</span><span class="p">(</span><span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;U&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="ln-229" name="ln-229" href="#ln-229"></a><span class="w">                           </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">col</span><span class="p">)),</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="ln-230" name="ln-230" href="#ln-230"></a><span class="w">                           </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="n">k</span><span class="p">),</span><span class="w"> </span><span class="n">bs</span><span class="p">)</span>
+<a id="ln-231" name="ln-231" href="#ln-231"></a>
+<a id="ln-232" name="ln-232" href="#ln-232"></a><span class="w">                </span><span class="k">do </span><span class="n">jj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">col</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<a id="ln-233" name="ln-233" href="#ln-233"></a><span class="w">                    </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">jj</span><span class="p">)</span>
+<a id="ln-234" name="ln-234" href="#ln-234"></a><span class="w">                    </span><span class="n">target_idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">work_pos</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+<a id="ln-235" name="ln-235" href="#ln-235"></a><span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">target_idx</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-236" name="ln-236" href="#ln-236"></a><span class="k">                        call </span><span class="n">dgemm</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="ln-237" name="ln-237" href="#ln-237"></a><span class="w">                                   </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="n">k</span><span class="p">),</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="ln-238" name="ln-238" href="#ln-238"></a><span class="w">                                   </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="n">jj</span><span class="p">),</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="ln-239" name="ln-239" href="#ln-239"></a><span class="w">                                   </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="n">target_idx</span><span class="p">),</span><span class="w"> </span><span class="n">bs</span><span class="p">)</span>
+<a id="ln-240" name="ln-240" href="#ln-240"></a><span class="w">                    </span><span class="k">end if</span>
+<a id="ln-241" name="ln-241" href="#ln-241"></a><span class="k">                end do</span>
+<a id="ln-242" name="ln-242" href="#ln-242"></a><span class="k">            end do</span>
+<a id="ln-243" name="ln-243" href="#ln-243"></a>
+<a id="ln-244" name="ln-244" href="#ln-244"></a><span class="k">            call </span><span class="n">dgetrf</span><span class="p">(</span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)),</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="ln-245" name="ln-245" href="#ln-245"></a><span class="w">                        </span><span class="n">self</span><span class="p">%</span><span class="n">diag_pivots</span><span class="p">(:,</span><span class="w"> </span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">info_lapack</span><span class="p">)</span>
+<a id="ln-246" name="ln-246" href="#ln-246"></a>
+<a id="ln-247" name="ln-247" href="#ln-247"></a><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">info_lapack</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-248" name="ln-248" href="#ln-248"></a><span class="k">                </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SOLVER_STATUS_DECOMPOSITION_FAILURE</span>
+<a id="ln-249" name="ln-249" href="#ln-249"></a><span class="w">                </span><span class="k">return</span>
+<a id="ln-250" name="ln-250" href="#ln-250"></a><span class="k">            end if</span>
+<a id="ln-251" name="ln-251" href="#ln-251"></a>
+<a id="ln-252" name="ln-252" href="#ln-252"></a><span class="k">            do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<a id="ln-253" name="ln-253" href="#ln-253"></a><span class="w">                </span><span class="n">work_pos</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">k</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<a id="ln-254" name="ln-254" href="#ln-254"></a><span class="w">            </span><span class="k">end do</span>
+<a id="ln-255" name="ln-255" href="#ln-255"></a><span class="k">        end do</span>
+<a id="ln-256" name="ln-256" href="#ln-256"></a>
+<a id="ln-257" name="ln-257" href="#ln-257"></a><span class="k">        </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SOLVER_STATUS_SUCCESS</span>
+<a id="ln-258" name="ln-258" href="#ln-258"></a><span class="w">    </span><span class="k">end subroutine </span><span class="n">setup_bsr_ilu0</span>
+<a id="ln-259" name="ln-259" href="#ln-259"></a>
+<a id="ln-260" name="ln-260" href="#ln-260"></a><span class="w">    </span><span class="c">!&gt; 前処理の適用</span>
+<a id="ln-261" name="ln-261" href="#ln-261"></a><span class="w">    </span><span class="k">module subroutine </span><span class="n">apply_preconditioner_iluk</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<a id="ln-262" name="ln-262" href="#ln-262"></a><span class="w">        </span><span class="k">implicit none</span>
+<a id="ln-263" name="ln-263" href="#ln-263"></a><span class="k">        class</span><span class="p">(</span><span class="n">type_preconditioner_iluk</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<a id="ln-264" name="ln-264" href="#ln-264"></a><span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_vector_dp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">r</span>
+<a id="ln-265" name="ln-265" href="#ln-265"></a><span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_vector_dp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">z</span>
+<a id="ln-266" name="ln-266" href="#ln-266"></a>
+<a id="ln-267" name="ln-267" href="#ln-267"></a><span class="w">        </span><span class="c">! 安全装置：セットアップ未完了時は恒等写像を返す</span>
+<a id="ln-268" name="ln-268" href="#ln-268"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-269" name="ln-269" href="#ln-269"></a><span class="k">            write</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;Warning: ILU preconditioner not initialized/setup. Applying Identity.&quot;</span>
+<a id="ln-270" name="ln-270" href="#ln-270"></a><span class="w">            </span><span class="k">call </span><span class="n">z</span><span class="p">%</span><span class="n">copy</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<a id="ln-271" name="ln-271" href="#ln-271"></a><span class="w">            </span><span class="k">return</span>
+<a id="ln-272" name="ln-272" href="#ln-272"></a><span class="k">        end if</span>
+<a id="ln-273" name="ln-273" href="#ln-273"></a>
+<a id="ln-274" name="ln-274" href="#ln-274"></a><span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">is_block</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-275" name="ln-275" href="#ln-275"></a><span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">apply_bsr_ilu0</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<a id="ln-276" name="ln-276" href="#ln-276"></a><span class="w">        </span><span class="k">else</span>
+<a id="ln-277" name="ln-277" href="#ln-277"></a><span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">apply_csr_ilu0</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<a id="ln-278" name="ln-278" href="#ln-278"></a><span class="w">        </span><span class="k">end if</span>
+<a id="ln-279" name="ln-279" href="#ln-279"></a><span class="k">    end subroutine </span><span class="n">apply_preconditioner_iluk</span>
+<a id="ln-280" name="ln-280" href="#ln-280"></a>
+<a id="ln-281" name="ln-281" href="#ln-281"></a><span class="w">    </span><span class="c">!&gt; スカラ ILU(0) 適用 (CSR)</span>
+<a id="ln-282" name="ln-282" href="#ln-282"></a><span class="w">    </span><span class="k">module subroutine </span><span class="n">apply_csr_ilu0</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<a id="ln-283" name="ln-283" href="#ln-283"></a><span class="w">        </span><span class="k">implicit none</span>
+<a id="ln-284" name="ln-284" href="#ln-284"></a><span class="k">        class</span><span class="p">(</span><span class="n">type_preconditioner_iluk</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<a id="ln-285" name="ln-285" href="#ln-285"></a><span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_vector_dp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">r</span>
+<a id="ln-286" name="ln-286" href="#ln-286"></a><span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_vector_dp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">z</span>
+<a id="ln-287" name="ln-287" href="#ln-287"></a>
+<a id="ln-288" name="ln-288" href="#ln-288"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:),</span><span class="w"> </span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">x</span>
+<a id="ln-289" name="ln-289" href="#ln-289"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">col</span>
+<a id="ln-290" name="ln-290" href="#ln-290"></a>
+<a id="ln-291" name="ln-291" href="#ln-291"></a><span class="w">        </span><span class="k">call </span><span class="n">z</span><span class="p">%</span><span class="n">copy</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<a id="ln-292" name="ln-292" href="#ln-292"></a><span class="w">        </span><span class="n">x</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">z</span><span class="p">%</span><span class="n">get_data</span><span class="p">()</span>
+<a id="ln-293" name="ln-293" href="#ln-293"></a>
+<a id="ln-294" name="ln-294" href="#ln-294"></a><span class="w">        </span><span class="c">! --- サイズチェックの追加 ---</span>
+<a id="ln-295" name="ln-295" href="#ln-295"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-296" name="ln-296" href="#ln-296"></a><span class="k">            write</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(A, I0, A, I0)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;Error in apply_csr_ilu0: Vector size (&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="ln-297" name="ln-297" href="#ln-297"></a><span class="w">                </span><span class="s2">&quot;) does not match Preconditioner Matrix size (&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;)&quot;</span>
+<a id="ln-298" name="ln-298" href="#ln-298"></a><span class="w">            </span><span class="c">! ここで処理を中断しないと、次のループでメモリ破壊や変な数値計算エラーが起きる</span>
+<a id="ln-299" name="ln-299" href="#ln-299"></a><span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span>
+<a id="ln-300" name="ln-300" href="#ln-300"></a><span class="w">            </span><span class="k">return</span>
+<a id="ln-301" name="ln-301" href="#ln-301"></a><span class="k">        end if</span>
+<a id="ln-302" name="ln-302" href="#ln-302"></a><span class="w">        </span><span class="c">! -------------------------</span>
+<a id="ln-303" name="ln-303" href="#ln-303"></a>
+<a id="ln-304" name="ln-304" href="#ln-304"></a><span class="w">        </span><span class="c">! 前進代入 Lz = r</span>
+<a id="ln-305" name="ln-305" href="#ln-305"></a><span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span>
+<a id="ln-306" name="ln-306" href="#ln-306"></a><span class="w">            </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<a id="ln-307" name="ln-307" href="#ln-307"></a><span class="w">                </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+<a id="ln-308" name="ln-308" href="#ln-308"></a><span class="w">                </span><span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">val</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+<a id="ln-309" name="ln-309" href="#ln-309"></a><span class="w">            </span><span class="k">end do</span>
+<a id="ln-310" name="ln-310" href="#ln-310"></a><span class="k">        end do</span>
+<a id="ln-311" name="ln-311" href="#ln-311"></a>
+<a id="ln-312" name="ln-312" href="#ln-312"></a><span class="w">        </span><span class="c">! 後退代入 Uz = z</span>
+<a id="ln-313" name="ln-313" href="#ln-313"></a><span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span>
+<a id="ln-314" name="ln-314" href="#ln-314"></a><span class="w">            </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<a id="ln-315" name="ln-315" href="#ln-315"></a><span class="w">                </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+<a id="ln-316" name="ln-316" href="#ln-316"></a><span class="w">                </span><span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">val</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+<a id="ln-317" name="ln-317" href="#ln-317"></a><span class="w">            </span><span class="k">end do</span>
+<a id="ln-318" name="ln-318" href="#ln-318"></a><span class="k">            </span><span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">val</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<a id="ln-319" name="ln-319" href="#ln-319"></a><span class="w">        </span><span class="k">end do</span>
+<a id="ln-320" name="ln-320" href="#ln-320"></a><span class="k">    end subroutine </span><span class="n">apply_csr_ilu0</span>
+<a id="ln-321" name="ln-321" href="#ln-321"></a>
+<a id="ln-322" name="ln-322" href="#ln-322"></a><span class="w">    </span><span class="c">!&gt; ブロック ILU(0) 適用 (BSR)</span>
+<a id="ln-323" name="ln-323" href="#ln-323"></a><span class="w">    </span><span class="k">module subroutine </span><span class="n">apply_bsr_ilu0</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<a id="ln-324" name="ln-324" href="#ln-324"></a><span class="w">        </span><span class="k">implicit none</span>
+<a id="ln-325" name="ln-325" href="#ln-325"></a><span class="k">        class</span><span class="p">(</span><span class="n">type_preconditioner_iluk</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<a id="ln-326" name="ln-326" href="#ln-326"></a><span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_vector_dp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">r</span>
+<a id="ln-327" name="ln-327" href="#ln-327"></a><span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_vector_dp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">z</span>
+<a id="ln-328" name="ln-328" href="#ln-328"></a>
+<a id="ln-329" name="ln-329" href="#ln-329"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:),</span><span class="w"> </span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">x</span>
+<a id="ln-330" name="ln-330" href="#ln-330"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">col</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">idx_i</span><span class="p">,</span><span class="w"> </span><span class="n">idx_c</span><span class="p">,</span><span class="w"> </span><span class="n">ierr</span>
+<a id="ln-331" name="ln-331" href="#ln-331"></a>
+<a id="ln-332" name="ln-332" href="#ln-332"></a><span class="w">        </span><span class="n">bs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">block_size</span>
+<a id="ln-333" name="ln-333" href="#ln-333"></a><span class="w">        </span><span class="k">call </span><span class="n">z</span><span class="p">%</span><span class="n">copy</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<a id="ln-334" name="ln-334" href="#ln-334"></a><span class="w">        </span><span class="n">x</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">z</span><span class="p">%</span><span class="n">get_data</span><span class="p">()</span>
+<a id="ln-335" name="ln-335" href="#ln-335"></a>
+<a id="ln-336" name="ln-336" href="#ln-336"></a><span class="w">        </span><span class="c">! --- サイズチェックの追加 ---</span>
+<a id="ln-337" name="ln-337" href="#ln-337"></a><span class="w">        </span><span class="c">! ブロック行列の場合、ベクトルサイズは num_rows * block_size のはず</span>
+<a id="ln-338" name="ln-338" href="#ln-338"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">bs</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-339" name="ln-339" href="#ln-339"></a><span class="k">            write</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(A, I0, A, I0)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;Error in apply_bsr_ilu0: Vector size (&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="ln-340" name="ln-340" href="#ln-340"></a><span class="w">                </span><span class="s2">&quot;) does not match Preconditioner Matrix size (&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;)&quot;</span>
+<a id="ln-341" name="ln-341" href="#ln-341"></a><span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span>
+<a id="ln-342" name="ln-342" href="#ln-342"></a><span class="w">            </span><span class="k">return</span>
+<a id="ln-343" name="ln-343" href="#ln-343"></a><span class="k">        end if</span>
+<a id="ln-344" name="ln-344" href="#ln-344"></a><span class="w">        </span><span class="c">! -------------------------</span>
+<a id="ln-345" name="ln-345" href="#ln-345"></a>
+<a id="ln-346" name="ln-346" href="#ln-346"></a><span class="w">        </span><span class="c">! 前進代入</span>
+<a id="ln-347" name="ln-347" href="#ln-347"></a><span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span>
+<a id="ln-348" name="ln-348" href="#ln-348"></a><span class="w">            </span><span class="n">idx_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">bs</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+<a id="ln-349" name="ln-349" href="#ln-349"></a><span class="w">            </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<a id="ln-350" name="ln-350" href="#ln-350"></a><span class="w">                </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+<a id="ln-351" name="ln-351" href="#ln-351"></a><span class="w">                </span><span class="n">idx_c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">col</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">bs</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+<a id="ln-352" name="ln-352" href="#ln-352"></a><span class="w">                </span><span class="k">call </span><span class="n">dgemv</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="ln-353" name="ln-353" href="#ln-353"></a><span class="w">                           </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="n">k</span><span class="p">),</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="ln-354" name="ln-354" href="#ln-354"></a><span class="w">                           </span><span class="n">x</span><span class="p">(</span><span class="n">idx_c</span><span class="p">),</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="ln-355" name="ln-355" href="#ln-355"></a><span class="w">                           </span><span class="n">x</span><span class="p">(</span><span class="n">idx_i</span><span class="p">),</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<a id="ln-356" name="ln-356" href="#ln-356"></a><span class="w">            </span><span class="k">end do</span>
+<a id="ln-357" name="ln-357" href="#ln-357"></a><span class="k">        end do</span>
+<a id="ln-358" name="ln-358" href="#ln-358"></a>
+<a id="ln-359" name="ln-359" href="#ln-359"></a><span class="w">        </span><span class="c">! 後退代入</span>
+<a id="ln-360" name="ln-360" href="#ln-360"></a><span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span>
+<a id="ln-361" name="ln-361" href="#ln-361"></a><span class="w">            </span><span class="n">idx_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">bs</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+<a id="ln-362" name="ln-362" href="#ln-362"></a><span class="w">            </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<a id="ln-363" name="ln-363" href="#ln-363"></a><span class="w">                </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+<a id="ln-364" name="ln-364" href="#ln-364"></a><span class="w">                </span><span class="n">idx_c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">col</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">bs</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+<a id="ln-365" name="ln-365" href="#ln-365"></a><span class="w">                </span><span class="k">call </span><span class="n">dgemv</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="ln-366" name="ln-366" href="#ln-366"></a><span class="w">                           </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="n">k</span><span class="p">),</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="ln-367" name="ln-367" href="#ln-367"></a><span class="w">                           </span><span class="n">x</span><span class="p">(</span><span class="n">idx_c</span><span class="p">),</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="ln-368" name="ln-368" href="#ln-368"></a><span class="w">                           </span><span class="n">x</span><span class="p">(</span><span class="n">idx_i</span><span class="p">),</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<a id="ln-369" name="ln-369" href="#ln-369"></a><span class="w">            </span><span class="k">end do</span>
+<a id="ln-370" name="ln-370" href="#ln-370"></a><span class="k">            call </span><span class="n">dgetrs</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="ln-371" name="ln-371" href="#ln-371"></a><span class="w">                        </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)),</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="ln-372" name="ln-372" href="#ln-372"></a><span class="w">                        </span><span class="n">self</span><span class="p">%</span><span class="n">diag_pivots</span><span class="p">(:,</span><span class="w"> </span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="ln-373" name="ln-373" href="#ln-373"></a><span class="w">                        </span><span class="n">x</span><span class="p">(</span><span class="n">idx_i</span><span class="p">),</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">ierr</span><span class="p">)</span>
+<a id="ln-374" name="ln-374" href="#ln-374"></a><span class="w">        </span><span class="k">end do</span>
+<a id="ln-375" name="ln-375" href="#ln-375"></a><span class="k">    end subroutine </span><span class="n">apply_bsr_ilu0</span>
+<a id="ln-376" name="ln-376" href="#ln-376"></a>
+<a id="ln-377" name="ln-377" href="#ln-377"></a><span class="w">    </span><span class="c">!&gt; デストラクタ</span>
+<a id="ln-378" name="ln-378" href="#ln-378"></a><span class="w">    </span><span class="k">module subroutine </span><span class="n">destroy_preconditioner_iluk</span><span class="p">(</span><span class="n">self</span><span class="p">)</span>
+<a id="ln-379" name="ln-379" href="#ln-379"></a><span class="w">        </span><span class="k">implicit none</span>
+<a id="ln-380" name="ln-380" href="#ln-380"></a><span class="k">        class</span><span class="p">(</span><span class="n">type_preconditioner_iluk</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<a id="ln-381" name="ln-381" href="#ln-381"></a>
+<a id="ln-382" name="ln-382" href="#ln-382"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val</span><span class="p">)</span>
+<a id="ln-383" name="ln-383" href="#ln-383"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">)</span>
+<a id="ln-384" name="ln-384" href="#ln-384"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">)</span>
+<a id="ln-385" name="ln-385" href="#ln-385"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">)</span>
+<a id="ln-386" name="ln-386" href="#ln-386"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">)</span>
+<a id="ln-387" name="ln-387" href="#ln-387"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_pivots</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_pivots</span><span class="p">)</span>
+<a id="ln-388" name="ln-388" href="#ln-388"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">name</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">name</span><span class="p">)</span>
+<a id="ln-389" name="ln-389" href="#ln-389"></a>
+<a id="ln-390" name="ln-390" href="#ln-390"></a><span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span>
+<a id="ln-391" name="ln-391" href="#ln-391"></a><span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span>
+<a id="ln-392" name="ln-392" href="#ln-392"></a><span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">is_block</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<a id="ln-393" name="ln-393" href="#ln-393"></a>
+<a id="ln-394" name="ln-394" href="#ln-394"></a><span class="w">    </span><span class="k">end subroutine </span><span class="n">destroy_preconditioner_iluk</span>
+<a id="ln-395" name="ln-395" href="#ln-395"></a>
+<a id="ln-396" name="ln-396" href="#ln-396"></a><span class="k">end submodule </span><span class="n">solver_preconditioner_iluk</span>
+</pre></div>
+
+      </section>
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

@@ -1,150 +1,178 @@
 module main_hydraulic
-    use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: stdlib_logger
-    use :: stdlib_strings
-    use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_state, type_crs
-    use :: module_domain, only:type_domain
-    use :: module_properties, only:type_properties_manager
-    use :: module_input, only:type_input
-    use :: module_calculate, only:gemv, add
-    use :: module_boundary, only:type_bc, mode_value, mode_nr
-    use :: module_solver
+    use, intrinsic :: iso_fortran_env
+    use :: module_core
     use :: module_control, only:type_controls
-    use :: hydraulic_hydraulic_assemble
+    use :: module_input, only:type_input
+    use :: module_physics, g => gravity_acceleration
+    use :: module_linalg
+    use :: main_base, only:type_assemble_workspace
     implicit none
     private
 
-    public :: abst_hydraulic
-    public :: type_hydraulic_crs
+    public :: type_hydraulic
 
-    type, abstract :: abst_hydraulic
-        type(type_dp_3d) :: water_flux
-
-        type(type_crs) :: KH_star
-        real(real64), allocatable :: FH(:)
-        real(real64), allocatable :: PHIH(:)
-
-        !! Nonlinear solver
-        character(:), allocatable :: algorithm
-
-        !! Solver
-        class(abst_solver), allocatable :: solver
-        integer(int32) :: order
-
-        procedure(abst_assemble_global_hydraulic), nopass, pointer :: assemble_global => null()
+    type :: type_hydraulic
+        private
+        integer(int32) :: computation_type
+        integer(int32) :: computation_dimension
+        type(type_physics_manager) :: physics
     contains
-        procedure(abst_hydraulic_update), pass(self), deferred :: update
-        procedure(abst_shift), pass(self), deferred :: shift
-        procedure(abst_solve), pass(self), deferred :: solve
-        procedure(abst_compute), pass(self), deferred :: compute
-    end type abst_hydraulic
+        procedure, pass(self), public :: initialize => initialize_type_hydraulic
+        procedure, pass(self), public :: destroy => destroy_type_hydraulic
 
-    type, extends(abst_hydraulic) :: type_hydraulic_crs
-    contains
-        procedure :: update => update_type_hydraulic_crs
-        procedure :: shift => shift_type_hydraulic_crs
-        procedure :: solve => solve_type_hydraulic_crs
-        procedure :: compute => compute_type_hydraulic_crs
-    end type type_hydraulic_crs
+        ! --- Assembly Procedures ---
+        procedure, pass(self), public :: assemble_local => assemble_local_hydraulic
+        procedure, pass(self), private :: assemble_local_newton => assemble_local_newton_hydraulic
+        procedure, pass(self), private :: assemble_local_picard => assemble_local_picard_hydraulic
 
-    abstract interface
-        subroutine abst_hydraulic_update(self, domain, property, pressure, porosity)
-            import :: abst_hydraulic, type_domain, type_properties_manager, real64
-            implicit none
-            class(abst_hydraulic), intent(inout) :: self
-            type(type_domain), intent(inout), target :: domain
-            type(type_properties_manager), intent(inout) :: property
-            real(real64), intent(in) :: pressure(:)
-            real(real64), intent(in) :: porosity(:)
+        ! --- Coefficient Computation Procedures ---
+        procedure, pass(self), private :: compute_mass_term => compute_mass_term_hydraulic
+        procedure, pass(self), private :: compute_diffusion_term => compute_diffusion_term_hydraulic
+        procedure, pass(self), private :: compute_advective_term => compute_advective_term_hydraulic
+        procedure, pass(self), private :: compute_transient_term => compute_transient_term_hydraulic
 
-        end subroutine abst_hydraulic_update
+        ! --- Helper Procedures ---
+        procedure, pass(self), public :: calc_K_wT => calc_K_wT_hydraulic
+        procedure, pass(self), public :: calc_K_wP => calc_K_wP_hydraulic
+        procedure, pass(self), public :: calc_K_vT => calc_K_vT_hydraulic
+        procedure, pass(self), public :: calc_K_vP => calc_K_vP_hydraulic
 
-        subroutine abst_shift(self)
-            import :: abst_hydraulic
-            implicit none
-            class(abst_hydraulic), intent(inout) :: self
-
-        end subroutine abst_shift
-
-        subroutine abst_solve(self, pressure, controls)
-            import :: abst_hydraulic, type_controls, type_variable
-            implicit none
-            class(abst_hydraulic), intent(inout) :: self
-            type(type_controls), intent(inout) :: controls
-            type(type_variable), intent(inout) :: pressure
-
-        end subroutine abst_solve
-
-        subroutine abst_compute(self, domain, property, pressure, temperature, porosity, ice, controls, bc)
-            import :: abst_hydraulic, type_domain, type_properties_manager, type_variable, type_controls, type_bc
-            implicit none
-            class(abst_hydraulic), intent(inout) :: self
-            type(type_domain), intent(inout) :: domain
-            type(type_properties_manager), intent(in) :: property
-            type(type_variable), intent(inout) :: pressure
-            type(type_variable), intent(inout) :: temperature
-            type(type_variable), intent(inout) :: porosity
-            type(type_variable), intent(inout) :: ice
-            type(type_controls), intent(inout) :: controls
-            type(type_bc), intent(inout) :: bc
-
-        end subroutine abst_compute
-    end interface
+        procedure, pass(self), public :: update_water_phases => update_water_phases_hydraulic
+        procedure, pass(self), public :: calc_effective_density => calc_effective_density_hydraulic
+    end type type_hydraulic
 
     interface
-        module function construct_type_hydraulic_crs(input, coordinate, domain) result(structure)
+        module subroutine initialize_type_hydraulic(self, input, active_region_ids)
             implicit none
-            class(abst_hydraulic), allocatable :: structure
-            type(type_input), intent(inout) :: input
-            type(type_dp_3d), intent(inout), pointer :: coordinate
-            type(type_domain), intent(inout) :: domain
+            class(type_hydraulic), intent(inout) :: self
+            type(type_input), intent(in) :: input
+            integer(int32), intent(in) :: active_region_ids(:)
+        end subroutine initialize_type_hydraulic
 
-        end function construct_type_hydraulic_crs
-
-        module subroutine update_type_hydraulic_crs(self, domain, property, pressure, porosity)
+        module subroutine destroy_type_hydraulic(self)
             implicit none
-            class(type_hydraulic_crs), intent(inout) :: self
-            type(type_domain), intent(inout), target :: domain
-            type(type_properties_manager), intent(inout) :: property
-            real(real64), intent(in) :: pressure(:)
-            real(real64), intent(in) :: porosity(:)
+            class(type_hydraulic), intent(inout) :: self
+        end subroutine destroy_type_hydraulic
 
-        end subroutine update_type_hydraulic_crs
-
-        module subroutine shift_type_hydraulic_crs(self)
+        ! --- Assembly Interfaces ---
+        module subroutine assemble_local_hydraulic(self, controls, workspace, K_HH, K_HT, F_H)
             implicit none
-            class(type_hydraulic_crs), intent(inout) :: self
+            class(type_hydraulic), intent(in) :: self
+            type(type_controls), intent(in) :: controls
+            type(type_assemble_workspace), intent(inout) :: workspace
+            type(type_matrix_dense), intent(inout), optional :: K_HH
+            type(type_matrix_dense), intent(inout), optional :: K_HT
+            type(type_vector_dp), intent(inout), optional :: F_H
+        end subroutine assemble_local_hydraulic
 
-        end subroutine shift_type_hydraulic_crs
-
-        module subroutine solve_type_hydraulic_crs(self, pressure, controls)
+        module subroutine assemble_local_newton_hydraulic(self, controls, workspace, K_HH, K_HT, F_H)
             implicit none
-            class(type_hydraulic_crs), intent(inout) :: self
-            type(type_variable), intent(inout) :: pressure
-            type(type_controls), intent(inout) :: controls
+            class(type_hydraulic), intent(in) :: self
+            type(type_controls), intent(in) :: controls
+            type(type_assemble_workspace), intent(inout) :: workspace
+            type(type_matrix_dense), intent(inout), optional :: K_HH
+            type(type_matrix_dense), intent(inout), optional :: K_HT
+            type(type_vector_dp), intent(inout), optional :: F_H
+        end subroutine assemble_local_newton_hydraulic
 
-        end subroutine solve_type_hydraulic_crs
-
-        module subroutine compute_type_hydraulic_crs(self, domain, property, pressure, temperature, porosity, ice, controls, bc)
+        module subroutine assemble_local_picard_hydraulic(self, controls, workspace, K_HH, K_HT, F_H)
             implicit none
-            class(type_hydraulic_crs), intent(inout) :: self
-            type(type_domain), intent(inout) :: domain
-            type(type_properties_manager), intent(in) :: property
-            type(type_variable), intent(inout) :: pressure
-            type(type_variable), intent(inout) :: temperature
-            type(type_variable), intent(inout) :: porosity
-            type(type_variable), intent(inout) :: ice
-            type(type_controls), intent(inout) :: controls
-            type(type_bc), intent(inout) :: bc
+            class(type_hydraulic), intent(in) :: self
+            type(type_controls), intent(in) :: controls
+            type(type_assemble_workspace), intent(inout) :: workspace
+            type(type_matrix_dense), intent(inout), optional :: K_HH
+            type(type_matrix_dense), intent(inout), optional :: K_HT
+            type(type_vector_dp), intent(inout), optional :: F_H
+        end subroutine assemble_local_picard_hydraulic
 
-        end subroutine compute_type_hydraulic_crs
+        ! --- Physics Term Interfaces ---
+        module subroutine compute_mass_term_hydraulic(self, material_id, state, C_HH)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: C_HH
+        end subroutine compute_mass_term_hydraulic
 
-    end interface
+        module subroutine compute_diffusion_term_hydraulic(self, material_id, state, D_HH)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(inout) :: state
+            real(real64), intent(inout) :: D_HH(:, :)
+        end subroutine compute_diffusion_term_hydraulic
 
-    interface type_hydraulic_crs
-        module procedure :: construct_type_hydraulic_crs
+        module subroutine compute_advective_term_hydraulic(self, material_id, state, V_H)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(inout) :: state
+            real(real64), intent(inout) :: V_H(:)
+        end subroutine compute_advective_term_hydraulic
+
+        module subroutine compute_transient_term_hydraulic(self, material_id, state, bdf_coeffs, drho_dt)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(in) :: bdf_coeffs(:)
+            real(real64), intent(inout) :: drho_dt
+        end subroutine compute_transient_term_hydraulic
+
+        ! --- Helper Interfaces ---
+        module subroutine calc_K_wT_hydraulic(self, target_id, state, K_wT)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: target_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: K_wT
+        end subroutine calc_K_wT_hydraulic
+
+        module subroutine calc_K_wP_hydraulic(self, target_id, state, K_wP)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: target_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: K_wP
+        end subroutine calc_K_wP_hydraulic
+
+        module subroutine calc_K_vT_hydraulic(self, target_id, state, K_vT)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: target_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: K_vT
+        end subroutine calc_K_vT_hydraulic
+
+        module subroutine calc_K_vP_hydraulic(self, target_id, state, K_vP)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: target_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: K_vP
+        end subroutine calc_K_vP_hydraulic
+
+        module subroutine update_water_phases_hydraulic(self, material_id, state)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(inout) :: state
+        end subroutine update_water_phases_hydraulic
+
+        module subroutine calc_effective_density_hydraulic(self, material_id, state, bdf_coeffs, drho_dt)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(in) :: bdf_coeffs(:)
+            real(real64), intent(inout) :: drho_dt
+        end subroutine calc_effective_density_hydraulic
+
     end interface
 
 contains
-
+    module subroutine destroy_type_hydraulic(self)
+        implicit none
+        class(type_hydraulic), intent(inout) :: self
+    end subroutine destroy_type_hydraulic
 end module main_hydraulic

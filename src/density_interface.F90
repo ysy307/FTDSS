@@ -1,85 +1,126 @@
-module calculate_density
+module physics_materials_density
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: module_core, only:type_state
-    use :: module_input, only:type_input
+    use :: iapws, only:type_iapws97, type_iapws06
+    use :: module_core, only:type_state, type_physics_info
+    use :: physics_constants, only:TtoK => celsius_to_kelvin
+    use :: physics_materials_base, only:abst_material
     implicit none
     private
 
-    ! --- 公開する型定義 ---
     public :: holder_dens
     public :: abst_den
+    public :: type_den_1phase
+    public :: type_den_2phase
     public :: type_den_3phase
+    public :: type_den_4phase
 
-    ! --- ポリモーフィックなコンテナ ---
     type :: holder_dens
         class(abst_den), allocatable :: p
     contains
         procedure, pass(self) :: initialize => initialize_holder_dens
     end type holder_dens
 
-    ! --- 密度の抽象基底クラス (インターフェースの契約) ---
-    type, abstract :: abst_den
-        integer(int32) :: material_id
-        real(real64) :: material1 !! soil, rock, concrete
-        real(real64) :: material2 !! water
-        real(real64) :: material3 !! ice
-        real(real64) :: material4 !! gas
+    interface
+        module subroutine initialize_holder_dens(self, material_id, physics_info, water, ice)
+            implicit none
+            class(holder_dens), intent(inout) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_physics_info), intent(in) :: physics_info
+            type(type_iapws97), intent(in), target :: water
+            type(type_iapws06), intent(in), target :: ice
+
+        end subroutine initialize_holder_dens
+    end interface
+
+    type, extends(abst_material), abstract :: abst_den
     contains
-        procedure(abst_calc_den_gauss_point), pass(self), deferred :: calc
+        procedure(abst_calc_den_gp), pass(self), public, deferred :: calc
     end type abst_den
 
-    type, extends(abst_den) :: type_den_3phase
-    contains
-        procedure :: calc => calc_den_gauss_point_3phase
-    end type type_den_3phase
-
-    ! ----------------------------------------------------------------
-    ! 抽象基底クラスのインターフェース
-    ! ----------------------------------------------------------------
     abstract interface
-        pure elemental function abst_calc_den_gauss_point(self, state) result(density)
-            import :: abst_den, type_state, real64
+        subroutine abst_calc_den_gp(self, state, density)
+            import :: abst_den, type_state, type_iapws97, type_iapws06, real64
             implicit none
             class(abst_den), intent(in) :: self
             type(type_state), intent(in) :: state
-            real(real64) :: density
-
-        end function abst_calc_den_gauss_point
+            real(real64), intent(inout) :: density
+        end subroutine abst_calc_den_gp
     end interface
 
+    type, extends(abst_den) :: type_den_1phase
+    contains
+        procedure, pass(self) :: calc => calc_den_gp_1phase
+    end type type_den_1phase
+
     interface
-        module subroutine initialize_holder_dens(self, input, material_id)
+        module subroutine calc_den_gp_1phase(self, state, density)
             implicit none
-            class(holder_dens), intent(inout) :: self
-            type(type_input), intent(in) :: input
-            integer(int32), intent(in) :: material_id
+            class(type_den_1phase), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: density
+        end subroutine calc_den_gp_1phase
+    end interface
 
-        end subroutine initialize_holder_dens
+    type, extends(abst_den) :: type_den_2phase
+    contains
+        procedure, pass(self) :: calc => calc_den_gp_2phase
+    end type type_den_2phase
 
-        module function construct_den_3phase(input, material_id) result(property)
+    interface
+        module subroutine calc_den_gp_2phase(self, state, density)
             implicit none
-            class(abst_den), allocatable :: property
-            type(type_input), intent(in) :: input
-            integer(int32), intent(in) :: material_id
+            class(type_den_2phase), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: density
+        end subroutine calc_den_gp_2phase
+    end interface
 
-        end function construct_den_3phase
+    type, extends(abst_den) :: type_den_3phase
+    contains
+        procedure, pass(self) :: calc => calc_den_gp_3phase
+    end type type_den_3phase
 
-        module pure elemental function calc_den_gauss_point_3phase(self, state) result(density)
+    interface
+        module subroutine calc_den_gp_3phase(self, state, density)
             implicit none
             class(type_den_3phase), intent(in) :: self
             type(type_state), intent(in) :: state
-            real(real64) :: density
+            real(real64), intent(inout) :: density
+        end subroutine calc_den_gp_3phase
+    end interface
 
-        end function calc_den_gauss_point_3phase
+    type, extends(abst_den) :: type_den_4phase
+    contains
+        procedure, pass(self) :: calc => calc_den_gp_4phase
+    end type type_den_4phase
+
+    interface
+        module subroutine calc_den_gp_4phase(self, state, density)
+            implicit none
+            class(type_den_4phase), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: density
+        end subroutine calc_den_gp_4phase
     end interface
 
     ! ------------------------------------------------------------------------------
     ! 密度計算のための関数インターフェース
     ! ------------------------------------------------------------------------------
     interface
-        module pure elemental function calc_den_3(density_soil, phi_soil, &
-                                                  density_water, phi_water, &
-                                                  density_ice, phi_ice) result(density)
+        module subroutine calc_den_2(density_soil, phi_soil, &
+                                     density_water, phi_water, density)
+            implicit none
+            real(real64), intent(in) :: density_soil
+            real(real64), intent(in) :: phi_soil
+            real(real64), intent(in) :: density_water
+            real(real64), intent(in) :: phi_water
+            real(real64), intent(inout) :: density
+
+        end subroutine calc_den_2
+
+        module subroutine calc_den_3(density_soil, phi_soil, &
+                                     density_water, phi_water, &
+                                     density_ice, phi_ice, density)
             implicit none
             real(real64), intent(in) :: density_soil
             real(real64), intent(in) :: phi_soil
@@ -87,12 +128,26 @@ module calculate_density
             real(real64), intent(in) :: phi_water
             real(real64), intent(in) :: density_ice
             real(real64), intent(in) :: phi_ice
-            real(real64) :: density
-        end function calc_den_3
+            real(real64), intent(inout) :: density
+
+        end subroutine calc_den_3
+
+        module subroutine calc_den_4(density_soil, phi_soil, &
+                                     density_water, phi_water, &
+                                     density_ice, phi_ice, &
+                                     density_vapor, phi_vapor, density)
+            implicit none
+            real(real64), intent(in) :: density_soil
+            real(real64), intent(in) :: phi_soil
+            real(real64), intent(in) :: density_water
+            real(real64), intent(in) :: phi_water
+            real(real64), intent(in) :: density_ice
+            real(real64), intent(in) :: phi_ice
+            real(real64), intent(in) :: density_vapor
+            real(real64), intent(in) :: phi_vapor
+            real(real64), intent(inout) :: density
+
+        end subroutine calc_den_4
     end interface
 
-    interface type_den_3phase
-        module procedure construct_den_3phase
-    end interface
-
-end module calculate_density
+end module physics_materials_density

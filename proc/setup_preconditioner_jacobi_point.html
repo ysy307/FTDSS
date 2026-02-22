@@ -1,0 +1,773 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>setup_preconditioner_jacobi_point &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>setup_preconditioner_jacobi_point
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">12 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/preconditioner_jacobi.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/preconditioner_jacobi.f90.html'>preconditioner_jacobi.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/solver_preconditioner_jacobi.html'>solver_preconditioner_jacobi</a></li>
+            <li class="breadcrumb-item active" aria-current="page">setup_preconditioner_jacobi_point</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/setup_preconditioner_jacobi_point.html#src">setup_preconditioner_jacobi_point</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine setup_preconditioner_jacobi_point(self, A)  
+    <a href="../interface/setup_preconditioner_jacobi_point.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+    <p>Point Jacobi のセットアップ</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~945"></span>
+              class(<a href='../type/type_preconditioner_jacobi.html'>type_preconditioner_jacobi</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~8"></span>
+              class(<a href='../type/abst_matrix.html'>abst_matrix</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~setup_preconditioner_jacobi_point~~CallsGraph Pages: 1 -->
+<svg id="procsetup_preconditioner_jacobi_pointCallsGraph" width="641pt" height="155pt"
+ viewBox="0.00 0.00 641.00 155.12" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph" class="graph" transform="scale(0.64 0.64) rotate(0) translate(4 238)">
+<title>proc~~setup_preconditioner_jacobi_point~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-238 996,-238 996,4 -4,4"/>
+<!-- proc~setup_preconditioner_jacobi_point -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_node1" class="node">
+<title>proc~setup_preconditioner_jacobi_point</title>
+<polygon fill="none" stroke="black" points="195,-150 0,-150 0,-126 195,-126 195,-150"/>
+<text text-anchor="middle" x="97.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50">setup_preconditioner_jacobi_point</text>
+</g>
+<!-- get_diagonal -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_node2" class="node">
+<title>get_diagonal</title>
+<polygon fill="#777777" stroke="#777777" points="374.5,-234 292.5,-234 292.5,-210 374.5,-210 374.5,-234"/>
+<text text-anchor="middle" x="333.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_diagonal</text>
+</g>
+<!-- proc~setup_preconditioner_jacobi_point&#45;&gt;get_diagonal -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_edge1" class="edge">
+<title>proc~setup_preconditioner_jacobi_point&#45;&gt;get_diagonal</title>
+<path fill="none" stroke="#ff0000" d="M119.87,-150.14C145.52,-164.23 190.19,-187.3 231,-201 247.39,-206.5 265.77,-210.83 282.34,-214.09"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="281.91,-217.58 292.39,-215.99 283.21,-210.7 281.91,-217.58"/>
+</g>
+<!-- interface~get_size_vector_dp -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_node3" class="node">
+<title>interface~get_size_vector_dp</title>
+<g id="a_proc~~setup_preconditioner_jacobi_point~~CallsGraph_node3"><a xlink:href="../interface/get_size_vector_dp.html" xlink:title="type_vector_dp%get_size_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="435.5,-192 231.5,-192 231.5,-168 435.5,-168 435.5,-192"/>
+<text text-anchor="middle" x="333.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%get_size_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~setup_preconditioner_jacobi_point&#45;&gt;interface~get_size_vector_dp -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_edge2" class="edge">
+<title>proc~setup_preconditioner_jacobi_point&#45;&gt;interface~get_size_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M165.56,-150.04C193.58,-155.07 226.32,-160.94 255.34,-166.15"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="254.97,-169.64 265.44,-167.96 256.21,-162.75 254.97,-169.64"/>
+</g>
+<!-- interface~initialize_vector_dp -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_node4" class="node">
+<title>interface~initialize_vector_dp</title>
+<g id="a_proc~~setup_preconditioner_jacobi_point~~CallsGraph_node4"><a xlink:href="../interface/initialize_vector_dp.html" xlink:title="type_vector_dp%initialize_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="436,-150 231,-150 231,-126 436,-126 436,-150"/>
+<text text-anchor="middle" x="333.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%initialize_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~setup_preconditioner_jacobi_point&#45;&gt;interface~initialize_vector_dp -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_edge3" class="edge">
+<title>proc~setup_preconditioner_jacobi_point&#45;&gt;interface~initialize_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M195.03,-138C203.53,-138 212.19,-138 220.8,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="220.89,-141.5 230.89,-138 220.89,-134.5 220.89,-141.5"/>
+</g>
+<!-- interface~vector_reciprocal -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_node5" class="node">
+<title>interface~vector_reciprocal</title>
+<g id="a_proc~~setup_preconditioner_jacobi_point~~CallsGraph_node5"><a xlink:href="../interface/vector_reciprocal.html" xlink:title="vector_reciprocal">
+<polygon fill="#a7506f" stroke="#a7506f" points="385.5,-108 281.5,-108 281.5,-84 385.5,-84 385.5,-108"/>
+<text text-anchor="middle" x="333.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_reciprocal</text>
+</a>
+</g>
+</g>
+<!-- proc~setup_preconditioner_jacobi_point&#45;&gt;interface~vector_reciprocal -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_edge4" class="edge">
+<title>proc~setup_preconditioner_jacobi_point&#45;&gt;interface~vector_reciprocal</title>
+<path fill="none" stroke="#ff0000" d="M165.56,-125.96C198.82,-119.99 238.72,-112.83 271.18,-107.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="272.21,-110.38 281.43,-105.17 270.97,-103.49 272.21,-110.38"/>
+</g>
+<!-- interface~zero_vector_dp -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_node6" class="node">
+<title>interface~zero_vector_dp</title>
+<g id="a_proc~~setup_preconditioner_jacobi_point~~CallsGraph_node6"><a xlink:href="../interface/zero_vector_dp.html" xlink:title="type_vector_dp%zero_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="425.5,-45 241.5,-45 241.5,-21 425.5,-21 425.5,-45"/>
+<text text-anchor="middle" x="333.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%zero_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~setup_preconditioner_jacobi_point&#45;&gt;interface~zero_vector_dp -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_edge5" class="edge">
+<title>proc~setup_preconditioner_jacobi_point&#45;&gt;interface~zero_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M123.23,-125.77C149.72,-112.79 193.06,-91.86 231,-75 251.18,-66.03 273.88,-56.58 292.68,-48.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="294.17,-52.09 302.13,-45.09 291.54,-45.61 294.17,-52.09"/>
+</g>
+<!-- proc~get_size_vector_dp -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_node7" class="node">
+<title>proc~get_size_vector_dp</title>
+<g id="a_proc~~setup_preconditioner_jacobi_point~~CallsGraph_node7"><a xlink:href="../proc/get_size_vector_dp.html" xlink:title="get_size_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="590,-192 477,-192 477,-168 590,-168 590,-192"/>
+<text text-anchor="middle" x="533.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_size_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~get_size_vector_dp&#45;&gt;proc~get_size_vector_dp -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_edge6" class="edge">
+<title>interface~get_size_vector_dp&#45;&gt;proc~get_size_vector_dp</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M435.53,-180C446.07,-180 456.59,-180 466.59,-180"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="466.81,-183.5 476.81,-180 466.81,-176.5 466.81,-183.5"/>
+</g>
+<!-- proc~initialize_vector_dp -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_node8" class="node">
+<title>proc~initialize_vector_dp</title>
+<g id="a_proc~~setup_preconditioner_jacobi_point~~CallsGraph_node8"><a xlink:href="../proc/initialize_vector_dp.html" xlink:title="initialize_vector_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="591,-150 476,-150 476,-126 591,-126 591,-150"/>
+<text text-anchor="middle" x="533.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_vector_dp&#45;&gt;proc~initialize_vector_dp -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_edge7" class="edge">
+<title>interface~initialize_vector_dp&#45;&gt;proc~initialize_vector_dp</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M436.11,-138C446.15,-138 456.16,-138 465.71,-138"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="465.89,-141.5 475.89,-138 465.89,-134.5 465.89,-141.5"/>
+</g>
+<!-- proc~reciprocal_vector_dp -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_node9" class="node">
+<title>proc~reciprocal_vector_dp</title>
+<g id="a_proc~~setup_preconditioner_jacobi_point~~CallsGraph_node9"><a xlink:href="../proc/reciprocal_vector_dp.html" xlink:title="reciprocal_vector_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="595,-108 472,-108 472,-84 595,-84 595,-108"/>
+<text text-anchor="middle" x="533.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">reciprocal_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_reciprocal&#45;&gt;proc~reciprocal_vector_dp -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_edge8" class="edge">
+<title>interface~vector_reciprocal&#45;&gt;proc~reciprocal_vector_dp</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M385.75,-96C408.91,-96 436.66,-96 461.76,-96"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="461.97,-99.5 471.97,-96 461.97,-92.5 461.97,-99.5"/>
+</g>
+<!-- proc~reciprocal_vector_int -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_node10" class="node">
+<title>proc~reciprocal_vector_int</title>
+<g id="a_proc~~setup_preconditioner_jacobi_point~~CallsGraph_node10"><a xlink:href="../proc/reciprocal_vector_int.html" xlink:title="reciprocal_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="595,-66 472,-66 472,-42 595,-42 595,-66"/>
+<text text-anchor="middle" x="533.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">reciprocal_vector_int</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_reciprocal&#45;&gt;proc~reciprocal_vector_int -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_edge9" class="edge">
+<title>interface~vector_reciprocal&#45;&gt;proc~reciprocal_vector_int</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M385.75,-85.13C410.23,-79.94 439.85,-73.65 466.04,-68.1"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="466.84,-71.51 475.89,-66.01 465.38,-64.66 466.84,-71.51"/>
+</g>
+<!-- proc~zero_vector_dp -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_node11" class="node">
+<title>proc~zero_vector_dp</title>
+<g id="a_proc~~setup_preconditioner_jacobi_point~~CallsGraph_node11"><a xlink:href="../proc/zero_vector_dp.html" xlink:title="zero_vector_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="580,-24 487,-24 487,0 580,0 580,-24"/>
+<text text-anchor="middle" x="533.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">zero_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~zero_vector_dp&#45;&gt;proc~zero_vector_dp -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_edge10" class="edge">
+<title>interface~zero_vector_dp&#45;&gt;proc~zero_vector_dp</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M425.68,-23.33C443.08,-21.48 460.8,-19.6 476.68,-17.92"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="477.26,-21.38 486.83,-16.84 476.52,-14.42 477.26,-21.38"/>
+</g>
+<!-- allocate_array -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_node12" class="node">
+<title>allocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="779.5,-192 690.5,-192 690.5,-168 779.5,-168 779.5,-192"/>
+<text text-anchor="middle" x="735" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</g>
+<!-- proc~initialize_vector_dp&#45;&gt;allocate_array -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_edge11" class="edge">
+<title>proc~initialize_vector_dp&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#cbff00" d="M589.08,-150.01C602.76,-152.98 617.41,-156.14 631,-159 646.97,-162.36 664.35,-165.94 680.2,-169.17"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="679.87,-172.68 690.37,-171.24 681.27,-165.82 679.87,-172.68"/>
+</g>
+<!-- deallocate_array -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_node13" class="node">
+<title>deallocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="786.5,-150 683.5,-150 683.5,-126 786.5,-126 786.5,-150"/>
+<text text-anchor="middle" x="735" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_array</text>
+</g>
+<!-- proc~initialize_vector_dp&#45;&gt;deallocate_array -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_edge12" class="edge">
+<title>proc~initialize_vector_dp&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#cbff00" d="M591.14,-138C616.76,-138 647.09,-138 673.2,-138"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="673.35,-141.5 683.35,-138 673.35,-134.5 673.35,-141.5"/>
+</g>
+<!-- interface~get_data_vector_dp -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_node14" class="node">
+<title>interface~get_data_vector_dp</title>
+<g id="a_proc~~setup_preconditioner_jacobi_point~~CallsGraph_node14"><a xlink:href="../interface/get_data_vector_dp.html" xlink:title="type_vector_dp%get_data_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="839,-108 631,-108 631,-84 839,-84 839,-108"/>
+<text text-anchor="middle" x="735" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~reciprocal_vector_dp&#45;&gt;interface~get_data_vector_dp -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_edge13" class="edge">
+<title>proc~reciprocal_vector_dp&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#00ff66" d="M595.17,-96C603.33,-96 611.9,-96 620.61,-96"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="620.89,-99.5 630.89,-96 620.89,-92.5 620.89,-99.5"/>
+</g>
+<!-- interface~get_data_vector_int -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_node15" class="node">
+<title>interface~get_data_vector_int</title>
+<g id="a_proc~~setup_preconditioner_jacobi_point~~CallsGraph_node15"><a xlink:href="../interface/get_data_vector_int.html" xlink:title="type_vector_int%get_data_vector_int">
+<polygon fill="#a7506f" stroke="#a7506f" points="839,-66 631,-66 631,-42 839,-42 839,-66"/>
+<text text-anchor="middle" x="735" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_int%get_data_vector_int</text>
+</a>
+</g>
+</g>
+<!-- proc~reciprocal_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_edge14" class="edge">
+<title>proc~reciprocal_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#0066ff" d="M595.17,-54C603.33,-54 611.9,-54 620.61,-54"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="620.89,-57.5 630.89,-54 620.89,-50.5 620.89,-57.5"/>
+</g>
+<!-- proc~get_data_vector_dp -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_node16" class="node">
+<title>proc~get_data_vector_dp</title>
+<g id="a_proc~~setup_preconditioner_jacobi_point~~CallsGraph_node16"><a xlink:href="../proc/get_data_vector_dp.html" xlink:title="get_data_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="992,-108 875,-108 875,-84 992,-84 992,-108"/>
+<text text-anchor="middle" x="933.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_edge15" class="edge">
+<title>interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M839.14,-96C847.74,-96 856.29,-96 864.53,-96"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="864.77,-99.5 874.77,-96 864.77,-92.5 864.77,-99.5"/>
+</g>
+<!-- proc~get_data_vector_int -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_node17" class="node">
+<title>proc~get_data_vector_int</title>
+<g id="a_proc~~setup_preconditioner_jacobi_point~~CallsGraph_node17"><a xlink:href="../proc/get_data_vector_int.html" xlink:title="get_data_vector_int">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="992,-66 875,-66 875,-42 992,-42 992,-66"/>
+<text text-anchor="middle" x="933.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_data_vector_int</text>
+</a>
+</g>
+</g>
+<!-- interface~get_data_vector_int&#45;&gt;proc~get_data_vector_int -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CallsGraph_edge16" class="edge">
+<title>interface~get_data_vector_int&#45;&gt;proc~get_data_vector_int</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M839.14,-54C847.74,-54 856.29,-54 864.53,-54"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="864.77,-57.5 874.77,-54 864.77,-50.5 864.77,-57.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocsetup_preconditioner_jacobi_pointCallsGraph = svgPanZoom('#procsetup_preconditioner_jacobi_pointCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~setup_preconditioner_jacobi_point~~CalledByGraph Pages: 1 -->
+<svg id="procsetup_preconditioner_jacobi_pointCalledByGraph" width="641pt" height="18pt"
+ viewBox="0.00 0.00 641.00 18.01" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~setup_preconditioner_jacobi_point~~CalledByGraph" class="graph" transform="scale(0.56 0.56) rotate(0) translate(4 28)">
+<title>proc~~setup_preconditioner_jacobi_point~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 1135,-28 1135,4 -4,4"/>
+<!-- proc~setup_preconditioner_jacobi_point -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CalledByGraph_node1" class="node">
+<title>proc~setup_preconditioner_jacobi_point</title>
+<polygon fill="none" stroke="black" points="1131,-24 936,-24 936,0 1131,0 1131,-24"/>
+<text text-anchor="middle" x="1033.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">setup_preconditioner_jacobi_point</text>
+</g>
+<!-- interface~setup_preconditioner_jacobi_point -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CalledByGraph_node2" class="node">
+<title>interface~setup_preconditioner_jacobi_point</title>
+<g id="a_proc~~setup_preconditioner_jacobi_point~~CalledByGraph_node2"><a xlink:href="../interface/setup_preconditioner_jacobi_point.html" xlink:title="type_preconditioner_jacobi%setup_preconditioner_jacobi_point">
+<polygon fill="#a7506f" stroke="#a7506f" points="900,-24 551,-24 551,0 900,0 900,-24"/>
+<text text-anchor="middle" x="725.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_preconditioner_jacobi%setup_preconditioner_jacobi_point</text>
+</a>
+</g>
+</g>
+<!-- interface~setup_preconditioner_jacobi_point&#45;&gt;proc~setup_preconditioner_jacobi_point -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CalledByGraph_edge1" class="edge">
+<title>interface~setup_preconditioner_jacobi_point&#45;&gt;proc~setup_preconditioner_jacobi_point</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M900.06,-12C908.69,-12 917.24,-12 925.58,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="925.64,-15.5 935.64,-12 925.64,-8.5 925.64,-15.5"/>
+</g>
+<!-- proc~setup_preconditioner_jacobi -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CalledByGraph_node3" class="node">
+<title>proc~setup_preconditioner_jacobi</title>
+<g id="a_proc~~setup_preconditioner_jacobi_point~~CalledByGraph_node3"><a xlink:href="../proc/setup_preconditioner_jacobi.html" xlink:title="setup_preconditioner_jacobi">
+<polygon fill="#d9534f" stroke="#d9534f" points="515,-24 352,-24 352,0 515,0 515,-24"/>
+<text text-anchor="middle" x="433.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">setup_preconditioner_jacobi</text>
+</a>
+</g>
+</g>
+<!-- proc~setup_preconditioner_jacobi&#45;&gt;interface~setup_preconditioner_jacobi_point -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CalledByGraph_edge2" class="edge">
+<title>proc~setup_preconditioner_jacobi&#45;&gt;interface~setup_preconditioner_jacobi_point</title>
+<path fill="none" stroke="#ff0000" d="M515.28,-12C523.41,-12 531.88,-12 540.55,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="540.81,-15.5 550.81,-12 540.81,-8.5 540.81,-15.5"/>
+</g>
+<!-- interface~setup_preconditioner_jacobi -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CalledByGraph_node4" class="node">
+<title>interface~setup_preconditioner_jacobi</title>
+<g id="a_proc~~setup_preconditioner_jacobi_point~~CalledByGraph_node4"><a xlink:href="../interface/setup_preconditioner_jacobi.html" xlink:title="type_preconditioner_jacobi%setup_preconditioner_jacobi">
+<polygon fill="#a7506f" stroke="#a7506f" points="316,-24 0,-24 0,0 316,0 316,-24"/>
+<text text-anchor="middle" x="158" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_preconditioner_jacobi%setup_preconditioner_jacobi</text>
+</a>
+</g>
+</g>
+<!-- interface~setup_preconditioner_jacobi&#45;&gt;proc~setup_preconditioner_jacobi -->
+<g id="proc~~setup_preconditioner_jacobi_point~~CalledByGraph_edge3" class="edge">
+<title>interface~setup_preconditioner_jacobi&#45;&gt;proc~setup_preconditioner_jacobi</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M316.11,-12C324.83,-12 333.44,-12 341.78,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="341.82,-15.5 351.82,-12 341.82,-8.5 341.82,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocsetup_preconditioner_jacobi_pointCalledByGraph = svgPanZoom('#procsetup_preconditioner_jacobi_pointCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">setup_preconditioner_jacobi_point</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_preconditioner_jacobi</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">abst_matrix</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">A</span>
+
+<span class="w">        </span><span class="c">! 初期化時のサイズでメモリを確保</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">M_inv</span><span class="p">%</span><span class="n">get_size</span><span class="p">()</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_nodes</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">M_inv</span><span class="p">%</span><span class="n">initialize</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_nodes</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        call </span><span class="n">self</span><span class="p">%</span><span class="n">M_inv</span><span class="p">%</span><span class="n">zero</span><span class="p">()</span>
+
+<span class="w">        </span><span class="c">! 対角成分を取得</span>
+<span class="w">        </span><span class="k">call </span><span class="n">A</span><span class="p">%</span><span class="n">get_diagonal</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">M_inv</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! 逆数を計算 (linalg側でゼロ除算回避処理が行われる)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">vector_reciprocal</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">M_inv</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SOLVER_STATUS_SUCCESS</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">setup_preconditioner_jacobi_point</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

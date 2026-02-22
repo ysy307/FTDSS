@@ -82,7 +82,7 @@
     <div class="container">
   <div class="row">
     <h1>calculate_wrf_mvg
-      <small>Module Function</small>
+      <small>Module Subroutine</small>
       
     </h1>
       <div class="container p-2 mb-4 bg-light border rounded-3">
@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.1% of total for procedures.">11 statements</a>
+                 title=" 0.0% of total for procedures.">11 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -105,7 +105,7 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
                 <li class="breadcrumb-item"><a href='../sourcefile/wrf_mvg.f90.html'>wrf_mvg.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/calculate_wrf_mvg.html'>calculate_wrf_mvg</a></li>
+                <li class="breadcrumb-item"><a href='../module/wrf_mvg.html'>wrf_mvg</a></li>
             <li class="breadcrumb-item active" aria-current="page">calculate_wrf_mvg</li>
           </ol>
         </nav>
@@ -159,7 +159,7 @@
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>pure elemental module function calculate_wrf_mvg(self, h) result(theta_w)  
+    <h2>module subroutine calculate_wrf_mvg(self, h, Qw)  
 </h2>
     
 
@@ -178,7 +178,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~441"></span>
+              <span class="anchor" id="variable-self~245"></span>
               class(type_wrf_mvg),
             </td>
 <td>intent(in)</td>
@@ -193,7 +193,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-h~31"></span>
+              <span class="anchor" id="variable-h~7"></span>
               real(kind=real64),
             </td>
 <td>intent(in)</td>
@@ -206,16 +206,24 @@
                 
             </td>
         </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-qw~3"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Qw</strong></td>
+            <td>
+                
+            </td>
+        </tr>
     </tbody>
   </table>
 
-      <h3>Return Value
-        <small>
-          <span class="anchor" id="variable-theta_w~6"></span>
-          real(kind=real64)
-        </small>
-      </h3>
-      
     <br>
 
 
@@ -230,19 +238,20 @@
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module pure elemental function </span><span class="n">calculate_wrf_mvg</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">theta_w</span><span class="p">)</span>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">calculate_wrf_mvg</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">,</span><span class="w"> </span><span class="n">Qw</span><span class="p">)</span>
 <span class="w">        </span><span class="k">implicit none</span>
 <span class="k">        class</span><span class="p">(</span><span class="n">type_wrf_mvg</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">h</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">theta_w</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Qw</span>
 
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">h</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">h_crit</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
-<span class="k">            </span><span class="n">theta_w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">theta_r</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">theta_s</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">theta_r</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">abs</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">alpha1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">h</span><span class="p">)</span><span class="o">**</span><span class="n">self</span><span class="p">%</span><span class="n">n1</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="n">self</span><span class="p">%</span><span class="n">m1</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">h</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">params</span><span class="p">%</span><span class="n">h_crit</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">Qw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">params</span><span class="p">%</span><span class="n">theta_r</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">params</span><span class="p">%</span><span class="n">theta_s</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">params</span><span class="p">%</span><span class="n">theta_r</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                 </span><span class="p">(</span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">abs</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">params</span><span class="p">%</span><span class="n">alpha1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">h</span><span class="p">)</span><span class="o">**</span><span class="n">self</span><span class="p">%</span><span class="n">params</span><span class="p">%</span><span class="n">n1</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="n">self</span><span class="p">%</span><span class="n">params</span><span class="p">%</span><span class="n">m1</span><span class="p">)</span>
 <span class="w">        </span><span class="k">else</span>
-<span class="k">            </span><span class="n">theta_w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">theta_s</span>
+<span class="k">            </span><span class="n">Qw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">params</span><span class="p">%</span><span class="n">theta_s</span>
 <span class="w">        </span><span class="k">end if</span>
 
-<span class="k">    end function </span><span class="n">calculate_wrf_mvg</span>
+<span class="k">    end subroutine </span><span class="n">calculate_wrf_mvg</span>
 </pre></div>
 
     </section>
@@ -259,14 +268,14 @@
           <div class="col">
             <p>
               FTDSS
- was developed by Kikuchi Shun<br>              &copy; 2025 
+ was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
           <div class="col">
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-08-26 10:37 +0000             </p>
+ on 2026-02-22 12:12 +0000             </p>
           </div>
         </div>
         <br>

@@ -1,0 +1,1006 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>get_data_vector_int &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>get_data_vector_int
+      <small>Module Function</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">6 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/vector_int.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/vector_int.f90.html'>vector_int.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_types_vector_int.html'>core_types_vector_int</a></li>
+            <li class="breadcrumb-item active" aria-current="page">get_data_vector_int</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/get_data_vector_int.html#src">get_data_vector_int</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module function get_data_vector_int(self) result(data)  
+    <a href="../interface/get_data_vector_int.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+    <p>Returns data pointer.</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~971"></span>
+              class(<a href='../type/type_vector_int.html'>type_vector_int</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+      <h3>Return Value
+        <small>
+          <span class="anchor" id="variable-data~7"></span>
+          integer(kind=int32), pointer, contiguous, dimension(:)
+        </small>
+      </h3>
+      
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~get_data_vector_int~~CalledByGraph Pages: 1 -->
+<svg id="procget_data_vector_intCalledByGraph" width="641pt" height="244pt"
+ viewBox="0.00 0.00 641.00 243.97" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_data_vector_int~~CalledByGraph" class="graph" transform="scale(0.33 0.33) rotate(0) translate(4 742)">
+<title>proc~~get_data_vector_int~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-742 1956,-742 1956,4 -4,4"/>
+<!-- proc~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node1" class="node">
+<title>proc~get_data_vector_int</title>
+<polygon fill="none" stroke="black" points="1952,-381 1835,-381 1835,-357 1952,-357 1952,-381"/>
+<text text-anchor="middle" x="1893.5" y="-366.6" font-family="Helvetica,sans-Serif" font-size="10.50">get_data_vector_int</text>
+</g>
+<!-- interface~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node2" class="node">
+<title>interface~get_data_vector_int</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node2"><a xlink:href="../interface/get_data_vector_int.html" xlink:title="type_vector_int%get_data_vector_int">
+<polygon fill="#a7506f" stroke="#a7506f" points="1799,-381 1591,-381 1591,-357 1799,-357 1799,-381"/>
+<text text-anchor="middle" x="1695" y="-366.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_int%get_data_vector_int</text>
+</a>
+</g>
+</g>
+<!-- interface~get_data_vector_int&#45;&gt;proc~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge1" class="edge">
+<title>interface~get_data_vector_int&#45;&gt;proc~get_data_vector_int</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1799.14,-369C1807.74,-369 1816.29,-369 1824.53,-369"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1824.77,-372.5 1834.77,-369 1824.77,-365.5 1824.77,-372.5"/>
+</g>
+<!-- proc~abs_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node3" class="node">
+<title>proc~abs_vector_int</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node3"><a xlink:href="../proc/abs_vector_int.html" xlink:title="abs_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="1518,-738 1429,-738 1429,-714 1518,-714 1518,-738"/>
+<text text-anchor="middle" x="1473.5" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abs_vector_int</text>
+</a>
+</g>
+</g>
+<!-- proc~abs_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge2" class="edge">
+<title>proc~abs_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#ff0000" d="M1518.11,-722.13C1531.19,-719.12 1544.76,-713.92 1555,-705 1653.79,-618.9 1683.76,-451.51 1691.57,-391.27"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1695.04,-391.67 1692.78,-381.32 1688.09,-390.82 1695.04,-391.67"/>
+</g>
+<!-- proc~add_scalar_1_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node4" class="node">
+<title>proc~add_scalar_1_vector_int</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node4"><a xlink:href="../proc/add_scalar_1_vector_int.html" xlink:title="add_scalar_1_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="1543.5,-696 1403.5,-696 1403.5,-672 1543.5,-672 1543.5,-696"/>
+<text text-anchor="middle" x="1473.5" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">add_scalar_1_vector_int</text>
+</a>
+</g>
+</g>
+<!-- proc~add_scalar_1_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge3" class="edge">
+<title>proc~add_scalar_1_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#ff0000" d="M1541.01,-671.87C1546.03,-669.43 1550.77,-666.5 1555,-663 1643.85,-589.34 1679.43,-445.86 1690.17,-391.03"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1693.64,-391.48 1692.04,-381.01 1686.76,-390.2 1693.64,-391.48"/>
+</g>
+<!-- proc~add_scalar_2_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node5" class="node">
+<title>proc~add_scalar_2_vector_int</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node5"><a xlink:href="../proc/add_scalar_2_vector_int.html" xlink:title="add_scalar_2_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="1543.5,-654 1403.5,-654 1403.5,-630 1543.5,-630 1543.5,-654"/>
+<text text-anchor="middle" x="1473.5" y="-639.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">add_scalar_2_vector_int</text>
+</a>
+</g>
+</g>
+<!-- proc~add_scalar_2_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge4" class="edge">
+<title>proc~add_scalar_2_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#ff0000" d="M1539.98,-629.95C1545.34,-627.5 1550.44,-624.55 1555,-621 1633.84,-559.69 1674.3,-440.49 1688.26,-391.18"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1691.71,-391.82 1690.97,-381.25 1684.96,-389.97 1691.71,-391.82"/>
+</g>
+<!-- proc~add_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node6" class="node">
+<title>proc~add_vector_int</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node6"><a xlink:href="../proc/add_vector_int.html" xlink:title="add_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="1519,-612 1428,-612 1428,-588 1519,-588 1519,-612"/>
+<text text-anchor="middle" x="1473.5" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">add_vector_int</text>
+</a>
+</g>
+</g>
+<!-- proc~add_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge5" class="edge">
+<title>proc~add_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#ff0000" d="M1519.23,-594.39C1531.63,-591.29 1544.54,-586.48 1555,-579 1624.33,-529.44 1668.67,-433.6 1685.88,-390.69"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1689.2,-391.8 1689.58,-381.21 1682.68,-389.25 1689.2,-391.8"/>
+</g>
+<!-- proc~assign_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node7" class="node">
+<title>proc~assign_vector_int</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node7"><a xlink:href="../proc/assign_vector_int.html" xlink:title="assign_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="1525.5,-570 1421.5,-570 1421.5,-546 1525.5,-546 1525.5,-570"/>
+<text text-anchor="middle" x="1473.5" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assign_vector_int</text>
+</a>
+</g>
+</g>
+<!-- proc~assign_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge6" class="edge">
+<title>proc~assign_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#ff0000" d="M1525.89,-549.71C1536.03,-546.7 1546.23,-542.59 1555,-537 1614.82,-498.88 1661.54,-426.55 1682.29,-390.52"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1685.58,-391.81 1687.44,-381.38 1679.48,-388.37 1685.58,-391.81"/>
+</g>
+<!-- proc~axpy_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node8" class="node">
+<title>proc~axpy_vector_int</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node8"><a xlink:href="../proc/axpy_vector_int.html" xlink:title="axpy_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="1521.5,-528 1425.5,-528 1425.5,-504 1521.5,-504 1521.5,-528"/>
+<text text-anchor="middle" x="1473.5" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">axpy_vector_int</text>
+</a>
+</g>
+</g>
+<!-- proc~axpy_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge7" class="edge">
+<title>proc~axpy_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#ff0000" d="M1521.92,-507.66C1533.16,-504.61 1544.84,-500.5 1555,-495 1606.15,-467.34 1653.56,-416.98 1677.57,-389.03"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1680.47,-391.03 1684.25,-381.13 1675.12,-386.51 1680.47,-391.03"/>
+</g>
+<!-- proc~axpyz_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node9" class="node">
+<title>proc~axpyz_vector_int</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node9"><a xlink:href="../proc/axpyz_vector_int.html" xlink:title="axpyz_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="1524,-486 1423,-486 1423,-462 1524,-462 1524,-486"/>
+<text text-anchor="middle" x="1473.5" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">axpyz_vector_int</text>
+</a>
+</g>
+</g>
+<!-- proc~axpyz_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge8" class="edge">
+<title>proc~axpyz_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#ff0000" d="M1524.2,-463.43C1534.57,-460.57 1545.29,-457.1 1555,-453 1597.24,-435.17 1641.91,-406.1 1668.87,-387.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1671.16,-389.93 1677.31,-381.29 1667.12,-384.21 1671.16,-389.93"/>
+</g>
+<!-- proc~multiply_scalar_1_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node10" class="node">
+<title>proc~multiply_scalar_1_vector_int</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node10"><a xlink:href="../proc/multiply_scalar_1_vector_int.html" xlink:title="multiply_scalar_1_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="1555,-444 1392,-444 1392,-420 1555,-420 1555,-444"/>
+<text text-anchor="middle" x="1473.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">multiply_scalar_1_vector_int</text>
+</a>
+</g>
+</g>
+<!-- proc~multiply_scalar_1_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge9" class="edge">
+<title>proc~multiply_scalar_1_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#ff0000" d="M1521.83,-419.98C1532.75,-417.11 1544.29,-414.01 1555,-411 1585.23,-402.49 1618.96,-392.32 1645.62,-384.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1646.95,-387.37 1655.47,-381.07 1644.88,-380.68 1646.95,-387.37"/>
+</g>
+<!-- proc~multiply_scalar_2_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node11" class="node">
+<title>proc~multiply_scalar_2_vector_int</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node11"><a xlink:href="../proc/multiply_scalar_2_vector_int.html" xlink:title="multiply_scalar_2_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="1555,-402 1392,-402 1392,-378 1555,-378 1555,-402"/>
+<text text-anchor="middle" x="1473.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">multiply_scalar_2_vector_int</text>
+</a>
+</g>
+</g>
+<!-- proc~multiply_scalar_2_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge10" class="edge">
+<title>proc~multiply_scalar_2_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#ff0000" d="M1555.3,-382.27C1563.65,-381.47 1572.23,-380.65 1580.85,-379.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1581.34,-383.29 1590.96,-378.86 1580.67,-376.33 1581.34,-383.29"/>
+</g>
+<!-- proc~multiply_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node12" class="node">
+<title>proc~multiply_vector_int</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node12"><a xlink:href="../proc/multiply_vector_int.html" xlink:title="multiply_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="1530,-318 1417,-318 1417,-294 1530,-294 1530,-318"/>
+<text text-anchor="middle" x="1473.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">multiply_vector_int</text>
+</a>
+</g>
+</g>
+<!-- proc~multiply_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge11" class="edge">
+<title>proc~multiply_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#ff0000" d="M1521.83,-318.02C1532.75,-320.89 1544.29,-323.99 1555,-327 1585.23,-335.51 1618.96,-345.68 1645.62,-353.89"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1644.88,-357.32 1655.47,-356.93 1646.95,-350.63 1644.88,-357.32"/>
+</g>
+<!-- proc~reciprocal_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node13" class="node">
+<title>proc~reciprocal_vector_int</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node13"><a xlink:href="../proc/reciprocal_vector_int.html" xlink:title="reciprocal_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="1535,-276 1412,-276 1412,-252 1535,-252 1535,-276"/>
+<text text-anchor="middle" x="1473.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">reciprocal_vector_int</text>
+</a>
+</g>
+</g>
+<!-- proc~reciprocal_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge12" class="edge">
+<title>proc~reciprocal_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#ff0000" d="M1529.34,-276.03C1538.06,-278.59 1546.88,-281.57 1555,-285 1597.24,-302.83 1641.91,-331.9 1668.87,-350.74"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1667.12,-353.79 1677.31,-356.71 1671.16,-348.07 1667.12,-353.79"/>
+</g>
+<!-- proc~scale_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node14" class="node">
+<title>proc~scale_vector_int</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node14"><a xlink:href="../proc/scale_vector_int.html" xlink:title="scale_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="1522.5,-360 1424.5,-360 1424.5,-336 1522.5,-336 1522.5,-360"/>
+<text text-anchor="middle" x="1473.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">scale_vector_int</text>
+</a>
+</g>
+</g>
+<!-- proc~scale_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge13" class="edge">
+<title>proc~scale_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#ff0000" d="M1522.67,-352.61C1539.91,-354.26 1560.16,-356.19 1580.57,-358.15"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1580.3,-361.64 1590.59,-359.11 1580.97,-354.67 1580.3,-361.64"/>
+</g>
+<!-- proc~scale_vector_int~2 -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node15" class="node">
+<title>proc~scale_vector_int~2</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node15"><a xlink:href="../proc/scale_vector_int~2.html" xlink:title="scale_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="1522.5,-234 1424.5,-234 1424.5,-210 1522.5,-210 1522.5,-234"/>
+<text text-anchor="middle" x="1473.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">scale_vector_int</text>
+</a>
+</g>
+</g>
+<!-- proc~scale_vector_int~2&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge14" class="edge">
+<title>proc~scale_vector_int~2&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#ff0000" d="M1522.76,-230.57C1533.75,-233.6 1545.09,-237.64 1555,-243 1606.15,-270.66 1653.56,-321.02 1677.57,-348.97"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1675.12,-351.49 1684.25,-356.87 1680.47,-346.97 1675.12,-351.49"/>
+</g>
+<!-- proc~shift_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node16" class="node">
+<title>proc~shift_vector_int</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node16"><a xlink:href="../proc/shift_vector_int.html" xlink:title="shift_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="1520,-192 1427,-192 1427,-168 1520,-168 1520,-192"/>
+<text text-anchor="middle" x="1473.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">shift_vector_int</text>
+</a>
+</g>
+</g>
+<!-- proc~shift_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge15" class="edge">
+<title>proc~shift_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#ff0000" d="M1520.41,-186.76C1532.29,-189.87 1544.65,-194.4 1555,-201 1614.82,-239.12 1661.54,-311.45 1682.29,-347.48"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1679.48,-349.63 1687.44,-356.62 1685.58,-346.19 1679.48,-349.63"/>
+</g>
+<!-- proc~subtract_scalar_1_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node17" class="node">
+<title>proc~subtract_scalar_1_vector_int</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node17"><a xlink:href="../proc/subtract_scalar_1_vector_int.html" xlink:title="subtract_scalar_1_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="1555,-150 1392,-150 1392,-126 1555,-126 1555,-150"/>
+<text text-anchor="middle" x="1473.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">subtract_scalar_1_vector_int</text>
+</a>
+</g>
+</g>
+<!-- proc~subtract_scalar_1_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge16" class="edge">
+<title>proc~subtract_scalar_1_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#ff0000" d="M1538.87,-150.09C1544.58,-152.54 1550.07,-155.47 1555,-159 1624.33,-208.56 1668.67,-304.4 1685.88,-347.31"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1682.68,-348.75 1689.58,-356.79 1689.2,-346.2 1682.68,-348.75"/>
+</g>
+<!-- proc~subtract_scalar_2_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node18" class="node">
+<title>proc~subtract_scalar_2_vector_int</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node18"><a xlink:href="../proc/subtract_scalar_2_vector_int.html" xlink:title="subtract_scalar_2_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="1555,-108 1392,-108 1392,-84 1555,-84 1555,-108"/>
+<text text-anchor="middle" x="1473.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">subtract_scalar_2_vector_int</text>
+</a>
+</g>
+</g>
+<!-- proc~subtract_scalar_2_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge17" class="edge">
+<title>proc~subtract_scalar_2_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#ff0000" d="M1539.98,-108.05C1545.34,-110.5 1550.44,-113.45 1555,-117 1633.84,-178.31 1674.3,-297.51 1688.26,-346.82"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1684.96,-348.03 1690.97,-356.75 1691.71,-346.18 1684.96,-348.03"/>
+</g>
+<!-- proc~subtract_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node19" class="node">
+<title>proc~subtract_vector_int</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node19"><a xlink:href="../proc/subtract_vector_int.html" xlink:title="subtract_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="1530.5,-66 1416.5,-66 1416.5,-42 1530.5,-42 1530.5,-66"/>
+<text text-anchor="middle" x="1473.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">subtract_vector_int</text>
+</a>
+</g>
+</g>
+<!-- proc~subtract_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge18" class="edge">
+<title>proc~subtract_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#ff0000" d="M1530.83,-61.91C1539.56,-64.97 1547.99,-69.19 1555,-75 1643.85,-148.66 1679.43,-292.14 1690.17,-346.97"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1686.76,-347.8 1692.04,-356.99 1693.64,-346.52 1686.76,-347.8"/>
+</g>
+<!-- proc~xpay_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node20" class="node">
+<title>proc~xpay_vector_int</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node20"><a xlink:href="../proc/xpay_vector_int.html" xlink:title="xpay_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="1521.5,-24 1425.5,-24 1425.5,0 1521.5,0 1521.5,-24"/>
+<text text-anchor="middle" x="1473.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xpay_vector_int</text>
+</a>
+</g>
+</g>
+<!-- proc~xpay_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge19" class="edge">
+<title>proc~xpay_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#ff0000" d="M1521.88,-16.79C1533.76,-19.91 1545.74,-24.93 1555,-33 1653.79,-119.1 1683.76,-286.49 1691.57,-346.73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1688.09,-347.18 1692.78,-356.68 1695.04,-346.33 1688.09,-347.18"/>
+</g>
+<!-- interface~add -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node21" class="node">
+<title>interface~add</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node21"><a xlink:href="../interface/add.html" xlink:title="add">
+<polygon fill="#a7506f" stroke="#a7506f" points="1288.5,-612 1234.5,-612 1234.5,-588 1288.5,-588 1288.5,-612"/>
+<text text-anchor="middle" x="1261.5" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">add</text>
+</a>
+</g>
+</g>
+<!-- interface~add&#45;&gt;proc~add_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge21" class="edge">
+<title>interface~add&#45;&gt;proc~add_vector_int</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M1288.67,-600C1320.8,-600 1376.14,-600 1417.73,-600"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="1417.98,-603.5 1427.98,-600 1417.98,-596.5 1417.98,-603.5"/>
+</g>
+<!-- interface~assignment(=) -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node22" class="node">
+<title>interface~assignment(=)</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node22"><a xlink:href="../interface/assignment(=).html" xlink:title="assignment(=)">
+<polygon fill="#a7506f" stroke="#a7506f" points="1307,-570 1216,-570 1216,-546 1307,-546 1307,-570"/>
+<text text-anchor="middle" x="1261.5" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assignment(=)</text>
+</a>
+</g>
+</g>
+<!-- interface~assignment(=)&#45;&gt;proc~assign_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge22" class="edge">
+<title>interface~assignment(=)&#45;&gt;proc~assign_vector_int</title>
+<path fill="none" stroke="#aaff00" stroke-dasharray="5,2" d="M1307.04,-558C1337.37,-558 1377.91,-558 1411.28,-558"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="1411.38,-561.5 1421.38,-558 1411.38,-554.5 1411.38,-561.5"/>
+</g>
+<!-- interface~multiply -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node23" class="node">
+<title>interface~multiply</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node23"><a xlink:href="../interface/multiply.html" xlink:title="multiply">
+<polygon fill="#a7506f" stroke="#a7506f" points="1289,-318 1234,-318 1234,-294 1289,-294 1289,-318"/>
+<text text-anchor="middle" x="1261.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">multiply</text>
+</a>
+</g>
+</g>
+<!-- interface~multiply&#45;&gt;proc~multiply_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge25" class="edge">
+<title>interface~multiply&#45;&gt;proc~multiply_vector_int</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1289.1,-306C1318.44,-306 1366.76,-306 1406.44,-306"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1406.58,-309.5 1416.58,-306 1406.58,-302.5 1406.58,-309.5"/>
+</g>
+<!-- interface~scale_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node24" class="node">
+<title>interface~scale_vector_int</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node24"><a xlink:href="../interface/scale_vector_int.html" xlink:title="type_vector_int%scale_vector_int">
+<polygon fill="#a7506f" stroke="#a7506f" points="1356,-234 1167,-234 1167,-210 1356,-210 1356,-234"/>
+<text text-anchor="middle" x="1261.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_int%scale_vector_int</text>
+</a>
+</g>
+</g>
+<!-- interface~scale_vector_int&#45;&gt;proc~scale_vector_int~2 -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge28" class="edge">
+<title>interface~scale_vector_int&#45;&gt;proc~scale_vector_int~2</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M1356.14,-222C1375.98,-222 1396.37,-222 1414.43,-222"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1414.48,-225.5 1424.48,-222 1414.48,-218.5 1414.48,-225.5"/>
+</g>
+<!-- interface~subtract -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node25" class="node">
+<title>interface~subtract</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node25"><a xlink:href="../interface/subtract.html" xlink:title="subtract">
+<polygon fill="#a7506f" stroke="#a7506f" points="1289.5,-66 1233.5,-66 1233.5,-42 1289.5,-42 1289.5,-66"/>
+<text text-anchor="middle" x="1261.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">subtract</text>
+</a>
+</g>
+</g>
+<!-- interface~subtract&#45;&gt;proc~subtract_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge30" class="edge">
+<title>interface~subtract&#45;&gt;proc~subtract_vector_int</title>
+<path fill="none" stroke="#ff00aa" stroke-dasharray="5,2" d="M1289.52,-54C1318.87,-54 1366.84,-54 1406.3,-54"/>
+<polygon fill="#ff00aa" stroke="#ff00aa" points="1406.4,-57.5 1416.4,-54 1406.4,-50.5 1406.4,-57.5"/>
+</g>
+<!-- interface~vector_abs -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node26" class="node">
+<title>interface~vector_abs</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node26"><a xlink:href="../interface/vector_abs.html" xlink:title="vector_abs">
+<polygon fill="#a7506f" stroke="#a7506f" points="1296.5,-738 1226.5,-738 1226.5,-714 1296.5,-714 1296.5,-738"/>
+<text text-anchor="middle" x="1261.5" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_abs</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_abs&#45;&gt;proc~abs_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge20" class="edge">
+<title>interface~vector_abs&#45;&gt;proc~abs_vector_int</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1296.71,-726C1329.64,-726 1379.96,-726 1418.34,-726"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1418.83,-729.5 1428.83,-726 1418.83,-722.5 1418.83,-729.5"/>
+</g>
+<!-- interface~vector_axpy -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node27" class="node">
+<title>interface~vector_axpy</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node27"><a xlink:href="../interface/vector_axpy.html" xlink:title="vector_axpy">
+<polygon fill="#a7506f" stroke="#a7506f" points="1300,-528 1223,-528 1223,-504 1300,-504 1300,-528"/>
+<text text-anchor="middle" x="1261.5" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_axpy</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_axpy&#45;&gt;proc~axpy_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge23" class="edge">
+<title>interface~vector_axpy&#45;&gt;proc~axpy_vector_int</title>
+<path fill="none" stroke="#54ff00" stroke-dasharray="5,2" d="M1300.04,-516C1332.07,-516 1378.62,-516 1415.29,-516"/>
+<polygon fill="#54ff00" stroke="#54ff00" points="1415.35,-519.5 1425.35,-516 1415.35,-512.5 1415.35,-519.5"/>
+</g>
+<!-- interface~vector_axpyz -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node28" class="node">
+<title>interface~vector_axpyz</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node28"><a xlink:href="../interface/vector_axpyz.html" xlink:title="vector_axpyz">
+<polygon fill="#a7506f" stroke="#a7506f" points="1302.5,-486 1220.5,-486 1220.5,-462 1302.5,-462 1302.5,-486"/>
+<text text-anchor="middle" x="1261.5" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_axpyz</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_axpyz&#45;&gt;proc~axpyz_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge24" class="edge">
+<title>interface~vector_axpyz&#45;&gt;proc~axpyz_vector_int</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1302.99,-474C1334.12,-474 1377.61,-474 1412.74,-474"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1412.88,-477.5 1422.88,-474 1412.88,-470.5 1412.88,-477.5"/>
+</g>
+<!-- interface~vector_reciprocal -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node29" class="node">
+<title>interface~vector_reciprocal</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node29"><a xlink:href="../interface/vector_reciprocal.html" xlink:title="vector_reciprocal">
+<polygon fill="#a7506f" stroke="#a7506f" points="1313.5,-276 1209.5,-276 1209.5,-252 1313.5,-252 1313.5,-276"/>
+<text text-anchor="middle" x="1261.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_reciprocal</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_reciprocal&#45;&gt;proc~reciprocal_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge26" class="edge">
+<title>interface~vector_reciprocal&#45;&gt;proc~reciprocal_vector_int</title>
+<path fill="none" stroke="#00a9ff" stroke-dasharray="5,2" d="M1313.6,-264C1340.1,-264 1372.88,-264 1401.78,-264"/>
+<polygon fill="#00a9ff" stroke="#00a9ff" points="1401.82,-267.5 1411.82,-264 1401.82,-260.5 1401.82,-267.5"/>
+</g>
+<!-- interface~vector_scale -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node30" class="node">
+<title>interface~vector_scale</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node30"><a xlink:href="../interface/vector_scale.html" xlink:title="vector_scale">
+<polygon fill="#a7506f" stroke="#a7506f" points="1301,-444 1222,-444 1222,-420 1301,-420 1301,-444"/>
+<text text-anchor="middle" x="1261.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_scale</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_scale&#45;&gt;proc~scale_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge27" class="edge">
+<title>interface~vector_scale&#45;&gt;proc~scale_vector_int</title>
+<path fill="none" stroke="#0054ff" stroke-dasharray="5,2" d="M1283.92,-419.95C1309.14,-406.14 1352.6,-383.56 1392,-369 1399.24,-366.32 1406.96,-363.85 1414.66,-361.61"/>
+<polygon fill="#0054ff" stroke="#0054ff" points="1415.66,-364.97 1424.34,-358.9 1413.77,-358.23 1415.66,-364.97"/>
+</g>
+<!-- interface~vector_shift -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node31" class="node">
+<title>interface~vector_shift</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node31"><a xlink:href="../interface/vector_shift.html" xlink:title="vector_shift">
+<polygon fill="#a7506f" stroke="#a7506f" points="1298.5,-192 1224.5,-192 1224.5,-168 1298.5,-168 1298.5,-192"/>
+<text text-anchor="middle" x="1261.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_shift</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_shift&#45;&gt;proc~shift_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge29" class="edge">
+<title>interface~vector_shift&#45;&gt;proc~shift_vector_int</title>
+<path fill="none" stroke="#5400ff" stroke-dasharray="5,2" d="M1298.6,-180C1331.08,-180 1379.31,-180 1416.74,-180"/>
+<polygon fill="#5400ff" stroke="#5400ff" points="1416.99,-183.5 1426.99,-180 1416.99,-176.5 1416.99,-183.5"/>
+</g>
+<!-- interface~vector_xpay -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node32" class="node">
+<title>interface~vector_xpay</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node32"><a xlink:href="../interface/vector_xpay.html" xlink:title="vector_xpay">
+<polygon fill="#a7506f" stroke="#a7506f" points="1300,-24 1223,-24 1223,0 1300,0 1300,-24"/>
+<text text-anchor="middle" x="1261.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_xpay</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_xpay&#45;&gt;proc~xpay_vector_int -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge31" class="edge">
+<title>interface~vector_xpay&#45;&gt;proc~xpay_vector_int</title>
+<path fill="none" stroke="#ff0055" stroke-dasharray="5,2" d="M1300.04,-12C1332.07,-12 1378.62,-12 1415.29,-12"/>
+<polygon fill="#ff0055" stroke="#ff0055" points="1415.35,-15.5 1425.35,-12 1415.35,-8.5 1415.35,-15.5"/>
+</g>
+<!-- proc~apply_preconditioner_jacobi -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node33" class="node">
+<title>proc~apply_preconditioner_jacobi</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node33"><a xlink:href="../proc/apply_preconditioner_jacobi.html" xlink:title="apply_preconditioner_jacobi">
+<polygon fill="#d9534f" stroke="#d9534f" points="1115,-318 952,-318 952,-294 1115,-294 1115,-318"/>
+<text text-anchor="middle" x="1033.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">apply_preconditioner_jacobi</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_preconditioner_jacobi&#45;&gt;interface~multiply -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge32" class="edge">
+<title>proc~apply_preconditioner_jacobi&#45;&gt;interface~multiply</title>
+<path fill="none" stroke="#ffff00" d="M1115.13,-306C1152.17,-306 1194.26,-306 1223.59,-306"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="1223.78,-309.5 1233.78,-306 1223.78,-302.5 1223.78,-309.5"/>
+</g>
+<!-- proc~setup_preconditioner_jacobi_point -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node34" class="node">
+<title>proc~setup_preconditioner_jacobi_point</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node34"><a xlink:href="../proc/setup_preconditioner_jacobi_point.html" xlink:title="setup_preconditioner_jacobi_point">
+<polygon fill="#d9534f" stroke="#d9534f" points="1131,-276 936,-276 936,-252 1131,-252 1131,-276"/>
+<text text-anchor="middle" x="1033.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">setup_preconditioner_jacobi_point</text>
+</a>
+</g>
+</g>
+<!-- proc~setup_preconditioner_jacobi_point&#45;&gt;interface~vector_reciprocal -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge37" class="edge">
+<title>proc~setup_preconditioner_jacobi_point&#45;&gt;interface~vector_reciprocal</title>
+<path fill="none" stroke="#0000ff" d="M1131.33,-264C1154.39,-264 1178.37,-264 1199.32,-264"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1199.34,-267.5 1209.34,-264 1199.34,-260.5 1199.34,-267.5"/>
+</g>
+<!-- proc~solve_type_solver_bicgstab -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node35" class="node">
+<title>proc~solve_type_solver_bicgstab</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node35"><a xlink:href="../proc/solve_type_solver_bicgstab.html" xlink:title="solve_type_solver_bicgstab">
+<polygon fill="#d9534f" stroke="#d9534f" points="1112,-507 955,-507 955,-483 1112,-483 1112,-507"/>
+<text text-anchor="middle" x="1033.5" y="-492.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_bicgstab</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_bicgstab&#45;&gt;interface~vector_axpy -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge33" class="edge">
+<title>proc~solve_type_solver_bicgstab&#45;&gt;interface~vector_axpy</title>
+<path fill="none" stroke="#00ffff" d="M1112.28,-502.23C1145.6,-505.32 1183.45,-508.84 1212.57,-511.55"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1212.6,-515.06 1222.88,-512.5 1213.24,-508.09 1212.6,-515.06"/>
+</g>
+<!-- proc~solve_type_solver_bicgstab&#45;&gt;interface~vector_axpyz -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge35" class="edge">
+<title>proc~solve_type_solver_bicgstab&#45;&gt;interface~vector_axpyz</title>
+<path fill="none" stroke="#007fff" d="M1112.28,-487.77C1144.69,-484.76 1181.39,-481.35 1210.17,-478.68"/>
+<polygon fill="#007fff" stroke="#007fff" points="1210.75,-482.14 1220.39,-477.73 1210.11,-475.17 1210.75,-482.14"/>
+</g>
+<!-- proc~solve_type_solver_bicgstab&#45;&gt;interface~vector_scale -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge38" class="edge">
+<title>proc~solve_type_solver_bicgstab&#45;&gt;interface~vector_scale</title>
+<path fill="none" stroke="#7f00ff" d="M1102.78,-482.95C1112.4,-480.45 1122.05,-477.48 1131,-474 1148.26,-467.28 1149.76,-459.78 1167,-453 1181.22,-447.41 1197.26,-443.13 1212,-439.94"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1212.85,-443.34 1221.95,-437.9 1211.45,-436.48 1212.85,-443.34"/>
+</g>
+<!-- proc~solve_type_solver_gmres -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node36" class="node">
+<title>proc~solve_type_solver_gmres</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node36"><a xlink:href="../proc/solve_type_solver_gmres.html" xlink:title="solve_type_solver_gmres">
+<polygon fill="#d9534f" stroke="#d9534f" points="1106,-465 961,-465 961,-441 1106,-441 1106,-465"/>
+<text text-anchor="middle" x="1033.5" y="-450.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_gmres</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;interface~vector_axpy -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge34" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;interface~vector_axpy</title>
+<path fill="none" stroke="#00ffff" d="M1102.78,-465.05C1112.4,-467.55 1122.05,-470.52 1131,-474 1148.26,-480.72 1149.76,-488.22 1167,-495 1181.47,-500.69 1197.83,-505.02 1212.78,-508.23"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1212.36,-511.72 1222.86,-510.28 1213.75,-504.86 1212.36,-511.72"/>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;interface~vector_axpyz -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge36" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;interface~vector_axpyz</title>
+<path fill="none" stroke="#007fff" d="M1106.01,-459.64C1139.93,-462.8 1179.65,-466.49 1210.32,-469.34"/>
+<polygon fill="#007fff" stroke="#007fff" points="1210.08,-472.83 1220.36,-470.27 1210.72,-465.86 1210.08,-472.83"/>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;interface~vector_scale -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge39" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;interface~vector_scale</title>
+<path fill="none" stroke="#7f00ff" d="M1106.01,-446.36C1140.51,-443.15 1181.02,-439.39 1211.89,-436.52"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1212.34,-439.99 1221.97,-435.58 1211.69,-433.02 1212.34,-439.99"/>
+</g>
+<!-- interface~apply_preconditioner_jacobi -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node37" class="node">
+<title>interface~apply_preconditioner_jacobi</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node37"><a xlink:href="../interface/apply_preconditioner_jacobi.html" xlink:title="type_preconditioner_jacobi%apply_preconditioner_jacobi">
+<polygon fill="#a7506f" stroke="#a7506f" points="883.5,-318 567.5,-318 567.5,-294 883.5,-294 883.5,-318"/>
+<text text-anchor="middle" x="725.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_preconditioner_jacobi%apply_preconditioner_jacobi</text>
+</a>
+</g>
+</g>
+<!-- interface~apply_preconditioner_jacobi&#45;&gt;proc~apply_preconditioner_jacobi -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge40" class="edge">
+<title>interface~apply_preconditioner_jacobi&#45;&gt;proc~apply_preconditioner_jacobi</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M883.53,-306C903.47,-306 923.31,-306 941.71,-306"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="941.77,-309.5 951.77,-306 941.77,-302.5 941.77,-309.5"/>
+</g>
+<!-- interface~setup_preconditioner_jacobi_point -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node38" class="node">
+<title>interface~setup_preconditioner_jacobi_point</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node38"><a xlink:href="../interface/setup_preconditioner_jacobi_point.html" xlink:title="type_preconditioner_jacobi%setup_preconditioner_jacobi_point">
+<polygon fill="#a7506f" stroke="#a7506f" points="900,-276 551,-276 551,-252 900,-252 900,-276"/>
+<text text-anchor="middle" x="725.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_preconditioner_jacobi%setup_preconditioner_jacobi_point</text>
+</a>
+</g>
+</g>
+<!-- interface~setup_preconditioner_jacobi_point&#45;&gt;proc~setup_preconditioner_jacobi_point -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge41" class="edge">
+<title>interface~setup_preconditioner_jacobi_point&#45;&gt;proc~setup_preconditioner_jacobi_point</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M900.06,-264C908.69,-264 917.24,-264 925.58,-264"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="925.64,-267.5 935.64,-264 925.64,-260.5 925.64,-267.5"/>
+</g>
+<!-- interface~solve_type_solver_bicgstab -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node39" class="node">
+<title>interface~solve_type_solver_bicgstab</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node39"><a xlink:href="../interface/solve_type_solver_bicgstab.html" xlink:title="type_solver_bicgstab%solve_type_solver_bicgstab">
+<polygon fill="#a7506f" stroke="#a7506f" points="864,-507 587,-507 587,-483 864,-483 864,-507"/>
+<text text-anchor="middle" x="725.5" y="-492.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_solver_bicgstab%solve_type_solver_bicgstab</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_type_solver_bicgstab&#45;&gt;proc~solve_type_solver_bicgstab -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge42" class="edge">
+<title>interface~solve_type_solver_bicgstab&#45;&gt;proc~solve_type_solver_bicgstab</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M864.28,-495C891.61,-495 919.59,-495 944.69,-495"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="944.89,-498.5 954.89,-495 944.89,-491.5 944.89,-498.5"/>
+</g>
+<!-- interface~solve_type_solver_gmres -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node40" class="node">
+<title>interface~solve_type_solver_gmres</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node40"><a xlink:href="../interface/solve_type_solver_gmres.html" xlink:title="type_solver_gmres%solve_type_solver_gmres">
+<polygon fill="#a7506f" stroke="#a7506f" points="852,-465 599,-465 599,-441 852,-441 852,-465"/>
+<text text-anchor="middle" x="725.5" y="-450.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_solver_gmres%solve_type_solver_gmres</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_type_solver_gmres&#45;&gt;proc~solve_type_solver_gmres -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge43" class="edge">
+<title>interface~solve_type_solver_gmres&#45;&gt;proc~solve_type_solver_gmres</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M852.29,-453C885.46,-453 920.4,-453 950.59,-453"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="950.64,-456.5 960.64,-453 950.64,-449.5 950.64,-456.5"/>
+</g>
+<!-- proc~setup_preconditioner_jacobi -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node41" class="node">
+<title>proc~setup_preconditioner_jacobi</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node41"><a xlink:href="../proc/setup_preconditioner_jacobi.html" xlink:title="setup_preconditioner_jacobi">
+<polygon fill="#d9534f" stroke="#d9534f" points="515,-276 352,-276 352,-252 515,-252 515,-276"/>
+<text text-anchor="middle" x="433.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">setup_preconditioner_jacobi</text>
+</a>
+</g>
+</g>
+<!-- proc~setup_preconditioner_jacobi&#45;&gt;interface~setup_preconditioner_jacobi_point -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge44" class="edge">
+<title>proc~setup_preconditioner_jacobi&#45;&gt;interface~setup_preconditioner_jacobi_point</title>
+<path fill="none" stroke="#7fff00" d="M515.28,-264C523.41,-264 531.88,-264 540.55,-264"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="540.81,-267.5 550.81,-264 540.81,-260.5 540.81,-267.5"/>
+</g>
+<!-- interface~setup_preconditioner_jacobi -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_node42" class="node">
+<title>interface~setup_preconditioner_jacobi</title>
+<g id="a_proc~~get_data_vector_int~~CalledByGraph_node42"><a xlink:href="../interface/setup_preconditioner_jacobi.html" xlink:title="type_preconditioner_jacobi%setup_preconditioner_jacobi">
+<polygon fill="#a7506f" stroke="#a7506f" points="316,-276 0,-276 0,-252 316,-252 316,-276"/>
+<text text-anchor="middle" x="158" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_preconditioner_jacobi%setup_preconditioner_jacobi</text>
+</a>
+</g>
+</g>
+<!-- interface~setup_preconditioner_jacobi&#45;&gt;proc~setup_preconditioner_jacobi -->
+<g id="proc~~get_data_vector_int~~CalledByGraph_edge45" class="edge">
+<title>interface~setup_preconditioner_jacobi&#45;&gt;proc~setup_preconditioner_jacobi</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M316.11,-264C324.83,-264 333.44,-264 341.78,-264"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="341.82,-267.5 351.82,-264 341.82,-260.5 341.82,-267.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocget_data_vector_intCalledByGraph = svgPanZoom('#procget_data_vector_intCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module function </span><span class="n">get_data_vector_int</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="k">data</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_vector_int</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">target</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">contiguous</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="k">data</span>
+
+<span class="k">        data</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">val</span>
+<span class="w">    </span><span class="k">end function </span><span class="n">get_data_vector_int</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

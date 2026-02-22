@@ -1,0 +1,845 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>compute_quad_rule_gauss_integration &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>compute_quad_rule_gauss_integration
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">20 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/gauss.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/gauss.f90.html'>gauss.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_types_math_gauss.html'>core_types_math_gauss</a></li>
+            <li class="breadcrumb-item active" aria-current="page">compute_quad_rule_gauss_integration</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/compute_quad_rule_gauss_integration.html#src">compute_quad_rule_gauss_integration</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine compute_quad_rule_gauss_integration(self, order)  
+</h2>
+    
+
+    <p>四角形要素用ルール (1Dの直積)
+一次配列をallocateせず，逐次計算して格納する</p>
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_gauss_integration_rule.html'>type_gauss_integration_rule</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~306"></span>
+              class(<a href='../type/type_gauss_integration_rule.html'>type_gauss_integration_rule</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-order~7"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>order</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~compute_quad_rule_gauss_integration~~CallsGraph Pages: 1 -->
+<svg id="proccompute_quad_rule_gauss_integrationCallsGraph" width="641pt" height="119pt"
+ viewBox="0.00 0.00 641.00 119.03" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph" class="graph" transform="scale(0.6 0.6) rotate(0) translate(4 196)">
+<title>proc~~compute_quad_rule_gauss_integration~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-196 1073,-196 1073,4 -4,4"/>
+<!-- proc~compute_quad_rule_gauss_integration -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_node1" class="node">
+<title>proc~compute_quad_rule_gauss_integration</title>
+<polygon fill="none" stroke="black" points="377,-108 0,-108 0,-84 377,-84 377,-108"/>
+<text text-anchor="middle" x="188.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_gauss_integration_rule%compute_quad_rule_gauss_integration</text>
+</g>
+<!-- none~set~12 -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_node2" class="node">
+<title>none~set~12</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CallsGraph_node2"><a xlink:href="../type/type_coordinate_dp.html#boundprocedure-set~12" xlink:title="type_coordinate_dp%set">
+<polygon fill="#a7506f" stroke="#a7506f" points="665,-150 522,-150 522,-126 665,-126 665,-150"/>
+<text text-anchor="middle" x="593.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_coordinate_dp%set</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_quad_rule_gauss_integration&#45;&gt;none~set~12 -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_edge1" class="edge">
+<title>proc~compute_quad_rule_gauss_integration&#45;&gt;none~set~12</title>
+<path fill="none" stroke="#ff0000" d="M304.71,-108.01C370.9,-114.91 452.41,-123.4 511.76,-129.59"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="511.52,-133.08 521.83,-130.64 512.25,-126.12 511.52,-133.08"/>
+</g>
+<!-- proc~get_legendre_point -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_node3" class="node">
+<title>proc~get_legendre_point</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CallsGraph_node3"><a xlink:href="../proc/get_legendre_point.html" xlink:title="get_legendre_point">
+<polygon fill="#d9534f" stroke="#d9534f" points="651,-108 536,-108 536,-84 651,-84 651,-108"/>
+<text text-anchor="middle" x="593.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_legendre_point</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_quad_rule_gauss_integration&#45;&gt;proc~get_legendre_point -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_edge2" class="edge">
+<title>proc~compute_quad_rule_gauss_integration&#45;&gt;proc~get_legendre_point</title>
+<path fill="none" stroke="#ff0000" d="M377.14,-96C430.34,-96 484.84,-96 525.7,-96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="525.78,-99.5 535.78,-96 525.78,-92.5 525.78,-99.5"/>
+</g>
+<!-- proc~initial_setup_gauss_integration_rule -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_node4" class="node">
+<title>proc~initial_setup_gauss_integration_rule</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CallsGraph_node4"><a xlink:href="../proc/initial_setup_gauss_integration_rule.html" xlink:title="type_gauss_integration_rule%initial_setup_gauss_integration_rule">
+<polygon fill="#d9534f" stroke="#d9534f" points="774,-66 413,-66 413,-42 774,-42 774,-66"/>
+<text text-anchor="middle" x="593.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_gauss_integration_rule%initial_setup_gauss_integration_rule</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_quad_rule_gauss_integration&#45;&gt;proc~initial_setup_gauss_integration_rule -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_edge3" class="edge">
+<title>proc~compute_quad_rule_gauss_integration&#45;&gt;proc~initial_setup_gauss_integration_rule</title>
+<path fill="none" stroke="#ff0000" d="M304.71,-83.99C355.42,-78.71 415.11,-72.49 466.94,-67.09"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="467.62,-70.53 477.2,-66.02 466.89,-63.57 467.62,-70.53"/>
+</g>
+<!-- proc~set_coordinate_dp -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_node8" class="node">
+<title>proc~set_coordinate_dp</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CallsGraph_node8"><a xlink:href="../proc/set_coordinate_dp.html" xlink:title="type_coordinate_dp%set_coordinate_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="1052,-192 827,-192 827,-168 1052,-168 1052,-192"/>
+<text text-anchor="middle" x="939.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_coordinate_dp%set_coordinate_dp</text>
+</a>
+</g>
+</g>
+<!-- none~set~12&#45;&gt;proc~set_coordinate_dp -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_edge4" class="edge">
+<title>none~set~12&#45;&gt;proc~set_coordinate_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M665.36,-146.65C712.75,-152.44 776.04,-160.16 829.76,-166.72"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="829.67,-170.24 840.02,-167.98 830.52,-163.29 829.67,-170.24"/>
+</g>
+<!-- proc~set_coordinate_dp_array -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_node9" class="node">
+<title>proc~set_coordinate_dp_array</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CallsGraph_node9"><a xlink:href="../proc/set_coordinate_dp_array.html" xlink:title="type_coordinate_dp%set_coordinate_dp_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="1069,-150 810,-150 810,-126 1069,-126 1069,-150"/>
+<text text-anchor="middle" x="939.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_coordinate_dp%set_coordinate_dp_array</text>
+</a>
+</g>
+</g>
+<!-- none~set~12&#45;&gt;proc~set_coordinate_dp_array -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_edge5" class="edge">
+<title>none~set~12&#45;&gt;proc~set_coordinate_dp_array</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M665.36,-138C704.11,-138 753.49,-138 799.58,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="799.67,-141.5 809.67,-138 799.67,-134.5 799.67,-141.5"/>
+</g>
+<!-- allocate_array -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_node5" class="node">
+<title>allocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="984,-108 895,-108 895,-84 984,-84 984,-108"/>
+<text text-anchor="middle" x="939.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</g>
+<!-- proc~initial_setup_gauss_integration_rule&#45;&gt;allocate_array -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_edge6" class="edge">
+<title>proc~initial_setup_gauss_integration_rule&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#0000ff" d="M698.93,-66.03C723.56,-68.92 749.71,-72.03 774,-75 811,-79.53 852.66,-84.85 884.8,-89"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="884.51,-92.49 894.88,-90.3 885.41,-85.55 884.51,-92.49"/>
+</g>
+<!-- deallocate_array -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_node6" class="node">
+<title>deallocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="991,-66 888,-66 888,-42 991,-42 991,-66"/>
+<text text-anchor="middle" x="939.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_array</text>
+</g>
+<!-- proc~initial_setup_gauss_integration_rule&#45;&gt;deallocate_array -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_edge7" class="edge">
+<title>proc~initial_setup_gauss_integration_rule&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#0000ff" d="M774.06,-54C811.51,-54 848.48,-54 877.85,-54"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="877.92,-57.5 887.92,-54 877.92,-50.5 877.92,-57.5"/>
+</g>
+<!-- proc~reset_coordinate_dp -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_node7" class="node">
+<title>proc~reset_coordinate_dp</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CallsGraph_node7"><a xlink:href="../proc/reset_coordinate_dp.html" xlink:title="type_coordinate_dp%reset_coordinate_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="1057,-24 822,-24 822,0 1057,0 1057,-24"/>
+<text text-anchor="middle" x="939.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_coordinate_dp%reset_coordinate_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~initial_setup_gauss_integration_rule&#45;&gt;proc~reset_coordinate_dp -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_edge8" class="edge">
+<title>proc~initial_setup_gauss_integration_rule&#45;&gt;proc~reset_coordinate_dp</title>
+<path fill="none" stroke="#0000ff" d="M693.08,-41.96C735.9,-36.74 786.2,-30.59 830.08,-25.24"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="830.7,-28.69 840.21,-24 829.86,-21.74 830.7,-28.69"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccompute_quad_rule_gauss_integrationCallsGraph = svgPanZoom('#proccompute_quad_rule_gauss_integrationCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~compute_quad_rule_gauss_integration~~CalledByGraph Pages: 1 -->
+<svg id="proccompute_quad_rule_gauss_integrationCalledByGraph" width="641pt" height="104pt"
+ viewBox="0.00 0.00 641.00 104.32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph" class="graph" transform="scale(0.43 0.43) rotate(0) translate(4 238)">
+<title>proc~~compute_quad_rule_gauss_integration~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-238 1483,-238 1483,4 -4,4"/>
+<!-- proc~compute_quad_rule_gauss_integration -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node1" class="node">
+<title>proc~compute_quad_rule_gauss_integration</title>
+<polygon fill="none" stroke="black" points="1479,-129 1102,-129 1102,-105 1479,-105 1479,-129"/>
+<text text-anchor="middle" x="1290.5" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_gauss_integration_rule%compute_quad_rule_gauss_integration</text>
+</g>
+<!-- proc~initialize_type_gauss_integration_rule -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node2" class="node">
+<title>proc~initialize_type_gauss_integration_rule</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node2"><a xlink:href="../proc/initialize_type_gauss_integration_rule.html" xlink:title="type_gauss_integration_rule%initialize_type_gauss_integration_rule">
+<polygon fill="#d9534f" stroke="#d9534f" points="1066,-129 696,-129 696,-105 1066,-105 1066,-129"/>
+<text text-anchor="middle" x="881" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_gauss_integration_rule%initialize_type_gauss_integration_rule</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_gauss_integration_rule&#45;&gt;proc~compute_quad_rule_gauss_integration -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_edge1" class="edge">
+<title>proc~initialize_type_gauss_integration_rule&#45;&gt;proc~compute_quad_rule_gauss_integration</title>
+<path fill="none" stroke="#ff0000" d="M1066.08,-117C1074.64,-117 1083.26,-117 1091.85,-117"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1091.94,-120.5 1101.94,-117 1091.94,-113.5 1091.94,-120.5"/>
+</g>
+<!-- proc~initialize_abst_fe -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node3" class="node">
+<title>proc~initialize_abst_fe</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node3"><a xlink:href="../proc/initialize_abst_fe.html" xlink:title="initialize_abst_fe">
+<polygon fill="#d9534f" stroke="#d9534f" points="660,-129 560,-129 560,-105 660,-105 660,-129"/>
+<text text-anchor="middle" x="610" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_abst_fe&#45;&gt;proc~initialize_type_gauss_integration_rule -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_edge2" class="edge">
+<title>proc~initialize_abst_fe&#45;&gt;proc~initialize_type_gauss_integration_rule</title>
+<path fill="none" stroke="#ff0000" d="M660.03,-117C667.98,-117 676.62,-117 685.72,-117"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="685.76,-120.5 695.76,-117 685.76,-113.5 685.76,-120.5"/>
+</g>
+<!-- interface~initialize_abst_fe -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node4" class="node">
+<title>interface~initialize_abst_fe</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node4"><a xlink:href="../interface/initialize_abst_fe.html" xlink:title="abst_fe%initialize_abst_fe">
+<polygon fill="#a7506f" stroke="#a7506f" points="524,-129 376,-129 376,-105 524,-105 524,-129"/>
+<text text-anchor="middle" x="450" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%initialize_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_abst_fe&#45;&gt;proc~initialize_abst_fe -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_edge3" class="edge">
+<title>interface~initialize_abst_fe&#45;&gt;proc~initialize_abst_fe</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M524.45,-117C532.84,-117 541.31,-117 549.48,-117"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="549.64,-120.5 559.64,-117 549.64,-113.5 549.64,-120.5"/>
+</g>
+<!-- proc~construct_side_first -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node5" class="node">
+<title>proc~construct_side_first</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node5"><a xlink:href="../proc/construct_side_first.html" xlink:title="construct_side_first">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="321.5,-234 206.5,-234 206.5,-210 321.5,-210 321.5,-234"/>
+<text text-anchor="middle" x="264" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_side_first</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_side_first&#45;&gt;interface~initialize_abst_fe -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_edge4" class="edge">
+<title>proc~construct_side_first&#45;&gt;interface~initialize_abst_fe</title>
+<path fill="none" stroke="#ff0000" d="M318.01,-209.92C325.57,-207.41 333.11,-204.45 340,-201 374.31,-183.79 408.49,-155.1 429.19,-136.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="431.76,-138.49 436.69,-129.11 426.99,-133.38 431.76,-138.49"/>
+</g>
+<!-- proc~construct_side_second -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node6" class="node">
+<title>proc~construct_side_second</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node6"><a xlink:href="../proc/construct_side_second.html" xlink:title="construct_side_second">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="330.5,-192 197.5,-192 197.5,-168 330.5,-168 330.5,-192"/>
+<text text-anchor="middle" x="264" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_side_second</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_side_second&#45;&gt;interface~initialize_abst_fe -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_edge5" class="edge">
+<title>proc~construct_side_second&#45;&gt;interface~initialize_abst_fe</title>
+<path fill="none" stroke="#ff0000" d="M310.82,-167.91C320.51,-165.15 330.63,-162.11 340,-159 363.6,-151.17 389.59,-141.21 410.27,-132.95"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="411.69,-136.15 419.67,-129.17 409.08,-129.66 411.69,-136.15"/>
+</g>
+<!-- proc~construct_square_first -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node7" class="node">
+<title>proc~construct_square_first</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node7"><a xlink:href="../proc/construct_square_first.html" xlink:title="construct_square_first">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="328.5,-150 199.5,-150 199.5,-126 328.5,-126 328.5,-150"/>
+<text text-anchor="middle" x="264" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_square_first</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_square_first&#45;&gt;interface~initialize_abst_fe -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_edge6" class="edge">
+<title>proc~construct_square_first&#45;&gt;interface~initialize_abst_fe</title>
+<path fill="none" stroke="#ff0000" d="M328.58,-130.74C340.63,-129.37 353.4,-127.91 365.94,-126.48"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="366.4,-129.95 375.94,-125.34 365.61,-122.99 366.4,-129.95"/>
+</g>
+<!-- proc~construct_square_second -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node8" class="node">
+<title>proc~construct_square_second</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node8"><a xlink:href="../proc/construct_square_second.html" xlink:title="construct_square_second">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="337.5,-108 190.5,-108 190.5,-84 337.5,-84 337.5,-108"/>
+<text text-anchor="middle" x="264" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_square_second</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_square_second&#45;&gt;interface~initialize_abst_fe -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_edge7" class="edge">
+<title>proc~construct_square_second&#45;&gt;interface~initialize_abst_fe</title>
+<path fill="none" stroke="#ff0000" d="M337.72,-104.3C346.94,-105.35 356.43,-106.44 365.8,-107.5"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="365.57,-111 375.9,-108.66 366.36,-104.05 365.57,-111"/>
+</g>
+<!-- proc~construct_triangle_first -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node9" class="node">
+<title>proc~construct_triangle_first</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node9"><a xlink:href="../proc/construct_triangle_first.html" xlink:title="construct_triangle_first">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="331,-66 197,-66 197,-42 331,-42 331,-66"/>
+<text text-anchor="middle" x="264" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_triangle_first</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_triangle_first&#45;&gt;interface~initialize_abst_fe -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_edge8" class="edge">
+<title>proc~construct_triangle_first&#45;&gt;interface~initialize_abst_fe</title>
+<path fill="none" stroke="#ff0000" d="M310.82,-66.09C320.51,-68.85 330.63,-71.89 340,-75 363.6,-82.83 389.59,-92.79 410.27,-101.05"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="409.08,-104.34 419.67,-104.83 411.69,-97.85 409.08,-104.34"/>
+</g>
+<!-- proc~construct_triangle_second -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node10" class="node">
+<title>proc~construct_triangle_second</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node10"><a xlink:href="../proc/construct_triangle_second.html" xlink:title="construct_triangle_second">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="340,-24 188,-24 188,0 340,0 340,-24"/>
+<text text-anchor="middle" x="264" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_triangle_second</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_triangle_second&#45;&gt;interface~initialize_abst_fe -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_edge9" class="edge">
+<title>proc~construct_triangle_second&#45;&gt;interface~initialize_abst_fe</title>
+<path fill="none" stroke="#ff0000" d="M318.01,-24.08C325.57,-26.59 333.11,-29.55 340,-33 374.31,-50.21 408.49,-78.9 429.19,-97.89"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="426.99,-100.62 436.69,-104.89 431.76,-95.51 426.99,-100.62"/>
+</g>
+<!-- interface~construct_side_first -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node11" class="node">
+<title>interface~construct_side_first</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node11"><a xlink:href="../interface/construct_side_first.html" xlink:title="construct_side_first">
+<polygon fill="#a7506f" stroke="#a7506f" points="133.5,-234 18.5,-234 18.5,-210 133.5,-210 133.5,-234"/>
+<text text-anchor="middle" x="76" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_side_first</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_side_first&#45;&gt;proc~construct_side_first -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_edge10" class="edge">
+<title>interface~construct_side_first&#45;&gt;proc~construct_side_first</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M133.56,-222C153.31,-222 175.67,-222 196.17,-222"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="196.38,-225.5 206.38,-222 196.38,-218.5 196.38,-225.5"/>
+</g>
+<!-- interface~construct_side_second -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node12" class="node">
+<title>interface~construct_side_second</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node12"><a xlink:href="../interface/construct_side_second.html" xlink:title="construct_side_second">
+<polygon fill="#a7506f" stroke="#a7506f" points="142.5,-192 9.5,-192 9.5,-168 142.5,-168 142.5,-192"/>
+<text text-anchor="middle" x="76" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_side_second</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_side_second&#45;&gt;proc~construct_side_second -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_edge11" class="edge">
+<title>interface~construct_side_second&#45;&gt;proc~construct_side_second</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M142.58,-180C157.02,-180 172.44,-180 187.25,-180"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="187.39,-183.5 197.39,-180 187.39,-176.5 187.39,-183.5"/>
+</g>
+<!-- interface~construct_square_first -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node13" class="node">
+<title>interface~construct_square_first</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node13"><a xlink:href="../interface/construct_square_first.html" xlink:title="construct_square_first">
+<polygon fill="#a7506f" stroke="#a7506f" points="140.5,-150 11.5,-150 11.5,-126 140.5,-126 140.5,-150"/>
+<text text-anchor="middle" x="76" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_square_first</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_square_first&#45;&gt;proc~construct_square_first -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_edge12" class="edge">
+<title>interface~construct_square_first&#45;&gt;proc~construct_square_first</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M140.75,-138C156.28,-138 173.02,-138 188.98,-138"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="189.33,-141.5 199.33,-138 189.33,-134.5 189.33,-141.5"/>
+</g>
+<!-- interface~construct_square_second -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node14" class="node">
+<title>interface~construct_square_second</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node14"><a xlink:href="../interface/construct_square_second.html" xlink:title="construct_square_second">
+<polygon fill="#a7506f" stroke="#a7506f" points="149.5,-108 2.5,-108 2.5,-84 149.5,-84 149.5,-108"/>
+<text text-anchor="middle" x="76" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_square_second</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_square_second&#45;&gt;proc~construct_square_second -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_edge13" class="edge">
+<title>interface~construct_square_second&#45;&gt;proc~construct_square_second</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M149.71,-96C159.72,-96 170.06,-96 180.24,-96"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="180.34,-99.5 190.34,-96 180.34,-92.5 180.34,-99.5"/>
+</g>
+<!-- interface~construct_triangle_first -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node15" class="node">
+<title>interface~construct_triangle_first</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node15"><a xlink:href="../interface/construct_triangle_first.html" xlink:title="construct_triangle_first">
+<polygon fill="#a7506f" stroke="#a7506f" points="143,-66 9,-66 9,-42 143,-42 143,-66"/>
+<text text-anchor="middle" x="76" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_triangle_first</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_triangle_first&#45;&gt;proc~construct_triangle_first -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_edge14" class="edge">
+<title>interface~construct_triangle_first&#45;&gt;proc~construct_triangle_first</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M143.1,-54C157.13,-54 172.06,-54 186.44,-54"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="186.8,-57.5 196.8,-54 186.8,-50.5 186.8,-57.5"/>
+</g>
+<!-- interface~construct_triangle_second -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node16" class="node">
+<title>interface~construct_triangle_second</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CalledByGraph_node16"><a xlink:href="../interface/construct_triangle_second.html" xlink:title="construct_triangle_second">
+<polygon fill="#a7506f" stroke="#a7506f" points="152,-24 0,-24 0,0 152,0 152,-24"/>
+<text text-anchor="middle" x="76" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_triangle_second</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_triangle_second&#45;&gt;proc~construct_triangle_second -->
+<g id="proc~~compute_quad_rule_gauss_integration~~CalledByGraph_edge15" class="edge">
+<title>interface~construct_triangle_second&#45;&gt;proc~construct_triangle_second</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M152.12,-12C160.6,-12 169.28,-12 177.87,-12"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="177.9,-15.5 187.9,-12 177.9,-8.5 177.9,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccompute_quad_rule_gauss_integrationCalledByGraph = svgPanZoom('#proccompute_quad_rule_gauss_integrationCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">compute_quad_rule_gauss_integration</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">order</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_gauss_integration_rule</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">order</span>
+
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">n_1d</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="n">k</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">w_i</span><span class="p">,</span><span class="w"> </span><span class="n">p_i</span><span class="p">,</span><span class="w"> </span><span class="n">w_j</span><span class="p">,</span><span class="w"> </span><span class="n">p_j</span>
+
+<span class="w">        </span><span class="n">n_1d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">order</span><span class="p">)</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">num_gauss</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n_1d</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">n_1d</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">initial_setup</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_gauss</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="k">do </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n_1d</span>
+<span class="w">            </span><span class="c">! j方向の座標と重みを取得</span>
+<span class="w">            </span><span class="k">call </span><span class="n">get_legendre_point</span><span class="p">(</span><span class="n">n_1d</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="n">w_j</span><span class="p">,</span><span class="w"> </span><span class="n">p_j</span><span class="p">)</span>
+
+<span class="w">            </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n_1d</span>
+<span class="w">                </span><span class="c">! i方向の座標と重みを取得</span>
+<span class="w">                </span><span class="k">call </span><span class="n">get_legendre_point</span><span class="p">(</span><span class="n">n_1d</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">w_i</span><span class="p">,</span><span class="w"> </span><span class="n">p_i</span><span class="p">)</span>
+
+<span class="w">                </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">weight</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">w_i</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">w_j</span>
+<span class="w">                </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">gauss</span><span class="p">(</span><span class="n">k</span><span class="p">)%</span><span class="n">set</span><span class="p">(</span><span class="n">p_i</span><span class="p">,</span><span class="w"> </span><span class="n">p_j</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span>
+<span class="w">            </span><span class="k">end do</span>
+<span class="k">        end do</span>
+<span class="k">    end subroutine </span><span class="n">compute_quad_rule_gauss_integration</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

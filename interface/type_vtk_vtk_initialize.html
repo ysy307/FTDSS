@@ -1,0 +1,992 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>type_vtk_vtk_initialize &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>type_vtk_vtk_initialize
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">28 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/vtk.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/vtk.f90.html'>vtk.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_vtk.html'>core_vtk</a></li>
+            <li class="breadcrumb-item active" aria-current="page">type_vtk_vtk_initialize</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+    <em>None</em>
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>interface</h2>
+      
+      <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~type_vtk_vtk_initialize~~CallsGraph Pages: 1 -->
+<svg id="interfacetype_vtk_vtk_initializeCallsGraph" width="641pt" height="399pt"
+ viewBox="0.00 0.00 641.00 398.71" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph" class="graph" transform="scale(0.44 0.44) rotate(0) translate(4 906)">
+<title>interface~~type_vtk_vtk_initialize~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-906 1459,-906 1459,4 -4,4"/>
+<!-- interface~type_vtk_vtk_initialize -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node1" class="node">
+<title>interface~type_vtk_vtk_initialize</title>
+<polygon fill="none" stroke="black" points="181,-461 0,-461 0,-437 181,-437 181,-461"/>
+<text text-anchor="middle" x="90.5" y="-446.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_vtk%type_vtk_vtk_initialize</text>
+</g>
+<!-- proc~type_vtk_vtk_initialize -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node2" class="node">
+<title>proc~type_vtk_vtk_initialize</title>
+<g id="a_interface~~type_vtk_vtk_initialize~~CallsGraph_node2"><a xlink:href="../proc/type_vtk_vtk_initialize.html" xlink:title="type_vtk_vtk_initialize">
+<polygon fill="#d9534f" stroke="#d9534f" points="344,-461 217,-461 217,-437 344,-437 344,-461"/>
+<text text-anchor="middle" x="280.5" y="-446.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vtk_vtk_initialize</text>
+</a>
+</g>
+</g>
+<!-- interface~type_vtk_vtk_initialize&#45;&gt;proc~type_vtk_vtk_initialize -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge1" class="edge">
+<title>interface~type_vtk_vtk_initialize&#45;&gt;proc~type_vtk_vtk_initialize</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M181.1,-449C189.7,-449 198.36,-449 206.77,-449"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="206.9,-452.5 216.9,-449 206.9,-445.5 206.9,-452.5"/>
+</g>
+<!-- allocate_array -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node3" class="node">
+<title>allocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="860.5,-483 771.5,-483 771.5,-459 860.5,-459 860.5,-483"/>
+<text text-anchor="middle" x="816" y="-468.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;allocate_array -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge2" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#ff0000" d="M281.09,-436.98C280.24,-390.82 284.09,-224.01 380,-155 442.95,-109.7 667.38,-107.91 729,-155 776.72,-191.47 804.25,-382.98 812.41,-448.78"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="808.96,-449.37 813.63,-458.88 815.91,-448.53 808.96,-449.37"/>
+</g>
+<!-- deallocate_array -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node4" class="node">
+<title>deallocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="606,-860 503,-860 503,-836 606,-836 606,-860"/>
+<text text-anchor="middle" x="554.5" y="-845.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_array</text>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;deallocate_array -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge3" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#ff0000" d="M282.86,-461.28C289.71,-520.58 322.29,-776.58 380,-827 410.28,-853.46 455.71,-858.15 492.49,-856.52"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="492.85,-860.01 502.62,-855.91 492.42,-853.02 492.85,-860.01"/>
+</g>
+<!-- interface~type_vtk_cell_set -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node5" class="node">
+<title>interface~type_vtk_cell_set</title>
+<g id="a_interface~~type_vtk_vtk_initialize~~CallsGraph_node5"><a xlink:href="../interface/type_vtk_cell_set.html" xlink:title="type_vtk_cell%type_vtk_cell_set">
+<polygon fill="#a7506f" stroke="#a7506f" points="644.5,-902 464.5,-902 464.5,-878 644.5,-878 644.5,-902"/>
+<text text-anchor="middle" x="554.5" y="-887.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vtk_cell%type_vtk_cell_set</text>
+</a>
+</g>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;interface~type_vtk_cell_set -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge4" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;interface~type_vtk_cell_set</title>
+<path fill="none" stroke="#ff0000" d="M282.53,-461.34C288.08,-524.65 316.54,-812.16 380,-869 400.14,-887.04 427.28,-895.07 454.11,-897.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="454.12,-901.37 464.36,-898.69 454.68,-894.4 454.12,-901.37"/>
+</g>
+<!-- interface~vtk_finalize -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node6" class="node">
+<title>interface~vtk_finalize</title>
+<g id="a_interface~~type_vtk_vtk_initialize~~CallsGraph_node6"><a xlink:href="../interface/vtk_finalize.html" xlink:title="vtk_finalize">
+<polygon fill="#a7506f" stroke="#a7506f" points="590.5,-776 518.5,-776 518.5,-752 590.5,-752 590.5,-776"/>
+<text text-anchor="middle" x="554.5" y="-761.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk_finalize</text>
+</a>
+</g>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_finalize -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge5" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_finalize</title>
+<path fill="none" stroke="#ff0000" d="M281.35,-461.29C281.54,-507.05 288.84,-668.68 380,-743 415.58,-772 469.69,-774.06 508.01,-770.89"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="508.76,-774.34 518.37,-769.88 508.08,-767.37 508.76,-774.34"/>
+</g>
+<!-- interface~vtk_get_cell_data_int32 -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node7" class="node">
+<title>interface~vtk_get_cell_data_int32</title>
+<g id="a_interface~~type_vtk_vtk_initialize~~CallsGraph_node7"><a xlink:href="../interface/vtk_get_cell_data_int32.html" xlink:title="vtk_get_cell_data_int32">
+<polygon fill="#a7506f" stroke="#a7506f" points="622.5,-734 486.5,-734 486.5,-710 622.5,-710 622.5,-734"/>
+<text text-anchor="middle" x="554.5" y="-719.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk_get_cell_data_int32</text>
+</a>
+</g>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_get_cell_data_int32 -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge6" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_get_cell_data_int32</title>
+<path fill="none" stroke="#ff0000" d="M282.11,-461.27C284.88,-502.81 299.99,-638.99 380,-701 406.95,-721.89 443.67,-728.48 476.39,-729.31"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="476.38,-732.81 486.4,-729.39 476.43,-725.81 476.38,-732.81"/>
+</g>
+<!-- interface~vtk_get_cell_info -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node8" class="node">
+<title>interface~vtk_get_cell_info</title>
+<g id="a_interface~~type_vtk_vtk_initialize~~CallsGraph_node8"><a xlink:href="../interface/vtk_get_cell_info.html" xlink:title="vtk_get_cell_info">
+<polygon fill="#a7506f" stroke="#a7506f" points="604.5,-692 504.5,-692 504.5,-668 604.5,-668 604.5,-692"/>
+<text text-anchor="middle" x="554.5" y="-677.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk_get_cell_info</text>
+</a>
+</g>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_get_cell_info -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge7" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_get_cell_info</title>
+<path fill="none" stroke="#ff0000" d="M283.1,-461.04C288.67,-497.78 310.83,-608.96 380,-659 412.55,-682.55 457.86,-687.36 494,-686.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="494.56,-689.99 504.42,-686.1 494.29,-682.99 494.56,-689.99"/>
+</g>
+<!-- interface~vtk_get_num_cells -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node9" class="node">
+<title>interface~vtk_get_num_cells</title>
+<g id="a_interface~~type_vtk_vtk_initialize~~CallsGraph_node9"><a xlink:href="../interface/vtk_get_num_cells.html" xlink:title="vtk_get_num_cells">
+<polygon fill="#a7506f" stroke="#a7506f" points="609,-650 500,-650 500,-626 609,-626 609,-650"/>
+<text text-anchor="middle" x="554.5" y="-635.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk_get_num_cells</text>
+</a>
+</g>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_get_num_cells -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge8" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_get_num_cells</title>
+<path fill="none" stroke="#ff0000" d="M284.64,-461.35C293.47,-493.3 321.76,-578.8 380,-617 411.98,-637.98 454.54,-643.39 489.5,-643.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="489.65,-646.97 499.61,-643.35 489.57,-639.97 489.65,-646.97"/>
+</g>
+<!-- interface~vtk_get_num_points -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node10" class="node">
+<title>interface~vtk_get_num_points</title>
+<g id="a_interface~~type_vtk_vtk_initialize~~CallsGraph_node10"><a xlink:href="../interface/vtk_get_num_points.html" xlink:title="vtk_get_num_points">
+<polygon fill="#a7506f" stroke="#a7506f" points="613.5,-608 495.5,-608 495.5,-584 613.5,-584 613.5,-608"/>
+<text text-anchor="middle" x="554.5" y="-593.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk_get_num_points</text>
+</a>
+</g>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_get_num_points -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge9" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_get_num_points</title>
+<path fill="none" stroke="#ff0000" d="M287,-461.31C299.38,-487.38 332.12,-547.98 380,-575 411.61,-592.84 451.56,-598.59 485.16,-599.66"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="485.3,-603.16 495.36,-599.85 485.43,-596.16 485.3,-603.16"/>
+</g>
+<!-- interface~vtk_get_point_data_float64 -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node11" class="node">
+<title>interface~vtk_get_point_data_float64</title>
+<g id="a_interface~~type_vtk_vtk_initialize~~CallsGraph_node11"><a xlink:href="../interface/vtk_get_point_data_float64.html" xlink:title="vtk_get_point_data_float64">
+<polygon fill="#a7506f" stroke="#a7506f" points="632,-566 477,-566 477,-542 632,-542 632,-566"/>
+<text text-anchor="middle" x="554.5" y="-551.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk_get_point_data_float64</text>
+</a>
+</g>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_get_point_data_float64 -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge10" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_get_point_data_float64</title>
+<path fill="none" stroke="#ff0000" d="M291.5,-461.25C307.81,-480.26 342.13,-516.39 380,-533 406.84,-544.77 438.14,-550.65 466.7,-553.41"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="466.41,-556.89 476.67,-554.25 467.01,-549.92 466.41,-556.89"/>
+</g>
+<!-- interface~vtk_get_point_data_int32 -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node12" class="node">
+<title>interface~vtk_get_point_data_int32</title>
+<g id="a_interface~~type_vtk_vtk_initialize~~CallsGraph_node12"><a xlink:href="../interface/vtk_get_point_data_int32.html" xlink:title="vtk_get_point_data_int32">
+<polygon fill="#a7506f" stroke="#a7506f" points="627,-524 482,-524 482,-500 627,-500 627,-524"/>
+<text text-anchor="middle" x="554.5" y="-509.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk_get_point_data_int32</text>
+</a>
+</g>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_get_point_data_int32 -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge11" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_get_point_data_int32</title>
+<path fill="none" stroke="#ff0000" d="M304.72,-461.12C324.27,-470.78 353.24,-483.83 380,-491 409.36,-498.87 442.32,-503.79 471.55,-506.87"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="471.43,-510.38 481.73,-507.89 472.12,-503.41 471.43,-510.38"/>
+</g>
+<!-- interface~vtk_get_points -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node13" class="node">
+<title>interface~vtk_get_points</title>
+<g id="a_interface~~type_vtk_vtk_initialize~~CallsGraph_node13"><a xlink:href="../interface/vtk_get_points.html" xlink:title="vtk_get_points">
+<polygon fill="#a7506f" stroke="#a7506f" points="598.5,-482 510.5,-482 510.5,-458 598.5,-458 598.5,-482"/>
+<text text-anchor="middle" x="554.5" y="-467.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk_get_points</text>
+</a>
+</g>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_get_points -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge12" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_get_points</title>
+<path fill="none" stroke="#ff0000" d="M344.24,-453.84C391.4,-457.49 455.31,-462.42 500.05,-465.87"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="499.9,-469.37 510.14,-466.65 500.44,-462.39 499.9,-469.37"/>
+</g>
+<!-- interface~vtk_get_total_connectivity_size -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node14" class="node">
+<title>interface~vtk_get_total_connectivity_size</title>
+<g id="a_interface~~type_vtk_vtk_initialize~~CallsGraph_node14"><a xlink:href="../interface/vtk_get_total_connectivity_size.html" xlink:title="vtk_get_total_connectivity_size">
+<polygon fill="#a7506f" stroke="#a7506f" points="642,-440 467,-440 467,-416 642,-416 642,-440"/>
+<text text-anchor="middle" x="554.5" y="-425.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk_get_total_connectivity_size</text>
+</a>
+</g>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_get_total_connectivity_size -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge13" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_get_total_connectivity_size</title>
+<path fill="none" stroke="#ff0000" d="M344.24,-444.16C377.51,-441.59 419.12,-438.37 456.45,-435.49"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="457.16,-438.95 466.86,-434.69 456.62,-431.97 457.16,-438.95"/>
+</g>
+<!-- interface~vtk_initialize -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node15" class="node">
+<title>interface~vtk_initialize</title>
+<g id="a_interface~~type_vtk_vtk_initialize~~CallsGraph_node15"><a xlink:href="../interface/vtk_initialize.html" xlink:title="vtk_initialize">
+<polygon fill="#a7506f" stroke="#a7506f" points="593.5,-398 515.5,-398 515.5,-374 593.5,-374 593.5,-398"/>
+<text text-anchor="middle" x="554.5" y="-383.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk_initialize</text>
+</a>
+</g>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_initialize -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge14" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_initialize</title>
+<path fill="none" stroke="#ff0000" d="M304.72,-436.88C324.27,-427.22 353.24,-414.17 380,-407 421.48,-395.89 470.12,-390.64 505.33,-388.18"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="505.6,-391.67 515.35,-387.52 505.14,-384.68 505.6,-391.67"/>
+</g>
+<!-- interface~vtk_read_header -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node16" class="node">
+<title>interface~vtk_read_header</title>
+<g id="a_interface~~type_vtk_vtk_initialize~~CallsGraph_node16"><a xlink:href="../interface/vtk_read_header.html" xlink:title="vtk_read_header">
+<polygon fill="#a7506f" stroke="#a7506f" points="605,-356 504,-356 504,-332 605,-332 605,-356"/>
+<text text-anchor="middle" x="554.5" y="-341.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk_read_header</text>
+</a>
+</g>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_read_header -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge15" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;interface~vtk_read_header</title>
+<path fill="none" stroke="#ff0000" d="M291.5,-436.75C307.81,-417.74 342.13,-381.61 380,-365 415.51,-349.43 458.79,-344.17 493.25,-342.81"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="493.75,-346.3 503.64,-342.5 493.54,-339.3 493.75,-346.3"/>
+</g>
+<!-- log_error -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node17" class="node">
+<title>log_error</title>
+<polygon fill="#777777" stroke="#777777" points="585,-314 524,-314 524,-290 585,-290 585,-314"/>
+<text text-anchor="middle" x="554.5" y="-299.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">log_error</text>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;log_error -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge16" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;log_error</title>
+<path fill="none" stroke="#ff0000" d="M287,-436.69C299.38,-410.62 332.12,-350.02 380,-323 421.12,-299.79 476.37,-297.04 513.37,-298.45"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="513.6,-301.97 523.76,-298.97 513.95,-294.97 513.6,-301.97"/>
+</g>
+<!-- mpi_allreduce -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node18" class="node">
+<title>mpi_allreduce</title>
+<polygon fill="#777777" stroke="#777777" points="598.5,-272 510.5,-272 510.5,-248 598.5,-248 598.5,-272"/>
+<text text-anchor="middle" x="554.5" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mpi_allreduce</text>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;mpi_allreduce -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge17" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#ff0000" d="M284.64,-436.65C293.47,-404.7 321.76,-319.2 380,-281 415.37,-257.8 463.66,-253.64 500.32,-254.66"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="500.19,-258.16 510.33,-255.08 500.48,-251.17 500.19,-258.16"/>
+</g>
+<!-- mpi_comm_rank -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node19" class="node">
+<title>mpi_comm_rank</title>
+<polygon fill="#777777" stroke="#777777" points="605,-230 504,-230 504,-206 605,-206 605,-230"/>
+<text text-anchor="middle" x="554.5" y="-215.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mpi_comm_rank</text>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;mpi_comm_rank -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge18" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;mpi_comm_rank</title>
+<path fill="none" stroke="#ff0000" d="M283.1,-436.96C288.67,-400.22 310.83,-289.04 380,-239 412.33,-215.61 457.23,-210.71 493.26,-211.48"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="493.52,-214.99 503.65,-211.86 493.78,-207.99 493.52,-214.99"/>
+</g>
+<!-- mpi_comm_size -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node20" class="node">
+<title>mpi_comm_size</title>
+<polygon fill="#777777" stroke="#777777" points="603,-188 506,-188 506,-164 603,-164 603,-188"/>
+<text text-anchor="middle" x="554.5" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mpi_comm_size</text>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;mpi_comm_size -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge19" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;mpi_comm_size</title>
+<path fill="none" stroke="#ff0000" d="M282.11,-436.73C284.88,-395.19 299.99,-259.01 380,-197 412.44,-171.86 459.05,-167.42 495.79,-168.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="495.69,-172.33 505.87,-169.37 496.07,-165.34 495.69,-172.33"/>
+</g>
+<!-- proc~initialize_type_coordinate_array_dp -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node21" class="node">
+<title>proc~initialize_type_coordinate_array_dp</title>
+<g id="a_interface~~type_vtk_vtk_initialize~~CallsGraph_node21"><a xlink:href="../proc/initialize_type_coordinate_array_dp.html" xlink:title="type_coordinate_array_dp%initialize_type_coordinate_array_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="729,-818 380,-818 380,-794 729,-794 729,-818"/>
+<text text-anchor="middle" x="554.5" y="-803.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_coordinate_array_dp%initialize_type_coordinate_array_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;proc~initialize_type_coordinate_array_dp -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge20" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;proc~initialize_type_coordinate_array_dp</title>
+<path fill="none" stroke="#ff0000" d="M283.24,-461.01C291.44,-515.74 327.95,-740.88 380,-785 381.35,-786.15 382.73,-787.25 384.14,-788.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="382.24,-791.26 392.48,-793.99 386.18,-785.47 382.24,-791.26"/>
+</g>
+<!-- replace_all -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node22" class="node">
+<title>replace_all</title>
+<polygon fill="#777777" stroke="#777777" points="589.5,-108 519.5,-108 519.5,-84 589.5,-84 589.5,-108"/>
+<text text-anchor="middle" x="554.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">replace_all</text>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;replace_all -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge21" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;replace_all</title>
+<path fill="none" stroke="#ff0000" d="M280.95,-436.82C279.51,-388.33 281.15,-207.56 380,-122 415.26,-91.48 470.4,-88.17 509.03,-90.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="509.23,-93.96 519.46,-91.2 509.75,-86.98 509.23,-93.96"/>
+</g>
+<!-- strip -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node23" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="581.5,-66 527.5,-66 527.5,-42 581.5,-42 581.5,-66"/>
+<text text-anchor="middle" x="554.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;strip -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge22" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M282.88,-436.85C289.83,-378.16 322.8,-124.85 380,-75 417.53,-42.29 478.22,-42.88 516.97,-47.53"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="516.9,-51.05 527.28,-48.92 517.84,-44.11 516.9,-51.05"/>
+</g>
+<!-- to_string -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node24" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="583.5,-24 525.5,-24 525.5,0 583.5,0 583.5,-24"/>
+<text text-anchor="middle" x="554.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;to_string -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge23" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;to_string</title>
+<path fill="none" stroke="#ff0000" d="M282.55,-436.77C288.2,-374.06 317.05,-89.26 380,-33 416.5,-0.38 475.9,-0.53 514.84,-5.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="514.87,-8.64 525.25,-6.49 515.8,-1.7 514.87,-8.64"/>
+</g>
+<!-- proc~type_vtk_cell_set -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node25" class="node">
+<title>proc~type_vtk_cell_set</title>
+<g id="a_interface~~type_vtk_vtk_initialize~~CallsGraph_node25"><a xlink:href="../proc/type_vtk_cell_set.html" xlink:title="type_vtk_cell_set">
+<polygon fill="#d9534f" stroke="#d9534f" points="867,-902 765,-902 765,-878 867,-878 867,-902"/>
+<text text-anchor="middle" x="816" y="-887.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vtk_cell_set</text>
+</a>
+</g>
+</g>
+<!-- interface~type_vtk_cell_set&#45;&gt;proc~type_vtk_cell_set -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge24" class="edge">
+<title>interface~type_vtk_cell_set&#45;&gt;proc~type_vtk_cell_set</title>
+<path fill="none" stroke="#ff8b00" stroke-dasharray="5,2" d="M644.81,-890C681.05,-890 721.98,-890 754.62,-890"/>
+<polygon fill="#ff8b00" stroke="#ff8b00" points="754.9,-893.5 764.9,-890 754.9,-886.5 754.9,-893.5"/>
+</g>
+<!-- proc~initialize_type_coordinate_array_dp&#45;&gt;allocate_array -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge25" class="edge">
+<title>proc~initialize_type_coordinate_array_dp&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#e700ff" d="M716.98,-793.84C721.19,-791.21 725.21,-788.27 729,-785 774.1,-746.08 803.24,-558.34 812.12,-493.27"/>
+<polygon fill="#e700ff" stroke="#e700ff" points="815.6,-493.63 813.46,-483.26 808.67,-492.7 815.6,-493.63"/>
+</g>
+<!-- proc~get_cell_info_from_cell_type -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node26" class="node">
+<title>proc~get_cell_info_from_cell_type</title>
+<g id="a_interface~~type_vtk_vtk_initialize~~CallsGraph_node26"><a xlink:href="../proc/get_cell_info_from_cell_type.html" xlink:title="type_vtk_constants%get_cell_info_from_cell_type">
+<polygon fill="#d9534f" stroke="#d9534f" points="1175,-902 903,-902 903,-878 1175,-878 1175,-902"/>
+<text text-anchor="middle" x="1039" y="-887.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vtk_constants%get_cell_info_from_cell_type</text>
+</a>
+</g>
+</g>
+<!-- proc~type_vtk_cell_set&#45;&gt;proc~get_cell_info_from_cell_type -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge26" class="edge">
+<title>proc~type_vtk_cell_set&#45;&gt;proc~get_cell_info_from_cell_type</title>
+<path fill="none" stroke="#ff0000" d="M867.15,-890C875.11,-890 883.67,-890 892.56,-890"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="892.74,-893.5 902.74,-890 892.74,-886.5 892.74,-893.5"/>
+</g>
+<!-- proc~initialize_vtk_constants -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_node27" class="node">
+<title>proc~initialize_vtk_constants</title>
+<g id="a_interface~~type_vtk_vtk_initialize~~CallsGraph_node27"><a xlink:href="../proc/initialize_vtk_constants.html" xlink:title="type_vtk_constants%initialize_vtk_constants">
+<polygon fill="#d9534f" stroke="#d9534f" points="1455,-902 1211,-902 1211,-878 1455,-878 1455,-902"/>
+<text text-anchor="middle" x="1333" y="-887.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vtk_constants%initialize_vtk_constants</text>
+</a>
+</g>
+</g>
+<!-- proc~get_cell_info_from_cell_type&#45;&gt;proc~initialize_vtk_constants -->
+<g id="interface~~type_vtk_vtk_initialize~~CallsGraph_edge27" class="edge">
+<title>proc~get_cell_info_from_cell_type&#45;&gt;proc~initialize_vtk_constants</title>
+<path fill="none" stroke="#ff0000" d="M1175.32,-890C1183.69,-890 1192.12,-890 1200.48,-890"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1200.64,-893.5 1210.64,-890 1200.64,-886.5 1200.64,-893.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacetype_vtk_vtk_initializeCallsGraph = svgPanZoom('#interfacetype_vtk_vtk_initializeCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~type_vtk_vtk_initialize~~CalledByGraph Pages: 1 -->
+<svg id="interfacetype_vtk_vtk_initializeCalledByGraph" width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.98" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~type_vtk_vtk_initialize~~CalledByGraph" class="graph" transform="scale(0.87 0.87) rotate(0) translate(4 28)">
+<title>interface~~type_vtk_vtk_initialize~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 729,-28 729,4 -4,4"/>
+<!-- interface~type_vtk_vtk_initialize -->
+<g id="interface~~type_vtk_vtk_initialize~~CalledByGraph_node1" class="node">
+<title>interface~type_vtk_vtk_initialize</title>
+<polygon fill="none" stroke="black" points="725,-24 544,-24 544,0 725,0 725,-24"/>
+<text text-anchor="middle" x="634.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_vtk%type_vtk_vtk_initialize</text>
+</g>
+<!-- proc~initialize_type_input_geometry -->
+<g id="interface~~type_vtk_vtk_initialize~~CalledByGraph_node2" class="node">
+<title>proc~initialize_type_input_geometry</title>
+<g id="a_interface~~type_vtk_vtk_initialize~~CalledByGraph_node2"><a xlink:href="../proc/initialize_type_input_geometry.html" xlink:title="initialize_type_input_geometry">
+<polygon fill="#d9534f" stroke="#d9534f" points="508,-24 333,-24 333,0 508,0 508,-24"/>
+<text text-anchor="middle" x="420.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_type_input_geometry</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_input_geometry&#45;&gt;interface~type_vtk_vtk_initialize -->
+<g id="interface~~type_vtk_vtk_initialize~~CalledByGraph_edge1" class="edge">
+<title>proc~initialize_type_input_geometry&#45;&gt;interface~type_vtk_vtk_initialize</title>
+<path fill="none" stroke="#ff0000" d="M508.03,-12C516.51,-12 525.16,-12 533.75,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="533.8,-15.5 543.8,-12 533.8,-8.5 533.8,-15.5"/>
+</g>
+<!-- interface~initialize_type_input_geometry -->
+<g id="interface~~type_vtk_vtk_initialize~~CalledByGraph_node3" class="node">
+<title>interface~initialize_type_input_geometry</title>
+<g id="a_interface~~type_vtk_vtk_initialize~~CalledByGraph_node3"><a xlink:href="../interface/initialize_type_input_geometry.html" xlink:title="type_input_geometry%initialize_type_input_geometry">
+<polygon fill="#a7506f" stroke="#a7506f" points="297,-24 0,-24 0,0 297,0 297,-24"/>
+<text text-anchor="middle" x="148.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input_geometry%initialize_type_input_geometry</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_input_geometry&#45;&gt;proc~initialize_type_input_geometry -->
+<g id="interface~~type_vtk_vtk_initialize~~CalledByGraph_edge2" class="edge">
+<title>interface~initialize_type_input_geometry&#45;&gt;proc~initialize_type_input_geometry</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M297.14,-12C305.8,-12 314.4,-12 322.78,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="322.89,-15.5 332.89,-12 322.89,-8.5 322.89,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacetype_vtk_vtk_initializeCalledByGraph = svgPanZoom('#interfacetype_vtk_vtk_initializeCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+      <h2>private module subroutine type_vtk_vtk_initialize(self, file_name, global_node_id_key, node_type_key, num_sharing_ranks_key, owner_ranks_key, communication_partners_key, cell_id_key, rank_key, color_key, point_field_names)  
+    <a href="../proc/type_vtk_vtk_initialize.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h2>
+
+    
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~340"></span>
+              class(<a href='../type/type_vtk.html'>type_vtk</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                <p>The vtk object to be initialized.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-file_name~2"></span>
+              character(len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>file_name</strong></td>
+            <td>
+                <p>Path to the input .vtk file.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-global_node_id_key"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>global_node_id_key</strong></td>
+            <td>
+                <p>Key for the point data array with global node IDs.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-node_type_key"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>node_type_key</strong></td>
+            <td>
+                <p>Key for the point data array defining node types.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_sharing_ranks_key"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_sharing_ranks_key</strong></td>
+            <td>
+                <p>Key for the point data array for the number of sharing ranks.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-owner_ranks_key"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>owner_ranks_key</strong></td>
+            <td>
+                <p>Key for the point data array listing owner ranks.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-communication_partners_key"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>communication_partners_key</strong></td>
+            <td>
+                <p>Key for the point data array listing communication partners.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cell_id_key"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>cell_id_key</strong></td>
+            <td>
+                <p>Key for the cell data array with cell IDs.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-rank_key"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>rank_key</strong></td>
+            <td>
+                <p>Key for the cell data array specifying the owning rank.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-color_key"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>color_key</strong></td>
+            <td>
+                <p>Key for the cell data array for graph coloring.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-point_field_names"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>point_field_names</strong>(:)</td>
+            <td>
+                <p>Names of additional point data fields to read.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h3>Description</h3>
+    <p>Initializes the vtk object by reading a legacy VTK (.vtk) file.</p>
+    <br>
+
+ </div>
+</div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

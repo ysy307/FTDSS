@@ -1,0 +1,873 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>compute_K1_lumped_capacity_abst_fe &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>compute_K1_lumped_capacity_abst_fe
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">38 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/fe_compute.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/fe_compute.f90.html'>fe_compute.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/domain_base_fe_compute.html'>domain_base_fe_compute</a></li>
+            <li class="breadcrumb-item active" aria-current="page">compute_K1_lumped_capacity_abst_fe</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/compute_k1_lumped_capacity_abst_fe.html#src">compute_K1_lumped_capacity_abst_fe</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine compute_K1_lumped_capacity_abst_fe(self, nodes, A_gp, elem_mat, work_psi)  
+    <a href="../interface/compute_k1_lumped_capacity_abst_fe.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+    <p>1-Lumped. Lumped Capacity Matrix K1 (Diagonal)
+   K_ii = \int A(x) * psi_i dOmega (Row-sum lumping approximation)
+   A_gp: Coefficients evaluated directly at Gauss points [num_gauss]
+   The result is stored in the diagonal elements of elem_mat.
+   Off-diagonal elements are zero.</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~313"></span>
+              class(<a href='../type/abst_fe.html'>abst_fe</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-nodes~3"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nodes</strong>(:,:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a_gp~4"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A_gp</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-elem_mat~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>elem_mat</strong>(:,:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-work_psi~3"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout),</td>
+              <td>optional,</td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>work_psi</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph Pages: 1 -->
+<svg id="proccompute_k1_lumped_capacity_abst_feCallsGraph" width="641pt" height="217pt"
+ viewBox="0.00 0.00 641.00 216.61" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph" class="graph" transform="scale(0.55 0.55) rotate(0) translate(4 388)">
+<title>proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-388 1156,-388 1156,4 -4,4"/>
+<!-- proc~compute_k1_lumped_capacity_abst_fe -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node1" class="node">
+<title>proc~compute_k1_lumped_capacity_abst_fe</title>
+<polygon fill="none" stroke="black" points="218,-128 0,-128 0,-104 218,-104 218,-128"/>
+<text text-anchor="middle" x="109" y="-113.6" font-family="Helvetica,sans-Serif" font-size="10.50">compute_K1_lumped_capacity_abst_fe</text>
+</g>
+<!-- allocate_array -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node2" class="node">
+<title>allocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="1145,-314 1056,-314 1056,-290 1145,-290 1145,-314"/>
+<text text-anchor="middle" x="1100.5" y="-299.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</g>
+<!-- proc~compute_k1_lumped_capacity_abst_fe&#45;&gt;allocate_array -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge1" class="edge">
+<title>proc~compute_k1_lumped_capacity_abst_fe&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#ff0000" d="M121.06,-128.21C169.82,-180.64 372.53,-384 583,-384 583,-384 583,-384 762,-384 873.04,-384 998.96,-341.57 1060.91,-317.75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1062.24,-320.99 1070.28,-314.1 1059.7,-314.47 1062.24,-320.99"/>
+</g>
+<!-- deallocate_array -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node3" class="node">
+<title>deallocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="1152,-272 1049,-272 1049,-248 1152,-248 1152,-272"/>
+<text text-anchor="middle" x="1100.5" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_array</text>
+</g>
+<!-- proc~compute_k1_lumped_capacity_abst_fe&#45;&gt;deallocate_array -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge2" class="edge">
+<title>proc~compute_k1_lumped_capacity_abst_fe&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#ff0000" d="M218.44,-123.19C314.27,-128.93 457.86,-136 583,-136 583,-136 583,-136 762,-136 884.11,-136 1016.66,-208.4 1072.4,-242.55"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1070.64,-245.58 1080.98,-247.88 1074.34,-239.63 1070.64,-245.58"/>
+</g>
+<!-- interface~calc_shape_function_abst_fe -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node4" class="node">
+<title>interface~calc_shape_function_abst_fe</title>
+<g id="a_proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node4"><a xlink:href="../interface/calc_shape_function_abst_fe.html" xlink:title="abst_fe%calc_shape_function_abst_fe">
+<polygon fill="#a7506f" stroke="#a7506f" points="466,-209 254,-209 254,-185 466,-185 466,-209"/>
+<text text-anchor="middle" x="360" y="-194.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%calc_shape_function_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_k1_lumped_capacity_abst_fe&#45;&gt;interface~calc_shape_function_abst_fe -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge3" class="edge">
+<title>proc~compute_k1_lumped_capacity_abst_fe&#45;&gt;interface~calc_shape_function_abst_fe</title>
+<path fill="none" stroke="#ff0000" d="M147.01,-128.04C190.9,-142.32 264.12,-166.13 311.98,-181.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="311.2,-185.13 321.79,-184.89 313.36,-178.47 311.2,-185.13"/>
+</g>
+<!-- interface~get_dimension -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node5" class="node">
+<title>interface~get_dimension</title>
+<g id="a_proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node5"><a xlink:href="../interface/get_dimension.html" xlink:title="abst_fe%get_dimension">
+<polygon fill="#a7506f" stroke="#a7506f" points="429.5,-108 290.5,-108 290.5,-84 429.5,-84 429.5,-108"/>
+<text text-anchor="middle" x="360" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%get_dimension</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_k1_lumped_capacity_abst_fe&#45;&gt;interface~get_dimension -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge4" class="edge">
+<title>proc~compute_k1_lumped_capacity_abst_fe&#45;&gt;interface~get_dimension</title>
+<path fill="none" stroke="#ff0000" d="M218.13,-107.31C239.03,-105.64 260.55,-103.91 280.3,-102.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="280.76,-105.8 290.44,-101.51 280.2,-98.82 280.76,-105.8"/>
+</g>
+<!-- interface~get_num_gauss -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node6" class="node">
+<title>interface~get_num_gauss</title>
+<g id="a_proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node6"><a xlink:href="../interface/get_num_gauss.html" xlink:title="abst_fe%get_num_gauss">
+<polygon fill="#a7506f" stroke="#a7506f" points="431.5,-66 288.5,-66 288.5,-42 431.5,-42 431.5,-66"/>
+<text text-anchor="middle" x="360" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%get_num_gauss</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_k1_lumped_capacity_abst_fe&#45;&gt;interface~get_num_gauss -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge5" class="edge">
+<title>proc~compute_k1_lumped_capacity_abst_fe&#45;&gt;interface~get_num_gauss</title>
+<path fill="none" stroke="#ff0000" d="M149.2,-103.92C178.03,-95.26 218.25,-83.65 254,-75 263.93,-72.6 274.43,-70.26 284.8,-68.07"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="285.61,-71.48 294.69,-66.02 284.18,-64.62 285.61,-71.48"/>
+</g>
+<!-- interface~get_num_nodes -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node7" class="node">
+<title>interface~get_num_nodes</title>
+<g id="a_proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node7"><a xlink:href="../interface/get_num_nodes.html" xlink:title="abst_fe%get_num_nodes">
+<polygon fill="#a7506f" stroke="#a7506f" points="432.5,-24 287.5,-24 287.5,0 432.5,0 432.5,-24"/>
+<text text-anchor="middle" x="360" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%get_num_nodes</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_k1_lumped_capacity_abst_fe&#45;&gt;interface~get_num_nodes -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge6" class="edge">
+<title>proc~compute_k1_lumped_capacity_abst_fe&#45;&gt;interface~get_num_nodes</title>
+<path fill="none" stroke="#ff0000" d="M126.82,-103.84C152.8,-85.65 204.85,-51.51 254,-33 261.48,-30.18 269.42,-27.72 277.44,-25.57"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="278.39,-28.94 287.24,-23.1 276.68,-22.15 278.39,-28.94"/>
+</g>
+<!-- proc~calc_shape_function_abst_fe -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node8" class="node">
+<title>proc~calc_shape_function_abst_fe</title>
+<g id="a_proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node8"><a xlink:href="../proc/calc_shape_function_abst_fe.html" xlink:title="calc_shape_function_abst_fe">
+<polygon fill="#d9534f" stroke="#d9534f" points="666,-251 502,-251 502,-227 666,-227 666,-251"/>
+<text text-anchor="middle" x="584" y="-236.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_shape_function_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_shape_function_abst_fe&#45;&gt;proc~calc_shape_function_abst_fe -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge7" class="edge">
+<title>interface~calc_shape_function_abst_fe&#45;&gt;proc~calc_shape_function_abst_fe</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M424.62,-209.04C451.09,-214.04 481.99,-219.89 509.43,-225.08"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="508.9,-228.54 519.37,-226.96 510.2,-221.66 508.9,-228.54"/>
+</g>
+<!-- proc~get_dimension -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node9" class="node">
+<title>proc~get_dimension</title>
+<g id="a_proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node9"><a xlink:href="../proc/get_dimension.html" xlink:title="get_dimension">
+<polygon fill="#d9534f" stroke="#d9534f" points="629.5,-108 538.5,-108 538.5,-84 629.5,-84 629.5,-108"/>
+<text text-anchor="middle" x="584" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_dimension</text>
+</a>
+</g>
+</g>
+<!-- interface~get_dimension&#45;&gt;proc~get_dimension -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge8" class="edge">
+<title>interface~get_dimension&#45;&gt;proc~get_dimension</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M429.72,-96C461.39,-96 498.45,-96 528.2,-96"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="528.4,-99.5 538.4,-96 528.4,-92.5 528.4,-99.5"/>
+</g>
+<!-- proc~get_num_gauss -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node10" class="node">
+<title>proc~get_num_gauss</title>
+<g id="a_proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node10"><a xlink:href="../proc/get_num_gauss.html" xlink:title="get_num_gauss">
+<polygon fill="#d9534f" stroke="#d9534f" points="631.5,-66 536.5,-66 536.5,-42 631.5,-42 631.5,-66"/>
+<text text-anchor="middle" x="584" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_num_gauss</text>
+</a>
+</g>
+</g>
+<!-- interface~get_num_gauss&#45;&gt;proc~get_num_gauss -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge9" class="edge">
+<title>interface~get_num_gauss&#45;&gt;proc~get_num_gauss</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M431.55,-54C462.08,-54 497.34,-54 526.15,-54"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="526.45,-57.5 536.45,-54 526.45,-50.5 526.45,-57.5"/>
+</g>
+<!-- proc~get_num_nodes -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node11" class="node">
+<title>proc~get_num_nodes</title>
+<g id="a_proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node11"><a xlink:href="../proc/get_num_nodes.html" xlink:title="get_num_nodes">
+<polygon fill="#d9534f" stroke="#d9534f" points="632.5,-24 535.5,-24 535.5,0 632.5,0 632.5,-24"/>
+<text text-anchor="middle" x="584" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_num_nodes</text>
+</a>
+</g>
+</g>
+<!-- interface~get_num_nodes&#45;&gt;proc~get_num_nodes -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge10" class="edge">
+<title>interface~get_num_nodes&#45;&gt;proc~get_num_nodes</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M432.77,-12C462.67,-12 496.93,-12 525.17,-12"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="525.28,-15.5 535.28,-12 525.28,-8.5 525.28,-15.5"/>
+</g>
+<!-- calc_dpsi -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node12" class="node">
+<title>calc_dpsi</title>
+<polygon fill="#777777" stroke="#777777" points="791.5,-230 730.5,-230 730.5,-206 791.5,-206 791.5,-230"/>
+<text text-anchor="middle" x="761" y="-215.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_dpsi</text>
+</g>
+<!-- proc~calc_shape_function_abst_fe&#45;&gt;calc_dpsi -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge11" class="edge">
+<title>proc~calc_shape_function_abst_fe&#45;&gt;calc_dpsi</title>
+<path fill="none" stroke="#ff0000" d="M666.1,-229.27C684.87,-227.02 704.04,-224.71 720.13,-222.78"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="720.7,-226.24 730.21,-221.57 719.87,-219.29 720.7,-226.24"/>
+</g>
+<!-- calc_jacobian -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node13" class="node">
+<title>calc_jacobian</title>
+<polygon fill="#777777" stroke="#777777" points="803.5,-188 718.5,-188 718.5,-164 803.5,-164 803.5,-188"/>
+<text text-anchor="middle" x="761" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_jacobian</text>
+</g>
+<!-- proc~calc_shape_function_abst_fe&#45;&gt;calc_jacobian -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge12" class="edge">
+<title>proc~calc_shape_function_abst_fe&#45;&gt;calc_jacobian</title>
+<path fill="none" stroke="#ff0000" d="M618.74,-226.85C646.79,-216.75 686.88,-202.32 717.19,-191.41"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="718.44,-194.68 726.66,-188 716.06,-188.1 718.44,-194.68"/>
+</g>
+<!-- calc_psi -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node14" class="node">
+<title>calc_psi</title>
+<polygon fill="#777777" stroke="#777777" points="788.5,-356 733.5,-356 733.5,-332 788.5,-332 788.5,-356"/>
+<text text-anchor="middle" x="761" y="-341.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_psi</text>
+</g>
+<!-- proc~calc_shape_function_abst_fe&#45;&gt;calc_psi -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge13" class="edge">
+<title>proc~calc_shape_function_abst_fe&#45;&gt;calc_psi</title>
+<path fill="none" stroke="#ff0000" d="M599.28,-251.27C620.51,-269.01 662.18,-302.01 702,-323 708.77,-326.57 716.29,-329.78 723.6,-332.56"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="722.77,-335.98 733.36,-336.07 725.14,-329.39 722.77,-335.98"/>
+</g>
+<!-- interface~matrix_determinant -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node15" class="node">
+<title>interface~matrix_determinant</title>
+<g id="a_proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node15"><a xlink:href="../interface/matrix_determinant.html" xlink:title="matrix_determinant">
+<polygon fill="#a7506f" stroke="#a7506f" points="820,-314 702,-314 702,-290 820,-290 820,-314"/>
+<text text-anchor="middle" x="761" y="-299.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_determinant</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_shape_function_abst_fe&#45;&gt;interface~matrix_determinant -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge14" class="edge">
+<title>proc~calc_shape_function_abst_fe&#45;&gt;interface~matrix_determinant</title>
+<path fill="none" stroke="#ff0000" d="M618.74,-251.15C646.79,-261.25 686.88,-275.68 717.19,-286.59"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="716.06,-289.9 726.66,-290 718.44,-283.32 716.06,-289.9"/>
+</g>
+<!-- interface~matrix_inverse -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node16" class="node">
+<title>interface~matrix_inverse</title>
+<g id="a_proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node16"><a xlink:href="../interface/matrix_inverse.html" xlink:title="matrix_inverse">
+<polygon fill="#a7506f" stroke="#a7506f" points="806.5,-272 715.5,-272 715.5,-248 806.5,-248 806.5,-272"/>
+<text text-anchor="middle" x="761" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_inverse</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_shape_function_abst_fe&#45;&gt;interface~matrix_inverse -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge15" class="edge">
+<title>proc~calc_shape_function_abst_fe&#45;&gt;interface~matrix_inverse</title>
+<path fill="none" stroke="#ff0000" d="M666.1,-248.73C679.37,-250.32 692.84,-251.94 705.27,-253.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="705.1,-256.94 715.45,-254.65 705.94,-249.99 705.1,-256.94"/>
+</g>
+<!-- proc~matrix_determinant_real64 -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node17" class="node">
+<title>proc~matrix_determinant_real64</title>
+<g id="a_proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node17"><a xlink:href="../proc/matrix_determinant_real64.html" xlink:title="matrix_determinant_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1013,-314 856,-314 856,-290 1013,-290 1013,-314"/>
+<text text-anchor="middle" x="934.5" y="-299.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_determinant_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~matrix_determinant&#45;&gt;proc~matrix_determinant_real64 -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge16" class="edge">
+<title>interface~matrix_determinant&#45;&gt;proc~matrix_determinant_real64</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M820.06,-302C828.3,-302 836.93,-302 845.58,-302"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="845.73,-305.5 855.73,-302 845.73,-298.5 845.73,-305.5"/>
+</g>
+<!-- proc~matrix_inverse_real64 -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node18" class="node">
+<title>proc~matrix_inverse_real64</title>
+<g id="a_proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_node18"><a xlink:href="../proc/matrix_inverse_real64.html" xlink:title="matrix_inverse_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="999.5,-272 869.5,-272 869.5,-248 999.5,-248 999.5,-272"/>
+<text text-anchor="middle" x="934.5" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_inverse_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~matrix_inverse&#45;&gt;proc~matrix_inverse_real64 -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge17" class="edge">
+<title>interface~matrix_inverse&#45;&gt;proc~matrix_inverse_real64</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M806.61,-260C822.7,-260 841.32,-260 859.25,-260"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="859.42,-263.5 869.42,-260 859.42,-256.5 859.42,-263.5"/>
+</g>
+<!-- proc~matrix_determinant_real64&#45;&gt;allocate_array -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge18" class="edge">
+<title>proc~matrix_determinant_real64&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#ff0000" d="M1013.18,-302C1024.11,-302 1035.14,-302 1045.49,-302"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1045.59,-305.5 1055.59,-302 1045.59,-298.5 1045.59,-305.5"/>
+</g>
+<!-- proc~matrix_determinant_real64&#45;&gt;deallocate_array -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge19" class="edge">
+<title>proc~matrix_determinant_real64&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#ff0000" d="M982.5,-289.96C1001.28,-285.15 1023.08,-279.57 1042.74,-274.54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1043.68,-277.91 1052.5,-272.04 1041.94,-271.13 1043.68,-277.91"/>
+</g>
+<!-- proc~matrix_inverse_real64&#45;&gt;allocate_array -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge20" class="edge">
+<title>proc~matrix_inverse_real64&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#00ffff" d="M982.5,-272.04C1002.34,-277.12 1025.56,-283.06 1046.05,-288.31"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1045.31,-291.74 1055.87,-290.83 1047.05,-284.96 1045.31,-291.74"/>
+</g>
+<!-- proc~matrix_inverse_real64&#45;&gt;deallocate_array -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CallsGraph_edge21" class="edge">
+<title>proc~matrix_inverse_real64&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#00ffff" d="M999.85,-260C1012.54,-260 1025.82,-260 1038.4,-260"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1038.77,-263.5 1048.77,-260 1038.77,-256.5 1038.77,-263.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccompute_k1_lumped_capacity_abst_feCallsGraph = svgPanZoom('#proccompute_k1_lumped_capacity_abst_feCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~compute_k1_lumped_capacity_abst_fe~~CalledByGraph Pages: 1 -->
+<svg id="proccompute_k1_lumped_capacity_abst_feCalledByGraph" width="641pt" height="21pt"
+ viewBox="0.00 0.00 641.00 21.41" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CalledByGraph" class="graph" transform="scale(0.67 0.67) rotate(0) translate(4 28)">
+<title>proc~~compute_k1_lumped_capacity_abst_fe~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 954,-28 954,4 -4,4"/>
+<!-- proc~compute_k1_lumped_capacity_abst_fe -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CalledByGraph_node1" class="node">
+<title>proc~compute_k1_lumped_capacity_abst_fe</title>
+<polygon fill="none" stroke="black" points="950,-24 732,-24 732,0 950,0 950,-24"/>
+<text text-anchor="middle" x="841" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">compute_K1_lumped_capacity_abst_fe</text>
+</g>
+<!-- interface~compute_k1_lumped_capacity_abst_fe -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CalledByGraph_node2" class="node">
+<title>interface~compute_k1_lumped_capacity_abst_fe</title>
+<g id="a_proc~~compute_k1_lumped_capacity_abst_fe~~CalledByGraph_node2"><a xlink:href="../interface/compute_k1_lumped_capacity_abst_fe.html" xlink:title="abst_fe%compute_K1_lumped_capacity_abst_fe">
+<polygon fill="#a7506f" stroke="#a7506f" points="696,-24 430,-24 430,0 696,0 696,-24"/>
+<text text-anchor="middle" x="563" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%compute_K1_lumped_capacity_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- interface~compute_k1_lumped_capacity_abst_fe&#45;&gt;proc~compute_k1_lumped_capacity_abst_fe -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CalledByGraph_edge1" class="edge">
+<title>interface~compute_k1_lumped_capacity_abst_fe&#45;&gt;proc~compute_k1_lumped_capacity_abst_fe</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M696.34,-12C704.8,-12 713.29,-12 721.67,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="721.85,-15.5 731.85,-12 721.85,-8.5 721.85,-15.5"/>
+</g>
+<!-- proc~compute_k1_lumped_assemble_workspace -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CalledByGraph_node3" class="node">
+<title>proc~compute_k1_lumped_assemble_workspace</title>
+<g id="a_proc~~compute_k1_lumped_capacity_abst_fe~~CalledByGraph_node3"><a xlink:href="../proc/compute_k1_lumped_assemble_workspace.html" xlink:title="type_assemble_workspace%compute_K1_lumped_assemble_workspace">
+<polygon fill="#d9534f" stroke="#d9534f" points="394,-24 0,-24 0,0 394,0 394,-24"/>
+<text text-anchor="middle" x="197" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assemble_workspace%compute_K1_lumped_assemble_workspace</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_k1_lumped_assemble_workspace&#45;&gt;interface~compute_k1_lumped_capacity_abst_fe -->
+<g id="proc~~compute_k1_lumped_capacity_abst_fe~~CalledByGraph_edge2" class="edge">
+<title>proc~compute_k1_lumped_assemble_workspace&#45;&gt;interface~compute_k1_lumped_capacity_abst_fe</title>
+<path fill="none" stroke="#ff0000" d="M394.12,-12C402.72,-12 411.28,-12 419.72,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="419.96,-15.5 429.96,-12 419.96,-8.5 419.96,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccompute_k1_lumped_capacity_abst_feCalledByGraph = svgPanZoom('#proccompute_k1_lumped_capacity_abst_feCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">compute_K1_lumped_capacity_abst_fe</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">nodes</span><span class="p">,</span><span class="w"> </span><span class="n">A_gp</span><span class="p">,</span><span class="w"> </span><span class="n">elem_mat</span><span class="p">,</span><span class="w"> </span><span class="n">work_psi</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">abst_fe</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nodes</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">A_gp</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">elem_mat</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="p">,</span><span class="w"> </span><span class="k">target</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">work_psi</span><span class="p">(:)</span>
+
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">num_nodes</span><span class="p">,</span><span class="w"> </span><span class="nb">dim</span><span class="p">,</span><span class="w"> </span><span class="n">num_gauss</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">w</span><span class="p">,</span><span class="w"> </span><span class="n">det_J</span><span class="p">,</span><span class="w"> </span><span class="n">A_val</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_coordinate_dp</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">r</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">p_psi</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="p">,</span><span class="w"> </span><span class="k">target</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">local_psi</span><span class="p">(:)</span>
+
+<span class="w">        </span><span class="k">nullify</span><span class="w"> </span><span class="p">(</span><span class="n">p_psi</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">get_dimension</span><span class="p">(</span><span class="nb">dim</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">get_num_nodes</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">get_num_gauss</span><span class="p">(</span><span class="n">num_gauss</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">work_psi</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">p_psi</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">work_psi</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">local_psi</span><span class="p">,</span><span class="w"> </span><span class="n">num_nodes</span><span class="p">)</span>
+<span class="w">            </span><span class="n">p_psi</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">local_psi</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="w">        </span><span class="c">! Initialize matrix to zero (including off-diagonal)</span>
+<span class="w">        </span><span class="n">elem_mat</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="n">p_psi</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+
+<span class="w">        </span><span class="k">do </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_gauss</span>
+<span class="w">            </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">integration_rule</span><span class="p">%</span><span class="n">gauss</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="w">            </span><span class="n">w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">integration_rule</span><span class="p">%</span><span class="n">weight</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c">! Calc shape function only (derivatives not needed for mass matrix)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">calc_shape_function</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">nodes</span><span class="p">,</span><span class="w"> </span><span class="n">psi</span><span class="o">=</span><span class="n">p_psi</span><span class="p">,</span><span class="w"> </span><span class="n">determinant_jacobian</span><span class="o">=</span><span class="n">det_J</span><span class="p">)</span>
+<span class="w">            </span><span class="n">A_val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_gp</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+<span class="w">            </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_nodes</span>
+<span class="w">                </span><span class="c">! Row-sum lumping:</span>
+<span class="w">                </span><span class="c">! Consistent mass term is psi_i * psi_j.</span>
+<span class="w">                </span><span class="c">! Since sum(psi_j) = 1, summing rows is equivalent to integrating psi_i.</span>
+<span class="w">                </span><span class="n">elem_mat</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">elem_mat</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">abs</span><span class="p">(</span><span class="n">det_J</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">A_val</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p_psi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="w">            </span><span class="k">end do</span>
+<span class="k">        end do</span>
+
+<span class="k">        nullify</span><span class="w"> </span><span class="p">(</span><span class="n">p_psi</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">present</span><span class="p">(</span><span class="n">work_psi</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">local_psi</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+<span class="k">    end subroutine </span><span class="n">compute_K1_lumped_capacity_abst_fe</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

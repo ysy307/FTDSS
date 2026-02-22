@@ -1,0 +1,549 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>compute_bdf_coefficients &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>compute_bdf_coefficients
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">32 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/time.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/time.f90.html'>time.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/control_time.html'>control_time</a></li>
+            <li class="breadcrumb-item active" aria-current="page">compute_bdf_coefficients</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/compute_bdf_coefficients.html#src">compute_bdf_coefficients</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine compute_bdf_coefficients(self)  
+</h2>
+    
+
+    <p>Compute variable step-size BDF coefficients.
+Calculates <script type="math/tex"> \alpha_j </script> such that <script type="math/tex"> \frac{dy}{dt}|_{t_n} \approx \sum_{j=0}^{k} \alpha_j y_{n-j} </script>.
+Note: Coefficients <script type="math/tex"> \alpha_j </script> inherently include the <script type="math/tex"> 1/\Delta t </script> scaling.</p>
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_time.html'>type_time</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~1155"></span>
+              class(<a href='../type/type_time.html'>type_time</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                <p>Time control instance</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~compute_bdf_coefficients~~CalledByGraph Pages: 1 -->
+<svg id="proccompute_bdf_coefficientsCalledByGraph" width="641pt" height="107pt"
+ viewBox="0.00 0.00 641.00 106.74" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph" class="graph" transform="scale(0.54 0.54) rotate(0) translate(4 192)">
+<title>proc~~compute_bdf_coefficients~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-192 1173,-192 1173,4 -4,4"/>
+<!-- proc~compute_bdf_coefficients -->
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph_node1" class="node">
+<title>proc~compute_bdf_coefficients</title>
+<polygon fill="none" stroke="black" points="1169,-106 958,-106 958,-82 1169,-82 1169,-106"/>
+<text text-anchor="middle" x="1063.5" y="-91.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_time%compute_bdf_coefficients</text>
+</g>
+<!-- proc~initialize_type_time -->
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph_node2" class="node">
+<title>proc~initialize_type_time</title>
+<g id="a_proc~~compute_bdf_coefficients~~CalledByGraph_node2"><a xlink:href="../proc/initialize_type_time.html" xlink:title="type_time%initialize_type_time">
+<polygon fill="#d9534f" stroke="#d9534f" points="909.5,-188 732.5,-188 732.5,-164 909.5,-164 909.5,-188"/>
+<text text-anchor="middle" x="821" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time%initialize_type_time</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_time&#45;&gt;proc~compute_bdf_coefficients -->
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph_edge1" class="edge">
+<title>proc~initialize_type_time&#45;&gt;proc~compute_bdf_coefficients</title>
+<path fill="none" stroke="#ff0000" d="M888.65,-163.97C899.89,-161.39 911.35,-158.39 922,-155 959.85,-142.95 1001.37,-124.19 1029.39,-110.66"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1031.26,-113.64 1038.71,-106.11 1028.18,-107.35 1031.26,-113.64"/>
+</g>
+<!-- proc~set_dt -->
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph_node3" class="node">
+<title>proc~set_dt</title>
+<g id="a_proc~~compute_bdf_coefficients~~CalledByGraph_node3"><a xlink:href="../proc/set_dt.html" xlink:title="type_time%set_dt">
+<polygon fill="#d9534f" stroke="#d9534f" points="874,-146 768,-146 768,-122 874,-122 874,-146"/>
+<text text-anchor="middle" x="821" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time%set_dt</text>
+</a>
+</g>
+</g>
+<!-- proc~set_dt&#45;&gt;proc~compute_bdf_coefficients -->
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph_edge2" class="edge">
+<title>proc~set_dt&#45;&gt;proc~compute_bdf_coefficients</title>
+<path fill="none" stroke="#ff0000" d="M874.18,-125.32C905.12,-120.18 945.01,-113.54 980.11,-107.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="981.06,-111.09 990.35,-106 979.91,-104.19 981.06,-111.09"/>
+</g>
+<!-- proc~shift_time -->
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph_node4" class="node">
+<title>proc~shift_time</title>
+<g id="a_proc~~compute_bdf_coefficients~~CalledByGraph_node4"><a xlink:href="../proc/shift_time.html" xlink:title="type_time%shift_time">
+<polygon fill="#d9534f" stroke="#d9534f" points="884.5,-66 757.5,-66 757.5,-42 884.5,-42 884.5,-66"/>
+<text text-anchor="middle" x="821" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time%shift_time</text>
+</a>
+</g>
+</g>
+<!-- proc~shift_time&#45;&gt;proc~compute_bdf_coefficients -->
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph_edge3" class="edge">
+<title>proc~shift_time&#45;&gt;proc~compute_bdf_coefficients</title>
+<path fill="none" stroke="#ff0000" d="M884.56,-64.41C913.7,-69.25 948.75,-75.08 980.02,-80.28"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="979.59,-83.76 990.03,-81.95 980.74,-76.85 979.59,-83.76"/>
+</g>
+<!-- proc~update_bdf_coefficients -->
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph_node5" class="node">
+<title>proc~update_bdf_coefficients</title>
+<g id="a_proc~~compute_bdf_coefficients~~CalledByGraph_node5"><a xlink:href="../proc/update_bdf_coefficients.html" xlink:title="type_time%update_bdf_coefficients">
+<polygon fill="#d9534f" stroke="#d9534f" points="922,-24 720,-24 720,0 922,0 922,-24"/>
+<text text-anchor="middle" x="821" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time%update_bdf_coefficients</text>
+</a>
+</g>
+</g>
+<!-- proc~update_bdf_coefficients&#45;&gt;proc~compute_bdf_coefficients -->
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph_edge4" class="edge">
+<title>proc~update_bdf_coefficients&#45;&gt;proc~compute_bdf_coefficients</title>
+<path fill="none" stroke="#ff0000" d="M888.65,-24.03C899.89,-26.61 911.35,-29.61 922,-33 959.85,-45.05 1001.37,-63.81 1029.39,-77.34"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1028.18,-80.65 1038.71,-81.89 1031.26,-74.36 1028.18,-80.65"/>
+</g>
+<!-- proc~update_type_time -->
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph_node6" class="node">
+<title>proc~update_type_time</title>
+<g id="a_proc~~compute_bdf_coefficients~~CalledByGraph_node6"><a xlink:href="../proc/update_type_time.html" xlink:title="type_time%update_type_time">
+<polygon fill="#d9534f" stroke="#d9534f" points="662.5,-86 492.5,-86 492.5,-62 662.5,-62 662.5,-86"/>
+<text text-anchor="middle" x="577.5" y="-71.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time%update_type_time</text>
+</a>
+</g>
+</g>
+<!-- proc~update_type_time&#45;&gt;proc~compute_bdf_coefficients -->
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph_edge5" class="edge">
+<title>proc~update_type_time&#45;&gt;proc~compute_bdf_coefficients</title>
+<path fill="none" stroke="#ff0000" d="M662.53,-77.47C741.43,-80.73 860.11,-85.64 947.72,-89.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="947.84,-92.76 957.97,-89.68 948.13,-85.77 947.84,-92.76"/>
+</g>
+<!-- proc~update_type_time&#45;&gt;proc~shift_time -->
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph_edge7" class="edge">
+<title>proc~update_type_time&#45;&gt;proc~shift_time</title>
+<path fill="none" stroke="#00ff66" d="M662.63,-67.03C690.27,-64.74 720.74,-62.22 747.44,-60.01"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="747.81,-63.49 757.48,-59.18 747.23,-56.51 747.81,-63.49"/>
+</g>
+<!-- proc~initialize_type_controls -->
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph_node7" class="node">
+<title>proc~initialize_type_controls</title>
+<g id="a_proc~~compute_bdf_coefficients~~CalledByGraph_node7"><a xlink:href="../proc/initialize_type_controls.html" xlink:title="type_controls%initialize_type_controls">
+<polygon fill="#d9534f" stroke="#d9534f" points="684,-188 471,-188 471,-164 684,-164 684,-188"/>
+<text text-anchor="middle" x="577.5" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_controls%initialize_type_controls</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_controls&#45;&gt;proc~initialize_type_time -->
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph_edge6" class="edge">
+<title>proc~initialize_type_controls&#45;&gt;proc~initialize_type_time</title>
+<path fill="none" stroke="#ff0000" d="M684.07,-176C696.79,-176 709.74,-176 722.34,-176"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="722.36,-179.5 732.36,-176 722.36,-172.5 722.36,-179.5"/>
+</g>
+<!-- proc~update_controls -->
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph_node8" class="node">
+<title>proc~update_controls</title>
+<g id="a_proc~~compute_bdf_coefficients~~CalledByGraph_node8"><a xlink:href="../proc/update_controls.html" xlink:title="type_controls%update_controls">
+<polygon fill="#d9534f" stroke="#d9534f" points="435,-86 257,-86 257,-62 435,-62 435,-86"/>
+<text text-anchor="middle" x="346" y="-71.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_controls%update_controls</text>
+</a>
+</g>
+</g>
+<!-- proc~update_controls&#45;&gt;proc~update_type_time -->
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph_edge8" class="edge">
+<title>proc~update_controls&#45;&gt;proc~update_type_time</title>
+<path fill="none" stroke="#cc00ff" d="M435.07,-74C450.52,-74 466.66,-74 482.27,-74"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="482.44,-77.5 492.44,-74 482.44,-70.5 482.44,-77.5"/>
+</g>
+<!-- proc~run_ftdss -->
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph_node9" class="node">
+<title>proc~run_ftdss</title>
+<g id="a_proc~~compute_bdf_coefficients~~CalledByGraph_node9"><a xlink:href="../proc/run_ftdss.html" xlink:title="run_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-86 160,-86 160,-62 221,-62 221,-86"/>
+<text text-anchor="middle" x="190.5" y="-71.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftdss&#45;&gt;proc~update_controls -->
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph_edge9" class="edge">
+<title>proc~run_ftdss&#45;&gt;proc~update_controls</title>
+<path fill="none" stroke="#00ffff" d="M221.1,-74C228.77,-74 237.48,-74 246.63,-74"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="246.71,-77.5 256.71,-74 246.71,-70.5 246.71,-77.5"/>
+</g>
+<!-- interface~run_ftdss -->
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph_node10" class="node">
+<title>interface~run_ftdss</title>
+<g id="a_proc~~compute_bdf_coefficients~~CalledByGraph_node10"><a xlink:href="../interface/run_ftdss.html" xlink:title="type_ftdss%run_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="124,-86 0,-86 0,-62 124,-62 124,-86"/>
+<text text-anchor="middle" x="62" y="-71.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftdss&#45;&gt;proc~run_ftdss -->
+<g id="proc~~compute_bdf_coefficients~~CalledByGraph_edge10" class="edge">
+<title>interface~run_ftdss&#45;&gt;proc~run_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M124.03,-74C132.82,-74 141.68,-74 149.91,-74"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="149.94,-77.5 159.94,-74 149.94,-70.5 149.94,-77.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccompute_bdf_coefficientsCalledByGraph = svgPanZoom('#proccompute_bdf_coefficientsCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">compute_bdf_coefficients</span><span class="p">(</span><span class="n">self</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="w">        </span><span class="c">!&gt; Time control instance</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">type_time</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="n">m</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">tau</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="n">self</span><span class="p">%</span><span class="n">current_bdf_order</span><span class="p">)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">prod_term</span>
+
+<span class="w">        </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">current_bdf_order</span>
+
+<span class="w">        </span><span class="c">! 0. Check for invalid dt</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">dt_s</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">EPS_TIME</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="w">            </span><span class="c">! Fallback to Backward Euler for safety if dt is extremely small</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">coeffs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">dt_s</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nb">epsilon</span><span class="p">(</span><span class="mf">0.0d0</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">self</span><span class="p">%</span><span class="n">coeffs</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">dt_s</span>
+<span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">coeffs</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">dt_s</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">            return</span>
+<span class="k">        end if</span>
+
+<span class="w">        </span><span class="c">! 1. Calculate relative time differences tau</span>
+<span class="w">        </span><span class="c">! tau(j) = t_n - t_{n-j}</span>
+<span class="w">        </span><span class="n">tau</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="k">do </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">k</span>
+<span class="w">            </span><span class="n">tau</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tau</span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">dt_s_history</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end do</span>
+
+<span class="k">        </span><span class="n">self</span><span class="p">%</span><span class="n">coeffs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+
+<span class="w">        </span><span class="c">! 2. Compute derivative of Lagrange interpolating polynomial at t_n</span>
+<span class="w">        </span><span class="c">! L_j(t) = prod_{m!=j} (t - t_{n-m}) / (t_{n-j} - t_{n-m})</span>
+
+<span class="w">        </span><span class="c">! (A) Case j = 0 (Coefficient for y_n)</span>
+<span class="w">        </span><span class="c">! L_0&#39;(t_n) = sum_{m=1}^k (1 / tau(m))</span>
+<span class="w">        </span><span class="k">do </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">k</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">coeffs</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">coeffs</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">tau</span><span class="p">(</span><span class="n">m</span><span class="p">))</span>
+<span class="w">        </span><span class="k">end do</span>
+
+<span class="w">        </span><span class="c">! (B) Case j &gt; 0 (Coefficient for y_{n-j})</span>
+<span class="w">        </span><span class="c">! Coeff_j = (1 / -tau(j)) * prod_{m!=0, j} (tau(m) / (tau(m) - tau(j)))</span>
+<span class="w">        </span><span class="k">do </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">k</span>
+<span class="w">            </span><span class="n">prod_term</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span>
+<span class="w">            </span><span class="k">do </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">k</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">m</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="k">cycle</span>
+<span class="k">                </span><span class="n">prod_term</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prod_term</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">tau</span><span class="p">(</span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">tau</span><span class="p">(</span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">tau</span><span class="p">(</span><span class="n">j</span><span class="p">)))</span>
+<span class="w">            </span><span class="k">end do</span>
+<span class="k">            </span><span class="n">self</span><span class="p">%</span><span class="n">coeffs</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">tau</span><span class="p">(</span><span class="n">j</span><span class="p">))</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">prod_term</span>
+<span class="w">        </span><span class="k">end do</span>
+
+<span class="k">    end subroutine </span><span class="n">compute_bdf_coefficients</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

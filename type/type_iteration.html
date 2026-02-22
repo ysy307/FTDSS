@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 2.1% of total for derived types.</p>Including implementation: 177 statements,  3.4% of total for derived types.">25 statements</a>
+                 title="<p> 1.6% of total for derived types.</p>Including implementation: 293 statements,  1.7% of total for derived types.">36 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -134,15 +134,13 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_iteration.html#variable-algorithm~2">algorithm</a>
-            <a class="list-group-item" href="../type/type_iteration.html#variable-config">config</a>
-            <a class="list-group-item" href="../type/type_iteration.html#variable-init_res_norm_inf">init_res_norm_inf</a>
-            <a class="list-group-item" href="../type/type_iteration.html#variable-init_res_norm_l2">init_res_norm_l2</a>
-            <a class="list-group-item" href="../type/type_iteration.html#variable-init_upd_norm_inf">init_upd_norm_inf</a>
-            <a class="list-group-item" href="../type/type_iteration.html#variable-init_upd_norm_l2">init_upd_norm_l2</a>
+            <a class="list-group-item" href="../type/type_iteration.html#variable-compute_nonlinear_solver_type">compute_nonlinear_solver_type</a>
+            <a class="list-group-item" href="../type/type_iteration.html#variable-config~2">config</a>
             <a class="list-group-item" href="../type/type_iteration.html#variable-is_converged">is_converged</a>
-            <a class="list-group-item" href="../type/type_iteration.html#variable-iter~3">iter</a>
-            <a class="list-group-item" href="../type/type_iteration.html#variable-step">step</a>
+            <a class="list-group-item" href="../type/type_iteration.html#variable-is_diverged">is_diverged</a>
+            <a class="list-group-item" href="../type/type_iteration.html#variable-nonlinear_iter">nonlinear_iter</a>
+            <a class="list-group-item" href="../type/type_iteration.html#variable-nonlinear_solver_type">nonlinear_solver_type</a>
+            <a class="list-group-item" href="../type/type_iteration.html#variable-total_iter">total_iter</a>
         </div>
       </div>
     </div>
@@ -170,16 +168,30 @@
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-check_convergence">check_convergence</a>
-            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-get_algorithm_name~2">get_algorithm_name</a>
-            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-get_iter">get_iter</a>
-            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-get_step">get_step</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-get_absolute_tolerance">get_absolute_tolerance</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-get_current_residual_norm">get_current_residual_norm</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-get_current_update_norm">get_current_update_norm</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-get_max_iterations">get_max_iterations</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-get_nonlinear_iter">get_nonlinear_iter</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-get_nonlinear_solver">get_nonlinear_solver</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-get_relative_tolerance">get_relative_tolerance</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-get_total_iter">get_total_iter</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-get_update_frequency">get_update_frequency</a>
             <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-has_converged">has_converged</a>
-            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-increment_iter">increment_iter</a>
-            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-increment_step">increment_step</a>
-            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-initialize~17">initialize</a>
-            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-reset_step">reset_step</a>
-            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-reset_timestep">reset_timestep</a>
-            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-set_initial_norms">set_initial_norms</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-has_diverged">has_diverged</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-increment_nonlinear">increment_nonlinear</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-increment_total">increment_total</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-initialize~27">initialize</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-is_compute_newton">is_compute_newton</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-is_compute_none">is_compute_none</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-is_compute_picard">is_compute_picard</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-is_newton">is_newton</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-is_none">is_none</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-is_picard">is_picard</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-reset~4">reset</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-set_converged">set_converged</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-set_diverged">set_diverged</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-set_nonlinear_solver">set_nonlinear_solver</a>
             <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-should_continue">should_continue</a>
         </div>
       </div>
@@ -202,7 +214,7 @@
     <div class="col-md-9" id='text'>
       <h2 id="type-def-statement">
         type, public :: type_iteration</h2>
-    
+    <p>反復管理クラス (Main)</p>
 <br>      <div class="card">
         <div class="card-header">
           <h3 class="card-title">Inherits</h3>
@@ -214,64 +226,94 @@
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: type~~type_iteration~~InheritsGraph Pages: 1 -->
-<svg id="typetype_iterationInheritsGraph" width="641pt" height="27pt"
- viewBox="0.00 0.00 641.00 27.10" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="type~~type_iteration~~InheritsGraph" class="graph" transform="scale(0.85 0.85) rotate(0) translate(4 28)">
+<svg id="typetype_iterationInheritsGraph" width="641pt" height="60pt"
+ viewBox="0.00 0.00 641.00 60.01" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_iteration~~InheritsGraph" class="graph" transform="scale(0.52 0.52) rotate(0) translate(4 112)">
 <title>type~~type_iteration~~InheritsGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 753,-28 753,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-112 1235,-112 1235,4 -4,4"/>
 <!-- type~type_iteration -->
 <g id="type~~type_iteration~~InheritsGraph_node1" class="node">
 <title>type~type_iteration</title>
-<polygon fill="none" stroke="black" points="749,-24 663,-24 663,0 749,0 749,-24"/>
-<text text-anchor="middle" x="706" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_iteration</text>
+<polygon fill="none" stroke="black" points="1231,-90 1145,-90 1145,-66 1231,-66 1231,-90"/>
+<text text-anchor="middle" x="1188" y="-75.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_iteration</text>
+</g>
+<!-- type~type_constant_id -->
+<g id="type~~type_iteration~~InheritsGraph_node2" class="node">
+<title>type~type_constant_id</title>
+<g id="a_type~~type_iteration~~InheritsGraph_node2"><a xlink:href="../type/type_constant_id.html" xlink:title="type_constant_id">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="102,-67 0,-67 0,-43 102,-43 102,-67"/>
+<text text-anchor="middle" x="51" y="-52.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_constant_id</text>
+</a>
+</g>
+</g>
+<!-- type~type_iteration&#45;&gt;type~type_constant_id -->
+<g id="type~~type_iteration~~InheritsGraph_edge1" class="edge">
+<title>type~type_iteration&#45;&gt;type~type_constant_id</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1144.74,-85.9C1111.18,-91.49 1063.01,-98 1020.5,-98 1020.5,-98 1020.5,-98 502.5,-98 341.83,-98 300.33,-103.22 141.5,-79"/>
+<text text-anchor="middle" x="692.5" y="-100.4" font-family="Helvetica,sans-Serif" font-size="9.50">nonlinear_solver_type, compute_nonlinear_solver_type</text>
 </g>
 <!-- type~type_iterator_config -->
-<g id="type~~type_iteration~~InheritsGraph_node2" class="node">
+<g id="type~~type_iteration~~InheritsGraph_node3" class="node">
 <title>type~type_iterator_config</title>
-<g id="a_type~~type_iteration~~InheritsGraph_node2"><a xlink:href="../type/type_iterator_config.html" xlink:title="type_iterator_config">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="597,-24 478,-24 478,0 597,0 597,-24"/>
-<text text-anchor="middle" x="537.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iterator_config</text>
+<g id="a_type~~type_iteration~~InheritsGraph_node3"><a xlink:href="../type/type_iterator_config.html" xlink:title="type_iterator_config">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1079,-68 960,-68 960,-44 1079,-44 1079,-68"/>
+<text text-anchor="middle" x="1019.5" y="-53.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iterator_config</text>
 </a>
 </g>
 </g>
 <!-- type~type_iteration&#45;&gt;type~type_iterator_config -->
-<g id="type~~type_iteration~~InheritsGraph_edge1" class="edge">
-<title>type~type_iteration&#45;&gt;type~type_iterator_config</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M662.99,-12C646.08,-12 626.14,-12 607.24,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="607.17,-8.5 597.17,-12 607.17,-15.5 607.17,-8.5"/>
-<text text-anchor="middle" x="630" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">config</text>
-</g>
-<!-- type~type_convergence -->
-<g id="type~~type_iteration~~InheritsGraph_node3" class="node">
-<title>type~type_convergence</title>
-<g id="a_type~~type_iteration~~InheritsGraph_node3"><a xlink:href="../type/type_convergence.html" xlink:title="type_convergence">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="380,-24 269,-24 269,0 380,0 380,-24"/>
-<text text-anchor="middle" x="324.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_convergence</text>
-</a>
-</g>
-</g>
-<!-- type~type_iterator_config&#45;&gt;type~type_convergence -->
 <g id="type~~type_iteration~~InheritsGraph_edge2" class="edge">
-<title>type~type_iterator_config&#45;&gt;type~type_convergence</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M477.72,-12C450.57,-12 418.25,-12 390.39,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="390.34,-8.5 380.34,-12 390.34,-15.5 390.34,-8.5"/>
-<text text-anchor="middle" x="429" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">convergence</text>
+<title>type~type_iteration&#45;&gt;type~type_iterator_config</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1144.99,-72.45C1128.08,-70.21 1108.14,-67.58 1089.24,-65.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1089.54,-61.59 1079.17,-63.75 1088.62,-68.53 1089.54,-61.59"/>
+<text text-anchor="middle" x="1112" y="-71.4" font-family="Helvetica,sans-Serif" font-size="9.50">config</text>
 </g>
-<!-- type~type_convergence_criteria -->
+<!-- type~type_convergence_control -->
 <g id="type~~type_iteration~~InheritsGraph_node4" class="node">
-<title>type~type_convergence_criteria</title>
-<g id="a_type~~type_iteration~~InheritsGraph_node4"><a xlink:href="../type/type_convergence_criteria.html" xlink:title="type_convergence_criteria">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="154,-24 0,-24 0,0 154,0 154,-24"/>
-<text text-anchor="middle" x="77" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_convergence_criteria</text>
+<title>type~type_convergence_control</title>
+<g id="a_type~~type_iteration~~InheritsGraph_node4"><a xlink:href="../type/type_convergence_control.html" xlink:title="type_convergence_control">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="769,-62 616,-62 616,-38 769,-38 769,-62"/>
+<text text-anchor="middle" x="692.5" y="-47.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_convergence_control</text>
 </a>
 </g>
 </g>
-<!-- type~type_convergence&#45;&gt;type~type_convergence_criteria -->
+<!-- type~type_iterator_config&#45;&gt;type~type_convergence_control -->
 <g id="type~~type_iteration~~InheritsGraph_edge3" class="edge">
-<title>type~type_convergence&#45;&gt;type~type_convergence_criteria</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M268.71,-12C237.97,-12 198.93,-12 164.18,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="164.03,-8.5 154.03,-12 164.03,-15.5 164.03,-8.5"/>
-<text text-anchor="middle" x="211.5" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">residual, update</text>
+<title>type~type_iterator_config&#45;&gt;type~type_convergence_control</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M959.64,-54.91C909.26,-53.98 836.05,-52.63 779.16,-51.58"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="779.17,-48.08 769.1,-51.4 779.04,-55.08 779.17,-48.08"/>
+<text text-anchor="middle" x="892" y="-57.4" font-family="Helvetica,sans-Serif" font-size="9.50">convergence_control</text>
+</g>
+<!-- type~type_convergence_control&#45;&gt;type~type_constant_id -->
+<g id="type~~type_iteration~~InheritsGraph_edge4" class="edge">
+<title>type~type_convergence_control&#45;&gt;type~type_constant_id</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M615.81,-51.52C515.69,-53.99 333.81,-60.08 179,-74 162.25,-75.51 158.17,-81.2 141.5,-79"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M139.5,-79C125.97,-76.94 111.55,-73.51 98.4,-69.88"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="99.21,-66.47 88.63,-67.09 97.28,-73.21 99.21,-66.47"/>
+<text text-anchor="middle" x="312.5" y="-76.4" font-family="Helvetica,sans-Serif" font-size="9.50">norm_type, combination_logic, convergence_norm_type</text>
+</g>
+<!-- type~type_convergence_criterion -->
+<g id="type~~type_iteration~~InheritsGraph_node5" class="node">
+<title>type~type_convergence_criterion</title>
+<g id="a_type~~type_iteration~~InheritsGraph_node5"><a xlink:href="../type/type_convergence_criterion.html" xlink:title="type_convergence_criterion">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="393,-24 232,-24 232,0 393,0 393,-24"/>
+<text text-anchor="middle" x="312.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_convergence_criterion</text>
+</a>
+</g>
+</g>
+<!-- type~type_convergence_control&#45;&gt;type~type_convergence_criterion -->
+<g id="type~~type_iteration~~InheritsGraph_edge5" class="edge">
+<title>type~type_convergence_control&#45;&gt;type~type_convergence_criterion</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M615.91,-42.4C554.66,-36.24 468.2,-27.55 403.4,-21.04"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="403.49,-17.53 393.19,-20.01 402.79,-24.49 403.49,-17.53"/>
+<text text-anchor="middle" x="503.5" y="-37.4" font-family="Helvetica,sans-Serif" font-size="9.50">residual, update</text>
+</g>
+<!-- type~type_convergence_criterion&#45;&gt;type~type_constant_id -->
+<g id="type~~type_iteration~~InheritsGraph_edge6" class="edge">
+<title>type~type_convergence_criterion&#45;&gt;type~type_constant_id</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M238.87,-24.04C198.99,-30.64 150.11,-38.74 112.34,-45"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="111.3,-41.63 102,-46.71 112.44,-48.53 111.3,-41.63"/>
+<text text-anchor="middle" x="140.5" y="-46.4" font-family="Helvetica,sans-Serif" font-size="9.50">criterion</text>
 </g>
 </g>
 </svg>
@@ -453,24 +495,24 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-algorithm~2"></span>
-              character(len=:),
+              <span class="anchor" id="variable-compute_nonlinear_solver_type"></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
             </td>
-              <td>private,</td>
+              <td>private</td>
             <td>
-              allocatable
+              
             </td>
             <td>::</td>
-            <td><strong>algorithm</strong></td>
-                <td></td>
-                <td></td>
+            <td><strong>compute_nonlinear_solver_type</strong></td>
+<td> =</td>
+                <td>NONLINEAR_SOLVER%PICARD</td>
             <td>
                 
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-config"></span>
+              <span class="anchor" id="variable-config~2"></span>
               type(<a href='type_iterator_config.html'>type_iterator_config</a>),
             </td>
               <td>private</td>
@@ -487,74 +529,6 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-init_res_norm_inf"></span>
-              real(kind=real64),
-            </td>
-              <td>private</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>init_res_norm_inf</strong></td>
-<td> =</td>
-                <td>0.0d0</td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-init_res_norm_l2"></span>
-              real(kind=real64),
-            </td>
-              <td>private</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>init_res_norm_l2</strong></td>
-<td> =</td>
-                <td>0.0d0</td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-init_upd_norm_inf"></span>
-              real(kind=real64),
-            </td>
-              <td>private</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>init_upd_norm_inf</strong></td>
-<td> =</td>
-                <td>0.0d0</td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-init_upd_norm_l2"></span>
-              real(kind=real64),
-            </td>
-              <td>private</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>init_upd_norm_l2</strong></td>
-<td> =</td>
-                <td>0.0d0</td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
               <span class="anchor" id="variable-is_converged"></span>
               logical,
             </td>
@@ -563,7 +537,24 @@ large graphs.</div>
               
             </td>
             <td>::</td>
-            <td><strong>is_converged</strong></td>
+            <td><strong>is_converged</strong>(PHYSICS_TYPES%NUM_ID)</td>
+<td> =</td>
+                <td>.true.</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-is_diverged"></span>
+              logical,
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>is_diverged</strong>(PHYSICS_TYPES%NUM_ID)</td>
 <td> =</td>
                 <td>.false.</td>
             <td>
@@ -572,7 +563,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-iter~3"></span>
+              <span class="anchor" id="variable-nonlinear_iter"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -580,7 +571,7 @@ large graphs.</div>
               
             </td>
             <td>::</td>
-            <td><strong>iter</strong></td>
+            <td><strong>nonlinear_iter</strong></td>
 <td> =</td>
                 <td>0</td>
             <td>
@@ -589,7 +580,24 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-step"></span>
+              <span class="anchor" id="variable-nonlinear_solver_type"></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nonlinear_solver_type</strong></td>
+<td> =</td>
+                <td>NONLINEAR_SOLVER%PICARD</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-total_iter"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -597,7 +605,7 @@ large graphs.</div>
               
             </td>
             <td>::</td>
-            <td><strong>step</strong></td>
+            <td><strong>total_iter</strong></td>
 <td> =</td>
                 <td>0</td>
             <td>
@@ -627,7 +635,7 @@ large graphs.</div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/check_convergence.html'>check_convergence</a>(self, res_vec, upd_vec)  
+    private  subroutine <a href='../proc/check_convergence.html'>check_convergence</a>(self, physics_type, residual_vector, update_vector)  
 </h3>
     
 
@@ -662,14 +670,14 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              real(kind=real64),
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>res_vec</strong>(:)</td>
+            <td><strong>physics_type</strong></td>
             <td>
 
             </td>
@@ -679,12 +687,27 @@ large graphs.</div>
               <span class="anchor" ></span>
               real(kind=real64),
             </td>
-<td>intent(in)</td>
-              <td></td>            <td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>upd_vec</strong>(:)</td>
+            <td><strong>residual_vector</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>update_vector</strong>(:)</td>
             <td>
 
             </td>
@@ -701,17 +724,17 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-get_algorithm_name~2"></span>
+      <span class="anchor" id="boundprocedure-get_absolute_tolerance"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>get_algorithm_name</strong>
+  <strong>get_absolute_tolerance</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/get_absolute_tolerance_iteration.html'>get_absolute_tolerance_iteration</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private pure function <a href='../proc/get_algorithm_name~2.html'>get_algorithm_name</a>(self) result(algorithm_name)  
+    private pure subroutine <a href='../proc/get_absolute_tolerance_iteration.html'>get_absolute_tolerance_iteration</a>(self, physics_type, criteria_type, absolute_tolerance)  
 </h3>
     
 
@@ -743,14 +766,54 @@ large graphs.</div>
 
             </td>
         </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>criteria_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>absolute_tolerance</strong></td>
+            <td>
+
+            </td>
+        </tr>
     </tbody>
   </table>
 
-    <h4>
-    Return Value
-    <small>character(len=:), allocatable</small>
-    </h4>
-    
 
           </li>
       </ul>
@@ -760,17 +823,17 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-get_iter"></span>
+      <span class="anchor" id="boundprocedure-get_current_residual_norm"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>get_iter</strong>
+  <strong>get_current_residual_norm</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/get_current_residual_norm_iteration.html'>get_current_residual_norm_iteration</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private pure function <a href='../proc/get_iter.html'>get_iter</a>(self) result(iter)  
+    private pure subroutine <a href='../proc/get_current_residual_norm_iteration.html'>get_current_residual_norm_iteration</a>(self, physics_type, norm_type, current_norm)  
 </h3>
     
 
@@ -802,14 +865,54 @@ large graphs.</div>
 
             </td>
         </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>norm_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_norm</strong></td>
+            <td>
+
+            </td>
+        </tr>
     </tbody>
   </table>
 
-    <h4>
-    Return Value
-    <small>integer(kind=int32)</small>
-    </h4>
-    
 
           </li>
       </ul>
@@ -819,17 +922,17 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-get_step"></span>
+      <span class="anchor" id="boundprocedure-get_current_update_norm"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>get_step</strong>
+  <strong>get_current_update_norm</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/get_current_update_norm_iteration.html'>get_current_update_norm_iteration</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private pure function <a href='../proc/get_step.html'>get_step</a>(self) result(step)  
+    private pure subroutine <a href='../proc/get_current_update_norm_iteration.html'>get_current_update_norm_iteration</a>(self, physics_type, norm_type, current_norm)  
 </h3>
     
 
@@ -861,14 +964,498 @@ large graphs.</div>
 
             </td>
         </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>norm_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_norm</strong></td>
+            <td>
+
+            </td>
+        </tr>
     </tbody>
   </table>
 
-    <h4>
-    Return Value
-    <small>integer(kind=int32)</small>
-    </h4>
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_max_iterations"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_max_iterations</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure subroutine <a href='../proc/get_max_iterations.html'>get_max_iterations</a>(self, max_iterations)  
+</h3>
     
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>max_iterations</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_nonlinear_iter"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_nonlinear_iter</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure subroutine <a href='../proc/get_nonlinear_iter.html'>get_nonlinear_iter</a>(self, nonlinear_iter)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nonlinear_iter</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_nonlinear_solver"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_nonlinear_solver</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/get_nonlinear_type_iteration.html'>get_nonlinear_type_iteration</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/get_nonlinear_type_iteration.html'>get_nonlinear_type_iteration</a>(self, nonlinear_solver_type)  
+</h3>
+    
+
+  <p>Returns the ACTIVE (compute) solver type</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>nonlinear_solver_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_relative_tolerance"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_relative_tolerance</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/get_relative_tolerance_iteration.html'>get_relative_tolerance_iteration</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure subroutine <a href='../proc/get_relative_tolerance_iteration.html'>get_relative_tolerance_iteration</a>(self, physics_type, criteria_type, relative_tolerance)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>criteria_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>relative_tolerance</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_total_iter"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_total_iter</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure subroutine <a href='../proc/get_total_iter.html'>get_total_iter</a>(self, total_iter)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>total_iter</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_update_frequency"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_update_frequency</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure subroutine <a href='../proc/get_update_frequency.html'>get_update_frequency</a>(self, update_frequency)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>update_frequency</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
 
           </li>
       </ul>
@@ -881,14 +1468,14 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-has_converged"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>has_converged</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/get_status.html'>get_status</a>
+  <strong>has_converged</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/has_converged_iteration.html'>has_converged_iteration</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private pure function <a href='../proc/get_status.html'>get_status</a>(self) result(is_converged)  
+    private pure function <a href='../proc/has_converged_iteration.html'>has_converged_iteration</a>(self) result(has_converged)  
 </h3>
     
 
@@ -937,17 +1524,76 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-increment_iter"></span>
+      <span class="anchor" id="boundprocedure-has_diverged"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>increment_iter</strong>
+  <strong>has_diverged</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/has_diverged_iteration.html'>has_diverged_iteration</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/increment_iter.html'>increment_iter</a>(self)  
+    private pure function <a href='../proc/has_diverged_iteration.html'>has_diverged_iteration</a>(self) result(has_diverged)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-increment_nonlinear"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>increment_nonlinear</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure subroutine <a href='../proc/increment_nonlinear.html'>increment_nonlinear</a>(self)  
 </h3>
     
 
@@ -991,17 +1637,17 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-increment_step"></span>
+      <span class="anchor" id="boundprocedure-increment_total"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>increment_step</strong>
+  <strong>increment_total</strong>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/increment_step.html'>increment_step</a>(self)  
+    private pure subroutine <a href='../proc/increment_total.html'>increment_total</a>(self)  
 </h3>
     
 
@@ -1045,17 +1691,17 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~17"></span>
+      <span class="anchor" id="boundprocedure-initialize~27"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>initialize</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/initialize_type_iteration.html'>initialize_type_iteration</a>
+  <strong>initialize</strong>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/initialize_type_iteration.html'>initialize_type_iteration</a>(self, input)  
+    private  subroutine <a href='../proc/initialize~2.html'>initialize</a>(self, input, reference_value)  
 </h3>
     
 
@@ -1077,7 +1723,7 @@ large graphs.</div>
               <span class="anchor" ></span>
               class(<a href='type_iteration.html'>type_iteration</a>),
             </td>
-<td>intent(out)</td>
+<td>intent(inout)</td>
               <td></td>            <td>
               
             </td>
@@ -1102,168 +1748,6 @@ large graphs.</div>
 
             </td>
         </tr>
-    </tbody>
-  </table>
-
-
-          </li>
-      </ul>
-  </div>
-
-          </div>
-          <div class="row">
-              <div class="card mt-3">
-    <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-reset_step"></span>
-      <h3>
-          procedure, public, pass(self) ::
-  <strong>reset_step</strong>
-        
-      </h3>
-    </div>
-      <ul class="list-group">
-          <li class="list-group-item">
-                    <h3>
-    private  subroutine <a href='../proc/reset_step.html'>reset_step</a>(self)  
-</h3>
-    
-
-  
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              class(<a href='type_iteration.html'>type_iteration</a>),
-            </td>
-<td>intent(inout)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>self</strong></td>
-            <td>
-
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-          </li>
-      </ul>
-  </div>
-
-          </div>
-          <div class="row">
-              <div class="card mt-3">
-    <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-reset_timestep"></span>
-      <h3>
-          procedure, public, pass(self) ::
-  <strong>reset_timestep</strong>
-        
-      </h3>
-    </div>
-      <ul class="list-group">
-          <li class="list-group-item">
-                    <h3>
-    private  subroutine <a href='../proc/reset_timestep.html'>reset_timestep</a>(self)  
-</h3>
-    
-
-  
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              class(<a href='type_iteration.html'>type_iteration</a>),
-            </td>
-<td>intent(inout)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>self</strong></td>
-            <td>
-
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-          </li>
-      </ul>
-  </div>
-
-          </div>
-          <div class="row">
-              <div class="card mt-3">
-    <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-set_initial_norms"></span>
-      <h3>
-          procedure, public, pass(self) ::
-  <strong>set_initial_norms</strong>
-        
-      </h3>
-    </div>
-      <ul class="list-group">
-          <li class="list-group-item">
-                    <h3>
-    private  subroutine <a href='../proc/set_initial_norms.html'>set_initial_norms</a>(self, res_vec, upd_vec)  
-</h3>
-    
-
-  
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              class(<a href='type_iteration.html'>type_iteration</a>),
-            </td>
-<td>intent(inout)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>self</strong></td>
-            <td>
-
-            </td>
-        </tr>
         <tr>
             <td>
               <span class="anchor" ></span>
@@ -1274,7 +1758,473 @@ large graphs.</div>
               
             </td>
             <td>::</td>
-            <td><strong>res_vec</strong>(:)</td>
+            <td><strong>reference_value</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_compute_newton"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_compute_newton</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/is_compute_newton_method_iteration.html'>is_compute_newton_method_iteration</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_compute_newton_method_iteration.html'>is_compute_newton_method_iteration</a>(self) result(is_newton)  
+</h3>
+    
+
+  <p>Returns true if the ACTIVE solver is Newton-Raphson
+(Returns false if solver is NONE)</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_compute_none"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_compute_none</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/is_compute_none_method_iteration.html'>is_compute_none_method_iteration</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_compute_none_method_iteration.html'>is_compute_none_method_iteration</a>(self) result(is_none)  
+</h3>
+    
+
+  <p>Returns true if the ACTIVE solver is NONE</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_compute_picard"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_compute_picard</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/is_compute_picard_method_iteration.html'>is_compute_picard_method_iteration</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_compute_picard_method_iteration.html'>is_compute_picard_method_iteration</a>(self) result(is_picard)  
+</h3>
+    
+
+  <p>Returns true if the ACTIVE solver is Picard
+(Returns false if solver is NONE)</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_newton"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_newton</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/is_newton_method_iteration.html'>is_newton_method_iteration</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_newton_method_iteration.html'>is_newton_method_iteration</a>(self) result(is_newton)  
+</h3>
+    
+
+  <p>Returns true if the ACTIVE solver is Newton-Raphson
+(Returns false if solver is NONE)</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_none"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_none</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/is_none_method_iteration.html'>is_none_method_iteration</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_none_method_iteration.html'>is_none_method_iteration</a>(self) result(is_none)  
+</h3>
+    
+
+  <p>Returns true if the ACTIVE solver is NONE</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_picard"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_picard</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/is_picard_method_iteration.html'>is_picard_method_iteration</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_picard_method_iteration.html'>is_picard_method_iteration</a>(self) result(is_picard)  
+</h3>
+    
+
+  <p>Returns true if the ACTIVE solver is Picard
+(Returns false if solver is NONE)</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-reset~4"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>reset</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/reset_nonlinear.html'>reset_nonlinear</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/reset_nonlinear.html'>reset_nonlinear</a>(self)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-set_converged"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>set_converged</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/set_converged.html'>set_converged</a>(self, physics_type, converged)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
             <td>
 
             </td>
@@ -1282,14 +2232,182 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              real(kind=real64),
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
             </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
+<td>intent(in)</td>
+              <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>upd_vec</strong>(:)</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              logical,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>converged</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-set_diverged"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>set_diverged</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/set_diverged.html'>set_diverged</a>(self, physics_type, diverged)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              logical,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>diverged</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-set_nonlinear_solver"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>set_nonlinear_solver</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/set_nonlinear_type_iteration.html'>set_nonlinear_type_iteration</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/set_nonlinear_type_iteration.html'>set_nonlinear_type_iteration</a>(self, nonlinear_solver_type)  
+</h3>
+    
+
+  <p>Sets the ACTIVE (compute) solver type</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nonlinear_solver_type</strong></td>
             <td>
 
             </td>
@@ -1309,14 +2427,14 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-should_continue"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>should_continue</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/continue_loop.html'>continue_loop</a>
+  <strong>should_continue</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/should_continue_iteration.html'>should_continue_iteration</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  function <a href='../proc/continue_loop.html'>continue_loop</a>(self) result(should_continue_loop)  
+    private  function <a href='../proc/should_continue_iteration.html'>should_continue_iteration</a>(self) result(should_continue)  
 </h3>
     
 
@@ -1367,31 +2485,60 @@ large graphs.</div>
     <section>
     <h3><span class="anchor" id="src"></span>Source Code</h3>
     <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_iteration</span>
-<span class="w">        </span><span class="k">private</span>
-<span class="k">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">iter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="c">! 非線形反復回数</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="c">! ステップカウンタ</span>
-<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_converged</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="c">! --- カウンタ ---</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">total_iter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nonlinear_iter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
 
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">init_res_norm_l2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">init_res_norm_inf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">init_upd_norm_l2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">init_upd_norm_inf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="c">! --- 状態フラグ ---</span>
+<span class="w">        </span><span class="c">! 物理量ごとに収束状態を保持する (Thermal, Hydro, etc.)</span>
+<span class="w">        </span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_converged</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">NUM_ID</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">        </span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_diverged</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">NUM_ID</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
 
-<span class="w">        </span><span class="kt">character</span><span class="p">(:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">algorithm</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_iterator_config</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">config</span>
+<span class="w">        </span><span class="c">! --- 設定 ---</span>
+<span class="w">        </span><span class="c">! nonlinear_solver_type: 入力設定に基づく静的な設定 (NONE/PICARD/NEWTON)</span>
+<span class="w">        </span><span class="c">! compute_nonlinear_solver_type: 計算中に使用される動的なソルバータイプ</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_constant_id</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nonlinear_solver_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NONLINEAR_SOLVER</span><span class="p">%</span><span class="n">PICARD</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_constant_id</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">compute_nonlinear_solver_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NONLINEAR_SOLVER</span><span class="p">%</span><span class="n">PICARD</span>
+
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_iterator_config</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">config</span>
 <span class="w">    </span><span class="k">contains</span>
-<span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">initialize_type_iteration</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">reset_step</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">set_initial_norms</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">reset_timestep</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">check_convergence</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">increment_iter</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">increment_step</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">should_continue</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">continue_loop</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_iter</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_step</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_algorithm_name</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">has_converged</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_status</span>
+<span class="w">        </span><span class="c">! Initialization / Reset</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">reset</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">reset_nonlinear</span>
+
+<span class="w">        </span><span class="c">! Operation</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">increment_nonlinear</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">increment_total</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">check_convergence</span>
+<span class="w">        </span><span class="c">! Query</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">should_continue</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">should_continue_iteration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">has_converged</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">has_converged_iteration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">has_diverged</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">has_diverged_iteration</span>
+
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">set_converged</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">set_diverged</span>
+
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_nonlinear_iter</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_total_iter</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_max_iterations</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_update_frequency</span>
+
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_current_update_norm</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_current_update_norm_iteration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_current_residual_norm</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_current_residual_norm_iteration</span>
+
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_absolute_tolerance</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_absolute_tolerance_iteration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_relative_tolerance</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_relative_tolerance_iteration</span>
+
+<span class="w">        </span><span class="c">! 以下のメソッドは compute_nonlinear_solver_type (動的) を操作/参照するように変更</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_nonlinear_solver</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_nonlinear_type_iteration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">set_nonlinear_solver</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">set_nonlinear_type_iteration</span>
+
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_compute_newton</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_compute_newton_method_iteration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_compute_picard</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_compute_picard_method_iteration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_compute_none</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_compute_none_method_iteration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_newton</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_newton_method_iteration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_picard</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_picard_method_iteration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_none</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_none_method_iteration</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_iteration</span>
 </pre></div>
 
@@ -1408,14 +2555,14 @@ large graphs.</div>
           <div class="col">
             <p>
               FTDSS
- was developed by Kikuchi Shun<br>              &copy; 2025 
+ was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
           <div class="col">
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-08-26 10:37 +0000             </p>
+ on 2026-02-22 12:12 +0000             </p>
           </div>
         </div>
         <br>

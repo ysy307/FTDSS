@@ -1,0 +1,2200 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>solver_preconditioner_jacobi &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>solver_preconditioner_jacobi
+      <small>Submodule</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.4% of total for modules and submodules.">119 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/preconditioner_jacobi.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/preconditioner_jacobi.f90.html'>preconditioner_jacobi.F90</a></li>
+            <li class="breadcrumb-item active" aria-current="page">solver_preconditioner_jacobi</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3">
+        <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#modsubs-0"
+         aria-expanded="false" aria-controls="modsubs-0">
+         <h4 class="card-header bg-primary text-white">Module Subroutines</h4>
+      </a>
+      <div id="modsubs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/solver_preconditioner_jacobi.html#proc-apply_preconditioner_jacobi">apply_preconditioner_jacobi</a>
+            <a class="list-group-item" href="../module/solver_preconditioner_jacobi.html#proc-destroy_preconditioner_jacobi">destroy_preconditioner_jacobi</a>
+            <a class="list-group-item" href="../module/solver_preconditioner_jacobi.html#proc-initialize_preconditioner_jacobi">initialize_preconditioner_jacobi</a>
+            <a class="list-group-item" href="../module/solver_preconditioner_jacobi.html#proc-setup_preconditioner_jacobi">setup_preconditioner_jacobi</a>
+            <a class="list-group-item" href="../module/solver_preconditioner_jacobi.html#proc-setup_preconditioner_jacobi_block">setup_preconditioner_jacobi_block</a>
+            <a class="list-group-item" href="../module/solver_preconditioner_jacobi.html#proc-setup_preconditioner_jacobi_point">setup_preconditioner_jacobi_point</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+
+
+  </div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      
+<br>          <div class="card mb-4">
+      <h3 class="card-header card-title bg-light">Uses</h3>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <ul class="list-inline">
+                <li><h5>Ancestors:</h5></li>
+                  <li class="list-inline-item"><a href='solver_preconditioner.html'>solver_preconditioner</a></li>
+              </ul>
+            </li>
+            <li class="list-group-item">
+              <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: module~~solver_preconditioner_jacobi~~UsesGraph Pages: 1 -->
+<svg id="modulesolver_preconditioner_jacobiUsesGraph" width="641pt" height="305pt"
+ viewBox="0.00 0.00 641.00 305.18" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph" class="graph" transform="scale(0.21 0.21) rotate(0) translate(4 1460.48)">
+<title>module~~solver_preconditioner_jacobi~~UsesGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1460.48 3072,-1460.48 3072,4 -4,4"/>
+<!-- module~solver_preconditioner_jacobi -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node1" class="node">
+<title>module~solver_preconditioner_jacobi</title>
+<polygon fill="none" stroke="black" points="3068,-1105.48 2902,-1105.48 2902,-1081.48 3068,-1081.48 3068,-1105.48"/>
+<text text-anchor="middle" x="2985" y="-1091.08" font-family="Helvetica,sans-Serif" font-size="10.50">solver_preconditioner_jacobi</text>
+</g>
+<!-- module~solver_preconditioner -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node2" class="node">
+<title>module~solver_preconditioner</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node2"><a xlink:href="../module/solver_preconditioner.html" xlink:title="solver_preconditioner">
+<polygon fill="#337ab7" stroke="#337ab7" points="2866,-1105.48 2738,-1105.48 2738,-1081.48 2866,-1081.48 2866,-1105.48"/>
+<text text-anchor="middle" x="2802" y="-1091.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solver_preconditioner</text>
+</a>
+</g>
+</g>
+<!-- module~solver_preconditioner_jacobi&#45;&gt;module~solver_preconditioner -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge1" class="edge">
+<title>module~solver_preconditioner_jacobi&#45;&gt;module~solver_preconditioner</title>
+<path fill="none" stroke="#ff0000" d="M2901.97,-1093.48C2893.4,-1093.48 2884.71,-1093.48 2876.24,-1093.48"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2876.04,-1089.98 2866.04,-1093.48 2876.04,-1096.98 2876.04,-1089.98"/>
+</g>
+<!-- iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node3" class="node">
+<title>iso_fortran_env</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node3"><a xlink:href="http://fortranwiki.org/fortran/show/iso_fortran_env" xlink:title="iso_fortran_env">
+<polygon fill="#337ab7" stroke="#337ab7" points="94,-674.48 0,-674.48 0,-650.48 94,-650.48 94,-674.48"/>
+<text text-anchor="middle" x="47" y="-660.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
+</a>
+</g>
+</g>
+<!-- module~solver_preconditioner&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge2" class="edge">
+<title>module~solver_preconditioner&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2797.85,-1105.56C2780.65,-1168.55 2691.9,-1456.48 2507,-1456.48 2507,-1456.48 2507,-1456.48 874.5,-1456.48 844.72,-1456.48 387.77,-1316.44 360.5,-1304.48"/>
+</g>
+<!-- module~module_core -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node4" class="node">
+<title>module~module_core</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node4"><a xlink:href="../module/module_core.html" xlink:title="module_core">
+<polygon fill="#337ab7" stroke="#337ab7" points="2398,-1044.48 2316,-1044.48 2316,-1020.48 2398,-1020.48 2398,-1044.48"/>
+<text text-anchor="middle" x="2357" y="-1030.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">module_core</text>
+</a>
+</g>
+</g>
+<!-- module~solver_preconditioner&#45;&gt;module~module_core -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge3" class="edge">
+<title>module~solver_preconditioner&#45;&gt;module~module_core</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2746.36,-1081.47C2731.95,-1078.42 2716.41,-1075.23 2702,-1072.48 2647.09,-1062.01 2633.45,-1058.56 2578,-1051.48 2519.96,-1044.07 2452.94,-1038.75 2408.27,-1035.65"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2408.46,-1032.16 2398.25,-1034.97 2407.99,-1039.14 2408.46,-1032.16"/>
+</g>
+<!-- module~module_linalg -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node5" class="node">
+<title>module~module_linalg</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node5"><a xlink:href="../module/module_linalg.html" xlink:title="module_linalg">
+<polygon fill="#337ab7" stroke="#337ab7" points="2702,-1105.48 2614,-1105.48 2614,-1081.48 2702,-1081.48 2702,-1105.48"/>
+<text text-anchor="middle" x="2658" y="-1091.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">module_linalg</text>
+</a>
+</g>
+</g>
+<!-- module~solver_preconditioner&#45;&gt;module~module_linalg -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge4" class="edge">
+<title>module~solver_preconditioner&#45;&gt;module~module_linalg</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2737.89,-1093.48C2729.45,-1093.48 2720.86,-1093.48 2712.61,-1093.48"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2712.37,-1089.98 2702.37,-1093.48 2712.37,-1096.98 2712.37,-1089.98"/>
+</g>
+<!-- module~core_constants -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node6" class="node">
+<title>module~core_constants</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node6"><a xlink:href="../module/core_constants.html" xlink:title="core_constants">
+<polygon fill="#337ab7" stroke="#337ab7" points="746.5,-654.48 654.5,-654.48 654.5,-630.48 746.5,-630.48 746.5,-654.48"/>
+<text text-anchor="middle" x="700.5" y="-640.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_constants -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge5" class="edge">
+<title>module~module_core&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1262.5,-520.48C1059.29,-497.58 990.55,-462.96 803,-544.48 764.95,-561.02 732.82,-598.57 715.43,-622.09"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="712.5,-620.18 709.51,-630.34 718.18,-624.26 712.5,-620.18"/>
+</g>
+<!-- module~core_interop -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node7" class="node">
+<title>module~core_interop</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node7"><a xlink:href="../module/core_interop.html" xlink:title="core_interop">
+<polygon fill="#337ab7" stroke="#337ab7" points="2260.5,-460.48 2181.5,-460.48 2181.5,-436.48 2260.5,-436.48 2260.5,-460.48"/>
+<text text-anchor="middle" x="2221" y="-446.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_interop</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_interop -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge6" class="edge">
+<title>module~module_core&#45;&gt;module~core_interop</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M2353.2,-1020.28C2336.41,-947.1 2249.02,-566.23 2227.03,-470.39"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="2230.43,-469.58 2224.78,-460.61 2223.61,-471.14 2230.43,-469.58"/>
+</g>
+<!-- module~core_memory -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node8" class="node">
+<title>module~core_memory</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node8"><a xlink:href="../module/core_memory.html" xlink:title="core_memory">
+<polygon fill="#337ab7" stroke="#337ab7" points="918.5,-1036.48 832.5,-1036.48 832.5,-1012.48 918.5,-1012.48 918.5,-1036.48"/>
+<text text-anchor="middle" x="875.5" y="-1022.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_memory</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_memory -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge7" class="edge">
+<title>module~module_core&#45;&gt;module~core_memory</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1777,-992.48C1703.91,-949.7 1110.15,-1002.19 928.86,-1019.39"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="928.4,-1015.92 918.78,-1020.35 929.07,-1022.88 928.4,-1015.92"/>
+</g>
+<!-- module~core_types -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node9" class="node">
+<title>module~core_types</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node9"><a xlink:href="../module/core_types.html" xlink:title="core_types">
+<polygon fill="#337ab7" stroke="#337ab7" points="1813,-1044.48 1743,-1044.48 1743,-1020.48 1813,-1020.48 1813,-1044.48"/>
+<text text-anchor="middle" x="1778" y="-1030.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_types -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge8" class="edge">
+<title>module~module_core&#45;&gt;module~core_types</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M2007.5,-1032.48C1943.52,-1029.71 1869.37,-1030.44 1823.32,-1031.35"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1823.01,-1027.85 1813.09,-1031.56 1823.16,-1034.85 1823.01,-1027.85"/>
+</g>
+<!-- module~core_utils -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node10" class="node">
+<title>module~core_utils</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node10"><a xlink:href="../module/core_utils.html" xlink:title="core_utils">
+<polygon fill="#337ab7" stroke="#337ab7" points="1295,-254.48 1232,-254.48 1232,-230.48 1295,-230.48 1295,-254.48"/>
+<text text-anchor="middle" x="1263.5" y="-240.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_utils</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_utils -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge9" class="edge">
+<title>module~module_core&#45;&gt;module~core_utils</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M2355.37,-1020.02C2351.36,-943.79 2328.12,-540.17 2280,-427.48 2205.12,-252.13 2200.18,-94.48 2009.5,-94.48 2009.5,-94.48 2009.5,-94.48 1777,-94.48 1589.22,-94.48 1377.4,-187.32 1297.42,-225.94"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1295.78,-222.84 1288.33,-230.37 1298.85,-229.14 1295.78,-222.84"/>
+</g>
+<!-- module~core_validation -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node11" class="node">
+<title>module~core_validation</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node11"><a xlink:href="../module/core_validation.html" xlink:title="core_validation">
+<polygon fill="#337ab7" stroke="#337ab7" points="1124.5,-454.48 1030.5,-454.48 1030.5,-430.48 1124.5,-430.48 1124.5,-454.48"/>
+<text text-anchor="middle" x="1077.5" y="-440.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_validation</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_validation -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge10" class="edge">
+<title>module~module_core&#45;&gt;module~core_validation</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M2315.96,-1033.61C2251.42,-1035.16 2120.38,-1037.28 2009.5,-1032.48"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M2007.5,-1032.48C1981.75,-1031.25 1801.13,-1005.69 1779,-992.48"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1777,-992.48C1747.1,-974.64 1723.73,-999.85 1701,-973.48 1647.06,-910.91 1720.2,-664.95 1665,-603.48 1543.54,-468.23 1444.68,-544.58 1264.5,-520.48"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1262.5,-520.48C1218.57,-515.53 1211.7,-498.74 1171,-481.48 1153.16,-473.92 1133.37,-465.57 1116.69,-458.54"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1117.84,-455.23 1107.26,-454.57 1115.12,-461.68 1117.84,-455.23"/>
+</g>
+<!-- module~linalg_matrix_operations -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node12" class="node">
+<title>module~linalg_matrix_operations</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node12"><a xlink:href="../module/linalg_matrix_operations.html" xlink:title="linalg_matrix_operations">
+<polygon fill="#337ab7" stroke="#337ab7" points="2578,-1126.48 2434,-1126.48 2434,-1102.48 2578,-1102.48 2578,-1126.48"/>
+<text text-anchor="middle" x="2506" y="-1112.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">linalg_matrix_operations</text>
+</a>
+</g>
+</g>
+<!-- module~module_linalg&#45;&gt;module~linalg_matrix_operations -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge11" class="edge">
+<title>module~module_linalg&#45;&gt;module~linalg_matrix_operations</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M2613.61,-1099.56C2605.57,-1100.68 2596.93,-1101.89 2588.17,-1103.12"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2587.68,-1099.65 2578.27,-1104.5 2588.65,-1106.58 2587.68,-1099.65"/>
+</g>
+<!-- module~linalg_vector_operations -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node13" class="node">
+<title>module~linalg_vector_operations</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node13"><a xlink:href="../module/linalg_vector_operations.html" xlink:title="linalg_vector_operations">
+<polygon fill="#337ab7" stroke="#337ab7" points="2577.5,-1084.48 2434.5,-1084.48 2434.5,-1060.48 2577.5,-1060.48 2577.5,-1084.48"/>
+<text text-anchor="middle" x="2506" y="-1070.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">linalg_vector_operations</text>
+</a>
+</g>
+</g>
+<!-- module~module_linalg&#45;&gt;module~linalg_vector_operations -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge12" class="edge">
+<title>module~module_linalg&#45;&gt;module~linalg_vector_operations</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M2613.61,-1087.41C2605.44,-1086.26 2596.66,-1085.03 2587.76,-1083.79"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2588.09,-1080.3 2577.7,-1082.38 2587.12,-1087.23 2588.09,-1080.3"/>
+</g>
+<!-- core_constants_error -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node18" class="node">
+<title>core_constants_error</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="594,-798.48 470,-798.48 470,-774.48 594,-774.48 594,-798.48"/>
+<text text-anchor="middle" x="532" y="-784.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_error</text>
+</g>
+<!-- module~core_constants&#45;&gt;core_constants_error -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge13" class="edge">
+<title>module~core_constants&#45;&gt;core_constants_error</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M663.03,-654.53C652.59,-659.4 641.91,-665.94 634,-674.48 604.46,-706.41 629.73,-735.73 598,-765.48 596.69,-766.71 595.31,-767.86 593.87,-768.95"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="591.68,-766.19 585.07,-774.47 595.4,-772.12 591.68,-766.19"/>
+</g>
+<!-- core_constants_ids -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node19" class="node">
+<title>core_constants_ids</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="588,-756.48 476,-756.48 476,-732.48 588,-732.48 588,-756.48"/>
+<text text-anchor="middle" x="532" y="-742.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_ids</text>
+</g>
+<!-- module~core_constants&#45;&gt;core_constants_ids -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge14" class="edge">
+<title>module~core_constants&#45;&gt;core_constants_ids</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M667,-654.61C655.83,-659.71 643.71,-666.37 634,-674.48 613.26,-691.8 619.92,-707.67 598,-723.48 595.78,-725.09 593.43,-726.57 590.99,-727.94"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="589.27,-724.89 581.85,-732.46 592.37,-731.17 589.27,-724.89"/>
+</g>
+<!-- core_constants_values -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node20" class="node">
+<title>core_constants_values</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="598,-714.48 466,-714.48 466,-690.48 598,-690.48 598,-714.48"/>
+<text text-anchor="middle" x="532" y="-700.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_values</text>
+</g>
+<!-- module~core_constants&#45;&gt;core_constants_values -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge15" class="edge">
+<title>module~core_constants&#45;&gt;core_constants_values</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M665.81,-654.62C639.88,-663.97 603.87,-676.94 575.89,-687.03"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="574.58,-683.78 566.36,-690.46 576.95,-690.36 574.58,-683.78"/>
+</g>
+<!-- module~core_constants_base -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node25" class="node">
+<title>module~core_constants_base</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node25"><a xlink:href="../module/core_constants_base.html" xlink:title="core_constants_base">
+<polygon fill="#337ab7" stroke="#337ab7" points="253,-714.48 130,-714.48 130,-690.48 253,-690.48 253,-714.48"/>
+<text text-anchor="middle" x="191.5" y="-700.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_base</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_base -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge16" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_base</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M531,-662.48C485.46,-667.82 475.38,-676.97 430,-683.48 374.31,-691.47 310.75,-696.33 263.4,-699.14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="263.04,-695.65 253.25,-699.72 263.44,-702.64 263.04,-695.65"/>
+</g>
+<!-- module~core_constants_parallel -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node26" class="node">
+<title>module~core_constants_parallel</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node26"><a xlink:href="../module/core_constants_parallel.html" xlink:title="core_constants_parallel">
+<polygon fill="#337ab7" stroke="#337ab7" points="428.5,-836.48 290.5,-836.48 290.5,-812.48 428.5,-812.48 428.5,-836.48"/>
+<text text-anchor="middle" x="359.5" y="-822.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_parallel</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_parallel -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge17" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_parallel</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M661.06,-654.64C651.05,-659.43 641.09,-665.89 634,-674.48 595,-721.7 645.27,-768.55 598,-807.48 549.44,-847.48 474.68,-845.93 422.03,-838.09"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="422.57,-834.63 412.14,-836.51 421.46,-841.55 422.57,-834.63"/>
+</g>
+<!-- module~core_constants_physical -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node27" class="node">
+<title>module~core_constants_physical</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node27"><a xlink:href="../module/core_constants_physical.html" xlink:title="core_constants_physical">
+<polygon fill="#337ab7" stroke="#337ab7" points="430,-674.48 289,-674.48 289,-650.48 430,-650.48 430,-674.48"/>
+<text text-anchor="middle" x="359.5" y="-660.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_physical</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_physical -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge18" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_physical</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M654.28,-647.98C620.8,-652.04 574.06,-657.66 533,-662.48"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M531,-662.48C501.67,-665.92 469.32,-666.68 440.74,-666.33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="440.46,-662.82 430.4,-666.15 440.33,-669.82 440.46,-662.82"/>
+</g>
+<!-- module~core_constants_solver -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node28" class="node">
+<title>module~core_constants_solver</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node28"><a xlink:href="../module/core_constants_solver.html" xlink:title="core_constants_solver">
+<polygon fill="#337ab7" stroke="#337ab7" points="424.5,-594.48 294.5,-594.48 294.5,-570.48 424.5,-570.48 424.5,-594.48"/>
+<text text-anchor="middle" x="359.5" y="-580.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_solver</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_solver -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge19" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_solver</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M675.57,-630.39C655.42,-620.81 625.56,-607.99 598,-601.48 544.27,-588.8 482.02,-584.17 434.73,-582.65"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="434.66,-579.15 424.57,-582.37 434.47,-586.15 434.66,-579.15"/>
+</g>
+<!-- module~core_constants_utils -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node29" class="node">
+<title>module~core_constants_utils</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node29"><a xlink:href="../module/core_constants_utils.html" xlink:title="core_constants_utils">
+<polygon fill="#337ab7" stroke="#337ab7" points="591.5,-634.48 472.5,-634.48 472.5,-610.48 591.5,-610.48 591.5,-634.48"/>
+<text text-anchor="middle" x="532" y="-620.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_utils</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_utils -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge20" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_utils</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M654.44,-637.07C638.26,-635.13 619.62,-632.89 601.88,-630.76"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="601.91,-627.23 591.56,-629.52 601.07,-634.18 601.91,-627.23"/>
+</g>
+<!-- module~core_fortran_utils_memory_stats_wrapper -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node31" class="node">
+<title>module~core_fortran_utils_memory_stats_wrapper</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node31"><a xlink:href="../module/core_fortran_utils_memory_stats_wrapper.html" xlink:title="core_fortran_utils_memory_stats_wrapper">
+<polygon fill="#337ab7" stroke="#337ab7" points="2126,-298.48 1891,-298.48 1891,-274.48 2126,-274.48 2126,-298.48"/>
+<text text-anchor="middle" x="2008.5" y="-284.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_fortran_utils_memory_stats_wrapper</text>
+</a>
+</g>
+</g>
+<!-- module~core_interop&#45;&gt;module~core_fortran_utils_memory_stats_wrapper -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge21" class="edge">
+<title>module~core_interop&#45;&gt;module~core_fortran_utils_memory_stats_wrapper</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M2207.02,-436.31C2189.26,-419.84 2156.12,-389.84 2126,-366.48 2096.6,-343.69 2061.16,-319.83 2037.14,-304.16"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="2038.83,-301.09 2028.54,-298.58 2035.02,-306.96 2038.83,-301.09"/>
+</g>
+<!-- module~core_fortran_utils_signal_flag_wrapper -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node32" class="node">
+<title>module~core_fortran_utils_signal_flag_wrapper</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node32"><a xlink:href="../module/core_fortran_utils_signal_flag_wrapper.html" xlink:title="core_fortran_utils_signal_flag_wrapper">
+<polygon fill="#337ab7" stroke="#337ab7" points="2117,-880.48 1900,-880.48 1900,-856.48 2117,-856.48 2117,-880.48"/>
+<text text-anchor="middle" x="2008.5" y="-866.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_fortran_utils_signal_flag_wrapper</text>
+</a>
+</g>
+</g>
+<!-- module~core_interop&#45;&gt;module~core_fortran_utils_signal_flag_wrapper -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge22" class="edge">
+<title>module~core_interop&#45;&gt;module~core_fortran_utils_signal_flag_wrapper</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M2213.93,-460.6C2184.64,-519.04 2057.84,-772.03 2020.12,-847.29"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="2016.95,-845.81 2015.6,-856.32 2023.21,-848.94 2016.95,-845.81"/>
+</g>
+<!-- module~core_fortran_utils_system_info_wrapper -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node33" class="node">
+<title>module~core_fortran_utils_system_info_wrapper</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node33"><a xlink:href="../module/core_fortran_utils_system_info_wrapper.html" xlink:title="core_fortran_utils_system_info_wrapper">
+<polygon fill="#337ab7" stroke="#337ab7" points="2120,-399.48 1897,-399.48 1897,-375.48 2120,-375.48 2120,-399.48"/>
+<text text-anchor="middle" x="2008.5" y="-385.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_fortran_utils_system_info_wrapper</text>
+</a>
+</g>
+</g>
+<!-- module~core_interop&#45;&gt;module~core_fortran_utils_system_info_wrapper -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge23" class="edge">
+<title>module~core_interop&#45;&gt;module~core_fortran_utils_system_info_wrapper</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M2181.39,-437.29C2147.51,-427.47 2097.97,-413.12 2060.77,-402.34"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="2061.69,-398.96 2051.11,-399.54 2059.74,-405.68 2061.69,-398.96"/>
+</g>
+<!-- module~core_vtk -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node47" class="node">
+<title>module~core_vtk</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node47"><a xlink:href="../module/core_vtk.html" xlink:title="core_vtk">
+<polygon fill="#337ab7" stroke="#337ab7" points="2037,-542.48 1980,-542.48 1980,-518.48 2037,-518.48 2037,-542.48"/>
+<text text-anchor="middle" x="2008.5" y="-528.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_vtk</text>
+</a>
+</g>
+</g>
+<!-- module~core_interop&#45;&gt;module~core_vtk -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge24" class="edge">
+<title>module~core_interop&#45;&gt;module~core_vtk</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M2188.94,-460.58C2151.12,-475.32 2087.28,-500.18 2046.83,-515.94"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="2045.37,-512.75 2037.32,-519.64 2047.91,-519.27 2045.37,-512.75"/>
+</g>
+<!-- module~core_vtk_vtk_constants -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node48" class="node">
+<title>module~core_vtk_vtk_constants</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node48"><a xlink:href="../module/core_vtk_vtk_constants.html" xlink:title="core_vtk_vtk_constants">
+<polygon fill="#337ab7" stroke="#337ab7" points="1499,-60.48 1365,-60.48 1365,-36.48 1499,-36.48 1499,-60.48"/>
+<text text-anchor="middle" x="1432" y="-46.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_vtk_vtk_constants</text>
+</a>
+</g>
+</g>
+<!-- module~core_interop&#45;&gt;module~core_vtk_vtk_constants -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge25" class="edge">
+<title>module~core_interop&#45;&gt;module~core_vtk_vtk_constants</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M2216.53,-436.29C2206.96,-404.53 2177.44,-318.09 2126,-265.48 1956.71,-92.34 1651.36,-56.86 1509.4,-49.93"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1509.2,-46.42 1499.05,-49.46 1508.89,-53.41 1509.2,-46.42"/>
+</g>
+<!-- core_allocate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node14" class="node">
+<title>core_allocate</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="742.5,-916.48 658.5,-916.48 658.5,-892.48 742.5,-892.48 742.5,-916.48"/>
+<text text-anchor="middle" x="700.5" y="-902.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_allocate</text>
+</g>
+<!-- module~core_memory&#45;&gt;core_allocate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge26" class="edge">
+<title>module~core_memory&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M856.96,-1012.32C826.31,-991.06 762.89,-947.07 727.25,-922.35"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="729.04,-919.33 718.83,-916.5 725.05,-925.08 729.04,-919.33"/>
+</g>
+<!-- core_deallocate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node21" class="node">
+<title>core_deallocate</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="749,-1035.48 652,-1035.48 652,-1011.48 749,-1011.48 749,-1035.48"/>
+<text text-anchor="middle" x="700.5" y="-1021.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_deallocate</text>
+</g>
+<!-- module~core_memory&#45;&gt;core_deallocate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge27" class="edge">
+<title>module~core_memory&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M832.18,-1024.24C810.21,-1024.11 783.04,-1023.95 759.18,-1023.82"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="759.2,-1020.32 749.18,-1023.76 759.16,-1027.32 759.2,-1020.32"/>
+</g>
+<!-- core_types_variable -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node23" class="node">
+<title>core_types_variable</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="1663.5,-1150.48 1545.5,-1150.48 1545.5,-1126.48 1663.5,-1126.48 1663.5,-1150.48"/>
+<text text-anchor="middle" x="1604.5" y="-1136.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_variable</text>
+</g>
+<!-- module~core_types&#45;&gt;core_types_variable -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge28" class="edge">
+<title>module~core_types&#45;&gt;core_types_variable</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1762.09,-1044.67C1741.24,-1061.36 1701.79,-1091.61 1665,-1112.48 1658.94,-1115.92 1652.34,-1119.21 1645.81,-1122.23"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="1644.07,-1119.17 1636.36,-1126.44 1646.92,-1125.57 1644.07,-1119.17"/>
+</g>
+<!-- module~core_types_coordinate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node36" class="node">
+<title>module~core_types_coordinate</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node36"><a xlink:href="../module/core_types_coordinate.html" xlink:title="core_types_coordinate">
+<polygon fill="#337ab7" stroke="#337ab7" points="767,-1157.48 634,-1157.48 634,-1133.48 767,-1133.48 767,-1157.48"/>
+<text text-anchor="middle" x="700.5" y="-1143.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_coordinate</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_coordinate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge29" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_coordinate</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1262.5,-1222.48C1138.44,-1222.85 1107.28,-1217.41 984,-1203.48 935.93,-1198.05 924.29,-1193.93 876.5,-1186.48"/>
+</g>
+<!-- module~core_types_coordinate_array -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node37" class="node">
+<title>module~core_types_coordinate_array</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node37"><a xlink:href="../module/core_types_coordinate_array.html" xlink:title="core_types_coordinate_array">
+<polygon fill="#337ab7" stroke="#337ab7" points="1160.5,-1194.48 994.5,-1194.48 994.5,-1170.48 1160.5,-1170.48 1160.5,-1194.48"/>
+<text text-anchor="middle" x="1077.5" y="-1180.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_coordinate_array</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_coordinate_array -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge30" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_coordinate_array</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1262.5,-1222.48C1237.73,-1222.48 1177.81,-1208.47 1133.04,-1197.03"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="1133.71,-1193.59 1123.16,-1194.48 1131.97,-1200.37 1133.71,-1193.59"/>
+</g>
+<!-- module~core_types_datetime -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node38" class="node">
+<title>module~core_types_datetime</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node38"><a xlink:href="../module/core_types_datetime.html" xlink:title="core_types_datetime">
+<polygon fill="#337ab7" stroke="#337ab7" points="937,-1314.48 814,-1314.48 814,-1290.48 937,-1290.48 937,-1314.48"/>
+<text text-anchor="middle" x="875.5" y="-1300.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_datetime</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_datetime -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge31" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_datetime</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1262.5,-1222.48C1213.63,-1222.81 1217.3,-1267.82 1171,-1283.48 1097.71,-1308.28 1008.41,-1310.43 947.49,-1308.03"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="947.35,-1304.52 937.21,-1307.57 947.04,-1311.51 947.35,-1304.52"/>
+</g>
+<!-- module~core_types_graph -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node39" class="node">
+<title>module~core_types_graph</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node39"><a xlink:href="../module/core_types_graph.html" xlink:title="core_types_graph">
+<polygon fill="#337ab7" stroke="#337ab7" points="1485,-837.48 1379,-837.48 1379,-813.48 1485,-813.48 1485,-837.48"/>
+<text text-anchor="middle" x="1432" y="-823.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_graph</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_graph -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge32" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_graph</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1742.93,-1022.95C1729.54,-1018.66 1714.23,-1013.07 1701,-1006.48 1603.73,-958.07 1500.37,-879.41 1455.71,-843.91"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="1457.82,-841.11 1447.83,-837.6 1453.45,-846.58 1457.82,-841.11"/>
+</g>
+<!-- module~core_types_math_gauss -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node40" class="node">
+<title>module~core_types_math_gauss</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node40"><a xlink:href="../module/core_types_math_gauss.html" xlink:title="core_types_math_gauss">
+<polygon fill="#337ab7" stroke="#337ab7" points="945,-956.48 806,-956.48 806,-932.48 945,-932.48 945,-956.48"/>
+<text text-anchor="middle" x="875.5" y="-942.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_math_gauss</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_math_gauss -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge33" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_math_gauss</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1262.5,-942.48C1210.96,-915.86 1052.6,-926.16 955.47,-935.62"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="955,-932.15 945.39,-936.62 955.69,-939.11 955,-932.15"/>
+</g>
+<!-- module~core_types_physics_config_bc -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node41" class="node">
+<title>module~core_types_physics_config_bc</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node41"><a xlink:href="../module/core_types_physics_config_bc.html" xlink:title="core_types_physics_config_bc">
+<polygon fill="#337ab7" stroke="#337ab7" points="1162.5,-572.48 992.5,-572.48 992.5,-548.48 1162.5,-548.48 1162.5,-572.48"/>
+<text text-anchor="middle" x="1077.5" y="-558.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_physics_config_bc</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_physics_config_bc -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge34" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_physics_config_bc</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1431,-600.48C1332.72,-582.47 1306.15,-593.77 1207,-581.48 1190.56,-579.44 1173,-576.85 1156.31,-574.19"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="1156.48,-570.67 1146.05,-572.53 1155.36,-577.58 1156.48,-570.67"/>
+</g>
+<!-- module~core_types_physics_info -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node42" class="node">
+<title>module~core_types_physics_info</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node42"><a xlink:href="../module/core_types_physics_info.html" xlink:title="core_types_physics_info">
+<polygon fill="#337ab7" stroke="#337ab7" points="945,-1158.48 806,-1158.48 806,-1134.48 945,-1134.48 945,-1158.48"/>
+<text text-anchor="middle" x="875.5" y="-1144.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_physics_info</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_physics_info -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge35" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_physics_info</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1770.22,-1044.77C1755.12,-1070.82 1716.02,-1131.47 1665,-1159.48 1507.05,-1246.19 1444.69,-1222.48 1264.5,-1222.48"/>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1262.5,-1222.48C1213.62,-1222.63 1217.4,-1176.83 1171,-1161.48 1100.7,-1138.23 1015.83,-1136.46 955.3,-1139.33"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="954.85,-1135.85 945.04,-1139.87 955.21,-1142.84 954.85,-1135.85"/>
+</g>
+<!-- module~core_types_physics_meteorology -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node43" class="node">
+<title>module~core_types_physics_meteorology</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node43"><a xlink:href="../module/core_types_physics_meteorology.html" xlink:title="core_types_physics_meteorology">
+<polygon fill="#337ab7" stroke="#337ab7" points="1171,-1070.48 984,-1070.48 984,-1046.48 1171,-1046.48 1171,-1070.48"/>
+<text text-anchor="middle" x="1077.5" y="-1056.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_physics_meteorology</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_physics_meteorology -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge36" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_physics_meteorology</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1431,-1098.48C1358.73,-1082.57 1338.39,-1102.44 1264.5,-1098.48"/>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1262.5,-1098.48C1238.22,-1097.18 1180.03,-1083.89 1135.54,-1072.98"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="1136.25,-1069.55 1125.7,-1070.55 1134.57,-1076.34 1136.25,-1069.55"/>
+</g>
+<!-- module~core_types_physics_state -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node44" class="node">
+<title>module~core_types_physics_state</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node44"><a xlink:href="../module/core_types_physics_state.html" xlink:title="core_types_physics_state">
+<polygon fill="#337ab7" stroke="#337ab7" points="948,-1116.48 803,-1116.48 803,-1092.48 948,-1092.48 948,-1116.48"/>
+<text text-anchor="middle" x="875.5" y="-1102.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_physics_state</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_physics_state -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge37" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_physics_state</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1262.5,-1098.48C1157.62,-1092.86 1036.49,-1096.37 958.32,-1099.94"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="957.88,-1096.45 948.05,-1100.42 958.21,-1103.45 957.88,-1096.45"/>
+</g>
+<!-- module~core_types_pointer -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node45" class="node">
+<title>module~core_types_pointer</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node45"><a xlink:href="../module/core_types_pointer.html" xlink:title="core_types_pointer">
+<polygon fill="#337ab7" stroke="#337ab7" points="1320,-572.48 1207,-572.48 1207,-548.48 1320,-548.48 1320,-572.48"/>
+<text text-anchor="middle" x="1263.5" y="-558.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_pointer</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_pointer -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge38" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_pointer</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1742.74,-1028.99C1727.66,-1025.63 1711.11,-1019.11 1701,-1006.48 1609.33,-892.01 1756.97,-792.71 1665,-678.48 1596.78,-593.75 1541.59,-606.9 1433,-600.48"/>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1431,-600.48C1393.1,-593.54 1350.91,-583.37 1318.48,-575.03"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="1319.3,-571.63 1308.74,-572.5 1317.54,-578.4 1319.3,-571.63"/>
+</g>
+<!-- module~core_types_solar -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node46" class="node">
+<title>module~core_types_solar</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node46"><a xlink:href="../module/core_types_solar.html" xlink:title="core_types_solar">
+<polygon fill="#337ab7" stroke="#337ab7" points="1128,-1274.48 1027,-1274.48 1027,-1250.48 1128,-1250.48 1128,-1274.48"/>
+<text text-anchor="middle" x="1077.5" y="-1260.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_solar</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_solar -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge39" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_solar</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1262.5,-1222.48C1237.73,-1222.48 1177.81,-1236.5 1133.04,-1247.94"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="1131.97,-1244.6 1123.16,-1250.48 1133.71,-1251.38 1131.97,-1244.6"/>
+</g>
+<!-- module~module_type_matrix -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node50" class="node">
+<title>module~module_type_matrix</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node50"><a xlink:href="../module/module_type_matrix.html" xlink:title="module_type_matrix">
+<polygon fill="#337ab7" stroke="#337ab7" points="1665,-711.48 1544,-711.48 1544,-687.48 1665,-687.48 1665,-711.48"/>
+<text text-anchor="middle" x="1604.5" y="-697.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">module_type_matrix</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~module_type_matrix -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge40" class="edge">
+<title>module~core_types&#45;&gt;module~module_type_matrix</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1742.64,-1028.24C1727.9,-1024.72 1711.67,-1018.27 1701,-1006.48 1653.84,-954.36 1685.79,-919.63 1665,-852.48 1650.14,-804.51 1627.55,-750.08 1614.91,-720.82"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="1618.08,-719.34 1610.88,-711.57 1611.66,-722.14 1618.08,-719.34"/>
+</g>
+<!-- module~module_type_vector -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node51" class="node">
+<title>module~module_type_vector</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node51"><a xlink:href="../module/module_type_vector.html" xlink:title="module_type_vector">
+<polygon fill="#337ab7" stroke="#337ab7" points="1138,-876.48 1017,-876.48 1017,-852.48 1138,-852.48 1138,-876.48"/>
+<text text-anchor="middle" x="1077.5" y="-862.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">module_type_vector</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~module_type_vector -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge41" class="edge">
+<title>module~core_types&#45;&gt;module~module_type_vector</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1751.44,-1044.52C1694.21,-1069.92 1551.48,-1124.57 1433,-1098.48"/>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1431,-1098.48C1331.43,-1079.26 1354.6,-989.02 1264.5,-942.48"/>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1262.5,-942.48C1215.24,-918.07 1158.6,-894.93 1120.76,-880.28"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="1121.68,-876.89 1111.09,-876.57 1119.17,-883.42 1121.68,-876.89"/>
+</g>
+<!-- core_findings -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node22" class="node">
+<title>core_findings</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="1119,-412.48 1036,-412.48 1036,-388.48 1119,-388.48 1119,-412.48"/>
+<text text-anchor="middle" x="1077.5" y="-398.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_findings</text>
+</g>
+<!-- module~core_utils&#45;&gt;core_findings -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge42" class="edge">
+<title>module~core_utils&#45;&gt;core_findings</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1248.37,-254.62C1216.53,-281.96 1138.97,-348.55 1100.66,-381.45"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1097.99,-379.13 1092.68,-388.31 1102.55,-384.45 1097.99,-379.13"/>
+</g>
+<!-- core_unique -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node24" class="node">
+<title>core_unique</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="1116.5,-294.48 1038.5,-294.48 1038.5,-270.48 1116.5,-270.48 1116.5,-294.48"/>
+<text text-anchor="middle" x="1077.5" y="-280.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_unique</text>
+</g>
+<!-- module~core_utils&#45;&gt;core_unique -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge43" class="edge">
+<title>module~core_utils&#45;&gt;core_unique</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1231.7,-249.18C1203.05,-255.41 1159.91,-264.78 1126.7,-272"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1125.77,-268.62 1116.74,-274.17 1127.26,-275.46 1125.77,-268.62"/>
+</g>
+<!-- module~core_string_utils -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node34" class="node">
+<title>module~core_string_utils</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node34"><a xlink:href="../module/core_string_utils.html" xlink:title="core_string_utils">
+<polygon fill="#337ab7" stroke="#337ab7" points="924.5,-454.48 826.5,-454.48 826.5,-430.48 924.5,-430.48 924.5,-454.48"/>
+<text text-anchor="middle" x="875.5" y="-440.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_string_utils</text>
+</a>
+</g>
+</g>
+<!-- module~core_utils&#45;&gt;module~core_string_utils -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge44" class="edge">
+<title>module~core_utils&#45;&gt;module~core_string_utils</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1231.7,-240.16C1167.1,-235.96 1020.42,-230.25 984,-261.48 928.67,-308.93 997.86,-368.31 948,-421.48 944.07,-425.67 939.36,-429.04 934.25,-431.74"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="932.46,-428.71 924.71,-435.93 935.27,-435.12 932.46,-428.71"/>
+</g>
+<!-- module~core_system_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node35" class="node">
+<title>module~core_system_env</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node35"><a xlink:href="../module/core_system_env.html" xlink:title="core_system_env">
+<polygon fill="#337ab7" stroke="#337ab7" points="1129,-214.48 1026,-214.48 1026,-190.48 1129,-190.48 1129,-214.48"/>
+<text text-anchor="middle" x="1077.5" y="-200.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_system_env</text>
+</a>
+</g>
+</g>
+<!-- module~core_utils&#45;&gt;module~core_system_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge45" class="edge">
+<title>module~core_utils&#45;&gt;module~core_system_env</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1231.7,-235.79C1206.5,-230.31 1170.09,-222.39 1139.08,-215.65"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1139.74,-212.21 1129.22,-213.51 1138.25,-219.05 1139.74,-212.21"/>
+</g>
+<!-- core_check_length -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node15" class="node">
+<title>core_check_length</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="756.5,-751.48 644.5,-751.48 644.5,-727.48 756.5,-727.48 756.5,-751.48"/>
+<text text-anchor="middle" x="700.5" y="-737.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_check_length</text>
+</g>
+<!-- module~core_validation&#45;&gt;core_check_length -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge46" class="edge">
+<title>module~core_validation&#45;&gt;core_check_length</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M1065.05,-454.66C1038.41,-482.9 972.65,-552 948,-572.48 874.57,-633.5 778.8,-693.39 731.13,-722.03"/>
+<polygon fill="#003fff" stroke="#003fff" points="729.05,-719.2 722.26,-727.33 732.64,-725.2 729.05,-719.2"/>
+</g>
+<!-- core_check_nan -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node16" class="node">
+<title>core_check_nan</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="924.5,-370.48 826.5,-370.48 826.5,-346.48 924.5,-346.48 924.5,-370.48"/>
+<text text-anchor="middle" x="875.5" y="-356.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_check_nan</text>
+</g>
+<!-- module~core_validation&#45;&gt;core_check_nan -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge47" class="edge">
+<title>module~core_validation&#45;&gt;core_check_nan</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M1030.08,-437.88C1014.61,-434.85 997.82,-429.82 984,-421.48 962.95,-408.78 968.65,-392.83 948,-379.48 943.7,-376.7 939.01,-374.28 934.17,-372.17"/>
+<polygon fill="#003fff" stroke="#003fff" points="935.31,-368.85 924.72,-368.48 932.77,-375.38 935.31,-368.85"/>
+</g>
+<!-- core_check_range -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node17" class="node">
+<title>core_check_range</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="755,-836.48 646,-836.48 646,-812.48 755,-812.48 755,-836.48"/>
+<text text-anchor="middle" x="700.5" y="-822.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_check_range</text>
+</g>
+<!-- module~core_validation&#45;&gt;core_check_range -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge48" class="edge">
+<title>module~core_validation&#45;&gt;core_check_range</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M1061.71,-454.49C1041.62,-471.51 1005.71,-504.48 984,-539.48 920.89,-641.22 983.8,-733.37 876.5,-786.48"/>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M874.5,-786.48C855.4,-795.93 806.29,-806.29 765.25,-813.8"/>
+<polygon fill="#003fff" stroke="#003fff" points="764.51,-810.37 755.29,-815.59 765.75,-817.26 764.51,-810.37"/>
+</g>
+<!-- module~core_error -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node30" class="node">
+<title>module~core_error</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node30"><a xlink:href="../module/core_error.html" xlink:title="core_error">
+<polygon fill="#337ab7" stroke="#337ab7" points="909,-412.48 842,-412.48 842,-388.48 909,-388.48 909,-412.48"/>
+<text text-anchor="middle" x="875.5" y="-398.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_error</text>
+</a>
+</g>
+</g>
+<!-- module~core_validation&#45;&gt;module~core_error -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge49" class="edge">
+<title>module~core_validation&#45;&gt;module~core_error</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M1030.36,-432.79C996.95,-425.78 952.1,-416.36 919.44,-409.5"/>
+<polygon fill="#003fff" stroke="#003fff" points="919.81,-406 909.3,-407.37 918.37,-412.85 919.81,-406"/>
+</g>
+<!-- module~linalg_matrix_operations&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge50" class="edge">
+<title>module~linalg_matrix_operations&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M2501.71,-1126.69C2491.85,-1161.04 2459.37,-1259.64 2398,-1314.48 2335.71,-1370.15 2305.54,-1380.48 2222,-1380.48 2222,-1380.48 2222,-1380.48 1076.5,-1380.48 832.59,-1380.48 775.56,-1330.1 533,-1304.48"/>
+</g>
+<!-- module~linalg_matrix_operations&#45;&gt;module~module_core -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge51" class="edge">
+<title>module~linalg_matrix_operations&#45;&gt;module~module_core</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M2455.14,-1102.43C2447.86,-1099.91 2440.61,-1096.94 2434,-1093.48 2412.88,-1082.43 2391.98,-1065.07 2377.46,-1051.68"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="2379.77,-1049.05 2370.09,-1044.73 2374.96,-1054.14 2379.77,-1049.05"/>
+</g>
+<!-- module~linalg_vector_operations&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge52" class="edge">
+<title>module~linalg_vector_operations&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M2446.67,-1084.59C2442.06,-1087.03 2437.75,-1089.97 2434,-1093.48 2362.51,-1160.52 2440.56,-1247.68 2358,-1300.48"/>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M2356,-1300.48C2319.51,-1323.82 2205.02,-1314.42 2162,-1319.48 2094.05,-1327.48 2077.83,-1337.12 2009.5,-1340.48"/>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M2007.5,-1340.48C1472.34,-1356.11 1335.21,-1381.76 803,-1323.48 757.21,-1318.47 747.57,-1302.21 701.5,-1302.48"/>
+</g>
+<!-- module~linalg_vector_operations&#45;&gt;module~module_core -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge54" class="edge">
+<title>module~linalg_vector_operations&#45;&gt;module~module_core</title>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M2460.9,-1060.48C2444.21,-1055.94 2425.11,-1050.74 2407.93,-1046.07"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="2408.63,-1042.63 2398.07,-1043.38 2406.8,-1049.39 2408.63,-1042.63"/>
+</g>
+<!-- module~linalg_mkl_backend -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node49" class="node">
+<title>module~linalg_mkl_backend</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node49"><a xlink:href="../module/linalg_mkl_backend.html" xlink:title="linalg_mkl_backend">
+<polygon fill="#337ab7" stroke="#337ab7" points="2280,-1352.48 2162,-1352.48 2162,-1328.48 2280,-1328.48 2280,-1352.48"/>
+<text text-anchor="middle" x="2221" y="-1338.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">linalg_mkl_backend</text>
+</a>
+</g>
+</g>
+<!-- module~linalg_vector_operations&#45;&gt;module~linalg_mkl_backend -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge53" class="edge">
+<title>module~linalg_vector_operations&#45;&gt;module~linalg_mkl_backend</title>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M2356,-1300.48C2336.13,-1313.19 2312.05,-1322.01 2289.82,-1328.07"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="2288.89,-1324.69 2280.09,-1330.58 2290.64,-1331.47 2288.89,-1324.69"/>
+</g>
+<!-- mpi_f08 -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node52" class="node">
+<title>mpi_f08</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node52"><a xlink:href="http://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node409.htm" xlink:title="mpi_f08">
+<polygon fill="#337ab7" stroke="#337ab7" points="1805.5,-964.48 1750.5,-964.48 1750.5,-940.48 1805.5,-940.48 1805.5,-964.48"/>
+<text text-anchor="middle" x="1778" y="-950.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mpi_f08</text>
+</a>
+</g>
+</g>
+<!-- module~linalg_vector_operations&#45;&gt;mpi_f08 -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge55" class="edge">
+<title>module~linalg_vector_operations&#45;&gt;mpi_f08</title>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M2488.97,-1060.42C2468.89,-1046.03 2432.86,-1022.52 2398,-1011.48 2185.71,-944.28 1913.66,-947.07 1815.97,-950.69"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="1815.59,-947.2 1805.73,-951.1 1815.86,-954.2 1815.59,-947.2"/>
+</g>
+<!-- module~core_constants_base&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge56" class="edge">
+<title>module~core_constants_base&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#4eff00" stroke-dasharray="5,2" d="M147.75,-690.48C133.08,-686.37 116.5,-681.71 101.12,-677.39"/>
+<polygon fill="#4eff00" stroke="#4eff00" points="101.79,-673.95 91.22,-674.61 99.9,-680.69 101.79,-673.95"/>
+</g>
+<!-- stdlib_optval -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node65" class="node">
+<title>stdlib_optval</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="86.5,-994.48 7.5,-994.48 7.5,-970.48 86.5,-970.48 86.5,-994.48"/>
+<text text-anchor="middle" x="47" y="-980.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_optval</text>
+</g>
+<!-- module~core_constants_base&#45;&gt;stdlib_optval -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge57" class="edge">
+<title>module~core_constants_base&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#4eff00" stroke-dasharray="5,2" d="M184.38,-714.51C162.37,-757.76 87.06,-905.73 58.82,-961.23"/>
+<polygon fill="#4eff00" stroke="#4eff00" points="55.68,-959.68 54.26,-970.18 61.92,-962.86 55.68,-959.68"/>
+</g>
+<!-- stdlib_strings -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node67" class="node">
+<title>stdlib_strings</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="88,-536.48 6,-536.48 6,-512.48 88,-512.48 88,-536.48"/>
+<text text-anchor="middle" x="47" y="-522.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_strings</text>
+</g>
+<!-- module~core_constants_base&#45;&gt;stdlib_strings -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge58" class="edge">
+<title>module~core_constants_base&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#4eff00" stroke-dasharray="5,2" d="M151.71,-690.4C143.93,-686.77 136.24,-682.19 130,-676.48 90.05,-639.93 65.66,-579.31 54.75,-546.77"/>
+<polygon fill="#4eff00" stroke="#4eff00" points="57.97,-545.33 51.57,-536.88 51.31,-547.47 57.97,-545.33"/>
+</g>
+<!-- module~core_constants_parallel&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge59" class="edge">
+<title>module~core_constants_parallel&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#27ff00" stroke-dasharray="5,2" d="M327.69,-836.59C286.67,-851.9 216.5,-875.08 192.5,-864.48"/>
+<path fill="none" stroke="#27ff00" stroke-dasharray="5,2" d="M190.5,-864.48C113.08,-830.31 70.38,-728.93 54.85,-684.15"/>
+<polygon fill="#27ff00" stroke="#27ff00" points="58.12,-682.91 51.63,-674.54 51.49,-685.13 58.12,-682.91"/>
+</g>
+<!-- module~core_constants_physical&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge60" class="edge">
+<title>module~core_constants_physical&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M190.5,-662.48C162.6,-656.16 130.82,-655.55 104.37,-656.78"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="103.92,-653.3 94.14,-657.36 104.32,-660.29 103.92,-653.3"/>
+</g>
+<!-- module~core_constants_physical&#45;&gt;module~core_constants_base -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge61" class="edge">
+<title>module~core_constants_physical&#45;&gt;module~core_constants_base</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M308.69,-674.48C290.97,-678.76 270.82,-683.61 252.34,-688.06"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="251.46,-684.67 242.56,-690.42 253.1,-691.48 251.46,-684.67"/>
+</g>
+<!-- stdlib_ascii -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node63" class="node">
+<title>stdlib_ascii</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="226.5,-634.48 156.5,-634.48 156.5,-610.48 226.5,-610.48 226.5,-634.48"/>
+<text text-anchor="middle" x="191.5" y="-620.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_ascii</text>
+</g>
+<!-- module~core_constants_physical&#45;&gt;stdlib_ascii -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge62" class="edge">
+<title>module~core_constants_physical&#45;&gt;stdlib_ascii</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M308.69,-650.48C285.75,-644.95 258.76,-638.45 236.57,-633.1"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="237.29,-629.67 226.75,-630.73 235.65,-636.48 237.29,-629.67"/>
+</g>
+<!-- module~core_constants_physical&#45;&gt;stdlib_strings -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge63" class="edge">
+<title>module~core_constants_physical&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M288.68,-669.3C258.73,-670.48 223.56,-669.52 192.5,-662.48"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M190.5,-662.48C163.01,-656.26 152.68,-660.22 130,-643.48 95.1,-617.72 69.93,-572.47 57.28,-545.81"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="60.39,-544.21 53.04,-536.58 54.03,-547.13 60.39,-544.21"/>
+</g>
+<!-- module~core_constants_solver&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge64" class="edge">
+<title>module~core_constants_solver&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff27" stroke-dasharray="5,2" d="M327.98,-570.39C286.95,-554.95 216.39,-531.45 192.5,-542.48"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge65" class="edge">
+<title>module~core_constants_utils&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M472.41,-625.85C439.42,-626.9 397.54,-626.83 360.5,-622.48"/>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M358.5,-622.48C326.7,-618.75 318.3,-616.4 289,-603.48 242.57,-583.01 238.57,-521.21 192.5,-542.48"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;module~core_constants_parallel -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge66" class="edge">
+<title>module~core_constants_utils&#45;&gt;module~core_constants_parallel</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M489.2,-634.52C480.94,-638.14 472.75,-642.73 466,-648.48 415.16,-691.8 382.2,-766.07 368.2,-802.72"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="364.8,-801.82 364.61,-812.41 371.37,-804.25 364.8,-801.82"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;module~core_constants_physical -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge67" class="edge">
+<title>module~core_constants_utils&#45;&gt;module~core_constants_physical</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M479.84,-634.48C461.55,-638.77 440.75,-643.65 421.7,-648.13"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="420.85,-644.73 411.91,-650.42 422.45,-651.54 420.85,-644.73"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;module~core_constants_solver -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge68" class="edge">
+<title>module~core_constants_utils&#45;&gt;module~core_constants_solver</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M479.84,-610.48C461.55,-606.19 440.75,-601.31 421.7,-596.84"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="422.45,-593.42 411.91,-594.54 420.85,-600.24 422.45,-593.42"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;stdlib_ascii -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge69" class="edge">
+<title>module~core_constants_utils&#45;&gt;stdlib_ascii</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M358.5,-622.48C317.56,-617.68 270.56,-618.24 237.04,-619.67"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="236.48,-616.2 226.65,-620.16 236.81,-623.19 236.48,-616.2"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;stdlib_strings -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge70" class="edge">
+<title>module~core_constants_utils&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M520.59,-610.35C503.39,-590.92 467.21,-552.55 430,-528.48 381.91,-497.39 246.66,-409.88 192.5,-428.48"/>
+</g>
+<!-- module~core_error&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge71" class="edge">
+<title>module~core_error&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff75" stroke-dasharray="5,2" d="M841.84,-409.82C732.58,-441 385.29,-539.78 360.5,-542.48"/>
+<path fill="none" stroke="#00ff75" stroke-dasharray="5,2" d="M358.5,-542.48C284.88,-547.26 259.48,-511.55 192.5,-542.48"/>
+</g>
+<!-- module~core_error&#45;&gt;module~core_constants -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge72" class="edge">
+<title>module~core_error&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#00ff75" stroke-dasharray="5,2" d="M841.98,-402.96C828.25,-405.62 813.13,-410.94 803,-421.48 757.57,-468.72 796.83,-506.13 767,-564.48 755.55,-586.87 736.61,-608.46 722.03,-623.22"/>
+<polygon fill="#00ff75" stroke="#00ff75" points="719.53,-620.77 714.87,-630.29 724.45,-625.76 719.53,-620.77"/>
+</g>
+<!-- module~core_error&#45;&gt;stdlib_strings -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge73" class="edge">
+<title>module~core_error&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#00ff75" stroke-dasharray="5,2" d="M841.75,-393.04C733.92,-369.15 391.12,-298.25 289,-338.48 234.43,-359.98 247.68,-408.62 192.5,-428.48"/>
+<path fill="none" stroke="#00ff75" stroke-dasharray="5,2" d="M190.5,-428.48C142.08,-444.95 94.6,-482.42 68.52,-505.37"/>
+<polygon fill="#00ff75" stroke="#00ff75" points="65.94,-502.99 60.83,-512.27 70.61,-508.2 65.94,-502.99"/>
+</g>
+<!-- module~core_fortran_utils_memory_stats_wrapper&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge74" class="edge">
+<title>module~core_fortran_utils_memory_stats_wrapper&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff9c" stroke-dasharray="5,2" d="M1994.05,-274.35C1968.9,-252.53 1912.13,-207.18 1855,-188.48 1410.15,-42.84 1270.62,-117.74 803,-138.48 682.65,-143.82 653.47,-162.48 533,-162.48 533,-162.48 533,-162.48 358.5,-162.48 244.25,-162.48 92.68,-543.99 56.16,-640.5"/>
+<polygon fill="#00ff9c" stroke="#00ff9c" points="52.79,-639.53 52.55,-650.12 59.34,-641.99 52.79,-639.53"/>
+</g>
+<!-- module~core_c_utils_memory_stats -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node55" class="node">
+<title>module~core_c_utils_memory_stats</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node55"><a xlink:href="../module/core_c_utils_memory_stats.html" xlink:title="core_c_utils_memory_stats">
+<polygon fill="#337ab7" stroke="#337ab7" points="1855,-298.48 1701,-298.48 1701,-274.48 1855,-274.48 1855,-298.48"/>
+<text text-anchor="middle" x="1778" y="-284.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_c_utils_memory_stats</text>
+</a>
+</g>
+</g>
+<!-- module~core_fortran_utils_memory_stats_wrapper&#45;&gt;module~core_c_utils_memory_stats -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge75" class="edge">
+<title>module~core_fortran_utils_memory_stats_wrapper&#45;&gt;module~core_c_utils_memory_stats</title>
+<path fill="none" stroke="#00ff9c" stroke-dasharray="5,2" d="M1890.91,-286.48C1882.3,-286.48 1873.72,-286.48 1865.34,-286.48"/>
+<polygon fill="#00ff9c" stroke="#00ff9c" points="1865.25,-282.98 1855.25,-286.48 1865.25,-289.98 1865.25,-282.98"/>
+</g>
+<!-- module~core_c_utils_signal_flag -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node56" class="node">
+<title>module~core_c_utils_signal_flag</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node56"><a xlink:href="../module/core_c_utils_signal_flag.html" xlink:title="core_c_utils_signal_flag">
+<polygon fill="#337ab7" stroke="#337ab7" points="1846,-922.48 1710,-922.48 1710,-898.48 1846,-898.48 1846,-922.48"/>
+<text text-anchor="middle" x="1778" y="-908.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_c_utils_signal_flag</text>
+</a>
+</g>
+</g>
+<!-- module~core_fortran_utils_signal_flag_wrapper&#45;&gt;module~core_c_utils_signal_flag -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge76" class="edge">
+<title>module~core_fortran_utils_signal_flag_wrapper&#45;&gt;module~core_c_utils_signal_flag</title>
+<path fill="none" stroke="#00ffc4" stroke-dasharray="5,2" d="M1942.02,-880.52C1914.65,-885.55 1882.69,-891.42 1854.35,-896.63"/>
+<polygon fill="#00ffc4" stroke="#00ffc4" points="1853.69,-893.19 1844.49,-898.44 1854.96,-900.08 1853.69,-893.19"/>
+</g>
+<!-- stdlib_logger -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node64" class="node">
+<title>stdlib_logger</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="1818.5,-880.48 1737.5,-880.48 1737.5,-856.48 1818.5,-856.48 1818.5,-880.48"/>
+<text text-anchor="middle" x="1778" y="-866.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_logger</text>
+</g>
+<!-- module~core_fortran_utils_signal_flag_wrapper&#45;&gt;stdlib_logger -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge77" class="edge">
+<title>module~core_fortran_utils_signal_flag_wrapper&#45;&gt;stdlib_logger</title>
+<path fill="none" stroke="#00ffc4" stroke-dasharray="5,2" d="M1899.94,-868.48C1875.09,-868.48 1849.81,-868.48 1828.83,-868.48"/>
+<polygon fill="#00ffc4" stroke="#00ffc4" points="1828.59,-864.98 1818.59,-868.48 1828.59,-871.98 1828.59,-864.98"/>
+</g>
+<!-- module~core_fortran_utils_system_info_wrapper&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge79" class="edge">
+<title>module~core_fortran_utils_system_info_wrapper&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ffeb" stroke-dasharray="5,2" d="M1603.5,-208.48C1439.34,-226.26 1428.39,-340.36 1264.5,-360.48"/>
+<path fill="none" stroke="#00ffeb" stroke-dasharray="5,2" d="M1262.5,-360.48C1139.36,-375.6 1085.19,-307.7 984,-379.48 950.87,-402.98 978.73,-436.92 948,-463.48 923.13,-484.98 907.89,-472.7 876.5,-482.48"/>
+<path fill="none" stroke="#00ffeb" stroke-dasharray="5,2" d="M874.5,-482.48C843.55,-492 832.7,-483.59 803,-496.48 784.89,-504.34 784.18,-512.77 767,-522.48 739.44,-538.07 733.1,-548.55 701.5,-550.48"/>
+<path fill="none" stroke="#00ffeb" stroke-dasharray="5,2" d="M699.5,-550.48C625.55,-555.01 607.03,-539.63 533,-542.48"/>
+</g>
+<!-- module~core_fortran_utils_system_info_wrapper&#45;&gt;module~core_system_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge82" class="edge">
+<title>module~core_fortran_utils_system_info_wrapper&#45;&gt;module~core_system_env</title>
+<path fill="none" stroke="#00ffeb" stroke-dasharray="5,2" d="M1982.37,-375.25C1956.64,-361.69 1916.86,-337.67 1891,-307.48 1866.95,-279.4 1885.31,-253.65 1855,-232.48 1763.66,-168.7 1716.25,-196.43 1605.5,-208.48"/>
+<path fill="none" stroke="#00ffeb" stroke-dasharray="5,2" d="M1603.5,-208.48C1436.14,-224.75 1237.37,-214.46 1139.36,-207.44"/>
+<polygon fill="#00ffeb" stroke="#00ffeb" points="1139.56,-203.94 1129.34,-206.7 1139.05,-210.92 1139.56,-203.94"/>
+</g>
+<!-- iso_c_binding -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node53" class="node">
+<title>iso_c_binding</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node53"><a xlink:href="http://fortranwiki.org/fortran/show/iso_c_binding" xlink:title="iso_c_binding">
+<polygon fill="#337ab7" stroke="#337ab7" points="1646.5,-491.48 1562.5,-491.48 1562.5,-467.48 1646.5,-467.48 1646.5,-491.48"/>
+<text text-anchor="middle" x="1604.5" y="-477.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_c_binding</text>
+</a>
+</g>
+</g>
+<!-- module~core_fortran_utils_system_info_wrapper&#45;&gt;iso_c_binding -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge78" class="edge">
+<title>module~core_fortran_utils_system_info_wrapper&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#00ffeb" stroke-dasharray="5,2" d="M1966.92,-399.5C1936.31,-408.36 1893.21,-420.4 1855,-429.48 1786.84,-445.68 1707.39,-460.99 1656.79,-470.31"/>
+<polygon fill="#00ffeb" stroke="#00ffeb" points="1655.96,-466.9 1646.75,-472.14 1657.22,-473.78 1655.96,-466.9"/>
+</g>
+<!-- module~core_c_utils -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node54" class="node">
+<title>module~core_c_utils</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node54"><a xlink:href="../module/core_c_utils.html" xlink:title="core_c_utils">
+<polygon fill="#337ab7" stroke="#337ab7" points="1815,-378.48 1741,-378.48 1741,-354.48 1815,-354.48 1815,-378.48"/>
+<text text-anchor="middle" x="1778" y="-364.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_c_utils</text>
+</a>
+</g>
+</g>
+<!-- module~core_fortran_utils_system_info_wrapper&#45;&gt;module~core_c_utils -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge80" class="edge">
+<title>module~core_fortran_utils_system_info_wrapper&#45;&gt;module~core_c_utils</title>
+<path fill="none" stroke="#00ffeb" stroke-dasharray="5,2" d="M1896.93,-377.32C1871.59,-374.99 1846.01,-372.64 1825.19,-370.73"/>
+<polygon fill="#00ffeb" stroke="#00ffeb" points="1825.34,-367.23 1815.06,-369.8 1824.7,-374.2 1825.34,-367.23"/>
+</g>
+<!-- module~core_c_utils_system_info -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node57" class="node">
+<title>module~core_c_utils_system_info</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node57"><a xlink:href="../module/core_c_utils_system_info.html" xlink:title="core_c_utils_system_info">
+<polygon fill="#337ab7" stroke="#337ab7" points="1849,-420.48 1707,-420.48 1707,-396.48 1849,-396.48 1849,-420.48"/>
+<text text-anchor="middle" x="1778" y="-406.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_c_utils_system_info</text>
+</a>
+</g>
+</g>
+<!-- module~core_fortran_utils_system_info_wrapper&#45;&gt;module~core_c_utils_system_info -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge81" class="edge">
+<title>module~core_fortran_utils_system_info_wrapper&#45;&gt;module~core_c_utils_system_info</title>
+<path fill="none" stroke="#00ffeb" stroke-dasharray="5,2" d="M1896.93,-397.64C1884.2,-398.81 1871.42,-399.99 1859.2,-401.11"/>
+<polygon fill="#00ffeb" stroke="#00ffeb" points="1858.73,-397.64 1849.09,-402.04 1859.37,-404.61 1858.73,-397.64"/>
+</g>
+<!-- module~core_fortran_utils_system_info_wrapper&#45;&gt;stdlib_strings -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge83" class="edge">
+<title>module~core_fortran_utils_system_info_wrapper&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#00ffeb" stroke-dasharray="5,2" d="M1978.42,-375.43C1951.37,-362.65 1912.15,-339.82 1891,-307.48 1844.44,-236.28 1912.16,-182.5 1855,-119.48 1703.49,47.56 1580.08,-2.1 1356,-27.48 1314.54,-32.18 1306.15,-46.02 1264.5,-48.48"/>
+<path fill="none" stroke="#00ffeb" stroke-dasharray="5,2" d="M1262.5,-48.48C1058.2,-57.56 1000.48,-19.35 803,-72.48 754.05,-85.65 751.83,-118.46 701.5,-124.48"/>
+<path fill="none" stroke="#00ffeb" stroke-dasharray="5,2" d="M699.5,-124.48C447.54,-150.83 323.91,14.55 130,-148.48 75.03,-194.69 54.56,-428.42 49.41,-502.16"/>
+<polygon fill="#00ffeb" stroke="#00ffeb" points="45.91,-501.99 48.73,-512.2 52.9,-502.46 45.91,-501.99"/>
+</g>
+<!-- module~core_string_utils&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge85" class="edge">
+<title>module~core_string_utils&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ebff" stroke-dasharray="5,2" d="M699.5,-508.48C624.65,-518.61 608.47,-539.58 533,-542.48"/>
+<path fill="none" stroke="#00ebff" stroke-dasharray="5,2" d="M531,-542.48C455.28,-545.4 435.83,-534.28 360.5,-542.48"/>
+</g>
+<!-- module~core_string_utils&#45;&gt;module~core_constants -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge86" class="edge">
+<title>module~core_string_utils&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#00ebff" stroke-dasharray="5,2" d="M858.53,-454.57C843.19,-466.66 819.92,-486.32 803,-506.48 783.5,-529.72 784.8,-539.91 767,-564.48 752.12,-585.02 733.35,-607.03 719.72,-622.42"/>
+<polygon fill="#00ebff" stroke="#00ebff" points="716.79,-620.44 712.74,-630.23 722.01,-625.11 716.79,-620.44"/>
+</g>
+<!-- module~core_string_utils&#45;&gt;core_allocate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge84" class="edge">
+<title>module~core_string_utils&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#00ebff" stroke-dasharray="5,2" d="M862.68,-454.78C846.15,-472.81 816.61,-508.24 803,-544.48 776.75,-614.37 812.19,-819.06 767,-878.48 763.01,-883.72 757.81,-887.91 752.08,-891.25"/>
+<polygon fill="#00ebff" stroke="#00ebff" points="750.16,-888.29 742.73,-895.84 753.25,-894.58 750.16,-888.29"/>
+</g>
+<!-- module~core_string_utils&#45;&gt;stdlib_strings -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge87" class="edge">
+<title>module~core_string_utils&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#00ebff" stroke-dasharray="5,2" d="M840.61,-454.6C828.69,-458.91 815.23,-463.85 803,-468.48 757.66,-485.66 749.68,-503.04 701.5,-508.48"/>
+<path fill="none" stroke="#00ebff" stroke-dasharray="5,2" d="M699.5,-508.48C648.52,-514.24 647.01,-468.68 598,-453.48 496.62,-422.04 466.18,-438.35 360.5,-428.48"/>
+<path fill="none" stroke="#00ebff" stroke-dasharray="5,2" d="M358.5,-428.48C285.2,-420.09 261.92,-403.49 192.5,-428.48"/>
+</g>
+<!-- module~core_system_env&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge88" class="edge">
+<title>module~core_system_env&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00c4ff" stroke-dasharray="5,2" d="M1025.81,-207.94C881.2,-224.31 470.04,-276.56 360.5,-352.48"/>
+</g>
+<!-- module~core_types_coordinate&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge89" class="edge">
+<title>module~core_types_coordinate&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#009cff" stroke-dasharray="5,2" d="M685.8,-1157.8C658.54,-1181.76 594.78,-1235.03 533,-1266.48"/>
+<path fill="none" stroke="#009cff" stroke-dasharray="5,2" d="M531,-1266.48C496.41,-1284.1 399.22,-1301.69 360.5,-1304.48"/>
+</g>
+<!-- module~core_types_coordinate&#45;&gt;stdlib_optval -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge90" class="edge">
+<title>module~core_types_coordinate&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#009cff" stroke-dasharray="5,2" d="M531,-1266.48C457.07,-1304.13 443.47,-1342.48 360.5,-1342.48"/>
+<path fill="none" stroke="#009cff" stroke-dasharray="5,2" d="M358.5,-1342.48C256.39,-1342.48 206.9,-1385.66 130,-1318.48 82.02,-1276.57 57.24,-1073.3 50.17,-1004.95"/>
+<polygon fill="#009cff" stroke="#009cff" points="53.63,-1004.44 49.15,-994.85 46.67,-1005.15 53.63,-1004.44"/>
+</g>
+<!-- module~core_types_coordinate&#45;&gt;stdlib_strings -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge91" class="edge">
+<title>module~core_types_coordinate&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#009cff" stroke-dasharray="5,2" d="M688.51,-1133.2C673.16,-1115.21 645.86,-1079.96 634,-1044.48 597.57,-935.46 662.03,-623.94 598,-528.48 566.1,-480.92 417.43,-434.68 360.5,-428.48"/>
+</g>
+<!-- module~core_types_coordinate_array&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge92" class="edge">
+<title>module~core_types_coordinate_array&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#0075ff" stroke-dasharray="5,2" d="M1057.24,-1194.57C1032.75,-1209.41 988.75,-1234.34 948,-1248.48 917.41,-1259.1 908.17,-1255.73 876.5,-1262.48"/>
+<path fill="none" stroke="#0075ff" stroke-dasharray="5,2" d="M874.5,-1262.48C855.2,-1266.6 721.23,-1302.36 701.5,-1302.48"/>
+<path fill="none" stroke="#0075ff" stroke-dasharray="5,2" d="M699.5,-1302.48C625.5,-1302.92 606.6,-1312.26 533,-1304.48"/>
+<path fill="none" stroke="#0075ff" stroke-dasharray="5,2" d="M531,-1304.48C455.64,-1296.52 429.9,-1334.9 360.5,-1304.48"/>
+</g>
+<!-- module~core_types_coordinate_array&#45;&gt;module~core_memory -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge93" class="edge">
+<title>module~core_types_coordinate_array&#45;&gt;module~core_memory</title>
+<path fill="none" stroke="#0075ff" stroke-dasharray="5,2" d="M1061.14,-1170.35C1026.31,-1142.83 941.17,-1075.57 899.81,-1042.9"/>
+<polygon fill="#0075ff" stroke="#0075ff" points="901.93,-1040.11 891.91,-1036.66 897.59,-1045.6 901.93,-1040.11"/>
+</g>
+<!-- module~core_types_coordinate_array&#45;&gt;module~core_types_coordinate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge94" class="edge">
+<title>module~core_types_coordinate_array&#45;&gt;module~core_types_coordinate</title>
+<path fill="none" stroke="#0075ff" stroke-dasharray="5,2" d="M994.33,-1190.54C958.02,-1192.45 914.93,-1192.47 876.5,-1186.48"/>
+<path fill="none" stroke="#0075ff" stroke-dasharray="5,2" d="M874.5,-1186.48C833.56,-1180.1 787.98,-1169.14 753.89,-1160.15"/>
+<polygon fill="#0075ff" stroke="#0075ff" points="754.71,-1156.75 744.14,-1157.56 752.91,-1163.51 754.71,-1156.75"/>
+</g>
+<!-- module~core_types_datetime&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge95" class="edge">
+<title>module~core_types_datetime&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#004eff" stroke-dasharray="5,2" d="M813.65,-1302.31C780.5,-1302.25 738.74,-1302.26 701.5,-1302.48"/>
+</g>
+<!-- module~core_types_datetime&#45;&gt;stdlib_optval -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge96" class="edge">
+<title>module~core_types_datetime&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#004eff" stroke-dasharray="5,2" d="M848.35,-1314.49C780.1,-1345.35 597.37,-1424.54 533,-1418.48"/>
+<path fill="none" stroke="#004eff" stroke-dasharray="5,2" d="M531,-1418.48C500.52,-1414.11 494.29,-1406.64 466,-1394.48 417.97,-1373.85 412.77,-1343.42 360.5,-1342.48"/>
+</g>
+<!-- module~core_types_graph&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge97" class="edge">
+<title>module~core_types_graph&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#0027ff" stroke-dasharray="5,2" d="M1378.67,-823.9C1270.66,-821.3 1015.34,-818.67 803,-843.48 757.24,-848.83 747.49,-861.86 701.5,-864.48"/>
+<path fill="none" stroke="#0027ff" stroke-dasharray="5,2" d="M699.5,-864.48C625.55,-867.33 605.62,-850.26 533,-864.48"/>
+</g>
+<!-- module~core_types_math_gauss&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge100" class="edge">
+<title>module~core_types_math_gauss&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M805.76,-947.37C756.75,-947.44 689.92,-943.46 634,-925.48 584.08,-909.43 585.01,-857.8 533,-864.48"/>
+</g>
+<!-- module~core_types_math_gauss&#45;&gt;module~core_constants -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge101" class="edge">
+<title>module~core_types_math_gauss&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M853.01,-932.28C836.75,-921.92 815.21,-905.56 803,-885.48 763.53,-820.62 800.83,-786.46 767,-718.48 756.19,-696.77 737.77,-676.2 723.21,-661.95"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="725.25,-659.06 715.59,-654.71 720.43,-664.13 725.25,-659.06"/>
+</g>
+<!-- module~core_types_math_gauss&#45;&gt;core_allocate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge98" class="edge">
+<title>module~core_types_math_gauss&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M822.59,-932.48C800.41,-927.35 774.6,-921.38 752.51,-916.28"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="753.19,-912.84 742.66,-914 751.61,-919.66 753.19,-912.84"/>
+</g>
+<!-- module~core_types_math_gauss&#45;&gt;core_deallocate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge99" class="edge">
+<title>module~core_types_math_gauss&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M835.07,-956.62C824.4,-960.49 813.04,-965.16 803,-970.48 785.56,-979.72 784.24,-986.88 767,-996.48 759.9,-1000.44 752.09,-1004.15 744.42,-1007.49"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="743.07,-1004.26 735.19,-1011.35 745.77,-1010.72 743.07,-1004.26"/>
+</g>
+<!-- module~core_types_math_gauss&#45;&gt;module~core_types_coordinate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge102" class="edge">
+<title>module~core_types_math_gauss&#45;&gt;module~core_types_coordinate</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M854.15,-956.56C838.09,-967.07 816.27,-983.7 803,-1003.48 772.93,-1048.31 803.67,-1079.87 767,-1119.48 763.88,-1122.86 760.26,-1125.8 756.36,-1128.37"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="754.43,-1125.43 747.45,-1133.4 757.88,-1131.53 754.43,-1125.43"/>
+</g>
+<!-- module~core_types_physics_config_bc&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge103" class="edge">
+<title>module~core_types_physics_config_bc&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#2700ff" stroke-dasharray="5,2" d="M992.13,-555.46C956.38,-554.42 914.33,-554.61 876.5,-558.48"/>
+<path fill="none" stroke="#2700ff" stroke-dasharray="5,2" d="M874.5,-558.48C797.93,-566.32 778.33,-545.78 701.5,-550.48"/>
+</g>
+<!-- module~core_types_physics_config_bc&#45;&gt;module~core_constants -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge104" class="edge">
+<title>module~core_types_physics_config_bc&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#2700ff" stroke-dasharray="5,2" d="M874.5,-558.48C816.51,-564.42 757.16,-601.32 725.27,-624.2"/>
+<polygon fill="#2700ff" stroke="#2700ff" points="723.02,-621.51 717.03,-630.24 727.16,-627.15 723.02,-621.51"/>
+</g>
+<!-- module~core_types_physics_config_bc&#45;&gt;module~core_memory -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge105" class="edge">
+<title>module~core_types_physics_config_bc&#45;&gt;module~core_memory</title>
+<path fill="none" stroke="#2700ff" stroke-dasharray="5,2" d="M1070.07,-572.53C1053.38,-604.32 1008.28,-693.4 984,-772.48 958.39,-855.9 992.31,-890.31 948,-965.48 938.03,-982.4 921.31,-996.6 906.55,-1006.82"/>
+<polygon fill="#2700ff" stroke="#2700ff" points="904.56,-1003.94 898.15,-1012.38 908.42,-1009.78 904.56,-1003.94"/>
+</g>
+<!-- module~core_types_physics_info&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge107" class="edge">
+<title>module~core_types_physics_info&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#4e00ff" stroke-dasharray="5,2" d="M831.75,-1134.48C784.78,-1121.59 714.27,-1103.23 701.5,-1105.48"/>
+</g>
+<!-- module~core_types_physics_info&#45;&gt;core_deallocate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge106" class="edge">
+<title>module~core_types_physics_info&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#4e00ff" stroke-dasharray="5,2" d="M822.04,-1134.42C815.41,-1131.94 808.89,-1128.99 803,-1125.48 798.09,-1122.56 748.43,-1071.8 720.44,-1043.01"/>
+<polygon fill="#4e00ff" stroke="#4e00ff" points="722.65,-1040.26 713.18,-1035.53 717.63,-1045.14 722.65,-1040.26"/>
+</g>
+<!-- module~core_types_physics_info&#45;&gt;module~core_types_coordinate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge108" class="edge">
+<title>module~core_types_physics_info&#45;&gt;module~core_types_coordinate</title>
+<path fill="none" stroke="#4e00ff" stroke-dasharray="5,2" d="M805.63,-1146.08C796.29,-1146.03 786.66,-1145.97 777.21,-1145.92"/>
+<polygon fill="#4e00ff" stroke="#4e00ff" points="777.06,-1142.42 767.04,-1145.86 777.02,-1149.42 777.06,-1142.42"/>
+</g>
+<!-- module~core_types_physics_meteorology&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge109" class="edge">
+<title>module~core_types_physics_meteorology&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#7500ff" stroke-dasharray="5,2" d="M983.74,-1064.13C930.63,-1068.07 862.85,-1074.3 803,-1083.48 757.38,-1090.48 746.96,-1097.46 701.5,-1105.48"/>
+<path fill="none" stroke="#7500ff" stroke-dasharray="5,2" d="M699.5,-1105.48C669.6,-1110.46 661.52,-1111.79 634,-1124.48 567.93,-1154.96 433.07,-1299.25 360.5,-1304.48"/>
+<path fill="none" stroke="#7500ff" stroke-dasharray="5,2" d="M358.5,-1304.48C217.74,-1311.6 81.77,-798.29 53.4,-684.59"/>
+<polygon fill="#7500ff" stroke="#7500ff" points="56.72,-683.46 50.92,-674.6 49.93,-685.14 56.72,-683.46"/>
+</g>
+<!-- module~core_types_physics_meteorology&#45;&gt;module~core_constants -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge110" class="edge">
+<title>module~core_types_physics_meteorology&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#7500ff" stroke-dasharray="5,2" d="M1068.96,-1046.28C1052.05,-1018.52 1010.51,-948.23 984,-885.48 963.49,-836.93 981.83,-812.9 948,-772.48 897.46,-712.11 811.57,-675.96 755.69,-657.64"/>
+<polygon fill="#7500ff" stroke="#7500ff" points="756.56,-654.24 745.97,-654.53 754.43,-660.91 756.56,-654.24"/>
+</g>
+<!-- module~core_types_physics_meteorology&#45;&gt;module~core_memory -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge111" class="edge">
+<title>module~core_types_physics_meteorology&#45;&gt;module~core_memory</title>
+<path fill="none" stroke="#7500ff" stroke-dasharray="5,2" d="M1005.71,-1046.45C980.35,-1042.14 952.26,-1037.36 928.76,-1033.37"/>
+<polygon fill="#7500ff" stroke="#7500ff" points="929.09,-1029.87 918.65,-1031.65 927.92,-1036.77 929.09,-1029.87"/>
+</g>
+<!-- module~core_types_physics_meteorology&#45;&gt;module~core_types_datetime -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge112" class="edge">
+<title>module~core_types_physics_meteorology&#45;&gt;module~core_types_datetime</title>
+<path fill="none" stroke="#7500ff" stroke-dasharray="5,2" d="M1062.21,-1070.68C1042.03,-1088.63 1005.29,-1124.09 984,-1161.48 957.5,-1208.02 985,-1237.76 948,-1276.48 944.78,-1279.85 941.09,-1282.78 937.13,-1285.34"/>
+<polygon fill="#7500ff" stroke="#7500ff" points="935.12,-1282.44 928.07,-1290.35 938.51,-1288.57 935.12,-1282.44"/>
+</g>
+<!-- module~core_types_physics_meteorology&#45;&gt;stdlib_optval -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge113" class="edge">
+<title>module~core_types_physics_meteorology&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#7500ff" stroke-dasharray="5,2" d="M1065.28,-1070.96C1034.31,-1105.4 949.82,-1199.29 948,-1200.48 810.71,-1290.47 758.45,-1283.79 598,-1318.48 494.3,-1340.9 466.58,-1344.38 360.5,-1342.48"/>
+</g>
+<!-- module~core_types_physics_state&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge116" class="edge">
+<title>module~core_types_physics_state&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#9c00ff" stroke-dasharray="5,2" d="M802.89,-1099.52C771.55,-1098.72 734.48,-1099.66 701.5,-1105.48"/>
+</g>
+<!-- module~core_types_physics_state&#45;&gt;core_allocate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge114" class="edge">
+<title>module~core_types_physics_state&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#9c00ff" stroke-dasharray="5,2" d="M857.56,-1092.46C842.37,-1081.25 819.94,-1063.58 803,-1045.48 766.52,-1006.51 731.96,-954.03 714.11,-925.35"/>
+<polygon fill="#9c00ff" stroke="#9c00ff" points="716.94,-923.27 708.72,-916.59 710.98,-926.94 716.94,-923.27"/>
+</g>
+<!-- module~core_types_physics_state&#45;&gt;core_deallocate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge115" class="edge">
+<title>module~core_types_physics_state&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#9c00ff" stroke-dasharray="5,2" d="M848.6,-1092.36C818.83,-1078.42 769.82,-1055.47 736.63,-1039.93"/>
+<polygon fill="#9c00ff" stroke="#9c00ff" points="737.83,-1036.63 727.29,-1035.56 734.87,-1042.97 737.83,-1036.63"/>
+</g>
+<!-- module~core_types_physics_state&#45;&gt;module~core_types_coordinate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge117" class="edge">
+<title>module~core_types_physics_state&#45;&gt;module~core_types_coordinate</title>
+<path fill="none" stroke="#9c00ff" stroke-dasharray="5,2" d="M823.53,-1116.56C804.35,-1121.11 782.34,-1126.32 762.34,-1131.06"/>
+<polygon fill="#9c00ff" stroke="#9c00ff" points="761.33,-1127.71 752.4,-1133.42 762.94,-1134.52 761.33,-1127.71"/>
+</g>
+<!-- module~core_types_pointer&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge118" class="edge">
+<title>module~core_types_pointer&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#c400ff" stroke-dasharray="5,2" d="M1226.63,-548.43C1143.87,-521.4 941.7,-460.01 876.5,-482.48"/>
+</g>
+<!-- module~core_types_solar&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge119" class="edge">
+<title>module~core_types_solar&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#eb00ff" stroke-dasharray="5,2" d="M1026.99,-1256.79C986.15,-1253.45 926.93,-1251.73 876.5,-1262.48"/>
+</g>
+<!-- module~core_types_solar&#45;&gt;module~core_types_datetime -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge120" class="edge">
+<title>module~core_types_solar&#45;&gt;module~core_types_datetime</title>
+<path fill="none" stroke="#eb00ff" stroke-dasharray="5,2" d="M1026.8,-1272.42C1002.6,-1277.26 973.07,-1283.17 946.61,-1288.46"/>
+<polygon fill="#eb00ff" stroke="#eb00ff" points="945.76,-1285.06 936.64,-1290.45 947.13,-1291.92 945.76,-1285.06"/>
+</g>
+<!-- module~core_vtk&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge125" class="edge">
+<title>module~core_vtk&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff00eb" stroke-dasharray="5,2" d="M1993.81,-518.24C1970.81,-497.25 1923.74,-452.39 1891,-408.48 1871.72,-382.63 1882.44,-362.42 1855,-345.48 1775.08,-296.15 1526.92,-322.48 1433,-322.48 1433,-322.48 1433,-322.48 1262.5,-322.48 1058.17,-322.48 1004.09,-301.24 803,-337.48 662.16,-362.86 322.43,-482.49 192.5,-542.48"/>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_types -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge126" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_types</title>
+<path fill="none" stroke="#ff00eb" stroke-dasharray="5,2" d="M2002.36,-542.68C1984.89,-584.51 1926.82,-726.31 1891,-847.48 1870.46,-916.97 1903.42,-952.58 1855,-1006.48 1846.63,-1015.8 1834.77,-1021.78 1822.91,-1025.62"/>
+<polygon fill="#ff00eb" stroke="#ff00eb" points="1821.72,-1022.32 1813.02,-1028.37 1823.59,-1029.06 1821.72,-1022.32"/>
+</g>
+<!-- module~core_vtk&#45;&gt;core_allocate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge121" class="edge">
+<title>module~core_vtk&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#ff00eb" stroke-dasharray="5,2" d="M1777,-828.48C1512.69,-886.12 1440.68,-864.1 1171,-885.48 1040.25,-895.85 1006.34,-885.91 876.5,-904.48"/>
+</g>
+<!-- module~core_vtk&#45;&gt;core_deallocate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge122" class="edge">
+<title>module~core_vtk&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#ff00eb" stroke-dasharray="5,2" d="M1777,-828.48C1743.16,-836.68 1732.71,-833.09 1701,-847.48 1683.26,-855.53 1683.2,-865.54 1665,-872.48 1473.39,-945.55 1405.54,-877.13 1207,-928.48 1147.35,-943.91 1134.08,-953.9 1078.5,-980.48"/>
+</g>
+<!-- module~core_vtk&#45;&gt;core_unique -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge123" class="edge">
+<title>module~core_vtk&#45;&gt;core_unique</title>
+<path fill="none" stroke="#ff00eb" stroke-dasharray="5,2" d="M1603.5,-246.48C1580.2,-242.73 1252.29,-268.5 1126.84,-278.57"/>
+<polygon fill="#ff00eb" stroke="#ff00eb" points="1126.44,-275.09 1116.75,-279.38 1127,-282.07 1126.44,-275.09"/>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_vtk_vtk_constants -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge127" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_vtk_vtk_constants</title>
+<path fill="none" stroke="#ff00eb" stroke-dasharray="5,2" d="M1990.97,-518.29C1965.24,-498.36 1915.98,-456.23 1891,-408.48 1853.99,-337.74 1905.25,-294.53 1855,-232.48 1767.8,-124.8 1605.17,-78.58 1509.27,-59.96"/>
+<polygon fill="#ff00eb" stroke="#ff00eb" points="1509.82,-56.5 1499.34,-58.09 1508.52,-63.38 1509.82,-56.5"/>
+</g>
+<!-- module~core_vtk&#45;&gt;mpi_f08 -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge130" class="edge">
+<title>module~core_vtk&#45;&gt;mpi_f08</title>
+<path fill="none" stroke="#ff00eb" stroke-dasharray="5,2" d="M2003.03,-542.68C1978.69,-609.09 1862.88,-924.31 1855,-931.48 1844.35,-941.18 1829.62,-946.45 1815.97,-949.3"/>
+<polygon fill="#ff00eb" stroke="#ff00eb" points="1815.08,-945.9 1805.81,-951.04 1816.26,-952.8 1815.08,-945.9"/>
+</g>
+<!-- module~core_vtk&#45;&gt;iso_c_binding -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge124" class="edge">
+<title>module~core_vtk&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#ff00eb" stroke-dasharray="5,2" d="M2004.17,-542.52C1989.01,-594.37 1921.05,-797.51 1779,-828.48"/>
+<path fill="none" stroke="#ff00eb" stroke-dasharray="5,2" d="M1777,-828.48C1641.6,-858.01 1741.27,-653.19 1665,-537.48 1655.26,-522.71 1641.19,-508.77 1629.18,-498.26"/>
+<polygon fill="#ff00eb" stroke="#ff00eb" points="1631.16,-495.36 1621.27,-491.57 1626.64,-500.7 1631.16,-495.36"/>
+</g>
+<!-- module~core_vtk_vtk_wrapper -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node61" class="node">
+<title>module~core_vtk_vtk_wrapper</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node61"><a xlink:href="../module/core_vtk_vtk_wrapper.html" xlink:title="core_vtk_vtk_wrapper">
+<polygon fill="#337ab7" stroke="#337ab7" points="1841.5,-542.48 1714.5,-542.48 1714.5,-518.48 1841.5,-518.48 1841.5,-542.48"/>
+<text text-anchor="middle" x="1778" y="-528.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_vtk_vtk_wrapper</text>
+</a>
+</g>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_vtk_vtk_wrapper -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge128" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_vtk_vtk_wrapper</title>
+<path fill="none" stroke="#ff00eb" stroke-dasharray="5,2" d="M1979.94,-530.48C1948.33,-530.48 1895.26,-530.48 1851.59,-530.48"/>
+<polygon fill="#ff00eb" stroke="#ff00eb" points="1851.57,-526.98 1841.57,-530.48 1851.57,-533.98 1851.57,-526.98"/>
+</g>
+<!-- module~core_vtk_vtu_wrapper -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node62" class="node">
+<title>module~core_vtk_vtu_wrapper</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node62"><a xlink:href="../module/core_vtk_vtu_wrapper.html" xlink:title="core_vtk_vtu_wrapper">
+<polygon fill="#337ab7" stroke="#337ab7" points="1842,-584.48 1714,-584.48 1714,-560.48 1842,-560.48 1842,-584.48"/>
+<text text-anchor="middle" x="1778" y="-570.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_vtk_vtu_wrapper</text>
+</a>
+</g>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_vtk_vtu_wrapper -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge129" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_vtk_vtu_wrapper</title>
+<path fill="none" stroke="#ff00eb" stroke-dasharray="5,2" d="M1979.94,-535.55C1948.44,-541.34 1895.63,-551.05 1852.05,-559.06"/>
+<polygon fill="#ff00eb" stroke="#ff00eb" points="1851.25,-555.64 1842.05,-560.89 1852.51,-562.53 1851.25,-555.64"/>
+</g>
+<!-- module~core_vtk&#45;&gt;stdlib_logger -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge131" class="edge">
+<title>module~core_vtk&#45;&gt;stdlib_logger</title>
+<path fill="none" stroke="#ff00eb" stroke-dasharray="5,2" d="M2005.07,-542.68C1995.22,-588.9 1954.01,-755.13 1855,-842.48 1847.39,-849.19 1837.97,-854.19 1828.38,-857.9"/>
+<polygon fill="#ff00eb" stroke="#ff00eb" points="1827.11,-854.64 1818.8,-861.21 1829.39,-861.26 1827.11,-854.64"/>
+</g>
+<!-- stdlib_sorting -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node66" class="node">
+<title>stdlib_sorting</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="1819.5,-500.48 1736.5,-500.48 1736.5,-476.48 1819.5,-476.48 1819.5,-500.48"/>
+<text text-anchor="middle" x="1778" y="-486.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_sorting</text>
+</g>
+<!-- module~core_vtk&#45;&gt;stdlib_sorting -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge132" class="edge">
+<title>module~core_vtk&#45;&gt;stdlib_sorting</title>
+<path fill="none" stroke="#ff00eb" stroke-dasharray="5,2" d="M1979.94,-525.42C1942.78,-518.59 1875.95,-506.3 1829.62,-497.79"/>
+<polygon fill="#ff00eb" stroke="#ff00eb" points="1830.24,-494.34 1819.77,-495.98 1828.97,-501.23 1830.24,-494.34"/>
+</g>
+<!-- module~core_vtk&#45;&gt;stdlib_strings -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge133" class="edge">
+<title>module~core_vtk&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#ff00eb" stroke-dasharray="5,2" d="M1991.63,-518.48C1966.37,-498.5 1917.19,-455.91 1891,-408.48 1859.32,-351.11 1905.12,-307.71 1855,-265.48 1769.95,-193.83 1715.5,-262.85 1605.5,-246.48"/>
+<path fill="none" stroke="#ff00eb" stroke-dasharray="5,2" d="M1603.5,-246.48C1203.9,-183.48 1103.73,-81.31 701.5,-124.48"/>
+</g>
+<!-- module~core_vtk_vtk_constants&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge134" class="edge">
+<title>module~core_vtk_vtk_constants&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff00c4" stroke-dasharray="5,2" d="M1364.88,-59.97C1174.69,-93.61 629.38,-194.38 466,-271.48 412.54,-296.71 406.53,-315.38 360.5,-352.48"/>
+<path fill="none" stroke="#ff00c4" stroke-dasharray="5,2" d="M358.5,-352.48C268.91,-419.92 294.31,-495.48 192.5,-542.48"/>
+<path fill="none" stroke="#ff00c4" stroke-dasharray="5,2" d="M190.5,-542.48C138.34,-566.56 89.96,-615 65.22,-642.4"/>
+<polygon fill="#ff00c4" stroke="#ff00c4" points="62.34,-640.37 58.33,-650.18 67.58,-645.01 62.34,-640.37"/>
+</g>
+<!-- module~core_vtk_vtk_constants&#45;&gt;stdlib_strings -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge135" class="edge">
+<title>module~core_vtk_vtk_constants&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#ff00c4" stroke-dasharray="5,2" d="M1364.91,-46.69C1334.33,-46.32 1297.54,-46.53 1264.5,-48.48"/>
+</g>
+<!-- module~linalg_mkl_backend&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge136" class="edge">
+<title>module~linalg_mkl_backend&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff009c" stroke-dasharray="5,2" d="M2161.89,-1338.95C2119.6,-1338.21 2060.97,-1337.95 2009.5,-1340.48"/>
+</g>
+<!-- module~core_types_matrix -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node58" class="node">
+<title>module~core_types_matrix</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node58"><a xlink:href="../module/core_types_matrix.html" xlink:title="core_types_matrix">
+<polygon fill="#337ab7" stroke="#337ab7" points="1318,-690.48 1209,-690.48 1209,-666.48 1318,-666.48 1318,-690.48"/>
+<text text-anchor="middle" x="1263.5" y="-676.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_matrix</text>
+</a>
+</g>
+</g>
+<!-- module~module_type_matrix&#45;&gt;module~core_types_matrix -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge137" class="edge">
+<title>module~module_type_matrix&#45;&gt;module~core_types_matrix</title>
+<path fill="none" stroke="#ff0075" stroke-dasharray="5,2" d="M1543.67,-695.78C1483.18,-692.03 1390.01,-686.26 1328.17,-682.43"/>
+<polygon fill="#ff0075" stroke="#ff0075" points="1328.34,-678.93 1318.15,-681.81 1327.91,-685.92 1328.34,-678.93"/>
+</g>
+<!-- module~core_types_matrix_factory -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node59" class="node">
+<title>module~core_types_matrix_factory</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node59"><a xlink:href="../module/core_types_matrix_factory.html" xlink:title="core_types_matrix_factory">
+<polygon fill="#337ab7" stroke="#337ab7" points="1508,-671.48 1356,-671.48 1356,-647.48 1508,-647.48 1508,-671.48"/>
+<text text-anchor="middle" x="1432" y="-657.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_matrix_factory</text>
+</a>
+</g>
+</g>
+<!-- module~module_type_matrix&#45;&gt;module~core_types_matrix_factory -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge138" class="edge">
+<title>module~module_type_matrix&#45;&gt;module~core_types_matrix_factory</title>
+<path fill="none" stroke="#ff0075" stroke-dasharray="5,2" d="M1552.34,-687.48C1534.05,-683.19 1513.25,-678.31 1494.2,-673.84"/>
+<polygon fill="#ff0075" stroke="#ff0075" points="1494.95,-670.42 1484.41,-671.54 1493.35,-677.24 1494.95,-670.42"/>
+</g>
+<!-- module~core_types_vector -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_node60" class="node">
+<title>module~core_types_vector</title>
+<g id="a_module~~solver_preconditioner_jacobi~~UsesGraph_node60"><a xlink:href="../module/core_types_vector.html" xlink:title="core_types_vector">
+<polygon fill="#337ab7" stroke="#337ab7" points="930,-876.48 821,-876.48 821,-852.48 930,-852.48 930,-876.48"/>
+<text text-anchor="middle" x="875.5" y="-862.08" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_vector</text>
+</a>
+</g>
+</g>
+<!-- module~module_type_vector&#45;&gt;module~core_types_vector -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge139" class="edge">
+<title>module~module_type_vector&#45;&gt;module~core_types_vector</title>
+<path fill="none" stroke="#ff004e" stroke-dasharray="5,2" d="M1016.76,-864.48C992.69,-864.48 964.89,-864.48 940.41,-864.48"/>
+<polygon fill="#ff004e" stroke="#ff004e" points="940.14,-860.98 930.14,-864.48 940.14,-867.98 940.14,-860.98"/>
+</g>
+<!-- module~core_c_utils&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge141" class="edge">
+<title>module~core_c_utils&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff6600" stroke-dasharray="5,2" d="M1740.81,-363.03C1656.82,-355.68 1442.25,-340.69 1264.5,-360.48"/>
+</g>
+<!-- module~core_c_utils&#45;&gt;iso_c_binding -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge140" class="edge">
+<title>module~core_c_utils&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#ff6600" stroke-dasharray="5,2" d="M1740.75,-372.63C1727.66,-375.83 1713.13,-380.57 1701,-387.48 1668.31,-406.12 1638.42,-438.47 1621.09,-459.42"/>
+<polygon fill="#ff6600" stroke="#ff6600" points="1618.24,-457.39 1614.67,-467.36 1623.68,-461.79 1618.24,-457.39"/>
+</g>
+<!-- module~core_c_utils_memory_stats&#45;&gt;iso_c_binding -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge142" class="edge">
+<title>module~core_c_utils_memory_stats&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#ffcc00" stroke-dasharray="5,2" d="M1758.59,-298.5C1742.39,-309.57 1718.7,-327.04 1701,-345.48 1666.49,-381.43 1634.67,-430.6 1617.9,-458.29"/>
+<polygon fill="#ffcc00" stroke="#ffcc00" points="1614.74,-456.75 1612.61,-467.13 1620.75,-460.34 1614.74,-456.75"/>
+</g>
+<!-- module~core_c_utils_signal_flag&#45;&gt;iso_c_binding -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge143" class="edge">
+<title>module~core_c_utils_signal_flag&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M1711.1,-898.29C1707.34,-895.84 1703.92,-892.93 1701,-889.48 1650.25,-829.42 1699.2,-608.28 1665,-537.48 1657.51,-521.97 1644.05,-508.31 1631.83,-498.14"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1633.67,-495.14 1623.66,-491.69 1629.34,-500.63 1633.67,-495.14"/>
+</g>
+<!-- module~core_c_utils_system_info&#45;&gt;iso_c_binding -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge144" class="edge">
+<title>module~core_c_utils_system_info&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#65ff00" stroke-dasharray="5,2" d="M1739.2,-420.49C1726.91,-424.64 1713.28,-429.51 1701,-434.48 1679.74,-443.1 1656.43,-454.05 1638.17,-462.99"/>
+<polygon fill="#65ff00" stroke="#65ff00" points="1636.53,-459.89 1629.12,-467.46 1639.63,-466.17 1636.53,-459.89"/>
+</g>
+<!-- module~core_types_matrix&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge149" class="edge">
+<title>module~core_types_matrix&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1246.85,-690.69C1216.38,-713.74 1146.16,-763.41 1078.5,-786.48"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1076.5,-786.48C1022.13,-805.03 1005.36,-775.6 948,-772.48 883.65,-768.99 867.18,-766.64 803,-772.48 726.95,-779.4 701.61,-767.99 634,-803.48 613.97,-814 616.97,-827.15 598,-839.48 572.05,-856.35 563.68,-860.37 533,-864.48"/>
+</g>
+<!-- module~core_types_matrix&#45;&gt;module~core_constants -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge150" class="edge">
+<title>module~core_types_matrix&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1236.1,-666.46C1189.23,-645.25 1094.85,-603.14 1078.5,-600.48"/>
+</g>
+<!-- module~core_types_matrix&#45;&gt;core_allocate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge145" class="edge">
+<title>module~core_types_matrix&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1076.5,-786.48C1030.79,-802.07 1020.71,-812.11 984,-843.48 965.31,-859.46 968.82,-872.4 948,-885.48 920.16,-902.97 909.05,-899.83 876.5,-904.48"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M874.5,-904.48C833.95,-910.28 787.5,-909.9 752.95,-908.28"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="752.8,-904.77 742.63,-907.74 752.43,-911.76 752.8,-904.77"/>
+</g>
+<!-- module~core_types_matrix&#45;&gt;core_check_range -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge146" class="edge">
+<title>module~core_types_matrix&#45;&gt;core_check_range</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1076.5,-786.48C992.37,-815.17 956.17,-747.05 876.5,-786.48"/>
+</g>
+<!-- module~core_types_matrix&#45;&gt;core_deallocate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge147" class="edge">
+<title>module~core_types_matrix&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1260.18,-690.53C1249.91,-739.9 1203.4,-926.7 1078.5,-980.48"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1076.5,-980.48C1020.48,-1004.6 863.4,-995.02 803,-1003.48 788.76,-1005.48 773.5,-1008.18 759.25,-1010.96"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="758.2,-1007.59 749.08,-1012.98 759.57,-1014.46 758.2,-1007.59"/>
+</g>
+<!-- module~core_types_matrix&#45;&gt;core_findings -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge148" class="edge">
+<title>module~core_types_matrix&#45;&gt;core_findings</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1223.69,-666.37C1217.29,-662.82 1211.34,-658.27 1207,-652.48 1144.64,-569.37 1241.91,-497.43 1171,-421.48 1160.21,-409.93 1144.51,-404.09 1129.1,-401.3"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1129.46,-397.81 1119.07,-399.88 1128.48,-404.74 1129.46,-397.81"/>
+</g>
+<!-- module~core_types_matrix&#45;&gt;module~module_type_vector -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge151" class="edge">
+<title>module~core_types_matrix&#45;&gt;module~module_type_vector</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1255.29,-690.57C1241.13,-713.7 1207.82,-765.05 1171,-800.48 1152.17,-818.6 1127.76,-835.27 1108.74,-847.04"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1106.88,-844.08 1100.15,-852.26 1110.51,-850.06 1106.88,-844.08"/>
+</g>
+<!-- module~core_types_matrix&#45;&gt;stdlib_optval -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge152" class="edge">
+<title>module~core_types_matrix&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1259.27,-690.61C1249.82,-726.61 1221.89,-836.09 1207,-928.48 1194.39,-1006.77 1222.33,-1223.05 1171,-1283.48 983.36,-1504.38 819.89,-1459.67 533,-1418.48"/>
+</g>
+<!-- module~core_types_matrix_factory&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge153" class="edge">
+<title>module~core_types_matrix_factory&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M1262.5,-638.48C1192.55,-630.55 687.66,-672.91 634,-718.48 591.24,-754.8 636.1,-798.29 598,-839.48 576.98,-862.21 563.69,-860.48 533,-864.48"/>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M531,-864.48C381.66,-882.71 330.13,-925.23 192.5,-864.48"/>
+</g>
+<!-- module~core_types_matrix_factory&#45;&gt;module~core_constants -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge154" class="edge">
+<title>module~core_types_matrix_factory&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M1355.62,-649.57C1327.1,-645.92 1294.32,-641.86 1264.5,-638.48"/>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M1262.5,-638.48C1179.53,-629.08 1160.92,-613.87 1078.5,-600.48"/>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M1076.5,-600.48C961.47,-581.8 825.24,-609.36 752.81,-627.92"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="751.82,-624.56 743.02,-630.47 753.58,-631.33 751.82,-624.56"/>
+</g>
+<!-- module~core_types_matrix_factory&#45;&gt;module~core_types_matrix -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge155" class="edge">
+<title>module~core_types_matrix_factory&#45;&gt;module~core_types_matrix</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M1355.54,-668.09C1346.52,-669.12 1337.36,-670.17 1328.52,-671.18"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1327.84,-667.73 1318.3,-672.34 1328.63,-674.69 1327.84,-667.73"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge160" class="edge">
+<title>module~core_types_vector&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ffcb" stroke-dasharray="5,2" d="M820.69,-862.91C786.52,-862.3 741.38,-862.21 701.5,-864.48"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;module~core_constants -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge161" class="edge">
+<title>module~core_types_vector&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#00ffcb" stroke-dasharray="5,2" d="M865.89,-852.13C848.04,-826.68 805.46,-766.72 767,-718.48 751.43,-698.95 732.74,-677.44 719.32,-662.31"/>
+<polygon fill="#00ffcb" stroke="#00ffcb" points="721.73,-659.75 712.46,-654.61 716.5,-664.41 721.73,-659.75"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;core_allocate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge156" class="edge">
+<title>module~core_types_vector&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#00ffcb" stroke-dasharray="5,2" d="M822.59,-876.48C800.41,-881.61 774.6,-887.58 752.51,-892.69"/>
+<polygon fill="#00ffcb" stroke="#00ffcb" points="751.61,-889.3 742.66,-894.97 753.19,-896.12 751.61,-889.3"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;core_check_length -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge157" class="edge">
+<title>module~core_types_vector&#45;&gt;core_check_length</title>
+<path fill="none" stroke="#00ffcb" stroke-dasharray="5,2" d="M857.6,-852.27C827.03,-830.18 762.42,-783.5 726.65,-757.65"/>
+<polygon fill="#00ffcb" stroke="#00ffcb" points="728.37,-754.58 718.22,-751.56 724.27,-760.25 728.37,-754.58"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;core_check_range -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge158" class="edge">
+<title>module~core_types_vector&#45;&gt;core_check_range</title>
+<path fill="none" stroke="#00ffcb" stroke-dasharray="5,2" d="M822.59,-852.48C804.03,-848.19 782.93,-843.31 763.59,-838.84"/>
+<polygon fill="#00ffcb" stroke="#00ffcb" points="764.2,-835.39 753.67,-836.54 762.62,-842.21 764.2,-835.39"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;core_deallocate -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge159" class="edge">
+<title>module~core_types_vector&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#00ffcb" stroke-dasharray="5,2" d="M855.89,-876.5C840.25,-887.32 818.08,-904.43 803,-923.48 780.55,-951.85 793.42,-971.78 767,-996.48 762.74,-1000.46 757.81,-1003.9 752.61,-1006.85"/>
+<polygon fill="#00ffcb" stroke="#00ffcb" points="751.01,-1003.74 743.66,-1011.37 754.17,-1009.98 751.01,-1003.74"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;stdlib_optval -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge162" class="edge">
+<title>module~core_types_vector&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#00ffcb" stroke-dasharray="5,2" d="M856.63,-876.68C835.91,-890.34 800.31,-912.27 767,-925.48 667.5,-964.94 640.04,-982.48 533,-982.48 533,-982.48 533,-982.48 358.5,-982.48 266.01,-982.48 158.02,-982.48 96.86,-982.48"/>
+<polygon fill="#00ffcb" stroke="#00ffcb" points="96.73,-978.98 86.73,-982.48 96.73,-985.98 96.73,-978.98"/>
+</g>
+<!-- module~core_vtk_vtk_wrapper&#45;&gt;iso_c_binding -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge163" class="edge">
+<title>module~core_vtk_vtk_wrapper&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#00cbff" stroke-dasharray="5,2" d="M1732.32,-518.41C1722.01,-515.55 1711.11,-512.47 1701,-509.48 1685.28,-504.84 1668.17,-499.55 1652.84,-494.71"/>
+<polygon fill="#00cbff" stroke="#00cbff" points="1653.64,-491.29 1643.05,-491.61 1651.53,-497.97 1653.64,-491.29"/>
+</g>
+<!-- module~core_vtk_vtu_wrapper&#45;&gt;iso_c_binding -->
+<g id="module~~solver_preconditioner_jacobi~~UsesGraph_edge164" class="edge">
+<title>module~core_vtk_vtu_wrapper&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M1723.31,-560.39C1715.65,-557.88 1708,-554.93 1701,-551.48 1672.73,-537.56 1644.42,-514.84 1626.05,-498.65"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1628.12,-495.8 1618.34,-491.72 1623.44,-501.01 1628.12,-495.8"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panmodulesolver_preconditioner_jacobiUsesGraph = svgPanZoom('#modulesolver_preconditioner_jacobiUsesGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#UsesGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="UsesGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="518pt" height="32pt"
+ viewBox="0.00 0.00 517.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 513.5,-28 513.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node">
+<title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node">
+<title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="145.5,-24 72.5,-24 72.5,0 145.5,0 145.5,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 164,-24 164,0 234,0 234,-24"/>
+<text text-anchor="middle" x="199" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="310,-24 252,-24 252,0 310,0 310,-24"/>
+<text text-anchor="middle" x="281" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="386,-24 328,-24 328,0 386,0 386,-24"/>
+<text text-anchor="middle" x="357" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="509.5,-24 404.5,-24 404.5,0 509.5,0 509.5,-24"/>
+<text text-anchor="middle" x="457" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a submodule to the (sub)module which it is
+descended from. Dashed arrows point from a module or program unit to 
+modules which it uses.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+            </li>
+        </ul>
+      </div>
+    </div>
+
+      
+      <br>
+
+
+
+
+
+
+
+
+
+
+        <section>
+          <h2>Module Subroutines</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-apply_preconditioner_jacobi"></span> <h3>module subroutine <a href='../proc/apply_preconditioner_jacobi.html'>apply_preconditioner_jacobi</a>(self, r, z)  
+    <a href="../interface/apply_preconditioner_jacobi.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>前処理の適用: z = M^-1 * r</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~947"></span>
+              class(<a href='../type/type_preconditioner_jacobi.html'>type_preconditioner_jacobi</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-r~68"></span>
+              type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>r</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-z~13"></span>
+              type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>z</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-destroy_preconditioner_jacobi"></span> <h3>module subroutine <a href='../proc/destroy_preconditioner_jacobi.html'>destroy_preconditioner_jacobi</a>(self)  
+    <a href="../interface/destroy_preconditioner_jacobi.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>メモリの解放</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~948"></span>
+              class(<a href='../type/type_preconditioner_jacobi.html'>type_preconditioner_jacobi</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-initialize_preconditioner_jacobi"></span> <h3>module subroutine <a href='../proc/initialize_preconditioner_jacobi.html'>initialize_preconditioner_jacobi</a>(self, info)  
+    <a href="../interface/initialize_preconditioner_jacobi.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Jacobi 前処理インスタンスを初期化する</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~943"></span>
+              class(<a href='../type/type_preconditioner_jacobi.html'>type_preconditioner_jacobi</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-info~9"></span>
+              type(<a href='../type/type_preconditioner_settings.html'>type_preconditioner_settings</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>info</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-setup_preconditioner_jacobi"></span> <h3>module subroutine <a href='../proc/setup_preconditioner_jacobi.html'>setup_preconditioner_jacobi</a>(self, A)  
+    <a href="../interface/setup_preconditioner_jacobi.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>行列 A に合わせて前処理をセットアップする</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~944"></span>
+              class(<a href='../type/type_preconditioner_jacobi.html'>type_preconditioner_jacobi</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~7"></span>
+              class(<a href='../type/abst_matrix.html'>abst_matrix</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-setup_preconditioner_jacobi_block"></span> <h3>module subroutine <a href='../proc/setup_preconditioner_jacobi_block.html'>setup_preconditioner_jacobi_block</a>(self, A)  
+    <a href="../interface/setup_preconditioner_jacobi_block.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Block Jacobi のセットアップ</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~946"></span>
+              class(<a href='../type/type_preconditioner_jacobi.html'>type_preconditioner_jacobi</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~9"></span>
+              class(<a href='../type/abst_matrix.html'>abst_matrix</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-setup_preconditioner_jacobi_point"></span> <h3>module subroutine <a href='../proc/setup_preconditioner_jacobi_point.html'>setup_preconditioner_jacobi_point</a>(self, A)  
+    <a href="../interface/setup_preconditioner_jacobi_point.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Point Jacobi のセットアップ</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~945"></span>
+              class(<a href='../type/type_preconditioner_jacobi.html'>type_preconditioner_jacobi</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~8"></span>
+              class(<a href='../type/abst_matrix.html'>abst_matrix</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

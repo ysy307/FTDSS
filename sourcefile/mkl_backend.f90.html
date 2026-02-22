@@ -1,0 +1,1707 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>mkl_backend.F90 &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>mkl_backend.F90
+      <small>Source File</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.2% of total for source files.">55 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/mkl_backend.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+            <li class="breadcrumb-item active" aria-current="page">mkl_backend.F90</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+        <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#mods-0"
+         aria-expanded="false" aria-controls="mods-0">
+         <h4 class="card-header bg-primary text-white">Modules</h4>
+      </a>
+      <div id="mods-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/linalg_mkl_backend.html">linalg_mkl_backend</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../sourcefile/mkl_backend.f90.html#src">mkl_backend.F90</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    <div class="col-md-9" id='text'>
+      
+      <br>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Files dependent on this one</h3>
+          </div>
+          <div class="card-body">
+            <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: sourcefile~~mkl_backend.f90~~AfferentGraph Pages: 1 -->
+<svg id="sourcefilemkl_backendf90AfferentGraph" width="641pt" height="248pt"
+ viewBox="0.00 0.00 641.00 247.50" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph" class="graph" transform="scale(0.27 0.27) rotate(0) translate(4 911.09)">
+<title>sourcefile~~mkl_backend.f90~~AfferentGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-911.09 2366,-911.09 2366,4 -4,4"/>
+<!-- sourcefile~mkl_backend.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node1" class="node">
+<title>sourcefile~mkl_backend.f90</title>
+<polygon fill="none" stroke="black" points="106,-335.1 0,-335.1 0,-311.1 106,-311.1 106,-335.1"/>
+<text text-anchor="middle" x="53" y="-320.7" font-family="Helvetica,sans-Serif" font-size="10.50">mkl_backend.F90</text>
+</g>
+<!-- sourcefile~vector_operations.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node2" class="node">
+<title>sourcefile~vector_operations.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node2"><a xlink:href="../sourcefile/vector_operations.f90.html" xlink:title="vector_operations.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="273,-335.1 142,-335.1 142,-311.1 273,-311.1 273,-335.1"/>
+<text text-anchor="middle" x="207.5" y="-320.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_operations.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~vector_operations.f90&#45;&gt;sourcefile~mkl_backend.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge1" class="edge">
+<title>sourcefile~vector_operations.f90&#45;&gt;sourcefile~mkl_backend.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M141.83,-323.1C133.4,-323.1 124.78,-323.1 116.39,-323.1"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="116.31,-319.6 106.31,-323.1 116.31,-326.6 116.31,-319.6"/>
+</g>
+<!-- sourcefile~linalg.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node3" class="node">
+<title>sourcefile~linalg.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node3"><a xlink:href="../sourcefile/linalg.f90.html" xlink:title="linalg.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="373,-335.1 309,-335.1 309,-311.1 373,-311.1 373,-335.1"/>
+<text text-anchor="middle" x="341" y="-320.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">linalg.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~linalg.f90&#45;&gt;sourcefile~vector_operations.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge2" class="edge">
+<title>sourcefile~linalg.f90&#45;&gt;sourcefile~vector_operations.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M308.84,-323.1C301,-323.1 292.25,-323.1 283.27,-323.1"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="283.07,-319.6 273.07,-323.1 283.07,-326.6 283.07,-319.6"/>
+</g>
+<!-- sourcefile~control.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node4" class="node">
+<title>sourcefile~control.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node4"><a xlink:href="../sourcefile/control.f90.html" xlink:title="control.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="711.5,-51.1 639.5,-51.1 639.5,-27.1 711.5,-27.1 711.5,-51.1"/>
+<text text-anchor="middle" x="675.5" y="-36.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">control.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~control.f90&#45;&gt;sourcefile~linalg.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge3" class="edge">
+<title>sourcefile~control.f90&#45;&gt;sourcefile~linalg.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M664.17,-51.46C638.02,-81.86 565.71,-160.62 487.5,-199.1"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M485.5,-199.1C432.53,-225.16 383.36,-275.54 358.66,-303.39"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="356.01,-301.1 352.08,-310.94 361.29,-305.7 356.01,-301.1"/>
+</g>
+<!-- sourcefile~iteration.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node8" class="node">
+<title>sourcefile~iteration.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node8"><a xlink:href="../sourcefile/iteration.f90.html" xlink:title="iteration.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="526.5,-109.1 446.5,-109.1 446.5,-85.1 526.5,-85.1 526.5,-109.1"/>
+<text text-anchor="middle" x="486.5" y="-94.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iteration.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~control.f90&#45;&gt;sourcefile~iteration.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge41" class="edge">
+<title>sourcefile~control.f90&#45;&gt;sourcefile~iteration.f90</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M639.33,-50.01C610.18,-59.05 568.44,-71.99 536.1,-82.02"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="534.9,-78.73 526.39,-85.03 536.98,-85.42 534.9,-78.73"/>
+</g>
+<!-- sourcefile~fe_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node5" class="node">
+<title>sourcefile~fe_interface.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node5"><a xlink:href="../sourcefile/fe_interface.f90.html" xlink:title="fe_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="536,-634.1 437,-634.1 437,-610.1 536,-610.1 536,-634.1"/>
+<text text-anchor="middle" x="486.5" y="-619.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fe_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~fe_interface.f90&#45;&gt;sourcefile~linalg.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge4" class="edge">
+<title>sourcefile~fe_interface.f90&#45;&gt;sourcefile~linalg.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M479.7,-610C457.84,-564.46 380.29,-402.87 352.23,-344.41"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="355.36,-342.84 347.88,-335.34 349.05,-345.87 355.36,-342.84"/>
+</g>
+<!-- sourcefile~ftdss_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node6" class="node">
+<title>sourcefile~ftdss_interface.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node6"><a xlink:href="../sourcefile/ftdss_interface.f90.html" xlink:title="ftdss_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2210,-466.1 2097,-466.1 2097,-442.1 2210,-442.1 2210,-466.1"/>
+<text text-anchor="middle" x="2153.5" y="-451.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ftdss_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~linalg.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge5" class="edge">
+<title>sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~linalg.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2152.56,-441.9C2152.15,-395.6 2144.67,-228.52 2061,-133.1 1853.49,103.56 1667.68,-110.56 1353,-117.1"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1351,-117.1C1302.62,-113.42 1298.75,-84.08 1252,-71.1 1201.91,-57.18 954.77,-43.28 872.5,-39.1"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M870.5,-39.1C816.76,-34.66 804.72,-22.78 751,-18.1 597.41,-4.7 516.37,34.54 409,-76.1 347.69,-139.27 341.15,-252.59 341.32,-300.61"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="337.83,-300.89 341.47,-310.84 344.83,-300.79 337.83,-300.89"/>
+</g>
+<!-- sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~control.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge16" class="edge">
+<title>sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~control.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M870.5,-39.1C819.55,-36.5 760.98,-36.98 721.64,-37.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="721.49,-34.3 711.57,-38.03 721.65,-41.3 721.49,-34.3"/>
+</g>
+<!-- sourcefile~field.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node25" class="node">
+<title>sourcefile~field.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node25"><a xlink:href="../sourcefile/field.f90.html" xlink:title="field.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1827.5,-691.1 1769.5,-691.1 1769.5,-667.1 1827.5,-667.1 1827.5,-691.1"/>
+<text text-anchor="middle" x="1798.5" y="-676.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">field.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~field.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge72" class="edge">
+<title>sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~field.f90</title>
+<path fill="none" stroke="#2aff00" stroke-dasharray="5,2" d="M2151.28,-466.22C2146.88,-502.67 2128.39,-611.63 2061,-659.1 1994.21,-706.14 1892.57,-697.06 1837.76,-687.42"/>
+<polygon fill="#2aff00" stroke="#2aff00" points="1838.23,-683.95 1827.76,-685.57 1836.96,-690.84 1838.23,-683.95"/>
+</g>
+<!-- sourcefile~hydraulic.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node32" class="node">
+<title>sourcefile~hydraulic.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node32"><a xlink:href="../sourcefile/hydraulic.f90.html" xlink:title="hydraulic.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2028,-364.1 1943,-364.1 1943,-340.1 2028,-340.1 2028,-364.1"/>
+<text text-anchor="middle" x="1985.5" y="-349.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hydraulic.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~hydraulic.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge73" class="edge">
+<title>sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~hydraulic.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M2140.83,-441.99C2124.38,-425.53 2092.82,-396.08 2061,-378.1 2053.71,-373.98 2045.66,-370.34 2037.63,-367.2"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2038.84,-363.92 2028.25,-363.73 2036.41,-370.48 2038.84,-363.92"/>
+</g>
+<!-- sourcefile~main_base.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node36" class="node">
+<title>sourcefile~main_base.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node36"><a xlink:href="../sourcefile/main_base.f90.html" xlink:title="main_base.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1672,-415.1 1579,-415.1 1579,-391.1 1672,-391.1 1672,-415.1"/>
+<text text-anchor="middle" x="1625.5" y="-400.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">main_base.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~main_base.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge74" class="edge">
+<title>sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~main_base.f90</title>
+<path fill="none" stroke="#0054ff" stroke-dasharray="5,2" d="M2133.04,-441.98C2115.09,-431.54 2087.33,-417.23 2061,-411.1 1928.04,-380.12 1765.95,-388.94 1682.35,-396.77"/>
+<polygon fill="#0054ff" stroke="#0054ff" points="1681.92,-393.3 1672.3,-397.74 1682.6,-400.26 1681.92,-393.3"/>
+</g>
+<!-- sourcefile~solver.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node45" class="node">
+<title>sourcefile~solver.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node45"><a xlink:href="../sourcefile/solver.f90.html" xlink:title="solver.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="904.5,-415.1 838.5,-415.1 838.5,-391.1 904.5,-391.1 904.5,-415.1"/>
+<text text-anchor="middle" x="871.5" y="-400.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solver.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~solver.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge88" class="edge">
+<title>sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~solver.f90</title>
+<path fill="none" stroke="#ff00d4" stroke-dasharray="5,2" d="M2148.01,-466.33C2137.54,-492.78 2108.73,-554.88 2061,-579.1 2016.75,-601.54 1714.37,-577.64 1626.5,-562.1"/>
+<path fill="none" stroke="#ff00d4" stroke-dasharray="5,2" d="M1624.5,-562.1C1529.15,-546.91 1510.01,-523.09 1416,-501.1 1306.57,-475.5 1277.6,-477.01 1167,-457.1 1077.18,-440.93 972.04,-421.54 914.84,-410.95"/>
+<polygon fill="#ff00d4" stroke="#ff00d4" points="915.21,-407.46 904.74,-409.08 913.93,-414.34 915.21,-407.46"/>
+</g>
+<!-- sourcefile~thermal.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node46" class="node">
+<title>sourcefile~thermal.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node46"><a xlink:href="../sourcefile/thermal.f90.html" xlink:title="thermal.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2024,-528.1 1947,-528.1 1947,-504.1 2024,-504.1 2024,-528.1"/>
+<text text-anchor="middle" x="1985.5" y="-513.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">thermal.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~thermal.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge89" class="edge">
+<title>sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~thermal.f90</title>
+<path fill="none" stroke="#ff00aa" stroke-dasharray="5,2" d="M2128.05,-466.23C2109.85,-474.97 2084.24,-486.67 2061,-495.1 2052.37,-498.23 2043.05,-501.18 2034.01,-503.83"/>
+<polygon fill="#ff00aa" stroke="#ff00aa" points="2033.02,-500.47 2024.36,-506.58 2034.94,-507.21 2033.02,-500.47"/>
+</g>
+<!-- sourcefile~boundary.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node50" class="node">
+<title>sourcefile~boundary.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node50"><a xlink:href="../sourcefile/boundary.f90.html" xlink:title="boundary.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1252,-129.1 1167,-129.1 1167,-105.1 1252,-105.1 1252,-129.1"/>
+<text text-anchor="middle" x="1209.5" y="-114.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">boundary.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~boundary.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge91" class="edge">
+<title>sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~boundary.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1351,-117.1C1321.61,-117.71 1288.76,-117.74 1262.22,-117.61"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1262.02,-114.11 1252,-117.55 1261.98,-121.11 1262.02,-114.11"/>
+</g>
+<!-- sourcefile~domain.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node52" class="node">
+<title>sourcefile~domain.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node52"><a xlink:href="../sourcefile/domain.f90.html" xlink:title="domain.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1528,-574.1 1452,-574.1 1452,-550.1 1528,-550.1 1528,-574.1"/>
+<text text-anchor="middle" x="1490" y="-559.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">domain.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~domain.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge92" class="edge">
+<title>sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~domain.f90</title>
+<path fill="none" stroke="#ffcc00" stroke-dasharray="5,2" d="M1624.5,-562.1C1596.22,-557.09 1564.03,-556.94 1538.35,-558.1"/>
+<polygon fill="#ffcc00" stroke="#ffcc00" points="1537.93,-554.62 1528.13,-558.65 1538.31,-561.61 1537.93,-554.62"/>
+</g>
+<!-- sourcefile~output.f90~2 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node57" class="node">
+<title>sourcefile~output.f90~2</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node57"><a xlink:href="../sourcefile/output.f90~2.html" xlink:title="output.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2020.5,-166.1 1950.5,-166.1 1950.5,-142.1 2020.5,-142.1 2020.5,-166.1"/>
+<text text-anchor="middle" x="1985.5" y="-151.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">output.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~output.f90~2 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge98" class="edge">
+<title>sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~output.f90~2</title>
+<path fill="none" stroke="#00ffcb" stroke-dasharray="5,2" d="M2150.72,-441.93C2144.58,-403.48 2121.25,-282.51 2061,-205.1 2050.26,-191.3 2034.73,-179.84 2020.63,-171.3"/>
+<polygon fill="#00ffcb" stroke="#00ffcb" points="2022.04,-168.08 2011.63,-166.12 2018.55,-174.14 2022.04,-168.08"/>
+</g>
+<!-- sourcefile~initial.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node66" class="node">
+<title>sourcefile~initial.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node66"><a xlink:href="../sourcefile/initial.f90.html" xlink:title="initial.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2017.5,-650.1 1953.5,-650.1 1953.5,-626.1 2017.5,-626.1 2017.5,-650.1"/>
+<text text-anchor="middle" x="1985.5" y="-635.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initial.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~initial.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge100" class="edge">
+<title>sourcefile~ftdss_interface.f90&#45;&gt;sourcefile~initial.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2148.74,-466.34C2139.07,-495.77 2110.59,-571.1 2061,-612.1 2051.35,-620.07 2039.09,-625.67 2027.32,-629.57"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2026.2,-626.25 2017.61,-632.46 2028.2,-632.96 2026.2,-626.25"/>
+</g>
+<!-- sourcefile~hydraulic_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node7" class="node">
+<title>sourcefile~hydraulic_interface.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node7"><a xlink:href="../sourcefile/hydraulic_interface.f90.html" xlink:title="hydraulic_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1867.5,-375.1 1729.5,-375.1 1729.5,-351.1 1867.5,-351.1 1867.5,-375.1"/>
+<text text-anchor="middle" x="1798.5" y="-360.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hydraulic_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~linalg.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge6" class="edge">
+<title>sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~linalg.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1624.5,-239.1C1508.89,-201 1474.72,-275.1 1353,-275.1 1353,-275.1 1353,-275.1 1060.5,-275.1 938.48,-275.1 898.68,-300.27 787,-251.1 767.14,-242.35 770.93,-226.69 751,-218.1 643.17,-171.62 592.86,-147.27 487.5,-199.1"/>
+</g>
+<!-- sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~control.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge17" class="edge">
+<title>sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~control.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1741.57,-350.97C1735.08,-348.52 1728.74,-345.59 1723,-342.1 1669.4,-309.5 1686.08,-258.73 1626.5,-239.1"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1624.5,-239.1C1617.15,-236.67 1498.68,-200.06 1491,-199.1"/>
+</g>
+<!-- sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~main_base.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge75" class="edge">
+<title>sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~main_base.f90</title>
+<path fill="none" stroke="#0054ff" stroke-dasharray="5,2" d="M1746.19,-375.1C1725.99,-379.82 1702.73,-385.26 1682.12,-390.08"/>
+<polygon fill="#0054ff" stroke="#0054ff" points="1681.19,-386.71 1672.25,-392.4 1682.78,-393.53 1681.19,-386.71"/>
+</g>
+<!-- sourcefile~iteration.f90&#45;&gt;sourcefile~linalg.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge7" class="edge">
+<title>sourcefile~iteration.f90&#45;&gt;sourcefile~linalg.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M472.96,-109.35C456.78,-125.61 428.42,-155.71 409,-185.1 383.49,-223.72 361.74,-273.5 350.4,-301.49"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="347.02,-300.5 346.57,-311.09 353.53,-303.09 347.02,-300.5"/>
+</g>
+<!-- sourcefile~jacobian_matrix.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node9" class="node">
+<title>sourcefile~jacobian_matrix.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node9"><a xlink:href="../sourcefile/jacobian_matrix.f90.html" xlink:title="jacobian_matrix.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1686,-691.1 1565,-691.1 1565,-667.1 1686,-667.1 1686,-691.1"/>
+<text text-anchor="middle" x="1625.5" y="-676.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">jacobian_matrix.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~jacobian_matrix.f90&#45;&gt;sourcefile~linalg.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge8" class="edge">
+<title>sourcefile~jacobian_matrix.f90&#45;&gt;sourcefile~linalg.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1622.09,-691.22C1613.31,-731.35 1578.88,-859.03 1491,-889.1"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1489,-889.1C1371.89,-929.16 1334.28,-889.1 1210.5,-889.1 1210.5,-889.1 1210.5,-889.1 674.5,-889.1 618.01,-889.1 494.42,-798.02 409,-643.1 353.35,-542.16 343.83,-400.02 342.27,-345.54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="345.77,-345.22 342.05,-335.3 338.77,-345.37 345.77,-345.22"/>
+</g>
+<!-- sourcefile~jacobian_matrix.f90&#45;&gt;sourcefile~domain.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge94" class="edge">
+<title>sourcefile~jacobian_matrix.f90&#45;&gt;sourcefile~domain.f90</title>
+<path fill="none" stroke="#ffcc00" stroke-dasharray="5,2" d="M1583.53,-667.05C1576.66,-664.06 1569.87,-660.44 1564,-656.1 1537.21,-636.28 1515.2,-604.12 1502.58,-583.03"/>
+<polygon fill="#ffcc00" stroke="#ffcc00" points="1505.51,-581.1 1497.46,-574.21 1499.45,-584.62 1505.51,-581.1"/>
+</g>
+<!-- sourcefile~precondition_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node10" class="node">
+<title>sourcefile~precondition_interface.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node10"><a xlink:href="../sourcefile/precondition_interface.f90.html" xlink:title="precondition_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="564,-335.1 409,-335.1 409,-311.1 564,-311.1 564,-335.1"/>
+<text text-anchor="middle" x="486.5" y="-320.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">precondition_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~precondition_interface.f90&#45;&gt;sourcefile~linalg.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge9" class="edge">
+<title>sourcefile~precondition_interface.f90&#45;&gt;sourcefile~linalg.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M408.71,-323.1C400,-323.1 391.39,-323.1 383.39,-323.1"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="383.28,-319.6 373.28,-323.1 383.28,-326.6 383.28,-319.6"/>
+</g>
+<!-- sourcefile~residual_vector.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node11" class="node">
+<title>sourcefile~residual_vector.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node11"><a xlink:href="../sourcefile/residual_vector.f90.html" xlink:title="residual_vector.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1683,-901.1 1568,-901.1 1568,-877.1 1683,-877.1 1683,-901.1"/>
+<text text-anchor="middle" x="1625.5" y="-886.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">residual_vector.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~residual_vector.f90&#45;&gt;sourcefile~linalg.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge10" class="edge">
+<title>sourcefile~residual_vector.f90&#45;&gt;sourcefile~linalg.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1567.95,-880.18C1543.53,-878.56 1515.1,-879.77 1491,-889.1"/>
+</g>
+<!-- sourcefile~residual_vector.f90&#45;&gt;sourcefile~domain.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge97" class="edge">
+<title>sourcefile~residual_vector.f90&#45;&gt;sourcefile~domain.f90</title>
+<path fill="none" stroke="#ffcc00" stroke-dasharray="5,2" d="M1619.59,-877.07C1599.76,-828.5 1525.42,-646.41 1499.77,-583.57"/>
+<polygon fill="#ffcc00" stroke="#ffcc00" points="1502.97,-582.17 1495.95,-574.23 1496.49,-584.81 1502.97,-582.17"/>
+</g>
+<!-- sourcefile~solver_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node12" class="node">
+<title>sourcefile~solver_interface.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node12"><a xlink:href="../sourcefile/solver_interface.f90.html" xlink:title="solver_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="736,-251.1 615,-251.1 615,-227.1 736,-227.1 736,-251.1"/>
+<text text-anchor="middle" x="675.5" y="-236.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solver_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~solver_interface.f90&#45;&gt;sourcefile~linalg.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge11" class="edge">
+<title>sourcefile~solver_interface.f90&#45;&gt;sourcefile~linalg.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M641.55,-226.99C595.42,-210.9 514.24,-185.94 487.5,-199.1"/>
+</g>
+<!-- sourcefile~solver_interface.f90&#45;&gt;sourcefile~precondition_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge47" class="edge">
+<title>sourcefile~solver_interface.f90&#45;&gt;sourcefile~precondition_interface.f90</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M625.45,-251.14C616.85,-253.76 608.07,-256.75 600,-260.1 569.46,-272.74 536.73,-291.76 514.49,-305.59"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="512.52,-302.69 505.92,-310.98 516.25,-308.61 512.52,-302.69"/>
+</g>
+<!-- sourcefile~thermal_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node13" class="node">
+<title>sourcefile~thermal_interface.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node13"><a xlink:href="../sourcefile/thermal_interface.f90.html" xlink:title="thermal_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1863.5,-476.1 1733.5,-476.1 1733.5,-452.1 1863.5,-452.1 1863.5,-476.1"/>
+<text text-anchor="middle" x="1798.5" y="-461.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">thermal_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~thermal_interface.f90&#45;&gt;sourcefile~linalg.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge12" class="edge">
+<title>sourcefile~thermal_interface.f90&#45;&gt;sourcefile~linalg.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1208.5,-443.1C1059.75,-429.92 1021.83,-443.1 872.5,-443.1 872.5,-443.1 872.5,-443.1 674.5,-443.1 555.04,-443.1 425,-373.71 369.54,-340.46"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="371.35,-337.47 360.99,-335.26 367.72,-343.45 371.35,-337.47"/>
+</g>
+<!-- sourcefile~thermal_interface.f90&#45;&gt;sourcefile~control.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge21" class="edge">
+<title>sourcefile~thermal_interface.f90&#45;&gt;sourcefile~control.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1733.16,-462.98C1625.09,-460.83 1400.3,-455.23 1210.5,-443.1"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1208.5,-443.1C1175.11,-440.14 1091.26,-422.33 1062.5,-405.1"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1060.5,-405.1C1002.38,-370.27 1007.5,-338.12 956,-294.1 921.84,-264.9 911.61,-259.22 872.5,-237.1"/>
+</g>
+<!-- sourcefile~thermal_interface.f90&#45;&gt;sourcefile~main_base.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge76" class="edge">
+<title>sourcefile~thermal_interface.f90&#45;&gt;sourcefile~main_base.f90</title>
+<path fill="none" stroke="#0054ff" stroke-dasharray="5,2" d="M1763.72,-452.04C1736.78,-442.44 1698.88,-428.92 1669.73,-418.52"/>
+<polygon fill="#0054ff" stroke="#0054ff" points="1670.81,-415.19 1660.21,-415.12 1668.46,-421.78 1670.81,-415.19"/>
+</g>
+<!-- sourcefile~boundary_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node14" class="node">
+<title>sourcefile~boundary_interface.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node14"><a xlink:href="../sourcefile/boundary_interface.f90.html" xlink:title="boundary_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="941,-149.1 802,-149.1 802,-125.1 941,-125.1 941,-149.1"/>
+<text text-anchor="middle" x="871.5" y="-134.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">boundary_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~boundary_interface.f90&#45;&gt;sourcefile~control.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge13" class="edge">
+<title>sourcefile~boundary_interface.f90&#45;&gt;sourcefile~control.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M846.71,-125.08C812.39,-107.74 748.82,-75.63 709.83,-55.93"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="710.99,-52.6 700.48,-51.21 707.83,-58.84 710.99,-52.6"/>
+</g>
+<!-- sourcefile~boundary_manager.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node15" class="node">
+<title>sourcefile~boundary_manager.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node15"><a xlink:href="../sourcefile/boundary_manager.f90.html" xlink:title="boundary_manager.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1131,-209.1 992,-209.1 992,-185.1 1131,-185.1 1131,-209.1"/>
+<text text-anchor="middle" x="1061.5" y="-194.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">boundary_manager.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~boundary_manager.f90&#45;&gt;sourcefile~control.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge14" class="edge">
+<title>sourcefile~boundary_manager.f90&#45;&gt;sourcefile~control.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1028.35,-209.15C981.96,-225.67 898.92,-251.73 872.5,-237.1"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M870.5,-237.1C788.3,-191.58 718.65,-100.33 690.21,-59.57"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="693.03,-57.49 684.48,-51.24 687.26,-61.46 693.03,-57.49"/>
+</g>
+<!-- sourcefile~boundary_manager.f90&#45;&gt;sourcefile~boundary_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge58" class="edge">
+<title>sourcefile~boundary_manager.f90&#45;&gt;sourcefile~boundary_interface.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1022.46,-184.95C992.8,-175.49 951.46,-162.3 919.69,-152.16"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="920.76,-148.82 910.17,-149.12 918.63,-155.49 920.76,-148.82"/>
+</g>
+<!-- sourcefile~domain_manager.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node16" class="node">
+<title>sourcefile~domain_manager.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node16"><a xlink:href="../sourcefile/domain_manager.f90.html" xlink:title="domain_manager.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1416,-534.1 1288,-534.1 1288,-510.1 1416,-510.1 1416,-534.1"/>
+<text text-anchor="middle" x="1352" y="-519.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">domain_manager.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~domain_manager.f90&#45;&gt;sourcefile~control.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge15" class="edge">
+<title>sourcefile~domain_manager.f90&#45;&gt;sourcefile~control.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1304.81,-510.03C1245.23,-493.03 1140.05,-458.06 1062.5,-405.1"/>
+</g>
+<!-- sourcefile~fe.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node18" class="node">
+<title>sourcefile~fe.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node18"><a xlink:href="../sourcefile/fe.f90.html" xlink:title="fe.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1236.5,-574.1 1182.5,-574.1 1182.5,-550.1 1236.5,-550.1 1236.5,-574.1"/>
+<text text-anchor="middle" x="1209.5" y="-559.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fe.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~domain_manager.f90&#45;&gt;sourcefile~fe.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge68" class="edge">
+<title>sourcefile~domain_manager.f90&#45;&gt;sourcefile~fe.f90</title>
+<path fill="none" stroke="#ffaa00" stroke-dasharray="5,2" d="M1308.85,-534.1C1288.98,-539.75 1265.52,-546.43 1246.49,-551.85"/>
+<polygon fill="#ffaa00" stroke="#ffaa00" points="1245.37,-548.53 1236.71,-554.63 1247.29,-555.26 1245.37,-548.53"/>
+</g>
+<!-- sourcefile~domain_manager.f90&#45;&gt;sourcefile~boundary.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge90" class="edge">
+<title>sourcefile~domain_manager.f90&#45;&gt;sourcefile~boundary.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1346.8,-509.98C1327.08,-453.15 1243.69,-212.77 1218.04,-138.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1221.27,-137.47 1214.69,-129.17 1214.66,-139.76 1221.27,-137.47"/>
+</g>
+<!-- sourcefile~element_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node17" class="node">
+<title>sourcefile~element_interface.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node17"><a xlink:href="../sourcefile/element_interface.f90.html" xlink:title="element_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="742,-533.1 609,-533.1 609,-509.1 742,-509.1 742,-533.1"/>
+<text text-anchor="middle" x="675.5" y="-518.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">element_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~element_interface.f90&#45;&gt;sourcefile~fe_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge22" class="edge">
+<title>sourcefile~element_interface.f90&#45;&gt;sourcefile~fe_interface.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M633.91,-533.18C622.69,-537.08 610.67,-541.79 600,-547.1 567.35,-563.35 532.89,-587.5 510.85,-603.98"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="508.62,-601.27 502.76,-610.1 512.84,-606.85 508.62,-601.27"/>
+</g>
+<!-- sourcefile~fe.f90&#45;&gt;sourcefile~fe_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge23" class="edge">
+<title>sourcefile~fe.f90&#45;&gt;sourcefile~fe_interface.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1184.59,-550.06C1156.18,-536.94 1107.01,-517.95 1062.5,-519.1"/>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1060.5,-519.1C975.28,-521.29 957.65,-485.17 872.5,-481.1"/>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M870.5,-481.1C750.12,-475.33 708.62,-447.89 600,-500.1 553.81,-522.3 517.49,-572.55 499.63,-601.15"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="496.48,-599.59 494.29,-609.95 502.47,-603.22 496.48,-599.59"/>
+</g>
+<!-- sourcefile~fe.f90&#45;&gt;sourcefile~element_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge65" class="edge">
+<title>sourcefile~fe.f90&#45;&gt;sourcefile~element_interface.f90</title>
+<path fill="none" stroke="#ff7f00" stroke-dasharray="5,2" d="M870.5,-481.1C817.68,-478.57 758.33,-493.51 719.34,-505.84"/>
+<polygon fill="#ff7f00" stroke="#ff7f00" points="717.83,-502.65 709.4,-509.07 719.99,-509.31 717.83,-502.65"/>
+</g>
+<!-- sourcefile~fe_factory.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node22" class="node">
+<title>sourcefile~fe_factory.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node22"><a xlink:href="../sourcefile/fe_factory.f90.html" xlink:title="fe_factory.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="915,-701.1 828,-701.1 828,-677.1 915,-677.1 915,-701.1"/>
+<text text-anchor="middle" x="871.5" y="-686.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fe_factory.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~fe.f90&#45;&gt;sourcefile~fe_factory.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge69" class="edge">
+<title>sourcefile~fe.f90&#45;&gt;sourcefile~fe_factory.f90</title>
+<path fill="none" stroke="#aaff00" stroke-dasharray="5,2" d="M1060.5,-519.1C979.64,-521.18 1022.63,-622.24 956,-668.1 946.86,-674.39 935.99,-678.8 925.17,-681.89"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="924.14,-678.54 915.3,-684.37 925.85,-685.33 924.14,-678.54"/>
+</g>
+<!-- sourcefile~fe_manager.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node24" class="node">
+<title>sourcefile~fe_manager.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node24"><a xlink:href="../sourcefile/fe_manager.f90.html" xlink:title="fe_manager.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1110.5,-701.1 1012.5,-701.1 1012.5,-677.1 1110.5,-677.1 1110.5,-701.1"/>
+<text text-anchor="middle" x="1061.5" y="-686.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fe_manager.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~fe.f90&#45;&gt;sourcefile~fe_manager.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge71" class="edge">
+<title>sourcefile~fe.f90&#45;&gt;sourcefile~fe_manager.f90</title>
+<path fill="none" stroke="#54ff00" stroke-dasharray="5,2" d="M1194.5,-574.27C1169.06,-596.41 1115.05,-643.38 1084.59,-669.88"/>
+<polygon fill="#54ff00" stroke="#54ff00" points="1081.92,-667.57 1076.67,-676.77 1086.51,-672.85 1081.92,-667.57"/>
+</g>
+<!-- sourcefile~side_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node42" class="node">
+<title>sourcefile~side_interface.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node42"><a xlink:href="../sourcefile/side_interface.f90.html" xlink:title="side_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="730.5,-819.1 620.5,-819.1 620.5,-795.1 730.5,-795.1 730.5,-819.1"/>
+<text text-anchor="middle" x="675.5" y="-804.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">side_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~fe.f90&#45;&gt;sourcefile~side_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge84" class="edge">
+<title>sourcefile~fe.f90&#45;&gt;sourcefile~side_interface.f90</title>
+<path fill="none" stroke="#aa00ff" stroke-dasharray="5,2" d="M1205.84,-574.34C1198.94,-603 1177.66,-674.67 1131,-710.1 1115.41,-721.93 862.32,-771.55 740.74,-794.88"/>
+<polygon fill="#aa00ff" stroke="#aa00ff" points="739.96,-791.47 730.8,-796.79 741.28,-798.34 739.96,-791.47"/>
+</g>
+<!-- sourcefile~fe_base.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node19" class="node">
+<title>sourcefile~fe_base.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node19"><a xlink:href="../sourcefile/fe_base.f90.html" xlink:title="fe_base.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="713.5,-739.1 637.5,-739.1 637.5,-715.1 713.5,-715.1 713.5,-739.1"/>
+<text text-anchor="middle" x="675.5" y="-724.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fe_base.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~fe_base.f90&#45;&gt;sourcefile~fe_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge24" class="edge">
+<title>sourcefile~fe_base.f90&#45;&gt;sourcefile~fe_interface.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M637.13,-719.43C624.94,-716.18 611.57,-711.8 600,-706.1 564.72,-688.7 529.21,-659.86 507.78,-640.91"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="510.07,-638.26 500.29,-634.18 505.39,-643.46 510.07,-638.26"/>
+</g>
+<!-- sourcefile~fe_coefficients.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node20" class="node">
+<title>sourcefile~fe_coefficients.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node20"><a xlink:href="../sourcefile/fe_coefficients.f90.html" xlink:title="fe_coefficients.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="731.5,-697.1 619.5,-697.1 619.5,-673.1 731.5,-673.1 731.5,-697.1"/>
+<text text-anchor="middle" x="675.5" y="-682.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fe_coefficients.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~fe_coefficients.f90&#45;&gt;sourcefile~fe_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge25" class="edge">
+<title>sourcefile~fe_coefficients.f90&#45;&gt;sourcefile~fe_interface.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M629.41,-673.03C619.66,-670.25 609.45,-667.19 600,-664.1 575.6,-656.12 548.64,-646.1 527.24,-637.84"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="528.41,-634.55 517.82,-634.19 525.88,-641.07 528.41,-634.55"/>
+</g>
+<!-- sourcefile~fe_compute.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node21" class="node">
+<title>sourcefile~fe_compute.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node21"><a xlink:href="../sourcefile/fe_compute.f90.html" xlink:title="fe_compute.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="724.5,-655.1 626.5,-655.1 626.5,-631.1 724.5,-631.1 724.5,-655.1"/>
+<text text-anchor="middle" x="675.5" y="-640.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fe_compute.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~fe_compute.f90&#45;&gt;sourcefile~fe_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge26" class="edge">
+<title>sourcefile~fe_compute.f90&#45;&gt;sourcefile~fe_interface.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M626.34,-637.69C601.89,-634.94 571.97,-631.58 546.17,-628.69"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="546.47,-625.2 536.14,-627.56 545.69,-632.15 546.47,-625.2"/>
+</g>
+<!-- sourcefile~fe_factory.f90&#45;&gt;sourcefile~fe_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge27" class="edge">
+<title>sourcefile~fe_factory.f90&#45;&gt;sourcefile~fe_interface.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M827.85,-686.12C813.5,-683.24 798.29,-677.89 787,-668.1 755.08,-640.41 786.08,-603.65 751,-580.1 678.22,-531.24 569.07,-577.55 517.08,-605.04"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="515.18,-602.09 508.06,-609.93 518.52,-608.24 515.18,-602.09"/>
+</g>
+<!-- sourcefile~fe_factory.f90&#45;&gt;sourcefile~element_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge66" class="edge">
+<title>sourcefile~fe_factory.f90&#45;&gt;sourcefile~element_interface.f90</title>
+<path fill="none" stroke="#ff7f00" stroke-dasharray="5,2" d="M827.73,-686.81C813.2,-684.01 797.9,-678.54 787,-668.1 746.49,-629.28 789.74,-587.68 751,-547.1 747.77,-543.72 744.08,-540.78 740.11,-538.22"/>
+<polygon fill="#ff7f00" stroke="#ff7f00" points="741.48,-534.98 731.04,-533.2 738.1,-541.1 741.48,-534.98"/>
+</g>
+<!-- sourcefile~fe_factory.f90&#45;&gt;sourcefile~side_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge85" class="edge">
+<title>sourcefile~fe_factory.f90&#45;&gt;sourcefile~side_interface.f90</title>
+<path fill="none" stroke="#aa00ff" stroke-dasharray="5,2" d="M850.47,-701.28C815.89,-722.31 744.89,-765.5 705.12,-789.69"/>
+<polygon fill="#aa00ff" stroke="#aa00ff" points="703.15,-786.79 696.42,-794.98 706.78,-792.77 703.15,-786.79"/>
+</g>
+<!-- sourcefile~fe_interpolation.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node23" class="node">
+<title>sourcefile~fe_interpolation.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node23"><a xlink:href="../sourcefile/fe_interpolation.f90.html" xlink:title="fe_interpolation.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="735,-613.1 616,-613.1 616,-589.1 735,-589.1 735,-613.1"/>
+<text text-anchor="middle" x="675.5" y="-598.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fe_interpolation.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~fe_interpolation.f90&#45;&gt;sourcefile~fe_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge28" class="edge">
+<title>sourcefile~fe_interpolation.f90&#45;&gt;sourcefile~fe_interface.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M615.85,-607.68C593.65,-610.18 568.39,-613.01 546.19,-615.51"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="545.77,-612.03 536.22,-616.62 546.55,-618.99 545.77,-612.03"/>
+</g>
+<!-- sourcefile~fe_manager.f90&#45;&gt;sourcefile~fe_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge29" class="edge">
+<title>sourcefile~fe_manager.f90&#45;&gt;sourcefile~fe_interface.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1014.21,-701.15C912.65,-726.63 673.47,-780.99 600,-748.1 551.7,-726.47 515.59,-672.72 498.49,-642.88"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="501.53,-641.15 493.61,-634.11 495.41,-644.55 501.53,-641.15"/>
+</g>
+<!-- sourcefile~fe_manager.f90&#45;&gt;sourcefile~fe_factory.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge70" class="edge">
+<title>sourcefile~fe_manager.f90&#45;&gt;sourcefile~fe_factory.f90</title>
+<path fill="none" stroke="#aaff00" stroke-dasharray="5,2" d="M1012.09,-689.1C985.56,-689.1 952.63,-689.1 925.43,-689.1"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="925.31,-685.6 915.31,-689.1 925.31,-692.6 925.31,-685.6"/>
+</g>
+<!-- sourcefile~field.f90&#45;&gt;sourcefile~jacobian_matrix.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge42" class="edge">
+<title>sourcefile~field.f90&#45;&gt;sourcefile~jacobian_matrix.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1769.26,-679.1C1749.42,-679.1 1721.95,-679.1 1696.4,-679.1"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1696.36,-675.6 1686.36,-679.1 1696.36,-682.6 1696.36,-675.6"/>
+</g>
+<!-- sourcefile~field.f90&#45;&gt;sourcefile~residual_vector.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge48" class="edge">
+<title>sourcefile~field.f90&#45;&gt;sourcefile~residual_vector.f90</title>
+<path fill="none" stroke="#3200ff" stroke-dasharray="5,2" d="M1787.57,-691.29C1759.23,-726.09 1677.81,-826.08 1642.81,-869.06"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="1640.06,-866.9 1636.46,-876.86 1645.49,-871.32 1640.06,-866.9"/>
+</g>
+<!-- sourcefile~ftdss.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node26" class="node">
+<title>sourcefile~ftdss.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node26"><a xlink:href="../sourcefile/ftdss.f90.html" xlink:title="ftdss.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2334,-571.1 2274,-571.1 2274,-547.1 2334,-547.1 2334,-571.1"/>
+<text text-anchor="middle" x="2304" y="-556.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ftdss.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~ftdss.f90&#45;&gt;sourcefile~ftdss_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge31" class="edge">
+<title>sourcefile~ftdss.f90&#45;&gt;sourcefile~ftdss_interface.f90</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M2273.87,-550.82C2264.61,-547.55 2254.55,-543.31 2246,-538.1 2216.98,-520.39 2189,-492.63 2171.78,-473.92"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="2174.18,-471.35 2164.88,-466.27 2168.98,-476.04 2174.18,-471.35"/>
+</g>
+<!-- sourcefile~ftdss_assemble.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node27" class="node">
+<title>sourcefile~ftdss_assemble.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node27"><a xlink:href="../sourcefile/ftdss_assemble.f90.html" xlink:title="ftdss_assemble.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2362,-529.1 2246,-529.1 2246,-505.1 2362,-505.1 2362,-529.1"/>
+<text text-anchor="middle" x="2304" y="-514.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ftdss_assemble.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~ftdss_assemble.f90&#45;&gt;sourcefile~ftdss_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge32" class="edge">
+<title>sourcefile~ftdss_assemble.f90&#45;&gt;sourcefile~ftdss_interface.f90</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M2269.08,-505.09C2261.44,-502.25 2253.41,-499.16 2246,-496.1 2226.78,-488.16 2205.66,-478.53 2188.56,-470.49"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="2190.05,-467.32 2179.51,-466.21 2187.06,-473.65 2190.05,-467.32"/>
+</g>
+<!-- sourcefile~ftdss_base.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node28" class="node">
+<title>sourcefile~ftdss_base.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node28"><a xlink:href="../sourcefile/ftdss_base.f90.html" xlink:title="ftdss_base.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2349.5,-487.1 2258.5,-487.1 2258.5,-463.1 2349.5,-463.1 2349.5,-487.1"/>
+<text text-anchor="middle" x="2304" y="-472.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ftdss_base.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~ftdss_base.f90&#45;&gt;sourcefile~ftdss_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge33" class="edge">
+<title>sourcefile~ftdss_base.f90&#45;&gt;sourcefile~ftdss_interface.f90</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M2258.45,-468.8C2246.45,-467.1 2233.21,-465.23 2220.31,-463.4"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="2220.47,-459.89 2210.08,-461.96 2219.49,-466.82 2220.47,-459.89"/>
+</g>
+<!-- sourcefile~ftdss_boundary.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node29" class="node">
+<title>sourcefile~ftdss_boundary.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node29"><a xlink:href="../sourcefile/ftdss_boundary.f90.html" xlink:title="ftdss_boundary.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2361.5,-445.1 2246.5,-445.1 2246.5,-421.1 2361.5,-421.1 2361.5,-445.1"/>
+<text text-anchor="middle" x="2304" y="-430.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ftdss_boundary.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~ftdss_boundary.f90&#45;&gt;sourcefile~ftdss_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge34" class="edge">
+<title>sourcefile~ftdss_boundary.f90&#45;&gt;sourcefile~ftdss_interface.f90</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M2246.43,-441.1C2237.95,-442.3 2229.14,-443.54 2220.48,-444.77"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="2219.83,-441.32 2210.42,-446.19 2220.81,-448.25 2219.83,-441.32"/>
+</g>
+<!-- sourcefile~ftdss_compute.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node30" class="node">
+<title>sourcefile~ftdss_compute.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node30"><a xlink:href="../sourcefile/ftdss_compute.f90.html" xlink:title="ftdss_compute.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2360,-403.1 2248,-403.1 2248,-379.1 2360,-379.1 2360,-403.1"/>
+<text text-anchor="middle" x="2304" y="-388.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ftdss_compute.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~ftdss_compute.f90&#45;&gt;sourcefile~ftdss_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge35" class="edge">
+<title>sourcefile~ftdss_compute.f90&#45;&gt;sourcefile~ftdss_interface.f90</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M2269.08,-403.1C2261.44,-405.94 2253.41,-409.04 2246,-412.1 2226.78,-420.03 2205.66,-429.66 2188.56,-437.7"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="2187.06,-434.54 2179.51,-441.98 2190.05,-440.87 2187.06,-434.54"/>
+</g>
+<!-- sourcefile~ftdss_solve.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node31" class="node">
+<title>sourcefile~ftdss_solve.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node31"><a xlink:href="../sourcefile/ftdss_solve.f90.html" xlink:title="ftdss_solve.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2350.5,-361.1 2257.5,-361.1 2257.5,-337.1 2350.5,-337.1 2350.5,-361.1"/>
+<text text-anchor="middle" x="2304" y="-346.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ftdss_solve.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~ftdss_solve.f90&#45;&gt;sourcefile~ftdss_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge36" class="edge">
+<title>sourcefile~ftdss_solve.f90&#45;&gt;sourcefile~ftdss_interface.f90</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M2264.03,-361.13C2257.8,-363.7 2251.58,-366.69 2246,-370.1 2216.98,-387.8 2189,-415.56 2171.78,-434.28"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="2168.98,-432.16 2164.88,-441.93 2174.18,-436.85 2168.98,-432.16"/>
+</g>
+<!-- sourcefile~hydraulic.f90&#45;&gt;sourcefile~hydraulic_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge37" class="edge">
+<title>sourcefile~hydraulic.f90&#45;&gt;sourcefile~hydraulic_interface.f90</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1942.98,-354.56C1923.77,-355.71 1900.28,-357.1 1877.92,-358.43"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1877.52,-354.95 1867.75,-359.04 1877.94,-361.94 1877.52,-354.95"/>
+</g>
+<!-- sourcefile~hydraulic_base.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node33" class="node">
+<title>sourcefile~hydraulic_base.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node33"><a xlink:href="../sourcefile/hydraulic_base.f90.html" xlink:title="hydraulic_base.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2043,-322.1 1928,-322.1 1928,-298.1 2043,-298.1 2043,-322.1"/>
+<text text-anchor="middle" x="1985.5" y="-307.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hydraulic_base.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~hydraulic_base.f90&#45;&gt;sourcefile~hydraulic_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge38" class="edge">
+<title>sourcefile~hydraulic_base.f90&#45;&gt;sourcefile~hydraulic_interface.f90</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1941.12,-322.15C1930.9,-325.04 1920.06,-328.14 1910,-331.1 1893.95,-335.81 1890.05,-337.38 1874,-342.1 1867.09,-344.13 1859.8,-346.23 1852.6,-348.28"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1851.54,-344.94 1842.88,-351.04 1853.46,-351.68 1851.54,-344.94"/>
+</g>
+<!-- sourcefile~hydraulic_coefficients.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node34" class="node">
+<title>sourcefile~hydraulic_coefficients.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node34"><a xlink:href="../sourcefile/hydraulic_coefficients.f90.html" xlink:title="hydraulic_coefficients.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2061,-280.1 1910,-280.1 1910,-256.1 2061,-256.1 2061,-280.1"/>
+<text text-anchor="middle" x="1985.5" y="-265.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hydraulic_coefficients.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~hydraulic_coefficients.f90&#45;&gt;sourcefile~hydraulic_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge39" class="edge">
+<title>sourcefile~hydraulic_coefficients.f90&#45;&gt;sourcefile~hydraulic_interface.f90</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1926.1,-280.17C1920.39,-282.62 1914.91,-285.56 1910,-289.1 1886.9,-305.74 1897.1,-325.45 1874,-342.1 1871.78,-343.7 1869.44,-345.18 1867.01,-346.55"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1865.34,-343.47 1857.9,-351.02 1868.42,-349.75 1865.34,-343.47"/>
+</g>
+<!-- sourcefile~hydraulic_matrix.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node35" class="node">
+<title>sourcefile~hydraulic_matrix.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node35"><a xlink:href="../sourcefile/hydraulic_matrix.f90.html" xlink:title="hydraulic_matrix.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2047.5,-238.1 1923.5,-238.1 1923.5,-214.1 2047.5,-214.1 2047.5,-238.1"/>
+<text text-anchor="middle" x="1985.5" y="-223.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hydraulic_matrix.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~hydraulic_matrix.f90&#45;&gt;sourcefile~hydraulic_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge40" class="edge">
+<title>sourcefile~hydraulic_matrix.f90&#45;&gt;sourcefile~hydraulic_interface.f90</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1923.35,-237.96C1918.51,-240.46 1913.96,-243.47 1910,-247.1 1876.71,-277.6 1907.29,-311.6 1874,-342.1 1872.67,-343.31 1871.28,-344.46 1869.83,-345.54"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1867.64,-342.78 1861.01,-351.04 1871.35,-348.72 1867.64,-342.78"/>
+</g>
+<!-- sourcefile~main_base.f90&#45;&gt;sourcefile~control.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge18" class="edge">
+<title>sourcefile~main_base.f90&#45;&gt;sourcefile~control.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1614.29,-390.89C1581,-352.55 1470.95,-237.1 1353,-237.1 1353,-237.1 1353,-237.1 1208.5,-237.1 1133.83,-237.1 937.82,-273.27 872.5,-237.1"/>
+</g>
+<!-- sourcefile~main_base.f90&#45;&gt;sourcefile~domain.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge95" class="edge">
+<title>sourcefile~main_base.f90&#45;&gt;sourcefile~domain.f90</title>
+<path fill="none" stroke="#ffcc00" stroke-dasharray="5,2" d="M1614.25,-415.31C1591.28,-442.66 1535.55,-509.04 1507.58,-542.35"/>
+<polygon fill="#ffcc00" stroke="#ffcc00" points="1504.86,-540.15 1501.11,-550.06 1510.22,-544.65 1504.86,-540.15"/>
+</g>
+<!-- sourcefile~output_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node37" class="node">
+<title>sourcefile~output_interface.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node37"><a xlink:href="../sourcefile/output_interface.f90.html" xlink:title="output_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1687,-211.1 1564,-211.1 1564,-187.1 1687,-187.1 1687,-211.1"/>
+<text text-anchor="middle" x="1625.5" y="-196.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">output_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~output_interface.f90&#45;&gt;sourcefile~control.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge19" class="edge">
+<title>sourcefile~output_interface.f90&#45;&gt;sourcefile~control.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1563.94,-201.12C1541.06,-201.35 1514.8,-200.98 1491,-199.1"/>
+</g>
+<!-- sourcefile~output_interface.f90&#45;&gt;sourcefile~domain.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge96" class="edge">
+<title>sourcefile~output_interface.f90&#45;&gt;sourcefile~domain.f90</title>
+<path fill="none" stroke="#ffcc00" stroke-dasharray="5,2" d="M1581.92,-211.18C1575.14,-214.72 1568.8,-219.27 1564,-225.1 1523.7,-274.01 1500.12,-472.57 1493.18,-539.76"/>
+<polygon fill="#ffcc00" stroke="#ffcc00" points="1489.66,-539.74 1492.14,-550.04 1496.63,-540.44 1489.66,-539.74"/>
+</g>
+<!-- sourcefile~output_overall_base.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node38" class="node">
+<title>sourcefile~output_overall_base.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node38"><a xlink:href="../sourcefile/output_overall_base.f90.html" xlink:title="output_overall_base.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1869.5,-85.1 1727.5,-85.1 1727.5,-61.1 1869.5,-61.1 1869.5,-85.1"/>
+<text text-anchor="middle" x="1798.5" y="-70.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">output_overall_base.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~output_overall_base.f90&#45;&gt;sourcefile~control.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge20" class="edge">
+<title>sourcefile~output_overall_base.f90&#45;&gt;sourcefile~control.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1771.87,-85.2C1703.64,-117.21 1520.75,-201.45 1491,-199.1"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1489,-199.1C1394.92,-192.57 1368.46,-180.29 1288,-131.1 1268.96,-119.46 1272.27,-105.43 1252,-96.1 1157.75,-52.67 890.16,-64.4 787,-53.1 765.56,-50.75 741.82,-47.79 721.86,-45.19"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="722.17,-41.7 711.8,-43.88 721.26,-48.65 722.17,-41.7"/>
+</g>
+<!-- sourcefile~output_overall_base.f90&#45;&gt;sourcefile~output_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge80" class="edge">
+<title>sourcefile~output_overall_base.f90&#45;&gt;sourcefile~output_interface.f90</title>
+<path fill="none" stroke="#002aff" stroke-dasharray="5,2" d="M1745.7,-85.2C1737.48,-88.73 1729.55,-93.27 1723,-99.1 1695.67,-123.4 1713.46,-147.85 1687,-173.1 1683.41,-176.52 1679.31,-179.52 1674.96,-182.16"/>
+<polygon fill="#002aff" stroke="#002aff" points="1672.96,-179.26 1665.79,-187.07 1676.26,-185.44 1672.96,-179.26"/>
+</g>
+<!-- sourcefile~preconditioner_iluk.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node39" class="node">
+<title>sourcefile~preconditioner_iluk.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node39"><a xlink:href="../sourcefile/preconditioner_iluk.f90.html" xlink:title="preconditioner_iluk.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="744,-377.1 607,-377.1 607,-353.1 744,-353.1 744,-377.1"/>
+<text text-anchor="middle" x="675.5" y="-362.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">preconditioner_iluk.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~preconditioner_iluk.f90&#45;&gt;sourcefile~precondition_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge43" class="edge">
+<title>sourcefile~preconditioner_iluk.f90&#45;&gt;sourcefile~precondition_interface.f90</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M620.91,-353.06C599.1,-348.16 573.72,-342.46 550.99,-337.36"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="551.62,-333.91 541.09,-335.13 550.08,-340.74 551.62,-333.91"/>
+</g>
+<!-- sourcefile~preconditioner_jacobi.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node40" class="node">
+<title>sourcefile~preconditioner_jacobi.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node40"><a xlink:href="../sourcefile/preconditioner_jacobi.f90.html" xlink:title="preconditioner_jacobi.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="751,-335.1 600,-335.1 600,-311.1 751,-311.1 751,-335.1"/>
+<text text-anchor="middle" x="675.5" y="-320.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">preconditioner_jacobi.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~preconditioner_jacobi.f90&#45;&gt;sourcefile~precondition_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge44" class="edge">
+<title>sourcefile~preconditioner_jacobi.f90&#45;&gt;sourcefile~precondition_interface.f90</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M599.79,-323.1C591.47,-323.1 582.94,-323.1 574.49,-323.1"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="574.24,-319.6 564.24,-323.1 574.24,-326.6 574.24,-319.6"/>
+</g>
+<!-- sourcefile~preconditioner_none.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node41" class="node">
+<title>sourcefile~preconditioner_none.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node41"><a xlink:href="../sourcefile/preconditioner_none.f90.html" xlink:title="preconditioner_none.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="748,-293.1 603,-293.1 603,-269.1 748,-269.1 748,-293.1"/>
+<text text-anchor="middle" x="675.5" y="-278.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">preconditioner_none.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~preconditioner_none.f90&#45;&gt;sourcefile~precondition_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge45" class="edge">
+<title>sourcefile~preconditioner_none.f90&#45;&gt;sourcefile~precondition_interface.f90</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M620.91,-293.13C599.1,-298.03 573.72,-303.73 550.99,-308.84"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="550.08,-305.45 541.09,-311.06 551.62,-312.28 550.08,-305.45"/>
+</g>
+<!-- sourcefile~side_interface.f90&#45;&gt;sourcefile~fe_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge30" class="edge">
+<title>sourcefile~side_interface.f90&#45;&gt;sourcefile~fe_interface.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M625.8,-795C616.7,-791.42 607.66,-786.86 600,-781.1 550.3,-743.68 513.94,-677.93 497.4,-643.89"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="500.36,-641.95 492.92,-634.41 494.03,-644.95 500.36,-641.95"/>
+</g>
+<!-- sourcefile~solve_bicgstab.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node43" class="node">
+<title>sourcefile~solve_bicgstab.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node43"><a xlink:href="../sourcefile/solve_bicgstab.f90.html" xlink:title="solve_bicgstab.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="928,-327.1 815,-327.1 815,-303.1 928,-303.1 928,-327.1"/>
+<text text-anchor="middle" x="871.5" y="-312.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_bicgstab.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~solve_bicgstab.f90&#45;&gt;sourcefile~solver_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge49" class="edge">
+<title>sourcefile~solve_bicgstab.f90&#45;&gt;sourcefile~solver_interface.f90</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M821.13,-303.09C809.59,-299.38 797.58,-294.74 787,-289.1 768.87,-279.43 769.26,-269.52 751,-260.1 747.24,-258.15 743.27,-256.37 739.22,-254.74"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="740.21,-251.38 729.62,-251.2 737.79,-257.95 740.21,-251.38"/>
+</g>
+<!-- sourcefile~solve_gmres.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node44" class="node">
+<title>sourcefile~solve_gmres.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node44"><a xlink:href="../sourcefile/solve_gmres.f90.html" xlink:title="solve_gmres.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="922,-369.1 821,-369.1 821,-345.1 922,-345.1 922,-369.1"/>
+<text text-anchor="middle" x="871.5" y="-354.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_gmres.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~solve_gmres.f90&#45;&gt;sourcefile~solver_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge50" class="edge">
+<title>sourcefile~solve_gmres.f90&#45;&gt;sourcefile~solver_interface.f90</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M820.78,-352.07C808.74,-348.94 796.59,-343.97 787,-336.1 758.11,-312.38 779.55,-284.22 751,-260.1 749.21,-258.58 747.31,-257.17 745.34,-255.87"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="746.67,-252.6 736.23,-250.77 743.25,-258.71 746.67,-252.6"/>
+</g>
+<!-- sourcefile~solver.f90&#45;&gt;sourcefile~precondition_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge46" class="edge">
+<title>sourcefile~solver.f90&#45;&gt;sourcefile~precondition_interface.f90</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M838.47,-405.6C787.02,-408.64 683.27,-410.64 600,-386.1 567.35,-376.47 533.8,-356.06 511.93,-341.06"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="513.79,-338.09 503.59,-335.22 509.77,-343.82 513.79,-338.09"/>
+</g>
+<!-- sourcefile~solver.f90&#45;&gt;sourcefile~solver_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge51" class="edge">
+<title>sourcefile~solver.f90&#45;&gt;sourcefile~solver_interface.f90</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M838.23,-400.71C820.96,-397.81 800.52,-391.54 787,-378.1 748.13,-339.43 790.18,-298.45 751,-260.1 749.11,-258.25 747.07,-256.56 744.91,-255.01"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="746.48,-251.87 736.1,-249.76 742.89,-257.88 746.48,-251.87"/>
+</g>
+<!-- sourcefile~thermal.f90&#45;&gt;sourcefile~thermal_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge52" class="edge">
+<title>sourcefile~thermal.f90&#45;&gt;sourcefile~thermal_interface.f90</title>
+<path fill="none" stroke="#ff0098" stroke-dasharray="5,2" d="M1946.62,-505.45C1919.45,-497.81 1882.5,-487.43 1852.43,-478.97"/>
+<polygon fill="#ff0098" stroke="#ff0098" points="1853.09,-475.52 1842.52,-476.19 1851.19,-482.26 1853.09,-475.52"/>
+</g>
+<!-- sourcefile~thermal_base.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node47" class="node">
+<title>sourcefile~thermal_base.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node47"><a xlink:href="../sourcefile/thermal_base.f90.html" xlink:title="thermal_base.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2039.5,-486.1 1931.5,-486.1 1931.5,-462.1 2039.5,-462.1 2039.5,-486.1"/>
+<text text-anchor="middle" x="1985.5" y="-471.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">thermal_base.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~thermal_base.f90&#45;&gt;sourcefile~thermal_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge53" class="edge">
+<title>sourcefile~thermal_base.f90&#45;&gt;sourcefile~thermal_interface.f90</title>
+<path fill="none" stroke="#ff0098" stroke-dasharray="5,2" d="M1931.49,-471.23C1913.48,-470.26 1893.02,-469.15 1873.68,-468.11"/>
+<polygon fill="#ff0098" stroke="#ff0098" points="1873.86,-464.61 1863.68,-467.57 1873.48,-471.6 1873.86,-464.61"/>
+</g>
+<!-- sourcefile~thermal_coefficients.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node48" class="node">
+<title>sourcefile~thermal_coefficients.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node48"><a xlink:href="../sourcefile/thermal_coefficients.f90.html" xlink:title="thermal_coefficients.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2057.5,-444.1 1913.5,-444.1 1913.5,-420.1 2057.5,-420.1 2057.5,-444.1"/>
+<text text-anchor="middle" x="1985.5" y="-429.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">thermal_coefficients.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~thermal_coefficients.f90&#45;&gt;sourcefile~thermal_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge54" class="edge">
+<title>sourcefile~thermal_coefficients.f90&#45;&gt;sourcefile~thermal_interface.f90</title>
+<path fill="none" stroke="#ff0098" stroke-dasharray="5,2" d="M1915.09,-444.1C1901.69,-446.42 1887.6,-448.86 1874.04,-451.2"/>
+<polygon fill="#ff0098" stroke="#ff0098" points="1873.06,-447.82 1863.8,-452.97 1874.25,-454.72 1873.06,-447.82"/>
+</g>
+<!-- sourcefile~thermal_matrix.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node49" class="node">
+<title>sourcefile~thermal_matrix.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node49"><a xlink:href="../sourcefile/thermal_matrix.f90.html" xlink:title="thermal_matrix.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2044,-570.1 1927,-570.1 1927,-546.1 2044,-546.1 2044,-570.1"/>
+<text text-anchor="middle" x="1985.5" y="-555.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">thermal_matrix.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~thermal_matrix.f90&#45;&gt;sourcefile~thermal_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge55" class="edge">
+<title>sourcefile~thermal_matrix.f90&#45;&gt;sourcefile~thermal_interface.f90</title>
+<path fill="none" stroke="#ff0098" stroke-dasharray="5,2" d="M1933.65,-546.04C1925.58,-543.49 1917.45,-540.51 1910,-537.1 1877.84,-522.38 1844.44,-498.99 1822.89,-482.67"/>
+<polygon fill="#ff0098" stroke="#ff0098" points="1824.76,-479.69 1814.7,-476.37 1820.49,-485.24 1824.76,-479.69"/>
+</g>
+<!-- sourcefile~boundary.f90&#45;&gt;sourcefile~boundary_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge56" class="edge">
+<title>sourcefile~boundary.f90&#45;&gt;sourcefile~boundary_interface.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1171.85,-129.16C1159.07,-132.79 1144.54,-136.29 1131,-138.1 1071.05,-146.07 1002.58,-145.38 951.18,-142.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="951.29,-139.43 941.13,-142.41 950.94,-146.42 951.29,-139.43"/>
+</g>
+<!-- sourcefile~boundary.f90&#45;&gt;sourcefile~boundary_manager.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge59" class="edge">
+<title>sourcefile~boundary.f90&#45;&gt;sourcefile~boundary_manager.f90</title>
+<path fill="none" stroke="#ff2a00" stroke-dasharray="5,2" d="M1193.48,-129.24C1178.37,-141.04 1154.06,-158.92 1131,-171.1 1123.96,-174.81 1116.27,-178.26 1108.67,-181.36"/>
+<polygon fill="#ff2a00" stroke="#ff2a00" points="1107.18,-178.18 1099.14,-185.09 1109.73,-184.7 1107.18,-178.18"/>
+</g>
+<!-- sourcefile~boundary_base.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node51" class="node">
+<title>sourcefile~boundary_base.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node51"><a xlink:href="../sourcefile/boundary_base.f90.html" xlink:title="boundary_base.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1120,-129.1 1003,-129.1 1003,-105.1 1120,-105.1 1120,-129.1"/>
+<text text-anchor="middle" x="1061.5" y="-114.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">boundary_base.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~boundary_base.f90&#45;&gt;sourcefile~boundary_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge57" class="edge">
+<title>sourcefile~boundary_base.f90&#45;&gt;sourcefile~boundary_interface.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1002.82,-123.23C986.58,-124.96 968.62,-126.87 951.37,-128.71"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="950.89,-125.24 941.31,-129.78 951.63,-132.2 950.89,-125.24"/>
+</g>
+<!-- sourcefile~domain.f90&#45;&gt;sourcefile~domain_manager.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge60" class="edge">
+<title>sourcefile~domain.f90&#45;&gt;sourcefile~domain_manager.f90</title>
+<path fill="none" stroke="#ff5400" stroke-dasharray="5,2" d="M1451.84,-551.17C1436.99,-546.8 1419.65,-541.7 1403.68,-537"/>
+<polygon fill="#ff5400" stroke="#ff5400" points="1404.52,-533.6 1393.94,-534.14 1402.55,-540.32 1404.52,-533.6"/>
+</g>
+<!-- sourcefile~domain.f90&#45;&gt;sourcefile~fe.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge67" class="edge">
+<title>sourcefile~domain.f90&#45;&gt;sourcefile~fe.f90</title>
+<path fill="none" stroke="#ffaa00" stroke-dasharray="5,2" d="M1451.73,-562.1C1398.2,-562.1 1300.18,-562.1 1247.05,-562.1"/>
+<polygon fill="#ffaa00" stroke="#ffaa00" points="1246.74,-558.6 1236.74,-562.1 1246.74,-565.6 1246.74,-558.6"/>
+</g>
+<!-- sourcefile~element_square_first.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node53" class="node">
+<title>sourcefile~element_square_first.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node53"><a xlink:href="../sourcefile/element_square_first.f90.html" xlink:title="element_square_first.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="944.5,-659.1 798.5,-659.1 798.5,-635.1 944.5,-635.1 944.5,-659.1"/>
+<text text-anchor="middle" x="871.5" y="-644.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">element_square_first.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~element_square_first.f90&#45;&gt;sourcefile~element_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge61" class="edge">
+<title>sourcefile~element_square_first.f90&#45;&gt;sourcefile~element_interface.f90</title>
+<path fill="none" stroke="#ff7f00" stroke-dasharray="5,2" d="M801.06,-635.06C796.01,-632.59 791.25,-629.64 787,-626.1 757.36,-601.39 779.51,-573.1 751,-547.1 747.11,-543.55 742.72,-540.49 738.05,-537.83"/>
+<polygon fill="#ff7f00" stroke="#ff7f00" points="739.32,-534.56 728.81,-533.23 736.2,-540.82 739.32,-534.56"/>
+</g>
+<!-- sourcefile~element_square_second.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node54" class="node">
+<title>sourcefile~element_square_second.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node54"><a xlink:href="../sourcefile/element_square_second.f90.html" xlink:title="element_square_second.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="953.5,-617.1 789.5,-617.1 789.5,-593.1 953.5,-593.1 953.5,-617.1"/>
+<text text-anchor="middle" x="871.5" y="-602.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">element_square_second.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~element_square_second.f90&#45;&gt;sourcefile~element_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge62" class="edge">
+<title>sourcefile~element_square_second.f90&#45;&gt;sourcefile~element_interface.f90</title>
+<path fill="none" stroke="#ff7f00" stroke-dasharray="5,2" d="M806.58,-592.97C799.75,-590.53 793.09,-587.6 787,-584.1 767.12,-572.64 770.35,-559.43 751,-547.1 744.88,-543.2 738.11,-539.8 731.22,-536.86"/>
+<polygon fill="#ff7f00" stroke="#ff7f00" points="732.37,-533.56 721.79,-533.14 729.8,-540.07 732.37,-533.56"/>
+</g>
+<!-- sourcefile~element_triangle_first.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node55" class="node">
+<title>sourcefile~element_triangle_first.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node55"><a xlink:href="../sourcefile/element_triangle_first.f90.html" xlink:title="element_triangle_first.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="947,-575.1 796,-575.1 796,-551.1 947,-551.1 947,-575.1"/>
+<text text-anchor="middle" x="871.5" y="-560.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">element_triangle_first.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~element_triangle_first.f90&#45;&gt;sourcefile~element_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge63" class="edge">
+<title>sourcefile~element_triangle_first.f90&#45;&gt;sourcefile~element_interface.f90</title>
+<path fill="none" stroke="#ff7f00" stroke-dasharray="5,2" d="M814.91,-551.06C792.18,-546.14 765.72,-540.41 742.05,-535.29"/>
+<polygon fill="#ff7f00" stroke="#ff7f00" points="742.61,-531.83 732.1,-533.13 741.13,-538.67 742.61,-531.83"/>
+</g>
+<!-- sourcefile~element_triangle_second.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node56" class="node">
+<title>sourcefile~element_triangle_second.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node56"><a xlink:href="../sourcefile/element_triangle_second.f90.html" xlink:title="element_triangle_second.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="956,-533.1 787,-533.1 787,-509.1 956,-509.1 956,-533.1"/>
+<text text-anchor="middle" x="871.5" y="-518.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">element_triangle_second.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~element_triangle_second.f90&#45;&gt;sourcefile~element_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge64" class="edge">
+<title>sourcefile~element_triangle_second.f90&#45;&gt;sourcefile~element_interface.f90</title>
+<path fill="none" stroke="#ff7f00" stroke-dasharray="5,2" d="M786.82,-521.1C775.36,-521.1 763.64,-521.1 752.33,-521.1"/>
+<polygon fill="#ff7f00" stroke="#ff7f00" points="752.07,-517.6 742.07,-521.1 752.07,-524.6 752.07,-517.6"/>
+</g>
+<!-- sourcefile~output.f90~2&#45;&gt;sourcefile~output_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge77" class="edge">
+<title>sourcefile~output.f90~2&#45;&gt;sourcefile~output_interface.f90</title>
+<path fill="none" stroke="#002aff" stroke-dasharray="5,2" d="M1953.44,-142.08C1902.71,-124.45 1799.99,-97.24 1723,-132.1 1700.91,-142.1 1706.62,-158.85 1687,-173.1 1682.14,-176.62 1676.73,-179.8 1671.19,-182.62"/>
+<polygon fill="#002aff" stroke="#002aff" points="1669.4,-179.6 1661.84,-187.02 1672.38,-185.93 1669.4,-179.6"/>
+</g>
+<!-- sourcefile~output_base.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node58" class="node">
+<title>sourcefile~output_base.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node58"><a xlink:href="../sourcefile/output_base.f90.html" xlink:title="output_base.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1848.5,-333.1 1748.5,-333.1 1748.5,-309.1 1848.5,-309.1 1848.5,-333.1"/>
+<text text-anchor="middle" x="1798.5" y="-318.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">output_base.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~output_base.f90&#45;&gt;sourcefile~output_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge78" class="edge">
+<title>sourcefile~output_base.f90&#45;&gt;sourcefile~output_interface.f90</title>
+<path fill="none" stroke="#002aff" stroke-dasharray="5,2" d="M1748.46,-313.66C1739.29,-310.58 1730.3,-306.24 1723,-300.1 1694.7,-276.3 1713.68,-250.69 1687,-225.1 1683.42,-221.67 1679.32,-218.65 1674.98,-216.01"/>
+<polygon fill="#002aff" stroke="#002aff" points="1676.28,-212.74 1665.81,-211.1 1672.98,-218.91 1676.28,-212.74"/>
+</g>
+<!-- sourcefile~output_observation.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node59" class="node">
+<title>sourcefile~output_observation.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node59"><a xlink:href="../sourcefile/output_observation.f90.html" xlink:title="output_observation.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1867.5,-291.1 1729.5,-291.1 1729.5,-267.1 1867.5,-267.1 1867.5,-291.1"/>
+<text text-anchor="middle" x="1798.5" y="-276.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">output_observation.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~output_observation.f90&#45;&gt;sourcefile~output_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge79" class="edge">
+<title>sourcefile~output_observation.f90&#45;&gt;sourcefile~output_interface.f90</title>
+<path fill="none" stroke="#002aff" stroke-dasharray="5,2" d="M1742.99,-266.96C1736.06,-264.49 1729.22,-261.56 1723,-258.1 1704.04,-247.53 1705.23,-236.88 1687,-225.1 1681.58,-221.59 1675.61,-218.37 1669.6,-215.48"/>
+<polygon fill="#002aff" stroke="#002aff" points="1670.73,-212.15 1660.18,-211.2 1667.84,-218.52 1670.73,-212.15"/>
+</g>
+<!-- sourcefile~output_overall_vtk.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node60" class="node">
+<title>sourcefile~output_overall_vtk.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node60"><a xlink:href="../sourcefile/output_overall_vtk.f90.html" xlink:title="output_overall_vtk.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1865,-249.1 1732,-249.1 1732,-225.1 1865,-225.1 1865,-249.1"/>
+<text text-anchor="middle" x="1798.5" y="-234.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">output_overall_vtk.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~output_overall_vtk.f90&#45;&gt;sourcefile~output_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge81" class="edge">
+<title>sourcefile~output_overall_vtk.f90&#45;&gt;sourcefile~output_interface.f90</title>
+<path fill="none" stroke="#002aff" stroke-dasharray="5,2" d="M1743.39,-225.07C1726.63,-221.35 1707.99,-217.2 1690.61,-213.34"/>
+<polygon fill="#002aff" stroke="#002aff" points="1691.07,-209.86 1680.55,-211.11 1689.55,-216.69 1691.07,-209.86"/>
+</g>
+<!-- sourcefile~output_overall_vtu.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node61" class="node">
+<title>sourcefile~output_overall_vtu.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node61"><a xlink:href="../sourcefile/output_overall_vtu.f90.html" xlink:title="output_overall_vtu.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1865,-207.1 1732,-207.1 1732,-183.1 1865,-183.1 1865,-207.1"/>
+<text text-anchor="middle" x="1798.5" y="-192.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">output_overall_vtu.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~output_overall_vtu.f90&#45;&gt;sourcefile~output_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge82" class="edge">
+<title>sourcefile~output_overall_vtu.f90&#45;&gt;sourcefile~output_interface.f90</title>
+<path fill="none" stroke="#002aff" stroke-dasharray="5,2" d="M1731.88,-196.63C1720.63,-196.89 1708.89,-197.17 1697.51,-197.44"/>
+<polygon fill="#002aff" stroke="#002aff" points="1697.09,-193.94 1687.18,-197.68 1697.26,-200.94 1697.09,-193.94"/>
+</g>
+<!-- sourcefile~output_system_logger.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node62" class="node">
+<title>sourcefile~output_system_logger.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node62"><a xlink:href="../sourcefile/output_system_logger.f90.html" xlink:title="output_system_logger.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1874,-165.1 1723,-165.1 1723,-141.1 1874,-141.1 1874,-165.1"/>
+<text text-anchor="middle" x="1798.5" y="-150.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">output_system_logger.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~output_system_logger.f90&#45;&gt;sourcefile~output_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge83" class="edge">
+<title>sourcefile~output_system_logger.f90&#45;&gt;sourcefile~output_interface.f90</title>
+<path fill="none" stroke="#002aff" stroke-dasharray="5,2" d="M1752.57,-165.18C1730.58,-171.1 1703.92,-178.27 1680.8,-184.49"/>
+<polygon fill="#002aff" stroke="#002aff" points="1679.88,-181.11 1671.13,-187.09 1681.69,-187.87 1679.88,-181.11"/>
+</g>
+<!-- sourcefile~side_first.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node63" class="node">
+<title>sourcefile~side_first.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node63"><a xlink:href="../sourcefile/side_first.f90.html" xlink:title="side_first.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="912.5,-819.1 830.5,-819.1 830.5,-795.1 912.5,-795.1 912.5,-819.1"/>
+<text text-anchor="middle" x="871.5" y="-804.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">side_first.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~side_first.f90&#45;&gt;sourcefile~side_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge86" class="edge">
+<title>sourcefile~side_first.f90&#45;&gt;sourcefile~side_interface.f90</title>
+<path fill="none" stroke="#aa00ff" stroke-dasharray="5,2" d="M830.3,-807.1C804.49,-807.1 770.39,-807.1 740.86,-807.1"/>
+<polygon fill="#aa00ff" stroke="#aa00ff" points="740.63,-803.6 730.63,-807.1 740.63,-810.6 740.63,-803.6"/>
+</g>
+<!-- sourcefile~side_second.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node64" class="node">
+<title>sourcefile~side_second.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node64"><a xlink:href="../sourcefile/side_second.f90.html" xlink:title="side_second.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="921.5,-861.1 821.5,-861.1 821.5,-837.1 921.5,-837.1 921.5,-861.1"/>
+<text text-anchor="middle" x="871.5" y="-846.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">side_second.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~side_second.f90&#45;&gt;sourcefile~side_interface.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge87" class="edge">
+<title>sourcefile~side_second.f90&#45;&gt;sourcefile~side_interface.f90</title>
+<path fill="none" stroke="#aa00ff" stroke-dasharray="5,2" d="M821.29,-838.44C796.81,-833.14 766.9,-826.67 740.64,-820.98"/>
+<polygon fill="#aa00ff" stroke="#aa00ff" points="741.29,-817.54 730.78,-818.85 739.81,-824.38 741.29,-817.54"/>
+</g>
+<!-- sourcefile~initial_manager.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_node65" class="node">
+<title>sourcefile~initial_manager.f90</title>
+<g id="a_sourcefile~~mkl_backend.f90~~AfferentGraph_node65"><a xlink:href="../sourcefile/initial_manager.f90.html" xlink:title="initial_manager.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1684,-647.1 1567,-647.1 1567,-623.1 1684,-623.1 1684,-647.1"/>
+<text text-anchor="middle" x="1625.5" y="-632.7" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initial_manager.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~initial_manager.f90&#45;&gt;sourcefile~domain.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge93" class="edge">
+<title>sourcefile~initial_manager.f90&#45;&gt;sourcefile~domain.f90</title>
+<path fill="none" stroke="#ffcc00" stroke-dasharray="5,2" d="M1602.46,-623.04C1580.52,-611.05 1546.67,-592.54 1522.03,-579.06"/>
+<polygon fill="#ffcc00" stroke="#ffcc00" points="1523.53,-575.9 1513.08,-574.17 1520.17,-582.04 1523.53,-575.9"/>
+</g>
+<!-- sourcefile~initial.f90&#45;&gt;sourcefile~initial_manager.f90 -->
+<g id="sourcefile~~mkl_backend.f90~~AfferentGraph_edge99" class="edge">
+<title>sourcefile~initial.f90&#45;&gt;sourcefile~initial_manager.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1953.36,-637.84C1895.89,-637.35 1771.95,-636.32 1694.28,-635.66"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1694.14,-632.16 1684.11,-635.58 1694.08,-639.16 1694.14,-632.16"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var pansourcefilemkl_backendf90AfferentGraph = svgPanZoom('#sourcefilemkl_backendf90AfferentGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#AfferentGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="AfferentGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="202pt" height="32pt"
+ viewBox="0.00 0.00 201.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 197.5,-28 197.5,4 -4,4"/>
+<!-- Source File -->
+<g id="node1" class="node">
+<title>Source File</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Source File</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="193.5,-24 88.5,-24 88.5,0 193.5,0 193.5,-24"/>
+<text text-anchor="middle" x="141" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a file to a file which it depends on. A file
+is dependent upon another if the latter must be compiled before the former
+can be.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+          </div>
+        </div>
+<br>
+      <section>
+        <h2><span class="anchor" id="src"></span>Source Code</h2>
+        <div class="hl codehilite"><pre><span></span><a id="ln-1" name="ln-1" href="#ln-1"></a><span class="c">!&gt;</span>
+<a id="ln-2" name="ln-2" href="#ln-2"></a><span class="c">!&gt; Contains backend implementations for vector norm and dot product calculations.</span>
+<a id="ln-3" name="ln-3" href="#ln-3"></a><span class="c">!&gt; It provides two versions of each routine: one using Intel MKL (if `_MKL`</span>
+<a id="ln-4" name="ln-4" href="#ln-4"></a><span class="c">!&gt; is defined) and a native Fortran version. Both versions support MPI parallelism.</span>
+<a id="ln-5" name="ln-5" href="#ln-5"></a><span class="c">!&gt; This module is intended to be used by `linalg_vector_operations`.</span>
+<a id="ln-6" name="ln-6" href="#ln-6"></a><span class="c">!&gt;</span>
+<a id="ln-7" name="ln-7" href="#ln-7"></a><span class="k">module </span><span class="n">linalg_mkl_backend</span>
+<a id="ln-8" name="ln-8" href="#ln-8"></a><span class="w">    </span><span class="k">use</span><span class="p">,</span><span class="w"> </span><span class="k">intrinsic</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">iso_fortran_env</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="w"> </span><span class="n">int32</span><span class="p">,</span><span class="w"> </span><span class="n">real64</span>
+<a id="ln-9" name="ln-9" href="#ln-9"></a><span class="cp">#ifdef _MPI</span>
+<a id="ln-10" name="ln-10" href="#ln-10"></a><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">mpi_f08</span>
+<a id="ln-11" name="ln-11" href="#ln-11"></a><span class="cp">#endif</span>
+<a id="ln-12" name="ln-12" href="#ln-12"></a><span class="cp">#ifdef _MKL</span>
+<a id="ln-13" name="ln-13" href="#ln-13"></a><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">linalg_mkl_interface</span>
+<a id="ln-14" name="ln-14" href="#ln-14"></a><span class="cp">#endif</span>
+<a id="ln-15" name="ln-15" href="#ln-15"></a>
+<a id="ln-16" name="ln-16" href="#ln-16"></a><span class="w">    </span><span class="k">implicit none</span>
+<a id="ln-17" name="ln-17" href="#ln-17"></a><span class="k">    private</span>
+<a id="ln-18" name="ln-18" href="#ln-18"></a>
+<a id="ln-19" name="ln-19" href="#ln-19"></a><span class="cp">#ifdef _MKL</span>
+<a id="ln-20" name="ln-20" href="#ln-20"></a><span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">norm_1_mkl</span>
+<a id="ln-21" name="ln-21" href="#ln-21"></a><span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">norm_2_mkl</span>
+<a id="ln-22" name="ln-22" href="#ln-22"></a><span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">norm_inf_mkl</span>
+<a id="ln-23" name="ln-23" href="#ln-23"></a><span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dot_mkl</span>
+<a id="ln-24" name="ln-24" href="#ln-24"></a><span class="cp">#else</span>
+<a id="ln-25" name="ln-25" href="#ln-25"></a><span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">norm_1_native</span>
+<a id="ln-26" name="ln-26" href="#ln-26"></a><span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">norm_2_native</span>
+<a id="ln-27" name="ln-27" href="#ln-27"></a><span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">norm_inf_native</span>
+<a id="ln-28" name="ln-28" href="#ln-28"></a><span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dot_native</span>
+<a id="ln-29" name="ln-29" href="#ln-29"></a><span class="cp">#endif</span>
+<a id="ln-30" name="ln-30" href="#ln-30"></a>
+<a id="ln-31" name="ln-31" href="#ln-31"></a><span class="k">contains</span>
+<a id="ln-32" name="ln-32" href="#ln-32"></a>
+<a id="ln-33" name="ln-33" href="#ln-33"></a><span class="w">    </span><span class="c">! =========================================================================</span>
+<a id="ln-34" name="ln-34" href="#ln-34"></a><span class="w">    </span><span class="c">! 1. MKL Backend Implementations</span>
+<a id="ln-35" name="ln-35" href="#ln-35"></a><span class="w">    </span><span class="c">! =========================================================================</span>
+<a id="ln-36" name="ln-36" href="#ln-36"></a><span class="cp">#ifdef _MKL</span>
+<a id="ln-37" name="ln-37" href="#ln-37"></a><span class="w">    </span><span class="c">!&gt;</span>
+<a id="ln-38" name="ln-38" href="#ln-38"></a><span class="w">    </span><span class="c">!&gt; Computes the 1-norm of a vector using MKL&#39;s ASUM function.</span>
+<a id="ln-39" name="ln-39" href="#ln-39"></a><span class="w">    </span><span class="c">!&gt;</span>
+<a id="ln-40" name="ln-40" href="#ln-40"></a><span class="w">    </span><span class="k">function </span><span class="n">norm_1_mkl</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">norm_value</span><span class="p">)</span>
+<a id="ln-41" name="ln-41" href="#ln-41"></a><span class="w">        </span><span class="k">implicit none</span>
+<a id="ln-42" name="ln-42" href="#ln-42"></a><span class="w">        </span><span class="c">!&gt; The input vector.</span>
+<a id="ln-43" name="ln-43" href="#ln-43"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">contiguous</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">x</span><span class="p">(:)</span>
+<a id="ln-44" name="ln-44" href="#ln-44"></a><span class="w">        </span><span class="c">!&gt; The computed 1-norm, \( \sum |x_i| \).</span>
+<a id="ln-45" name="ln-45" href="#ln-45"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">norm_value</span>
+<a id="ln-46" name="ln-46" href="#ln-46"></a>
+<a id="ln-47" name="ln-47" href="#ln-47"></a><span class="cp">#ifdef _MPI</span>
+<a id="ln-48" name="ln-48" href="#ln-48"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nprocs</span>
+<a id="ln-49" name="ln-49" href="#ln-49"></a><span class="w">        </span><span class="k">call </span><span class="n">MPI_Comm_size</span><span class="p">(</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="w"> </span><span class="n">nprocs</span><span class="p">)</span>
+<a id="ln-50" name="ln-50" href="#ln-50"></a>
+<a id="ln-51" name="ln-51" href="#ln-51"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">nprocs</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-52" name="ln-52" href="#ln-52"></a><span class="k">            </span><span class="n">norm_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dasum</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<a id="ln-53" name="ln-53" href="#ln-53"></a><span class="w">        </span><span class="k">else</span>
+<a id="ln-54" name="ln-54" href="#ln-54"></a><span class="k">            </span><span class="n">norm_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pdasum</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<a id="ln-55" name="ln-55" href="#ln-55"></a><span class="w">        </span><span class="k">end if</span>
+<a id="ln-56" name="ln-56" href="#ln-56"></a><span class="cp">#else</span>
+<a id="ln-57" name="ln-57" href="#ln-57"></a><span class="w">        </span><span class="n">norm_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dasum</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<a id="ln-58" name="ln-58" href="#ln-58"></a><span class="cp">#endif</span>
+<a id="ln-59" name="ln-59" href="#ln-59"></a><span class="w">    </span><span class="k">end function </span><span class="n">norm_1_mkl</span>
+<a id="ln-60" name="ln-60" href="#ln-60"></a>
+<a id="ln-61" name="ln-61" href="#ln-61"></a><span class="w">    </span><span class="c">!&gt;</span>
+<a id="ln-62" name="ln-62" href="#ln-62"></a><span class="w">    </span><span class="c">!&gt; Computes the 2-norm (Euclidean norm) of a vector using MKL&#39;s NRM2 function.</span>
+<a id="ln-63" name="ln-63" href="#ln-63"></a><span class="w">    </span><span class="c">!&gt;</span>
+<a id="ln-64" name="ln-64" href="#ln-64"></a><span class="w">    </span><span class="k">function </span><span class="n">norm_2_mkl</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">norm_value</span><span class="p">)</span>
+<a id="ln-65" name="ln-65" href="#ln-65"></a><span class="w">        </span><span class="k">implicit none</span>
+<a id="ln-66" name="ln-66" href="#ln-66"></a><span class="w">        </span><span class="c">!&gt; The input vector.</span>
+<a id="ln-67" name="ln-67" href="#ln-67"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">contiguous</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">x</span><span class="p">(:)</span>
+<a id="ln-68" name="ln-68" href="#ln-68"></a><span class="w">        </span><span class="c">!&gt; The computed 2-norm, \( \sqrt{\sum x_i^2} \).</span>
+<a id="ln-69" name="ln-69" href="#ln-69"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">norm_value</span>
+<a id="ln-70" name="ln-70" href="#ln-70"></a>
+<a id="ln-71" name="ln-71" href="#ln-71"></a><span class="cp">#ifdef _MPI</span>
+<a id="ln-72" name="ln-72" href="#ln-72"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nprocs</span>
+<a id="ln-73" name="ln-73" href="#ln-73"></a><span class="w">        </span><span class="k">call </span><span class="n">MPI_Comm_size</span><span class="p">(</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="w"> </span><span class="n">nprocs</span><span class="p">)</span>
+<a id="ln-74" name="ln-74" href="#ln-74"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">nprocs</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-75" name="ln-75" href="#ln-75"></a><span class="k">            </span><span class="n">norm_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dnrm2</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<a id="ln-76" name="ln-76" href="#ln-76"></a><span class="w">        </span><span class="k">else</span>
+<a id="ln-77" name="ln-77" href="#ln-77"></a><span class="k">            </span><span class="n">norm_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pdnrm2</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<a id="ln-78" name="ln-78" href="#ln-78"></a><span class="w">        </span><span class="k">end if</span>
+<a id="ln-79" name="ln-79" href="#ln-79"></a><span class="cp">#else</span>
+<a id="ln-80" name="ln-80" href="#ln-80"></a><span class="w">        </span><span class="n">norm_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dnrm2</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<a id="ln-81" name="ln-81" href="#ln-81"></a><span class="cp">#endif</span>
+<a id="ln-82" name="ln-82" href="#ln-82"></a><span class="w">    </span><span class="k">end function </span><span class="n">norm_2_mkl</span>
+<a id="ln-83" name="ln-83" href="#ln-83"></a>
+<a id="ln-84" name="ln-84" href="#ln-84"></a><span class="w">    </span><span class="c">!&gt;</span>
+<a id="ln-85" name="ln-85" href="#ln-85"></a><span class="w">    </span><span class="c">!&gt; Computes the infinity-norm (maximum absolute value) of a vector using MKL&#39;s IDAMAX.</span>
+<a id="ln-86" name="ln-86" href="#ln-86"></a><span class="w">    </span><span class="c">!&gt;</span>
+<a id="ln-87" name="ln-87" href="#ln-87"></a><span class="w">    </span><span class="k">function </span><span class="n">norm_inf_mkl</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">norm_value</span><span class="p">)</span>
+<a id="ln-88" name="ln-88" href="#ln-88"></a><span class="w">        </span><span class="k">implicit none</span>
+<a id="ln-89" name="ln-89" href="#ln-89"></a><span class="w">        </span><span class="c">!&gt; The input vector.</span>
+<a id="ln-90" name="ln-90" href="#ln-90"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">contiguous</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">x</span><span class="p">(:)</span>
+<a id="ln-91" name="ln-91" href="#ln-91"></a><span class="w">        </span><span class="c">!&gt; The computed infinity-norm, \( \max(|x_i|) \).</span>
+<a id="ln-92" name="ln-92" href="#ln-92"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">norm_value</span>
+<a id="ln-93" name="ln-93" href="#ln-93"></a>
+<a id="ln-94" name="ln-94" href="#ln-94"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">local_max</span>
+<a id="ln-95" name="ln-95" href="#ln-95"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">global_max</span>
+<a id="ln-96" name="ln-96" href="#ln-96"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ierr</span>
+<a id="ln-97" name="ln-97" href="#ln-97"></a>
+<a id="ln-98" name="ln-98" href="#ln-98"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-99" name="ln-99" href="#ln-99"></a><span class="k">            </span><span class="n">local_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">idamax</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)))</span>
+<a id="ln-100" name="ln-100" href="#ln-100"></a><span class="w">        </span><span class="k">else</span>
+<a id="ln-101" name="ln-101" href="#ln-101"></a><span class="k">            </span><span class="n">local_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<a id="ln-102" name="ln-102" href="#ln-102"></a><span class="w">        </span><span class="k">end if</span>
+<a id="ln-103" name="ln-103" href="#ln-103"></a><span class="cp">#ifdef _MPI</span>
+<a id="ln-104" name="ln-104" href="#ln-104"></a><span class="w">        </span><span class="k">call </span><span class="n">MPI_Allreduce</span><span class="p">(</span><span class="n">local_max</span><span class="p">,</span><span class="w"> </span><span class="n">global_max</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_REAL8</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_MAX</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="w"> </span><span class="n">ierr</span><span class="p">)</span>
+<a id="ln-105" name="ln-105" href="#ln-105"></a><span class="w">        </span><span class="n">norm_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">global_max</span>
+<a id="ln-106" name="ln-106" href="#ln-106"></a><span class="cp">#else</span>
+<a id="ln-107" name="ln-107" href="#ln-107"></a><span class="w">        </span><span class="n">norm_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">local_max</span>
+<a id="ln-108" name="ln-108" href="#ln-108"></a><span class="cp">#endif</span>
+<a id="ln-109" name="ln-109" href="#ln-109"></a><span class="w">    </span><span class="k">end function </span><span class="n">norm_inf_mkl</span>
+<a id="ln-110" name="ln-110" href="#ln-110"></a>
+<a id="ln-111" name="ln-111" href="#ln-111"></a><span class="w">    </span><span class="c">!&gt;</span>
+<a id="ln-112" name="ln-112" href="#ln-112"></a><span class="w">    </span><span class="c">!&gt; Computes the dot product of two vectors using MKL&#39;s DOT function.</span>
+<a id="ln-113" name="ln-113" href="#ln-113"></a><span class="w">    </span><span class="c">!&gt;</span>
+<a id="ln-114" name="ln-114" href="#ln-114"></a><span class="w">    </span><span class="k">function </span><span class="n">dot_mkl</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="nb">product</span><span class="p">)</span>
+<a id="ln-115" name="ln-115" href="#ln-115"></a><span class="w">        </span><span class="k">implicit none</span>
+<a id="ln-116" name="ln-116" href="#ln-116"></a><span class="w">        </span><span class="c">!&gt; The first input vector.</span>
+<a id="ln-117" name="ln-117" href="#ln-117"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">contiguous</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">x</span><span class="p">(:)</span>
+<a id="ln-118" name="ln-118" href="#ln-118"></a><span class="w">        </span><span class="c">!&gt; The second input vector.</span>
+<a id="ln-119" name="ln-119" href="#ln-119"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">contiguous</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">y</span><span class="p">(:)</span>
+<a id="ln-120" name="ln-120" href="#ln-120"></a><span class="w">        </span><span class="c">!&gt; The computed dot product, \( \sum x_i y_i \).</span>
+<a id="ln-121" name="ln-121" href="#ln-121"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="nb">product</span>
+<a id="ln-122" name="ln-122" href="#ln-122"></a>
+<a id="ln-123" name="ln-123" href="#ln-123"></a><span class="cp">#ifdef _MPI</span>
+<a id="ln-124" name="ln-124" href="#ln-124"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nprocs</span>
+<a id="ln-125" name="ln-125" href="#ln-125"></a><span class="w">        </span><span class="k">call </span><span class="n">MPI_Comm_size</span><span class="p">(</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="w"> </span><span class="n">nprocs</span><span class="p">)</span>
+<a id="ln-126" name="ln-126" href="#ln-126"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">nprocs</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-127" name="ln-127" href="#ln-127"></a><span class="k">            </span><span class="nb">product</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ddot</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<a id="ln-128" name="ln-128" href="#ln-128"></a><span class="w">        </span><span class="k">else</span>
+<a id="ln-129" name="ln-129" href="#ln-129"></a><span class="k">            </span><span class="nb">product</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pddot</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<a id="ln-130" name="ln-130" href="#ln-130"></a><span class="w">        </span><span class="k">end if</span>
+<a id="ln-131" name="ln-131" href="#ln-131"></a><span class="cp">#else</span>
+<a id="ln-132" name="ln-132" href="#ln-132"></a><span class="w">        </span><span class="nb">product</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ddot</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<a id="ln-133" name="ln-133" href="#ln-133"></a><span class="cp">#endif</span>
+<a id="ln-134" name="ln-134" href="#ln-134"></a><span class="w">    </span><span class="k">end function </span><span class="n">dot_mkl</span>
+<a id="ln-135" name="ln-135" href="#ln-135"></a><span class="cp">#endif</span>
+<a id="ln-136" name="ln-136" href="#ln-136"></a>
+<a id="ln-137" name="ln-137" href="#ln-137"></a><span class="w">    </span><span class="c">! =========================================================================</span>
+<a id="ln-138" name="ln-138" href="#ln-138"></a><span class="w">    </span><span class="c">! 2. Native Fortran Backend Implementations</span>
+<a id="ln-139" name="ln-139" href="#ln-139"></a><span class="w">    </span><span class="c">! =========================================================================</span>
+<a id="ln-140" name="ln-140" href="#ln-140"></a><span class="w">    </span><span class="c">!&gt;</span>
+<a id="ln-141" name="ln-141" href="#ln-141"></a><span class="w">    </span><span class="c">!&gt; Computes the 1-norm of a vector using native Fortran intrinsics.</span>
+<a id="ln-142" name="ln-142" href="#ln-142"></a><span class="w">    </span><span class="c">!&gt;</span>
+<a id="ln-143" name="ln-143" href="#ln-143"></a><span class="w">    </span><span class="k">function </span><span class="n">norm_1_native</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">norm_value</span><span class="p">)</span>
+<a id="ln-144" name="ln-144" href="#ln-144"></a><span class="w">        </span><span class="k">implicit none</span>
+<a id="ln-145" name="ln-145" href="#ln-145"></a><span class="w">        </span><span class="c">!&gt; The input vector.</span>
+<a id="ln-146" name="ln-146" href="#ln-146"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">contiguous</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">x</span><span class="p">(:)</span>
+<a id="ln-147" name="ln-147" href="#ln-147"></a><span class="w">        </span><span class="c">!&gt; The computed 1-norm, \( \sum |x_i| \).</span>
+<a id="ln-148" name="ln-148" href="#ln-148"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">norm_value</span>
+<a id="ln-149" name="ln-149" href="#ln-149"></a>
+<a id="ln-150" name="ln-150" href="#ln-150"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">local_sum</span>
+<a id="ln-151" name="ln-151" href="#ln-151"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">global_sum</span>
+<a id="ln-152" name="ln-152" href="#ln-152"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ierr</span>
+<a id="ln-153" name="ln-153" href="#ln-153"></a>
+<a id="ln-154" name="ln-154" href="#ln-154"></a><span class="w">        </span><span class="n">local_sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sum</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<a id="ln-155" name="ln-155" href="#ln-155"></a><span class="cp">#ifdef _MPI</span>
+<a id="ln-156" name="ln-156" href="#ln-156"></a><span class="w">        </span><span class="k">call </span><span class="n">MPI_Allreduce</span><span class="p">(</span><span class="n">local_sum</span><span class="p">,</span><span class="w"> </span><span class="n">global_sum</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_REAL8</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_SUM</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="w"> </span><span class="n">ierr</span><span class="p">)</span>
+<a id="ln-157" name="ln-157" href="#ln-157"></a><span class="w">        </span><span class="n">norm_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">global_sum</span>
+<a id="ln-158" name="ln-158" href="#ln-158"></a><span class="cp">#else</span>
+<a id="ln-159" name="ln-159" href="#ln-159"></a><span class="w">        </span><span class="n">norm_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">local_sum</span>
+<a id="ln-160" name="ln-160" href="#ln-160"></a><span class="cp">#endif</span>
+<a id="ln-161" name="ln-161" href="#ln-161"></a><span class="w">    </span><span class="k">end function </span><span class="n">norm_1_native</span>
+<a id="ln-162" name="ln-162" href="#ln-162"></a>
+<a id="ln-163" name="ln-163" href="#ln-163"></a><span class="w">    </span><span class="c">!&gt;</span>
+<a id="ln-164" name="ln-164" href="#ln-164"></a><span class="w">    </span><span class="c">!&gt; Computes the 2-norm (Euclidean norm) of a vector using native Fortran intrinsics.</span>
+<a id="ln-165" name="ln-165" href="#ln-165"></a><span class="w">    </span><span class="c">!&gt;</span>
+<a id="ln-166" name="ln-166" href="#ln-166"></a><span class="w">    </span><span class="k">function </span><span class="n">norm_2_native</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">norm_value</span><span class="p">)</span>
+<a id="ln-167" name="ln-167" href="#ln-167"></a><span class="w">        </span><span class="k">implicit none</span>
+<a id="ln-168" name="ln-168" href="#ln-168"></a><span class="w">        </span><span class="c">!&gt; The input vector.</span>
+<a id="ln-169" name="ln-169" href="#ln-169"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">contiguous</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">x</span><span class="p">(:)</span>
+<a id="ln-170" name="ln-170" href="#ln-170"></a><span class="w">        </span><span class="c">!&gt; The computed 2-norm, \( \sqrt{\sum x_i^2} \).</span>
+<a id="ln-171" name="ln-171" href="#ln-171"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">norm_value</span>
+<a id="ln-172" name="ln-172" href="#ln-172"></a>
+<a id="ln-173" name="ln-173" href="#ln-173"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">local_sum_sq</span>
+<a id="ln-174" name="ln-174" href="#ln-174"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">global_sum_sq</span>
+<a id="ln-175" name="ln-175" href="#ln-175"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ierr</span>
+<a id="ln-176" name="ln-176" href="#ln-176"></a>
+<a id="ln-177" name="ln-177" href="#ln-177"></a><span class="w">        </span><span class="n">local_sum_sq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<a id="ln-178" name="ln-178" href="#ln-178"></a><span class="cp">#ifdef _MPI</span>
+<a id="ln-179" name="ln-179" href="#ln-179"></a><span class="w">        </span><span class="k">call </span><span class="n">MPI_Allreduce</span><span class="p">(</span><span class="n">local_sum_sq</span><span class="p">,</span><span class="w"> </span><span class="n">global_sum_sq</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_REAL8</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_SUM</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="w"> </span><span class="n">ierr</span><span class="p">)</span>
+<a id="ln-180" name="ln-180" href="#ln-180"></a><span class="w">        </span><span class="n">norm_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="n">global_sum_sq</span><span class="p">)</span>
+<a id="ln-181" name="ln-181" href="#ln-181"></a><span class="cp">#else</span>
+<a id="ln-182" name="ln-182" href="#ln-182"></a><span class="w">        </span><span class="n">norm_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="n">local_sum_sq</span><span class="p">)</span>
+<a id="ln-183" name="ln-183" href="#ln-183"></a><span class="cp">#endif</span>
+<a id="ln-184" name="ln-184" href="#ln-184"></a><span class="w">    </span><span class="k">end function </span><span class="n">norm_2_native</span>
+<a id="ln-185" name="ln-185" href="#ln-185"></a>
+<a id="ln-186" name="ln-186" href="#ln-186"></a><span class="w">    </span><span class="c">!&gt;</span>
+<a id="ln-187" name="ln-187" href="#ln-187"></a><span class="w">    </span><span class="c">!&gt; Computes the infinity-norm (maximum absolute value) of a vector using native Fortran intrinsics.</span>
+<a id="ln-188" name="ln-188" href="#ln-188"></a><span class="w">    </span><span class="c">!&gt;</span>
+<a id="ln-189" name="ln-189" href="#ln-189"></a><span class="w">    </span><span class="k">function </span><span class="n">norm_inf_native</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">norm_value</span><span class="p">)</span>
+<a id="ln-190" name="ln-190" href="#ln-190"></a><span class="w">        </span><span class="k">implicit none</span>
+<a id="ln-191" name="ln-191" href="#ln-191"></a><span class="w">        </span><span class="c">!&gt; The input vector.</span>
+<a id="ln-192" name="ln-192" href="#ln-192"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">contiguous</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">x</span><span class="p">(:)</span>
+<a id="ln-193" name="ln-193" href="#ln-193"></a><span class="w">        </span><span class="c">!&gt; The computed infinity-norm, \( \max(|x_i|) \).</span>
+<a id="ln-194" name="ln-194" href="#ln-194"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">norm_value</span>
+<a id="ln-195" name="ln-195" href="#ln-195"></a>
+<a id="ln-196" name="ln-196" href="#ln-196"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">local_max</span>
+<a id="ln-197" name="ln-197" href="#ln-197"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">global_max</span>
+<a id="ln-198" name="ln-198" href="#ln-198"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ierr</span>
+<a id="ln-199" name="ln-199" href="#ln-199"></a>
+<a id="ln-200" name="ln-200" href="#ln-200"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-201" name="ln-201" href="#ln-201"></a><span class="k">            </span><span class="n">local_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">maxval</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<a id="ln-202" name="ln-202" href="#ln-202"></a><span class="w">        </span><span class="k">else</span>
+<a id="ln-203" name="ln-203" href="#ln-203"></a><span class="k">            </span><span class="n">local_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<a id="ln-204" name="ln-204" href="#ln-204"></a><span class="w">        </span><span class="k">end if</span>
+<a id="ln-205" name="ln-205" href="#ln-205"></a><span class="cp">#ifdef _MPI</span>
+<a id="ln-206" name="ln-206" href="#ln-206"></a><span class="w">        </span><span class="k">call </span><span class="n">MPI_Allreduce</span><span class="p">(</span><span class="n">local_max</span><span class="p">,</span><span class="w"> </span><span class="n">global_max</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_REAL8</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_MAX</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="w"> </span><span class="n">ierr</span><span class="p">)</span>
+<a id="ln-207" name="ln-207" href="#ln-207"></a><span class="w">        </span><span class="n">norm_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">global_max</span>
+<a id="ln-208" name="ln-208" href="#ln-208"></a><span class="cp">#else</span>
+<a id="ln-209" name="ln-209" href="#ln-209"></a><span class="w">        </span><span class="n">norm_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">local_max</span>
+<a id="ln-210" name="ln-210" href="#ln-210"></a><span class="cp">#endif</span>
+<a id="ln-211" name="ln-211" href="#ln-211"></a><span class="w">    </span><span class="k">end function </span><span class="n">norm_inf_native</span>
+<a id="ln-212" name="ln-212" href="#ln-212"></a>
+<a id="ln-213" name="ln-213" href="#ln-213"></a><span class="w">    </span><span class="c">!&gt;</span>
+<a id="ln-214" name="ln-214" href="#ln-214"></a><span class="w">    </span><span class="c">!&gt; Computes the dot product of two vectors using the native Fortran intrinsic.</span>
+<a id="ln-215" name="ln-215" href="#ln-215"></a><span class="w">    </span><span class="c">!&gt;</span>
+<a id="ln-216" name="ln-216" href="#ln-216"></a><span class="w">    </span><span class="k">function </span><span class="n">dot_native</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="nb">product</span><span class="p">)</span>
+<a id="ln-217" name="ln-217" href="#ln-217"></a><span class="w">        </span><span class="k">implicit none</span>
+<a id="ln-218" name="ln-218" href="#ln-218"></a><span class="w">        </span><span class="c">!&gt; The first input vector.</span>
+<a id="ln-219" name="ln-219" href="#ln-219"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">contiguous</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">x</span><span class="p">(:)</span>
+<a id="ln-220" name="ln-220" href="#ln-220"></a><span class="w">        </span><span class="c">!&gt; The second input vector.</span>
+<a id="ln-221" name="ln-221" href="#ln-221"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">contiguous</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">y</span><span class="p">(:)</span>
+<a id="ln-222" name="ln-222" href="#ln-222"></a><span class="w">        </span><span class="c">!&gt; The computed dot product, \( \sum x_i y_i \).</span>
+<a id="ln-223" name="ln-223" href="#ln-223"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="nb">product</span>
+<a id="ln-224" name="ln-224" href="#ln-224"></a>
+<a id="ln-225" name="ln-225" href="#ln-225"></a><span class="nb">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">local_prod</span>
+<a id="ln-226" name="ln-226" href="#ln-226"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">global_prod</span>
+<a id="ln-227" name="ln-227" href="#ln-227"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ierr</span>
+<a id="ln-228" name="ln-228" href="#ln-228"></a>
+<a id="ln-229" name="ln-229" href="#ln-229"></a><span class="w">        </span><span class="n">local_prod</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">dot_product</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span>
+<a id="ln-230" name="ln-230" href="#ln-230"></a><span class="cp">#ifdef _MPI</span>
+<a id="ln-231" name="ln-231" href="#ln-231"></a><span class="w">        </span><span class="k">call </span><span class="n">MPI_Allreduce</span><span class="p">(</span><span class="n">local_prod</span><span class="p">,</span><span class="w"> </span><span class="n">global_prod</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_REAL8</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_SUM</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="w"> </span><span class="n">ierr</span><span class="p">)</span>
+<a id="ln-232" name="ln-232" href="#ln-232"></a><span class="w">        </span><span class="nb">product</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">global_prod</span>
+<a id="ln-233" name="ln-233" href="#ln-233"></a><span class="cp">#else</span>
+<a id="ln-234" name="ln-234" href="#ln-234"></a><span class="w">        </span><span class="nb">product</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">local_prod</span>
+<a id="ln-235" name="ln-235" href="#ln-235"></a><span class="cp">#endif</span>
+<a id="ln-236" name="ln-236" href="#ln-236"></a><span class="w">    </span><span class="k">end function </span><span class="n">dot_native</span>
+<a id="ln-237" name="ln-237" href="#ln-237"></a>
+<a id="ln-238" name="ln-238" href="#ln-238"></a><span class="k">end module </span><span class="n">linalg_mkl_backend</span>
+</pre></div>
+
+      </section>
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,1434 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>calc_thc_dispersivity_gp_4phase &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>calc_thc_dispersivity_gp_4phase
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">25 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/thermal_conductivity_multiphase.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/thermal_conductivity_multiphase.f90.html'>thermal_conductivity_multiphase.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/thermal_conductivity_multiphase.html'>thermal_conductivity_multiphase</a></li>
+            <li class="breadcrumb-item active" aria-current="page">calc_thc_dispersivity_gp_4phase</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/calc_thc_dispersivity_gp_4phase.html#src">calc_thc_dispersivity_gp_4phase</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine calc_thc_dispersivity_gp_4phase(self, state, lambda)  
+    <a href="../interface/calc_thc_dispersivity_gp_4phase.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~1099"></span>
+              class(<a href='../type/type_thc_4phase.html'>type_thc_4phase</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-state~224"></span>
+              type(<a href='../type/type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-lambda~32"></span>
+              type(<a href='../type/type_thc_dispersivity.html'>type_thc_dispersivity</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>lambda</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph Pages: 1 -->
+<svg id="proccalc_thc_dispersivity_gp_4phaseCallsGraph" width="641pt" height="142pt"
+ viewBox="0.00 0.00 641.00 142.19" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph" class="graph" transform="scale(0.39 0.39) rotate(0) translate(4 359.56)">
+<title>proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-359.56 1635,-359.56 1635,4 -4,4"/>
+<!-- proc~calc_thc_dispersivity_gp_4phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node1" class="node">
+<title>proc~calc_thc_dispersivity_gp_4phase</title>
+<polygon fill="none" stroke="black" points="184,-231.56 0,-231.56 0,-207.56 184,-207.56 184,-231.56"/>
+<text text-anchor="middle" x="92" y="-217.16" font-family="Helvetica,sans-Serif" font-size="10.50">calc_thc_dispersivity_gp_4phase</text>
+</g>
+<!-- interface~calc_lambda_dispersivity_abst_thc -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node2" class="node">
+<title>interface~calc_lambda_dispersivity_abst_thc</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node2"><a xlink:href="../interface/calc_lambda_dispersivity_abst_thc.html" xlink:title="abst_thc%calc_lambda_dispersivity_abst_thc">
+<polygon fill="#a7506f" stroke="#a7506f" points="481.5,-334.56 232.5,-334.56 232.5,-310.56 481.5,-310.56 481.5,-334.56"/>
+<text text-anchor="middle" x="357" y="-320.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_thc%calc_lambda_dispersivity_abst_thc</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thc_dispersivity_gp_4phase&#45;&gt;interface~calc_lambda_dispersivity_abst_thc -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge1" class="edge">
+<title>proc~calc_thc_dispersivity_gp_4phase&#45;&gt;interface~calc_lambda_dispersivity_abst_thc</title>
+<path fill="none" stroke="#ff0000" d="M108.91,-231.57C132.09,-248.46 177.08,-279.03 220,-295.56 233.23,-300.66 247.58,-304.84 261.82,-308.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="261.12,-311.69 271.65,-310.5 262.68,-304.86 261.12,-311.69"/>
+</g>
+<!-- none~calc~21 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node3" class="node">
+<title>none~calc~21</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node3"><a xlink:href="../type/type_thc_4phase.html#boundprocedure-calc~21" xlink:title="type_thc_4phase%calc">
+<polygon fill="#a7506f" stroke="#a7506f" points="423.5,-252.56 290.5,-252.56 290.5,-228.56 423.5,-228.56 423.5,-252.56"/>
+<text text-anchor="middle" x="357" y="-238.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thc_4phase%calc</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thc_dispersivity_gp_4phase&#45;&gt;none~calc~21 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge2" class="edge">
+<title>proc~calc_thc_dispersivity_gp_4phase&#45;&gt;none~calc~21</title>
+<path fill="none" stroke="#ff0000" d="M184.25,-226.85C215.43,-229.34 249.96,-232.1 279.84,-234.48"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="279.95,-238 290.19,-235.31 280.5,-231.02 279.95,-238"/>
+</g>
+<!-- proc~calc_water_cp_abst_material -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node4" class="node">
+<title>proc~calc_water_cp_abst_material</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node4"><a xlink:href="../proc/calc_water_cp_abst_material.html" xlink:title="abst_material%calc_water_cp_abst_material">
+<polygon fill="#d9534f" stroke="#d9534f" points="481,-210.56 233,-210.56 233,-186.56 481,-186.56 481,-210.56"/>
+<text text-anchor="middle" x="357" y="-196.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_material%calc_water_cp_abst_material</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thc_dispersivity_gp_4phase&#45;&gt;proc~calc_water_cp_abst_material -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge3" class="edge">
+<title>proc~calc_thc_dispersivity_gp_4phase&#45;&gt;proc~calc_water_cp_abst_material</title>
+<path fill="none" stroke="#ff0000" d="M184.25,-212.28C196.78,-211.28 209.85,-210.23 222.94,-209.19"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="223.26,-212.67 232.95,-208.39 222.7,-205.7 223.26,-212.67"/>
+</g>
+<!-- proc~calc_water_density_abst_material -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node5" class="node">
+<title>proc~calc_water_density_abst_material</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node5"><a xlink:href="../proc/calc_water_density_abst_material.html" xlink:title="abst_material%calc_water_density_abst_material">
+<polygon fill="#d9534f" stroke="#d9534f" points="494,-168.56 220,-168.56 220,-144.56 494,-144.56 494,-168.56"/>
+<text text-anchor="middle" x="357" y="-154.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_material%calc_water_density_abst_material</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thc_dispersivity_gp_4phase&#45;&gt;proc~calc_water_density_abst_material -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge4" class="edge">
+<title>proc~calc_thc_dispersivity_gp_4phase&#45;&gt;proc~calc_water_density_abst_material</title>
+<path fill="none" stroke="#ff0000" d="M124.41,-207.55C149.86,-198.22 186.81,-185.56 220,-177.56 230.96,-174.93 242.5,-172.55 254.03,-170.42"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="254.92,-173.82 264.15,-168.62 253.69,-166.93 254.92,-173.82"/>
+</g>
+<!-- proc~get_all_state -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node6" class="node">
+<title>proc~get_all_state</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node6"><a xlink:href="../proc/get_all_state.html" xlink:title="type_state%get_all_state">
+<polygon fill="#d9534f" stroke="#d9534f" points="429,-96.56 285,-96.56 285,-72.56 429,-72.56 429,-96.56"/>
+<text text-anchor="middle" x="357" y="-82.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_state%get_all_state</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thc_dispersivity_gp_4phase&#45;&gt;proc~get_all_state -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge5" class="edge">
+<title>proc~calc_thc_dispersivity_gp_4phase&#45;&gt;proc~get_all_state</title>
+<path fill="none" stroke="#ff0000" d="M108.73,-207.47C132.04,-189.93 177.61,-157.18 220,-135.56 247.89,-121.34 280.71,-108.92 307.12,-99.9"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="308.54,-103.11 316.91,-96.61 306.31,-96.48 308.54,-103.11"/>
+</g>
+<!-- proc~calc_lambda_dispersivity_abst_thc -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node10" class="node">
+<title>proc~calc_lambda_dispersivity_abst_thc</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node10"><a xlink:href="../proc/calc_lambda_dispersivity_abst_thc.html" xlink:title="calc_lambda_dispersivity_abst_thc">
+<polygon fill="#d9534f" stroke="#d9534f" points="769,-345.56 574,-345.56 574,-321.56 769,-321.56 769,-345.56"/>
+<text text-anchor="middle" x="671.5" y="-331.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_lambda_dispersivity_abst_thc</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_lambda_dispersivity_abst_thc&#45;&gt;proc~calc_lambda_dispersivity_abst_thc -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge6" class="edge">
+<title>interface~calc_lambda_dispersivity_abst_thc&#45;&gt;proc~calc_lambda_dispersivity_abst_thc</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M481.51,-326.91C508.74,-327.87 537.36,-328.88 563.85,-329.81"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="563.78,-333.31 573.9,-330.16 564.03,-326.31 563.78,-333.31"/>
+</g>
+<!-- interface~calc_thc_dispersivity_gp_4phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node7" class="node">
+<title>interface~calc_thc_dispersivity_gp_4phase</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node7"><a xlink:href="../interface/calc_thc_dispersivity_gp_4phase.html" xlink:title="type_thc_4phase%calc_thc_dispersivity_gp_4phase">
+<polygon fill="#a7506f" stroke="#a7506f" points="813,-294.56 530,-294.56 530,-270.56 813,-270.56 813,-294.56"/>
+<text text-anchor="middle" x="671.5" y="-280.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thc_4phase%calc_thc_dispersivity_gp_4phase</text>
+</a>
+</g>
+</g>
+<!-- none~calc~21&#45;&gt;interface~calc_thc_dispersivity_gp_4phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge7" class="edge">
+<title>none~calc~21&#45;&gt;interface~calc_thc_dispersivity_gp_4phase</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M423.51,-249.37C466.2,-255.11 522.72,-262.7 570.92,-269.18"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="570.7,-272.68 581.07,-270.55 571.63,-265.74 570.7,-272.68"/>
+</g>
+<!-- interface~calc_thc_gp_4phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node8" class="node">
+<title>interface~calc_thc_gp_4phase</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node8"><a xlink:href="../interface/calc_thc_gp_4phase.html" xlink:title="type_thc_4phase%calc_thc_gp_4phase">
+<polygon fill="#a7506f" stroke="#a7506f" points="780.5,-252.56 562.5,-252.56 562.5,-228.56 780.5,-228.56 780.5,-252.56"/>
+<text text-anchor="middle" x="671.5" y="-238.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thc_4phase%calc_thc_gp_4phase</text>
+</a>
+</g>
+</g>
+<!-- none~calc~21&#45;&gt;interface~calc_thc_gp_4phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge8" class="edge">
+<title>none~calc~21&#45;&gt;interface~calc_thc_gp_4phase</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M423.51,-240.56C460.79,-240.56 508.61,-240.56 552.22,-240.56"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="552.33,-244.06 562.33,-240.56 552.33,-237.06 552.33,-244.06"/>
+</g>
+<!-- proc~calc_cp_water_abst_physics -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node9" class="node">
+<title>proc~calc_cp_water_abst_physics</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node9"><a xlink:href="../proc/calc_cp_water_abst_physics.html" xlink:title="abst_physics%calc_cp_water_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="789.5,-210.56 553.5,-210.56 553.5,-186.56 789.5,-186.56 789.5,-210.56"/>
+<text text-anchor="middle" x="671.5" y="-196.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_cp_water_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_water_cp_abst_material&#45;&gt;proc~calc_cp_water_abst_physics -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge9" class="edge">
+<title>proc~calc_water_cp_abst_material&#45;&gt;proc~calc_cp_water_abst_physics</title>
+<path fill="none" stroke="#00ff66" d="M481.06,-198.56C501.54,-198.56 522.81,-198.56 543.38,-198.56"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="543.42,-202.06 553.42,-198.56 543.42,-195.06 543.42,-202.06"/>
+</g>
+<!-- proc~calc_rho_water_abst_physics -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node11" class="node">
+<title>proc~calc_rho_water_abst_physics</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node11"><a xlink:href="../proc/calc_rho_water_abst_physics.html" xlink:title="abst_physics%calc_rho_water_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="792,-168.56 551,-168.56 551,-144.56 792,-144.56 792,-168.56"/>
+<text text-anchor="middle" x="671.5" y="-154.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_rho_water_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_water_density_abst_material&#45;&gt;proc~calc_rho_water_abst_physics -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge10" class="edge">
+<title>proc~calc_water_density_abst_material&#45;&gt;proc~calc_rho_water_abst_physics</title>
+<path fill="none" stroke="#0066ff" d="M494.16,-156.56C509.67,-156.56 525.46,-156.56 540.89,-156.56"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="540.97,-160.06 550.97,-156.56 540.97,-153.06 540.97,-160.06"/>
+</g>
+<!-- proc~get_field_dp -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node12" class="node">
+<title>proc~get_field_dp</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node12"><a xlink:href="../proc/get_field_dp.html" xlink:title="type_field_dp%get_field_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="1631,-189.56 1474,-189.56 1474,-165.56 1631,-165.56 1631,-189.56"/>
+<text text-anchor="middle" x="1552.5" y="-175.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_field_dp%get_field_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~get_all_state&#45;&gt;proc~get_field_dp -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge11" class="edge">
+<title>proc~get_all_state&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#cc00ff" d="M404.09,-72.51C557.54,-34.74 1062.57,70.39 1438,-74.56 1480.86,-91.11 1517.53,-132.18 1536.87,-157.18"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1534.16,-159.4 1542.97,-165.28 1539.75,-155.19 1534.16,-159.4"/>
+</g>
+<!-- interface~calc_thc_dispersivity_gp_4phase&#45;&gt;proc~calc_thc_dispersivity_gp_4phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge12" class="edge">
+<title>interface~calc_thc_dispersivity_gp_4phase&#45;&gt;proc~calc_thc_dispersivity_gp_4phase</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M529.86,-285.8C440.43,-285.46 322.59,-280.55 220,-261.56 189.46,-255.91 156.17,-244.7 131.33,-235.28"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="132.5,-231.99 121.92,-231.65 129.98,-238.51 132.5,-231.99"/>
+</g>
+<!-- proc~calc_thc_gp_4phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node16" class="node">
+<title>proc~calc_thc_gp_4phase</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node16"><a xlink:href="../proc/calc_thc_gp_4phase.html" xlink:title="calc_thc_gp_4phase">
+<polygon fill="#d9534f" stroke="#d9534f" points="1031.5,-261.56 912.5,-261.56 912.5,-237.56 1031.5,-237.56 1031.5,-261.56"/>
+<text text-anchor="middle" x="972" y="-247.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_thc_gp_4phase</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_thc_gp_4phase&#45;&gt;proc~calc_thc_gp_4phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge13" class="edge">
+<title>interface~calc_thc_gp_4phase&#45;&gt;proc~calc_thc_gp_4phase</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M780.69,-243.83C821.08,-245.04 865.83,-246.39 901.78,-247.48"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="902.05,-250.99 912.15,-247.79 902.26,-243.99 902.05,-250.99"/>
+</g>
+<!-- calc_cp -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node13" class="node">
+<title>calc_cp</title>
+<polygon fill="#777777" stroke="#777777" points="999,-210.56 945,-210.56 945,-186.56 999,-186.56 999,-210.56"/>
+<text text-anchor="middle" x="972" y="-196.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_cp</text>
+</g>
+<!-- proc~calc_cp_water_abst_physics&#45;&gt;calc_cp -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge14" class="edge">
+<title>proc~calc_cp_water_abst_physics&#45;&gt;calc_cp</title>
+<path fill="none" stroke="#00ff00" d="M789.62,-198.56C841.5,-198.56 898.82,-198.56 934.86,-198.56"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="934.89,-202.06 944.89,-198.56 934.89,-195.06 934.89,-202.06"/>
+</g>
+<!-- proc~get_thermo_state_tp -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node17" class="node">
+<title>proc~get_thermo_state_tp</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node17"><a xlink:href="../proc/get_thermo_state_tp.html" xlink:title="abst_physics%get_thermo_state_TP">
+<polygon fill="#d9534f" stroke="#d9534f" points="1072,-168.56 872,-168.56 872,-144.56 1072,-144.56 1072,-168.56"/>
+<text text-anchor="middle" x="972" y="-154.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%get_thermo_state_TP</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_cp_water_abst_physics&#45;&gt;proc~get_thermo_state_tp -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge15" class="edge">
+<title>proc~calc_cp_water_abst_physics&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#00ff00" d="M758.04,-186.53C794.81,-181.35 837.93,-175.29 875.71,-169.97"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="876.29,-173.42 885.71,-168.56 875.32,-166.49 876.29,-173.42"/>
+</g>
+<!-- interface~reset_thc_dispersivity -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node15" class="node">
+<title>interface~reset_thc_dispersivity</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node15"><a xlink:href="../interface/reset_thc_dispersivity.html" xlink:title="type_thc_dispersivity%reset_thc_dispersivity">
+<polygon fill="#a7506f" stroke="#a7506f" points="1095,-350.56 849,-350.56 849,-326.56 1095,-326.56 1095,-350.56"/>
+<text text-anchor="middle" x="972" y="-336.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thc_dispersivity%reset_thc_dispersivity</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_lambda_dispersivity_abst_thc&#45;&gt;interface~reset_thc_dispersivity -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge16" class="edge">
+<title>proc~calc_lambda_dispersivity_abst_thc&#45;&gt;interface~reset_thc_dispersivity</title>
+<path fill="none" stroke="#00ffff" d="M769,-335.18C791.28,-335.55 815.37,-335.96 838.87,-336.35"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="838.85,-339.85 848.91,-336.52 838.97,-332.85 838.85,-339.85"/>
+</g>
+<!-- calc_rho -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node14" class="node">
+<title>calc_rho</title>
+<polygon fill="#777777" stroke="#777777" points="1001,-126.56 943,-126.56 943,-102.56 1001,-102.56 1001,-126.56"/>
+<text text-anchor="middle" x="972" y="-112.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_rho</text>
+</g>
+<!-- proc~calc_rho_water_abst_physics&#45;&gt;calc_rho -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge17" class="edge">
+<title>proc~calc_rho_water_abst_physics&#45;&gt;calc_rho</title>
+<path fill="none" stroke="#0000ff" d="M758.04,-144.53C815.77,-136.4 889.17,-126.08 932.99,-119.91"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="933.52,-123.37 942.93,-118.51 932.54,-116.44 933.52,-123.37"/>
+</g>
+<!-- proc~calc_rho_water_abst_physics&#45;&gt;proc~get_thermo_state_tp -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge18" class="edge">
+<title>proc~calc_rho_water_abst_physics&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#0000ff" d="M792.19,-156.56C815.12,-156.56 839.01,-156.56 861.6,-156.56"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="861.87,-160.06 871.87,-156.56 861.87,-153.06 861.87,-160.06"/>
+</g>
+<!-- proc~reset_thc_dispersivity -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node21" class="node">
+<title>proc~reset_thc_dispersivity</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node21"><a xlink:href="../proc/reset_thc_dispersivity.html" xlink:title="reset_thc_dispersivity">
+<polygon fill="#d9534f" stroke="#d9534f" points="1347.5,-355.56 1221.5,-355.56 1221.5,-331.56 1347.5,-331.56 1347.5,-355.56"/>
+<text text-anchor="middle" x="1284.5" y="-341.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">reset_thc_dispersivity</text>
+</a>
+</g>
+</g>
+<!-- interface~reset_thc_dispersivity&#45;&gt;proc~reset_thc_dispersivity -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge19" class="edge">
+<title>interface~reset_thc_dispersivity&#45;&gt;proc~reset_thc_dispersivity</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M1095.27,-340.53C1134.34,-341.16 1176.32,-341.84 1210.7,-342.39"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1211.06,-345.9 1221.12,-342.56 1211.18,-338.9 1211.06,-345.9"/>
+</g>
+<!-- interface~calc_thc_4 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node18" class="node">
+<title>interface~calc_thc_4</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node18"><a xlink:href="../interface/calc_thc_4.html" xlink:title="calc_thc_4">
+<polygon fill="#a7506f" stroke="#a7506f" points="1318.5,-313.56 1250.5,-313.56 1250.5,-289.56 1318.5,-289.56 1318.5,-313.56"/>
+<text text-anchor="middle" x="1284.5" y="-299.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_thc_4</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thc_gp_4phase&#45;&gt;interface~calc_thc_4 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge20" class="edge">
+<title>proc~calc_thc_gp_4phase&#45;&gt;interface~calc_thc_4</title>
+<path fill="none" stroke="#0066ff" d="M1030.27,-261.62C1060.21,-267.71 1097.5,-274.98 1131,-280.56 1167.67,-286.68 1209.51,-292.35 1240.08,-296.25"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1240.04,-299.77 1250.4,-297.56 1240.92,-292.83 1240.04,-299.77"/>
+</g>
+<!-- interface~calc_thc_4_vadoze -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node19" class="node">
+<title>interface~calc_thc_4_vadoze</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node19"><a xlink:href="../interface/calc_thc_4_vadoze.html" xlink:title="calc_thc_4_vadoze">
+<polygon fill="#a7506f" stroke="#a7506f" points="1340.5,-271.56 1228.5,-271.56 1228.5,-247.56 1340.5,-247.56 1340.5,-271.56"/>
+<text text-anchor="middle" x="1284.5" y="-257.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_thc_4_vadoze</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thc_gp_4phase&#45;&gt;interface~calc_thc_4_vadoze -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge21" class="edge">
+<title>proc~calc_thc_gp_4phase&#45;&gt;interface~calc_thc_4_vadoze</title>
+<path fill="none" stroke="#0066ff" d="M1031.77,-251.46C1084.98,-253.17 1163.25,-255.69 1218.35,-257.47"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1218.25,-260.96 1228.36,-257.79 1218.48,-253.97 1218.25,-260.96"/>
+</g>
+<!-- proc~get_material_phi -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node20" class="node">
+<title>proc~get_material_phi</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node20"><a xlink:href="../proc/get_material_phi.html" xlink:title="abst_material%get_material_phi">
+<polygon fill="#d9534f" stroke="#d9534f" points="1376.5,-229.56 1192.5,-229.56 1192.5,-205.56 1376.5,-205.56 1376.5,-229.56"/>
+<text text-anchor="middle" x="1284.5" y="-215.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_material%get_material_phi</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thc_gp_4phase&#45;&gt;proc~get_material_phi -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge22" class="edge">
+<title>proc~calc_thc_gp_4phase&#45;&gt;proc~get_material_phi</title>
+<path fill="none" stroke="#0066ff" d="M1031.77,-243.51C1074.12,-239.14 1132.35,-233.14 1182.14,-228.01"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1182.71,-231.47 1192.3,-226.96 1181.99,-224.51 1182.71,-231.47"/>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge23" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#cc00ff" d="M1072.12,-160.16C1182.11,-164.15 1357.95,-170.54 1463.33,-174.36"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1463.49,-177.87 1473.61,-174.74 1463.75,-170.88 1463.49,-177.87"/>
+</g>
+<!-- proc~shift_pressure_absolute_abst_physics -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node22" class="node">
+<title>proc~shift_pressure_absolute_abst_physics</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node22"><a xlink:href="../proc/shift_pressure_absolute_abst_physics.html" xlink:title="abst_physics%shift_pressure_absolute_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="1427,-149.56 1142,-149.56 1142,-125.56 1427,-125.56 1427,-149.56"/>
+<text text-anchor="middle" x="1284.5" y="-135.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%shift_pressure_absolute_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_physics -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge24" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_physics</title>
+<path fill="none" stroke="#cc00ff" d="M1072.1,-150.5C1091.08,-149.34 1111.35,-148.1 1131.55,-146.86"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1132,-150.34 1141.77,-146.24 1131.58,-143.35 1132,-150.34"/>
+</g>
+<!-- proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node23" class="node">
+<title>proc~shift_temperature_absolute_abst_physics</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node23"><a xlink:href="../proc/shift_temperature_absolute_abst_physics.html" xlink:title="abst_physics%shift_temperature_absolute_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="1438,-107.56 1131,-107.56 1131,-83.56 1438,-83.56 1438,-107.56"/>
+<text text-anchor="middle" x="1284.5" y="-93.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%shift_temperature_absolute_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge25" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#cc00ff" d="M1062.44,-144.53C1073.54,-142.05 1084.62,-139.1 1095,-135.56 1112.13,-129.74 1113.78,-122.1 1131,-116.56 1138.95,-114.01 1147.24,-111.76 1155.66,-109.78"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1156.58,-113.17 1165.59,-107.59 1155.07,-106.33 1156.58,-113.17"/>
+</g>
+<!-- proc~calc_thc_4 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node24" class="node">
+<title>proc~calc_thc_4</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node24"><a xlink:href="../proc/calc_thc_4.html" xlink:title="calc_thc_4">
+<polygon fill="#d9534f" stroke="#d9534f" points="1586.5,-313.56 1518.5,-313.56 1518.5,-289.56 1586.5,-289.56 1586.5,-313.56"/>
+<text text-anchor="middle" x="1552.5" y="-299.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_thc_4</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_thc_4&#45;&gt;proc~calc_thc_4 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge26" class="edge">
+<title>interface~calc_thc_4&#45;&gt;proc~calc_thc_4</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1318.65,-301.56C1366.57,-301.56 1455.24,-301.56 1508.25,-301.56"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1508.35,-305.06 1518.35,-301.56 1508.35,-298.06 1508.35,-305.06"/>
+</g>
+<!-- proc~calc_thc_4_vadoze -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node25" class="node">
+<title>proc~calc_thc_4_vadoze</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_node25"><a xlink:href="../proc/calc_thc_4_vadoze.html" xlink:title="calc_thc_4_vadoze">
+<polygon fill="#d9534f" stroke="#d9534f" points="1608.5,-271.56 1496.5,-271.56 1496.5,-247.56 1608.5,-247.56 1608.5,-271.56"/>
+<text text-anchor="middle" x="1552.5" y="-257.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_thc_4_vadoze</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_thc_4_vadoze&#45;&gt;proc~calc_thc_4_vadoze -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge27" class="edge">
+<title>interface~calc_thc_4_vadoze&#45;&gt;proc~calc_thc_4_vadoze</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M1340.62,-259.56C1382.97,-259.56 1441.59,-259.56 1486.28,-259.56"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="1486.46,-263.06 1496.46,-259.56 1486.46,-256.06 1486.46,-263.06"/>
+</g>
+<!-- proc~get_material_phi&#45;&gt;proc~get_field_dp -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CallsGraph_edge28" class="edge">
+<title>proc~get_material_phi&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#00ff00" d="M1365.31,-205.56C1396.24,-200.91 1431.77,-195.57 1463.44,-190.81"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1464.21,-194.23 1473.58,-189.28 1463.17,-187.31 1464.21,-194.23"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccalc_thc_dispersivity_gp_4phaseCallsGraph = svgPanZoom('#proccalc_thc_dispersivity_gp_4phaseCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph Pages: 1 -->
+<svg id="proccalc_thc_dispersivity_gp_4phaseCalledByGraph" width="641pt" height="33pt"
+ viewBox="0.00 0.00 641.00 32.59" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph" class="graph" transform="scale(0.13 0.13) rotate(0) translate(4 238)">
+<title>proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-238 4756,-238 4756,4 -4,4"/>
+<!-- proc~calc_thc_dispersivity_gp_4phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node1" class="node">
+<title>proc~calc_thc_dispersivity_gp_4phase</title>
+<polygon fill="none" stroke="black" points="4169,-234 3985,-234 3985,-210 4169,-210 4169,-234"/>
+<text text-anchor="middle" x="4077" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50">calc_thc_dispersivity_gp_4phase</text>
+</g>
+<!-- none~calc~21 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node4" class="node">
+<title>none~calc~21</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node4"><a xlink:href="../type/type_thc_4phase.html#boundprocedure-calc~21" xlink:title="type_thc_4phase%calc">
+<polygon fill="#a7506f" stroke="#a7506f" points="4433,-233 4300,-233 4300,-209 4433,-209 4433,-233"/>
+<text text-anchor="middle" x="4366.5" y="-218.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thc_4phase%calc</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thc_dispersivity_gp_4phase&#45;&gt;none~calc~21 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge9" class="edge">
+<title>proc~calc_thc_dispersivity_gp_4phase&#45;&gt;none~calc~21</title>
+<path fill="none" stroke="#cbff00" d="M4169.36,-221.68C4208.14,-221.55 4252.8,-221.39 4289.71,-221.26"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="4289.91,-224.76 4299.9,-221.23 4289.89,-217.76 4289.91,-224.76"/>
+</g>
+<!-- interface~calc_thc_dispersivity_gp_4phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node2" class="node">
+<title>interface~calc_thc_dispersivity_gp_4phase</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node2"><a xlink:href="../interface/calc_thc_dispersivity_gp_4phase.html" xlink:title="type_thc_4phase%calc_thc_dispersivity_gp_4phase">
+<polygon fill="#a7506f" stroke="#a7506f" points="4752,-129 4469,-129 4469,-105 4752,-105 4752,-129"/>
+<text text-anchor="middle" x="4610.5" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thc_4phase%calc_thc_dispersivity_gp_4phase</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_thc_dispersivity_gp_4phase&#45;&gt;proc~calc_thc_dispersivity_gp_4phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge1" class="edge">
+<title>interface~calc_thc_dispersivity_gp_4phase&#45;&gt;proc~calc_thc_dispersivity_gp_4phase</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M4567.58,-129.01C4502.93,-147.11 4374.78,-181.36 4264,-201 4236.64,-205.85 4206.81,-209.8 4179.21,-212.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4178.71,-209.45 4169.15,-214.03 4179.47,-216.41 4178.71,-209.45"/>
+</g>
+<!-- none~calc~15 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node3" class="node">
+<title>none~calc~15</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node3"><a xlink:href="../type/abst_thc.html#boundprocedure-calc~15" xlink:title="abst_thc%calc">
+<polygon fill="#a7506f" stroke="#a7506f" points="4410.5,-150 4322.5,-150 4322.5,-126 4410.5,-126 4410.5,-150"/>
+<text text-anchor="middle" x="4366.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_thc%calc</text>
+</a>
+</g>
+</g>
+<!-- none~calc~15&#45;&gt;interface~calc_thc_dispersivity_gp_4phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge2" class="edge">
+<title>none~calc~15&#45;&gt;interface~calc_thc_dispersivity_gp_4phase</title>
+<path fill="none" stroke="#ff0000" d="M4410.76,-134.25C4425.45,-132.97 4442.78,-131.47 4460.99,-129.89"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4461.52,-133.35 4471.18,-129 4460.92,-126.38 4461.52,-133.35"/>
+</g>
+<!-- none~calc~21&#45;&gt;interface~calc_thc_dispersivity_gp_4phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge3" class="edge">
+<title>none~calc~21&#45;&gt;interface~calc_thc_dispersivity_gp_4phase</title>
+<path fill="none" stroke="#ff0000" d="M4397.23,-208.9C4408.46,-204.28 4421.34,-198.95 4433,-194 4481.53,-173.42 4537.23,-148.98 4572.87,-133.24"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4574.63,-136.29 4582.36,-129.04 4571.8,-129.89 4574.63,-136.29"/>
+</g>
+<!-- none~calc~22 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node5" class="node">
+<title>none~calc~22</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node5"><a xlink:href="../type/type_thc_1phase.html#boundprocedure-calc~22" xlink:title="type_thc_1phase%calc">
+<polygon fill="#a7506f" stroke="#a7506f" points="4433,-108 4300,-108 4300,-84 4433,-84 4433,-108"/>
+<text text-anchor="middle" x="4366.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thc_1phase%calc</text>
+</a>
+</g>
+</g>
+<!-- none~calc~22&#45;&gt;interface~calc_thc_dispersivity_gp_4phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge4" class="edge">
+<title>none~calc~22&#45;&gt;interface~calc_thc_dispersivity_gp_4phase</title>
+<path fill="none" stroke="#ff0000" d="M4433.31,-101.71C4442.14,-102.48 4451.47,-103.29 4461.04,-104.12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4460.82,-107.61 4471.09,-104.99 4461.43,-100.64 4460.82,-107.61"/>
+</g>
+<!-- none~calc~23 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node6" class="node">
+<title>none~calc~23</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node6"><a xlink:href="../type/type_thc_2phase.html#boundprocedure-calc~23" xlink:title="type_thc_2phase%calc">
+<polygon fill="#a7506f" stroke="#a7506f" points="4433,-66 4300,-66 4300,-42 4433,-42 4433,-66"/>
+<text text-anchor="middle" x="4366.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thc_2phase%calc</text>
+</a>
+</g>
+</g>
+<!-- none~calc~23&#45;&gt;interface~calc_thc_dispersivity_gp_4phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge5" class="edge">
+<title>none~calc~23&#45;&gt;interface~calc_thc_dispersivity_gp_4phase</title>
+<path fill="none" stroke="#ff0000" d="M4413.87,-66.07C4453.64,-76.43 4511.06,-91.37 4553.41,-102.4"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4552.72,-105.84 4563.28,-104.97 4554.49,-99.06 4552.72,-105.84"/>
+</g>
+<!-- none~calc~24 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node7" class="node">
+<title>none~calc~24</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node7"><a xlink:href="../type/type_thc_3phase.html#boundprocedure-calc~24" xlink:title="type_thc_3phase%calc">
+<polygon fill="#a7506f" stroke="#a7506f" points="4433,-24 4300,-24 4300,0 4433,0 4433,-24"/>
+<text text-anchor="middle" x="4366.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thc_3phase%calc</text>
+</a>
+</g>
+</g>
+<!-- none~calc~24&#45;&gt;interface~calc_thc_dispersivity_gp_4phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge6" class="edge">
+<title>none~calc~24&#45;&gt;interface~calc_thc_dispersivity_gp_4phase</title>
+<path fill="none" stroke="#ff0000" d="M4407.98,-24.04C4416.33,-26.79 4425.01,-29.83 4433,-33 4484.76,-53.51 4542.68,-82.23 4577.59,-100.22"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4576.32,-103.5 4586.81,-104.99 4579.54,-97.28 4576.32,-103.5"/>
+</g>
+<!-- proc~calc_thc_dispersivity_gp_1phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node8" class="node">
+<title>proc~calc_thc_dispersivity_gp_1phase</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node8"><a xlink:href="../proc/calc_thc_dispersivity_gp_1phase.html" xlink:title="calc_thc_dispersivity_gp_1phase">
+<polygon fill="#d9534f" stroke="#d9534f" points="4169,-108 3985,-108 3985,-84 4169,-84 4169,-108"/>
+<text text-anchor="middle" x="4077" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_thc_dispersivity_gp_1phase</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thc_dispersivity_gp_1phase&#45;&gt;none~calc~22 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge10" class="edge">
+<title>proc~calc_thc_dispersivity_gp_1phase&#45;&gt;none~calc~22</title>
+<path fill="none" stroke="#00ff66" d="M4169.36,-96C4208.14,-96 4252.8,-96 4289.71,-96"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="4289.9,-99.5 4299.9,-96 4289.9,-92.5 4289.9,-99.5"/>
+</g>
+<!-- proc~calc_thc_dispersivity_gp_2phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node9" class="node">
+<title>proc~calc_thc_dispersivity_gp_2phase</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node9"><a xlink:href="../proc/calc_thc_dispersivity_gp_2phase.html" xlink:title="calc_thc_dispersivity_gp_2phase">
+<polygon fill="#d9534f" stroke="#d9534f" points="4169,-66 3985,-66 3985,-42 4169,-42 4169,-66"/>
+<text text-anchor="middle" x="4077" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_thc_dispersivity_gp_2phase</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thc_dispersivity_gp_2phase&#45;&gt;none~calc~23 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge11" class="edge">
+<title>proc~calc_thc_dispersivity_gp_2phase&#45;&gt;none~calc~23</title>
+<path fill="none" stroke="#0066ff" d="M4169.36,-54C4208.14,-54 4252.8,-54 4289.71,-54"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="4289.9,-57.5 4299.9,-54 4289.9,-50.5 4289.9,-57.5"/>
+</g>
+<!-- proc~calc_thc_dispersivity_gp_3phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node10" class="node">
+<title>proc~calc_thc_dispersivity_gp_3phase</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node10"><a xlink:href="../proc/calc_thc_dispersivity_gp_3phase.html" xlink:title="calc_thc_dispersivity_gp_3phase">
+<polygon fill="#d9534f" stroke="#d9534f" points="4169,-24 3985,-24 3985,0 4169,0 4169,-24"/>
+<text text-anchor="middle" x="4077" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_thc_dispersivity_gp_3phase</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thc_dispersivity_gp_3phase&#45;&gt;none~calc~24 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge12" class="edge">
+<title>proc~calc_thc_dispersivity_gp_3phase&#45;&gt;none~calc~24</title>
+<path fill="none" stroke="#cc00ff" d="M4169.36,-12C4208.14,-12 4252.8,-12 4289.71,-12"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="4289.9,-15.5 4299.9,-12 4289.9,-8.5 4289.9,-15.5"/>
+</g>
+<!-- proc~calc_thermal_conductivity_dispersivity -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node11" class="node">
+<title>proc~calc_thermal_conductivity_dispersivity</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node11"><a xlink:href="../proc/calc_thermal_conductivity_dispersivity.html" xlink:title="type_material_manager%calc_thermal_conductivity_dispersivity">
+<polygon fill="#d9534f" stroke="#d9534f" points="4254,-192 3900,-192 3900,-168 4254,-168 4254,-192"/>
+<text text-anchor="middle" x="4077" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_material_manager%calc_thermal_conductivity_dispersivity</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thermal_conductivity_dispersivity&#45;&gt;none~calc~15 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge7" class="edge">
+<title>proc~calc_thermal_conductivity_dispersivity&#45;&gt;none~calc~15</title>
+<path fill="none" stroke="#ff0000" d="M4198.78,-167.99C4220.54,-165.37 4242.98,-162.35 4264,-159 4279.74,-156.49 4296.75,-153.2 4312.25,-149.97"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4313.14,-153.36 4322.2,-147.87 4311.69,-146.51 4313.14,-153.36"/>
+</g>
+<!-- proc~calc_thermal_conductivity_nondispersivity -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node12" class="node">
+<title>proc~calc_thermal_conductivity_nondispersivity</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node12"><a xlink:href="../proc/calc_thermal_conductivity_nondispersivity.html" xlink:title="type_material_manager%calc_thermal_conductivity_nondispersivity">
+<polygon fill="#d9534f" stroke="#d9534f" points="4264,-150 3890,-150 3890,-126 4264,-126 4264,-150"/>
+<text text-anchor="middle" x="4077" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_material_manager%calc_thermal_conductivity_nondispersivity</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thermal_conductivity_nondispersivity&#45;&gt;none~calc~15 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge8" class="edge">
+<title>proc~calc_thermal_conductivity_nondispersivity&#45;&gt;none~calc~15</title>
+<path fill="none" stroke="#ff0000" d="M4264.14,-138C4281.43,-138 4297.81,-138 4312.17,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4312.26,-141.5 4322.26,-138 4312.26,-134.5 4312.26,-141.5"/>
+</g>
+<!-- interface~calc_thc_dispersivity_gp_1phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node13" class="node">
+<title>interface~calc_thc_dispersivity_gp_1phase</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node13"><a xlink:href="../interface/calc_thc_dispersivity_gp_1phase.html" xlink:title="type_thc_1phase%calc_thc_dispersivity_gp_1phase">
+<polygon fill="#a7506f" stroke="#a7506f" points="3851,-108 3568,-108 3568,-84 3851,-84 3851,-108"/>
+<text text-anchor="middle" x="3709.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thc_1phase%calc_thc_dispersivity_gp_1phase</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_thc_dispersivity_gp_1phase&#45;&gt;proc~calc_thc_dispersivity_gp_1phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge13" class="edge">
+<title>interface~calc_thc_dispersivity_gp_1phase&#45;&gt;proc~calc_thc_dispersivity_gp_1phase</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3851.03,-96C3892.22,-96 3936.43,-96 3974.67,-96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3974.77,-99.5 3984.77,-96 3974.77,-92.5 3974.77,-99.5"/>
+</g>
+<!-- interface~calc_thc_dispersivity_gp_2phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node14" class="node">
+<title>interface~calc_thc_dispersivity_gp_2phase</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node14"><a xlink:href="../interface/calc_thc_dispersivity_gp_2phase.html" xlink:title="type_thc_2phase%calc_thc_dispersivity_gp_2phase">
+<polygon fill="#a7506f" stroke="#a7506f" points="3851,-66 3568,-66 3568,-42 3851,-42 3851,-66"/>
+<text text-anchor="middle" x="3709.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thc_2phase%calc_thc_dispersivity_gp_2phase</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_thc_dispersivity_gp_2phase&#45;&gt;proc~calc_thc_dispersivity_gp_2phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge14" class="edge">
+<title>interface~calc_thc_dispersivity_gp_2phase&#45;&gt;proc~calc_thc_dispersivity_gp_2phase</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M3851.03,-54C3892.22,-54 3936.43,-54 3974.67,-54"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="3974.77,-57.5 3984.77,-54 3974.77,-50.5 3974.77,-57.5"/>
+</g>
+<!-- interface~calc_thc_dispersivity_gp_3phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node15" class="node">
+<title>interface~calc_thc_dispersivity_gp_3phase</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node15"><a xlink:href="../interface/calc_thc_dispersivity_gp_3phase.html" xlink:title="type_thc_3phase%calc_thc_dispersivity_gp_3phase">
+<polygon fill="#a7506f" stroke="#a7506f" points="3851,-24 3568,-24 3568,0 3851,0 3851,-24"/>
+<text text-anchor="middle" x="3709.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thc_3phase%calc_thc_dispersivity_gp_3phase</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_thc_dispersivity_gp_3phase&#45;&gt;proc~calc_thc_dispersivity_gp_3phase -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge15" class="edge">
+<title>interface~calc_thc_dispersivity_gp_3phase&#45;&gt;proc~calc_thc_dispersivity_gp_3phase</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M3851.03,-12C3892.22,-12 3936.43,-12 3974.67,-12"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="3974.77,-15.5 3984.77,-12 3974.77,-8.5 3974.77,-15.5"/>
+</g>
+<!-- none~calc_thermal_conductivity -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node16" class="node">
+<title>none~calc_thermal_conductivity</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node16"><a xlink:href="../type/type_material_manager.html#boundprocedure-calc_thermal_conductivity" xlink:title="type_material_manager%calc_thermal_conductivity">
+<polygon fill="#a7506f" stroke="#a7506f" points="3854,-171 3565,-171 3565,-147 3854,-147 3854,-171"/>
+<text text-anchor="middle" x="3709.5" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_material_manager%calc_thermal_conductivity</text>
+</a>
+</g>
+</g>
+<!-- none~calc_thermal_conductivity&#45;&gt;proc~calc_thermal_conductivity_dispersivity -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge16" class="edge">
+<title>none~calc_thermal_conductivity&#45;&gt;proc~calc_thermal_conductivity_dispersivity</title>
+<path fill="none" stroke="#0066ff" d="M3854.17,-167.25C3865.88,-167.93 3877.82,-168.61 3889.77,-169.3"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="3889.63,-172.8 3899.82,-169.88 3890.03,-165.81 3889.63,-172.8"/>
+</g>
+<!-- none~calc_thermal_conductivity&#45;&gt;proc~calc_thermal_conductivity_nondispersivity -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge17" class="edge">
+<title>none~calc_thermal_conductivity&#45;&gt;proc~calc_thermal_conductivity_nondispersivity</title>
+<path fill="none" stroke="#cc00ff" d="M3854.17,-150.75C3862.57,-150.26 3871.09,-149.77 3879.65,-149.28"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="3879.93,-152.77 3889.72,-148.7 3879.53,-145.78 3879.93,-152.77"/>
+</g>
+<!-- proc~calc_thermal_conductivity_dispersivity~2 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node17" class="node">
+<title>proc~calc_thermal_conductivity_dispersivity~2</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node17"><a xlink:href="../proc/calc_thermal_conductivity_dispersivity~2.html" xlink:title="type_physics_manager%calc_thermal_conductivity_dispersivity">
+<polygon fill="#d9534f" stroke="#d9534f" points="3519,-192 3171,-192 3171,-168 3519,-168 3519,-192"/>
+<text text-anchor="middle" x="3345" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%calc_thermal_conductivity_dispersivity</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thermal_conductivity_dispersivity~2&#45;&gt;none~calc_thermal_conductivity -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge18" class="edge">
+<title>proc~calc_thermal_conductivity_dispersivity~2&#45;&gt;none~calc_thermal_conductivity</title>
+<path fill="none" stroke="#7f00ff" d="M3519.02,-169.98C3530.86,-169.29 3542.74,-168.6 3554.47,-167.92"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="3554.95,-171.4 3564.73,-167.33 3554.55,-164.41 3554.95,-171.4"/>
+</g>
+<!-- proc~calc_thermal_conductivity_nondispersivity~2 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node18" class="node">
+<title>proc~calc_thermal_conductivity_nondispersivity~2</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node18"><a xlink:href="../proc/calc_thermal_conductivity_nondispersivity~2.html" xlink:title="type_physics_manager%calc_thermal_conductivity_nondispersivity">
+<polygon fill="#d9534f" stroke="#d9534f" points="3529,-150 3161,-150 3161,-126 3529,-126 3529,-150"/>
+<text text-anchor="middle" x="3345" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%calc_thermal_conductivity_nondispersivity</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thermal_conductivity_nondispersivity~2&#45;&gt;none~calc_thermal_conductivity -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge19" class="edge">
+<title>proc~calc_thermal_conductivity_nondispersivity~2&#45;&gt;none~calc_thermal_conductivity</title>
+<path fill="none" stroke="#7f00ff" d="M3529.11,-148.61C3537.76,-149.11 3546.41,-149.61 3554.98,-150.11"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="3554.8,-153.6 3564.99,-150.69 3555.21,-146.61 3554.8,-153.6"/>
+</g>
+<!-- none~calc_thermal_conductivity~2 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node19" class="node">
+<title>none~calc_thermal_conductivity~2</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node19"><a xlink:href="../type/type_physics_manager.html#boundprocedure-calc_thermal_conductivity~2" xlink:title="type_physics_manager%calc_thermal_conductivity">
+<polygon fill="#a7506f" stroke="#a7506f" points="3125,-171 2842,-171 2842,-147 3125,-147 3125,-171"/>
+<text text-anchor="middle" x="2983.5" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%calc_thermal_conductivity</text>
+</a>
+</g>
+</g>
+<!-- none~calc_thermal_conductivity~2&#45;&gt;proc~calc_thermal_conductivity_dispersivity~2 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge20" class="edge">
+<title>none~calc_thermal_conductivity~2&#45;&gt;proc~calc_thermal_conductivity_dispersivity~2</title>
+<path fill="none" stroke="#ff0000" d="M3125.04,-167.21C3136.81,-167.9 3148.81,-168.6 3160.84,-169.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3160.75,-172.8 3170.94,-169.89 3161.16,-165.81 3160.75,-172.8"/>
+</g>
+<!-- none~calc_thermal_conductivity~2&#45;&gt;proc~calc_thermal_conductivity_nondispersivity~2 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge21" class="edge">
+<title>none~calc_thermal_conductivity~2&#45;&gt;proc~calc_thermal_conductivity_nondispersivity~2</title>
+<path fill="none" stroke="#00ffff" d="M3125.04,-150.79C3133.53,-150.29 3142.14,-149.79 3150.8,-149.29"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="3151.2,-152.77 3160.98,-148.69 3150.79,-145.78 3151.2,-152.77"/>
+</g>
+<!-- proc~compute_diffusion_term_thermal -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node20" class="node">
+<title>proc~compute_diffusion_term_thermal</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node20"><a xlink:href="../proc/compute_diffusion_term_thermal.html" xlink:title="compute_diffusion_term_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="2806,-171 2617,-171 2617,-147 2806,-147 2806,-171"/>
+<text text-anchor="middle" x="2711.5" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">compute_diffusion_term_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_diffusion_term_thermal&#45;&gt;none~calc_thermal_conductivity~2 -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge22" class="edge">
+<title>proc~compute_diffusion_term_thermal&#45;&gt;none~calc_thermal_conductivity~2</title>
+<path fill="none" stroke="#ff0000" d="M2806.18,-159C2814.5,-159 2823.05,-159 2831.69,-159"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2831.86,-162.5 2841.86,-159 2831.86,-155.5 2831.86,-162.5"/>
+</g>
+<!-- interface~compute_diffusion_term_thermal -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node21" class="node">
+<title>interface~compute_diffusion_term_thermal</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node21"><a xlink:href="../interface/compute_diffusion_term_thermal.html" xlink:title="type_thermal%compute_diffusion_term_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="2581,-171 2312,-171 2312,-147 2581,-147 2581,-171"/>
+<text text-anchor="middle" x="2446.5" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%compute_diffusion_term_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~compute_diffusion_term_thermal&#45;&gt;proc~compute_diffusion_term_thermal -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge23" class="edge">
+<title>interface~compute_diffusion_term_thermal&#45;&gt;proc~compute_diffusion_term_thermal</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2581.31,-159C2589.88,-159 2598.44,-159 2606.84,-159"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2606.99,-162.5 2616.99,-159 2606.99,-155.5 2606.99,-162.5"/>
+</g>
+<!-- proc~assemble_local_newton_thermal -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node22" class="node">
+<title>proc~assemble_local_newton_thermal</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node22"><a xlink:href="../proc/assemble_local_newton_thermal.html" xlink:title="assemble_local_newton_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="2276,-192 2090,-192 2090,-168 2276,-168 2276,-192"/>
+<text text-anchor="middle" x="2183" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_newton_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_newton_thermal&#45;&gt;interface~compute_diffusion_term_thermal -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge24" class="edge">
+<title>proc~assemble_local_newton_thermal&#45;&gt;interface~compute_diffusion_term_thermal</title>
+<path fill="none" stroke="#ff0000" d="M2276.2,-172.6C2284.54,-171.93 2293.12,-171.24 2301.78,-170.54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2302.28,-174.01 2311.97,-169.72 2301.72,-167.04 2302.28,-174.01"/>
+</g>
+<!-- proc~assemble_local_picard_thermal -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node23" class="node">
+<title>proc~assemble_local_picard_thermal</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node23"><a xlink:href="../proc/assemble_local_picard_thermal.html" xlink:title="assemble_local_picard_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="2273.5,-150 2092.5,-150 2092.5,-126 2273.5,-126 2273.5,-150"/>
+<text text-anchor="middle" x="2183" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_picard_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_picard_thermal&#45;&gt;interface~compute_diffusion_term_thermal -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge25" class="edge">
+<title>proc~assemble_local_picard_thermal&#45;&gt;interface~compute_diffusion_term_thermal</title>
+<path fill="none" stroke="#ff0000" d="M2273.63,-145.2C2282.64,-145.92 2291.94,-146.67 2301.34,-147.42"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2301.31,-150.93 2311.56,-148.24 2301.87,-143.95 2301.31,-150.93"/>
+</g>
+<!-- interface~assemble_local_newton_thermal -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node24" class="node">
+<title>interface~assemble_local_newton_thermal</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node24"><a xlink:href="../interface/assemble_local_newton_thermal.html" xlink:title="type_thermal%assemble_local_newton_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="2054,-192 1788,-192 1788,-168 2054,-168 2054,-192"/>
+<text text-anchor="middle" x="1921" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%assemble_local_newton_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_newton_thermal&#45;&gt;proc~assemble_local_newton_thermal -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge26" class="edge">
+<title>interface~assemble_local_newton_thermal&#45;&gt;proc~assemble_local_newton_thermal</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2054.29,-180C2062.85,-180 2071.4,-180 2079.78,-180"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2079.92,-183.5 2089.92,-180 2079.92,-176.5 2079.92,-183.5"/>
+</g>
+<!-- interface~assemble_local_picard_thermal -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node25" class="node">
+<title>interface~assemble_local_picard_thermal</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node25"><a xlink:href="../interface/assemble_local_picard_thermal.html" xlink:title="type_thermal%assemble_local_picard_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="2051.5,-150 1790.5,-150 1790.5,-126 2051.5,-126 2051.5,-150"/>
+<text text-anchor="middle" x="1921" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%assemble_local_picard_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_picard_thermal&#45;&gt;proc~assemble_local_picard_thermal -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge27" class="edge">
+<title>interface~assemble_local_picard_thermal&#45;&gt;proc~assemble_local_picard_thermal</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M2051.62,-138C2061.82,-138 2072.01,-138 2081.97,-138"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2082.24,-141.5 2092.24,-138 2082.24,-134.5 2082.24,-141.5"/>
+</g>
+<!-- proc~assemble_local_thermal -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node26" class="node">
+<title>proc~assemble_local_thermal</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node26"><a xlink:href="../proc/assemble_local_thermal.html" xlink:title="assemble_local_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="1752,-171 1610,-171 1610,-147 1752,-147 1752,-171"/>
+<text text-anchor="middle" x="1681" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_thermal&#45;&gt;interface~assemble_local_newton_thermal -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge28" class="edge">
+<title>proc~assemble_local_thermal&#45;&gt;interface~assemble_local_newton_thermal</title>
+<path fill="none" stroke="#ff0000" d="M1752.12,-165.19C1760.39,-165.92 1769.04,-166.68 1777.87,-167.46"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1777.63,-170.95 1787.9,-168.34 1778.24,-163.98 1777.63,-170.95"/>
+</g>
+<!-- proc~assemble_local_thermal&#45;&gt;interface~assemble_local_picard_thermal -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge29" class="edge">
+<title>proc~assemble_local_thermal&#45;&gt;interface~assemble_local_picard_thermal</title>
+<path fill="none" stroke="#00ffff" d="M1752.12,-152.81C1761.08,-152.02 1770.48,-151.19 1780.07,-150.35"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1780.47,-153.83 1790.12,-149.46 1779.85,-146.85 1780.47,-153.83"/>
+</g>
+<!-- interface~assemble_local_thermal -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node27" class="node">
+<title>interface~assemble_local_thermal</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node27"><a xlink:href="../interface/assemble_local_thermal.html" xlink:title="type_thermal%assemble_local_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="1574,-171 1352,-171 1352,-147 1574,-147 1574,-171"/>
+<text text-anchor="middle" x="1463" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%assemble_local_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_thermal&#45;&gt;proc~assemble_local_thermal -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge30" class="edge">
+<title>interface~assemble_local_thermal&#45;&gt;proc~assemble_local_thermal</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1574.21,-159C1582.87,-159 1591.5,-159 1599.89,-159"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1599.99,-162.5 1609.99,-159 1599.99,-155.5 1599.99,-162.5"/>
+</g>
+<!-- proc~assemble_local_ftdss -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node28" class="node">
+<title>proc~assemble_local_ftdss</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node28"><a xlink:href="../proc/assemble_local_ftdss.html" xlink:title="assemble_local_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1316,-171 1192,-171 1192,-147 1316,-147 1316,-171"/>
+<text text-anchor="middle" x="1254" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_ftdss&#45;&gt;interface~assemble_local_thermal -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge31" class="edge">
+<title>proc~assemble_local_ftdss&#45;&gt;interface~assemble_local_thermal</title>
+<path fill="none" stroke="#ff0000" d="M1316.27,-159C1324.5,-159 1333.15,-159 1341.98,-159"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1341.99,-162.5 1351.99,-159 1341.99,-155.5 1341.99,-162.5"/>
+</g>
+<!-- interface~assemble_local_ftdss -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node29" class="node">
+<title>interface~assemble_local_ftdss</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node29"><a xlink:href="../interface/assemble_local_ftdss.html" xlink:title="type_ftdss%assemble_local_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1156,-171 969,-171 969,-147 1156,-147 1156,-171"/>
+<text text-anchor="middle" x="1062.5" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_local_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_ftdss&#45;&gt;proc~assemble_local_ftdss -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge32" class="edge">
+<title>interface~assemble_local_ftdss&#45;&gt;proc~assemble_local_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1156.03,-159C1164.65,-159 1173.29,-159 1181.67,-159"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1181.74,-162.5 1191.74,-159 1181.74,-155.5 1181.74,-162.5"/>
+</g>
+<!-- proc~assemble_ftdss -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node30" class="node">
+<title>proc~assemble_ftdss</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node30"><a xlink:href="../proc/assemble_ftdss.html" xlink:title="assemble_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="933,-171 839,-171 839,-147 933,-147 933,-171"/>
+<text text-anchor="middle" x="886" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_ftdss&#45;&gt;interface~assemble_local_ftdss -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge33" class="edge">
+<title>proc~assemble_ftdss&#45;&gt;interface~assemble_local_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M933.3,-159C941.3,-159 949.89,-159 958.7,-159"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="958.72,-162.5 968.72,-159 958.72,-155.5 958.72,-162.5"/>
+</g>
+<!-- interface~assemble_ftdss -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node31" class="node">
+<title>interface~assemble_ftdss</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node31"><a xlink:href="../interface/assemble_ftdss.html" xlink:title="type_ftdss%assemble_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="803,-171 646,-171 646,-147 803,-147 803,-171"/>
+<text text-anchor="middle" x="724.5" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge34" class="edge">
+<title>interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M803.38,-159C811.94,-159 820.54,-159 828.76,-159"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="828.95,-162.5 838.95,-159 828.95,-155.5 828.95,-162.5"/>
+</g>
+<!-- proc~solve_time_step_ftdss -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node32" class="node">
+<title>proc~solve_time_step_ftdss</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node32"><a xlink:href="../proc/solve_time_step_ftdss.html" xlink:title="solve_time_step_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="610,-171 483,-171 483,-147 610,-147 610,-171"/>
+<text text-anchor="middle" x="546.5" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge35" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M610.05,-159C618.36,-159 627,-159 635.63,-159"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="635.75,-162.5 645.75,-159 635.75,-155.5 635.75,-162.5"/>
+</g>
+<!-- interface~solve_time_step_ftdss -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node33" class="node">
+<title>interface~solve_time_step_ftdss</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node33"><a xlink:href="../interface/solve_time_step_ftdss.html" xlink:title="type_ftdss%solve_time_step_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="447,-171 257,-171 257,-147 447,-147 447,-171"/>
+<text text-anchor="middle" x="352" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge36" class="edge">
+<title>interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M447.28,-159C455.88,-159 464.5,-159 472.87,-159"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="472.93,-162.5 482.93,-159 472.93,-155.5 472.93,-162.5"/>
+</g>
+<!-- proc~run_ftdss -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node34" class="node">
+<title>proc~run_ftdss</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node34"><a xlink:href="../proc/run_ftdss.html" xlink:title="run_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-171 160,-171 160,-147 221,-147 221,-171"/>
+<text text-anchor="middle" x="190.5" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge37" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M221.13,-159C228.8,-159 237.52,-159 246.72,-159"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="246.86,-162.5 256.86,-159 246.86,-155.5 246.86,-162.5"/>
+</g>
+<!-- interface~run_ftdss -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node35" class="node">
+<title>interface~run_ftdss</title>
+<g id="a_proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_node35"><a xlink:href="../interface/run_ftdss.html" xlink:title="type_ftdss%run_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="124,-171 0,-171 0,-147 124,-147 124,-171"/>
+<text text-anchor="middle" x="62" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftdss&#45;&gt;proc~run_ftdss -->
+<g id="proc~~calc_thc_dispersivity_gp_4phase~~CalledByGraph_edge38" class="edge">
+<title>interface~run_ftdss&#45;&gt;proc~run_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M124.03,-159C132.82,-159 141.68,-159 149.91,-159"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="149.94,-162.5 159.94,-159 149.94,-155.5 149.94,-162.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccalc_thc_dispersivity_gp_4phaseCalledByGraph = svgPanZoom('#proccalc_thc_dispersivity_gp_4phaseCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">calc_thc_dispersivity_gp_4phase</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">lambda</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_thc_4phase</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_state</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">state</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_thc_dispersivity</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">lambda</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">lambda_0</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_coordinate_dp</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">water_flux</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">qx</span><span class="p">,</span><span class="w"> </span><span class="n">qy</span><span class="p">,</span><span class="w"> </span><span class="n">qz</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">htc_water</span><span class="p">,</span><span class="w"> </span><span class="n">rho_water</span><span class="p">,</span><span class="w"> </span><span class="n">cp_water</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">calc_water_density</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">rho_water</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">calc_water_cp</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">cp_water</span><span class="p">)</span>
+<span class="w">        </span><span class="n">htc_water</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rho_water</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cp_water</span>
+<span class="w">        </span><span class="k">call </span><span class="n">state</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">water_flux</span><span class="o">=</span><span class="n">water_flux</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">associated</span><span class="p">(</span><span class="n">water_flux</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">qx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">water_flux</span><span class="p">%</span><span class="n">x</span>
+<span class="w">            </span><span class="n">qy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">water_flux</span><span class="p">%</span><span class="n">y</span>
+<span class="w">            </span><span class="n">qz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">water_flux</span><span class="p">%</span><span class="n">z</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            </span><span class="n">qx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">            </span><span class="n">qy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">            </span><span class="n">qz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        call </span><span class="n">self</span><span class="p">%</span><span class="n">calc</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">lambda_0</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">calc_lambda_dispersivity</span><span class="p">(</span><span class="n">lambda_0</span><span class="p">,</span><span class="w"> </span><span class="n">htc_water</span><span class="p">,</span><span class="w"> </span><span class="n">qx</span><span class="p">,</span><span class="w"> </span><span class="n">qy</span><span class="p">,</span><span class="w"> </span><span class="n">qz</span><span class="p">,</span><span class="w"> </span><span class="n">lambda</span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">calc_thc_dispersivity_gp_4phase</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

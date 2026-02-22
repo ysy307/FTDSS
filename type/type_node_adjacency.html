@@ -92,20 +92,20 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 1.4% of total for derived types.</p>Including implementation: 113 statements,  2.2% of total for derived types.">17 statements</a>
+                 title="<p> 0.3% of total for derived types.</p>Including implementation: 195 statements,  1.1% of total for derived types.">7 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/adjacency_node.F90"> Source File</a>
+              <a href="../src/node.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/adjacency_node.f90.html'>adjacency_node.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/domain_adjacency_adjacency_node.html'>domain_adjacency_adjacency_node</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/node.f90.html'>node.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/domain_adjacency_node.html'>domain_adjacency_node</a></li>
             <li class="breadcrumb-item active" aria-current="page">type_node_adjacency</li>
           </ol>
         </nav>
@@ -134,12 +134,10 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_node_adjacency.html#variable-col~18">col</a>
-            <a class="list-group-item" href="../type/type_node_adjacency.html#variable-ind~7">ind</a>
-            <a class="list-group-item" href="../type/type_node_adjacency.html#variable-nnz~4">nnz</a>
-            <a class="list-group-item" href="../type/type_node_adjacency.html#variable-num_nodes~20">num_nodes</a>
-            <a class="list-group-item" href="../type/type_node_adjacency.html#variable-ptr~6">ptr</a>
-            <a class="list-group-item" href="../type/type_node_adjacency.html#variable-row~18">row</a>
+            <a class="list-group-item" href="../type/type_node_adjacency.html#variable-col_ind">col_ind</a>
+            <a class="list-group-item" href="../type/type_node_adjacency.html#variable-num_edges">num_edges</a>
+            <a class="list-group-item" href="../type/type_node_adjacency.html#variable-num_nodes~17">num_nodes</a>
+            <a class="list-group-item" href="../type/type_node_adjacency.html#variable-row_ptr">row_ptr</a>
         </div>
       </div>
     </div>
@@ -166,14 +164,15 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_node_adjacency.html#boundprocedure-destroy~10">destroy</a>
+            <a class="list-group-item" href="../type/type_node_adjacency.html#boundprocedure-build">build</a>
+            <a class="list-group-item" href="../type/type_node_adjacency.html#boundprocedure-destroy~8">destroy</a>
             <a class="list-group-item" href="../type/type_node_adjacency.html#boundprocedure-get_coo">get_coo</a>
             <a class="list-group-item" href="../type/type_node_adjacency.html#boundprocedure-get_csr">get_csr</a>
-            <a class="list-group-item" href="../type/type_node_adjacency.html#boundprocedure-get_degree~2">get_degree</a>
-            <a class="list-group-item" href="../type/type_node_adjacency.html#boundprocedure-get_neighbors~2">get_neighbors</a>
+            <a class="list-group-item" href="../type/type_node_adjacency.html#boundprocedure-get_degree">get_degree</a>
+            <a class="list-group-item" href="../type/type_node_adjacency.html#boundprocedure-get_neighbors">get_neighbors</a>
             <a class="list-group-item" href="../type/type_node_adjacency.html#boundprocedure-get_nnz">get_nnz</a>
-            <a class="list-group-item" href="../type/type_node_adjacency.html#boundprocedure-get_num_nodes~2">get_num_nodes</a>
-            <a class="list-group-item" href="../type/type_node_adjacency.html#boundprocedure-initialize~31">initialize</a>
+            <a class="list-group-item" href="../type/type_node_adjacency.html#boundprocedure-initialize~37">initialize</a>
+            <a class="list-group-item" href="../type/type_node_adjacency.html#boundprocedure-print">print</a>
         </div>
       </div>
     </div>
@@ -194,9 +193,100 @@
     
     <div class="col-md-9" id='text'>
       <h2 id="type-def-statement">
-        type, public :: type_node_adjacency</h2>
-    
+        type, public, extends(<a href='type_graph.html'>type_graph</a>) :: type_node_adjacency</h2>
+    <p>Stores node adjacency information.
+Inherits CSR storage and graph algorithms (get_degree, get_neighbors) from type_graph.</p>
 <br>      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Inherits</h3>
+        </div>
+        <div class="card-body">
+          <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: type~~type_node_adjacency~~InheritsGraph Pages: 1 -->
+<svg id="typetype_node_adjacencyInheritsGraph" width="245pt" height="32pt"
+ viewBox="0.00 0.00 245.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_node_adjacency~~InheritsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>type~~type_node_adjacency~~InheritsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 241,-28 241,4 -4,4"/>
+<!-- type~type_node_adjacency -->
+<g id="type~~type_node_adjacency~~InheritsGraph_node1" class="node">
+<title>type~type_node_adjacency</title>
+<polygon fill="none" stroke="black" points="237,-24 109,-24 109,0 237,0 237,-24"/>
+<text text-anchor="middle" x="173" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_node_adjacency</text>
+</g>
+<!-- type~type_graph -->
+<g id="type~~type_node_adjacency~~InheritsGraph_node2" class="node">
+<title>type~type_graph</title>
+<g id="a_type~~type_node_adjacency~~InheritsGraph_node2"><a xlink:href="../type/type_graph.html" xlink:title="type_graph">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="73,-24 0,-24 0,0 73,0 73,-24"/>
+<text text-anchor="middle" x="36.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_graph</text>
+</a>
+</g>
+</g>
+<!-- type~type_node_adjacency&#45;&gt;type~type_graph -->
+<g id="type~~type_node_adjacency~~InheritsGraph_edge1" class="edge">
+<title>type~type_node_adjacency&#45;&gt;type~type_graph</title>
+<path fill="none" stroke="#ff0000" d="M108.69,-12C100.07,-12 91.36,-12 83.13,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="83.01,-8.5 73.01,-12 83.01,-15.5 83.01,-8.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#InheritsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="InheritsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="186pt" height="32pt"
+ viewBox="0.00 0.00 185.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 181.5,-28 181.5,4 -4,4"/>
+<!-- Type -->
+<g id="node1" class="node">
+<title>Type</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="177.5,-24 72.5,-24 72.5,0 177.5,0 177.5,-24"/>
+<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a derived type to the parent type which it
+extends. Dashed arrows point from a derived type to the other
+types it contains as a components, with a label listing the name(s) of
+said component(s).
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+      <div class="card">
         <div class="card-header">
           <h3 class="card-title">Inherited by</h3>
         </div>
@@ -207,48 +297,117 @@
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: type~~type_node_adjacency~~InheritedByGraph Pages: 1 -->
-<svg id="typetype_node_adjacencyInheritedByGraph" width="471pt" height="32pt"
- viewBox="0.00 0.00 471.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="type~~type_node_adjacency~~InheritedByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<svg id="typetype_node_adjacencyInheritedByGraph" width="489pt" height="231pt"
+ viewBox="0.00 0.00 489.00 230.58" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_node_adjacency~~InheritedByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 226.58)">
 <title>type~~type_node_adjacency~~InheritedByGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 467,-28 467,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-226.58 485,-226.58 485,4 -4,4"/>
 <!-- type~type_node_adjacency -->
 <g id="type~~type_node_adjacency~~InheritedByGraph_node1" class="node">
 <title>type~type_node_adjacency</title>
-<polygon fill="none" stroke="black" points="128,-24 0,-24 0,0 128,0 128,-24"/>
-<text text-anchor="middle" x="64" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_node_adjacency</text>
+<polygon fill="none" stroke="black" points="137,-222.58 9,-222.58 9,-198.58 137,-198.58 137,-222.58"/>
+<text text-anchor="middle" x="73" y="-208.18" font-family="Helvetica,sans-Serif" font-size="10.50">type_node_adjacency</text>
 </g>
 <!-- type~type_domain -->
 <g id="type~~type_node_adjacency~~InheritedByGraph_node2" class="node">
 <title>type~type_domain</title>
 <g id="a_type~~type_node_adjacency~~InheritedByGraph_node2"><a xlink:href="../type/type_domain.html" xlink:title="type_domain">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="324,-24 242,-24 242,0 324,0 324,-24"/>
-<text text-anchor="middle" x="283" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain</text>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="342,-123.58 260,-123.58 260,-99.58 342,-99.58 342,-123.58"/>
+<text text-anchor="middle" x="301" y="-109.18" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain</text>
 </a>
 </g>
 </g>
 <!-- type~type_domain&#45;&gt;type~type_node_adjacency -->
 <g id="type~~type_node_adjacency~~InheritedByGraph_edge1" class="edge">
 <title>type~type_domain&#45;&gt;type~type_node_adjacency</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M241.95,-12C212.97,-12 172.98,-12 138.34,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="138.26,-8.5 128.26,-12 138.26,-15.5 138.26,-8.5"/>
-<text text-anchor="middle" x="185" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">node_adjacency</text>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M292.65,-123.8C282.99,-138.74 264.56,-163.63 242,-176.58 213.48,-192.95 178.27,-201.52 147.47,-205.98"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="146.67,-202.55 137.21,-207.34 147.59,-209.49 146.67,-202.55"/>
+<text text-anchor="middle" x="203" y="-203.98" font-family="Helvetica,sans-Serif" font-size="9.50">node_adjacency</text>
+</g>
+<!-- type~type_boundary_manager -->
+<g id="type~~type_node_adjacency~~InheritedByGraph_node3" class="node">
+<title>type~type_boundary_manager</title>
+<g id="a_type~~type_node_adjacency~~InheritedByGraph_node3"><a xlink:href="../type/type_boundary_manager.html" xlink:title="type_boundary_manager">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="146,-168.58 0,-168.58 0,-144.58 146,-144.58 146,-168.58"/>
+<text text-anchor="middle" x="73" y="-154.18" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_boundary_manager</text>
+</a>
+</g>
+</g>
+<!-- type~type_domain&#45;&gt;type~type_boundary_manager -->
+<g id="type~~type_node_adjacency~~InheritedByGraph_edge6" class="edge">
+<title>type~type_domain&#45;&gt;type~type_boundary_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M286.93,-123.92C275.9,-133.45 259.2,-145.94 242,-151.58 214.96,-160.45 184.14,-163.28 156.35,-163.4"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="156.28,-159.9 146.25,-163.32 156.23,-166.9 156.28,-159.9"/>
+<text text-anchor="middle" x="203" y="-164.98" font-family="Helvetica,sans-Serif" font-size="9.50">boundaries</text>
+</g>
+<!-- type~type_element_manager -->
+<g id="type~~type_node_adjacency~~InheritedByGraph_node4" class="node">
+<title>type~type_element_manager</title>
+<g id="a_type~~type_node_adjacency~~InheritedByGraph_node4"><a xlink:href="../type/type_element_manager.html" xlink:title="type_element_manager">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="142.5,-107.58 3.5,-107.58 3.5,-83.58 142.5,-83.58 142.5,-107.58"/>
+<text text-anchor="middle" x="73" y="-93.18" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_element_manager</text>
+</a>
+</g>
+</g>
+<!-- type~type_domain&#45;&gt;type~type_element_manager -->
+<g id="type~~type_node_adjacency~~InheritedByGraph_edge7" class="edge">
+<title>type~type_domain&#45;&gt;type~type_element_manager</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M259.86,-108.74C230.17,-106.64 188.8,-103.71 152.63,-101.15"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="152.8,-97.65 142.57,-100.44 152.3,-104.63 152.8,-97.65"/>
+<text text-anchor="middle" x="203" y="-109.98" font-family="Helvetica,sans-Serif" font-size="9.50">elements</text>
+</g>
+<!-- type~type_node_manager -->
+<g id="type~~type_node_adjacency~~InheritedByGraph_node6" class="node">
+<title>type~type_node_manager</title>
+<g id="a_type~~type_node_adjacency~~InheritedByGraph_node6"><a xlink:href="../type/type_node_manager.html" xlink:title="type_node_manager">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="134,-41.58 12,-41.58 12,-17.58 134,-17.58 134,-41.58"/>
+<text text-anchor="middle" x="73" y="-27.18" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_node_manager</text>
+</a>
+</g>
+</g>
+<!-- type~type_domain&#45;&gt;type~type_node_manager -->
+<g id="type~~type_node_adjacency~~InheritedByGraph_edge8" class="edge">
+<title>type~type_domain&#45;&gt;type~type_node_manager</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M289.79,-99.4C279.13,-87.53 261.3,-69.95 242,-60.58 211.91,-45.98 175.74,-38.23 144.68,-34.12"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="144.71,-30.6 134.36,-32.87 143.86,-37.55 144.71,-30.6"/>
+<text text-anchor="middle" x="203" y="-62.98" font-family="Helvetica,sans-Serif" font-size="9.50">nodes</text>
+</g>
+<!-- type~type_boundary_manager&#45;&gt;type~type_domain -->
+<g id="type~~type_node_adjacency~~InheritedByGraph_edge4" class="edge">
+<title>type~type_boundary_manager&#45;&gt;type~type_domain</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M134.61,-144.51C170.6,-137.35 215.68,-128.37 249.68,-121.6"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="250.73,-124.96 259.86,-119.58 249.37,-118.1 250.73,-124.96"/>
+<text text-anchor="middle" x="203" y="-139.98" font-family="Helvetica,sans-Serif" font-size="9.50">parent</text>
+</g>
+<!-- type~type_element_manager&#45;&gt;type~type_domain -->
+<g id="type~~type_node_adjacency~~InheritedByGraph_edge3" class="edge">
+<title>type~type_element_manager&#45;&gt;type~type_domain</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M116.75,-83.51C151.09,-75.71 200.29,-68.84 242,-79.58 253.31,-82.49 264.77,-88.13 274.49,-93.87"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="272.87,-96.99 283.21,-99.32 276.58,-91.06 272.87,-96.99"/>
+<text text-anchor="middle" x="203" y="-81.98" font-family="Helvetica,sans-Serif" font-size="9.50">parent</text>
 </g>
 <!-- type~type_ftdss -->
-<g id="type~~type_node_adjacency~~InheritedByGraph_node3" class="node">
+<g id="type~~type_node_adjacency~~InheritedByGraph_node5" class="node">
 <title>type~type_ftdss</title>
-<g id="a_type~~type_node_adjacency~~InheritedByGraph_node3"><a xlink:href="../type/type_ftdss.html" xlink:title="type_ftdss">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="463,-24 397,-24 397,0 463,0 463,-24"/>
-<text text-anchor="middle" x="430" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss</text>
+<g id="a_type~~type_node_adjacency~~InheritedByGraph_node5"><a xlink:href="../type/type_ftdss.html" xlink:title="type_ftdss">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="481,-123.58 415,-123.58 415,-99.58 481,-99.58 481,-123.58"/>
+<text text-anchor="middle" x="448" y="-109.18" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss</text>
 </a>
 </g>
 </g>
 <!-- type~type_ftdss&#45;&gt;type~type_domain -->
-<g id="type~~type_node_adjacency~~InheritedByGraph_edge2" class="edge">
+<g id="type~~type_node_adjacency~~InheritedByGraph_edge5" class="edge">
 <title>type~type_ftdss&#45;&gt;type~type_domain</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M396.82,-12C378.48,-12 355.08,-12 334.36,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="334.12,-8.5 324.12,-12 334.12,-15.5 334.12,-8.5"/>
-<text text-anchor="middle" x="360.5" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">domain</text>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M414.82,-111.58C396.48,-111.58 373.08,-111.58 352.36,-111.58"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="352.12,-108.08 342.12,-111.58 352.12,-115.08 352.12,-108.08"/>
+<text text-anchor="middle" x="378.5" y="-113.98" font-family="Helvetica,sans-Serif" font-size="9.50">domain</text>
+</g>
+<!-- type~type_node_manager&#45;&gt;type~type_domain -->
+<g id="type~~type_node_adjacency~~InheritedByGraph_edge2" class="edge">
+<title>type~type_node_manager&#45;&gt;type~type_domain</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M102.25,-17.48C137.43,-4.42 198.22,11.38 242,-13.58 270.45,-29.8 286.36,-66.06 294.05,-89.63"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="290.78,-90.9 297.03,-99.45 297.48,-88.87 290.78,-90.9"/>
+<text text-anchor="middle" x="203" y="-15.98" font-family="Helvetica,sans-Serif" font-size="9.50">parent</text>
 </g>
 </g>
 </svg>
@@ -319,7 +478,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-col~18"></span>
+              <span class="anchor" id="variable-col_ind"></span>
               integer(kind=int32),
             </td>
               <td>public,</td>
@@ -327,7 +486,7 @@ large graphs.</div>
               allocatable
             </td>
             <td>::</td>
-            <td><strong>col</strong>(:)</td>
+            <td><strong>col_ind</strong>(:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -336,24 +495,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-ind~7"></span>
-              integer(kind=int32),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>ind</strong>(:)</td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-nnz~4"></span>
+              <span class="anchor" id="variable-num_edges"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -361,7 +503,7 @@ large graphs.</div>
               
             </td>
             <td>::</td>
-            <td><strong>nnz</strong></td>
+            <td><strong>num_edges</strong></td>
 <td> =</td>
                 <td>0</td>
             <td>
@@ -370,7 +512,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-num_nodes~20"></span>
+              <span class="anchor" id="variable-num_nodes~17"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -387,7 +529,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-ptr~6"></span>
+              <span class="anchor" id="variable-row_ptr"></span>
               integer(kind=int32),
             </td>
               <td>public,</td>
@@ -395,24 +537,7 @@ large graphs.</div>
               allocatable
             </td>
             <td>::</td>
-            <td><strong>ptr</strong>(:)</td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-row~18"></span>
-              integer(kind=int32),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>row</strong>(:)</td>
+            <td><strong>row_ptr</strong>(:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -432,17 +557,17 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-destroy~10"></span>
+      <span class="anchor" id="boundprocedure-build"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>destroy</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/destroy_hybrid.html'>destroy_hybrid</a>
+  <strong>build</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/build_from_pairs.html'>build_from_pairs</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/destroy_hybrid.html'>destroy_hybrid</a>(self)  
+    private  subroutine <a href='../proc/build_from_pairs.html'>build_from_pairs</a>(self, pair_lists, num_nodes)  
 </h3>
     
 
@@ -462,7 +587,91 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='type_node_adjacency.html'>type_node_adjacency</a>),
+              class(<a href='type_graph.html'>type_graph</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>pair_lists</strong>(:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_nodes</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-destroy~8"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>destroy</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/destroy.html'>destroy</a>(self)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_graph.html'>type_graph</a>),
             </td>
 <td>intent(inout)</td>
               <td></td>            <td>
@@ -489,18 +698,19 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-get_coo"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>get_coo</strong>
+  <strong>get_coo</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/reconstruct_coo.html'>reconstruct_coo</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/get_coo.html'>get_coo</a>(self, row_out, col_out)  
+    private  subroutine <a href='../proc/reconstruct_coo.html'>reconstruct_coo</a>(self, row_out, col_out)  
 </h3>
     
 
-  
+  <p>Reconstructs COO format from the internal CSR storage.
+(Used for compatibility with legacy code expecting get_coo)</p>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -573,18 +783,18 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-get_csr"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>get_csr</strong>
+  <strong>get_csr</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/export_csr.html'>export_csr</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/get_csr.html'>get_csr</a>(self, ptr_out, ind_out)  
+    private  subroutine <a href='../proc/export_csr.html'>export_csr</a>(self, ptr_out, ind_out)  
 </h3>
     
 
-  
+  <p>Exports CSR arrays (Deep copy).</p>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -654,17 +864,17 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-get_degree~2"></span>
+      <span class="anchor" id="boundprocedure-get_degree"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>get_degree</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/get_degree_csr.html'>get_degree_csr</a>
+  <strong>get_degree</strong>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private pure function <a href='../proc/get_degree_csr.html'>get_degree_csr</a>(self, node_id) result(degree)  
+    private pure elemental subroutine <a href='../proc/get_degree.html'>get_degree</a>(self, node_id, degree)  
 </h3>
     
 
@@ -684,7 +894,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='type_node_adjacency.html'>type_node_adjacency</a>),
+              class(<a href='type_graph.html'>type_graph</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -711,14 +921,24 @@ large graphs.</div>
 
             </td>
         </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>degree</strong></td>
+            <td>
+
+            </td>
+        </tr>
     </tbody>
   </table>
 
-    <h4>
-    Return Value
-    <small>integer(kind=int32)</small>
-    </h4>
-    
 
           </li>
       </ul>
@@ -728,17 +948,17 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-get_neighbors~2"></span>
+      <span class="anchor" id="boundprocedure-get_neighbors"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>get_neighbors</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/get_neighbors_csr.html'>get_neighbors_csr</a>
+  <strong>get_neighbors</strong>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/get_neighbors_csr.html'>get_neighbors_csr</a>(self, node_id, neighbors)  
+    private  subroutine <a href='../proc/get_neighbors.html'>get_neighbors</a>(self, node_id, neighbors)  
 </h3>
     
 
@@ -758,11 +978,11 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='type_node_adjacency.html'>type_node_adjacency</a>),
+              class(<a href='type_graph.html'>type_graph</a>),
             </td>
-<td>intent(in)</td>
+<td>intent(in),</td>
               <td></td>            <td>
-              
+              target
             </td>
             <td>::</td>
             <td><strong>self</strong></td>
@@ -790,12 +1010,12 @@ large graphs.</div>
               <span class="anchor" ></span>
               integer(kind=int32),
             </td>
-<td>intent(out),</td>
+<td>intent(inout),</td>
               <td></td>            <td>
-              allocatable
+              dimension(:), pointer
             </td>
             <td>::</td>
-            <td><strong>neighbors</strong>(:)</td>
+            <td><strong>neighbors</strong></td>
             <td>
 
             </td>
@@ -815,18 +1035,19 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-get_nnz"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>get_nnz</strong>
+  <strong>get_nnz</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/get_nnz_csr.html'>get_nnz_csr</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private pure function <a href='../proc/get_nnz.html'>get_nnz</a>(self) result(nnz)  
+    private pure function <a href='../proc/get_nnz_csr.html'>get_nnz_csr</a>(self) result(nnz)  
 </h3>
     
 
-  
+  <p>Returns the number of non-zero entries (stored edges).
+Note: In CSR, this is the size of the col_ind array.</p>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -871,80 +1092,22 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-get_num_nodes~2"></span>
+      <span class="anchor" id="boundprocedure-initialize~37"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>get_num_nodes</strong>
+  <strong>initialize</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/initialize_from_connectivity.html'>initialize_from_connectivity</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private pure function <a href='../proc/get_num_nodes~2.html'>get_num_nodes</a>(self) result(n_nodes)  
+    private  subroutine <a href='../proc/initialize_from_connectivity.html'>initialize_from_connectivity</a>(self, num_all_nodes, conn_ind, conn_val)  
 </h3>
     
 
-  
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              class(<a href='type_node_adjacency.html'>type_node_adjacency</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>self</strong></td>
-            <td>
-
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-    <h4>
-    Return Value
-    <small>integer(kind=int32)</small>
-    </h4>
-    
-
-          </li>
-      </ul>
-  </div>
-
-          </div>
-          <div class="row">
-              <div class="card mt-3">
-    <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~31"></span>
-      <h3>
-          procedure, public, pass(self) ::
-  <strong>initialize</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/initialize_hybrid_from_mesh.html'>initialize_hybrid_from_mesh</a>
-        
-      </h3>
-    </div>
-      <ul class="list-group">
-          <li class="list-group-item">
-                    <h3>
-    private  subroutine <a href='../proc/initialize_hybrid_from_mesh.html'>initialize_hybrid_from_mesh</a>(self, num_nodes, computation_dimension, sides, elements)  
-</h3>
-    
-
-  
+  <p>Initializes the graph from element connectivity data.
+Converts connectivity to edge pairs and delegates construction to type_graph.</p>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -982,7 +1145,7 @@ large graphs.</div>
               
             </td>
             <td>::</td>
-            <td><strong>num_nodes</strong></td>
+            <td><strong>num_all_nodes</strong></td>
             <td>
 
             </td>
@@ -997,7 +1160,7 @@ large graphs.</div>
               
             </td>
             <td>::</td>
-            <td><strong>computation_dimension</strong></td>
+            <td><strong>conn_ind</strong>(:)</td>
             <td>
 
             </td>
@@ -1005,29 +1168,68 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='holder_sides.html'>holder_sides</a>),
+              integer(kind=int32),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>sides</strong>(:)</td>
+            <td><strong>conn_val</strong>(:)</td>
             <td>
 
             </td>
         </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-print"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>print</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/print_graph_info.html'>print_graph_info</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/print_graph_info.html'>print_graph_info</a>(self)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='holder_elements.html'>holder_elements</a>),
+              class(<a href='type_graph.html'>type_graph</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>elements</strong>(:)</td>
+            <td><strong>self</strong></td>
             <td>
 
             </td>
@@ -1045,26 +1247,14 @@ large graphs.</div>
 
     <section>
     <h3><span class="anchor" id="src"></span>Source Code</h3>
-    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_node_adjacency</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_nodes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nnz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
-
-<span class="w">        </span><span class="c">! COO (Coordinate list) 形式のデータ (ソート済み)</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">row</span><span class="p">(:)</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">col</span><span class="p">(:)</span>
-
-<span class="w">        </span><span class="c">! CSR (Compressed Sparse Row) 形式のデータ</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ptr</span><span class="p">(:)</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ind</span><span class="p">(:)</span>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">extends</span><span class="p">(</span><span class="n">type_graph</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_node_adjacency</span>
 <span class="w">    </span><span class="k">contains</span>
-<span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">initialize_hybrid_from_mesh</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_num_nodes</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_num_nodes</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_degree</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_degree_csr</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_neighbors</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_neighbors_csr</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_nnz</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_nnz</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_coo</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_coo</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_csr</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_csr</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">destroy</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">destroy_hybrid</span>
+<span class="w">        </span><span class="c">! メッシュデータからの初期化メソッド</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">initialize_from_connectivity</span>
+
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_nnz</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_nnz_csr</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_coo</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">reconstruct_coo</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_csr</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">export_csr</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_node_adjacency</span>
 </pre></div>
 
@@ -1081,14 +1271,14 @@ large graphs.</div>
           <div class="col">
             <p>
               FTDSS
- was developed by Kikuchi Shun<br>              &copy; 2025 
+ was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
           <div class="col">
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-08-26 10:37 +0000             </p>
+ on 2026-02-22 12:12 +0000             </p>
           </div>
         </div>
         <br>

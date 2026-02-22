@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.7% of total for derived types.</p>Including implementation: 9 statements,  0.2% of total for derived types.">9 statements</a>
+                 title="<p> 0.2% of total for derived types.</p>Including implementation: 286 statements,  1.7% of total for derived types.">4 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -105,7 +105,7 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
                 <li class="breadcrumb-item"><a href='../sourcefile/specific_heat_interface.f90.html'>specific_heat_interface.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/calculate_specific_heat.html'>calculate_specific_heat</a></li>
+                <li class="breadcrumb-item"><a href='../module/physics_materials_specific_heat.html'>physics_materials_specific_heat</a></li>
             <li class="breadcrumb-item active" aria-current="page">abst_sph</li>
           </ol>
         </nav>
@@ -134,11 +134,14 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/abst_sph.html#variable-material1~3">material1</a>
-            <a class="list-group-item" href="../type/abst_sph.html#variable-material2~3">material2</a>
-            <a class="list-group-item" href="../type/abst_sph.html#variable-material3~3">material3</a>
-            <a class="list-group-item" href="../type/abst_sph.html#variable-material4~3">material4</a>
-            <a class="list-group-item" href="../type/abst_sph.html#variable-material_id~29">material_id</a>
+            <a class="list-group-item" href="../type/abst_sph.html#variable-ice~20">ice</a>
+            <a class="list-group-item" href="../type/abst_sph.html#variable-initialized~10">initialized</a>
+            <a class="list-group-item" href="../type/abst_sph.html#variable-material1">material1</a>
+            <a class="list-group-item" href="../type/abst_sph.html#variable-material2">material2</a>
+            <a class="list-group-item" href="../type/abst_sph.html#variable-material3">material3</a>
+            <a class="list-group-item" href="../type/abst_sph.html#variable-material4">material4</a>
+            <a class="list-group-item" href="../type/abst_sph.html#variable-material_id~41">material_id</a>
+            <a class="list-group-item" href="../type/abst_sph.html#variable-water~21">water</a>
         </div>
       </div>
     </div>
@@ -165,7 +168,34 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc~10">calc</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc">calc</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_cp_ice">calc_cp_ice</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_cp_vapor">calc_cp_vapor</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_cp_water">calc_cp_water</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_drho_ice_dp">calc_drho_ice_dP</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_drho_ice_dt">calc_drho_ice_dT</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_drho_vapor_dp">calc_drho_vapor_dP</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_drho_vapor_dt">calc_drho_vapor_dT</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_drho_vapor_saturation_dp">calc_drho_vapor_saturation_dP</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_drho_vapor_saturation_dt">calc_drho_vapor_saturation_dT</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_drho_water_dp">calc_drho_water_dP</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_drho_water_dt">calc_drho_water_dT</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_ice_cp">calc_ice_cp</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_ice_density">calc_ice_density</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_rho_ice">calc_rho_ice</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_rho_vapor">calc_rho_vapor</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_rho_vapor_saturation">calc_rho_vapor_saturation</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_rho_water">calc_rho_water</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_vapor_cp">calc_vapor_cp</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_vapor_density">calc_vapor_density</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_water_cp">calc_water_cp</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-calc_water_density">calc_water_density</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-get_phi">get_phi</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-get_solid">get_solid</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-initialize~36">initialize</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-is_initialized~8">is_initialized</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-shift_pressure_absolute">shift_pressure_absolute</a>
+            <a class="list-group-item" href="../type/abst_sph.html#boundprocedure-shift_temperature_absolute">shift_temperature_absolute</a>
         </div>
       </div>
     </div>
@@ -186,9 +216,140 @@
     
     <div class="col-md-9" id='text'>
       <h2 id="type-def-statement">
-        type, public, abstract :: abst_sph</h2>
+        type, public, abstract, extends(<a href='abst_material.html'>abst_material</a>) :: abst_sph</h2>
     
 <br>      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Inherits</h3>
+        </div>
+        <div class="card-body">
+          <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: type~~abst_sph~~InheritsGraph Pages: 1 -->
+<svg id="typeabst_sphInheritsGraph" width="454pt" height="74pt"
+ viewBox="0.00 0.00 454.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~abst_sph~~InheritsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 70)">
+<title>type~~abst_sph~~InheritsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 450,-70 450,4 -4,4"/>
+<!-- type~abst_sph -->
+<g id="type~~abst_sph~~InheritsGraph_node1" class="node">
+<title>type~abst_sph</title>
+<polygon fill="none" stroke="black" points="446,-45 387,-45 387,-21 446,-21 446,-45"/>
+<text text-anchor="middle" x="416.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">abst_sph</text>
+</g>
+<!-- type~abst_material -->
+<g id="type~~abst_sph~~InheritsGraph_node2" class="node">
+<title>type~abst_material</title>
+<g id="a_type~~abst_sph~~InheritsGraph_node2"><a xlink:href="../type/abst_material.html" xlink:title="abst_material">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="350,-45 265,-45 265,-21 350,-21 350,-45"/>
+<text text-anchor="middle" x="307.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_material</text>
+</a>
+</g>
+</g>
+<!-- type~abst_sph&#45;&gt;type~abst_material -->
+<g id="type~~abst_sph~~InheritsGraph_edge1" class="edge">
+<title>type~abst_sph&#45;&gt;type~abst_material</title>
+<path fill="none" stroke="#ff0000" d="M386.83,-33C378.64,-33 369.46,-33 360.34,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="360.13,-29.5 350.13,-33 360.13,-36.5 360.13,-29.5"/>
+</g>
+<!-- type~abst_physics -->
+<g id="type~~abst_sph~~InheritsGraph_node3" class="node">
+<title>type~abst_physics</title>
+<g id="a_type~~abst_sph~~InheritsGraph_node3"><a xlink:href="../type/abst_physics.html" xlink:title="abst_physics">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="228,-45 149,-45 149,-21 228,-21 228,-45"/>
+<text text-anchor="middle" x="188.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics</text>
+</a>
+</g>
+</g>
+<!-- type~abst_material&#45;&gt;type~abst_physics -->
+<g id="type~~abst_sph~~InheritsGraph_edge2" class="edge">
+<title>type~abst_material&#45;&gt;type~abst_physics</title>
+<path fill="none" stroke="#ff0000" d="M264.92,-33C256.33,-33 247.2,-33 238.38,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="238.21,-29.5 228.21,-33 238.21,-36.5 238.21,-29.5"/>
+</g>
+<!-- type_iapws06 -->
+<g id="type~~abst_sph~~InheritsGraph_node4" class="node">
+<title>type_iapws06</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="85,-66 0,-66 0,-42 85,-42 85,-66"/>
+<text text-anchor="middle" x="42.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iapws06</text>
+</g>
+<!-- type~abst_physics&#45;&gt;type_iapws06 -->
+<g id="type~~abst_sph~~InheritsGraph_edge4" class="edge">
+<title>type~abst_physics&#45;&gt;type_iapws06</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M148.91,-38.63C132.48,-41.02 113.06,-43.86 95.39,-46.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="94.62,-43.01 85.23,-47.91 95.63,-49.93 94.62,-43.01"/>
+<text text-anchor="middle" x="117" y="-46.4" font-family="Helvetica,sans-Serif" font-size="9.50">ice</text>
+</g>
+<!-- type_iapws97 -->
+<g id="type~~abst_sph~~InheritsGraph_node5" class="node">
+<title>type_iapws97</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="85,-24 0,-24 0,0 85,0 85,-24"/>
+<text text-anchor="middle" x="42.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iapws97</text>
+</g>
+<!-- type~abst_physics&#45;&gt;type_iapws97 -->
+<g id="type~~abst_sph~~InheritsGraph_edge3" class="edge">
+<title>type~abst_physics&#45;&gt;type_iapws97</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M148.97,-25.08C142.97,-23.97 136.83,-22.9 131,-22 119.55,-20.23 107.2,-18.64 95.5,-17.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="95.76,-13.77 85.43,-16.12 94.97,-20.72 95.76,-13.77"/>
+<text text-anchor="middle" x="117" y="-24.4" font-family="Helvetica,sans-Serif" font-size="9.50">water</text>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#InheritsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="InheritsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="186pt" height="32pt"
+ viewBox="0.00 0.00 185.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 181.5,-28 181.5,4 -4,4"/>
+<!-- Type -->
+<g id="node1" class="node">
+<title>Type</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="177.5,-24 72.5,-24 72.5,0 177.5,0 177.5,-24"/>
+<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a derived type to the parent type which it
+extends. Dashed arrows point from a derived type to the other
+types it contains as a components, with a label listing the name(s) of
+said component(s).
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+      <div class="card">
         <div class="card-header">
           <h3 class="card-title">Inherited by</h3>
         </div>
@@ -199,95 +360,177 @@
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: type~~abst_sph~~InheritedByGraph Pages: 1 -->
-<svg id="typeabst_sphInheritedByGraph" width="641pt" height="61pt"
- viewBox="0.00 0.00 641.00 60.66" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="type~~abst_sph~~InheritedByGraph" class="graph" transform="scale(0.82 0.82) rotate(0) translate(4 70)">
+<svg id="typeabst_sphInheritedByGraph" width="641pt" height="152pt"
+ viewBox="0.00 0.00 641.00 151.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~abst_sph~~InheritedByGraph" class="graph" transform="scale(0.69 0.69) rotate(0) translate(4 217)">
 <title>type~~abst_sph~~InheritedByGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 778,-70 778,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-217 931,-217 931,4 -4,4"/>
 <!-- type~abst_sph -->
 <g id="type~~abst_sph~~InheritedByGraph_node1" class="node">
 <title>type~abst_sph</title>
-<polygon fill="none" stroke="black" points="59,-40 0,-40 0,-16 59,-16 59,-40"/>
-<text text-anchor="middle" x="29.5" y="-25.6" font-family="Helvetica,sans-Serif" font-size="10.50">abst_sph</text>
+<polygon fill="none" stroke="black" points="59,-124 0,-124 0,-100 59,-100 59,-124"/>
+<text text-anchor="middle" x="29.5" y="-109.6" font-family="Helvetica,sans-Serif" font-size="10.50">abst_sph</text>
 </g>
 <!-- type~holder_sphs -->
 <g id="type~~abst_sph~~InheritedByGraph_node2" class="node">
 <title>type~holder_sphs</title>
 <g id="a_type~~abst_sph~~InheritedByGraph_node2"><a xlink:href="../type/holder_sphs.html" xlink:title="holder_sphs">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="192,-66 116,-66 116,-42 192,-42 192,-66"/>
-<text text-anchor="middle" x="154" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">holder_sphs</text>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="192,-192 116,-192 116,-168 192,-168 192,-192"/>
+<text text-anchor="middle" x="154" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">holder_sphs</text>
 </a>
 </g>
 </g>
 <!-- type~holder_sphs&#45;&gt;type~abst_sph -->
 <g id="type~~abst_sph~~InheritedByGraph_edge1" class="edge">
 <title>type~holder_sphs&#45;&gt;type~abst_sph</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M115.91,-46.13C101.15,-43 84.16,-39.39 69.24,-36.22"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="69.8,-32.76 59.29,-34.11 68.35,-39.61 69.8,-32.76"/>
-<text text-anchor="middle" x="80.5" y="-41.4" font-family="Helvetica,sans-Serif" font-size="9.50">p</text>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M121.01,-167.93C114.61,-165.21 108.01,-162.18 102,-159 85.84,-150.46 68.69,-139.27 55.25,-129.95"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="57.18,-127.04 46.99,-124.15 53.16,-132.76 57.18,-127.04"/>
+<text text-anchor="middle" x="80.5" y="-151.4" font-family="Helvetica,sans-Serif" font-size="9.50">p</text>
+</g>
+<!-- type~type_sph_1phase -->
+<g id="type~~abst_sph~~InheritedByGraph_node3" class="node">
+<title>type~type_sph_1phase</title>
+<g id="a_type~~abst_sph~~InheritedByGraph_node3"><a xlink:href="../type/type_sph_1phase.html" xlink:title="type_sph_1phase">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="206,-150 102,-150 102,-126 206,-126 206,-150"/>
+<text text-anchor="middle" x="154" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_sph_1phase</text>
+</a>
+</g>
+</g>
+<!-- type~type_sph_1phase&#45;&gt;type~abst_sph -->
+<g id="type~~abst_sph~~InheritedByGraph_edge3" class="edge">
+<title>type~type_sph_1phase&#45;&gt;type~abst_sph</title>
+<path fill="none" stroke="#ff0000" d="M118.27,-125.95C112.63,-123.36 107,-120.38 102,-117 91.19,-109.7 93.99,-92.26 81.5,-96"/>
+</g>
+<!-- type~type_sph_2phase -->
+<g id="type~~abst_sph~~InheritedByGraph_node4" class="node">
+<title>type~type_sph_2phase</title>
+<g id="a_type~~abst_sph~~InheritedByGraph_node4"><a xlink:href="../type/type_sph_2phase.html" xlink:title="type_sph_2phase">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="206,-108 102,-108 102,-84 206,-84 206,-108"/>
+<text text-anchor="middle" x="154" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_sph_2phase</text>
+</a>
+</g>
+</g>
+<!-- type~type_sph_2phase&#45;&gt;type~abst_sph -->
+<g id="type~~abst_sph~~InheritedByGraph_edge4" class="edge">
+<title>type~type_sph_2phase&#45;&gt;type~abst_sph</title>
+<path fill="none" stroke="#ff0000" d="M101.7,-92.41C94.81,-92.96 87.92,-94.08 81.5,-96"/>
 </g>
 <!-- type~type_sph_3phase -->
-<g id="type~~abst_sph~~InheritedByGraph_node3" class="node">
+<g id="type~~abst_sph~~InheritedByGraph_node5" class="node">
 <title>type~type_sph_3phase</title>
-<g id="a_type~~abst_sph~~InheritedByGraph_node3"><a xlink:href="../type/type_sph_3phase.html" xlink:title="type_sph_3phase">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="206,-24 102,-24 102,0 206,0 206,-24"/>
-<text text-anchor="middle" x="154" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_sph_3phase</text>
+<g id="a_type~~abst_sph~~InheritedByGraph_node5"><a xlink:href="../type/type_sph_3phase.html" xlink:title="type_sph_3phase">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="206,-66 102,-66 102,-42 206,-42 206,-66"/>
+<text text-anchor="middle" x="154" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_sph_3phase</text>
 </a>
 </g>
 </g>
 <!-- type~type_sph_3phase&#45;&gt;type~abst_sph -->
-<g id="type~~abst_sph~~InheritedByGraph_edge2" class="edge">
+<g id="type~~abst_sph~~InheritedByGraph_edge5" class="edge">
 <title>type~type_sph_3phase&#45;&gt;type~abst_sph</title>
-<path fill="none" stroke="#ff0000" d="M101.76,-18.69C90.84,-20.12 79.49,-21.6 69.14,-22.95"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="68.64,-19.49 59.18,-24.25 69.55,-26.43 68.64,-19.49"/>
+<path fill="none" stroke="#ff0000" d="M118.27,-66.05C112.63,-68.64 107,-71.62 102,-75 91.19,-82.3 93.99,-92.26 81.5,-96"/>
+</g>
+<!-- type~type_sph_4phase -->
+<g id="type~~abst_sph~~InheritedByGraph_node6" class="node">
+<title>type~type_sph_4phase</title>
+<g id="a_type~~abst_sph~~InheritedByGraph_node6"><a xlink:href="../type/type_sph_4phase.html" xlink:title="type_sph_4phase">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="206,-24 102,-24 102,0 206,0 206,-24"/>
+<text text-anchor="middle" x="154" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_sph_4phase</text>
+</a>
+</g>
+</g>
+<!-- type~type_sph_4phase&#45;&gt;type~abst_sph -->
+<g id="type~~abst_sph~~InheritedByGraph_edge2" class="edge">
+<title>type~type_sph_4phase&#45;&gt;type~abst_sph</title>
+<path fill="none" stroke="#ff0000" d="M113.4,-24.09C109.18,-26.55 105.25,-29.49 102,-33 81.99,-54.6 109.71,-87.55 81.5,-96"/>
+<path fill="none" stroke="#ff0000" d="M79.5,-96C75.99,-97.05 72.36,-98.17 68.72,-99.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="67.64,-95.99 59.19,-102.37 69.78,-102.66 67.64,-95.99"/>
 </g>
 <!-- type~type_material_manager -->
-<g id="type~~abst_sph~~InheritedByGraph_node4" class="node">
+<g id="type~~abst_sph~~InheritedByGraph_node7" class="node">
 <title>type~type_material_manager</title>
-<g id="a_type~~abst_sph~~InheritedByGraph_node4"><a xlink:href="../type/type_material_manager.html" xlink:title="type_material_manager">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="400,-66 260,-66 260,-42 400,-42 400,-66"/>
-<text text-anchor="middle" x="330" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_material_manager</text>
+<g id="a_type~~abst_sph~~InheritedByGraph_node7"><a xlink:href="../type/type_material_manager.html" xlink:title="type_material_manager">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="400,-192 260,-192 260,-168 400,-168 400,-192"/>
+<text text-anchor="middle" x="330" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_material_manager</text>
 </a>
 </g>
 </g>
 <!-- type~type_material_manager&#45;&gt;type~holder_sphs -->
-<g id="type~~abst_sph~~InheritedByGraph_edge3" class="edge">
+<g id="type~~abst_sph~~InheritedByGraph_edge6" class="edge">
 <title>type~type_material_manager&#45;&gt;type~holder_sphs</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M259.98,-54C240.63,-54 220.03,-54 202.26,-54"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="202.15,-50.5 192.15,-54 202.15,-57.5 202.15,-50.5"/>
-<text text-anchor="middle" x="233" y="-56.4" font-family="Helvetica,sans-Serif" font-size="9.50">sph</text>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M259.98,-180C240.63,-180 220.03,-180 202.26,-180"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="202.15,-176.5 192.15,-180 202.15,-183.5 202.15,-176.5"/>
+<text text-anchor="middle" x="233" y="-182.4" font-family="Helvetica,sans-Serif" font-size="9.50">sph</text>
 </g>
-<!-- type~type_properties_manager -->
-<g id="type~~abst_sph~~InheritedByGraph_node5" class="node">
-<title>type~type_properties_manager</title>
-<g id="a_type~~abst_sph~~InheritedByGraph_node5"><a xlink:href="../type/type_properties_manager.html" xlink:title="type_properties_manager">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="631,-66 482,-66 482,-42 631,-42 631,-66"/>
-<text text-anchor="middle" x="556.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager</text>
+<!-- type~type_physics_manager -->
+<g id="type~~abst_sph~~InheritedByGraph_node8" class="node">
+<title>type~type_physics_manager</title>
+<g id="a_type~~abst_sph~~InheritedByGraph_node8"><a xlink:href="../type/type_physics_manager.html" xlink:title="type_physics_manager">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="616,-192 482,-192 482,-168 616,-168 616,-192"/>
+<text text-anchor="middle" x="549" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager</text>
 </a>
 </g>
 </g>
-<!-- type~type_properties_manager&#45;&gt;type~type_material_manager -->
-<g id="type~~abst_sph~~InheritedByGraph_edge4" class="edge">
-<title>type~type_properties_manager&#45;&gt;type~type_material_manager</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M481.99,-54C459.04,-54 433.63,-54 410.31,-54"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="410.1,-50.5 400.1,-54 410.1,-57.5 410.1,-50.5"/>
-<text text-anchor="middle" x="441" y="-56.4" font-family="Helvetica,sans-Serif" font-size="9.50">materials</text>
+<!-- type~type_physics_manager&#45;&gt;type~type_material_manager -->
+<g id="type~~abst_sph~~InheritedByGraph_edge7" class="edge">
+<title>type~type_physics_manager&#45;&gt;type~type_material_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M481.71,-180C459.24,-180 433.9,-180 410.51,-180"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="410.26,-176.5 400.26,-180 410.26,-183.5 410.26,-176.5"/>
+<text text-anchor="middle" x="441" y="-182.4" font-family="Helvetica,sans-Serif" font-size="9.50">materials</text>
+</g>
+<!-- type~type_hydraulic -->
+<g id="type~~abst_sph~~InheritedByGraph_node9" class="node">
+<title>type~type_hydraulic</title>
+<g id="a_type~~abst_sph~~InheritedByGraph_node9"><a xlink:href="../type/type_hydraulic.html" xlink:title="type_hydraulic">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="780,-213 689,-213 689,-189 780,-189 780,-213"/>
+<text text-anchor="middle" x="734.5" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- type~type_hydraulic&#45;&gt;type~type_physics_manager -->
+<g id="type~~abst_sph~~InheritedByGraph_edge9" class="edge">
+<title>type~type_hydraulic&#45;&gt;type~type_physics_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M688.61,-195.86C669.83,-193.71 647.48,-191.16 626.26,-188.73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="626.61,-185.25 616.28,-187.59 625.82,-192.2 626.61,-185.25"/>
+<text text-anchor="middle" x="652.5" y="-195.4" font-family="Helvetica,sans-Serif" font-size="9.50">physics</text>
+</g>
+<!-- type~type_thermal -->
+<g id="type~~abst_sph~~InheritedByGraph_node10" class="node">
+<title>type~type_thermal</title>
+<g id="a_type~~abst_sph~~InheritedByGraph_node10"><a xlink:href="../type/type_thermal.html" xlink:title="type_thermal">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="776,-171 693,-171 693,-147 776,-147 776,-171"/>
+<text text-anchor="middle" x="734.5" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal</text>
+</a>
+</g>
+</g>
+<!-- type~type_thermal&#45;&gt;type~type_physics_manager -->
+<g id="type~~abst_sph~~InheritedByGraph_edge8" class="edge">
+<title>type~type_thermal&#45;&gt;type~type_physics_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M692.75,-160.99C674.71,-162.1 653.26,-163.72 634,-166 631.49,-166.3 628.95,-166.62 626.38,-166.95"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="625.83,-163.5 616.4,-168.34 626.79,-170.43 625.83,-163.5"/>
+<text text-anchor="middle" x="652.5" y="-168.4" font-family="Helvetica,sans-Serif" font-size="9.50">physics</text>
 </g>
 <!-- type~type_ftdss -->
-<g id="type~~abst_sph~~InheritedByGraph_node6" class="node">
+<g id="type~~abst_sph~~InheritedByGraph_node11" class="node">
 <title>type~type_ftdss</title>
-<g id="a_type~~abst_sph~~InheritedByGraph_node6"><a xlink:href="../type/type_ftdss.html" xlink:title="type_ftdss">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="774,-66 708,-66 708,-42 774,-42 774,-66"/>
-<text text-anchor="middle" x="741" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss</text>
+<g id="a_type~~abst_sph~~InheritedByGraph_node11"><a xlink:href="../type/type_ftdss.html" xlink:title="type_ftdss">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="927,-191 861,-191 861,-167 927,-167 927,-191"/>
+<text text-anchor="middle" x="894" y="-176.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss</text>
 </a>
 </g>
 </g>
-<!-- type~type_ftdss&#45;&gt;type~type_properties_manager -->
-<g id="type~~abst_sph~~InheritedByGraph_edge5" class="edge">
-<title>type~type_ftdss&#45;&gt;type~type_properties_manager</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M707.79,-54C689.17,-54 664.79,-54 641.11,-54"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="641.02,-50.5 631.02,-54 641.02,-57.5 641.02,-50.5"/>
-<text text-anchor="middle" x="669.5" y="-56.4" font-family="Helvetica,sans-Serif" font-size="9.50">property</text>
+<!-- type~type_ftdss&#45;&gt;type~type_hydraulic -->
+<g id="type~~abst_sph~~InheritedByGraph_edge10" class="edge">
+<title>type~type_ftdss&#45;&gt;type~type_hydraulic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M860.75,-183.51C840.52,-186.33 813.92,-190.05 790.44,-193.33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="789.67,-189.9 780.25,-194.75 790.63,-196.83 789.67,-189.9"/>
+<text text-anchor="middle" x="820.5" y="-193.4" font-family="Helvetica,sans-Serif" font-size="9.50">hydraulic</text>
+</g>
+<!-- type~type_ftdss&#45;&gt;type~type_thermal -->
+<g id="type~~abst_sph~~InheritedByGraph_edge11" class="edge">
+<title>type~type_ftdss&#45;&gt;type~type_thermal</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M860.91,-169.7C855,-168.26 848.84,-166.94 843,-166 824.55,-163.03 804.12,-161.31 786.07,-160.32"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="786.19,-156.82 776.03,-159.83 785.85,-163.81 786.19,-156.82"/>
+<text text-anchor="middle" x="820.5" y="-168.4" font-family="Helvetica,sans-Serif" font-size="9.50">thermal</text>
 </g>
 </g>
 </svg>
@@ -362,7 +605,41 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-material1~3"></span>
+              <span class="anchor" id="variable-ice~20"></span>
+              type(type_iapws06),
+            </td>
+              <td>public,</td>
+            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>ice</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                <p>IAPWS-06 氷物性計算オブジェクトへのポインタ</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-initialized~10"></span>
+              logical,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>initialized</strong></td>
+<td> =</td>
+                <td>.false.</td>
+            <td>
+                <p>初期化済みフラグ</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-material1"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -371,15 +648,15 @@ large graphs.</div>
             </td>
             <td>::</td>
             <td><strong>material1</strong></td>
-                <td></td>
-                <td></td>
+<td> =</td>
+                <td>0.0d0</td>
             <td>
-                <p>soil, rock, concrete</p>
+                <p>like a soil or a rock, a concrete</p>
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material2~3"></span>
+              <span class="anchor" id="variable-material2"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -388,15 +665,15 @@ large graphs.</div>
             </td>
             <td>::</td>
             <td><strong>material2</strong></td>
-                <td></td>
-                <td></td>
+<td> =</td>
+                <td>0.0d0</td>
             <td>
-                <p>water</p>
+                <p>like a water</p>
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material3~3"></span>
+              <span class="anchor" id="variable-material3"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -405,15 +682,15 @@ large graphs.</div>
             </td>
             <td>::</td>
             <td><strong>material3</strong></td>
-                <td></td>
-                <td></td>
+<td> =</td>
+                <td>0.0d0</td>
             <td>
-                <p>ice</p>
+                <p>like a ice</p>
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material4~3"></span>
+              <span class="anchor" id="variable-material4"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -422,15 +699,15 @@ large graphs.</div>
             </td>
             <td>::</td>
             <td><strong>material4</strong></td>
-                <td></td>
-                <td></td>
+<td> =</td>
+                <td>0.0d0</td>
             <td>
-                <p>gas</p>
+                <p>like a gas</p>
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material_id~29"></span>
+              <span class="anchor" id="variable-material_id~41"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -439,10 +716,27 @@ large graphs.</div>
             </td>
             <td>::</td>
             <td><strong>material_id</strong></td>
+<td> =</td>
+                <td>-1</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-water~21"></span>
+              type(type_iapws97),
+            </td>
+              <td>public,</td>
+            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>water</strong></td>
                 <td></td>
                 <td></td>
             <td>
-                
+                <p>IAPWS-97 水物性計算オブジェクトへのポインタ</p>
             </td>
         </tr>
     </tbody>
@@ -458,9 +752,9 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-calc~10"></span>
+      <span class="anchor" id="boundprocedure-calc"></span>
       <h3>
-          procedure(<a href='../interface/abst_calc_sph_gauss_point.html'>abst_calc_sph_gauss_point</a>), public, deferred, pass(self) ::
+          procedure(<a href='../interface/abst_calc_sph_gp.html'>abst_calc_sph_gp</a>), public, deferred, pass(self) ::
   <strong>calc</strong>
         
       </h3>
@@ -468,7 +762,7 @@ large graphs.</div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    pure elemental function abst_calc_sph_gauss_point(self, state) result(specific_heat)  
+     subroutine abst_calc_sph_gp(self, state, specific_heat)  
 <small>Prototype</small></h3>
 
   
@@ -514,14 +808,2395 @@ large graphs.</div>
                 
             </td>
         </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>specific_heat</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_cp_ice"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_cp_ice</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_cp_ice_abst_physics.html'>calc_cp_ice_abst_physics</a>
+        
+      </h3>
+    </div>
+        <div class="card-body">
+          
+          <p>氷の定圧比熱を計算</p>
+        </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_cp_ice_abst_physics.html'>calc_cp_ice_abst_physics</a>(self, state, cp)  
+</h3>
+    
+
+  <p>氷の定圧比熱 (Cp) を計算します。</p><a href="../proc/calc_cp_ice_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_physics.html'>abst_physics</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>cp</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_cp_vapor"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_cp_vapor</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_cp_vapor_abst_physics.html'>calc_cp_vapor_abst_physics</a>
+        
+      </h3>
+    </div>
+        <div class="card-body">
+          
+          <p>水蒸気の定圧比熱(飽和状態)を計算</p>
+        </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_cp_vapor_abst_physics.html'>calc_cp_vapor_abst_physics</a>(self, state, cp)  
+</h3>
+    
+
+  <p>蒸気の定圧比熱 (Cp) を飽和状態で計算します。</p><a href="../proc/calc_cp_vapor_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_physics.html'>abst_physics</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>cp</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_cp_water"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_cp_water</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_cp_water_abst_physics.html'>calc_cp_water_abst_physics</a>
+        
+      </h3>
+    </div>
+        <div class="card-body">
+          
+          <p>液体の水の定圧比熱を計算</p>
+        </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_cp_water_abst_physics.html'>calc_cp_water_abst_physics</a>(self, state, cp)  
+</h3>
+    
+
+  <p>液体の水の定圧比熱 (Cp) を計算します。</p><a href="../proc/calc_cp_water_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_physics.html'>abst_physics</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>cp</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_drho_ice_dp"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_drho_ice_dP</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_drho_ice_dp_abst_physics.html'>calc_drho_ice_dP_abst_physics</a>
+        
+      </h3>
+    </div>
+        <div class="card-body">
+          
+          <p>氷密度の圧力微分を計算</p>
+        </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_drho_ice_dp_abst_physics.html'>calc_drho_ice_dP_abst_physics</a>(self, state, deriv_density)  
+</h3>
+    
+
+  <p>氷密度の圧力微分 (dRho/dP) を計算します。</p><a href="../proc/calc_drho_ice_dp_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_physics.html'>abst_physics</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>deriv_density</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_drho_ice_dt"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_drho_ice_dT</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_drho_ice_dt_abst_physics.html'>calc_drho_ice_dT_abst_physics</a>
+        
+      </h3>
+    </div>
+        <div class="card-body">
+          
+          <p>氷密度の温度微分を計算</p>
+        </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_drho_ice_dt_abst_physics.html'>calc_drho_ice_dT_abst_physics</a>(self, state, deriv_density)  
+</h3>
+    
+
+  <p>氷密度の温度微分 (dRho/dT) を計算します。</p><a href="../proc/calc_drho_ice_dt_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_physics.html'>abst_physics</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>deriv_density</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_drho_vapor_dp"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_drho_vapor_dP</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_drho_vapor_dp_abst_physics.html'>calc_drho_vapor_dP_abst_physics</a>
+        
+      </h3>
+    </div>
+        <div class="card-body">
+          
+          <p>水蒸気密度の圧力微分を計算</p>
+        </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_drho_vapor_dp_abst_physics.html'>calc_drho_vapor_dP_abst_physics</a>(self, state, deriv_density)  
+</h3>
+    
+
+  <p>蒸気密度の圧力微分 (dRho_v/dP) を計算します。</p><a href="../proc/calc_drho_vapor_dp_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_physics.html'>abst_physics</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>deriv_density</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_drho_vapor_dt"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_drho_vapor_dT</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_drho_vapor_dt_abst_physics.html'>calc_drho_vapor_dT_abst_physics</a>
+        
+      </h3>
+    </div>
+        <div class="card-body">
+          
+          <p>水蒸気密度の温度微分を計算</p>
+        </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_drho_vapor_dt_abst_physics.html'>calc_drho_vapor_dT_abst_physics</a>(self, state, deriv_density)  
+</h3>
+    
+
+  <p>蒸気密度の温度微分 (dRho_v/dT) を計算します。</p><a href="../proc/calc_drho_vapor_dt_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_physics.html'>abst_physics</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>deriv_density</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_drho_vapor_saturation_dp"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_drho_vapor_saturation_dP</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_drho_vapor_saturation_dp_abst_physics.html'>calc_drho_vapor_saturation_dP_abst_physics</a>
+        
+      </h3>
+    </div>
+        <div class="card-body">
+          
+          <p>飽和水蒸気密度の圧力微分を計算</p>
+        </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_drho_vapor_saturation_dp_abst_physics.html'>calc_drho_vapor_saturation_dP_abst_physics</a>(self, state, deriv_density)  
+</h3>
+    
+
+  <p>飽和水蒸気密度の圧力微分を計算します。</p><a href="../proc/calc_drho_vapor_saturation_dp_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_physics.html'>abst_physics</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>deriv_density</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_drho_vapor_saturation_dt"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_drho_vapor_saturation_dT</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_drho_vapor_saturation_dt_abst_physics.html'>calc_drho_vapor_saturation_dT_abst_physics</a>
+        
+      </h3>
+    </div>
+        <div class="card-body">
+          
+          <p>飽和水蒸気密度の温度微分を計算</p>
+        </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_drho_vapor_saturation_dt_abst_physics.html'>calc_drho_vapor_saturation_dT_abst_physics</a>(self, state, deriv_density)  
+</h3>
+    
+
+  <p>飽和水蒸気密度の温度微分を計算します。</p><a href="../proc/calc_drho_vapor_saturation_dt_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_physics.html'>abst_physics</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>deriv_density</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_drho_water_dp"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_drho_water_dP</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_drho_water_dp_abst_physics.html'>calc_drho_water_dP_abst_physics</a>
+        
+      </h3>
+    </div>
+        <div class="card-body">
+          
+          <p>水密度の圧力微分を計算</p>
+        </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_drho_water_dp_abst_physics.html'>calc_drho_water_dP_abst_physics</a>(self, state, deriv_density)  
+</h3>
+    
+
+  <p>水密度の圧力微分 (dRho/dP) を計算します。</p><a href="../proc/calc_drho_water_dp_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_physics.html'>abst_physics</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>deriv_density</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_drho_water_dt"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_drho_water_dT</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_drho_water_dt_abst_physics.html'>calc_drho_water_dT_abst_physics</a>
+        
+      </h3>
+    </div>
+        <div class="card-body">
+          
+          <p>水密度の温度微分を計算</p>
+        </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_drho_water_dt_abst_physics.html'>calc_drho_water_dT_abst_physics</a>(self, state, deriv_density)  
+</h3>
+    
+
+  <p>水密度の温度微分 (dRho/dT) を計算します。</p><a href="../proc/calc_drho_water_dt_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_physics.html'>abst_physics</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>deriv_density</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_ice_cp"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_ice_cp</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_ice_cp_abst_material.html'>calc_ice_cp_abst_material</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_ice_cp_abst_material.html'>calc_ice_cp_abst_material</a>(self, state, cp)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_material.html'>abst_material</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>cp</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_ice_density"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_ice_density</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_ice_density_abst_material.html'>calc_ice_density_abst_material</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_ice_density_abst_material.html'>calc_ice_density_abst_material</a>(self, state, density)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_material.html'>abst_material</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>density</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_rho_ice"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_rho_ice</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_rho_ice_abst_physics.html'>calc_rho_ice_abst_physics</a>
+        
+      </h3>
+    </div>
+        <div class="card-body">
+          
+          <p>氷密度を計算</p>
+        </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_rho_ice_abst_physics.html'>calc_rho_ice_abst_physics</a>(self, state, density)  
+</h3>
+    
+
+  <p>IAPWS-06を用いて氷密度を計算します。</p><a href="../proc/calc_rho_ice_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_physics.html'>abst_physics</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>density</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_rho_vapor"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_rho_vapor</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_rho_vapor_abst_physics.html'>calc_rho_vapor_abst_physics</a>
+        
+      </h3>
+    </div>
+        <div class="card-body">
+          
+          <p>相対湿度に基づき水蒸気密度を計算</p>
+        </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_rho_vapor_abst_physics.html'>calc_rho_vapor_abst_physics</a>(self, state, density)  
+</h3>
+    
+
+  <p>相対湿度と飽和密度に基づき蒸気密度を計算します。</p><a href="../proc/calc_rho_vapor_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_physics.html'>abst_physics</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>density</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_rho_vapor_saturation"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_rho_vapor_saturation</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_rho_vapor_saturation_abst_physics.html'>calc_rho_vapor_saturation_abst_physics</a>
+        
+      </h3>
+    </div>
+        <div class="card-body">
+          
+          <p>飽和水蒸気密度を計算</p>
+        </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_rho_vapor_saturation_abst_physics.html'>calc_rho_vapor_saturation_abst_physics</a>(self, state, density)  
+</h3>
+    
+
+  <p>飽和水蒸気密度を計算します。</p><a href="../proc/calc_rho_vapor_saturation_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_physics.html'>abst_physics</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>density</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_rho_water"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_rho_water</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_rho_water_abst_physics.html'>calc_rho_water_abst_physics</a>
+        
+      </h3>
+    </div>
+        <div class="card-body">
+          
+          <p>液体の水密度を計算</p>
+        </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_rho_water_abst_physics.html'>calc_rho_water_abst_physics</a>(self, state, density)  
+</h3>
+    
+
+  <p>IAPWS-97を用いて液体の水密度を計算します。</p><a href="../proc/calc_rho_water_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_physics.html'>abst_physics</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>density</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_vapor_cp"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_vapor_cp</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_vapor_cp_abst_material.html'>calc_vapor_cp_abst_material</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_vapor_cp_abst_material.html'>calc_vapor_cp_abst_material</a>(self, state, cp)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_material.html'>abst_material</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>cp</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_vapor_density"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_vapor_density</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_vapor_density_abst_material.html'>calc_vapor_density_abst_material</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_vapor_density_abst_material.html'>calc_vapor_density_abst_material</a>(self, state, density)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_material.html'>abst_material</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>density</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_water_cp"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_water_cp</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_water_cp_abst_material.html'>calc_water_cp_abst_material</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_water_cp_abst_material.html'>calc_water_cp_abst_material</a>(self, state, cp)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_material.html'>abst_material</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>cp</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_water_density"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_water_density</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_water_density_abst_material.html'>calc_water_density_abst_material</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_water_density_abst_material.html'>calc_water_density_abst_material</a>(self, state, density)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_material.html'>abst_material</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>density</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_phi"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_phi</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/get_material_phi.html'>get_material_phi</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/get_material_phi.html'>get_material_phi</a>(self, state, phi1, phi2, phi3, phi4)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_material.html'>abst_material</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>phi1</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>phi2</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>phi3</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>phi4</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_solid"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_solid</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/get_solid_abst_material.html'>get_solid_abst_material</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/get_solid_abst_material.html'>get_solid_abst_material</a>(self, solid)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_material.html'>abst_material</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>solid</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-initialize~36"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>initialize</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/initialize_abst_material.html'>initialize_abst_material</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/initialize_abst_material.html'>initialize_abst_material</a>(self, material_id, physics_info, water, ice)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_material.html'>abst_material</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>material_id</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_physics_info.html'>type_physics_info</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_info</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(type_iapws97),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>water</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(type_iapws06),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>ice</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_initialized~8"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_initialized</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/is_initialized_abst_physics.html'>is_initialized_abst_physics</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  function <a href='../proc/is_initialized_abst_physics.html'>is_initialized_abst_physics</a>(self) result(initialized)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_physics.html'>abst_physics</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
     </tbody>
   </table>
 
     <h4>
     Return Value
-    <small>real(kind=real64)</small>
+    <small>logical</small>
     </h4>
     
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-shift_pressure_absolute"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>shift_pressure_absolute</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/shift_pressure_absolute_abst_physics.html'>shift_pressure_absolute_abst_physics</a>
+        
+      </h3>
+    </div>
+        <div class="card-body">
+          
+          <p>ゲージ圧を絶対圧に変換</p>
+        </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/shift_pressure_absolute_abst_physics.html'>shift_pressure_absolute_abst_physics</a>(self, pressure_gauge, pressure_absolute)  
+</h3>
+    
+
+  <p>ゲージ圧を絶対圧に変換します。</p><a href="../proc/shift_pressure_absolute_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_physics.html'>abst_physics</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>pressure_gauge</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>pressure_absolute</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-shift_temperature_absolute"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>shift_temperature_absolute</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/shift_temperature_absolute_abst_physics.html'>shift_temperature_absolute_abst_physics</a>
+        
+      </h3>
+    </div>
+        <div class="card-body">
+          
+          <p>摂氏温度をケルビンに変換</p>
+        </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/shift_temperature_absolute_abst_physics.html'>shift_temperature_absolute_abst_physics</a>(self, temperature_degree, temperature_K)  
+</h3>
+    
+
+  <p>摂氏温度をケルビンに変換します。</p><a href="../proc/shift_temperature_absolute_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_physics.html'>abst_physics</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>temperature_degree</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>temperature_K</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
 
           </li>
       </ul>
@@ -532,14 +3207,9 @@ large graphs.</div>
 
     <section>
     <h3><span class="anchor" id="src"></span>Source Code</h3>
-    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">abstract</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">abst_sph</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">material_id</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">material1</span><span class="w"> </span><span class="c">!! soil, rock, concrete</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">material2</span><span class="w"> </span><span class="c">!! water</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">material3</span><span class="w"> </span><span class="c">!! ice</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">material4</span><span class="w"> </span><span class="c">!! gas</span>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">extends</span><span class="p">(</span><span class="n">abst_material</span><span class="p">),</span><span class="w"> </span><span class="k">abstract</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">abst_sph</span>
 <span class="w">    </span><span class="k">contains</span>
-<span class="k">        procedure</span><span class="p">(</span><span class="n">abst_calc_sph_gauss_point</span><span class="p">),</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">deferred</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc</span>
+<span class="k">        procedure</span><span class="p">(</span><span class="n">abst_calc_sph_gp</span><span class="p">),</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">deferred</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">abst_sph</span>
 </pre></div>
 
@@ -556,14 +3226,14 @@ large graphs.</div>
           <div class="col">
             <p>
               FTDSS
- was developed by Kikuchi Shun<br>              &copy; 2025 
+ was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
           <div class="col">
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-08-26 10:37 +0000             </p>
+ on 2026-02-22 12:12 +0000             </p>
           </div>
         </div>
         <br>

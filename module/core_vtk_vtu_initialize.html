@@ -1,0 +1,1551 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>core_vtk_vtu_initialize &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>core_vtk_vtu_initialize
+      <small>Submodule</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.6% of total for modules and submodules.">166 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/vtu_initialize.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/vtu_initialize.f90.html'>vtu_initialize.F90</a></li>
+            <li class="breadcrumb-item active" aria-current="page">core_vtk_vtu_initialize</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3">
+        <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#modsubs-0"
+         aria-expanded="false" aria-controls="modsubs-0">
+         <h4 class="card-header bg-primary text-white">Module Subroutines</h4>
+      </a>
+      <div id="modsubs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/core_vtk_vtu_initialize.html#proc-type_vtk_vtu_initialize">type_vtk_vtu_initialize</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+
+
+  </div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      
+<br>          <div class="card mb-4">
+      <h3 class="card-header card-title bg-light">Uses</h3>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <ul class="list-inline">
+                <li><h5>Ancestors:</h5></li>
+                  <li class="list-inline-item"><a href='core_vtk.html'>core_vtk</a></li>
+              </ul>
+            </li>
+            <li class="list-group-item">
+              <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: module~~core_vtk_vtu_initialize~~UsesGraph Pages: 1 -->
+<svg id="modulecore_vtk_vtu_initializeUsesGraph" width="641pt" height="338pt"
+ viewBox="0.00 0.00 641.00 338.47" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph" class="graph" transform="scale(0.3 0.3) rotate(0) translate(4 1107.5)">
+<title>module~~core_vtk_vtu_initialize~~UsesGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1107.5 2101,-1107.5 2101,4 -4,4"/>
+<!-- module~core_vtk_vtu_initialize -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node1" class="node">
+<title>module~core_vtk_vtu_initialize</title>
+<polygon fill="none" stroke="black" points="2097,-190 1969,-190 1969,-166 2097,-166 2097,-190"/>
+<text text-anchor="middle" x="2033" y="-175.6" font-family="Helvetica,sans-Serif" font-size="10.50">core_vtk_vtu_initialize</text>
+</g>
+<!-- module~core_vtk -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node2" class="node">
+<title>module~core_vtk</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node2"><a xlink:href="../module/core_vtk.html" xlink:title="core_vtk">
+<polygon fill="#337ab7" stroke="#337ab7" points="1933,-190 1876,-190 1876,-166 1933,-166 1933,-190"/>
+<text text-anchor="middle" x="1904.5" y="-175.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_vtk</text>
+</a>
+</g>
+</g>
+<!-- module~core_vtk_vtu_initialize&#45;&gt;module~core_vtk -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge1" class="edge">
+<title>module~core_vtk_vtu_initialize&#45;&gt;module~core_vtk</title>
+<path fill="none" stroke="#ff0000" d="M1968.75,-178C1960.07,-178 1951.4,-178 1943.38,-178"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1943.26,-174.5 1933.26,-178 1943.26,-181.5 1943.26,-174.5"/>
+</g>
+<!-- core_allocate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node3" class="node">
+<title>core_allocate</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="753.5,-549 669.5,-549 669.5,-525 753.5,-525 753.5,-549"/>
+<text text-anchor="middle" x="711.5" y="-534.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_allocate</text>
+</g>
+<!-- module~core_vtk&#45;&gt;core_allocate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge2" class="edge">
+<title>module~core_vtk&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1775,-300C1732.43,-317.71 1720.64,-319.45 1676,-331 1526.42,-369.69 1125.08,-387.63 995,-471 972.25,-485.58 981.33,-504.78 959,-520 931.83,-538.52 920.25,-536.02 887.5,-539"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M885.5,-539C844.74,-541.43 798.49,-540.71 764.07,-539.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="763.91,-536 753.79,-539.12 763.65,-543 763.91,-536"/>
+</g>
+<!-- core_deallocate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node4" class="node">
+<title>core_deallocate</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="760,-469 663,-469 663,-445 760,-445 760,-469"/>
+<text text-anchor="middle" x="711.5" y="-454.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_deallocate</text>
+</g>
+<!-- module~core_vtk&#45;&gt;core_deallocate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge3" class="edge">
+<title>module~core_vtk&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1775,-300C1638.2,-354.1 1591.11,-300 1444,-300 1444,-300 1444,-300 1273.5,-300 1146.69,-300 1106.15,-300.96 995,-362 975.17,-372.89 978.61,-386.71 959,-398 930.51,-414.41 920.17,-413.27 887.5,-417"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M885.5,-417C842.13,-420.27 794.03,-432.08 759.57,-442.03"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="758.39,-438.73 749.79,-444.91 760.37,-445.45 758.39,-438.73"/>
+</g>
+<!-- core_unique -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node5" class="node">
+<title>core_unique</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="1815,-272 1737,-272 1737,-248 1815,-248 1815,-272"/>
+<text text-anchor="middle" x="1776" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_unique</text>
+</g>
+<!-- module~core_vtk&#45;&gt;core_unique -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge4" class="edge">
+<title>module~core_vtk&#45;&gt;core_unique</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1893.53,-190.45C1881.97,-204.12 1861.72,-225.88 1840,-239 1835.25,-241.87 1830.06,-244.4 1824.76,-246.62"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1823.27,-243.45 1815.19,-250.29 1825.78,-249.98 1823.27,-243.45"/>
+</g>
+<!-- iso_c_binding -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node6" class="node">
+<title>iso_c_binding</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node6"><a xlink:href="http://fortranwiki.org/fortran/show/iso_c_binding" xlink:title="iso_c_binding">
+<polygon fill="#337ab7" stroke="#337ab7" points="1657.5,-190 1573.5,-190 1573.5,-166 1657.5,-166 1657.5,-190"/>
+<text text-anchor="middle" x="1615.5" y="-175.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_c_binding</text>
+</a>
+</g>
+</g>
+<!-- module~core_vtk&#45;&gt;iso_c_binding -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge5" class="edge">
+<title>module~core_vtk&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1875.98,-178C1828.1,-178 1728.77,-178 1667.85,-178"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1667.68,-174.5 1657.68,-178 1667.68,-181.5 1667.68,-174.5"/>
+</g>
+<!-- iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node7" class="node">
+<title>iso_fortran_env</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node7"><a xlink:href="http://fortranwiki.org/fortran/show/iso_fortran_env" xlink:title="iso_fortran_env">
+<polygon fill="#337ab7" stroke="#337ab7" points="94,-627 0,-627 0,-603 94,-603 94,-627"/>
+<text text-anchor="middle" x="47" y="-612.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
+</a>
+</g>
+</g>
+<!-- module~core_vtk&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge6" class="edge">
+<title>module~core_vtk&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M369.5,-301C202.93,-312.55 90.17,-524.24 57.67,-593.36"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="54.31,-592.29 53.3,-602.84 60.66,-595.22 54.31,-592.29"/>
+</g>
+<!-- module~core_types -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node8" class="node">
+<title>module~core_types</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node8"><a xlink:href="../module/core_types.html" xlink:title="core_types">
+<polygon fill="#337ab7" stroke="#337ab7" points="1811,-504 1741,-504 1741,-480 1811,-480 1811,-504"/>
+<text text-anchor="middle" x="1776" y="-489.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types</text>
+</a>
+</g>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_types -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge7" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_types</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1898.54,-190.31C1879.41,-237.79 1810.27,-409.43 1785.72,-470.36"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1782.42,-469.19 1781.92,-479.78 1788.91,-471.81 1782.42,-469.19"/>
+</g>
+<!-- module~core_vtk_vtk_constants -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node9" class="node">
+<title>module~core_vtk_vtk_constants</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node9"><a xlink:href="../module/core_vtk_vtk_constants.html" xlink:title="core_vtk_vtk_constants">
+<polygon fill="#337ab7" stroke="#337ab7" points="264,-313 130,-313 130,-289 264,-289 264,-313"/>
+<text text-anchor="middle" x="197" y="-298.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_vtk_vtk_constants</text>
+</a>
+</g>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_vtk_vtk_constants -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge8" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_vtk_vtk_constants</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M369.5,-301C338.4,-302.98 304.07,-303.34 274.34,-303.07"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="274.07,-299.57 264.03,-302.95 273.99,-306.57 274.07,-299.57"/>
+</g>
+<!-- module~core_vtk_vtk_wrapper -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node10" class="node">
+<title>module~core_vtk_vtk_wrapper</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node10"><a xlink:href="../module/core_vtk_vtk_wrapper.html" xlink:title="core_vtk_vtk_wrapper">
+<polygon fill="#337ab7" stroke="#337ab7" points="1839.5,-150 1712.5,-150 1712.5,-126 1839.5,-126 1839.5,-150"/>
+<text text-anchor="middle" x="1776" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_vtk_vtk_wrapper</text>
+</a>
+</g>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_vtk_vtk_wrapper -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge9" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_vtk_vtk_wrapper</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1875.74,-169.22C1860.9,-164.53 1842.22,-158.62 1825.11,-153.21"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1825.84,-149.77 1815.25,-150.1 1823.73,-156.45 1825.84,-149.77"/>
+</g>
+<!-- module~core_vtk_vtu_wrapper -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node11" class="node">
+<title>module~core_vtk_vtu_wrapper</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node11"><a xlink:href="../module/core_vtk_vtu_wrapper.html" xlink:title="core_vtk_vtu_wrapper">
+<polygon fill="#337ab7" stroke="#337ab7" points="1840,-230 1712,-230 1712,-206 1840,-206 1840,-230"/>
+<text text-anchor="middle" x="1776" y="-215.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_vtk_vtu_wrapper</text>
+</a>
+</g>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_vtk_vtu_wrapper -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge10" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_vtk_vtu_wrapper</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1875.74,-186.78C1860.9,-191.47 1842.22,-197.38 1825.11,-202.79"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1823.73,-199.55 1815.25,-205.9 1825.84,-206.23 1823.73,-199.55"/>
+</g>
+<!-- mpi_f08 -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node12" class="node">
+<title>mpi_f08</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node12"><a xlink:href="http://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node409.htm" xlink:title="mpi_f08">
+<polygon fill="#337ab7" stroke="#337ab7" points="1803.5,-108 1748.5,-108 1748.5,-84 1803.5,-84 1803.5,-108"/>
+<text text-anchor="middle" x="1776" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mpi_f08</text>
+</a>
+</g>
+</g>
+<!-- module~core_vtk&#45;&gt;mpi_f08 -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge11" class="edge">
+<title>module~core_vtk&#45;&gt;mpi_f08</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1893.53,-165.55C1881.97,-151.88 1861.72,-130.12 1840,-117 1831.81,-112.05 1822.31,-108.11 1813.21,-105.03"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1814.16,-101.66 1803.57,-102.03 1812.08,-108.34 1814.16,-101.66"/>
+</g>
+<!-- stdlib_logger -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node13" class="node">
+<title>stdlib_logger</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="1816.5,-66 1735.5,-66 1735.5,-42 1816.5,-42 1816.5,-66"/>
+<text text-anchor="middle" x="1776" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_logger</text>
+</g>
+<!-- module~core_vtk&#45;&gt;stdlib_logger -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge12" class="edge">
+<title>module~core_vtk&#45;&gt;stdlib_logger</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1899.25,-165.93C1891.11,-144.52 1871.28,-99.79 1840,-75 1835.87,-71.73 1831.21,-68.95 1826.33,-66.61"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1827.36,-63.24 1816.78,-62.6 1824.65,-69.69 1827.36,-63.24"/>
+</g>
+<!-- stdlib_sorting -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node14" class="node">
+<title>stdlib_sorting</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="1817.5,-24 1734.5,-24 1734.5,0 1817.5,0 1817.5,-24"/>
+<text text-anchor="middle" x="1776" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_sorting</text>
+</g>
+<!-- module~core_vtk&#45;&gt;stdlib_sorting -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge13" class="edge">
+<title>module~core_vtk&#45;&gt;stdlib_sorting</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1901.62,-165.95C1896.68,-138.39 1880.8,-70.24 1840,-33 1836.16,-29.49 1831.72,-26.57 1827.01,-24.14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1828.26,-20.86 1817.7,-20.03 1825.43,-27.27 1828.26,-20.86"/>
+</g>
+<!-- stdlib_strings -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node15" class="node">
+<title>stdlib_strings</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="88,-452 6,-452 6,-428 88,-428 88,-452"/>
+<text text-anchor="middle" x="47" y="-437.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_strings</text>
+</g>
+<!-- module~core_vtk&#45;&gt;stdlib_strings -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge14" class="edge">
+<title>module~core_vtk&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1899.32,-190.16C1891.29,-211.72 1871.64,-256.67 1840,-281 1816.82,-298.83 1804.39,-289.75 1777,-300"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1775,-300C1747.61,-310.25 1739.42,-291.18 1712,-281 1695.59,-274.9 1692.71,-270.23 1676,-265 1608.21,-243.77 1589.72,-241.7 1519,-235 1385.82,-222.39 1351.77,-233.8 1218,-235 1118.88,-235.89 1094.11,-237.02 995,-239 914.55,-240.61 894.23,-236.87 814,-243 616.23,-258.1 569.45,-288.43 371.5,-301"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M369.5,-301C262.84,-307.47 221.17,-224.28 130,-280 80.28,-310.39 59.47,-381.54 51.84,-417.85"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="48.36,-417.43 49.88,-427.91 55.23,-418.76 48.36,-417.43"/>
+</g>
+<!-- core_types_variable -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node16" class="node">
+<title>core_types_variable</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="1674.5,-544 1556.5,-544 1556.5,-520 1674.5,-520 1674.5,-544"/>
+<text text-anchor="middle" x="1615.5" y="-529.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_variable</text>
+</g>
+<!-- module~core_types&#45;&gt;core_types_variable -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge15" class="edge">
+<title>module~core_types&#45;&gt;core_types_variable</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M1741,-500.58C1721.51,-505.5 1696.52,-511.81 1674.06,-517.47"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="1673.11,-514.1 1664.28,-519.94 1674.83,-520.89 1673.11,-514.1"/>
+</g>
+<!-- module~core_types_coordinate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node17" class="node">
+<title>module~core_types_coordinate</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node17"><a xlink:href="../module/core_types_coordinate.html" xlink:title="core_types_coordinate">
+<polygon fill="#337ab7" stroke="#337ab7" points="778,-388 645,-388 645,-364 778,-364 778,-388"/>
+<text text-anchor="middle" x="711.5" y="-373.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_coordinate</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_coordinate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge16" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_coordinate</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M1760.93,-479.92C1717.19,-443.61 1578.37,-338 1444,-338 1444,-338 1444,-338 1273.5,-338 1069,-338 1003.48,-237.07 814,-314 793.32,-322.39 796.65,-336.75 778,-349 771.85,-353.04 765,-356.66 758.11,-359.85"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="756.53,-356.72 748.75,-363.92 759.32,-363.14 756.53,-356.72"/>
+</g>
+<!-- module~core_types_coordinate_array -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node18" class="node">
+<title>module~core_types_coordinate_array</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node18"><a xlink:href="../module/core_types_coordinate_array.html" xlink:title="core_types_coordinate_array">
+<polygon fill="#337ab7" stroke="#337ab7" points="1171.5,-272 1005.5,-272 1005.5,-248 1171.5,-248 1171.5,-272"/>
+<text text-anchor="middle" x="1088.5" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_coordinate_array</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_coordinate_array -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge17" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_coordinate_array</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M1771.85,-479.61C1762.98,-447.58 1734.56,-361.87 1676,-324 1522.27,-224.6 1297.33,-232.8 1175.54,-246.8"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="1175.03,-243.34 1165.51,-248 1175.86,-250.29 1175.03,-243.34"/>
+</g>
+<!-- module~core_types_datetime -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node19" class="node">
+<title>module~core_types_datetime</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node19"><a xlink:href="../module/core_types_datetime.html" xlink:title="core_types_datetime">
+<polygon fill="#337ab7" stroke="#337ab7" points="948,-1054 825,-1054 825,-1030 948,-1030 948,-1054"/>
+<text text-anchor="middle" x="886.5" y="-1039.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_datetime</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_datetime -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge18" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_datetime</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M1273.5,-1042C1163.35,-1040.99 1035.52,-1041.28 958.12,-1041.61"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="957.99,-1038.11 948.01,-1041.66 958.02,-1045.11 957.99,-1038.11"/>
+</g>
+<!-- module~core_types_graph -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node20" class="node">
+<title>module~core_types_graph</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node20"><a xlink:href="../module/core_types_graph.html" xlink:title="core_types_graph">
+<polygon fill="#337ab7" stroke="#337ab7" points="1496,-974 1390,-974 1390,-950 1496,-950 1496,-974"/>
+<text text-anchor="middle" x="1443" y="-959.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_graph</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_graph -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge19" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_graph</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M1614.5,-962C1579.84,-986.79 1530.24,-983.7 1493.47,-976.24"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="1493.98,-972.77 1483.46,-974.05 1492.47,-979.61 1493.98,-972.77"/>
+</g>
+<!-- module~core_types_math_gauss -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node21" class="node">
+<title>module~core_types_math_gauss</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node21"><a xlink:href="../module/core_types_math_gauss.html" xlink:title="core_types_math_gauss">
+<polygon fill="#337ab7" stroke="#337ab7" points="956,-469 817,-469 817,-445 956,-445 956,-469"/>
+<text text-anchor="middle" x="886.5" y="-454.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_math_gauss</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_math_gauss -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge20" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_math_gauss</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M1273.5,-452C1168.2,-436.22 1044.94,-441.95 966.56,-448.57"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="965.94,-445.11 956.28,-449.47 966.55,-452.09 965.94,-445.11"/>
+</g>
+<!-- module~core_types_physics_config_bc -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node22" class="node">
+<title>module~core_types_physics_config_bc</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node22"><a xlink:href="../module/core_types_physics_config_bc.html" xlink:title="core_types_physics_config_bc">
+<polygon fill="#337ab7" stroke="#337ab7" points="1173.5,-740 1003.5,-740 1003.5,-716 1173.5,-716 1173.5,-740"/>
+<text text-anchor="middle" x="1088.5" y="-725.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_physics_config_bc</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_physics_config_bc -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge21" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_physics_config_bc</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M1775.48,-504.35C1777.15,-566.69 1775.49,-848.29 1616.5,-962"/>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M1614.5,-962C1610.54,-964.83 1448.74,-923.1 1444,-922"/>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M1442,-922C1406.69,-913.82 1196.91,-791.37 1118.79,-745.33"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="1120.33,-742.17 1109.94,-740.11 1116.77,-748.2 1120.33,-742.17"/>
+</g>
+<!-- module~core_types_physics_info -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node23" class="node">
+<title>module~core_types_physics_info</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node23"><a xlink:href="../module/core_types_physics_info.html" xlink:title="core_types_physics_info">
+<polygon fill="#337ab7" stroke="#337ab7" points="956,-389 817,-389 817,-365 956,-365 956,-389"/>
+<text text-anchor="middle" x="886.5" y="-374.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_physics_info</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_physics_info -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge22" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_physics_info</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M1087.5,-376C1048.38,-366.29 1003.61,-365.59 966.36,-367.73"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="965.82,-364.26 956.07,-368.4 966.28,-371.24 965.82,-364.26"/>
+</g>
+<!-- module~core_types_physics_meteorology -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node24" class="node">
+<title>module~core_types_physics_meteorology</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node24"><a xlink:href="../module/core_types_physics_meteorology.html" xlink:title="core_types_physics_meteorology">
+<polygon fill="#337ab7" stroke="#337ab7" points="1182,-934 995,-934 995,-910 1182,-910 1182,-934"/>
+<text text-anchor="middle" x="1088.5" y="-919.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_physics_meteorology</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_physics_meteorology -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge23" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_physics_meteorology</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M1442,-922C1359.88,-901.76 1263.69,-903.37 1192.56,-909.14"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="1191.92,-905.69 1182.25,-910.02 1192.51,-912.66 1191.92,-905.69"/>
+</g>
+<!-- module~core_types_physics_state -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node25" class="node">
+<title>module~core_types_physics_state</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node25"><a xlink:href="../module/core_types_physics_state.html" xlink:title="core_types_physics_state">
+<polygon fill="#337ab7" stroke="#337ab7" points="959,-347 814,-347 814,-323 959,-323 959,-347"/>
+<text text-anchor="middle" x="886.5" y="-332.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_physics_state</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_physics_state -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge24" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_physics_state</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M1740.65,-493.33C1680.48,-495.37 1552.13,-498.39 1444,-492"/>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M1442,-492C1366.07,-486.85 1350.67,-463.88 1275.5,-452"/>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M1273.5,-452C1186.11,-438.19 1175.37,-397.31 1089.5,-376"/>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M1087.5,-376C1046.61,-365.85 1000.56,-356.29 962.97,-348.95"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="963.59,-345.51 953.11,-347.04 962.26,-352.38 963.59,-345.51"/>
+</g>
+<!-- module~core_types_pointer -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node26" class="node">
+<title>module~core_types_pointer</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node26"><a xlink:href="../module/core_types_pointer.html" xlink:title="core_types_pointer">
+<polygon fill="#337ab7" stroke="#337ab7" points="1331,-504 1218,-504 1218,-480 1331,-480 1331,-504"/>
+<text text-anchor="middle" x="1274.5" y="-489.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_pointer</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_pointer -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge25" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_pointer</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M1442,-492C1408.82,-490.04 1371.85,-489.84 1341.19,-490.21"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="1341,-486.72 1331.05,-490.36 1341.1,-493.72 1341,-486.72"/>
+</g>
+<!-- module~core_types_solar -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node27" class="node">
+<title>module~core_types_solar</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node27"><a xlink:href="../module/core_types_solar.html" xlink:title="core_types_solar">
+<polygon fill="#337ab7" stroke="#337ab7" points="1139,-1014 1038,-1014 1038,-990 1139,-990 1139,-1014"/>
+<text text-anchor="middle" x="1088.5" y="-999.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_solar</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_solar -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge26" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_solar</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M1614.5,-962C1488.58,-1052.06 1430,-1032.26 1275.5,-1042"/>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M1273.5,-1042C1248.81,-1041.77 1189.18,-1027.88 1144.45,-1016.54"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="1145.13,-1013.1 1134.58,-1014.01 1143.4,-1019.88 1145.13,-1013.1"/>
+</g>
+<!-- module~module_type_matrix -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node28" class="node">
+<title>module~module_type_matrix</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node28"><a xlink:href="../module/module_type_matrix.html" xlink:title="module_type_matrix">
+<polygon fill="#337ab7" stroke="#337ab7" points="1676,-640 1555,-640 1555,-616 1676,-616 1676,-640"/>
+<text text-anchor="middle" x="1615.5" y="-625.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">module_type_matrix</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~module_type_matrix -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge27" class="edge">
+<title>module~core_types&#45;&gt;module~module_type_matrix</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M1760.93,-504.07C1733.28,-527.8 1671.63,-580.7 1638.53,-609.1"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="1636.07,-606.59 1630.76,-615.76 1640.63,-611.91 1636.07,-606.59"/>
+</g>
+<!-- module~module_type_vector -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node29" class="node">
+<title>module~module_type_vector</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node29"><a xlink:href="../module/module_type_vector.html" xlink:title="module_type_vector">
+<polygon fill="#337ab7" stroke="#337ab7" points="1149,-504 1028,-504 1028,-480 1149,-480 1149,-504"/>
+<text text-anchor="middle" x="1088.5" y="-489.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">module_type_vector</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~module_type_vector -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge28" class="edge">
+<title>module~core_types&#45;&gt;module~module_type_vector</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M1273.5,-452C1260.95,-450.12 1195.91,-465.24 1146.69,-477.43"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="1145.62,-474.09 1136.76,-479.9 1147.31,-480.88 1145.62,-474.09"/>
+</g>
+<!-- module~core_vtk_vtk_constants&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge29" class="edge">
+<title>module~core_vtk_vtk_constants&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ffc4" stroke-dasharray="5,2" d="M149.17,-313.02C142,-316.56 135.25,-321.12 130,-327 88.92,-372.99 110.83,-401.67 94,-461 80.64,-508.1 63.99,-562.98 54.83,-592.85"/>
+<polygon fill="#00ffc4" stroke="#00ffc4" points="51.41,-592.07 51.81,-602.66 58.1,-594.13 51.41,-592.07"/>
+</g>
+<!-- module~core_vtk_vtk_constants&#45;&gt;stdlib_strings -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge30" class="edge">
+<title>module~core_vtk_vtk_constants&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#00ffc4" stroke-dasharray="5,2" d="M154.63,-313.13C145.99,-316.77 137.3,-321.34 130,-327 97.52,-352.16 72.1,-393.54 58.64,-418.63"/>
+<polygon fill="#00ffc4" stroke="#00ffc4" points="55.43,-417.2 53.91,-427.69 61.64,-420.44 55.43,-417.2"/>
+</g>
+<!-- module~core_vtk_vtk_wrapper&#45;&gt;iso_c_binding -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge31" class="edge">
+<title>module~core_vtk_vtk_wrapper&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#00c4ff" stroke-dasharray="5,2" d="M1727.44,-150C1708.5,-154.78 1686.66,-160.29 1667.39,-165.16"/>
+<polygon fill="#00c4ff" stroke="#00c4ff" points="1666.42,-161.79 1657.58,-167.63 1668.13,-168.58 1666.42,-161.79"/>
+</g>
+<!-- module~core_vtk_vtu_wrapper&#45;&gt;iso_c_binding -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge32" class="edge">
+<title>module~core_vtk_vtu_wrapper&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#004eff" stroke-dasharray="5,2" d="M1727.44,-206C1708.5,-201.22 1686.66,-195.71 1667.39,-190.84"/>
+<polygon fill="#004eff" stroke="#004eff" points="1668.13,-187.42 1657.58,-188.37 1666.42,-194.21 1668.13,-187.42"/>
+</g>
+<!-- module~core_types_coordinate&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge33" class="edge">
+<title>module~core_types_coordinate&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff6d00" stroke-dasharray="5,2" d="M542,-459C468.22,-478.23 447.24,-469.19 371.5,-478"/>
+</g>
+<!-- module~core_types_coordinate&#45;&gt;stdlib_strings -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge35" class="edge">
+<title>module~core_types_coordinate&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#ff6d00" stroke-dasharray="5,2" d="M679.19,-388.05C668.25,-392.48 655.97,-397.72 645,-403 598.75,-425.26 593.99,-447.36 544,-459"/>
+<path fill="none" stroke="#ff6d00" stroke-dasharray="5,2" d="M542,-459C499.71,-468.85 215.52,-451.25 98.35,-443.45"/>
+<polygon fill="#ff6d00" stroke="#ff6d00" points="98.42,-439.94 88.21,-442.77 97.95,-446.93 98.42,-439.94"/>
+</g>
+<!-- stdlib_optval -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node35" class="node">
+<title>stdlib_optval</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="86.5,-1052 7.5,-1052 7.5,-1028 86.5,-1028 86.5,-1052"/>
+<text text-anchor="middle" x="47" y="-1037.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_optval</text>
+</g>
+<!-- module~core_types_coordinate&#45;&gt;stdlib_optval -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge34" class="edge">
+<title>module~core_types_coordinate&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#ff6d00" stroke-dasharray="5,2" d="M690.81,-388.13C675.5,-398.72 655.21,-415.59 645,-436 543.03,-639.95 742.36,-826.55 544,-939"/>
+<path fill="none" stroke="#ff6d00" stroke-dasharray="5,2" d="M542,-939C522.48,-950.06 217.37,-1008.19 96.64,-1030.9"/>
+<polygon fill="#ff6d00" stroke="#ff6d00" points="95.75,-1027.5 86.56,-1032.79 97.04,-1034.38 95.75,-1027.5"/>
+</g>
+<!-- module~core_types_coordinate_array&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge36" class="edge">
+<title>module~core_types_coordinate_array&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M1005.12,-249.16C968.57,-246.79 925.36,-247.38 887.5,-257"/>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M885.5,-257C853.01,-265.26 844.79,-267.75 814,-281 767.06,-301.2 762.85,-326.27 712.5,-335"/>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M710.5,-335C680.51,-340.2 673.49,-344.29 645,-355 582.62,-378.44 437.7,-470.3 371.5,-478"/>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M369.5,-478C257.12,-485.89 231.05,-511.19 130,-561 109.49,-571.11 87.96,-585.45 72.11,-596.82"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="69.95,-594.06 63.93,-602.78 74.07,-599.72 69.95,-594.06"/>
+</g>
+<!-- module~core_types_coordinate_array&#45;&gt;module~core_types_coordinate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge38" class="edge">
+<title>module~core_types_coordinate_array&#45;&gt;module~core_types_coordinate</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M885.5,-257C853.01,-265.26 839.55,-259.31 814,-281 787.93,-303.13 803.31,-326.01 778,-349 773.63,-352.97 768.59,-356.41 763.29,-359.36"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="761.58,-356.3 754.19,-363.9 764.7,-362.57 761.58,-356.3"/>
+</g>
+<!-- module~core_memory -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node31" class="node">
+<title>module~core_memory</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node31"><a xlink:href="../module/core_memory.html" xlink:title="core_memory">
+<polygon fill="#337ab7" stroke="#337ab7" points="929.5,-511 843.5,-511 843.5,-487 929.5,-487 929.5,-511"/>
+<text text-anchor="middle" x="886.5" y="-496.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_memory</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_coordinate_array&#45;&gt;module~core_memory -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge37" class="edge">
+<title>module~core_types_coordinate_array&#45;&gt;module~core_memory</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M1073.19,-272.05C1052.99,-289.78 1016.22,-324.84 995,-362 968.24,-408.88 997.46,-440.12 959,-478 953.55,-483.37 946.8,-487.38 939.65,-490.37"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="938.01,-487.23 929.73,-493.85 940.32,-493.84 938.01,-487.23"/>
+</g>
+<!-- module~core_types_datetime&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge39" class="edge">
+<title>module~core_types_datetime&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#b6ff00" stroke-dasharray="5,2" d="M844.5,-1054.08C733,-1084.49 417.9,-1153.94 198,-1040"/>
+<path fill="none" stroke="#b6ff00" stroke-dasharray="5,2" d="M196,-1040C170.57,-1021.91 150.39,-1039.63 130,-1016 80,-958.04 56.08,-713.64 49.76,-637.64"/>
+<polygon fill="#b6ff00" stroke="#b6ff00" points="53.22,-637 48.92,-627.32 46.24,-637.57 53.22,-637"/>
+</g>
+<!-- module~core_types_datetime&#45;&gt;stdlib_optval -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge40" class="edge">
+<title>module~core_types_datetime&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#b6ff00" stroke-dasharray="5,2" d="M196,-1040C165.66,-1024.28 126.91,-1024.89 96.67,-1029.11"/>
+<polygon fill="#b6ff00" stroke="#b6ff00" points="96.11,-1025.65 86.77,-1030.66 97.19,-1032.57 96.11,-1025.65"/>
+</g>
+<!-- module~core_types_graph&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge41" class="edge">
+<title>module~core_types_graph&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M1389.84,-961.68C1306.22,-961.74 1137.12,-964.19 995,-981 946.66,-986.72 936.12,-999.6 887.5,-1002"/>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M885.5,-1002C733.82,-1007.44 695.78,-1002 544,-1002 544,-1002 544,-1002 369.5,-1002 178.07,-1002 78.78,-718.37 54.16,-636.74"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="57.48,-635.61 51.3,-627.01 50.77,-637.59 57.48,-635.61"/>
+</g>
+<!-- module~core_types_math_gauss&#45;&gt;core_allocate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge42" class="edge">
+<title>module~core_types_math_gauss&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#00ff24" stroke-dasharray="5,2" d="M833.94,-469.04C827.03,-471.54 820.2,-474.5 814,-478 795.1,-488.67 796.39,-499.47 778,-511 772.15,-514.67 765.7,-517.98 759.19,-520.92"/>
+<polygon fill="#00ff24" stroke="#00ff24" points="757.52,-517.83 749.68,-524.95 760.25,-524.27 757.52,-517.83"/>
+</g>
+<!-- module~core_types_math_gauss&#45;&gt;core_deallocate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge43" class="edge">
+<title>module~core_types_math_gauss&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#00ff24" stroke-dasharray="5,2" d="M816.63,-457C801.24,-457 785.07,-457 770.19,-457"/>
+<polygon fill="#00ff24" stroke="#00ff24" points="770.12,-453.5 760.12,-457 770.12,-460.5 770.12,-453.5"/>
+</g>
+<!-- module~core_types_math_gauss&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge44" class="edge">
+<title>module~core_types_math_gauss&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff24" stroke-dasharray="5,2" d="M837.77,-469.04C771.81,-484.21 649.02,-507.14 544,-497"/>
+</g>
+<!-- module~core_types_math_gauss&#45;&gt;module~core_types_coordinate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge46" class="edge">
+<title>module~core_types_math_gauss&#45;&gt;module~core_types_coordinate</title>
+<path fill="none" stroke="#00ff24" stroke-dasharray="5,2" d="M859.6,-444.87C829.83,-430.94 780.82,-407.99 747.63,-392.45"/>
+<polygon fill="#00ff24" stroke="#00ff24" points="748.83,-389.15 738.29,-388.08 745.87,-395.49 748.83,-389.15"/>
+</g>
+<!-- module~core_constants -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node30" class="node">
+<title>module~core_constants</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node30"><a xlink:href="../module/core_constants.html" xlink:title="core_constants">
+<polygon fill="#337ab7" stroke="#337ab7" points="757.5,-751 665.5,-751 665.5,-727 757.5,-727 757.5,-751"/>
+<text text-anchor="middle" x="711.5" y="-736.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_math_gauss&#45;&gt;module~core_constants -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge45" class="edge">
+<title>module~core_types_math_gauss&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#00ff24" stroke-dasharray="5,2" d="M824.73,-469.19C820.76,-471.62 817.11,-474.53 814,-478 753.14,-545.91 822.28,-600.28 778,-680 768.89,-696.4 753.49,-710.62 739.91,-720.99"/>
+<polygon fill="#00ff24" stroke="#00ff24" points="737.78,-718.21 731.76,-726.93 741.91,-723.87 737.78,-718.21"/>
+</g>
+<!-- module~core_types_physics_config_bc&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge47" class="edge">
+<title>module~core_types_physics_config_bc&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M1003.32,-727.72C967.6,-727.45 925.51,-726.95 887.5,-726"/>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M885.5,-726C858.3,-725.32 665.26,-698.16 645,-680 604.48,-643.69 652.57,-595.58 609,-563 549.2,-518.28 515.67,-561.44 441,-561 378.33,-560.63 362.38,-555 300,-561 223.39,-568.37 205.09,-577.11 130,-594 121.16,-595.99 111.81,-598.24 102.72,-600.51"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="101.84,-597.12 93,-602.97 103.55,-603.91 101.84,-597.12"/>
+</g>
+<!-- module~core_types_physics_config_bc&#45;&gt;module~core_constants -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge48" class="edge">
+<title>module~core_types_physics_config_bc&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M885.5,-726C846.07,-725.02 801.71,-728.44 767.78,-732.02"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="767.17,-728.57 757.61,-733.13 767.93,-735.53 767.17,-728.57"/>
+</g>
+<!-- module~core_types_physics_config_bc&#45;&gt;module~core_memory -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge49" class="edge">
+<title>module~core_types_physics_config_bc&#45;&gt;module~core_memory</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M1057.33,-715.97C1036.78,-706.26 1010.58,-690.64 995,-669 956.45,-615.46 1003.17,-574 959,-525 953.59,-519 946.68,-514.38 939.3,-510.83"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="940.36,-507.47 929.78,-506.87 937.67,-513.94 940.36,-507.47"/>
+</g>
+<!-- module~core_types_physics_info&#45;&gt;core_deallocate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge50" class="edge">
+<title>module~core_types_physics_info&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M845.57,-389.03C835.01,-392.88 823.83,-397.57 814,-403 796.26,-412.81 795.6,-420.94 778,-431 771.65,-434.63 764.69,-437.99 757.75,-441"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="756.27,-437.82 748.37,-444.88 758.95,-444.29 756.27,-437.82"/>
+</g>
+<!-- module~core_types_physics_info&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge51" class="edge">
+<title>module~core_types_physics_info&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M819.14,-389.01C758.64,-400.73 674.38,-419.18 645,-436 625.09,-447.4 628.24,-460.5 609,-473 583.18,-489.78 574.67,-499.75 544,-497"/>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M542,-497C466.05,-490.27 447.24,-469.19 371.5,-478"/>
+</g>
+<!-- module~core_types_physics_info&#45;&gt;module~core_types_coordinate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge52" class="edge">
+<title>module~core_types_physics_info&#45;&gt;module~core_types_coordinate</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M816.63,-376.6C807.29,-376.55 797.66,-376.49 788.21,-376.44"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="788.06,-372.94 778.04,-376.38 788.02,-379.94 788.06,-372.94"/>
+</g>
+<!-- module~core_types_physics_meteorology&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge53" class="edge">
+<title>module~core_types_physics_meteorology&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M1037.92,-934.07C988.49,-945.54 915.95,-960.66 887.5,-958"/>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M885.5,-958C793.82,-949.41 804.58,-843.24 712.5,-844"/>
+</g>
+<!-- module~core_types_physics_meteorology&#45;&gt;module~core_types_datetime -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge56" class="edge">
+<title>module~core_types_physics_meteorology&#45;&gt;module~core_types_datetime</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M1065.72,-934.18C1046.43,-945.37 1017.85,-962.91 995,-981 977.5,-994.85 977.91,-1004.15 959,-1016 952.85,-1019.86 946.03,-1023.26 939.13,-1026.22"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="937.71,-1023.02 929.72,-1029.99 940.31,-1029.52 937.71,-1023.02"/>
+</g>
+<!-- module~core_types_physics_meteorology&#45;&gt;module~core_constants -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge54" class="edge">
+<title>module~core_types_physics_meteorology&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M1042.5,-910C986.67,-894.05 889.63,-862.83 814,-820 783.14,-802.52 751.87,-775.94 732.36,-758.04"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="734.7,-755.43 724.99,-751.18 729.93,-760.55 734.7,-755.43"/>
+</g>
+<!-- module~core_types_physics_meteorology&#45;&gt;module~core_memory -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge55" class="edge">
+<title>module~core_types_physics_meteorology&#45;&gt;module~core_memory</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M1079.01,-909.64C1060.54,-882.14 1016.65,-813.22 995,-749 962.79,-653.45 1023.24,-602.72 959,-525 953.68,-518.56 946.62,-513.71 939,-510.07"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="940.1,-506.74 929.52,-506.19 937.45,-513.21 940.1,-506.74"/>
+</g>
+<!-- module~core_types_physics_meteorology&#45;&gt;stdlib_optval -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge57" class="edge">
+<title>module~core_types_physics_meteorology&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M885.5,-958C808.49,-950.79 786.38,-916.1 712.5,-939"/>
+</g>
+<!-- module~core_types_physics_state&#45;&gt;core_allocate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge58" class="edge">
+<title>module~core_types_physics_state&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#0024ff" stroke-dasharray="5,2" d="M826.17,-347C821.71,-349.47 817.57,-352.43 814,-356 774,-395.95 808.14,-430.17 778,-478 767.93,-493.98 752.35,-508.26 738.91,-518.77"/>
+<polygon fill="#0024ff" stroke="#0024ff" points="736.78,-516 730.89,-524.81 740.99,-521.59 736.78,-516"/>
+</g>
+<!-- module~core_types_physics_state&#45;&gt;core_deallocate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge59" class="edge">
+<title>module~core_types_physics_state&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#0024ff" stroke-dasharray="5,2" d="M832.08,-347C825.75,-349.48 819.56,-352.45 814,-356 793.56,-369.04 794.97,-379.67 778,-397 763.97,-411.33 747.3,-426.58 734.28,-438.12"/>
+<polygon fill="#0024ff" stroke="#0024ff" points="731.91,-435.55 726.71,-444.78 736.53,-440.8 731.91,-435.55"/>
+</g>
+<!-- module~core_types_physics_state&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge60" class="edge">
+<title>module~core_types_physics_state&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#0024ff" stroke-dasharray="5,2" d="M813.91,-329.53C782.57,-328.54 745.5,-329.28 712.5,-335"/>
+</g>
+<!-- module~core_types_physics_state&#45;&gt;module~core_types_coordinate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge61" class="edge">
+<title>module~core_types_physics_state&#45;&gt;module~core_types_coordinate</title>
+<path fill="none" stroke="#0024ff" stroke-dasharray="5,2" d="M834.53,-347.08C815.35,-351.63 793.34,-356.84 773.34,-361.58"/>
+<polygon fill="#0024ff" stroke="#0024ff" points="772.33,-358.22 763.4,-363.94 773.94,-365.04 772.33,-358.22"/>
+</g>
+<!-- module~core_types_pointer&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge62" class="edge">
+<title>module~core_types_pointer&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M1252.49,-504.05C1178.27,-545.09 921.63,-673.84 712.5,-619"/>
+</g>
+<!-- module~core_types_solar&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge63" class="edge">
+<title>module~core_types_solar&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#b600ff" stroke-dasharray="5,2" d="M1037.74,-1000.64C997.25,-999.86 938.65,-999.47 887.5,-1002"/>
+</g>
+<!-- module~core_types_solar&#45;&gt;module~core_types_datetime -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge64" class="edge">
+<title>module~core_types_solar&#45;&gt;module~core_types_datetime</title>
+<path fill="none" stroke="#b600ff" stroke-dasharray="5,2" d="M1037.8,-1011.94C1013.6,-1016.78 984.07,-1022.69 957.61,-1027.98"/>
+<polygon fill="#b600ff" stroke="#b600ff" points="956.76,-1024.58 947.64,-1029.97 958.13,-1031.44 956.76,-1024.58"/>
+</g>
+<!-- module~core_types_matrix -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node32" class="node">
+<title>module~core_types_matrix</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node32"><a xlink:href="../module/core_types_matrix.html" xlink:title="core_types_matrix">
+<polygon fill="#337ab7" stroke="#337ab7" points="1329,-660 1220,-660 1220,-636 1329,-636 1329,-660"/>
+<text text-anchor="middle" x="1274.5" y="-645.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_matrix</text>
+</a>
+</g>
+</g>
+<!-- module~module_type_matrix&#45;&gt;module~core_types_matrix -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge65" class="edge">
+<title>module~module_type_matrix&#45;&gt;module~core_types_matrix</title>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M1554.67,-631.53C1494.18,-635.1 1401.01,-640.6 1339.17,-644.24"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="1338.92,-640.75 1329.15,-644.84 1339.33,-647.74 1338.92,-640.75"/>
+</g>
+<!-- module~core_types_matrix_factory -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node33" class="node">
+<title>module~core_types_matrix_factory</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node33"><a xlink:href="../module/core_types_matrix_factory.html" xlink:title="core_types_matrix_factory">
+<polygon fill="#337ab7" stroke="#337ab7" points="1519,-680 1367,-680 1367,-656 1519,-656 1519,-680"/>
+<text text-anchor="middle" x="1443" y="-665.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_matrix_factory</text>
+</a>
+</g>
+</g>
+<!-- module~module_type_matrix&#45;&gt;module~core_types_matrix_factory -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge66" class="edge">
+<title>module~module_type_matrix&#45;&gt;module~core_types_matrix_factory</title>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M1563.34,-640C1545.05,-644.29 1524.25,-649.17 1505.2,-653.64"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="1504.35,-650.25 1495.41,-655.94 1505.95,-657.06 1504.35,-650.25"/>
+</g>
+<!-- module~core_types_vector -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node34" class="node">
+<title>module~core_types_vector</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node34"><a xlink:href="../module/core_types_vector.html" xlink:title="core_types_vector">
+<polygon fill="#337ab7" stroke="#337ab7" points="941,-591 832,-591 832,-567 941,-567 941,-591"/>
+<text text-anchor="middle" x="886.5" y="-576.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_vector</text>
+</a>
+</g>
+</g>
+<!-- module~module_type_vector&#45;&gt;module~core_types_vector -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge67" class="edge">
+<title>module~module_type_vector&#45;&gt;module~core_types_vector</title>
+<path fill="none" stroke="#ff006d" stroke-dasharray="5,2" d="M1063.65,-504.15C1038.08,-516.99 996.14,-537.47 959,-553 950.41,-556.59 941.13,-560.18 932.19,-563.49"/>
+<polygon fill="#ff006d" stroke="#ff006d" points="930.86,-560.24 922.67,-566.96 933.26,-566.82 930.86,-560.24"/>
+</g>
+<!-- core_constants_error -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node38" class="node">
+<title>core_constants_error</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="605,-709 481,-709 481,-685 605,-685 605,-709"/>
+<text text-anchor="middle" x="543" y="-694.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_error</text>
+</g>
+<!-- module~core_constants&#45;&gt;core_constants_error -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge68" class="edge">
+<title>module~core_constants&#45;&gt;core_constants_error</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M665.44,-727.63C645.74,-722.66 622.39,-716.77 601.46,-711.49"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="602.27,-708.09 591.71,-709.04 600.56,-714.88 602.27,-708.09"/>
+</g>
+<!-- core_constants_ids -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node39" class="node">
+<title>core_constants_ids</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="599,-793 487,-793 487,-769 599,-769 599,-793"/>
+<text text-anchor="middle" x="543" y="-778.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_ids</text>
+</g>
+<!-- module~core_constants&#45;&gt;core_constants_ids -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge69" class="edge">
+<title>module~core_constants&#45;&gt;core_constants_ids</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M665.44,-750.37C645.74,-755.34 622.39,-761.23 601.46,-766.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="600.56,-763.12 591.71,-768.96 602.27,-769.91 600.56,-763.12"/>
+</g>
+<!-- core_constants_values -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node40" class="node">
+<title>core_constants_values</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="609,-751 477,-751 477,-727 609,-727 609,-751"/>
+<text text-anchor="middle" x="543" y="-736.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_values</text>
+</g>
+<!-- module~core_constants&#45;&gt;core_constants_values -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge70" class="edge">
+<title>module~core_constants&#45;&gt;core_constants_values</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M665.44,-739C651.22,-739 635.1,-739 619.36,-739"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="619.1,-735.5 609.1,-739 619.1,-742.5 619.1,-735.5"/>
+</g>
+<!-- module~core_constants_base -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node42" class="node">
+<title>module~core_constants_base</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node42"><a xlink:href="../module/core_constants_base.html" xlink:title="core_constants_base">
+<polygon fill="#337ab7" stroke="#337ab7" points="258.5,-627 135.5,-627 135.5,-603 258.5,-603 258.5,-627"/>
+<text text-anchor="middle" x="197" y="-612.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_base</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_base -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge71" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_base</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M665.21,-727.26C657.7,-723.67 650.56,-719.02 645,-713 608.09,-673.03 647.74,-634.2 609,-596 587.57,-574.87 572.99,-585.08 544,-577"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M542,-577C436.84,-547.71 307.69,-579.13 241.56,-599.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="240.35,-596.56 231.89,-602.94 242.48,-603.22 240.35,-596.56"/>
+</g>
+<!-- module~core_constants_parallel -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node43" class="node">
+<title>module~core_constants_parallel</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node43"><a xlink:href="../module/core_constants_parallel.html" xlink:title="core_constants_parallel">
+<polygon fill="#337ab7" stroke="#337ab7" points="439.5,-789 301.5,-789 301.5,-765 439.5,-765 439.5,-789"/>
+<text text-anchor="middle" x="370.5" y="-774.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_parallel</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_parallel -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge72" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_parallel</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M696.61,-751.2C678.12,-766.56 643.7,-792.11 609,-802 544.04,-820.52 465.58,-805.34 417.11,-791.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="417.81,-788.42 407.23,-789.02 415.88,-795.15 417.81,-788.42"/>
+</g>
+<!-- module~core_constants_physical -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node44" class="node">
+<title>module~core_constants_physical</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node44"><a xlink:href="../module/core_constants_physical.html" xlink:title="core_constants_physical">
+<polygon fill="#337ab7" stroke="#337ab7" points="441,-667 300,-667 300,-643 441,-643 441,-667"/>
+<text text-anchor="middle" x="370.5" y="-652.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_physical</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_physical -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge73" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_physical</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M542,-577C484.43,-560.96 421.74,-608.05 390.89,-635.96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="388.34,-633.55 383.4,-642.93 393.11,-638.68 388.34,-633.55"/>
+</g>
+<!-- module~core_constants_solver -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node45" class="node">
+<title>module~core_constants_solver</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node45"><a xlink:href="../module/core_constants_solver.html" xlink:title="core_constants_solver">
+<polygon fill="#337ab7" stroke="#337ab7" points="435.5,-747 305.5,-747 305.5,-723 435.5,-723 435.5,-747"/>
+<text text-anchor="middle" x="370.5" y="-732.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_solver</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_solver -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge74" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_solver</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M672.08,-726.87C662.83,-723.12 653.24,-718.5 645,-713 625.92,-700.26 630.14,-684.93 609,-676 554.95,-653.18 531.68,-654.73 477,-676 456.77,-683.87 459.5,-697.66 441,-709 434.81,-712.8 427.97,-716.18 421.08,-719.15"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="419.65,-715.95 411.69,-722.95 422.28,-722.44 419.65,-715.95"/>
+</g>
+<!-- module~core_constants_utils -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node46" class="node">
+<title>module~core_constants_utils</title>
+<g id="a_module~~core_vtk_vtu_initialize~~UsesGraph_node46"><a xlink:href="../module/core_constants_utils.html" xlink:title="core_constants_utils">
+<polygon fill="#337ab7" stroke="#337ab7" points="602.5,-629 483.5,-629 483.5,-605 602.5,-605 602.5,-629"/>
+<text text-anchor="middle" x="543" y="-614.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_utils</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_utils -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge75" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_utils</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M667.06,-726.88C659.11,-723.31 651.34,-718.75 645,-713 619.09,-689.49 634.88,-666.54 609,-643 605.11,-639.46 600.68,-636.38 596,-633.69"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="597.27,-630.41 586.77,-629.01 594.11,-636.66 597.27,-630.41"/>
+</g>
+<!-- module~core_memory&#45;&gt;core_allocate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge76" class="edge">
+<title>module~core_memory&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M843.18,-508.3C819.16,-513.57 788.93,-520.21 763.59,-525.78"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="762.8,-522.37 753.79,-527.93 764.3,-529.2 762.8,-522.37"/>
+</g>
+<!-- module~core_memory&#45;&gt;core_deallocate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge77" class="edge">
+<title>module~core_memory&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M843.18,-488.73C821.21,-483.39 794.04,-476.8 770.18,-471"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="770.72,-467.53 760.18,-468.58 769.07,-474.34 770.72,-467.53"/>
+</g>
+<!-- module~core_types_matrix&#45;&gt;core_allocate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge78" class="edge">
+<title>module~core_types_matrix&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1241.55,-636C1162.41,-606.75 958.56,-534.51 887.5,-539"/>
+</g>
+<!-- module~core_types_matrix&#45;&gt;core_deallocate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge80" class="edge">
+<title>module~core_types_matrix&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1265.53,-635.88C1251.34,-615.35 1219.63,-573.92 1182,-553 1107.72,-511.7 1061.51,-565.92 995,-513 965.44,-489.48 987.98,-460.24 959,-436 933.78,-414.9 920.16,-413.23 887.5,-417"/>
+</g>
+<!-- module~core_types_matrix&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge82" class="edge">
+<title>module~core_types_matrix&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M885.5,-768C801.78,-774.64 796.48,-843.31 712.5,-844"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M710.5,-844C526.92,-845.52 473.17,-858.96 300,-798 249.74,-780.31 247.13,-755.63 198,-735"/>
+</g>
+<!-- module~core_types_matrix&#45;&gt;module~module_type_vector -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge84" class="edge">
+<title>module~core_types_matrix&#45;&gt;module~module_type_vector</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1268.41,-635.87C1256.95,-610.07 1226.61,-549.56 1182,-518 1175.05,-513.08 1167.2,-509.09 1159.07,-505.86"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1160.05,-502.49 1149.45,-502.39 1157.68,-509.07 1160.05,-502.49"/>
+</g>
+<!-- module~core_types_matrix&#45;&gt;module~core_constants -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge83" class="edge">
+<title>module~core_types_matrix&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1266.87,-660.08C1253.93,-682.32 1222.91,-729.26 1182,-749 1063.87,-806 1018.37,-759.25 887.5,-768"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M885.5,-768C843.09,-771.36 795.44,-762.42 760.91,-753.6"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="761.64,-750.17 751.08,-751 759.86,-756.94 761.64,-750.17"/>
+</g>
+<!-- module~core_types_matrix&#45;&gt;stdlib_optval -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge85" class="edge">
+<title>module~core_types_matrix&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1268.06,-660.23C1256.14,-685.66 1225.29,-744.56 1182,-777 1005.35,-909.36 923.35,-873.65 712.5,-939"/>
+</g>
+<!-- core_check_range -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node37" class="node">
+<title>core_check_range</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="766,-671 657,-671 657,-647 766,-647 766,-671"/>
+<text text-anchor="middle" x="711.5" y="-656.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_check_range</text>
+</g>
+<!-- module~core_types_matrix&#45;&gt;core_check_range -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge79" class="edge">
+<title>module~core_types_matrix&#45;&gt;core_check_range</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1230.1,-660.07C1215,-663.7 1197.87,-667.2 1182,-669 1037.69,-685.35 866.89,-674.1 776.33,-665.75"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="776.51,-662.25 766.23,-664.8 775.85,-669.22 776.51,-662.25"/>
+</g>
+<!-- core_findings -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node41" class="node">
+<title>core_findings</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="1130,-660 1047,-660 1047,-636 1130,-636 1130,-660"/>
+<text text-anchor="middle" x="1088.5" y="-645.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_findings</text>
+</g>
+<!-- module~core_types_matrix&#45;&gt;core_findings -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge81" class="edge">
+<title>module~core_types_matrix&#45;&gt;core_findings</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1219.78,-648C1194.72,-648 1165.05,-648 1140.36,-648"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1140.11,-644.5 1130.11,-648 1140.11,-651.5 1140.11,-644.5"/>
+</g>
+<!-- module~core_types_matrix_factory&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge86" class="edge">
+<title>module~core_types_matrix_factory&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1273.5,-882C1158.46,-930.77 837.37,-848.51 712.5,-844"/>
+</g>
+<!-- module~core_types_matrix_factory&#45;&gt;module~core_constants -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge87" class="edge">
+<title>module~core_types_matrix_factory&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1437.87,-680.03C1423.38,-719.91 1370.53,-847.19 1275.5,-882"/>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1273.5,-882C1261.23,-886.49 826.45,-785.95 814,-782 791.06,-774.72 766.17,-764.21 746.77,-755.41"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="748,-752.12 737.45,-751.12 745.07,-758.48 748,-752.12"/>
+</g>
+<!-- module~core_types_matrix_factory&#45;&gt;module~core_types_matrix -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge88" class="edge">
+<title>module~core_types_matrix_factory&#45;&gt;module~core_types_matrix</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1366.54,-658.94C1357.42,-657.84 1348.16,-656.73 1339.23,-655.66"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1339.65,-652.18 1329.3,-654.46 1338.81,-659.13 1339.65,-652.18"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;core_allocate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge89" class="edge">
+<title>module~core_types_vector&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M835.93,-566.96C813.22,-561.45 786.35,-554.93 763.48,-549.38"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="764.16,-545.94 753.62,-546.98 762.51,-552.74 764.16,-545.94"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;core_deallocate -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge92" class="edge">
+<title>module~core_types_vector&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M868.28,-566.86C837.71,-545.3 773.82,-500.25 738.09,-475.05"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="739.84,-472 729.65,-469.09 735.81,-477.72 739.84,-472"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge93" class="edge">
+<title>module~core_types_vector&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M850.87,-591.02C808.23,-605.12 738.29,-625.76 712.5,-619"/>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M710.5,-619C681.18,-611.31 668.13,-619.59 645,-600 616.79,-576.1 635.67,-550.61 609,-525 586.31,-503.22 575.31,-500.02 544,-497"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;module~core_constants -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge94" class="edge">
+<title>module~core_types_vector&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M872.67,-591.21C852.6,-610.29 812.49,-648.27 778,-680 763.26,-693.56 746.48,-708.67 733.59,-720.2"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="731.25,-717.61 726.12,-726.88 735.91,-722.82 731.25,-717.61"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;stdlib_optval -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge95" class="edge">
+<title>module~core_types_vector&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M877.49,-591.33C862.94,-614.24 831.99,-665.27 814,-712 774.29,-815.14 818.06,-906.28 712.5,-939"/>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M710.5,-939C639.82,-960.91 604.05,-895.76 544,-939"/>
+</g>
+<!-- core_check_length -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node36" class="node">
+<title>core_check_length</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="767.5,-591 655.5,-591 655.5,-567 767.5,-567 767.5,-591"/>
+<text text-anchor="middle" x="711.5" y="-576.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_check_length</text>
+</g>
+<!-- module~core_types_vector&#45;&gt;core_check_length -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge90" class="edge">
+<title>module~core_types_vector&#45;&gt;core_check_length</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M831.71,-579C814.71,-579 795.74,-579 778.02,-579"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="777.75,-575.5 767.75,-579 777.75,-582.5 777.75,-575.5"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;core_check_range -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge91" class="edge">
+<title>module~core_types_vector&#45;&gt;core_check_range</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M862.71,-591.18C841.14,-602.53 807.73,-619.66 778,-633 770.22,-636.49 761.82,-640.01 753.71,-643.28"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="752.38,-640.04 744.38,-646.99 754.97,-646.55 752.38,-640.04"/>
+</g>
+<!-- module~core_constants_base&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge96" class="edge">
+<title>module~core_constants_base&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00b9ff" stroke-dasharray="5,2" d="M135.38,-615C125.19,-615 114.64,-615 104.56,-615"/>
+<polygon fill="#00b9ff" stroke="#00b9ff" points="104.25,-611.5 94.25,-615 104.25,-618.5 104.25,-611.5"/>
+</g>
+<!-- module~core_constants_base&#45;&gt;stdlib_strings -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge98" class="edge">
+<title>module~core_constants_base&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#00b9ff" stroke-dasharray="5,2" d="M182.21,-602.86C168.39,-590.42 146.81,-570.22 130,-551 103.94,-521.2 77.36,-483.62 61.79,-460.73"/>
+<polygon fill="#00b9ff" stroke="#00b9ff" points="64.5,-458.49 56.01,-452.16 58.7,-462.41 64.5,-458.49"/>
+</g>
+<!-- module~core_constants_base&#45;&gt;stdlib_optval -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge97" class="edge">
+<title>module~core_constants_base&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#00b9ff" stroke-dasharray="5,2" d="M176.82,-627.17C161.78,-637.73 141.52,-654.38 130,-674 61.71,-790.32 50.25,-958.04 48.36,-1017.81"/>
+<polygon fill="#00b9ff" stroke="#00b9ff" points="44.85,-1017.9 48.1,-1027.98 51.85,-1018.07 44.85,-1017.9"/>
+</g>
+<!-- module~core_constants_parallel&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge99" class="edge">
+<title>module~core_constants_parallel&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#002eff" stroke-dasharray="5,2" d="M301.14,-765.41C269.07,-758.68 230.79,-748.77 198,-735"/>
+</g>
+<!-- module~core_constants_physical&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge100" class="edge">
+<title>module~core_constants_physical&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#5c00ff" stroke-dasharray="5,2" d="M299.95,-652.63C251.94,-650.23 186.78,-645.45 130,-636 120,-634.34 109.43,-632.04 99.33,-629.58"/>
+<polygon fill="#5c00ff" stroke="#5c00ff" points="99.97,-626.13 89.42,-627.08 98.26,-632.92 99.97,-626.13"/>
+</g>
+<!-- module~core_constants_physical&#45;&gt;stdlib_strings -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge103" class="edge">
+<title>module~core_constants_physical&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#5c00ff" stroke-dasharray="5,2" d="M328.83,-642.99C319.01,-639.24 308.82,-634.58 300,-629 281.15,-617.06 280.45,-609.08 264,-594 235.43,-567.81 231.16,-557.06 198,-537"/>
+</g>
+<!-- module~core_constants_physical&#45;&gt;module~core_constants_base -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge101" class="edge">
+<title>module~core_constants_physical&#45;&gt;module~core_constants_base</title>
+<path fill="none" stroke="#5c00ff" stroke-dasharray="5,2" d="M318.04,-643C299.64,-638.71 278.72,-633.83 259.56,-629.36"/>
+<polygon fill="#5c00ff" stroke="#5c00ff" points="260.25,-625.92 249.72,-627.06 258.66,-632.74 260.25,-625.92"/>
+</g>
+<!-- stdlib_ascii -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_node47" class="node">
+<title>stdlib_ascii</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="232,-707 162,-707 162,-683 232,-683 232,-707"/>
+<text text-anchor="middle" x="197" y="-692.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_ascii</text>
+</g>
+<!-- module~core_constants_physical&#45;&gt;stdlib_ascii -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge102" class="edge">
+<title>module~core_constants_physical&#45;&gt;stdlib_ascii</title>
+<path fill="none" stroke="#5c00ff" stroke-dasharray="5,2" d="M318.04,-667C293.81,-672.65 265.19,-679.33 241.98,-684.74"/>
+<polygon fill="#5c00ff" stroke="#5c00ff" points="241.01,-681.37 232.07,-687.05 242.6,-688.19 241.01,-681.37"/>
+</g>
+<!-- module~core_constants_solver&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge104" class="edge">
+<title>module~core_constants_solver&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#e700ff" stroke-dasharray="5,2" d="M305.25,-746.56C272.01,-749.72 231.49,-749.07 198,-735"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;iso_fortran_env -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge105" class="edge">
+<title>module~core_constants_utils&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff008b" stroke-dasharray="5,2" d="M369.5,-695C360.07,-697.61 207.02,-738.79 198,-735"/>
+<path fill="none" stroke="#ff008b" stroke-dasharray="5,2" d="M196,-735C167.86,-723.18 155.46,-732.84 130,-716 98.71,-695.3 73.5,-658.93 59.66,-635.95"/>
+<polygon fill="#ff008b" stroke="#ff008b" points="62.66,-634.16 54.59,-627.29 56.62,-637.69 62.66,-634.16"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;stdlib_strings -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge110" class="edge">
+<title>module~core_constants_utils&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#ff008b" stroke-dasharray="5,2" d="M483.4,-614.37C411.42,-608.79 287.84,-591.35 198,-537"/>
+<path fill="none" stroke="#ff008b" stroke-dasharray="5,2" d="M196,-537C151.62,-511.42 102.26,-478.01 73.24,-457.82"/>
+<polygon fill="#ff008b" stroke="#ff008b" points="75.12,-454.86 64.91,-452 71.11,-460.6 75.12,-454.86"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;module~core_constants_parallel -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge106" class="edge">
+<title>module~core_constants_utils&#45;&gt;module~core_constants_parallel</title>
+<path fill="none" stroke="#ff008b" stroke-dasharray="5,2" d="M525.27,-629.02C510.98,-639.97 490.62,-657.26 477,-676 454.08,-707.54 470.29,-730.27 441,-756 439.51,-757.31 437.94,-758.54 436.3,-759.69"/>
+<polygon fill="#ff008b" stroke="#ff008b" points="434.46,-756.71 427.66,-764.83 438.05,-762.73 434.46,-756.71"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;module~core_constants_physical -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge107" class="edge">
+<title>module~core_constants_utils&#45;&gt;module~core_constants_physical</title>
+<path fill="none" stroke="#ff008b" stroke-dasharray="5,2" d="M488.05,-629.02C471.33,-632.75 452.75,-636.89 435.42,-640.75"/>
+<polygon fill="#ff008b" stroke="#ff008b" points="434.39,-637.4 425.39,-642.99 435.91,-644.23 434.39,-637.4"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;module~core_constants_solver -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge108" class="edge">
+<title>module~core_constants_utils&#45;&gt;module~core_constants_solver</title>
+<path fill="none" stroke="#ff008b" stroke-dasharray="5,2" d="M499.34,-629.13C491.33,-632.72 483.45,-637.27 477,-643 452.01,-665.18 466.24,-687.1 441,-709 436.8,-712.64 432.05,-715.79 427.04,-718.52"/>
+<polygon fill="#ff008b" stroke="#ff008b" points="425.31,-715.47 417.83,-722.97 428.35,-721.77 425.31,-715.47"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;stdlib_ascii -->
+<g id="module~~core_vtk_vtu_initialize~~UsesGraph_edge109" class="edge">
+<title>module~core_constants_utils&#45;&gt;stdlib_ascii</title>
+<path fill="none" stroke="#ff008b" stroke-dasharray="5,2" d="M521.14,-629.2C491.64,-646.44 441.26,-675.89 441,-676 411.48,-688.4 402.36,-686.47 371.5,-695"/>
+<path fill="none" stroke="#ff008b" stroke-dasharray="5,2" d="M369.5,-695C327.45,-706.63 277.35,-704.94 242.19,-701.38"/>
+<polygon fill="#ff008b" stroke="#ff008b" points="242.56,-697.9 232.24,-700.28 241.79,-704.85 242.56,-697.9"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panmodulecore_vtk_vtu_initializeUsesGraph = svgPanZoom('#modulecore_vtk_vtu_initializeUsesGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#UsesGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="UsesGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="518pt" height="32pt"
+ viewBox="0.00 0.00 517.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 513.5,-28 513.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node">
+<title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node">
+<title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="145.5,-24 72.5,-24 72.5,0 145.5,0 145.5,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 164,-24 164,0 234,0 234,-24"/>
+<text text-anchor="middle" x="199" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="310,-24 252,-24 252,0 310,0 310,-24"/>
+<text text-anchor="middle" x="281" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="386,-24 328,-24 328,0 386,0 386,-24"/>
+<text text-anchor="middle" x="357" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="509.5,-24 404.5,-24 404.5,0 509.5,0 509.5,-24"/>
+<text text-anchor="middle" x="457" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a submodule to the (sub)module which it is
+descended from. Dashed arrows point from a module or program unit to 
+modules which it uses.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+            </li>
+        </ul>
+      </div>
+    </div>
+
+      
+      <br>
+
+
+
+
+
+
+
+
+
+
+        <section>
+          <h2>Module Subroutines</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-type_vtk_vtu_initialize"></span> <h3>module subroutine <a href='../proc/type_vtk_vtu_initialize.html'>type_vtk_vtu_initialize</a>(self, file_name, global_node_id_key, node_type_key, num_sharing_ranks_key, owner_ranks_key, communication_partners_key, cell_id_key, rank_key, color_key, point_field_names)  
+    <a href="../interface/type_vtk_vtu_initialize.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~1247"></span>
+              class(<a href='../type/type_vtk.html'>type_vtk</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-file_name~12"></span>
+              character(len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>file_name</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-global_node_id_key~6"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>global_node_id_key</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-node_type_key~6"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>node_type_key</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_sharing_ranks_key~6"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_sharing_ranks_key</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-owner_ranks_key~6"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>owner_ranks_key</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-communication_partners_key~6"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>communication_partners_key</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cell_id_key~6"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>cell_id_key</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-rank_key~6"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>rank_key</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-color_key~6"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>color_key</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-point_field_names~4"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>point_field_names</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

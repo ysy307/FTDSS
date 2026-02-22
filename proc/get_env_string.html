@@ -1,0 +1,563 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>get_env_string &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>get_env_string
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">28 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/system_env.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/system_env.f90.html'>system_env.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_system_env.html'>core_system_env</a></li>
+            <li class="breadcrumb-item active" aria-current="page">get_env_string</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/get_env_string.html#src">get_env_string</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>public  subroutine get_env_string(env_var_name, value, status)  
+</h2>
+    
+
+    <p>Gets the value of a specified environment variable as a string.
+In an MPI environment, rank 0 reads the variable, which is then broadcast
+to all other ranks to ensure consistency.</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-env_var_name"></span>
+              character(len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>env_var_name</strong></td>
+            <td>
+                <p>The name of the environment variable to retrieve.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~20"></span>
+              character(len=:),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+                <p>The retrieved value of the environment variable. An empty string is
+returned if the variable is not set or is empty.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-status~5"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>status</strong></td>
+            <td>
+                <p>Status code: 0 if successful, non-zero otherwise.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~get_env_string~~CalledByGraph Pages: 1 -->
+<svg id="procget_env_stringCalledByGraph" width="641pt" height="96pt"
+ viewBox="0.00 0.00 641.00 96.18" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_env_string~~CalledByGraph" class="graph" transform="scale(0.61 0.61) rotate(0) translate(4 154)">
+<title>proc~~get_env_string~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-154 1049,-154 1049,4 -4,4"/>
+<!-- proc~get_env_string -->
+<g id="proc~~get_env_string~~CalledByGraph_node1" class="node">
+<title>proc~get_env_string</title>
+<polygon fill="none" stroke="black" points="1045,-87 955,-87 955,-63 1045,-63 1045,-87"/>
+<text text-anchor="middle" x="1000" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50">get_env_string</text>
+</g>
+<!-- proc~get_hostname -->
+<g id="proc~~get_env_string~~CalledByGraph_node2" class="node">
+<title>proc~get_hostname</title>
+<g id="a_proc~~get_env_string~~CalledByGraph_node2"><a xlink:href="../proc/get_hostname.html" xlink:title="get_hostname">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="864,-150 776,-150 776,-126 864,-126 864,-150"/>
+<text text-anchor="middle" x="820" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_hostname</text>
+</a>
+</g>
+</g>
+<!-- proc~get_hostname&#45;&gt;proc~get_env_string -->
+<g id="proc~~get_env_string~~CalledByGraph_edge1" class="edge">
+<title>proc~get_hostname&#45;&gt;proc~get_env_string</title>
+<path fill="none" stroke="#ff0000" d="M864.16,-131.38C881.5,-128.04 901.49,-123.34 919,-117 936.96,-110.5 955.92,-100.69 970.88,-92.18"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="972.75,-95.14 979.63,-87.09 969.23,-89.09 972.75,-95.14"/>
+</g>
+<!-- proc~get_username -->
+<g id="proc~~get_env_string~~CalledByGraph_node3" class="node">
+<title>proc~get_username</title>
+<g id="a_proc~~get_env_string~~CalledByGraph_node3"><a xlink:href="../proc/get_username.html" xlink:title="get_username">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="864.5,-108 775.5,-108 775.5,-84 864.5,-84 864.5,-108"/>
+<text text-anchor="middle" x="820" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_username</text>
+</a>
+</g>
+</g>
+<!-- proc~get_username&#45;&gt;proc~get_env_string -->
+<g id="proc~~get_env_string~~CalledByGraph_edge2" class="edge">
+<title>proc~get_username&#45;&gt;proc~get_env_string</title>
+<path fill="none" stroke="#ff0000" d="M864.54,-90.86C888.8,-88 919.22,-84.41 944.99,-81.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="945.46,-84.84 954.98,-80.19 944.64,-77.89 945.46,-84.84"/>
+</g>
+<!-- proc~initialize_type_input -->
+<g id="proc~~get_env_string~~CalledByGraph_node4" class="node">
+<title>proc~initialize_type_input</title>
+<g id="a_proc~~get_env_string~~CalledByGraph_node4"><a xlink:href="../proc/initialize_type_input.html" xlink:title="type_input%initialize_type_input">
+<polygon fill="#d9534f" stroke="#d9534f" points="911.5,-66 728.5,-66 728.5,-42 911.5,-42 911.5,-66"/>
+<text text-anchor="middle" x="820" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input%initialize_type_input</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_input&#45;&gt;proc~get_env_string -->
+<g id="proc~~get_env_string~~CalledByGraph_edge3" class="edge">
+<title>proc~initialize_type_input&#45;&gt;proc~get_env_string</title>
+<path fill="none" stroke="#ff0000" d="M911.56,-64.68C922.9,-66.02 934.2,-67.36 944.74,-68.6"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="944.64,-72.11 954.99,-69.81 945.46,-65.16 944.64,-72.11"/>
+</g>
+<!-- proc~initialize_type_output -->
+<g id="proc~~get_env_string~~CalledByGraph_node5" class="node">
+<title>proc~initialize_type_output</title>
+<g id="a_proc~~get_env_string~~CalledByGraph_node5"><a xlink:href="../proc/initialize_type_output.html" xlink:title="type_output%initialize_type_output">
+<polygon fill="#d9534f" stroke="#d9534f" points="919,-24 721,-24 721,0 919,0 919,-24"/>
+<text text-anchor="middle" x="820" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output%initialize_type_output</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_output&#45;&gt;proc~get_env_string -->
+<g id="proc~~get_env_string~~CalledByGraph_edge4" class="edge">
+<title>proc~initialize_type_output&#45;&gt;proc~get_env_string</title>
+<path fill="none" stroke="#ff0000" d="M888.9,-24.03C899.11,-26.56 909.43,-29.54 919,-33 936.96,-39.5 955.92,-49.31 970.88,-57.82"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="969.23,-60.91 979.63,-62.91 972.75,-54.86 969.23,-60.91"/>
+</g>
+<!-- proc~output_system_log -->
+<g id="proc~~get_env_string~~CalledByGraph_node6" class="node">
+<title>proc~output_system_log</title>
+<g id="a_proc~~get_env_string~~CalledByGraph_node6"><a xlink:href="../proc/output_system_log.html" xlink:title="output_system_log">
+<polygon fill="#d9534f" stroke="#d9534f" points="685,-129 573,-129 573,-105 685,-105 685,-129"/>
+<text text-anchor="middle" x="629" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">output_system_log</text>
+</a>
+</g>
+</g>
+<!-- proc~output_system_log&#45;&gt;proc~get_hostname -->
+<g id="proc~~get_env_string~~CalledByGraph_edge5" class="edge">
+<title>proc~output_system_log&#45;&gt;proc~get_hostname</title>
+<path fill="none" stroke="#ff0000" d="M685.17,-123.13C710.55,-125.95 740.53,-129.28 765.68,-132.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="765.45,-135.57 775.77,-133.2 766.22,-128.61 765.45,-135.57"/>
+</g>
+<!-- proc~output_system_log&#45;&gt;proc~get_username -->
+<g id="proc~~get_env_string~~CalledByGraph_edge6" class="edge">
+<title>proc~output_system_log&#45;&gt;proc~get_username</title>
+<path fill="none" stroke="#7fff00" d="M685.17,-110.87C710.46,-108.06 740.31,-104.74 765.4,-101.96"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="765.92,-105.42 775.47,-100.84 765.14,-98.46 765.92,-105.42"/>
+</g>
+<!-- interface~output_system_log -->
+<g id="proc~~get_env_string~~CalledByGraph_node7" class="node">
+<title>interface~output_system_log</title>
+<g id="a_proc~~get_env_string~~CalledByGraph_node7"><a xlink:href="../interface/output_system_log.html" xlink:title="type_output%output_system_log">
+<polygon fill="#a7506f" stroke="#a7506f" points="537,-129 353,-129 353,-105 537,-105 537,-129"/>
+<text text-anchor="middle" x="445" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output%output_system_log</text>
+</a>
+</g>
+</g>
+<!-- interface~output_system_log&#45;&gt;proc~output_system_log -->
+<g id="proc~~get_env_string~~CalledByGraph_edge7" class="edge">
+<title>interface~output_system_log&#45;&gt;proc~output_system_log</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M537.27,-117C545.75,-117 554.23,-117 562.41,-117"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="562.59,-120.5 572.59,-117 562.59,-113.5 562.59,-120.5"/>
+</g>
+<!-- proc~finalize_type_ftdss -->
+<g id="proc~~get_env_string~~CalledByGraph_node8" class="node">
+<title>proc~finalize_type_ftdss</title>
+<g id="a_proc~~get_env_string~~CalledByGraph_node8"><a xlink:href="../proc/finalize_type_ftdss.html" xlink:title="finalize_type_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="317,-129 208,-129 208,-105 317,-105 317,-129"/>
+<text text-anchor="middle" x="262.5" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">finalize_type_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~finalize_type_ftdss&#45;&gt;interface~output_system_log -->
+<g id="proc~~get_env_string~~CalledByGraph_edge8" class="edge">
+<title>proc~finalize_type_ftdss&#45;&gt;interface~output_system_log</title>
+<path fill="none" stroke="#ff0000" d="M317.17,-117C325.23,-117 333.77,-117 342.45,-117"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="342.68,-120.5 352.68,-117 342.68,-113.5 342.68,-120.5"/>
+</g>
+<!-- interface~finalize_type_ftdss -->
+<g id="proc~~get_env_string~~CalledByGraph_node9" class="node">
+<title>interface~finalize_type_ftdss</title>
+<g id="a_proc~~get_env_string~~CalledByGraph_node9"><a xlink:href="../interface/finalize_type_ftdss.html" xlink:title="type_ftdss%finalize_type_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="172,-129 0,-129 0,-105 172,-105 172,-129"/>
+<text text-anchor="middle" x="86" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%finalize_type_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~finalize_type_ftdss&#45;&gt;proc~finalize_type_ftdss -->
+<g id="proc~~get_env_string~~CalledByGraph_edge9" class="edge">
+<title>interface~finalize_type_ftdss&#45;&gt;proc~finalize_type_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M172.21,-117C180.72,-117 189.26,-117 197.51,-117"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="197.77,-120.5 207.77,-117 197.76,-113.5 197.77,-120.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocget_env_stringCalledByGraph = svgPanZoom('#procget_env_stringCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">get_env_string</span><span class="p">(</span><span class="n">env_var_name</span><span class="p">,</span><span class="w"> </span><span class="k">value</span><span class="p">,</span><span class="w"> </span><span class="n">status</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="w">        </span><span class="c">!&gt; The name of the environment variable to retrieve.</span>
+<span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">env_var_name</span>
+<span class="w">        </span><span class="c">!&gt; The retrieved value of the environment variable. An empty string is</span>
+<span class="w">        </span><span class="c">!&gt; returned if the variable is not set or is empty.</span>
+<span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span><span class="w"> </span><span class="k">allocatable</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="k">value</span>
+<span class="w">        </span><span class="c">!&gt; Status code: 0 if successful, non-zero otherwise.</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">status</span>
+
+<span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">2048</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">buffer</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nulpos</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="nb">stat</span>
+<span class="cp">#ifdef _MPI</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">my_rank</span><span class="p">,</span><span class="w"> </span><span class="n">ierr</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">MPI_Comm_rank</span><span class="p">(</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="w"> </span><span class="n">my_rank</span><span class="p">,</span><span class="w"> </span><span class="n">ierr</span><span class="p">)</span>
+<span class="cp">#endif</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="k">value</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="k">value</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Rank 0 reads the environment variable</span>
+<span class="cp">#ifdef _MPI</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">my_rank</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="cp">#endif</span>
+<span class="w">            </span><span class="k">call </span><span class="nb">get_environment_variable</span><span class="p">(</span><span class="n">env_var_name</span><span class="p">,</span><span class="w"> </span><span class="n">buffer</span><span class="p">,</span><span class="w"> </span><span class="n">status</span><span class="o">=</span><span class="nb">stat</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">stat</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&#39;</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">status</span><span class="p">))</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">stat</span>
+<span class="nb">                </span><span class="k">return</span>
+<span class="k">            end if</span>
+<span class="cp">#ifdef _MPI</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="w">        </span><span class="c">! Broadcast the result to all ranks</span>
+<span class="w">        </span><span class="k">call </span><span class="n">MPI_Bcast</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">buffer</span><span class="p">),</span><span class="w"> </span><span class="n">MPI_CHARACTER</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="w"> </span><span class="n">ierr</span><span class="p">)</span>
+<span class="cp">#endif</span>
+
+<span class="w">        </span><span class="c">! Trim the result and allocate the output string to the correct length</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">len_trim</span><span class="p">(</span><span class="n">buffer</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">nulpos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">scan</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span><span class="w"> </span><span class="nb">achar</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">nulpos</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                allocate</span><span class="w"> </span><span class="p">(</span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="n">nulpos</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="k">value</span><span class="p">)</span>
+<span class="w">                </span><span class="k">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">nulpos</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">            </span><span class="k">else</span>
+<span class="k">                allocate</span><span class="w"> </span><span class="p">(</span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="nb">len_trim</span><span class="p">(</span><span class="n">buffer</span><span class="p">))</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="k">value</span><span class="p">)</span>
+<span class="w">                </span><span class="k">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="nb">len_trim</span><span class="p">(</span><span class="n">buffer</span><span class="p">))</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        else</span>
+<span class="k">            value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&#39;</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">    end subroutine </span><span class="n">get_env_string</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.5% of total for derived types.</p>Including implementation: 6 statements,  0.1% of total for derived types.">6 statements</a>
+                 title="<p> 0.3% of total for derived types.</p>Including implementation: 6 statements,  0.0% of total for derived types.">6 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -134,8 +134,9 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_ic_uniform.html#variable-type">type</a>
-            <a class="list-group-item" href="../type/type_ic_uniform.html#variable-value">value</a>
+            <a class="list-group-item" href="../type/type_ic_uniform.html#variable-target_id">target_id</a>
+            <a class="list-group-item" href="../type/type_ic_uniform.html#variable-type~2">type</a>
+            <a class="list-group-item" href="../type/type_ic_uniform.html#variable-value~13">value</a>
         </div>
       </div>
     </div>
@@ -163,13 +164,19 @@
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../type/type_ic_uniform.html#boundprocedure-apply~2">apply</a>
-            <a class="list-group-item" href="../type/type_ic_uniform.html#boundprocedure-initialize~6">initialize</a>
+            <a class="list-group-item" href="../type/type_ic_uniform.html#boundprocedure-initialize~14">initialize</a>
         </div>
       </div>
     </div>
 
   
   
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../type/type_ic_uniform.html#src">type_ic_uniform</a>
+      </div>
+    </div>
 
 
   </div>
@@ -286,24 +293,41 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-type"></span>
-              character(len=:),
+              <span class="anchor" id="variable-target_id"></span>
+              integer(kind=int32),
             </td>
-              <td>public,</td>
+              <td>public</td>
             <td>
-              allocatable
+              
             </td>
             <td>::</td>
-            <td><strong>type</strong></td>
-                <td></td>
-                <td></td>
+            <td><strong>target_id</strong></td>
+<td> =</td>
+                <td>-1</td>
             <td>
                 
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-value"></span>
+              <span class="anchor" id="variable-type~2"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>type</strong></td>
+<td> =</td>
+                <td>-1</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~13"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -312,8 +336,8 @@ large graphs.</div>
             </td>
             <td>::</td>
             <td><strong>value</strong></td>
-                <td></td>
-                <td></td>
+<td> =</td>
+                <td>0.0d0</td>
             <td>
                 
             </td>
@@ -342,7 +366,7 @@ large graphs.</div>
           <li class="list-group-item">
                 <h3>interface </h3>
                     <h3>
-    private module subroutine apply_uniform(self, domain, variable)  
+    private module subroutine apply_uniform(self, variable)  
     <a href="../proc/apply_uniform.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
@@ -377,22 +401,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              type(<a href='type_domain.html'>type_domain</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>domain</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              type(<a href='type_variable.html'>type_variable</a>),
+              type(type_variable),
             </td>
 <td>intent(inout)</td>
               <td></td>            <td>
@@ -416,7 +425,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~6"></span>
+      <span class="anchor" id="boundprocedure-initialize~14"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>initialize</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/initialize_type_ic_uniform.html'>initialize_type_ic_uniform</a>
@@ -427,7 +436,7 @@ large graphs.</div>
           <li class="list-group-item">
                 <h3>interface </h3>
                     <h3>
-    private module subroutine initialize_type_ic_uniform(self, input, initial_target)  
+    private module subroutine initialize_type_ic_uniform(self, input, initial_target_id)  
     <a href="../proc/initialize_type_ic_uniform.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
@@ -477,14 +486,14 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              character(len=*),
+              integer(kind=int32),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>initial_target</strong></td>
+            <td><strong>initial_target_id</strong></td>
             <td>
                 
             </td>
@@ -500,6 +509,17 @@ large graphs.</div>
           </div>
       </section>
 
+    <section>
+    <h3><span class="anchor" id="src"></span>Source Code</h3>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">extends</span><span class="p">(</span><span class="n">abst_ic</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_ic_uniform</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="k">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">    </span><span class="k">contains</span>
+<span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">initialize_type_ic_uniform</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">apply</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">apply_uniform</span>
+<span class="w">    </span><span class="k">end type </span><span class="n">type_ic_uniform</span>
+</pre></div>
+
+    </section>
     
     </div>
   </div>
@@ -512,14 +532,14 @@ large graphs.</div>
           <div class="col">
             <p>
               FTDSS
- was developed by Kikuchi Shun<br>              &copy; 2025 
+ was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
           <div class="col">
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-08-26 10:37 +0000             </p>
+ on 2026-02-22 12:12 +0000             </p>
           </div>
         </div>
         <br>

@@ -1,0 +1,1689 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>matvec &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>matvec
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title="<p> 0.0% of total for procedures.</p>Including implementation: 35 statements,  0.1% of total for procedures.">4 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/matrix_operations.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/matrix_operations.f90.html'>matrix_operations.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/linalg_matrix_operations.html'>linalg_matrix_operations</a></li>
+            <li class="breadcrumb-item active" aria-current="page">matvec</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+        <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#modprocs-0"
+         aria-expanded="false" aria-controls="modprocs-0">
+         <h4 class="card-header bg-primary text-white">Module Procedures</h4>
+      </a>
+      <div id="modprocs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../interface/matvec.html#moduleprocedure-matvec_real64">matvec_real64</a>
+            <a class="list-group-item" href="../interface/matvec.html#moduleprocedure-matvec_matrix">matvec_matrix</a>
+        </div>
+      </div>
+    </div>
+
+  
+
+
+  </div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      <h2>public interface matvec</h2>
+      
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Calls</h3>
+          </div>
+          <div class="card-body">
+            <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~matvec~~CallsGraph Pages: 1 -->
+<svg id="interfacematvecCallsGraph" width="641pt" height="462pt"
+ viewBox="0.00 0.00 641.00 461.97" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~matvec~~CallsGraph" class="graph" transform="scale(0.8 0.8) rotate(0) translate(4 574)">
+<title>interface~~matvec~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-574 798,-574 798,4 -4,4"/>
+<!-- interface~matvec -->
+<g id="interface~~matvec~~CallsGraph_node1" class="node">
+<title>interface~matvec</title>
+<polygon fill="none" stroke="black" points="54,-171 0,-171 0,-147 54,-147 54,-171"/>
+<text text-anchor="middle" x="27" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50">matvec</text>
+</g>
+<!-- proc~matvec_matrix -->
+<g id="interface~~matvec~~CallsGraph_node2" class="node">
+<title>proc~matvec_matrix</title>
+<g id="a_interface~~matvec~~CallsGraph_node2"><a xlink:href="../proc/matvec_matrix.html" xlink:title="matvec_matrix">
+<polygon fill="#d9534f" stroke="#d9534f" points="182,-213 90,-213 90,-189 182,-189 182,-213"/>
+<text text-anchor="middle" x="136" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matvec_matrix</text>
+</a>
+</g>
+</g>
+<!-- interface~matvec&#45;&gt;proc~matvec_matrix -->
+<g id="interface~~matvec~~CallsGraph_edge1" class="edge">
+<title>interface~matvec&#45;&gt;proc~matvec_matrix</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M54.18,-169.27C66.32,-174.04 81.04,-179.82 94.57,-185.13"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="93.57,-188.5 104.16,-188.89 96.13,-181.98 93.57,-188.5"/>
+</g>
+<!-- proc~matvec_real64 -->
+<g id="interface~~matvec~~CallsGraph_node3" class="node">
+<title>proc~matvec_real64</title>
+<g id="a_interface~~matvec~~CallsGraph_node3"><a xlink:href="../proc/matvec_real64.html" xlink:title="matvec_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="181.5,-150 90.5,-150 90.5,-126 181.5,-126 181.5,-150"/>
+<text text-anchor="middle" x="136" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matvec_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~matvec&#45;&gt;proc~matvec_real64 -->
+<g id="interface~~matvec~~CallsGraph_edge2" class="edge">
+<title>interface~matvec&#45;&gt;proc~matvec_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M54.18,-153.86C62.17,-152.29 71.28,-150.51 80.43,-148.71"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="81.19,-152.13 90.33,-146.77 79.84,-145.26 81.19,-152.13"/>
+</g>
+<!-- interface~get_data_vector_dp -->
+<g id="interface~~matvec~~CallsGraph_node4" class="node">
+<title>interface~get_data_vector_dp</title>
+<g id="a_interface~~matvec~~CallsGraph_node4"><a xlink:href="../interface/get_data_vector_dp.html" xlink:title="type_vector_dp%get_data_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="426,-528 218,-528 218,-504 426,-504 426,-528"/>
+<text text-anchor="middle" x="322" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~matvec_matrix&#45;&gt;interface~get_data_vector_dp -->
+<g id="interface~~matvec~~CallsGraph_edge3" class="edge">
+<title>proc~matvec_matrix&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M137.94,-213.15C141.52,-252.12 157.35,-375.88 218,-453 234.25,-473.67 259.31,-489.21 280.64,-499.68"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="279.28,-502.91 289.82,-504 282.26,-496.58 279.28,-502.91"/>
+</g>
+<!-- proc~gemv_matrix_bsr -->
+<g id="interface~~matvec~~CallsGraph_node5" class="node">
+<title>proc~gemv_matrix_bsr</title>
+<g id="a_interface~~matvec~~CallsGraph_node5"><a xlink:href="../proc/gemv_matrix_bsr.html" xlink:title="gemv_matrix_bsr">
+<polygon fill="#d9534f" stroke="#d9534f" points="374,-444 270,-444 270,-420 374,-420 374,-444"/>
+<text text-anchor="middle" x="322" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gemv_matrix_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~matvec_matrix&#45;&gt;proc~gemv_matrix_bsr -->
+<g id="interface~~matvec~~CallsGraph_edge4" class="edge">
+<title>proc~matvec_matrix&#45;&gt;proc~gemv_matrix_bsr</title>
+<path fill="none" stroke="#ff0000" d="M146.63,-213.09C176.5,-250.59 267.74,-365.13 304.95,-411.85"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="302.27,-414.11 311.24,-419.75 307.75,-409.74 302.27,-414.11"/>
+</g>
+<!-- proc~gemv_matrix_coo -->
+<g id="interface~~matvec~~CallsGraph_node6" class="node">
+<title>proc~gemv_matrix_coo</title>
+<g id="a_interface~~matvec~~CallsGraph_node6"><a xlink:href="../proc/gemv_matrix_coo.html" xlink:title="gemv_matrix_coo">
+<polygon fill="#d9534f" stroke="#d9534f" points="375.5,-276 268.5,-276 268.5,-252 375.5,-252 375.5,-276"/>
+<text text-anchor="middle" x="322" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gemv_matrix_coo</text>
+</a>
+</g>
+</g>
+<!-- proc~matvec_matrix&#45;&gt;proc~gemv_matrix_coo -->
+<g id="interface~~matvec~~CallsGraph_edge5" class="edge">
+<title>proc~matvec_matrix&#45;&gt;proc~gemv_matrix_coo</title>
+<path fill="none" stroke="#ff0000" d="M172.48,-213.15C202.1,-223.29 244.49,-237.8 276.4,-248.73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="275.35,-252.07 285.94,-252 277.62,-245.45 275.35,-252.07"/>
+</g>
+<!-- proc~gemv_matrix_csr -->
+<g id="interface~~matvec~~CallsGraph_node7" class="node">
+<title>proc~gemv_matrix_csr</title>
+<g id="a_interface~~matvec~~CallsGraph_node7"><a xlink:href="../proc/gemv_matrix_csr.html" xlink:title="gemv_matrix_csr">
+<polygon fill="#d9534f" stroke="#d9534f" points="373.5,-171 270.5,-171 270.5,-147 373.5,-147 373.5,-171"/>
+<text text-anchor="middle" x="322" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gemv_matrix_csr</text>
+</a>
+</g>
+</g>
+<!-- proc~matvec_matrix&#45;&gt;proc~gemv_matrix_csr -->
+<g id="interface~~matvec~~CallsGraph_edge6" class="edge">
+<title>proc~matvec_matrix&#45;&gt;proc~gemv_matrix_csr</title>
+<path fill="none" stroke="#ff0000" d="M182.01,-190.73C205.59,-185.34 234.79,-178.68 260.33,-172.85"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="261.32,-176.21 270.29,-170.58 259.76,-169.39 261.32,-176.21"/>
+</g>
+<!-- proc~gemv_matrix_dense -->
+<g id="interface~~matvec~~CallsGraph_node8" class="node">
+<title>proc~gemv_matrix_dense</title>
+<g id="a_interface~~matvec~~CallsGraph_node8"><a xlink:href="../proc/gemv_matrix_dense.html" xlink:title="gemv_matrix_dense">
+<polygon fill="#d9534f" stroke="#d9534f" points="382,-129 262,-129 262,-105 382,-105 382,-129"/>
+<text text-anchor="middle" x="322" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gemv_matrix_dense</text>
+</a>
+</g>
+</g>
+<!-- proc~matvec_matrix&#45;&gt;proc~gemv_matrix_dense -->
+<g id="interface~~matvec~~CallsGraph_edge7" class="edge">
+<title>proc~matvec_matrix&#45;&gt;proc~gemv_matrix_dense</title>
+<path fill="none" stroke="#ff0000" d="M148.71,-188.99C163.48,-174.56 190.32,-150.73 218,-138 228.52,-133.16 240.14,-129.43 251.68,-126.56"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="252.81,-129.89 261.78,-124.25 251.25,-123.07 252.81,-129.89"/>
+</g>
+<!-- proc~gemv_matrix_real64 -->
+<g id="interface~~matvec~~CallsGraph_node9" class="node">
+<title>proc~gemv_matrix_real64</title>
+<g id="a_interface~~matvec~~CallsGraph_node9"><a xlink:href="../proc/gemv_matrix_real64.html" xlink:title="gemv_matrix_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="382.5,-87 261.5,-87 261.5,-63 382.5,-63 382.5,-87"/>
+<text text-anchor="middle" x="322" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gemv_matrix_real64</text>
+</a>
+</g>
+</g>
+<!-- proc~matvec_real64&#45;&gt;proc~gemv_matrix_real64 -->
+<g id="interface~~matvec~~CallsGraph_edge8" class="edge">
+<title>proc~matvec_real64&#45;&gt;proc~gemv_matrix_real64</title>
+<path fill="none" stroke="#00ffff" d="M156.61,-125.86C172.6,-116.46 196.05,-103.76 218,-96 228.65,-92.24 240.16,-89.07 251.51,-86.42"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="252.4,-89.81 261.41,-84.23 250.89,-82.97 252.4,-89.81"/>
+</g>
+<!-- proc~get_data_vector_dp -->
+<g id="interface~~matvec~~CallsGraph_node23" class="node">
+<title>proc~get_data_vector_dp</title>
+<g id="a_interface~~matvec~~CallsGraph_node23"><a xlink:href="../proc/get_data_vector_dp.html" xlink:title="get_data_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="622,-570 505,-570 505,-546 622,-546 622,-570"/>
+<text text-anchor="middle" x="563.5" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp -->
+<g id="interface~~matvec~~CallsGraph_edge9" class="edge">
+<title>interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M391.63,-528.04C423.94,-533.7 462.35,-540.44 494.57,-546.09"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="494.34,-549.6 504.79,-547.88 495.55,-542.71 494.34,-549.6"/>
+</g>
+<!-- interface~get_ind_bsr -->
+<g id="interface~~matvec~~CallsGraph_node11" class="node">
+<title>interface~get_ind_bsr</title>
+<g id="a_interface~~matvec~~CallsGraph_node11"><a xlink:href="../interface/get_ind_bsr.html" xlink:title="type_matrix_bsr%get_ind_bsr">
+<polygon fill="#a7506f" stroke="#a7506f" points="647.5,-528 479.5,-528 479.5,-504 647.5,-504 647.5,-528"/>
+<text text-anchor="middle" x="563.5" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_bsr%get_ind_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_bsr&#45;&gt;interface~get_ind_bsr -->
+<g id="interface~~matvec~~CallsGraph_edge10" class="edge">
+<title>proc~gemv_matrix_bsr&#45;&gt;interface~get_ind_bsr</title>
+<path fill="none" stroke="#ffff00" d="M345.5,-444.06C372.49,-458.09 419.44,-481.09 462,-495 469.33,-497.39 477.05,-499.58 484.82,-501.55"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="484.11,-504.99 494.66,-503.95 485.77,-498.18 484.11,-504.99"/>
+</g>
+<!-- interface~get_info_bsr -->
+<g id="interface~~matvec~~CallsGraph_node13" class="node">
+<title>interface~get_info_bsr</title>
+<g id="a_interface~~matvec~~CallsGraph_node13"><a xlink:href="../interface/get_info_bsr.html" xlink:title="type_matrix_bsr%get_info_bsr">
+<polygon fill="#a7506f" stroke="#a7506f" points="649.5,-486 477.5,-486 477.5,-462 649.5,-462 649.5,-486"/>
+<text text-anchor="middle" x="563.5" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_bsr%get_info_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_bsr&#45;&gt;interface~get_info_bsr -->
+<g id="interface~~matvec~~CallsGraph_edge11" class="edge">
+<title>proc~gemv_matrix_bsr&#45;&gt;interface~get_info_bsr</title>
+<path fill="none" stroke="#ffff00" d="M374.08,-440.96C405.98,-446.55 447.69,-453.87 483.76,-460.19"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="483.32,-463.67 493.77,-461.95 484.52,-456.77 483.32,-463.67"/>
+</g>
+<!-- interface~get_ptr_bsr -->
+<g id="interface~~matvec~~CallsGraph_node17" class="node">
+<title>interface~get_ptr_bsr</title>
+<g id="a_interface~~matvec~~CallsGraph_node17"><a xlink:href="../interface/get_ptr_bsr.html" xlink:title="type_matrix_bsr%get_ptr_bsr">
+<polygon fill="#a7506f" stroke="#a7506f" points="646.5,-444 480.5,-444 480.5,-420 646.5,-420 646.5,-444"/>
+<text text-anchor="middle" x="563.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_bsr%get_ptr_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_bsr&#45;&gt;interface~get_ptr_bsr -->
+<g id="interface~~matvec~~CallsGraph_edge12" class="edge">
+<title>proc~gemv_matrix_bsr&#45;&gt;interface~get_ptr_bsr</title>
+<path fill="none" stroke="#ffff00" d="M374.08,-432C402.1,-432 437.68,-432 470.36,-432"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="470.4,-435.5 480.4,-432 470.4,-428.5 470.4,-435.5"/>
+</g>
+<!-- interface~get_val_bsr -->
+<g id="interface~~matvec~~CallsGraph_node20" class="node">
+<title>interface~get_val_bsr</title>
+<g id="a_interface~~matvec~~CallsGraph_node20"><a xlink:href="../interface/get_val_bsr.html" xlink:title="type_matrix_bsr%get_val_bsr">
+<polygon fill="#a7506f" stroke="#a7506f" points="647,-402 480,-402 480,-378 647,-378 647,-402"/>
+<text text-anchor="middle" x="563.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_bsr%get_val_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_bsr&#45;&gt;interface~get_val_bsr -->
+<g id="interface~~matvec~~CallsGraph_edge13" class="edge">
+<title>proc~gemv_matrix_bsr&#45;&gt;interface~get_val_bsr</title>
+<path fill="none" stroke="#ffff00" d="M374.08,-423.04C405.98,-417.45 447.69,-410.13 483.76,-403.81"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="484.52,-407.23 493.77,-402.05 483.32,-400.33 484.52,-407.23"/>
+</g>
+<!-- interface~get_col_coo -->
+<g id="interface~~matvec~~CallsGraph_node10" class="node">
+<title>interface~get_col_coo</title>
+<g id="a_interface~~matvec~~CallsGraph_node10"><a xlink:href="../interface/get_col_coo.html" xlink:title="type_matrix_coo%get_col_coo">
+<polygon fill="#a7506f" stroke="#a7506f" points="650,-360 477,-360 477,-336 650,-336 650,-360"/>
+<text text-anchor="middle" x="563.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_coo%get_col_coo</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_coo&#45;&gt;interface~get_col_coo -->
+<g id="interface~~matvec~~CallsGraph_edge14" class="edge">
+<title>proc~gemv_matrix_coo&#45;&gt;interface~get_col_coo</title>
+<path fill="none" stroke="#00ff00" d="M345.5,-276.06C372.49,-290.09 419.44,-313.09 462,-327 469.33,-329.39 477.05,-331.58 484.82,-333.55"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="484.11,-336.99 494.66,-335.95 485.77,-330.18 484.11,-336.99"/>
+</g>
+<!-- interface~get_info_coo -->
+<g id="interface~~matvec~~CallsGraph_node14" class="node">
+<title>interface~get_info_coo</title>
+<g id="a_interface~~matvec~~CallsGraph_node14"><a xlink:href="../interface/get_info_coo.html" xlink:title="type_matrix_coo%get_info_coo">
+<polygon fill="#a7506f" stroke="#a7506f" points="652.5,-318 474.5,-318 474.5,-294 652.5,-294 652.5,-318"/>
+<text text-anchor="middle" x="563.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_coo%get_info_coo</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_coo&#45;&gt;interface~get_info_coo -->
+<g id="interface~~matvec~~CallsGraph_edge15" class="edge">
+<title>proc~gemv_matrix_coo&#45;&gt;interface~get_info_coo</title>
+<path fill="none" stroke="#00ff00" d="M375.56,-273.22C407.28,-278.78 448.29,-285.97 483.82,-292.2"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="483.23,-295.65 493.68,-293.93 484.44,-288.76 483.23,-295.65"/>
+</g>
+<!-- interface~get_row_coo -->
+<g id="interface~~matvec~~CallsGraph_node19" class="node">
+<title>interface~get_row_coo</title>
+<g id="a_interface~~matvec~~CallsGraph_node19"><a xlink:href="../interface/get_row_coo.html" xlink:title="type_matrix_coo%get_row_coo">
+<polygon fill="#a7506f" stroke="#a7506f" points="651.5,-276 475.5,-276 475.5,-252 651.5,-252 651.5,-276"/>
+<text text-anchor="middle" x="563.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_coo%get_row_coo</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_coo&#45;&gt;interface~get_row_coo -->
+<g id="interface~~matvec~~CallsGraph_edge16" class="edge">
+<title>proc~gemv_matrix_coo&#45;&gt;interface~get_row_coo</title>
+<path fill="none" stroke="#00ff00" d="M375.56,-264C401.79,-264 434.37,-264 464.95,-264"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="465.24,-267.5 475.24,-264 465.24,-260.5 465.24,-267.5"/>
+</g>
+<!-- interface~get_val_coo -->
+<g id="interface~~matvec~~CallsGraph_node21" class="node">
+<title>interface~get_val_coo</title>
+<g id="a_interface~~matvec~~CallsGraph_node21"><a xlink:href="../interface/get_val_coo.html" xlink:title="type_matrix_coo%get_val_coo">
+<polygon fill="#a7506f" stroke="#a7506f" points="650,-234 477,-234 477,-210 650,-210 650,-234"/>
+<text text-anchor="middle" x="563.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_coo%get_val_coo</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_coo&#45;&gt;interface~get_val_coo -->
+<g id="interface~~matvec~~CallsGraph_edge17" class="edge">
+<title>proc~gemv_matrix_coo&#45;&gt;interface~get_val_coo</title>
+<path fill="none" stroke="#00ff00" d="M375.56,-254.78C407.28,-249.22 448.29,-242.03 483.82,-235.8"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="484.44,-239.24 493.68,-234.07 483.23,-232.35 484.44,-239.24"/>
+</g>
+<!-- interface~get_ind_csr -->
+<g id="interface~~matvec~~CallsGraph_node12" class="node">
+<title>interface~get_ind_csr</title>
+<g id="a_interface~~matvec~~CallsGraph_node12"><a xlink:href="../interface/get_ind_csr.html" xlink:title="type_matrix_csr%get_ind_csr">
+<polygon fill="#a7506f" stroke="#a7506f" points="646.5,-192 480.5,-192 480.5,-168 646.5,-168 646.5,-192"/>
+<text text-anchor="middle" x="563.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_csr%get_ind_csr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_csr&#45;&gt;interface~get_ind_csr -->
+<g id="interface~~matvec~~CallsGraph_edge18" class="edge">
+<title>proc~gemv_matrix_csr&#45;&gt;interface~get_ind_csr</title>
+<path fill="none" stroke="#00ffff" d="M373.79,-163.45C401.79,-165.91 437.42,-169.03 470.16,-171.9"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="469.95,-175.4 480.21,-172.78 470.56,-168.42 469.95,-175.4"/>
+</g>
+<!-- interface~get_info_csr -->
+<g id="interface~~matvec~~CallsGraph_node15" class="node">
+<title>interface~get_info_csr</title>
+<g id="a_interface~~matvec~~CallsGraph_node15"><a xlink:href="../interface/get_info_csr.html" xlink:title="type_matrix_csr%get_info_csr">
+<polygon fill="#a7506f" stroke="#a7506f" points="648.5,-150 478.5,-150 478.5,-126 648.5,-126 648.5,-150"/>
+<text text-anchor="middle" x="563.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_csr%get_info_csr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_csr&#45;&gt;interface~get_info_csr -->
+<g id="interface~~matvec~~CallsGraph_edge19" class="edge">
+<title>proc~gemv_matrix_csr&#45;&gt;interface~get_info_csr</title>
+<path fill="none" stroke="#00ffff" d="M373.79,-154.55C401.17,-152.15 435.85,-149.1 467.99,-146.29"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="468.67,-149.74 478.32,-145.38 468.06,-142.77 468.67,-149.74"/>
+</g>
+<!-- interface~get_ptr_csr -->
+<g id="interface~~matvec~~CallsGraph_node18" class="node">
+<title>interface~get_ptr_csr</title>
+<g id="a_interface~~matvec~~CallsGraph_node18"><a xlink:href="../interface/get_ptr_csr.html" xlink:title="type_matrix_csr%get_ptr_csr">
+<polygon fill="#a7506f" stroke="#a7506f" points="646,-108 481,-108 481,-84 646,-84 646,-108"/>
+<text text-anchor="middle" x="563.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_csr%get_ptr_csr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_csr&#45;&gt;interface~get_ptr_csr -->
+<g id="interface~~matvec~~CallsGraph_edge20" class="edge">
+<title>proc~gemv_matrix_csr&#45;&gt;interface~get_ptr_csr</title>
+<path fill="none" stroke="#00ffff" d="M373.7,-152.07C390.67,-148.86 409.46,-144.31 426,-138 443.31,-131.4 444.71,-123.65 462,-117 468.15,-114.64 474.62,-112.52 481.18,-110.62"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="482.11,-114 490.85,-108 480.28,-107.24 482.11,-114"/>
+</g>
+<!-- interface~get_val_csr -->
+<g id="interface~~matvec~~CallsGraph_node22" class="node">
+<title>interface~get_val_csr</title>
+<g id="a_interface~~matvec~~CallsGraph_node22"><a xlink:href="../interface/get_val_csr.html" xlink:title="type_matrix_csr%get_val_csr">
+<polygon fill="#a7506f" stroke="#a7506f" points="646.5,-66 480.5,-66 480.5,-42 646.5,-42 646.5,-66"/>
+<text text-anchor="middle" x="563.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_csr%get_val_csr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_csr&#45;&gt;interface~get_val_csr -->
+<g id="interface~~matvec~~CallsGraph_edge21" class="edge">
+<title>proc~gemv_matrix_csr&#45;&gt;interface~get_val_csr</title>
+<path fill="none" stroke="#00ffff" d="M373.6,-157.19C391.5,-154.46 410.92,-148.91 426,-138 452.13,-119.09 435.92,-93.97 462,-75 464.9,-72.89 467.96,-70.98 471.15,-69.26"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="472.87,-72.32 480.41,-64.87 469.87,-65.99 472.87,-72.32"/>
+</g>
+<!-- interface~get_info_dense -->
+<g id="interface~~matvec~~CallsGraph_node16" class="node">
+<title>interface~get_info_dense</title>
+<g id="a_interface~~matvec~~CallsGraph_node16"><a xlink:href="../interface/get_info_dense.html" xlink:title="type_matrix_dense%get_info_dense">
+<polygon fill="#a7506f" stroke="#a7506f" points="665,-24 462,-24 462,0 665,0 665,-24"/>
+<text text-anchor="middle" x="563.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dense%get_info_dense</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_dense&#45;&gt;interface~get_info_dense -->
+<g id="interface~~matvec~~CallsGraph_edge22" class="edge">
+<title>proc~gemv_matrix_dense&#45;&gt;interface~get_info_dense</title>
+<path fill="none" stroke="#0000ff" d="M382.12,-113.69C397.49,-110.59 413.28,-105.2 426,-96 452.13,-77.09 435.92,-51.97 462,-33 464.08,-31.49 466.25,-30.08 468.48,-28.76"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="470.12,-31.86 477.41,-24.17 466.92,-25.63 470.12,-31.86"/>
+</g>
+<!-- proc~get_col_coo -->
+<g id="interface~~matvec~~CallsGraph_node24" class="node">
+<title>proc~get_col_coo</title>
+<g id="a_interface~~matvec~~CallsGraph_node24"><a xlink:href="../proc/get_col_coo.html" xlink:title="get_col_coo">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="785.5,-360 709.5,-360 709.5,-336 785.5,-336 785.5,-360"/>
+<text text-anchor="middle" x="747.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_col_coo</text>
+</a>
+</g>
+</g>
+<!-- interface~get_col_coo&#45;&gt;proc~get_col_coo -->
+<g id="interface~~matvec~~CallsGraph_edge23" class="edge">
+<title>interface~get_col_coo&#45;&gt;proc~get_col_coo</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M650.17,-348C667.1,-348 684.28,-348 699.35,-348"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="699.41,-351.5 709.41,-348 699.41,-344.5 699.41,-351.5"/>
+</g>
+<!-- proc~get_ind_bsr -->
+<g id="interface~~matvec~~CallsGraph_node25" class="node">
+<title>proc~get_ind_bsr</title>
+<g id="a_interface~~matvec~~CallsGraph_node25"><a xlink:href="../proc/get_ind_bsr.html" xlink:title="get_ind_bsr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="784,-528 711,-528 711,-504 784,-504 784,-528"/>
+<text text-anchor="middle" x="747.5" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_ind_bsr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_ind_bsr&#45;&gt;proc~get_ind_bsr -->
+<g id="interface~~matvec~~CallsGraph_edge24" class="edge">
+<title>interface~get_ind_bsr&#45;&gt;proc~get_ind_bsr</title>
+<path fill="none" stroke="#ff6d00" stroke-dasharray="5,2" d="M647.51,-516C665.81,-516 684.55,-516 700.73,-516"/>
+<polygon fill="#ff6d00" stroke="#ff6d00" points="700.96,-519.5 710.96,-516 700.96,-512.5 700.96,-519.5"/>
+</g>
+<!-- proc~get_ind_csr -->
+<g id="interface~~matvec~~CallsGraph_node26" class="node">
+<title>proc~get_ind_csr</title>
+<g id="a_interface~~matvec~~CallsGraph_node26"><a xlink:href="../proc/get_ind_csr.html" xlink:title="get_ind_csr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="784,-192 711,-192 711,-168 784,-168 784,-192"/>
+<text text-anchor="middle" x="747.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_ind_csr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_ind_csr&#45;&gt;proc~get_ind_csr -->
+<g id="interface~~matvec~~CallsGraph_edge25" class="edge">
+<title>interface~get_ind_csr&#45;&gt;proc~get_ind_csr</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M646.71,-180C665.11,-180 683.98,-180 700.3,-180"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="700.62,-183.5 710.62,-180 700.62,-176.5 700.62,-183.5"/>
+</g>
+<!-- proc~get_info_bsr -->
+<g id="interface~~matvec~~CallsGraph_node27" class="node">
+<title>proc~get_info_bsr</title>
+<g id="a_interface~~matvec~~CallsGraph_node27"><a xlink:href="../proc/get_info_bsr.html" xlink:title="get_info_bsr">
+<polygon fill="#d9534f" stroke="#d9534f" points="786,-486 709,-486 709,-462 786,-462 786,-486"/>
+<text text-anchor="middle" x="747.5" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_info_bsr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_info_bsr&#45;&gt;proc~get_info_bsr -->
+<g id="interface~~matvec~~CallsGraph_edge26" class="edge">
+<title>interface~get_info_bsr&#45;&gt;proc~get_info_bsr</title>
+<path fill="none" stroke="#b6ff00" stroke-dasharray="5,2" d="M649.64,-474C666.48,-474 683.58,-474 698.64,-474"/>
+<polygon fill="#b6ff00" stroke="#b6ff00" points="698.71,-477.5 708.71,-474 698.71,-470.5 698.71,-477.5"/>
+</g>
+<!-- proc~get_info_coo -->
+<g id="interface~~matvec~~CallsGraph_node28" class="node">
+<title>proc~get_info_coo</title>
+<g id="a_interface~~matvec~~CallsGraph_node28"><a xlink:href="../proc/get_info_coo.html" xlink:title="get_info_coo">
+<polygon fill="#d9534f" stroke="#d9534f" points="787.5,-318 707.5,-318 707.5,-294 787.5,-294 787.5,-318"/>
+<text text-anchor="middle" x="747.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_info_coo</text>
+</a>
+</g>
+</g>
+<!-- interface~get_info_coo&#45;&gt;proc~get_info_coo -->
+<g id="interface~~matvec~~CallsGraph_edge27" class="edge">
+<title>interface~get_info_coo&#45;&gt;proc~get_info_coo</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M652.57,-306C667.9,-306 683.34,-306 697.14,-306"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="697.36,-309.5 707.36,-306 697.36,-302.5 697.36,-309.5"/>
+</g>
+<!-- proc~get_info_csr -->
+<g id="interface~~matvec~~CallsGraph_node29" class="node">
+<title>proc~get_info_csr</title>
+<g id="a_interface~~matvec~~CallsGraph_node29"><a xlink:href="../proc/get_info_csr.html" xlink:title="get_info_csr">
+<polygon fill="#d9534f" stroke="#d9534f" points="785.5,-150 709.5,-150 709.5,-126 785.5,-126 785.5,-150"/>
+<text text-anchor="middle" x="747.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_info_csr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_info_csr&#45;&gt;proc~get_info_csr -->
+<g id="interface~~matvec~~CallsGraph_edge28" class="edge">
+<title>interface~get_info_csr&#45;&gt;proc~get_info_csr</title>
+<path fill="none" stroke="#00ff24" stroke-dasharray="5,2" d="M648.57,-138C665.83,-138 683.42,-138 698.84,-138"/>
+<polygon fill="#00ff24" stroke="#00ff24" points="699.14,-141.5 709.14,-138 699.14,-134.5 699.14,-141.5"/>
+</g>
+<!-- proc~get_info_dense -->
+<g id="interface~~matvec~~CallsGraph_node30" class="node">
+<title>proc~get_info_dense</title>
+<g id="a_interface~~matvec~~CallsGraph_node30"><a xlink:href="../proc/get_info_dense.html" xlink:title="get_info_dense">
+<polygon fill="#d9534f" stroke="#d9534f" points="794,-24 701,-24 701,0 794,0 794,-24"/>
+<text text-anchor="middle" x="747.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_info_dense</text>
+</a>
+</g>
+</g>
+<!-- interface~get_info_dense&#45;&gt;proc~get_info_dense -->
+<g id="interface~~matvec~~CallsGraph_edge29" class="edge">
+<title>interface~get_info_dense&#45;&gt;proc~get_info_dense</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M665.08,-12C673.87,-12 682.53,-12 690.75,-12"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="690.88,-15.5 700.88,-12 690.88,-8.5 690.88,-15.5"/>
+</g>
+<!-- proc~get_ptr_bsr -->
+<g id="interface~~matvec~~CallsGraph_node31" class="node">
+<title>proc~get_ptr_bsr</title>
+<g id="a_interface~~matvec~~CallsGraph_node31"><a xlink:href="../proc/get_ptr_bsr.html" xlink:title="get_ptr_bsr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="783.5,-444 711.5,-444 711.5,-420 783.5,-420 783.5,-444"/>
+<text text-anchor="middle" x="747.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_ptr_bsr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_ptr_bsr&#45;&gt;proc~get_ptr_bsr -->
+<g id="interface~~matvec~~CallsGraph_edge30" class="edge">
+<title>interface~get_ptr_bsr&#45;&gt;proc~get_ptr_bsr</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M646.71,-432C665.26,-432 684.3,-432 700.71,-432"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="701.08,-435.5 711.08,-432 701.08,-428.5 701.08,-435.5"/>
+</g>
+<!-- proc~get_ptr_csr -->
+<g id="interface~~matvec~~CallsGraph_node32" class="node">
+<title>proc~get_ptr_csr</title>
+<g id="a_interface~~matvec~~CallsGraph_node32"><a xlink:href="../proc/get_ptr_csr.html" xlink:title="get_ptr_csr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="783,-108 712,-108 712,-84 783,-84 783,-108"/>
+<text text-anchor="middle" x="747.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_ptr_csr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_ptr_csr&#45;&gt;proc~get_ptr_csr -->
+<g id="interface~~matvec~~CallsGraph_edge31" class="edge">
+<title>interface~get_ptr_csr&#45;&gt;proc~get_ptr_csr</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M646.18,-96C665.28,-96 684.93,-96 701.72,-96"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="701.77,-99.5 711.77,-96 701.77,-92.5 701.77,-99.5"/>
+</g>
+<!-- proc~get_row_coo -->
+<g id="interface~~matvec~~CallsGraph_node33" class="node">
+<title>proc~get_row_coo</title>
+<g id="a_interface~~matvec~~CallsGraph_node33"><a xlink:href="../proc/get_row_coo.html" xlink:title="get_row_coo">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="787,-276 708,-276 708,-252 787,-252 787,-276"/>
+<text text-anchor="middle" x="747.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_row_coo</text>
+</a>
+</g>
+</g>
+<!-- interface~get_row_coo&#45;&gt;proc~get_row_coo -->
+<g id="interface~~matvec~~CallsGraph_edge32" class="edge">
+<title>interface~get_row_coo&#45;&gt;proc~get_row_coo</title>
+<path fill="none" stroke="#0024ff" stroke-dasharray="5,2" d="M651.5,-264C667.39,-264 683.44,-264 697.7,-264"/>
+<polygon fill="#0024ff" stroke="#0024ff" points="697.75,-267.5 707.75,-264 697.75,-260.5 697.75,-267.5"/>
+</g>
+<!-- proc~get_val_bsr -->
+<g id="interface~~matvec~~CallsGraph_node34" class="node">
+<title>proc~get_val_bsr</title>
+<g id="a_interface~~matvec~~CallsGraph_node34"><a xlink:href="../proc/get_val_bsr.html" xlink:title="get_val_bsr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="784,-402 711,-402 711,-378 784,-378 784,-402"/>
+<text text-anchor="middle" x="747.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_val_bsr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_val_bsr&#45;&gt;proc~get_val_bsr -->
+<g id="interface~~matvec~~CallsGraph_edge33" class="edge">
+<title>interface~get_val_bsr&#45;&gt;proc~get_val_bsr</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M647.25,-390C665.58,-390 684.36,-390 700.59,-390"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="700.85,-393.5 710.85,-390 700.85,-386.5 700.85,-393.5"/>
+</g>
+<!-- proc~get_val_coo -->
+<g id="interface~~matvec~~CallsGraph_node35" class="node">
+<title>proc~get_val_coo</title>
+<g id="a_interface~~matvec~~CallsGraph_node35"><a xlink:href="../proc/get_val_coo.html" xlink:title="get_val_coo">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="785.5,-234 709.5,-234 709.5,-210 785.5,-210 785.5,-234"/>
+<text text-anchor="middle" x="747.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_val_coo</text>
+</a>
+</g>
+</g>
+<!-- interface~get_val_coo&#45;&gt;proc~get_val_coo -->
+<g id="interface~~matvec~~CallsGraph_edge34" class="edge">
+<title>interface~get_val_coo&#45;&gt;proc~get_val_coo</title>
+<path fill="none" stroke="#b600ff" stroke-dasharray="5,2" d="M650.17,-222C667.1,-222 684.28,-222 699.35,-222"/>
+<polygon fill="#b600ff" stroke="#b600ff" points="699.41,-225.5 709.41,-222 699.41,-218.5 699.41,-225.5"/>
+</g>
+<!-- proc~get_val_csr -->
+<g id="interface~~matvec~~CallsGraph_node36" class="node">
+<title>proc~get_val_csr</title>
+<g id="a_interface~~matvec~~CallsGraph_node36"><a xlink:href="../proc/get_val_csr.html" xlink:title="get_val_csr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="783.5,-66 711.5,-66 711.5,-42 783.5,-42 783.5,-66"/>
+<text text-anchor="middle" x="747.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_val_csr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_val_csr&#45;&gt;proc~get_val_csr -->
+<g id="interface~~matvec~~CallsGraph_edge35" class="edge">
+<title>interface~get_val_csr&#45;&gt;proc~get_val_csr</title>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M646.71,-54C665.26,-54 684.3,-54 700.71,-54"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="701.08,-57.5 711.08,-54 701.08,-50.5 701.08,-57.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacematvecCallsGraph = svgPanZoom('#interfacematvecCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Called by</h3>
+          </div>
+          <div class="card-body">
+            <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~matvec~~CalledByGraph Pages: 1 -->
+<svg id="interfacematvecCalledByGraph" width="641pt" height="50pt"
+ viewBox="0.00 0.00 641.00 49.89" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~matvec~~CalledByGraph" class="graph" transform="scale(0.17 0.17) rotate(0) translate(4 294)">
+<title>interface~~matvec~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-294 3825,-294 3825,4 -4,4"/>
+<!-- interface~matvec -->
+<g id="interface~~matvec~~CalledByGraph_node1" class="node">
+<title>interface~matvec</title>
+<polygon fill="none" stroke="black" points="3821,-126 3767,-126 3767,-102 3821,-102 3821,-126"/>
+<text text-anchor="middle" x="3794" y="-111.6" font-family="Helvetica,sans-Serif" font-size="10.50">matvec</text>
+</g>
+<!-- proc~assemble_local_newton_hydraulic -->
+<g id="interface~~matvec~~CalledByGraph_node2" class="node">
+<title>proc~assemble_local_newton_hydraulic</title>
+<g id="a_interface~~matvec~~CalledByGraph_node2"><a xlink:href="../proc/assemble_local_newton_hydraulic.html" xlink:title="assemble_local_newton_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="2358,-102 2165,-102 2165,-78 2358,-78 2358,-102"/>
+<text text-anchor="middle" x="2261.5" y="-87.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_newton_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_newton_hydraulic&#45;&gt;interface~matvec -->
+<g id="interface~~matvec~~CalledByGraph_edge1" class="edge">
+<title>proc~assemble_local_newton_hydraulic&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2358.22,-91.05C2474.85,-92.23 2677.88,-94 2852,-94 2852,-94 2852,-94 3384.5,-94 3521.94,-94 3685.08,-105.43 3756.48,-111.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3756.49,-114.52 3766.74,-111.82 3757.04,-107.54 3756.49,-114.52"/>
+</g>
+<!-- none~compute_k2 -->
+<g id="interface~~matvec~~CalledByGraph_node25" class="node">
+<title>none~compute_k2</title>
+<g id="a_interface~~matvec~~CalledByGraph_node25"><a xlink:href="../type/type_assemble_workspace.html#boundprocedure-compute_k2" xlink:title="type_assemble_workspace%compute_K2">
+<polygon fill="#a7506f" stroke="#a7506f" points="2624,-166 2394,-166 2394,-142 2624,-142 2624,-166"/>
+<text text-anchor="middle" x="2509" y="-151.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assemble_workspace%compute_K2</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_newton_hydraulic&#45;&gt;none~compute_k2 -->
+<g id="interface~~matvec~~CalledByGraph_edge28" class="edge">
+<title>proc~assemble_local_newton_hydraulic&#45;&gt;none~compute_k2</title>
+<path fill="none" stroke="#00ff00" d="M2319.95,-102.02C2332.53,-104.82 2345.74,-107.9 2358,-111 2391.71,-119.53 2429.33,-130.32 2458.46,-138.95"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="2457.81,-142.41 2468.39,-141.91 2459.81,-135.7 2457.81,-142.41"/>
+</g>
+<!-- proc~assemble_local_newton_thermal -->
+<g id="interface~~matvec~~CalledByGraph_node3" class="node">
+<title>proc~assemble_local_newton_thermal</title>
+<g id="a_interface~~matvec~~CalledByGraph_node3"><a xlink:href="../proc/assemble_local_newton_thermal.html" xlink:title="assemble_local_newton_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="2354.5,-228 2168.5,-228 2168.5,-204 2354.5,-204 2354.5,-228"/>
+<text text-anchor="middle" x="2261.5" y="-213.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_newton_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_newton_thermal&#45;&gt;interface~matvec -->
+<g id="interface~~matvec~~CalledByGraph_edge2" class="edge">
+<title>proc~assemble_local_newton_thermal&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2354.65,-216C2470.67,-216 2676.1,-216 2852,-216 2852,-216 2852,-216 3384.5,-216 3540.87,-216 3585.74,-212.89 3731,-155 3744.81,-149.5 3758.75,-140.64 3769.9,-132.57"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3772.3,-135.15 3778.19,-126.34 3768.09,-129.55 3772.3,-135.15"/>
+</g>
+<!-- proc~assemble_local_newton_thermal&#45;&gt;none~compute_k2 -->
+<g id="interface~~matvec~~CalledByGraph_edge29" class="edge">
+<title>proc~assemble_local_newton_thermal&#45;&gt;none~compute_k2</title>
+<path fill="none" stroke="#00ff00" d="M2319.42,-203.98C2332.14,-201.15 2345.56,-198.07 2358,-195 2390.83,-186.91 2427.43,-176.92 2456.27,-168.83"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="2457.44,-172.14 2466.12,-166.05 2455.55,-165.4 2457.44,-172.14"/>
+</g>
+<!-- proc~compute_k2_diffusion_abst_fe -->
+<g id="interface~~matvec~~CalledByGraph_node4" class="node">
+<title>proc~compute_k2_diffusion_abst_fe</title>
+<g id="a_interface~~matvec~~CalledByGraph_node4"><a xlink:href="../proc/compute_k2_diffusion_abst_fe.html" xlink:title="compute_K2_diffusion_abst_fe">
+<polygon fill="#d9534f" stroke="#d9534f" points="3731,-146 3558,-146 3558,-122 3731,-122 3731,-146"/>
+<text text-anchor="middle" x="3644.5" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">compute_K2_diffusion_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_k2_diffusion_abst_fe&#45;&gt;interface~matvec -->
+<g id="interface~~matvec~~CalledByGraph_edge3" class="edge">
+<title>proc~compute_k2_diffusion_abst_fe&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M3731.3,-122.37C3740.29,-121.15 3749.04,-119.96 3756.98,-118.88"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3757.48,-122.35 3766.92,-117.54 3756.54,-115.41 3757.48,-122.35"/>
+</g>
+<!-- proc~dlerp_abst_fe -->
+<g id="interface~~matvec~~CalledByGraph_node5" class="node">
+<title>proc~dlerp_abst_fe</title>
+<g id="a_interface~~matvec~~CalledByGraph_node5"><a xlink:href="../proc/dlerp_abst_fe.html" xlink:title="dlerp_abst_fe">
+<polygon fill="#d9534f" stroke="#d9534f" points="2551,-268 2467,-268 2467,-244 2551,-244 2551,-268"/>
+<text text-anchor="middle" x="2509" y="-253.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dlerp_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- proc~dlerp_abst_fe&#45;&gt;interface~matvec -->
+<g id="interface~~matvec~~CalledByGraph_edge4" class="edge">
+<title>proc~dlerp_abst_fe&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2551.2,-255.89C2652.28,-255.63 2920.61,-255 3144.5,-255 3144.5,-255 3144.5,-255 3384.5,-255 3538.9,-255 3601.51,-314.1 3731,-230 3764.14,-208.48 3780.8,-163.06 3788.13,-135.87"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3791.54,-136.66 3790.56,-126.11 3784.75,-134.97 3791.54,-136.66"/>
+</g>
+<!-- proc~solve_type_solver_bicgstab -->
+<g id="interface~~matvec~~CalledByGraph_node6" class="node">
+<title>proc~solve_type_solver_bicgstab</title>
+<g id="a_interface~~matvec~~CalledByGraph_node6"><a xlink:href="../proc/solve_type_solver_bicgstab.html" xlink:title="solve_type_solver_bicgstab">
+<polygon fill="#d9534f" stroke="#d9534f" points="3723,-66 3566,-66 3566,-42 3723,-42 3723,-66"/>
+<text text-anchor="middle" x="3644.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_bicgstab</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_bicgstab&#45;&gt;interface~matvec -->
+<g id="interface~~matvec~~CalledByGraph_edge5" class="edge">
+<title>proc~solve_type_solver_bicgstab&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M3691.38,-66.05C3704.38,-69.98 3718.42,-74.7 3731,-80 3742.26,-84.74 3754.14,-90.93 3764.45,-96.73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3763,-99.94 3773.42,-101.9 3766.5,-93.87 3763,-99.94"/>
+</g>
+<!-- proc~solve_type_solver_gmres -->
+<g id="interface~~matvec~~CalledByGraph_node7" class="node">
+<title>proc~solve_type_solver_gmres</title>
+<g id="a_interface~~matvec~~CalledByGraph_node7"><a xlink:href="../proc/solve_type_solver_gmres.html" xlink:title="solve_type_solver_gmres">
+<polygon fill="#d9534f" stroke="#d9534f" points="3717,-24 3572,-24 3572,0 3717,0 3717,-24"/>
+<text text-anchor="middle" x="3644.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_gmres</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;interface~matvec -->
+<g id="interface~~matvec~~CalledByGraph_edge6" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M3713.59,-24.12C3719.72,-26.56 3725.63,-29.49 3731,-33 3753.84,-47.94 3771.66,-74.25 3782.21,-92.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3779.21,-94.62 3787.06,-101.73 3785.35,-91.28 3779.21,-94.62"/>
+</g>
+<!-- interface~assemble_local_newton_hydraulic -->
+<g id="interface~~matvec~~CalledByGraph_node8" class="node">
+<title>interface~assemble_local_newton_hydraulic</title>
+<g id="a_interface~~matvec~~CalledByGraph_node8"><a xlink:href="../interface/assemble_local_newton_hydraulic.html" xlink:title="type_hydraulic%assemble_local_newton_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="2129,-102 1848,-102 1848,-78 2129,-78 2129,-102"/>
+<text text-anchor="middle" x="1988.5" y="-87.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%assemble_local_newton_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_newton_hydraulic&#45;&gt;proc~assemble_local_newton_hydraulic -->
+<g id="interface~~matvec~~CalledByGraph_edge7" class="edge">
+<title>interface~assemble_local_newton_hydraulic&#45;&gt;proc~assemble_local_newton_hydraulic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2129.37,-90C2137.92,-90 2146.46,-90 2154.83,-90"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2154.96,-93.5 2164.96,-90 2154.96,-86.5 2154.96,-93.5"/>
+</g>
+<!-- interface~assemble_local_newton_thermal -->
+<g id="interface~~matvec~~CalledByGraph_node9" class="node">
+<title>interface~assemble_local_newton_thermal</title>
+<g id="a_interface~~matvec~~CalledByGraph_node9"><a xlink:href="../interface/assemble_local_newton_thermal.html" xlink:title="type_thermal%assemble_local_newton_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="2121.5,-228 1855.5,-228 1855.5,-204 2121.5,-204 2121.5,-228"/>
+<text text-anchor="middle" x="1988.5" y="-213.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%assemble_local_newton_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_newton_thermal&#45;&gt;proc~assemble_local_newton_thermal -->
+<g id="interface~~matvec~~CalledByGraph_edge8" class="edge">
+<title>interface~assemble_local_newton_thermal&#45;&gt;proc~assemble_local_newton_thermal</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M2121.82,-216C2133.98,-216 2146.18,-216 2158.01,-216"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="2158.31,-219.5 2168.31,-216 2158.31,-212.5 2158.31,-219.5"/>
+</g>
+<!-- interface~compute_k2_diffusion_abst_fe -->
+<g id="interface~~matvec~~CalledByGraph_node10" class="node">
+<title>interface~compute_k2_diffusion_abst_fe</title>
+<g id="a_interface~~matvec~~CalledByGraph_node10"><a xlink:href="../interface/compute_k2_diffusion_abst_fe.html" xlink:title="abst_fe%compute_K2_diffusion_abst_fe">
+<polygon fill="#a7506f" stroke="#a7506f" points="3494,-146 3273,-146 3273,-122 3494,-122 3494,-146"/>
+<text text-anchor="middle" x="3383.5" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%compute_K2_diffusion_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- interface~compute_k2_diffusion_abst_fe&#45;&gt;proc~compute_k2_diffusion_abst_fe -->
+<g id="interface~~matvec~~CalledByGraph_edge9" class="edge">
+<title>interface~compute_k2_diffusion_abst_fe&#45;&gt;proc~compute_k2_diffusion_abst_fe</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M3494.34,-134C3512.09,-134 3530.34,-134 3547.72,-134"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="3547.85,-137.5 3557.85,-134 3547.85,-130.5 3547.85,-137.5"/>
+</g>
+<!-- interface~dlerp_abst_fe -->
+<g id="interface~~matvec~~CalledByGraph_node11" class="node">
+<title>interface~dlerp_abst_fe</title>
+<g id="a_interface~~matvec~~CalledByGraph_node11"><a xlink:href="../interface/dlerp_abst_fe.html" xlink:title="abst_fe%dlerp_abst_fe">
+<polygon fill="#a7506f" stroke="#a7506f" points="1803.5,-268 1671.5,-268 1671.5,-244 1803.5,-244 1803.5,-268"/>
+<text text-anchor="middle" x="1737.5" y="-253.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%dlerp_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- interface~dlerp_abst_fe&#45;&gt;proc~dlerp_abst_fe -->
+<g id="interface~~matvec~~CalledByGraph_edge10" class="edge">
+<title>interface~dlerp_abst_fe&#45;&gt;proc~dlerp_abst_fe</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1803.78,-256C1953.91,-256 2321.23,-256 2456.72,-256"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2456.82,-259.5 2466.82,-256 2456.82,-252.5 2456.82,-259.5"/>
+</g>
+<!-- interface~solve_type_solver_bicgstab -->
+<g id="interface~~matvec~~CalledByGraph_node12" class="node">
+<title>interface~solve_type_solver_bicgstab</title>
+<g id="a_interface~~matvec~~CalledByGraph_node12"><a xlink:href="../interface/solve_type_solver_bicgstab.html" xlink:title="type_solver_bicgstab%solve_type_solver_bicgstab">
+<polygon fill="#a7506f" stroke="#a7506f" points="3522,-66 3245,-66 3245,-42 3522,-42 3522,-66"/>
+<text text-anchor="middle" x="3383.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_solver_bicgstab%solve_type_solver_bicgstab</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_type_solver_bicgstab&#45;&gt;proc~solve_type_solver_bicgstab -->
+<g id="interface~~matvec~~CalledByGraph_edge11" class="edge">
+<title>interface~solve_type_solver_bicgstab&#45;&gt;proc~solve_type_solver_bicgstab</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M3522.34,-54C3533.6,-54 3544.78,-54 3555.53,-54"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="3555.69,-57.5 3565.69,-54 3555.69,-50.5 3555.69,-57.5"/>
+</g>
+<!-- interface~solve_type_solver_gmres -->
+<g id="interface~~matvec~~CalledByGraph_node13" class="node">
+<title>interface~solve_type_solver_gmres</title>
+<g id="a_interface~~matvec~~CalledByGraph_node13"><a xlink:href="../interface/solve_type_solver_gmres.html" xlink:title="type_solver_gmres%solve_type_solver_gmres">
+<polygon fill="#a7506f" stroke="#a7506f" points="3510,-24 3257,-24 3257,0 3510,0 3510,-24"/>
+<text text-anchor="middle" x="3383.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_solver_gmres%solve_type_solver_gmres</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_type_solver_gmres&#45;&gt;proc~solve_type_solver_gmres -->
+<g id="interface~~matvec~~CalledByGraph_edge12" class="edge">
+<title>interface~solve_type_solver_gmres&#45;&gt;proc~solve_type_solver_gmres</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M3510.21,-12C3527.71,-12 3545.31,-12 3561.72,-12"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="3561.77,-15.5 3571.77,-12 3561.77,-8.5 3561.77,-15.5"/>
+</g>
+<!-- none~compute_k2~2 -->
+<g id="interface~~matvec~~CalledByGraph_node14" class="node">
+<title>none~compute_k2~2</title>
+<g id="a_interface~~matvec~~CalledByGraph_node14"><a xlink:href="../type/abst_fe.html#boundprocedure-compute_k2~2" xlink:title="abst_fe%compute_K2">
+<polygon fill="#a7506f" stroke="#a7506f" points="3209,-146 3082,-146 3082,-122 3209,-122 3209,-146"/>
+<text text-anchor="middle" x="3145.5" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%compute_K2</text>
+</a>
+</g>
+</g>
+<!-- none~compute_k2~2&#45;&gt;interface~compute_k2_diffusion_abst_fe -->
+<g id="interface~~matvec~~CalledByGraph_edge15" class="edge">
+<title>none~compute_k2~2&#45;&gt;interface~compute_k2_diffusion_abst_fe</title>
+<path fill="none" stroke="#00ff00" d="M3209.12,-134C3225.6,-134 3243.94,-134 3262.35,-134"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="3262.57,-137.5 3272.57,-134 3262.57,-130.5 3262.57,-137.5"/>
+</g>
+<!-- proc~assemble_local_hydraulic -->
+<g id="interface~~matvec~~CalledByGraph_node15" class="node">
+<title>proc~assemble_local_hydraulic</title>
+<g id="a_interface~~matvec~~CalledByGraph_node15"><a xlink:href="../proc/assemble_local_hydraulic.html" xlink:title="assemble_local_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="1812,-123 1663,-123 1663,-99 1812,-99 1812,-123"/>
+<text text-anchor="middle" x="1737.5" y="-108.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_newton_hydraulic -->
+<g id="interface~~matvec~~CalledByGraph_edge13" class="edge">
+<title>proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_newton_hydraulic</title>
+<path fill="none" stroke="#ff0000" d="M1812.2,-104.78C1820.34,-104.1 1828.83,-103.38 1837.5,-102.65"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1838.07,-106.12 1847.74,-101.79 1837.48,-99.14 1838.07,-106.12"/>
+</g>
+<!-- interface~assemble_local_picard_hydraulic -->
+<g id="interface~~matvec~~CalledByGraph_node32" class="node">
+<title>interface~assemble_local_picard_hydraulic</title>
+<g id="a_interface~~matvec~~CalledByGraph_node32"><a xlink:href="../interface/assemble_local_picard_hydraulic.html" xlink:title="type_hydraulic%assemble_local_picard_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="2126.5,-144 1850.5,-144 1850.5,-120 2126.5,-120 2126.5,-144"/>
+<text text-anchor="middle" x="1988.5" y="-129.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%assemble_local_picard_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_picard_hydraulic -->
+<g id="interface~~matvec~~CalledByGraph_edge38" class="edge">
+<title>proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_picard_hydraulic</title>
+<path fill="none" stroke="#00ff00" d="M1812.2,-117.22C1821.14,-117.97 1830.5,-118.76 1840.05,-119.56"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1839.8,-123.06 1850.06,-120.41 1840.39,-116.08 1839.8,-123.06"/>
+</g>
+<!-- proc~assemble_local_thermal -->
+<g id="interface~~matvec~~CalledByGraph_node16" class="node">
+<title>proc~assemble_local_thermal</title>
+<g id="a_interface~~matvec~~CalledByGraph_node16"><a xlink:href="../proc/assemble_local_thermal.html" xlink:title="assemble_local_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="1808.5,-206 1666.5,-206 1666.5,-182 1808.5,-182 1808.5,-206"/>
+<text text-anchor="middle" x="1737.5" y="-191.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_thermal&#45;&gt;interface~assemble_local_newton_thermal -->
+<g id="interface~~matvec~~CalledByGraph_edge14" class="edge">
+<title>proc~assemble_local_thermal&#45;&gt;interface~assemble_local_newton_thermal</title>
+<path fill="none" stroke="#ffff00" d="M1808.52,-200.19C1820.1,-201.21 1832.46,-202.3 1845.07,-203.42"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="1844.96,-206.92 1855.23,-204.31 1845.57,-199.95 1844.96,-206.92"/>
+</g>
+<!-- interface~assemble_local_picard_thermal -->
+<g id="interface~~matvec~~CalledByGraph_node33" class="node">
+<title>interface~assemble_local_picard_thermal</title>
+<g id="a_interface~~matvec~~CalledByGraph_node33"><a xlink:href="../interface/assemble_local_picard_thermal.html" xlink:title="type_thermal%assemble_local_picard_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="2119,-186 1858,-186 1858,-162 2119,-162 2119,-186"/>
+<text text-anchor="middle" x="1988.5" y="-171.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%assemble_local_picard_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_thermal&#45;&gt;interface~assemble_local_picard_thermal -->
+<g id="interface~~matvec~~CalledByGraph_edge39" class="edge">
+<title>proc~assemble_local_thermal&#45;&gt;interface~assemble_local_picard_thermal</title>
+<path fill="none" stroke="#0000ff" d="M1808.52,-188.38C1820.79,-187.39 1833.93,-186.33 1847.32,-185.26"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1847.91,-188.72 1857.6,-184.43 1847.35,-181.75 1847.91,-188.72"/>
+</g>
+<!-- proc~dlerp_domain -->
+<g id="interface~~matvec~~CalledByGraph_node17" class="node">
+<title>proc~dlerp_domain</title>
+<g id="a_interface~~matvec~~CalledByGraph_node17"><a xlink:href="../proc/dlerp_domain.html" xlink:title="type_domain%dlerp_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="1591,-290 1426,-290 1426,-266 1591,-266 1591,-290"/>
+<text text-anchor="middle" x="1508.5" y="-275.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%dlerp_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~dlerp_domain&#45;&gt;interface~dlerp_abst_fe -->
+<g id="interface~~matvec~~CalledByGraph_edge16" class="edge">
+<title>proc~dlerp_domain&#45;&gt;interface~dlerp_abst_fe</title>
+<path fill="none" stroke="#00ffff" d="M1591.13,-270.09C1613.95,-267.88 1638.63,-265.48 1661.08,-263.31"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1661.6,-266.78 1671.21,-262.33 1660.92,-259.81 1661.6,-266.78"/>
+</g>
+<!-- proc~lerp_states -->
+<g id="interface~~matvec~~CalledByGraph_node18" class="node">
+<title>proc~lerp_states</title>
+<g id="a_interface~~matvec~~CalledByGraph_node18"><a xlink:href="../proc/lerp_states.html" xlink:title="type_assemble_workspace%lerp_states">
+<polygon fill="#d9534f" stroke="#d9534f" points="1619.5,-248 1397.5,-248 1397.5,-224 1619.5,-224 1619.5,-248"/>
+<text text-anchor="middle" x="1508.5" y="-233.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assemble_workspace%lerp_states</text>
+</a>
+</g>
+</g>
+<!-- proc~lerp_states&#45;&gt;interface~dlerp_abst_fe -->
+<g id="interface~~matvec~~CalledByGraph_edge17" class="edge">
+<title>proc~lerp_states&#45;&gt;interface~dlerp_abst_fe</title>
+<path fill="none" stroke="#00ffff" d="M1619.68,-245.71C1633.81,-246.95 1648.01,-248.2 1661.4,-249.38"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1661.2,-252.88 1671.47,-250.27 1661.82,-245.91 1661.2,-252.88"/>
+</g>
+<!-- interface~assemble_local_hydraulic -->
+<g id="interface~~matvec~~CalledByGraph_node19" class="node">
+<title>interface~assemble_local_hydraulic</title>
+<g id="a_interface~~matvec~~CalledByGraph_node19"><a xlink:href="../interface/assemble_local_hydraulic.html" xlink:title="type_hydraulic%assemble_local_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="1627,-123 1390,-123 1390,-99 1627,-99 1627,-123"/>
+<text text-anchor="middle" x="1508.5" y="-108.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%assemble_local_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_hydraulic&#45;&gt;proc~assemble_local_hydraulic -->
+<g id="interface~~matvec~~CalledByGraph_edge20" class="edge">
+<title>interface~assemble_local_hydraulic&#45;&gt;proc~assemble_local_hydraulic</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M1627.32,-111C1635.92,-111 1644.48,-111 1652.81,-111"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1652.85,-114.5 1662.85,-111 1652.85,-107.5 1652.85,-114.5"/>
+</g>
+<!-- interface~assemble_local_thermal -->
+<g id="interface~~matvec~~CalledByGraph_node20" class="node">
+<title>interface~assemble_local_thermal</title>
+<g id="a_interface~~matvec~~CalledByGraph_node20"><a xlink:href="../interface/assemble_local_thermal.html" xlink:title="type_thermal%assemble_local_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="1619.5,-206 1397.5,-206 1397.5,-182 1619.5,-182 1619.5,-206"/>
+<text text-anchor="middle" x="1508.5" y="-191.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%assemble_local_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_thermal&#45;&gt;proc~assemble_local_thermal -->
+<g id="interface~~matvec~~CalledByGraph_edge21" class="edge">
+<title>interface~assemble_local_thermal&#45;&gt;proc~assemble_local_thermal</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M1619.68,-194C1631.99,-194 1644.37,-194 1656.21,-194"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1656.46,-197.5 1666.46,-194 1656.46,-190.5 1656.46,-197.5"/>
+</g>
+<!-- proc~assemble_initialize_ftdss -->
+<g id="interface~~matvec~~CalledByGraph_node21" class="node">
+<title>proc~assemble_initialize_ftdss</title>
+<g id="a_interface~~matvec~~CalledByGraph_node21"><a xlink:href="../proc/assemble_initialize_ftdss.html" xlink:title="assemble_initialize_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1354,-248 1211,-248 1211,-224 1354,-224 1354,-248"/>
+<text text-anchor="middle" x="1282.5" y="-233.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_initialize_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_initialize_ftdss&#45;&gt;proc~lerp_states -->
+<g id="interface~~matvec~~CalledByGraph_edge22" class="edge">
+<title>proc~assemble_initialize_ftdss&#45;&gt;proc~lerp_states</title>
+<path fill="none" stroke="#cc00ff" d="M1354.07,-236C1364.57,-236 1375.65,-236 1386.83,-236"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1387.13,-239.5 1397.13,-236 1387.13,-232.5 1387.13,-239.5"/>
+</g>
+<!-- proc~compute_k2_assemble_workspace -->
+<g id="interface~~matvec~~CalledByGraph_node22" class="node">
+<title>proc~compute_k2_assemble_workspace</title>
+<g id="a_interface~~matvec~~CalledByGraph_node22"><a xlink:href="../proc/compute_k2_assemble_workspace.html" xlink:title="type_assemble_workspace%compute_K2_assemble_workspace">
+<polygon fill="#d9534f" stroke="#d9534f" points="3027.5,-188 2678.5,-188 2678.5,-164 3027.5,-164 3027.5,-188"/>
+<text text-anchor="middle" x="2853" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assemble_workspace%compute_K2_assemble_workspace</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_k2_assemble_workspace&#45;&gt;none~compute_k2~2 -->
+<g id="interface~~matvec~~CalledByGraph_edge18" class="edge">
+<title>proc~compute_k2_assemble_workspace&#45;&gt;none~compute_k2~2</title>
+<path fill="none" stroke="#ff0000" d="M2980.76,-163.97C3002.57,-161.38 3024.98,-158.38 3046,-155 3057.94,-153.08 3070.61,-150.67 3082.75,-148.16"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3083.73,-151.53 3092.8,-146.05 3082.29,-144.68 3083.73,-151.53"/>
+</g>
+<!-- proc~compute_k2_scalar_assemble_workspace -->
+<g id="interface~~matvec~~CalledByGraph_node23" class="node">
+<title>proc~compute_k2_scalar_assemble_workspace</title>
+<g id="a_interface~~matvec~~CalledByGraph_node23"><a xlink:href="../proc/compute_k2_scalar_assemble_workspace.html" xlink:title="type_assemble_workspace%compute_K2_scalar_assemble_workspace">
+<polygon fill="#d9534f" stroke="#d9534f" points="3046,-146 2660,-146 2660,-122 3046,-122 3046,-146"/>
+<text text-anchor="middle" x="2853" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assemble_workspace%compute_K2_scalar_assemble_workspace</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_k2_scalar_assemble_workspace&#45;&gt;none~compute_k2~2 -->
+<g id="interface~~matvec~~CalledByGraph_edge19" class="edge">
+<title>proc~compute_k2_scalar_assemble_workspace&#45;&gt;none~compute_k2~2</title>
+<path fill="none" stroke="#ff0000" d="M3046.15,-134C3054.98,-134 3063.55,-134 3071.71,-134"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3071.81,-137.5 3081.81,-134 3071.81,-130.5 3071.81,-137.5"/>
+</g>
+<!-- interface~assemble_initialize_ftdss -->
+<g id="interface~~matvec~~CalledByGraph_node24" class="node">
+<title>interface~assemble_initialize_ftdss</title>
+<g id="a_interface~~matvec~~CalledByGraph_node24"><a xlink:href="../interface/assemble_initialize_ftdss.html" xlink:title="type_ftdss%assemble_initialize_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1175,-248 969,-248 969,-224 1175,-224 1175,-248"/>
+<text text-anchor="middle" x="1072" y="-233.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_initialize_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_initialize_ftdss&#45;&gt;proc~assemble_initialize_ftdss -->
+<g id="interface~~matvec~~CalledByGraph_edge24" class="edge">
+<title>interface~assemble_initialize_ftdss&#45;&gt;proc~assemble_initialize_ftdss</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M1175.11,-236C1183.69,-236 1192.3,-236 1200.68,-236"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1200.79,-239.5 1210.79,-236 1200.79,-232.5 1200.79,-239.5"/>
+</g>
+<!-- none~compute_k2&#45;&gt;proc~compute_k2_assemble_workspace -->
+<g id="interface~~matvec~~CalledByGraph_edge25" class="edge">
+<title>none~compute_k2&#45;&gt;proc~compute_k2_assemble_workspace</title>
+<path fill="none" stroke="#0066ff" d="M2624.36,-161.36C2638.48,-162.26 2653.18,-163.21 2668.01,-164.16"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="2668.09,-167.68 2678.3,-164.83 2668.54,-160.69 2668.09,-167.68"/>
+</g>
+<!-- none~compute_k2&#45;&gt;proc~compute_k2_scalar_assemble_workspace -->
+<g id="interface~~matvec~~CalledByGraph_edge26" class="edge">
+<title>none~compute_k2&#45;&gt;proc~compute_k2_scalar_assemble_workspace</title>
+<path fill="none" stroke="#cc00ff" d="M2624.36,-147.31C2632.66,-146.83 2641.17,-146.33 2649.78,-145.83"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="2650.16,-149.31 2659.94,-145.23 2649.75,-142.32 2650.16,-149.31"/>
+</g>
+<!-- proc~assemble_local_ftdss -->
+<g id="interface~~matvec~~CalledByGraph_node26" class="node">
+<title>proc~assemble_local_ftdss</title>
+<g id="a_interface~~matvec~~CalledByGraph_node26"><a xlink:href="../proc/assemble_local_ftdss.html" xlink:title="assemble_local_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1344.5,-206 1220.5,-206 1220.5,-182 1344.5,-182 1344.5,-206"/>
+<text text-anchor="middle" x="1282.5" y="-191.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_ftdss&#45;&gt;interface~assemble_local_thermal -->
+<g id="interface~~matvec~~CalledByGraph_edge23" class="edge">
+<title>proc~assemble_local_ftdss&#45;&gt;interface~assemble_local_thermal</title>
+<path fill="none" stroke="#cbff00" d="M1344.71,-194C1357.97,-194 1372.44,-194 1387.1,-194"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1387.26,-197.5 1397.26,-194 1387.26,-190.5 1387.26,-197.5"/>
+</g>
+<!-- interface~assemble_local_ftdss -->
+<g id="interface~~matvec~~CalledByGraph_node27" class="node">
+<title>interface~assemble_local_ftdss</title>
+<g id="a_interface~~matvec~~CalledByGraph_node27"><a xlink:href="../interface/assemble_local_ftdss.html" xlink:title="type_ftdss%assemble_local_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1165.5,-206 978.5,-206 978.5,-182 1165.5,-182 1165.5,-206"/>
+<text text-anchor="middle" x="1072" y="-191.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_local_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_ftdss&#45;&gt;proc~assemble_local_ftdss -->
+<g id="interface~~matvec~~CalledByGraph_edge32" class="edge">
+<title>interface~assemble_local_ftdss&#45;&gt;proc~assemble_local_ftdss</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M1165.67,-194C1180.54,-194 1195.74,-194 1210.02,-194"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1210.24,-197.5 1220.24,-194 1210.24,-190.5 1210.24,-197.5"/>
+</g>
+<!-- proc~assemble_ftdss -->
+<g id="interface~~matvec~~CalledByGraph_node28" class="node">
+<title>proc~assemble_ftdss</title>
+<g id="a_interface~~matvec~~CalledByGraph_node28"><a xlink:href="../proc/assemble_ftdss.html" xlink:title="assemble_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="933,-227 839,-227 839,-203 933,-203 933,-227"/>
+<text text-anchor="middle" x="886" y="-212.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_ftdss&#45;&gt;interface~assemble_initialize_ftdss -->
+<g id="interface~~matvec~~CalledByGraph_edge27" class="edge">
+<title>proc~assemble_ftdss&#45;&gt;interface~assemble_initialize_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M933.43,-220.3C941.4,-221.21 949.98,-222.19 958.81,-223.2"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="958.55,-226.69 968.89,-224.35 959.35,-219.73 958.55,-226.69"/>
+</g>
+<!-- proc~assemble_ftdss&#45;&gt;interface~assemble_local_ftdss -->
+<g id="interface~~matvec~~CalledByGraph_edge33" class="edge">
+<title>proc~assemble_ftdss&#45;&gt;interface~assemble_local_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M933.43,-209.7C944.16,-208.48 956,-207.13 968.09,-205.75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="968.75,-209.19 978.28,-204.58 967.95,-202.24 968.75,-209.19"/>
+</g>
+<!-- proc~assemble_local_picard_hydraulic -->
+<g id="interface~~matvec~~CalledByGraph_node29" class="node">
+<title>proc~assemble_local_picard_hydraulic</title>
+<g id="a_interface~~matvec~~CalledByGraph_node29"><a xlink:href="../proc/assemble_local_picard_hydraulic.html" xlink:title="assemble_local_picard_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="2355.5,-144 2167.5,-144 2167.5,-120 2355.5,-120 2355.5,-144"/>
+<text text-anchor="middle" x="2261.5" y="-129.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_picard_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_picard_hydraulic&#45;&gt;none~compute_k2 -->
+<g id="interface~~matvec~~CalledByGraph_edge30" class="edge">
+<title>proc~assemble_local_picard_hydraulic&#45;&gt;none~compute_k2</title>
+<path fill="none" stroke="#00ff00" d="M2355.66,-140.35C2364.83,-141.17 2374.23,-142.01 2383.64,-142.86"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="2383.57,-146.36 2393.84,-143.77 2384.2,-139.39 2383.57,-146.36"/>
+</g>
+<!-- proc~assemble_local_picard_thermal -->
+<g id="interface~~matvec~~CalledByGraph_node30" class="node">
+<title>proc~assemble_local_picard_thermal</title>
+<g id="a_interface~~matvec~~CalledByGraph_node30"><a xlink:href="../proc/assemble_local_picard_thermal.html" xlink:title="assemble_local_picard_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="2352,-186 2171,-186 2171,-162 2352,-162 2352,-186"/>
+<text text-anchor="middle" x="2261.5" y="-171.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_picard_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_picard_thermal&#45;&gt;none~compute_k2 -->
+<g id="interface~~matvec~~CalledByGraph_edge31" class="edge">
+<title>proc~assemble_local_picard_thermal&#45;&gt;none~compute_k2</title>
+<path fill="none" stroke="#00ff00" d="M2352.17,-166.69C2362.45,-165.86 2373.06,-164.99 2383.69,-164.13"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="2384.19,-167.6 2393.87,-163.3 2383.62,-160.62 2384.19,-167.6"/>
+</g>
+<!-- interface~assemble_ftdss -->
+<g id="interface~~matvec~~CalledByGraph_node31" class="node">
+<title>interface~assemble_ftdss</title>
+<g id="a_interface~~matvec~~CalledByGraph_node31"><a xlink:href="../interface/assemble_ftdss.html" xlink:title="type_ftdss%assemble_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="803,-227 646,-227 646,-203 803,-203 803,-227"/>
+<text text-anchor="middle" x="724.5" y="-212.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss -->
+<g id="interface~~matvec~~CalledByGraph_edge34" class="edge">
+<title>interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M803.38,-215C811.94,-215 820.54,-215 828.76,-215"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="828.95,-218.5 838.95,-215 828.95,-211.5 828.95,-218.5"/>
+</g>
+<!-- interface~assemble_local_picard_hydraulic&#45;&gt;proc~assemble_local_picard_hydraulic -->
+<g id="interface~~matvec~~CalledByGraph_edge35" class="edge">
+<title>interface~assemble_local_picard_hydraulic&#45;&gt;proc~assemble_local_picard_hydraulic</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M2126.59,-132C2136.82,-132 2147.04,-132 2157.01,-132"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2157.31,-135.5 2167.31,-132 2157.31,-128.5 2157.31,-135.5"/>
+</g>
+<!-- interface~assemble_local_picard_thermal&#45;&gt;proc~assemble_local_picard_thermal -->
+<g id="interface~~matvec~~CalledByGraph_edge36" class="edge">
+<title>interface~assemble_local_picard_thermal&#45;&gt;proc~assemble_local_picard_thermal</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M2119.05,-174C2133.04,-174 2147.11,-174 2160.67,-174"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="2160.93,-177.5 2170.93,-174 2160.93,-170.5 2160.93,-177.5"/>
+</g>
+<!-- proc~solve_time_step_ftdss -->
+<g id="interface~~matvec~~CalledByGraph_node34" class="node">
+<title>proc~solve_time_step_ftdss</title>
+<g id="a_interface~~matvec~~CalledByGraph_node34"><a xlink:href="../proc/solve_time_step_ftdss.html" xlink:title="solve_time_step_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="610,-227 483,-227 483,-203 610,-203 610,-227"/>
+<text text-anchor="middle" x="546.5" y="-212.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss -->
+<g id="interface~~matvec~~CalledByGraph_edge37" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M610.05,-215C618.36,-215 627,-215 635.63,-215"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="635.75,-218.5 645.75,-215 635.75,-211.5 635.75,-218.5"/>
+</g>
+<!-- interface~solve_time_step_ftdss -->
+<g id="interface~~matvec~~CalledByGraph_node35" class="node">
+<title>interface~solve_time_step_ftdss</title>
+<g id="a_interface~~matvec~~CalledByGraph_node35"><a xlink:href="../interface/solve_time_step_ftdss.html" xlink:title="type_ftdss%solve_time_step_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="447,-227 257,-227 257,-203 447,-203 447,-227"/>
+<text text-anchor="middle" x="352" y="-212.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss -->
+<g id="interface~~matvec~~CalledByGraph_edge40" class="edge">
+<title>interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M447.28,-215C455.88,-215 464.5,-215 472.87,-215"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="472.93,-218.5 482.93,-215 472.93,-211.5 472.93,-218.5"/>
+</g>
+<!-- proc~run_ftdss -->
+<g id="interface~~matvec~~CalledByGraph_node36" class="node">
+<title>proc~run_ftdss</title>
+<g id="a_interface~~matvec~~CalledByGraph_node36"><a xlink:href="../proc/run_ftdss.html" xlink:title="run_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-227 160,-227 160,-203 221,-203 221,-227"/>
+<text text-anchor="middle" x="190.5" y="-212.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss -->
+<g id="interface~~matvec~~CalledByGraph_edge41" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M221.13,-215C228.8,-215 237.52,-215 246.72,-215"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="246.86,-218.5 256.86,-215 246.86,-211.5 246.86,-218.5"/>
+</g>
+<!-- interface~run_ftdss -->
+<g id="interface~~matvec~~CalledByGraph_node37" class="node">
+<title>interface~run_ftdss</title>
+<g id="a_interface~~matvec~~CalledByGraph_node37"><a xlink:href="../interface/run_ftdss.html" xlink:title="type_ftdss%run_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="124,-227 0,-227 0,-203 124,-203 124,-227"/>
+<text text-anchor="middle" x="62" y="-212.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftdss&#45;&gt;proc~run_ftdss -->
+<g id="interface~~matvec~~CalledByGraph_edge42" class="edge">
+<title>interface~run_ftdss&#45;&gt;proc~run_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M124.03,-215C132.82,-215 141.68,-215 149.91,-215"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="149.94,-218.5 159.94,-215 149.94,-211.5 149.94,-218.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacematvecCalledByGraph = svgPanZoom('#interfacematvecCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+          </div>
+        </div>
+<br>
+
+
+        <h2>Module Procedures</h2>
+            <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-matvec_real64"></span> <h3>private  subroutine <a href='../proc/matvec_real64.html'>matvec_real64</a>(A, x, y, ierr)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Compute matrix-vector multiplication <script type="math/tex"> y = A x </script>.
+Wrapper for GEMV with <script type="math/tex"> \alpha = 1, \beta = 0 </script>.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~35"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong>(:,:)</td>
+            <td>
+<p>System matrix A</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-x~58"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>x</strong>(:)</td>
+            <td>
+<p>Input vector x</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-y~36"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>y</strong>(:)</td>
+            <td>
+<p>Output vector y</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ierr~51"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ierr</strong></td>
+            <td>
+<p>Error status</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+            <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-matvec_matrix"></span> <h3>private  subroutine <a href='../proc/matvec_matrix.html'>matvec_matrix</a>(A, x, y, ierr)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Compute matrix-vector multiplication <script type="math/tex"> y = A x </script>.
+Wrapper for GEMV with <script type="math/tex"> \alpha = 1, \beta = 0 </script>.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~36"></span>
+              class(<a href='../type/abst_matrix.html'>abst_matrix</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+<p>System matrix A</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-x~59"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>x</strong></td>
+            <td>
+<p>Input vector x</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-y~37"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>y</strong></td>
+            <td>
+<p>Output vector y</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ierr~52"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ierr</strong></td>
+            <td>
+<p>Error status</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+</div>
+  </div>
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

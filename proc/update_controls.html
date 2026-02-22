@@ -1,0 +1,725 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>update_controls &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>update_controls
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">24 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/control.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/control.f90.html'>control.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/module_control.html'>module_control</a></li>
+            <li class="breadcrumb-item active" aria-current="page">update_controls</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/update_controls.html#src">update_controls</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine update_controls(self, success)  
+</h2>
+    
+
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_controls.html'>type_controls</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~452"></span>
+              class(<a href='../type/type_controls.html'>type_controls</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-success"></span>
+              logical,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>success</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~update_controls~~CallsGraph Pages: 1 -->
+<svg id="procupdate_controlsCallsGraph" width="641pt" height="256pt"
+ viewBox="0.00 0.00 641.00 255.84" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~update_controls~~CallsGraph" class="graph" transform="scale(0.7 0.7) rotate(0) translate(4 364)">
+<title>proc~~update_controls~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-364 918,-364 918,4 -4,4"/>
+<!-- proc~update_controls -->
+<g id="proc~~update_controls~~CallsGraph_node1" class="node">
+<title>proc~update_controls</title>
+<polygon fill="none" stroke="black" points="178,-234 0,-234 0,-210 178,-210 178,-234"/>
+<text text-anchor="middle" x="89" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_controls%update_controls</text>
+</g>
+<!-- proc~get_dt -->
+<g id="proc~~update_controls~~CallsGraph_node2" class="node">
+<title>proc~get_dt</title>
+<g id="a_proc~~update_controls~~CallsGraph_node2"><a xlink:href="../proc/get_dt.html" xlink:title="type_time%get_dt">
+<polygon fill="#d9534f" stroke="#d9534f" points="393.5,-360 285.5,-360 285.5,-336 393.5,-336 393.5,-360"/>
+<text text-anchor="middle" x="339.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time%get_dt</text>
+</a>
+</g>
+</g>
+<!-- proc~update_controls&#45;&gt;proc~get_dt -->
+<g id="proc~~update_controls~~CallsGraph_edge1" class="edge">
+<title>proc~update_controls&#45;&gt;proc~get_dt</title>
+<path fill="none" stroke="#ff0000" d="M100.16,-234.13C119.69,-256.53 164.88,-304.18 214,-327 232.96,-335.81 255.08,-340.97 275.37,-343.98"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="275.09,-347.47 285.47,-345.32 276.02,-340.53 275.09,-347.47"/>
+</g>
+<!-- proc~get_end_time -->
+<g id="proc~~update_controls~~CallsGraph_node3" class="node">
+<title>proc~get_end_time</title>
+<g id="a_proc~~update_controls~~CallsGraph_node3"><a xlink:href="../proc/get_end_time.html" xlink:title="type_time%get_end_time">
+<polygon fill="#d9534f" stroke="#d9534f" points="413,-318 266,-318 266,-294 413,-294 413,-318"/>
+<text text-anchor="middle" x="339.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time%get_end_time</text>
+</a>
+</g>
+</g>
+<!-- proc~update_controls&#45;&gt;proc~get_end_time -->
+<g id="proc~~update_controls~~CallsGraph_edge2" class="edge">
+<title>proc~update_controls&#45;&gt;proc~get_end_time</title>
+<path fill="none" stroke="#ff0000" d="M109.38,-234.2C133.13,-248.58 175.02,-272.14 214,-285 227.23,-289.36 241.57,-292.86 255.65,-295.64"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="255.36,-299.15 265.84,-297.54 256.65,-292.27 255.36,-299.15"/>
+</g>
+<!-- proc~get_next_target_time -->
+<g id="proc~~update_controls~~CallsGraph_node4" class="node">
+<title>proc~get_next_target_time</title>
+<g id="a_proc~~update_controls~~CallsGraph_node4"><a xlink:href="../proc/get_next_target_time.html" xlink:title="type_output_manager%get_next_target_time">
+<polygon fill="#d9534f" stroke="#d9534f" points="465,-276 214,-276 214,-252 465,-252 465,-276"/>
+<text text-anchor="middle" x="339.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output_manager%get_next_target_time</text>
+</a>
+</g>
+</g>
+<!-- proc~update_controls&#45;&gt;proc~get_next_target_time -->
+<g id="proc~~update_controls~~CallsGraph_edge3" class="edge">
+<title>proc~update_controls&#45;&gt;proc~get_next_target_time</title>
+<path fill="none" stroke="#ff0000" d="M160.82,-234C178.21,-236.95 196.78,-240.09 214,-243 227.96,-245.36 242.8,-247.87 257.19,-250.29"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="256.62,-253.75 267.07,-251.96 257.79,-246.84 256.62,-253.75"/>
+</g>
+<!-- proc~get_nonlinear_iter -->
+<g id="proc~~update_controls~~CallsGraph_node5" class="node">
+<title>proc~get_nonlinear_iter</title>
+<g id="a_proc~~update_controls~~CallsGraph_node5"><a xlink:href="../proc/get_nonlinear_iter.html" xlink:title="type_iteration%get_nonlinear_iter">
+<polygon fill="#d9534f" stroke="#d9534f" points="436,-234 243,-234 243,-210 436,-210 436,-234"/>
+<text text-anchor="middle" x="339.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%get_nonlinear_iter</text>
+</a>
+</g>
+</g>
+<!-- proc~update_controls&#45;&gt;proc~get_nonlinear_iter -->
+<g id="proc~~update_controls~~CallsGraph_edge4" class="edge">
+<title>proc~update_controls&#45;&gt;proc~get_nonlinear_iter</title>
+<path fill="none" stroke="#ff0000" d="M178.31,-222C195.97,-222 214.68,-222 232.85,-222"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="232.88,-225.5 242.88,-222 232.88,-218.5 232.88,-225.5"/>
+</g>
+<!-- proc~get_time -->
+<g id="proc~~update_controls~~CallsGraph_node6" class="node">
+<title>proc~get_time</title>
+<g id="a_proc~~update_controls~~CallsGraph_node6"><a xlink:href="../proc/get_time.html" xlink:title="type_time%get_time">
+<polygon fill="#d9534f" stroke="#d9534f" points="400,-192 279,-192 279,-168 400,-168 400,-192"/>
+<text text-anchor="middle" x="339.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time%get_time</text>
+</a>
+</g>
+</g>
+<!-- proc~update_controls&#45;&gt;proc~get_time -->
+<g id="proc~~update_controls~~CallsGraph_edge5" class="edge">
+<title>proc~update_controls&#45;&gt;proc~get_time</title>
+<path fill="none" stroke="#ff0000" d="M160.82,-210C178.21,-207.05 196.78,-203.91 214,-201 231.71,-198.01 250.83,-194.78 268.65,-191.77"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="269.69,-195.15 278.97,-190.03 268.53,-188.24 269.69,-195.15"/>
+</g>
+<!-- proc~is_enabled -->
+<g id="proc~~update_controls~~CallsGraph_node7" class="node">
+<title>proc~is_enabled</title>
+<g id="a_proc~~update_controls~~CallsGraph_node7"><a xlink:href="../proc/is_enabled.html" xlink:title="type_output_manager%is_enabled">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="437.5,-150 241.5,-150 241.5,-126 437.5,-126 437.5,-150"/>
+<text text-anchor="middle" x="339.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output_manager%is_enabled</text>
+</a>
+</g>
+</g>
+<!-- proc~update_controls&#45;&gt;proc~is_enabled -->
+<g id="proc~~update_controls~~CallsGraph_edge6" class="edge">
+<title>proc~update_controls&#45;&gt;proc~is_enabled</title>
+<path fill="none" stroke="#ff0000" d="M109.38,-209.8C133.13,-195.42 175.02,-171.86 214,-159 221.62,-156.49 229.61,-154.26 237.7,-152.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="238.65,-155.67 247.61,-150.02 237.08,-148.85 238.65,-155.67"/>
+</g>
+<!-- proc~update_type_time -->
+<g id="proc~~update_controls~~CallsGraph_node8" class="node">
+<title>proc~update_type_time</title>
+<g id="a_proc~~update_controls~~CallsGraph_node8"><a xlink:href="../proc/update_type_time.html" xlink:title="type_time%update_type_time">
+<polygon fill="#d9534f" stroke="#d9534f" points="424.5,-108 254.5,-108 254.5,-84 424.5,-84 424.5,-108"/>
+<text text-anchor="middle" x="339.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time%update_type_time</text>
+</a>
+</g>
+</g>
+<!-- proc~update_controls&#45;&gt;proc~update_type_time -->
+<g id="proc~~update_controls~~CallsGraph_edge7" class="edge">
+<title>proc~update_controls&#45;&gt;proc~update_type_time</title>
+<path fill="none" stroke="#ff0000" d="M100.16,-209.87C119.69,-187.47 164.88,-139.82 214,-117 223.59,-112.55 233.98,-109.02 244.54,-106.24"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="245.37,-109.64 254.26,-103.89 243.72,-102.84 245.37,-109.64"/>
+</g>
+<!-- proc~calc_retry_dt -->
+<g id="proc~~update_controls~~CallsGraph_node9" class="node">
+<title>proc~calc_retry_dt</title>
+<g id="a_proc~~update_controls~~CallsGraph_node9"><a xlink:href="../proc/calc_retry_dt.html" xlink:title="type_ats%calc_retry_dt">
+<polygon fill="#d9534f" stroke="#d9534f" points="651,-188 517,-188 517,-164 651,-164 651,-188"/>
+<text text-anchor="middle" x="584" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ats%calc_retry_dt</text>
+</a>
+</g>
+</g>
+<!-- proc~update_type_time&#45;&gt;proc~calc_retry_dt -->
+<g id="proc~~update_controls~~CallsGraph_edge8" class="edge">
+<title>proc~update_type_time&#45;&gt;proc~calc_retry_dt</title>
+<path fill="none" stroke="#ff00da" d="M424.61,-103.4C438.53,-106.52 452.49,-110.89 465,-117 484.5,-126.53 482.21,-139.13 501,-150 507.98,-154.04 515.67,-157.53 523.46,-160.53"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="522.37,-163.86 532.96,-163.94 524.73,-157.27 522.37,-163.86"/>
+</g>
+<!-- proc~compute_bdf_coefficients -->
+<g id="proc~~update_controls~~CallsGraph_node10" class="node">
+<title>proc~compute_bdf_coefficients</title>
+<g id="a_proc~~update_controls~~CallsGraph_node10"><a xlink:href="../proc/compute_bdf_coefficients.html" xlink:title="type_time%compute_bdf_coefficients">
+<polygon fill="#d9534f" stroke="#d9534f" points="914,-107 703,-107 703,-83 914,-83 914,-107"/>
+<text text-anchor="middle" x="808.5" y="-92.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time%compute_bdf_coefficients</text>
+</a>
+</g>
+</g>
+<!-- proc~update_type_time&#45;&gt;proc~compute_bdf_coefficients -->
+<g id="proc~~update_controls~~CallsGraph_edge9" class="edge">
+<title>proc~update_type_time&#45;&gt;proc~compute_bdf_coefficients</title>
+<path fill="none" stroke="#ff00da" d="M416.64,-108.02C443.25,-111.68 473.38,-115.2 501,-117 574.62,-121.8 593.44,-122.72 667,-117 688.99,-115.29 712.75,-112.09 734.36,-108.66"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="735.14,-112.07 744.45,-107.01 734.02,-105.16 735.14,-112.07"/>
+</g>
+<!-- proc~predict_next_dt -->
+<g id="proc~~update_controls~~CallsGraph_node11" class="node">
+<title>proc~predict_next_dt</title>
+<g id="a_proc~~update_controls~~CallsGraph_node11"><a xlink:href="../proc/predict_next_dt.html" xlink:title="type_ats%predict_next_dt">
+<polygon fill="#d9534f" stroke="#d9534f" points="657.5,-108 510.5,-108 510.5,-84 657.5,-84 657.5,-108"/>
+<text text-anchor="middle" x="584" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ats%predict_next_dt</text>
+</a>
+</g>
+</g>
+<!-- proc~update_type_time&#45;&gt;proc~predict_next_dt -->
+<g id="proc~~update_controls~~CallsGraph_edge10" class="edge">
+<title>proc~update_type_time&#45;&gt;proc~predict_next_dt</title>
+<path fill="none" stroke="#ff00da" d="M424.63,-96C449.05,-96 475.69,-96 500.04,-96"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="500.32,-99.5 510.32,-96 500.32,-92.5 500.32,-99.5"/>
+</g>
+<!-- proc~shift_time -->
+<g id="proc~~update_controls~~CallsGraph_node12" class="node">
+<title>proc~shift_time</title>
+<g id="a_proc~~update_controls~~CallsGraph_node12"><a xlink:href="../proc/shift_time.html" xlink:title="type_time%shift_time">
+<polygon fill="#d9534f" stroke="#d9534f" points="647.5,-66 520.5,-66 520.5,-42 647.5,-42 647.5,-66"/>
+<text text-anchor="middle" x="584" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time%shift_time</text>
+</a>
+</g>
+</g>
+<!-- proc~update_type_time&#45;&gt;proc~shift_time -->
+<g id="proc~~update_controls~~CallsGraph_edge11" class="edge">
+<title>proc~update_type_time&#45;&gt;proc~shift_time</title>
+<path fill="none" stroke="#ff00da" d="M409.99,-83.96C441.31,-78.54 478.3,-72.13 510.03,-66.64"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="510.87,-70.04 520.13,-64.89 509.68,-63.15 510.87,-70.04"/>
+</g>
+<!-- proc~sync_with_output -->
+<g id="proc~~update_controls~~CallsGraph_node13" class="node">
+<title>proc~sync_with_output</title>
+<g id="a_proc~~update_controls~~CallsGraph_node13"><a xlink:href="../proc/sync_with_output.html" xlink:title="type_time%sync_with_output">
+<polygon fill="#d9534f" stroke="#d9534f" points="667,-24 501,-24 501,0 667,0 667,-24"/>
+<text text-anchor="middle" x="584" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time%sync_with_output</text>
+</a>
+</g>
+</g>
+<!-- proc~update_type_time&#45;&gt;proc~sync_with_output -->
+<g id="proc~~update_controls~~CallsGraph_edge12" class="edge">
+<title>proc~update_type_time&#45;&gt;proc~sync_with_output</title>
+<path fill="none" stroke="#ff00da" d="M368.24,-83.9C399.94,-70.36 453.57,-48.32 501,-33 507.83,-30.8 515.03,-28.67 522.22,-26.67"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="523.24,-30.02 531.98,-24.03 521.41,-23.26 523.24,-30.02"/>
+</g>
+<!-- proc~shift_time&#45;&gt;proc~compute_bdf_coefficients -->
+<g id="proc~~update_controls~~CallsGraph_edge13" class="edge">
+<title>proc~shift_time&#45;&gt;proc~compute_bdf_coefficients</title>
+<path fill="none" stroke="#0066ff" d="M647.57,-65.53C673.9,-70.38 704.76,-76.07 732.31,-81.15"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="731.83,-84.62 742.3,-82.99 733.1,-77.73 731.83,-84.62"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocupdate_controlsCallsGraph = svgPanZoom('#procupdate_controlsCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~update_controls~~CalledByGraph Pages: 1 -->
+<svg id="procupdate_controlsCalledByGraph" width="443pt" height="32pt"
+ viewBox="0.00 0.00 443.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~update_controls~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~update_controls~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 439,-28 439,4 -4,4"/>
+<!-- proc~update_controls -->
+<g id="proc~~update_controls~~CalledByGraph_node1" class="node">
+<title>proc~update_controls</title>
+<polygon fill="none" stroke="black" points="435,-24 257,-24 257,0 435,0 435,-24"/>
+<text text-anchor="middle" x="346" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_controls%update_controls</text>
+</g>
+<!-- proc~run_ftdss -->
+<g id="proc~~update_controls~~CalledByGraph_node2" class="node">
+<title>proc~run_ftdss</title>
+<g id="a_proc~~update_controls~~CalledByGraph_node2"><a xlink:href="../proc/run_ftdss.html" xlink:title="run_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-24 160,-24 160,0 221,0 221,-24"/>
+<text text-anchor="middle" x="190.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftdss&#45;&gt;proc~update_controls -->
+<g id="proc~~update_controls~~CalledByGraph_edge1" class="edge">
+<title>proc~run_ftdss&#45;&gt;proc~update_controls</title>
+<path fill="none" stroke="#ff0000" d="M221.1,-12C228.77,-12 237.48,-12 246.63,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="246.71,-15.5 256.71,-12 246.71,-8.5 246.71,-15.5"/>
+</g>
+<!-- interface~run_ftdss -->
+<g id="proc~~update_controls~~CalledByGraph_node3" class="node">
+<title>interface~run_ftdss</title>
+<g id="a_proc~~update_controls~~CalledByGraph_node3"><a xlink:href="../interface/run_ftdss.html" xlink:title="type_ftdss%run_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="124,-24 0,-24 0,0 124,0 124,-24"/>
+<text text-anchor="middle" x="62" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftdss&#45;&gt;proc~run_ftdss -->
+<g id="proc~~update_controls~~CalledByGraph_edge2" class="edge">
+<title>interface~run_ftdss&#45;&gt;proc~run_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M124.03,-12C132.82,-12 141.68,-12 149.91,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="149.94,-15.5 159.94,-12 149.94,-8.5 149.94,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">update_controls</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">success</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_controls</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">success</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">iter_count</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">t_target</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">t_arrival</span><span class="w"> </span><span class="c">! 計算によって到達する時刻</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">t_target_out</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">current_time_s</span><span class="p">,</span><span class="w"> </span><span class="n">dt_s</span>
+
+<span class="w">        </span><span class="c">! 1. 反復回数の取得</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">iteration</span><span class="p">%</span><span class="n">get_nonlinear_iter</span><span class="p">(</span><span class="n">iter_count</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! 2. 到達予測時刻 (t_new = t_old + dt)</span>
+<span class="w">        </span><span class="c">!    成功していれば，この後 time%update で時刻がここまで進む</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="nb">time</span><span class="p">%</span><span class="n">get_time</span><span class="p">(</span><span class="n">current_time_s</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="nb">time</span><span class="p">%</span><span class="n">get_dt</span><span class="p">(</span><span class="n">dt_s</span><span class="p">)</span>
+<span class="w">        </span><span class="n">t_arrival</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_time_s</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dt_s</span>
+
+<span class="w">        </span><span class="c">! 3. ターゲット時刻の決定</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="nb">time</span><span class="p">%</span><span class="n">get_end_time</span><span class="p">(</span><span class="n">t_target</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! 到達時刻(300) を渡して，次のターゲット(600) を取得する</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">out_field</span><span class="p">%</span><span class="n">is_enabled</span><span class="p">())</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">out_field</span><span class="p">%</span><span class="n">get_next_target_time</span><span class="p">(</span><span class="n">t_arrival</span><span class="p">,</span><span class="w"> </span><span class="n">t_target_out</span><span class="p">)</span>
+<span class="w">            </span><span class="n">t_target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">min</span><span class="p">(</span><span class="n">t_target</span><span class="p">,</span><span class="w"> </span><span class="n">t_target_out</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">out_history</span><span class="p">%</span><span class="n">is_enabled</span><span class="p">())</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">out_history</span><span class="p">%</span><span class="n">get_next_target_time</span><span class="p">(</span><span class="n">t_arrival</span><span class="p">,</span><span class="w"> </span><span class="n">t_target_out</span><span class="p">)</span>
+<span class="w">            </span><span class="n">t_target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">min</span><span class="p">(</span><span class="n">t_target</span><span class="p">,</span><span class="w"> </span><span class="n">t_target_out</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="w">        </span><span class="c">! 4. 更新実行 (t_target=600 なので，残り300に合わせて dt が制限される)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="nb">time</span><span class="p">%</span><span class="n">update</span><span class="p">(</span><span class="n">success</span><span class="p">,</span><span class="w"> </span><span class="n">iter_count</span><span class="p">,</span><span class="w"> </span><span class="n">t_target</span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">update_controls</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

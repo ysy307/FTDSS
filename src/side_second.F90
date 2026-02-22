@@ -1,181 +1,228 @@
-submodule(domain_mesh_side) domain_mesh_side_second
+!>
+!> Implements the procedures for the second-order side (line) finite element.
+!> Refactored to use subroutines for all interface methods and strict variable declarations.
+!>
+submodule(domain_fe_side) domain_fe_side_second
     implicit none
 contains
 
-    module function construct_side_second(id, global_coordinate, input) result(side)
+    !>
+    !> Creates and initializes a second-order side (3-node line) element object.
+    !>
+    module function construct_side_second(integration_order) result(fe)
         implicit none
-        integer(int32), intent(in) :: id
-        type(type_dp_3d), pointer, intent(in) :: global_coordinate
-        type(type_input), intent(in) :: input
-        class(abst_side), allocatable :: side
+        !> The integration order for the element.
+        integer(int32), intent(in) :: integration_order
+        class(abst_fe), allocatable :: fe
 
-        integer(int32) :: num_nodes, num_gauss
-        real(real64), allocatable :: weight(:)
-        real(real64), allocatable :: gauss(:, :)
+        character(len=*), parameter :: cell_name = "QuadraticEdge"
+        integer(int32) :: vtk_type
+        integer(int32) :: num_nodes
+        integer(int32) :: dimension
+        integer(int32) :: order
+        integer(int32) :: num_gauss
 
-        allocate (type_side_second :: side)
+        allocate (type_side_second :: fe)
 
-        num_nodes = input%geometry%vtk%cells(id)%num_nodes_in_cell
+        call vtk_constants%get_cell_info_from_cell_name(cell_name, vtk_type, num_nodes, dimension, order)
 
-        select case (input%basic%geometry_settings%integration_type)
-        case ("full")
-            num_gauss = 2_int32
-            call allocate_array(weight, num_gauss)
-            call allocate_array(gauss, 3_int32, num_gauss)
-
-            weight(:) = [1.0d0, 1.0d0]
-            gauss(:, 1) = [-sqrt(1.0d0 / 3.0d0), 0.0d0, 0.0d0]
-            gauss(:, 2) = [sqrt(1.0d0 / 3.0d0), 0.0d0, 0.0d0]
-        case ("reduced")
-            num_gauss = 1_int32
-            call allocate_array(weight, num_gauss)
-            call allocate_array(gauss, 3_int32, num_gauss)
-
-            weight(:) = [0.0d0]
-            gauss(:, 1) = [2.0d0, 0.0d0, 0.0d0]
-        case ("free")
-            num_gauss = 2_int32
-            call allocate_array(weight, num_gauss)
-            call allocate_array(gauss, 3_int32, num_gauss)
-
-            weight(:) = [1.0d0, 1.0d0]
-            gauss(:, 1) = [-sqrt(1.0d0 / 3.0d0), 0.0d0, 0.0d0]
-            gauss(:, 2) = [sqrt(1.0d0 / 3.0d0), 0.0d0, 0.0d0]
-        end select
-
-        call side%initialize(id=id, &
-                             type=input%geometry%vtk%cells(id)%cell_type, &
-                             group=input%geometry%vtk%cells(id)%cell_entity_id, &
-                             dimension=input%geometry%vtk%cells(id)%get_dimension(), &
-                             order=input%geometry%vtk%cells(id)%get_order(), &
-                             num_nodes=num_nodes, &
-                             connectivity=input%geometry%vtk%cells(id)%connectivity(1:num_nodes), &
-                             num_gauss=num_gauss, &
-                             weight=weight, &
-                             gauss=gauss, &
-                             global_coordinate=global_coordinate)
+        call fe%initialize(type=vtk_type, dimension=dimension, order=order, num_nodes=num_nodes, &
+                           integration_order=integration_order)
 
     end function construct_side_second
 
-    module pure function get_length_side_second(self) result(length)
+    !>
+    !> Computes the tangent vector at a specified local coordinate.
+    !>
+    pure module subroutine compute_tangent_vector_side_second(self, r, node_coords, tangent_vec)
         implicit none
         class(type_side_second), intent(in) :: self
-        real(real64) :: length
+        type(type_coordinate_dp), intent(in) :: r
+        real(real64), intent(in) :: node_coords(:, :)
+        real(real64), intent(inout) :: tangent_vec(:)
 
-        real(real64), parameter :: xi1 = -1.0d0 / sqrt(3.0d0)
-        real(real64), parameter :: xi2 = 1.0d0 / sqrt(3.0d0)
-        ! -----------------------------------------------
+        integer(int32) :: i
+        integer(int32) :: nn
+        integer(int32) :: n_dim ! <--- 追加: 座標の次元数
+        real(real64) :: dpsi_val
 
-        type(type_dp_vector_3d) :: r1, r2
-        real(real64) :: det1, det2
+        tangent_vec = 0.0d0
+        call self%get_num_nodes(nn)
 
-        r1 = type_dp_vector_3d(-1.0d0 / sqrt(3.0d0), 0.0d0, 0.0d0)
-        r2 = type_dp_vector_3d(1.0d0 / sqrt(3.0d0), 0.0d0, 0.0d0)
+        ! node_coords の第1次元（空間次元）を取得
+        n_dim = size(node_coords, 1)
 
-        ! 各ガウス積分点でのヤコビ行列式 det(J) = ds/dξ を計算
-        det1 = self%jacobian_det(r1)
-        det2 = self%jacobian_det(r2)
+        do i = 1, nn
+            call self%calc_dpsi(i, 1, r, dpsi_val)
 
-        ! ガウス求積法で長さを計算: Length ≈ w1*det(J(ξ1)) + w2*det(J(ξ2))
-        length = det1 + det2
+            ! tangent_vec のサイズだけでなく、node_coords の次元数もチェックする
+            if (size(tangent_vec) >= 1 .and. n_dim >= 1) &
+                tangent_vec(1) = tangent_vec(1) + dpsi_val * node_coords(1, i)
 
-    end function get_length_side_second
+            if (size(tangent_vec) >= 2 .and. n_dim >= 2) &
+                tangent_vec(2) = tangent_vec(2) + dpsi_val * node_coords(2, i)
 
-    module pure elemental function psi_side_second(self, i, r) result(psi)
+            if (size(tangent_vec) >= 3 .and. n_dim >= 3) &
+                tangent_vec(3) = tangent_vec(3) + dpsi_val * node_coords(3, i)
+        end do
+    end subroutine compute_tangent_vector_side_second
+
+    !>
+    !> Calculates the curved length of the element using Gauss quadrature.
+    !>
+    module subroutine calc_length_side_second(self, node_coords, measure)
+        implicit none
+        class(type_side_second), intent(in) :: self
+        real(real64), intent(in) :: node_coords(:, :)
+        real(real64), intent(inout) :: measure
+
+        integer(int32) :: i
+        type(type_gauss_integration_rule), pointer :: gauss_rule
+        real(real64) :: det_j
+
+        measure = 0.0d0
+        call self%get_integration_rule(gauss_rule)
+
+        do i = 1, gauss_rule%num_gauss
+            call self%calc_jacobian_determinant(gauss_rule%gauss(i), node_coords, det_j)
+            measure = measure + det_j * gauss_rule%weight(i)
+        end do
+
+    end subroutine calc_length_side_second
+
+    !>
+    !> Evaluates the shape function psi.
+    !>
+    pure elemental module subroutine calc_psi_side_second(self, i, r, psi_val)
         implicit none
         class(type_side_second), intent(in) :: self
         integer(int32), intent(in) :: i
-        type(type_dp_vector_3d), intent(in) :: r
-        real(real64) :: psi
+        type(type_coordinate_dp), intent(in) :: r
+        real(real64), intent(inout) :: psi_val
+        real(real64) :: xi
 
+        xi = r%x
         select case (i)
         case (1)
-            psi = 0.5d0 * r%x * (1.0d0 - r%x)
+            psi_val = 0.5d0 * xi * (xi - 1.0d0)
         case (2)
-            psi = 1.0d0 * r%x**2.0d0
+            psi_val = 0.5d0 * xi * (xi + 1.0d0)
         case (3)
-            psi = 0.5d0 * r%x * (1.0d0 + r%x)
+            psi_val = 1.0d0 - xi**2
         case default
-            psi = 0.0d0
+            psi_val = 0.0d0
         end select
-    end function psi_side_second
+    end subroutine calc_psi_side_second
 
-    module pure elemental function dpsi_side_second(self, i, j, r) result(dpsi)
+    !>
+    !> Evaluates the derivative dpsi.
+    !>
+    pure elemental module subroutine calc_dpsi_side_second(self, i, j, r, dpsi_val)
         implicit none
         class(type_side_second), intent(in) :: self
         integer(int32), intent(in) :: i
         integer(int32), intent(in) :: j
-        type(type_dp_vector_3d), intent(in) :: r
-        real(real64) :: dpsi
+        type(type_coordinate_dp), intent(in) :: r
+        real(real64), intent(inout) :: dpsi_val
+        real(real64) :: xi
 
-        select case (j)
-        case (1)
+        dpsi_val = 0.0d0
+        if (j == 1) then
+            xi = r%x
             select case (i)
             case (1)
-                dpsi = 0.5d0 - r%x
+                dpsi_val = xi - 0.5d0
             case (2)
-                dpsi = 2.0d0 * r%x
+                dpsi_val = xi + 0.5d0
             case (3)
-                dpsi = 0.5d0 + r%x
-            case default
-                dpsi = 0.0d0
+                dpsi_val = -2.0d0 * xi
             end select
-        case default
-            dpsi = 0.0d0
-        end select
-    end function dpsi_side_second
+        end if
+    end subroutine calc_dpsi_side_second
 
-    pure elemental module function jacobian_side_second(self, i, j, r) result(jacobian)
+    !>
+    !> Calculates the Jacobian matrix.
+    !>
+    pure module subroutine calc_jacobian_side_second(self, r, node_coords, jac)
         implicit none
         class(type_side_second), intent(in) :: self
-        integer(int32), intent(in) :: i ! Global coordinate direction (1=x, 2=y, 3=z)
-        integer(int32), intent(in) :: j ! Local coordinate direction (1=ξ)
-        type(type_dp_vector_3d), intent(in) :: r
-        real(real64) :: jacobian
+        type(type_coordinate_dp), intent(in) :: r
+        real(real64), intent(in) :: node_coords(:, :)
+        real(real64), intent(inout) :: jac(:, :)
 
-        integer(int32) :: k
-        real(real64) :: dpsi_val
-        type(type_dp_vector_3d) :: coord
+        real(real64) :: tangent_vec(3)
 
-        jacobian = 0.0d0
+        call self%compute_tangent_vector(r, node_coords, tangent_vec)
+        jac(1, 1) = sqrt(sum(tangent_vec**2))
+    end subroutine calc_jacobian_side_second
 
-        ! The Jacobian is defined as J = sum(dNi/dξ * xi) over all nodes
-        if (j == 1) then
-            do k = 1, self%get_num_nodes()
-                ! Get the shape function derivative at point r
-                dpsi_val = self%dpsi(k, 1, r)
-                ! Get the coordinates of node k
-                coord = self%get_coordinate(k)
+    !>
+    !> Checks if point is inside using Newton-Raphson.
+    !>
+    module subroutine is_in_side_second(self, cartesian, normalized, node_coords, is_in)
+        implicit none
+        class(type_side_second), intent(in) :: self
+        type(type_coordinate_dp), intent(in) :: cartesian
+        type(type_coordinate_dp), intent(inout) :: normalized
+        real(real64), intent(in) :: node_coords(:, :)
+        logical, intent(inout) :: is_in
 
-                select case (i)
-                case (1) ! x-component
-                    jacobian = jacobian + dpsi_val * coord%x
-                case (2) ! y-component
-                    jacobian = jacobian + dpsi_val * coord%y
-                case (3) ! z-component
-                    jacobian = jacobian + dpsi_val * coord%z
-                end select
+        type(type_coordinate_dp) :: r_local
+        type(type_coordinate_dp) :: pos_guess
+        type(type_coordinate_dp) :: residual_vec
+        real(real64) :: tangent_vec(3)
+        real(real64) :: tangent_dot_tangent
+        real(real64) :: residual_norm
+        real(real64) :: psi_val
+        integer(int32) :: iter
+        integer(int32) :: i
+        integer(int32) :: node_id
+        integer(int32) :: nn
+        logical :: converged
+        real(real64), parameter :: tol = 1.0e-9
+        integer(int32), parameter :: max_iter = 10
+
+        call r_local%set(0.0d0, 0.0d0, 0.0d0)
+        call self%get_num_nodes(nn)
+        converged = .false.
+
+        do iter = 1, max_iter
+            call pos_guess%set(0.0d0, 0.0d0, 0.0d0)
+            do i = 1, nn
+                call self%calc_psi(i, r_local, psi_val)
+                pos_guess%x = pos_guess%x + psi_val * node_coords(1, i)
+                pos_guess%y = pos_guess%y + psi_val * node_coords(2, i)
+                pos_guess%z = pos_guess%z + psi_val * node_coords(3, i)
             end do
+
+            residual_vec%x = cartesian%x - pos_guess%x
+            residual_vec%y = cartesian%y - pos_guess%y
+            residual_vec%z = cartesian%z - pos_guess%z
+            residual_norm = sqrt(residual_vec%x**2 + residual_vec%y**2 + residual_vec%z**2)
+
+            if (residual_norm < tol) then
+                converged = .true.
+                exit
+            end if
+
+            call self%compute_tangent_vector(r_local, node_coords, tangent_vec)
+            tangent_dot_tangent = tangent_vec(1)**2 + tangent_vec(2)**2 + tangent_vec(3)**2
+
+            if (tangent_dot_tangent < epsilon(tangent_dot_tangent)) then
+                is_in = .false.
+                return
+            end if
+
+            r_local%x = r_local%x + (tangent_vec(1) * residual_vec%x + &
+                                     tangent_vec(2) * residual_vec%y + &
+                                     tangent_vec(3) * residual_vec%z) / tangent_dot_tangent
+        end do
+
+        is_in = converged .and. (abs(r_local%x) <= 1.0d0 + tol)
+        if (is_in) then
+            normalized = r_local
         end if
 
-    end function jacobian_side_second
+    end subroutine is_in_side_second
 
-    pure elemental module function jacobian_det_side_second(self, r) result(jacobian_det)
-        implicit none
-        class(type_side_second), intent(in) :: self
-        type(type_dp_vector_3d), intent(in) :: r
-        real(real64) :: jacobian_det
-
-        real(real64) :: jac_x, jac_y, jac_z
-
-        ! Get the three components of the Jacobian vector at point r
-        jac_x = self%jacobian(1, 1, r)
-        jac_y = self%jacobian(2, 1, r)
-        jac_z = self%jacobian(3, 1, r)
-
-        ! The determinant is the vector's magnitude (norm), which is ds/dξ
-        jacobian_det = sqrt(jac_x**2 + jac_y**2 + jac_z**2)
-
-    end function jacobian_det_side_second
-
-end submodule domain_mesh_side_Second
+end submodule domain_fe_side_second

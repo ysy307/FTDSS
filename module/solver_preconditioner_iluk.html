@@ -1,0 +1,2365 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>solver_preconditioner_iluk &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>solver_preconditioner_iluk
+      <small>Submodule</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 1.0% of total for modules and submodules.">287 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/preconditioner_iluk.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/preconditioner_iluk.f90.html'>preconditioner_iluk.F90</a></li>
+            <li class="breadcrumb-item active" aria-current="page">solver_preconditioner_iluk</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3">
+        <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#modsubs-0"
+         aria-expanded="false" aria-controls="modsubs-0">
+         <h4 class="card-header bg-primary text-white">Module Subroutines</h4>
+      </a>
+      <div id="modsubs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/solver_preconditioner_iluk.html#proc-apply_bsr_ilu0">apply_bsr_ilu0</a>
+            <a class="list-group-item" href="../module/solver_preconditioner_iluk.html#proc-apply_csr_ilu0">apply_csr_ilu0</a>
+            <a class="list-group-item" href="../module/solver_preconditioner_iluk.html#proc-apply_preconditioner_iluk">apply_preconditioner_iluk</a>
+            <a class="list-group-item" href="../module/solver_preconditioner_iluk.html#proc-destroy_preconditioner_iluk">destroy_preconditioner_iluk</a>
+            <a class="list-group-item" href="../module/solver_preconditioner_iluk.html#proc-initialize_preconditioner_iluk">initialize_preconditioner_iluk</a>
+            <a class="list-group-item" href="../module/solver_preconditioner_iluk.html#proc-setup_bsr_ilu0">setup_bsr_ilu0</a>
+            <a class="list-group-item" href="../module/solver_preconditioner_iluk.html#proc-setup_csr_ilu0">setup_csr_ilu0</a>
+            <a class="list-group-item" href="../module/solver_preconditioner_iluk.html#proc-setup_preconditioner_iluk">setup_preconditioner_iluk</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+
+
+  </div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      
+<br>          <div class="card mb-4">
+      <h3 class="card-header card-title bg-light">Uses</h3>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <ul class="list-inline">
+                  <li class="list-inline-item"><a href='module_type_vector.html'>module_type_vector</a></li>
+                  <li class="list-inline-item"><a href='core_types_matrix.html'>core_types_matrix</a></li>
+                  <li class="list-inline-item"><a href='core_constants.html'>core_constants</a></li>
+              </ul>
+            </li>
+            <li class="list-group-item">
+              <ul class="list-inline">
+                <li><h5>Ancestors:</h5></li>
+                  <li class="list-inline-item"><a href='solver_preconditioner.html'>solver_preconditioner</a></li>
+              </ul>
+            </li>
+            <li class="list-group-item">
+              <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: module~~solver_preconditioner_iluk~~UsesGraph Pages: 1 -->
+<svg id="modulesolver_preconditioner_ilukUsesGraph" width="641pt" height="272pt"
+ viewBox="0.00 0.00 641.00 272.32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~solver_preconditioner_iluk~~UsesGraph" class="graph" transform="scale(0.21 0.21) rotate(0) translate(4 1296.85)">
+<title>module~~solver_preconditioner_iluk~~UsesGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1296.85 3058,-1296.85 3058,4 -4,4"/>
+<!-- module~solver_preconditioner_iluk -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node1" class="node">
+<title>module~solver_preconditioner_iluk</title>
+<polygon fill="none" stroke="black" points="3054,-622.82 2902,-622.82 2902,-598.82 3054,-598.82 3054,-622.82"/>
+<text text-anchor="middle" x="2978" y="-608.42" font-family="Helvetica,sans-Serif" font-size="10.50">solver_preconditioner_iluk</text>
+</g>
+<!-- module~core_constants -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node2" class="node">
+<title>module~core_constants</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node2"><a xlink:href="../module/core_constants.html" xlink:title="core_constants">
+<polygon fill="#337ab7" stroke="#337ab7" points="746.5,-517.82 654.5,-517.82 654.5,-493.82 746.5,-493.82 746.5,-517.82"/>
+<text text-anchor="middle" x="700.5" y="-503.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants</text>
+</a>
+</g>
+</g>
+<!-- module~solver_preconditioner_iluk&#45;&gt;module~core_constants -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge1" class="edge">
+<title>module~solver_preconditioner_iluk&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2965.94,-598.62C2909.28,-537.32 2643.03,-264.32 2358,-220.82"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2356,-220.82C2290.61,-200.51 2285.41,-170.66 2222,-144.82"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2220,-144.82C2175.98,-126.89 2171.62,-107.16 2126,-93.82 1977.59,-50.42 1933.62,-68.82 1779,-68.82 1779,-68.82 1779,-68.82 1431,-68.82 1218.13,-68.82 1140.81,-96.87 984,-240.82 957.06,-265.56 973.12,-288.24 948,-314.82 897.3,-368.48 860.97,-350.13 803,-395.82 793.67,-403.17 745.91,-456.12 719.36,-485.79"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="716.53,-483.7 712.48,-493.49 721.75,-488.36 716.53,-483.7"/>
+</g>
+<!-- module~core_types_matrix -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node3" class="node">
+<title>module~core_types_matrix</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node3"><a xlink:href="../module/core_types_matrix.html" xlink:title="core_types_matrix">
+<polygon fill="#337ab7" stroke="#337ab7" points="1318,-391.82 1209,-391.82 1209,-367.82 1318,-367.82 1318,-391.82"/>
+<text text-anchor="middle" x="1263.5" y="-377.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_matrix</text>
+</a>
+</g>
+</g>
+<!-- module~solver_preconditioner_iluk&#45;&gt;module~core_types_matrix -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge2" class="edge">
+<title>module~solver_preconditioner_iluk&#45;&gt;module~core_types_matrix</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2356,-220.82C2203.43,-199.91 2163.5,-220.82 2009.5,-220.82 2009.5,-220.82 2009.5,-220.82 1777,-220.82 1586.77,-220.82 1373.94,-321.99 1295.59,-362.93"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1293.93,-359.85 1286.72,-367.61 1297.19,-366.04 1293.93,-359.85"/>
+</g>
+<!-- module~module_type_vector -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node4" class="node">
+<title>module~module_type_vector</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node4"><a xlink:href="../module/module_type_vector.html" xlink:title="module_type_vector">
+<polygon fill="#337ab7" stroke="#337ab7" points="1138,-273.82 1017,-273.82 1017,-249.82 1138,-249.82 1138,-273.82"/>
+<text text-anchor="middle" x="1077.5" y="-259.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">module_type_vector</text>
+</a>
+</g>
+</g>
+<!-- module~solver_preconditioner_iluk&#45;&gt;module~module_type_vector -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge3" class="edge">
+<title>module~solver_preconditioner_iluk&#45;&gt;module~module_type_vector</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2220,-144.82C1817.27,-0.88 1690.85,-225.15 1264.5,-258.82"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1262.5,-258.82C1224.86,-259.12 1182.9,-259.78 1148.56,-260.41"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1148.09,-256.92 1138.16,-260.6 1148.22,-263.91 1148.09,-256.92"/>
+</g>
+<!-- module~solver_preconditioner -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node5" class="node">
+<title>module~solver_preconditioner</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node5"><a xlink:href="../module/solver_preconditioner.html" xlink:title="solver_preconditioner">
+<polygon fill="#337ab7" stroke="#337ab7" points="2866,-993.82 2738,-993.82 2738,-969.82 2866,-969.82 2866,-993.82"/>
+<text text-anchor="middle" x="2802" y="-979.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solver_preconditioner</text>
+</a>
+</g>
+</g>
+<!-- module~solver_preconditioner_iluk&#45;&gt;module~solver_preconditioner -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge4" class="edge">
+<title>module~solver_preconditioner_iluk&#45;&gt;module~solver_preconditioner</title>
+<path fill="none" stroke="#ff0000" d="M2971.21,-623.17C2945.97,-676.98 2845.37,-891.48 2813.05,-960.39"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2809.71,-959.27 2808.64,-969.81 2816.05,-962.24 2809.71,-959.27"/>
+</g>
+<!-- core_constants_error -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node8" class="node">
+<title>core_constants_error</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="594,-536.82 470,-536.82 470,-512.82 594,-512.82 594,-536.82"/>
+<text text-anchor="middle" x="532" y="-522.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_error</text>
+</g>
+<!-- module~core_constants&#45;&gt;core_constants_error -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge5" class="edge">
+<title>module~core_constants&#45;&gt;core_constants_error</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M654.44,-510.96C638.9,-512.74 621.1,-514.77 604,-516.72"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="603.58,-513.24 594.04,-517.86 604.37,-520.2 603.58,-513.24"/>
+</g>
+<!-- core_constants_ids -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node9" class="node">
+<title>core_constants_ids</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="588,-620.82 476,-620.82 476,-596.82 588,-596.82 588,-620.82"/>
+<text text-anchor="middle" x="532" y="-606.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_ids</text>
+</g>
+<!-- module~core_constants&#45;&gt;core_constants_ids -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge6" class="edge">
+<title>module~core_constants&#45;&gt;core_constants_ids</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M682.45,-517.86C669.02,-527.51 649.96,-541.59 634,-554.82 617.29,-568.67 616.76,-576.9 598,-587.82 594.84,-589.66 591.5,-591.36 588.07,-592.93"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="586.72,-589.7 578.83,-596.78 589.41,-596.16 586.72,-589.7"/>
+</g>
+<!-- core_constants_values -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node10" class="node">
+<title>core_constants_values</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="598,-578.82 466,-578.82 466,-554.82 598,-554.82 598,-578.82"/>
+<text text-anchor="middle" x="532" y="-564.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_values</text>
+</g>
+<!-- module~core_constants&#45;&gt;core_constants_values -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge7" class="edge">
+<title>module~core_constants&#45;&gt;core_constants_values</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M670.37,-517.86C650.18,-526.07 622.61,-537.01 598,-545.82 592.56,-547.77 586.85,-549.73 581.15,-551.64"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="580.03,-548.32 571.63,-554.78 582.22,-554.97 580.03,-548.32"/>
+</g>
+<!-- module~core_constants_base -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node14" class="node">
+<title>module~core_constants_base</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node14"><a xlink:href="../module/core_constants_base.html" xlink:title="core_constants_base">
+<polygon fill="#337ab7" stroke="#337ab7" points="253,-411.82 130,-411.82 130,-387.82 253,-387.82 253,-411.82"/>
+<text text-anchor="middle" x="191.5" y="-397.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_base</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_base -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge8" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_base</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M665.96,-493.74C615.46,-476.04 516.6,-443.27 430,-425.82 374.69,-414.68 311.11,-408.04 263.66,-404.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="263.72,-400.75 253.48,-403.47 263.18,-407.73 263.72,-400.75"/>
+</g>
+<!-- module~core_constants_parallel -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node15" class="node">
+<title>module~core_constants_parallel</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node15"><a xlink:href="../module/core_constants_parallel.html" xlink:title="core_constants_parallel">
+<polygon fill="#337ab7" stroke="#337ab7" points="428.5,-815.82 290.5,-815.82 290.5,-791.82 428.5,-791.82 428.5,-815.82"/>
+<text text-anchor="middle" x="359.5" y="-801.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_parallel</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_parallel -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge9" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_parallel</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M531,-804.82C497.68,-821.56 455.87,-821.58 421.99,-817.29"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="422.14,-813.77 411.75,-815.83 421.15,-820.7 422.14,-813.77"/>
+</g>
+<!-- module~core_constants_physical -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node16" class="node">
+<title>module~core_constants_physical</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node16"><a xlink:href="../module/core_constants_physical.html" xlink:title="core_constants_physical">
+<polygon fill="#337ab7" stroke="#337ab7" points="430,-529.82 289,-529.82 289,-505.82 430,-505.82 430,-529.82"/>
+<text text-anchor="middle" x="359.5" y="-515.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_physical</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_physical -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge10" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_physical</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M654.28,-504.74C636.71,-504.37 616.42,-504 598,-503.82 539.34,-503.24 524.54,-499.95 466,-503.82 457.65,-504.37 448.96,-505.17 440.3,-506.1"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="439.71,-502.65 430.17,-507.26 440.5,-509.6 439.71,-502.65"/>
+</g>
+<!-- module~core_constants_solver -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node17" class="node">
+<title>module~core_constants_solver</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node17"><a xlink:href="../module/core_constants_solver.html" xlink:title="core_constants_solver">
+<polygon fill="#337ab7" stroke="#337ab7" points="424.5,-773.82 294.5,-773.82 294.5,-749.82 424.5,-749.82 424.5,-773.82"/>
+<text text-anchor="middle" x="359.5" y="-759.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_solver</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_solver -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge11" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_solver</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M687.47,-517.89C672.46,-533.68 647.18,-562.89 634,-592.82 598.83,-672.68 656.54,-721.12 598,-785.82 577.81,-808.14 559.9,-791.31 533,-804.82"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M531,-804.82C525.54,-807.56 460.32,-790.08 412.16,-776.59"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="413.05,-773.2 402.48,-773.86 411.16,-779.94 413.05,-773.2"/>
+</g>
+<!-- module~core_constants_utils -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node18" class="node">
+<title>module~core_constants_utils</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node18"><a xlink:href="../module/core_constants_utils.html" xlink:title="core_constants_utils">
+<polygon fill="#337ab7" stroke="#337ab7" points="591.5,-776.82 472.5,-776.82 472.5,-752.82 591.5,-752.82 591.5,-776.82"/>
+<text text-anchor="middle" x="532" y="-762.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_utils</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_utils -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge12" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_utils</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M687.74,-518.01C673.01,-533.93 648.04,-563.28 634,-592.82 605.32,-653.19 641.87,-688.4 598,-738.82 595.13,-742.12 591.78,-745.01 588.14,-747.53"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="586.07,-744.69 579.23,-752.79 589.62,-750.72 586.07,-744.69"/>
+</g>
+<!-- module~core_types_matrix&#45;&gt;module~core_constants -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge18" class="edge">
+<title>module~core_types_matrix&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M1076.5,-377.82C986.74,-384.69 963.53,-386.83 876.5,-409.82"/>
+</g>
+<!-- module~core_types_matrix&#45;&gt;module~module_type_vector -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge19" class="edge">
+<title>module~core_types_matrix&#45;&gt;module~module_type_vector</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M1243.5,-367.64C1210.77,-346.65 1143.65,-303.6 1105.88,-279.38"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1107.7,-276.39 1097.39,-273.94 1103.92,-282.28 1107.7,-276.39"/>
+</g>
+<!-- core_allocate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node6" class="node">
+<title>core_allocate</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="742.5,-776.82 658.5,-776.82 658.5,-752.82 742.5,-752.82 742.5,-776.82"/>
+<text text-anchor="middle" x="700.5" y="-762.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_allocate</text>
+</g>
+<!-- module~core_types_matrix&#45;&gt;core_allocate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge13" class="edge">
+<title>module~core_types_matrix&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M1257,-391.97C1246.27,-415.99 1222.27,-471.45 1207,-519.82 1186.23,-585.61 1223,-625.48 1171,-670.82 1109.07,-724.82 878.29,-673.91 803,-706.82 783.38,-715.4 785.22,-727.59 767,-738.82 761.05,-742.49 754.5,-745.81 747.9,-748.76"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="746.14,-745.71 738.28,-752.82 748.86,-752.16 746.14,-745.71"/>
+</g>
+<!-- core_check_range -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node7" class="node">
+<title>core_check_range</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="755,-343.82 646,-343.82 646,-319.82 755,-319.82 755,-343.82"/>
+<text text-anchor="middle" x="700.5" y="-329.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_check_range</text>
+</g>
+<!-- module~core_types_matrix&#45;&gt;core_check_range -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge14" class="edge">
+<title>module~core_types_matrix&#45;&gt;core_check_range</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M1208.88,-376.78C1172.13,-375.29 1122.3,-374.47 1078.5,-377.82"/>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M1076.5,-377.82C972.22,-385.8 976.48,-223.13 876.5,-253.82"/>
+</g>
+<!-- core_deallocate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node11" class="node">
+<title>core_deallocate</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="749,-658.82 652,-658.82 652,-634.82 749,-634.82 749,-658.82"/>
+<text text-anchor="middle" x="700.5" y="-644.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_deallocate</text>
+</g>
+<!-- module~core_types_matrix&#45;&gt;core_deallocate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge15" class="edge">
+<title>module~core_types_matrix&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M1076.5,-377.82C1027.15,-381.6 1013.83,-400.33 984,-439.82 952.74,-481.2 985.65,-515.15 948,-550.82 924.13,-573.44 906.95,-557.41 876.5,-569.82"/>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M874.5,-569.82C844.05,-582.24 831.96,-573.25 803,-588.82 784.14,-598.96 785.22,-609.59 767,-620.82 761.05,-624.49 754.5,-627.81 747.9,-630.76"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="746.14,-627.71 738.28,-634.82 748.86,-634.16 746.14,-627.71"/>
+</g>
+<!-- core_findings -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node12" class="node">
+<title>core_findings</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="1119,-783.82 1036,-783.82 1036,-759.82 1119,-759.82 1119,-783.82"/>
+<text text-anchor="middle" x="1077.5" y="-769.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_findings</text>
+</g>
+<!-- module~core_types_matrix&#45;&gt;core_findings -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge16" class="edge">
+<title>module~core_types_matrix&#45;&gt;core_findings</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M1256.66,-391.87C1245.33,-415.72 1220.33,-470.88 1207,-519.82 1179.68,-620.07 1241.91,-674.87 1171,-750.82 1160.21,-762.37 1144.51,-768.22 1129.1,-771.01"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1128.48,-767.56 1119.07,-772.43 1129.46,-774.49 1128.48,-767.56"/>
+</g>
+<!-- iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node13" class="node">
+<title>iso_fortran_env</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node13"><a xlink:href="http://fortranwiki.org/fortran/show/iso_fortran_env" xlink:title="iso_fortran_env">
+<polygon fill="#337ab7" stroke="#337ab7" points="94,-529.82 0,-529.82 0,-505.82 94,-505.82 94,-529.82"/>
+<text text-anchor="middle" x="47" y="-515.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_matrix&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge17" class="edge">
+<title>module~core_types_matrix&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M1256.3,-392.19C1244.58,-416.16 1219.27,-470.87 1207,-519.82 1172.74,-656.5 1230.91,-707.28 1171,-834.82 1119.95,-943.51 1063.53,-939.86 984,-1029.82 933.89,-1086.51 952.05,-1165.84 876.5,-1161.82"/>
+</g>
+<!-- stdlib_optval -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node22" class="node">
+<title>stdlib_optval</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="86.5,-261.82 7.5,-261.82 7.5,-237.82 86.5,-237.82 86.5,-261.82"/>
+<text text-anchor="middle" x="47" y="-247.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_optval</text>
+</g>
+<!-- module~core_types_matrix&#45;&gt;stdlib_optval -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge20" class="edge">
+<title>module~core_types_matrix&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M1261.05,-367.59C1254.2,-311.8 1223.12,-82.31 1171,-36.82 1095.74,28.86 1047.69,-15.06 948,-8.82 731.62,4.71 670.5,-11.84 466,-83.82 416.69,-101.18 412.09,-127.38 360.5,-135.82"/>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M358.5,-135.82C285.12,-143.5 263.77,-116.74 192.5,-135.82"/>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M190.5,-135.82C162.56,-143.3 153.8,-143.37 130,-159.82 102.13,-179.08 77.01,-209.51 62.13,-229.56"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="59.25,-227.57 56.22,-237.72 64.92,-231.67 59.25,-227.57"/>
+</g>
+<!-- module~core_types_vector -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node19" class="node">
+<title>module~core_types_vector</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node19"><a xlink:href="../module/core_types_vector.html" xlink:title="core_types_vector">
+<polygon fill="#337ab7" stroke="#337ab7" points="930,-305.82 821,-305.82 821,-281.82 930,-281.82 930,-305.82"/>
+<text text-anchor="middle" x="875.5" y="-291.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_vector</text>
+</a>
+</g>
+</g>
+<!-- module~module_type_vector&#45;&gt;module~core_types_vector -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge21" class="edge">
+<title>module~module_type_vector&#45;&gt;module~core_types_vector</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1016.76,-271.38C992.59,-275.25 964.64,-279.72 940.08,-283.65"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="939.47,-280.2 930.14,-285.24 940.57,-287.11 939.47,-280.2"/>
+</g>
+<!-- module~solver_preconditioner&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge22" class="edge">
+<title>module~solver_preconditioner&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M2796.35,-994.03C2773.98,-1050.53 2671.64,-1283.82 2507,-1283.82 2507,-1283.82 2507,-1283.82 2356,-1283.82 2202,-1283.82 2162.77,-1268.82 2009.5,-1283.82"/>
+</g>
+<!-- module~module_core -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node20" class="node">
+<title>module~module_core</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node20"><a xlink:href="../module/module_core.html" xlink:title="module_core">
+<polygon fill="#337ab7" stroke="#337ab7" points="2398,-973.82 2316,-973.82 2316,-949.82 2398,-949.82 2398,-973.82"/>
+<text text-anchor="middle" x="2357" y="-959.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">module_core</text>
+</a>
+</g>
+</g>
+<!-- module~solver_preconditioner&#45;&gt;module~module_core -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge23" class="edge">
+<title>module~solver_preconditioner&#45;&gt;module~module_core</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M2738,-978.98C2649.41,-974.98 2489.79,-967.77 2408.52,-964.1"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="2408.21,-960.58 2398.06,-963.63 2407.89,-967.58 2408.21,-960.58"/>
+</g>
+<!-- module~module_linalg -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node21" class="node">
+<title>module~module_linalg</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node21"><a xlink:href="../module/module_linalg.html" xlink:title="module_linalg">
+<polygon fill="#337ab7" stroke="#337ab7" points="2702,-1013.82 2614,-1013.82 2614,-989.82 2702,-989.82 2702,-1013.82"/>
+<text text-anchor="middle" x="2658" y="-999.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">module_linalg</text>
+</a>
+</g>
+</g>
+<!-- module~solver_preconditioner&#45;&gt;module~module_linalg -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge24" class="edge">
+<title>module~solver_preconditioner&#45;&gt;module~module_linalg</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M2737.89,-990.71C2729.36,-991.91 2720.67,-993.13 2712.34,-994.31"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="2711.79,-990.85 2702.37,-995.71 2712.76,-997.78 2711.79,-990.85"/>
+</g>
+<!-- module~core_constants_base&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge25" class="edge">
+<title>module~core_constants_base&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ffd1" stroke-dasharray="5,2" d="M175.79,-412.01C150.83,-432.67 100.03,-474.73 70.56,-499.14"/>
+<polygon fill="#00ffd1" stroke="#00ffd1" points="68.32,-496.45 62.85,-505.53 72.78,-501.85 68.32,-496.45"/>
+</g>
+<!-- module~core_constants_base&#45;&gt;stdlib_optval -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge26" class="edge">
+<title>module~core_constants_base&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#00ffd1" stroke-dasharray="5,2" d="M179.08,-387.8C154.48,-361.91 96.31,-300.68 66.43,-269.22"/>
+<polygon fill="#00ffd1" stroke="#00ffd1" points="68.9,-266.74 59.47,-261.9 63.82,-271.56 68.9,-266.74"/>
+</g>
+<!-- stdlib_strings -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node32" class="node">
+<title>stdlib_strings</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="88,-411.82 6,-411.82 6,-387.82 88,-387.82 88,-411.82"/>
+<text text-anchor="middle" x="47" y="-397.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_strings</text>
+</g>
+<!-- module~core_constants_base&#45;&gt;stdlib_strings -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge27" class="edge">
+<title>module~core_constants_base&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#00ffd1" stroke-dasharray="5,2" d="M129.65,-399.82C119.21,-399.82 108.46,-399.82 98.33,-399.82"/>
+<polygon fill="#00ffd1" stroke="#00ffd1" points="98.04,-396.32 88.04,-399.82 98.04,-403.32 98.04,-396.32"/>
+</g>
+<!-- module~core_constants_parallel&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge28" class="edge">
+<title>module~core_constants_parallel&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00d1ff" stroke-dasharray="5,2" d="M290.27,-807.3C258.59,-806 221.6,-800.1 192.5,-782.82"/>
+</g>
+<!-- module~core_constants_physical&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge29" class="edge">
+<title>module~core_constants_physical&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#0078ff" stroke-dasharray="5,2" d="M323.95,-505.79C283.04,-492.19 217.3,-472.59 192.5,-477.82"/>
+</g>
+<!-- module~core_constants_physical&#45;&gt;module~core_constants_base -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge30" class="edge">
+<title>module~core_constants_physical&#45;&gt;module~core_constants_base</title>
+<path fill="none" stroke="#0078ff" stroke-dasharray="5,2" d="M347.14,-505.73C328.79,-486.74 290.85,-449.63 253,-425.82 247.48,-422.35 241.41,-419.13 235.31,-416.22"/>
+<polygon fill="#0078ff" stroke="#0078ff" points="236.34,-412.85 225.78,-411.93 233.46,-419.23 236.34,-412.85"/>
+</g>
+<!-- stdlib_ascii -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node31" class="node">
+<title>stdlib_ascii</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="226.5,-529.82 156.5,-529.82 156.5,-505.82 226.5,-505.82 226.5,-529.82"/>
+<text text-anchor="middle" x="191.5" y="-515.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_ascii</text>
+</g>
+<!-- module~core_constants_physical&#45;&gt;stdlib_ascii -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge31" class="edge">
+<title>module~core_constants_physical&#45;&gt;stdlib_ascii</title>
+<path fill="none" stroke="#0078ff" stroke-dasharray="5,2" d="M288.58,-517.82C270.99,-517.82 252.6,-517.82 236.67,-517.82"/>
+<polygon fill="#0078ff" stroke="#0078ff" points="236.59,-514.32 226.59,-517.82 236.59,-521.32 236.59,-514.32"/>
+</g>
+<!-- module~core_constants_physical&#45;&gt;stdlib_strings -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge32" class="edge">
+<title>module~core_constants_physical&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#0078ff" stroke-dasharray="5,2" d="M338.99,-505.62C308.87,-487.5 248.66,-454.11 192.5,-439.82"/>
+</g>
+<!-- module~core_constants_solver&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge33" class="edge">
+<title>module~core_constants_solver&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#001dff" stroke-dasharray="5,2" d="M312.82,-773.85C270.84,-783.79 212.23,-794.54 192.5,-782.82"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge34" class="edge">
+<title>module~core_constants_utils&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#3c00ff" stroke-dasharray="5,2" d="M498.07,-752.77C456.28,-738.14 386.51,-716.07 360.5,-721.82"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;module~core_constants_parallel -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge35" class="edge">
+<title>module~core_constants_utils&#45;&gt;module~core_constants_parallel</title>
+<path fill="none" stroke="#3c00ff" stroke-dasharray="5,2" d="M478.45,-776.84C460.95,-780.84 441.28,-785.34 423.09,-789.5"/>
+<polygon fill="#3c00ff" stroke="#3c00ff" points="422.13,-786.13 413.17,-791.77 423.7,-792.96 422.13,-786.13"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;module~core_constants_physical -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge36" class="edge">
+<title>module~core_constants_utils&#45;&gt;module~core_constants_physical</title>
+<path fill="none" stroke="#3c00ff" stroke-dasharray="5,2" d="M484.36,-752.69C477.44,-749.17 470.98,-744.64 466,-738.82 419.45,-684.43 465.94,-643.73 430,-581.82 419.47,-563.68 402.11,-547.69 387.38,-536.23"/>
+<polygon fill="#3c00ff" stroke="#3c00ff" points="389.18,-533.21 379.08,-530.03 384.99,-538.82 389.18,-533.21"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;module~core_constants_solver -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge37" class="edge">
+<title>module~core_constants_utils&#45;&gt;module~core_constants_solver</title>
+<path fill="none" stroke="#3c00ff" stroke-dasharray="5,2" d="M472.32,-763.79C460.16,-763.58 447.2,-763.35 434.57,-763.12"/>
+<polygon fill="#3c00ff" stroke="#3c00ff" points="434.59,-759.62 424.53,-762.95 434.47,-766.62 434.59,-759.62"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;stdlib_ascii -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge38" class="edge">
+<title>module~core_constants_utils&#45;&gt;stdlib_ascii</title>
+<path fill="none" stroke="#3c00ff" stroke-dasharray="5,2" d="M490.63,-752.71C482.01,-749.05 473.31,-744.47 466,-738.82 403.5,-690.53 429.75,-633.8 360.5,-595.82"/>
+<path fill="none" stroke="#3c00ff" stroke-dasharray="5,2" d="M358.5,-595.82C315.68,-572.34 264.59,-549 230.51,-534.06"/>
+<polygon fill="#3c00ff" stroke="#3c00ff" points="231.5,-530.67 220.93,-529.89 228.7,-537.09 231.5,-530.67"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;stdlib_strings -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge39" class="edge">
+<title>module~core_constants_utils&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#3c00ff" stroke-dasharray="5,2" d="M358.5,-595.82C266.73,-545.49 213.88,-601.42 130,-538.82 109.05,-523.19 75.08,-456.51 58.2,-421.49"/>
+<polygon fill="#3c00ff" stroke="#3c00ff" points="61.19,-419.64 53.73,-412.13 54.88,-422.66 61.19,-419.64"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;module~core_constants -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge45" class="edge">
+<title>module~core_types_vector&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#9500ff" stroke-dasharray="5,2" d="M822.96,-305.98C815.56,-309.49 808.58,-314.01 803,-319.82 766.49,-357.84 793.18,-387.08 767,-432.82 755.3,-453.27 737.11,-472.94 722.86,-486.7"/>
+<polygon fill="#9500ff" stroke="#9500ff" points="720.31,-484.3 715.42,-493.7 725.1,-489.4 720.31,-484.3"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;core_allocate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge40" class="edge">
+<title>module~core_types_vector&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#9500ff" stroke-dasharray="5,2" d="M865.99,-306.18C850.63,-329.17 818.42,-380.57 803,-428.82 765.88,-544.98 821.6,-591.79 767,-700.82 757.89,-719 741.54,-734.99 727.45,-746.44"/>
+<polygon fill="#9500ff" stroke="#9500ff" points="725.23,-743.73 719.49,-752.64 729.53,-749.26 725.23,-743.73"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;core_check_range -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge42" class="edge">
+<title>module~core_types_vector&#45;&gt;core_check_range</title>
+<path fill="none" stroke="#9500ff" stroke-dasharray="5,2" d="M820.71,-305.64C803.14,-309.5 783.45,-313.82 765.21,-317.83"/>
+<polygon fill="#9500ff" stroke="#9500ff" points="764.27,-314.45 755.26,-320.01 765.77,-321.29 764.27,-314.45"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;core_deallocate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge43" class="edge">
+<title>module~core_types_vector&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#9500ff" stroke-dasharray="5,2" d="M867.43,-305.83C853.9,-329.08 823.85,-382.07 803,-428.82 784.1,-471.2 786.17,-484.56 767,-526.82 750.8,-562.54 728.22,-602.14 714.25,-625.73"/>
+<polygon fill="#9500ff" stroke="#9500ff" points="711.13,-624.14 709.01,-634.52 717.14,-627.73 711.13,-624.14"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge44" class="edge">
+<title>module~core_types_vector&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#9500ff" stroke-dasharray="5,2" d="M699.5,-371.82C669.19,-371.42 661.46,-377.99 634,-390.82 552.48,-428.92 535.87,-447.12 466,-503.82 448.67,-517.88 450.68,-530.43 430,-538.82 316.71,-584.82 168.82,-553.8 94.67,-532.75"/>
+<polygon fill="#9500ff" stroke="#9500ff" points="95.29,-529.28 84.71,-529.85 93.34,-536.01 95.29,-529.28"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;stdlib_optval -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge46" class="edge">
+<title>module~core_types_vector&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#9500ff" stroke-dasharray="5,2" d="M832.77,-305.88C822.66,-309.63 812.15,-314.27 803,-319.82 784.44,-331.08 785.92,-342.19 767,-352.82 740.58,-367.68 731.81,-372.22 701.5,-371.82"/>
+<path fill="none" stroke="#9500ff" stroke-dasharray="5,2" d="M699.5,-371.82C669.19,-371.42 655.79,-373.89 634,-352.82 597.01,-317.07 619.5,-289.56 598,-242.82 574.75,-192.27 586.07,-152.56 533,-135.82"/>
+</g>
+<!-- core_check_length -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node23" class="node">
+<title>core_check_length</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="756.5,-263.82 644.5,-263.82 644.5,-239.82 756.5,-239.82 756.5,-263.82"/>
+<text text-anchor="middle" x="700.5" y="-249.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_check_length</text>
+</g>
+<!-- module~core_types_vector&#45;&gt;core_check_length -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge41" class="edge">
+<title>module~core_types_vector&#45;&gt;core_check_length</title>
+<path fill="none" stroke="#9500ff" stroke-dasharray="5,2" d="M824.93,-281.79C804.93,-276.93 781.69,-271.29 760.81,-266.22"/>
+<polygon fill="#9500ff" stroke="#9500ff" points="761.63,-262.82 751.08,-263.86 759.97,-269.62 761.63,-262.82"/>
+</g>
+<!-- module~module_core&#45;&gt;module~core_constants -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge47" class="edge">
+<title>module~module_core&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#f000ff" stroke-dasharray="5,2" d="M2350.87,-949.74C2324.77,-890.43 2200.54,-632.34 2009.5,-619.82"/>
+<path fill="none" stroke="#f000ff" stroke-dasharray="5,2" d="M2007.5,-619.82C1699.93,-509.28 1644.38,-398.76 1320,-358.82 1258.58,-351.26 1008.31,-356.69 984,-363.82 966.01,-369.1 965,-377.9 948,-385.82 917.62,-399.98 908.84,-401 876.5,-409.82"/>
+<path fill="none" stroke="#f000ff" stroke-dasharray="5,2" d="M874.5,-409.82C842.68,-418.1 832.54,-414.39 803,-428.82 772.05,-443.94 741.19,-469.16 721.76,-486.6"/>
+<polygon fill="#f000ff" stroke="#f000ff" points="719.19,-484.21 714.17,-493.55 723.91,-489.38 719.19,-484.21"/>
+</g>
+<!-- module~core_interop -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node24" class="node">
+<title>module~core_interop</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node24"><a xlink:href="../module/core_interop.html" xlink:title="core_interop">
+<polygon fill="#337ab7" stroke="#337ab7" points="2260.5,-973.82 2181.5,-973.82 2181.5,-949.82 2260.5,-949.82 2260.5,-973.82"/>
+<text text-anchor="middle" x="2221" y="-959.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_interop</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_interop -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge48" class="edge">
+<title>module~module_core&#45;&gt;module~core_interop</title>
+<path fill="none" stroke="#f000ff" stroke-dasharray="5,2" d="M2315.8,-961.82C2301.78,-961.82 2285.88,-961.82 2271.21,-961.82"/>
+<polygon fill="#f000ff" stroke="#f000ff" points="2270.79,-958.32 2260.79,-961.82 2270.79,-965.32 2270.79,-958.32"/>
+</g>
+<!-- module~core_memory -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node25" class="node">
+<title>module~core_memory</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node25"><a xlink:href="../module/core_memory.html" xlink:title="core_memory">
+<polygon fill="#337ab7" stroke="#337ab7" points="918.5,-739.82 832.5,-739.82 832.5,-715.82 918.5,-715.82 918.5,-739.82"/>
+<text text-anchor="middle" x="875.5" y="-725.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_memory</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_memory -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge49" class="edge">
+<title>module~module_core&#45;&gt;module~core_memory</title>
+<path fill="none" stroke="#f000ff" stroke-dasharray="5,2" d="M2007.5,-619.82C1905.77,-613.16 1880.24,-627.86 1779,-639.82"/>
+<path fill="none" stroke="#f000ff" stroke-dasharray="5,2" d="M1777,-639.82C1673.97,-652 1628.12,-593.11 1544,-653.82 1509.07,-679.03 1540.19,-715.19 1508,-743.82 1479.02,-769.6 1209.45,-829.72 1171,-834.82 1088.61,-845.75 1053.19,-880.87 984,-834.82 949.5,-811.87 978.88,-776.45 948,-748.82 942.37,-743.78 935.58,-739.95 928.46,-737.03"/>
+<polygon fill="#f000ff" stroke="#f000ff" points="929.21,-733.59 918.62,-733.6 926.91,-740.2 929.21,-733.59"/>
+</g>
+<!-- module~core_types -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node26" class="node">
+<title>module~core_types</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node26"><a xlink:href="../module/core_types.html" xlink:title="core_types">
+<polygon fill="#337ab7" stroke="#337ab7" points="1813,-611.82 1743,-611.82 1743,-587.82 1813,-587.82 1813,-611.82"/>
+<text text-anchor="middle" x="1778" y="-597.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_types -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge50" class="edge">
+<title>module~module_core&#45;&gt;module~core_types</title>
+<path fill="none" stroke="#f000ff" stroke-dasharray="5,2" d="M2007.5,-619.82C1943.35,-615.62 1869.25,-608.76 1823.25,-604.27"/>
+<polygon fill="#f000ff" stroke="#f000ff" points="1823.33,-600.76 1813.03,-603.27 1822.64,-607.73 1823.33,-600.76"/>
+</g>
+<!-- module~core_utils -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node27" class="node">
+<title>module~core_utils</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node27"><a xlink:href="../module/core_utils.html" xlink:title="core_utils">
+<polygon fill="#337ab7" stroke="#337ab7" points="1295,-1023.82 1232,-1023.82 1232,-999.82 1295,-999.82 1295,-1023.82"/>
+<text text-anchor="middle" x="1263.5" y="-1009.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_utils</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_utils -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge51" class="edge">
+<title>module~module_core&#45;&gt;module~core_utils</title>
+<path fill="none" stroke="#f000ff" stroke-dasharray="5,2" d="M1777,-639.82C1667.36,-656.2 1625.12,-653.27 1544,-728.82 1517.82,-753.2 1528.84,-771.74 1508,-800.82 1473.4,-849.1 1369.81,-958.46 1320,-990.82 1315.25,-993.91 1309.98,-996.64 1304.63,-999.02"/>
+<polygon fill="#f000ff" stroke="#f000ff" points="1302.95,-995.93 1295.01,-1002.94 1305.59,-1002.41 1302.95,-995.93"/>
+</g>
+<!-- module~core_validation -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node28" class="node">
+<title>module~core_validation</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node28"><a xlink:href="../module/core_validation.html" xlink:title="core_validation">
+<polygon fill="#337ab7" stroke="#337ab7" points="1124.5,-69.82 1030.5,-69.82 1030.5,-45.82 1124.5,-45.82 1124.5,-69.82"/>
+<text text-anchor="middle" x="1077.5" y="-55.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_validation</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_validation -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge52" class="edge">
+<title>module~module_core&#45;&gt;module~core_validation</title>
+<path fill="none" stroke="#f000ff" stroke-dasharray="5,2" d="M2355.96,-949.54C2355.31,-902 2348.16,-726.64 2280,-605.82 2086.45,-262.73 1999.42,-30.82 1605.5,-30.82 1605.5,-30.82 1605.5,-30.82 1431,-30.82 1326.21,-30.82 1204.4,-42.83 1134.89,-50.83"/>
+<polygon fill="#f000ff" stroke="#f000ff" points="1134.13,-47.4 1124.61,-52.03 1134.94,-54.35 1134.13,-47.4"/>
+</g>
+<!-- module~linalg_matrix_operations -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node29" class="node">
+<title>module~linalg_matrix_operations</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node29"><a xlink:href="../module/linalg_matrix_operations.html" xlink:title="linalg_matrix_operations">
+<polygon fill="#337ab7" stroke="#337ab7" points="2578,-1013.82 2434,-1013.82 2434,-989.82 2578,-989.82 2578,-1013.82"/>
+<text text-anchor="middle" x="2506" y="-999.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">linalg_matrix_operations</text>
+</a>
+</g>
+</g>
+<!-- module~module_linalg&#45;&gt;module~linalg_matrix_operations -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge53" class="edge">
+<title>module~module_linalg&#45;&gt;module~linalg_matrix_operations</title>
+<path fill="none" stroke="#ff00b4" stroke-dasharray="5,2" d="M2613.61,-1001.82C2605.65,-1001.82 2597.11,-1001.82 2588.45,-1001.82"/>
+<polygon fill="#ff00b4" stroke="#ff00b4" points="2588.27,-998.32 2578.27,-1001.82 2588.27,-1005.32 2588.27,-998.32"/>
+</g>
+<!-- module~linalg_vector_operations -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node30" class="node">
+<title>module~linalg_vector_operations</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node30"><a xlink:href="../module/linalg_vector_operations.html" xlink:title="linalg_vector_operations">
+<polygon fill="#337ab7" stroke="#337ab7" points="2577.5,-1055.82 2434.5,-1055.82 2434.5,-1031.82 2577.5,-1031.82 2577.5,-1055.82"/>
+<text text-anchor="middle" x="2506" y="-1041.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">linalg_vector_operations</text>
+</a>
+</g>
+</g>
+<!-- module~module_linalg&#45;&gt;module~linalg_vector_operations -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge54" class="edge">
+<title>module~module_linalg&#45;&gt;module~linalg_vector_operations</title>
+<path fill="none" stroke="#ff00b4" stroke-dasharray="5,2" d="M2614.02,-1013.86C2597.07,-1018.6 2577.44,-1024.1 2559.65,-1029.08"/>
+<polygon fill="#ff00b4" stroke="#ff00b4" points="2558.68,-1025.72 2549.99,-1031.78 2560.56,-1032.46 2558.68,-1025.72"/>
+</g>
+<!-- module~core_fortran_utils_memory_stats_wrapper -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node37" class="node">
+<title>module~core_fortran_utils_memory_stats_wrapper</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node37"><a xlink:href="../module/core_fortran_utils_memory_stats_wrapper.html" xlink:title="core_fortran_utils_memory_stats_wrapper">
+<polygon fill="#337ab7" stroke="#337ab7" points="2126,-1255.82 1891,-1255.82 1891,-1231.82 2126,-1231.82 2126,-1255.82"/>
+<text text-anchor="middle" x="2008.5" y="-1241.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_fortran_utils_memory_stats_wrapper</text>
+</a>
+</g>
+</g>
+<!-- module~core_interop&#45;&gt;module~core_fortran_utils_memory_stats_wrapper -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge55" class="edge">
+<title>module~core_interop&#45;&gt;module~core_fortran_utils_memory_stats_wrapper</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M2218.89,-973.9C2214.66,-1013.08 2196.01,-1137.97 2126,-1204.82 2115.28,-1215.05 2101.81,-1222.61 2087.85,-1228.18"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="2086.33,-1225.01 2078.14,-1231.73 2088.74,-1231.58 2086.33,-1225.01"/>
+</g>
+<!-- module~core_fortran_utils_signal_flag_wrapper -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node38" class="node">
+<title>module~core_fortran_utils_signal_flag_wrapper</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node38"><a xlink:href="../module/core_fortran_utils_signal_flag_wrapper.html" xlink:title="core_fortran_utils_signal_flag_wrapper">
+<polygon fill="#337ab7" stroke="#337ab7" points="2117,-973.82 1900,-973.82 1900,-949.82 2117,-949.82 2117,-973.82"/>
+<text text-anchor="middle" x="2008.5" y="-959.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_fortran_utils_signal_flag_wrapper</text>
+</a>
+</g>
+</g>
+<!-- module~core_interop&#45;&gt;module~core_fortran_utils_signal_flag_wrapper -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge56" class="edge">
+<title>module~core_interop&#45;&gt;module~core_fortran_utils_signal_flag_wrapper</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M2181.39,-961.82C2165.83,-961.82 2146.96,-961.82 2127.5,-961.82"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="2127.28,-958.32 2117.28,-961.82 2127.28,-965.32 2127.28,-958.32"/>
+</g>
+<!-- module~core_fortran_utils_system_info_wrapper -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node39" class="node">
+<title>module~core_fortran_utils_system_info_wrapper</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node39"><a xlink:href="../module/core_fortran_utils_system_info_wrapper.html" xlink:title="core_fortran_utils_system_info_wrapper">
+<polygon fill="#337ab7" stroke="#337ab7" points="2120,-1195.82 1897,-1195.82 1897,-1171.82 2120,-1171.82 2120,-1195.82"/>
+<text text-anchor="middle" x="2008.5" y="-1181.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_fortran_utils_system_info_wrapper</text>
+</a>
+</g>
+</g>
+<!-- module~core_interop&#45;&gt;module~core_fortran_utils_system_info_wrapper -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge57" class="edge">
+<title>module~core_interop&#45;&gt;module~core_fortran_utils_system_info_wrapper</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M2208.38,-974.07C2173.66,-1010.69 2070.47,-1119.52 2028.04,-1164.27"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="2025.42,-1161.94 2021.08,-1171.61 2030.5,-1166.76 2025.42,-1161.94"/>
+</g>
+<!-- module~core_vtk -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node53" class="node">
+<title>module~core_vtk</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node53"><a xlink:href="../module/core_vtk.html" xlink:title="core_vtk">
+<polygon fill="#337ab7" stroke="#337ab7" points="2037,-849.82 1980,-849.82 1980,-825.82 2037,-825.82 2037,-849.82"/>
+<text text-anchor="middle" x="2008.5" y="-835.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_vtk</text>
+</a>
+</g>
+</g>
+<!-- module~core_interop&#45;&gt;module~core_vtk -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge58" class="edge">
+<title>module~core_interop&#45;&gt;module~core_vtk</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M2199.43,-949.71C2161.86,-927.57 2082.03,-880.55 2038.79,-855.08"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="2040.54,-852.05 2030.15,-849.99 2036.99,-858.08 2040.54,-852.05"/>
+</g>
+<!-- module~core_vtk_vtk_constants -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node54" class="node">
+<title>module~core_vtk_vtk_constants</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node54"><a xlink:href="../module/core_vtk_vtk_constants.html" xlink:title="core_vtk_vtk_constants">
+<polygon fill="#337ab7" stroke="#337ab7" points="1499,-998.82 1365,-998.82 1365,-974.82 1499,-974.82 1499,-998.82"/>
+<text text-anchor="middle" x="1432" y="-984.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_vtk_vtk_constants</text>
+</a>
+</g>
+</g>
+<!-- module~core_interop&#45;&gt;module~core_vtk_vtk_constants -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge59" class="edge">
+<title>module~core_interop&#45;&gt;module~core_vtk_vtk_constants</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M2215.07,-949.58C2203.48,-922.2 2171.95,-855.41 2126,-816.82 1976.14,-690.99 1880.61,-624.17 1701,-701.82 1667.74,-716.2 1503.68,-904.68 1450.02,-966.98"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="1447.35,-964.72 1443.48,-974.58 1452.65,-969.28 1447.35,-964.72"/>
+</g>
+<!-- module~core_memory&#45;&gt;core_allocate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge60" class="edge">
+<title>module~core_memory&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M832.18,-736.87C808.16,-742.01 777.93,-748.48 752.59,-753.89"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="751.83,-750.48 742.79,-755.99 753.3,-757.32 751.83,-750.48"/>
+</g>
+<!-- module~core_memory&#45;&gt;core_deallocate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge61" class="edge">
+<title>module~core_memory&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M852.15,-715.6C830.62,-704.01 796.98,-686.4 767,-672.82 759.39,-669.38 751.19,-665.92 743.24,-662.7"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="744.32,-659.37 733.74,-658.91 741.73,-665.87 744.32,-659.37"/>
+</g>
+<!-- module~core_types&#45;&gt;module~module_type_vector -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge75" class="edge">
+<title>module~core_types&#45;&gt;module~module_type_vector</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1772.99,-587.65C1758.29,-545.15 1703.15,-402.2 1605.5,-334.82"/>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1603.5,-334.82C1571.73,-312.9 1302.83,-254.24 1264.5,-258.82"/>
+</g>
+<!-- core_types_variable -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node34" class="node">
+<title>core_types_variable</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="1663.5,-510.82 1545.5,-510.82 1545.5,-486.82 1663.5,-486.82 1663.5,-510.82"/>
+<text text-anchor="middle" x="1604.5" y="-496.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_variable</text>
+</g>
+<!-- module~core_types&#45;&gt;core_types_variable -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge62" class="edge">
+<title>module~core_types&#45;&gt;core_types_variable</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1761.3,-587.77C1735.45,-568.07 1684.82,-530.13 1665,-519.82 1661.49,-518 1657.79,-516.27 1654.02,-514.65"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1655.16,-511.33 1644.58,-510.84 1652.54,-517.82 1655.16,-511.33"/>
+</g>
+<!-- module~core_types_coordinate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node42" class="node">
+<title>module~core_types_coordinate</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node42"><a xlink:href="../module/core_types_coordinate.html" xlink:title="core_types_coordinate">
+<polygon fill="#337ab7" stroke="#337ab7" points="767,-423.82 634,-423.82 634,-399.82 767,-399.82 767,-423.82"/>
+<text text-anchor="middle" x="700.5" y="-409.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_coordinate</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_coordinate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge63" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_coordinate</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1603.5,-334.82C1572.09,-314.92 997.31,-322.08 984,-325.82 965.95,-330.9 965,-339.9 948,-347.82 917.62,-361.98 909.37,-378.39 876.5,-371.82"/>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M874.5,-371.82C850.54,-366.59 789.54,-383.31 746.79,-396.72"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="745.63,-393.42 737.16,-399.78 747.75,-400.09 745.63,-393.42"/>
+</g>
+<!-- module~core_types_coordinate_array -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node43" class="node">
+<title>module~core_types_coordinate_array</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node43"><a xlink:href="../module/core_types_coordinate_array.html" xlink:title="core_types_coordinate_array">
+<polygon fill="#337ab7" stroke="#337ab7" points="1160.5,-741.82 994.5,-741.82 994.5,-717.82 1160.5,-717.82 1160.5,-741.82"/>
+<text text-anchor="middle" x="1077.5" y="-727.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_coordinate_array</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_coordinate_array -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge64" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_coordinate_array</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1262.5,-729.82C1232.78,-729.93 1200.36,-729.96 1171.13,-729.95"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1170.94,-726.45 1160.94,-729.95 1170.93,-733.45 1170.94,-726.45"/>
+</g>
+<!-- module~core_types_datetime -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node44" class="node">
+<title>module~core_types_datetime</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node44"><a xlink:href="../module/core_types_datetime.html" xlink:title="core_types_datetime">
+<polygon fill="#337ab7" stroke="#337ab7" points="937,-621.82 814,-621.82 814,-597.82 937,-597.82 937,-621.82"/>
+<text text-anchor="middle" x="875.5" y="-607.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_datetime</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_datetime -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge65" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_datetime</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1262.5,-533.82C1140.01,-513.06 1100.46,-514.55 984,-557.82 965.5,-564.7 965.44,-574.58 948,-583.82 940.86,-587.6 933.06,-591.06 925.31,-594.13"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="924.04,-590.87 915.93,-597.69 926.53,-597.41 924.04,-590.87"/>
+</g>
+<!-- module~core_types_graph -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node45" class="node">
+<title>module~core_types_graph</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node45"><a xlink:href="../module/core_types_graph.html" xlink:title="core_types_graph">
+<polygon fill="#337ab7" stroke="#337ab7" points="1485,-612.82 1379,-612.82 1379,-588.82 1485,-588.82 1485,-612.82"/>
+<text text-anchor="middle" x="1432" y="-598.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_graph</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_graph -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge66" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_graph</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1603.5,-600.82C1568.16,-608.01 1527.85,-608.35 1495.3,-606.74"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1495.2,-603.23 1485.02,-606.16 1494.8,-610.22 1495.2,-603.23"/>
+</g>
+<!-- module~core_types_math_gauss -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node46" class="node">
+<title>module~core_types_math_gauss</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node46"><a xlink:href="../module/core_types_math_gauss.html" xlink:title="core_types_math_gauss">
+<polygon fill="#337ab7" stroke="#337ab7" points="945,-541.82 806,-541.82 806,-517.82 945,-517.82 945,-541.82"/>
+<text text-anchor="middle" x="875.5" y="-527.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_math_gauss</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_math_gauss -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge67" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_math_gauss</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1076.5,-453.82C1010,-446.15 938.01,-486.95 901.21,-511.77"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="898.88,-509.13 892.64,-517.7 902.86,-514.89 898.88,-509.13"/>
+</g>
+<!-- module~core_types_physics_config_bc -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node47" class="node">
+<title>module~core_types_physics_config_bc</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node47"><a xlink:href="../module/core_types_physics_config_bc.html" xlink:title="core_types_physics_config_bc">
+<polygon fill="#337ab7" stroke="#337ab7" points="1162.5,-825.82 992.5,-825.82 992.5,-801.82 1162.5,-801.82 1162.5,-825.82"/>
+<text text-anchor="middle" x="1077.5" y="-811.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_physics_config_bc</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_physics_config_bc -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge68" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_physics_config_bc</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1262.5,-729.82C1235.63,-729.92 1228.92,-738.28 1207,-753.82 1187.76,-767.47 1191.42,-781.01 1171,-792.82 1167.74,-794.7 1164.33,-796.42 1160.82,-797.98"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1159.31,-794.81 1151.32,-801.76 1161.9,-801.32 1159.31,-794.81"/>
+</g>
+<!-- module~core_types_physics_info -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node48" class="node">
+<title>module~core_types_physics_info</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node48"><a xlink:href="../module/core_types_physics_info.html" xlink:title="core_types_physics_info">
+<polygon fill="#337ab7" stroke="#337ab7" points="945,-461.82 806,-461.82 806,-437.82 945,-437.82 945,-461.82"/>
+<text text-anchor="middle" x="875.5" y="-447.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_physics_info</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_physics_info -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge69" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_physics_info</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1742.8,-596.39C1707.93,-593.74 1652.44,-591.85 1605.5,-600.82"/>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1603.5,-600.82C1560.81,-608.98 1550.58,-588.52 1508,-579.82 1400.09,-557.77 1373.17,-551.76 1264.5,-533.82"/>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1262.5,-533.82C1214.53,-524.47 1216.11,-491.64 1171,-472.82 1132.27,-456.66 1120.19,-458.63 1078.5,-453.82"/>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1076.5,-453.82C1036.77,-449.24 992.3,-447.97 955.41,-447.96"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="955.2,-444.46 945.21,-447.99 955.22,-451.46 955.2,-444.46"/>
+</g>
+<!-- module~core_types_physics_meteorology -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node49" class="node">
+<title>module~core_types_physics_meteorology</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node49"><a xlink:href="../module/core_types_physics_meteorology.html" xlink:title="core_types_physics_meteorology">
+<polygon fill="#337ab7" stroke="#337ab7" points="1171,-505.82 984,-505.82 984,-481.82 1171,-481.82 1171,-505.82"/>
+<text text-anchor="middle" x="1077.5" y="-491.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_physics_meteorology</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_physics_meteorology -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge70" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_physics_meteorology</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1262.5,-533.82C1220.52,-526.71 1173.62,-516.48 1137.68,-508.14"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1138.38,-504.71 1127.85,-505.85 1136.79,-511.53 1138.38,-504.71"/>
+</g>
+<!-- module~core_types_physics_state -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node50" class="node">
+<title>module~core_types_physics_state</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node50"><a xlink:href="../module/core_types_physics_state.html" xlink:title="core_types_physics_state">
+<polygon fill="#337ab7" stroke="#337ab7" points="948,-781.82 803,-781.82 803,-757.82 948,-757.82 948,-781.82"/>
+<text text-anchor="middle" x="875.5" y="-767.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_physics_state</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_physics_state -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge71" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_physics_state</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1431,-729.82C1400.21,-744.02 1388.18,-733.13 1356,-743.82 1269.04,-772.72 1260.25,-814.06 1171,-834.82 1090.05,-853.65 1060.13,-868.16 984,-834.82 962.39,-825.36 967.64,-808.89 948,-795.82 942.31,-792.04 936,-788.72 929.55,-785.84"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="930.64,-782.5 920.07,-781.92 927.97,-788.97 930.64,-782.5"/>
+</g>
+<!-- module~core_types_pointer -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node51" class="node">
+<title>module~core_types_pointer</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node51"><a xlink:href="../module/core_types_pointer.html" xlink:title="core_types_pointer">
+<polygon fill="#337ab7" stroke="#337ab7" points="1320,-981.82 1207,-981.82 1207,-957.82 1320,-957.82 1320,-981.82"/>
+<text text-anchor="middle" x="1263.5" y="-967.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_pointer</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_pointer -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge72" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_pointer</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1603.5,-600.82C1528.61,-616.05 1564,-691.81 1508,-743.82 1451.12,-796.64 1412.61,-776.72 1356,-829.82 1318.33,-865.16 1288.83,-918.99 1274.33,-948.54"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1271.17,-947.05 1270,-957.58 1277.48,-950.07 1271.17,-947.05"/>
+</g>
+<!-- module~core_types_solar -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node52" class="node">
+<title>module~core_types_solar</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node52"><a xlink:href="../module/core_types_solar.html" xlink:title="core_types_solar">
+<polygon fill="#337ab7" stroke="#337ab7" points="1128,-661.82 1027,-661.82 1027,-637.82 1128,-637.82 1128,-661.82"/>
+<text text-anchor="middle" x="1077.5" y="-647.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_solar</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_solar -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge73" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_solar</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1603.5,-600.82C1575.49,-606.17 1568,-609.42 1544,-624.82 1486.85,-661.5 1494.67,-701.39 1433,-729.82"/>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1431,-729.82C1363.8,-760.8 1338.5,-729.56 1264.5,-729.82"/>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1262.5,-729.82C1200.79,-730.04 1136.37,-691.64 1102.54,-667.97"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1104.4,-664.99 1094.23,-662.02 1100.32,-670.69 1104.4,-664.99"/>
+</g>
+<!-- module~module_type_matrix -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node56" class="node">
+<title>module~module_type_matrix</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node56"><a xlink:href="../module/module_type_matrix.html" xlink:title="module_type_matrix">
+<polygon fill="#337ab7" stroke="#337ab7" points="1665,-552.82 1544,-552.82 1544,-528.82 1665,-528.82 1665,-552.82"/>
+<text text-anchor="middle" x="1604.5" y="-538.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">module_type_matrix</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~module_type_matrix -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge74" class="edge">
+<title>module~core_types&#45;&gt;module~module_type_matrix</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1742.71,-588.02C1716.1,-578.87 1679,-566.11 1650.08,-556.16"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1651.21,-552.85 1640.62,-552.9 1648.93,-559.47 1651.21,-552.85"/>
+</g>
+<!-- module~core_utils&#45;&gt;core_findings -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge76" class="edge">
+<title>module~core_utils&#45;&gt;core_findings</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M1231.98,-1006.37C1222.72,-1003.27 1213.33,-998.42 1207,-990.82 1149.76,-922.09 1232.86,-857.42 1171,-792.82 1160.16,-781.5 1144.6,-775.7 1129.33,-772.87"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1129.78,-769.4 1119.38,-771.41 1128.77,-776.33 1129.78,-769.4"/>
+</g>
+<!-- core_unique -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node35" class="node">
+<title>core_unique</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="1116.5,-1095.82 1038.5,-1095.82 1038.5,-1071.82 1116.5,-1071.82 1116.5,-1095.82"/>
+<text text-anchor="middle" x="1077.5" y="-1081.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_unique</text>
+</g>
+<!-- module~core_utils&#45;&gt;core_unique -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge77" class="edge">
+<title>module~core_utils&#45;&gt;core_unique</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M1235.78,-1023.88C1226.59,-1028.15 1216.28,-1033.07 1207,-1037.82 1190.7,-1046.15 1187.93,-1050.85 1171,-1057.82 1156.84,-1063.65 1140.94,-1068.64 1126.36,-1072.65"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1125.29,-1069.31 1116.53,-1075.26 1127.09,-1076.08 1125.29,-1069.31"/>
+</g>
+<!-- module~core_string_utils -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node40" class="node">
+<title>module~core_string_utils</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node40"><a xlink:href="../module/core_string_utils.html" xlink:title="core_string_utils">
+<polygon fill="#337ab7" stroke="#337ab7" points="924.5,-861.82 826.5,-861.82 826.5,-837.82 924.5,-837.82 924.5,-861.82"/>
+<text text-anchor="middle" x="875.5" y="-847.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_string_utils</text>
+</a>
+</g>
+</g>
+<!-- module~core_utils&#45;&gt;module~core_string_utils -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge78" class="edge">
+<title>module~core_utils&#45;&gt;module~core_string_utils</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M1231.78,-1018.23C1175.84,-1028.01 1056.49,-1039.89 984,-981.82 945.17,-950.72 982.8,-911.38 948,-875.82 943.86,-871.59 938.97,-868.04 933.73,-865.07"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="935.16,-861.87 924.64,-860.59 932.07,-868.15 935.16,-861.87"/>
+</g>
+<!-- module~core_system_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node41" class="node">
+<title>module~core_system_env</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node41"><a xlink:href="../module/core_system_env.html" xlink:title="core_system_env">
+<polygon fill="#337ab7" stroke="#337ab7" points="1129,-1213.82 1026,-1213.82 1026,-1189.82 1129,-1189.82 1129,-1213.82"/>
+<text text-anchor="middle" x="1077.5" y="-1199.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_system_env</text>
+</a>
+</g>
+</g>
+<!-- module~core_utils&#45;&gt;module~core_system_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge79" class="edge">
+<title>module~core_utils&#45;&gt;module~core_system_env</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M1250.71,-1024C1219.76,-1055.96 1135.95,-1142.5 1097.83,-1181.86"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1094.87,-1179.88 1090.43,-1189.5 1099.9,-1184.75 1094.87,-1179.88"/>
+</g>
+<!-- module~core_validation&#45;&gt;core_check_range -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge82" class="edge">
+<title>module~core_validation&#45;&gt;core_check_range</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1067.75,-69.93C1038.97,-109.75 949.05,-234.1 948,-234.82 920.89,-253.42 907.93,-244.17 876.5,-253.82"/>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M874.5,-253.82C843.07,-263.47 831.84,-257.03 803,-272.82 783.96,-283.24 785.39,-294.29 767,-305.82 761.15,-309.49 754.7,-312.8 748.19,-315.74"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="746.52,-312.65 738.68,-319.77 749.25,-319.09 746.52,-312.65"/>
+</g>
+<!-- module~core_validation&#45;&gt;core_check_length -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge80" class="edge">
+<title>module~core_validation&#45;&gt;core_check_length</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1049.07,-45.69C996.66,-24.54 880.63,12.38 803,-36.82 734.39,-80.3 711.29,-183.97 704.27,-229.61"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="700.78,-229.25 702.84,-239.64 707.71,-230.24 700.78,-229.25"/>
+</g>
+<!-- core_check_nan -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node33" class="node">
+<title>core_check_nan</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="924.5,-69.82 826.5,-69.82 826.5,-45.82 924.5,-45.82 924.5,-69.82"/>
+<text text-anchor="middle" x="875.5" y="-55.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_check_nan</text>
+</g>
+<!-- module~core_validation&#45;&gt;core_check_nan -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge81" class="edge">
+<title>module~core_validation&#45;&gt;core_check_nan</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1030.36,-57.82C1001.97,-57.82 965.31,-57.82 934.89,-57.82"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="934.84,-54.32 924.84,-57.82 934.84,-61.32 934.84,-54.32"/>
+</g>
+<!-- module~core_error -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node36" class="node">
+<title>module~core_error</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node36"><a xlink:href="../module/core_error.html" xlink:title="core_error">
+<polygon fill="#337ab7" stroke="#337ab7" points="909,-225.82 842,-225.82 842,-201.82 909,-201.82 909,-225.82"/>
+<text text-anchor="middle" x="875.5" y="-211.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_error</text>
+</a>
+</g>
+</g>
+<!-- module~core_validation&#45;&gt;module~core_error -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge83" class="edge">
+<title>module~core_validation&#45;&gt;module~core_error</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1060.81,-70.06C1025.83,-97.34 941.31,-163.27 900.01,-195.48"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="897.85,-192.73 892.12,-201.64 902.16,-198.25 897.85,-192.73"/>
+</g>
+<!-- module~linalg_matrix_operations&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge84" class="edge">
+<title>module~linalg_matrix_operations&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M2454.72,-1013.92C2447.58,-1016.43 2440.47,-1019.38 2434,-1022.82 2326.13,-1080.19 2340.02,-1166.21 2222,-1197.82"/>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M2220,-1197.82C2193.9,-1208.14 2184.61,-1206.18 2162,-1222.82 2142.2,-1237.4 2147.43,-1252.78 2126,-1264.82 2080.26,-1290.52 2061.71,-1278.71 2009.5,-1283.82"/>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M2007.5,-1283.82C1906.43,-1293.71 1875.83,-1253.2 1779,-1283.82"/>
+</g>
+<!-- module~linalg_matrix_operations&#45;&gt;module~module_core -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge85" class="edge">
+<title>module~linalg_matrix_operations&#45;&gt;module~module_core</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M2460.9,-989.82C2444.21,-985.28 2425.11,-980.08 2407.93,-975.41"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="2408.63,-971.97 2398.07,-972.72 2406.8,-978.73 2408.63,-971.97"/>
+</g>
+<!-- module~linalg_vector_operations&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge86" class="edge">
+<title>module~linalg_vector_operations&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#3200ff" stroke-dasharray="5,2" d="M2356,-1197.82C2301.31,-1221.4 2277.38,-1175.93 2222,-1197.82"/>
+</g>
+<!-- module~linalg_vector_operations&#45;&gt;module~module_core -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge88" class="edge">
+<title>module~linalg_vector_operations&#45;&gt;module~module_core</title>
+<path fill="none" stroke="#3200ff" stroke-dasharray="5,2" d="M2455.14,-1031.77C2447.86,-1029.24 2440.61,-1026.28 2434,-1022.82 2412.88,-1011.77 2391.98,-994.41 2377.46,-981.02"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="2379.77,-978.38 2370.09,-974.06 2374.96,-983.47 2379.77,-978.38"/>
+</g>
+<!-- module~linalg_mkl_backend -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node55" class="node">
+<title>module~linalg_mkl_backend</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node55"><a xlink:href="../module/linalg_mkl_backend.html" xlink:title="linalg_mkl_backend">
+<polygon fill="#337ab7" stroke="#337ab7" points="2280,-1255.82 2162,-1255.82 2162,-1231.82 2280,-1231.82 2280,-1255.82"/>
+<text text-anchor="middle" x="2221" y="-1241.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">linalg_mkl_backend</text>
+</a>
+</g>
+</g>
+<!-- module~linalg_vector_operations&#45;&gt;module~linalg_mkl_backend -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge87" class="edge">
+<title>module~linalg_vector_operations&#45;&gt;module~linalg_mkl_backend</title>
+<path fill="none" stroke="#3200ff" stroke-dasharray="5,2" d="M2356,-1197.82C2328.75,-1209.49 2297.47,-1220.37 2271.98,-1228.61"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="2270.62,-1225.37 2262.16,-1231.75 2272.75,-1232.04 2270.62,-1225.37"/>
+</g>
+<!-- mpi_f08 -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node57" class="node">
+<title>mpi_f08</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node57"><a xlink:href="http://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node409.htm" xlink:title="mpi_f08">
+<polygon fill="#337ab7" stroke="#337ab7" points="1805.5,-973.82 1750.5,-973.82 1750.5,-949.82 1805.5,-949.82 1805.5,-973.82"/>
+<text text-anchor="middle" x="1778" y="-959.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mpi_f08</text>
+</a>
+</g>
+</g>
+<!-- module~linalg_vector_operations&#45;&gt;mpi_f08 -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge89" class="edge">
+<title>module~linalg_vector_operations&#45;&gt;mpi_f08</title>
+<path fill="none" stroke="#3200ff" stroke-dasharray="5,2" d="M2498.12,-1056.17C2480.02,-1087.18 2427.65,-1167.99 2358,-1197.82"/>
+<path fill="none" stroke="#3200ff" stroke-dasharray="5,2" d="M2356,-1197.82C2300.32,-1221.67 1912.16,-1002.88 1855,-982.82 1842.26,-978.35 1828.06,-974.21 1815.41,-970.8"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="1816.21,-967.4 1805.65,-968.24 1814.43,-974.17 1816.21,-967.4"/>
+</g>
+<!-- module~core_error&#45;&gt;module~core_constants -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge91" class="edge">
+<title>module~core_error&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#ffb700" stroke-dasharray="5,2" d="M853.39,-225.84C837.12,-236.2 815.39,-252.67 803,-272.82 764.83,-334.92 800.42,-368.05 767,-432.82 756.26,-453.63 738.16,-473.15 723.7,-486.76"/>
+<polygon fill="#ffb700" stroke="#ffb700" points="721.14,-484.36 716.11,-493.68 725.86,-489.53 721.14,-484.36"/>
+</g>
+<!-- module~core_error&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge90" class="edge">
+<title>module~core_error&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ffb700" stroke-dasharray="5,2" d="M841.95,-222.66C829.29,-226.85 814.97,-232.56 803,-239.82 784.44,-251.08 785.94,-262.22 767,-272.82 713.35,-302.84 692.51,-291.97 634,-310.82 478.91,-360.79 438.08,-369.08 289,-434.82 272.45,-442.12 269.43,-446.25 253,-453.82 226.73,-465.92 220.63,-471.06 192.5,-477.82"/>
+<path fill="none" stroke="#ffb700" stroke-dasharray="5,2" d="M190.5,-477.82C158.06,-484.24 122.22,-494.31 94.6,-502.74"/>
+<polygon fill="#ffb700" stroke="#ffb700" points="93.34,-499.47 84.82,-505.77 95.41,-506.16 93.34,-499.47"/>
+</g>
+<!-- module~core_error&#45;&gt;stdlib_strings -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge92" class="edge">
+<title>module~core_error&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#ffb700" stroke-dasharray="5,2" d="M841.9,-210.81C740.68,-202.79 424.69,-187.88 192.5,-287.82"/>
+<path fill="none" stroke="#ffb700" stroke-dasharray="5,2" d="M190.5,-287.82C138.59,-307.76 90.44,-353.54 65.6,-379.99"/>
+<polygon fill="#ffb700" stroke="#ffb700" points="62.86,-377.8 58.66,-387.52 68.01,-382.54 62.86,-377.8"/>
+</g>
+<!-- module~core_fortran_utils_memory_stats_wrapper&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge93" class="edge">
+<title>module~core_fortran_utils_memory_stats_wrapper&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#fff400" stroke-dasharray="5,2" d="M1904.87,-1255.84C1865,-1262.05 1819.32,-1271.07 1779,-1283.82"/>
+</g>
+<!-- module~core_c_utils_memory_stats -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node60" class="node">
+<title>module~core_c_utils_memory_stats</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node60"><a xlink:href="../module/core_c_utils_memory_stats.html" xlink:title="core_c_utils_memory_stats">
+<polygon fill="#337ab7" stroke="#337ab7" points="1855,-1137.82 1701,-1137.82 1701,-1113.82 1855,-1113.82 1855,-1137.82"/>
+<text text-anchor="middle" x="1778" y="-1123.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_c_utils_memory_stats</text>
+</a>
+</g>
+</g>
+<!-- module~core_fortran_utils_memory_stats_wrapper&#45;&gt;module~core_c_utils_memory_stats -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge94" class="edge">
+<title>module~core_fortran_utils_memory_stats_wrapper&#45;&gt;module~core_c_utils_memory_stats</title>
+<path fill="none" stroke="#fff400" stroke-dasharray="5,2" d="M1961.45,-1231.78C1939.51,-1225.21 1913.26,-1216.09 1891,-1204.82 1857.64,-1187.93 1823.03,-1162.01 1801.28,-1144.51"/>
+<polygon fill="#fff400" stroke="#fff400" points="1803.29,-1141.63 1793.33,-1138.03 1798.87,-1147.06 1803.29,-1141.63"/>
+</g>
+<!-- module~core_c_utils_signal_flag -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node61" class="node">
+<title>module~core_c_utils_signal_flag</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node61"><a xlink:href="../module/core_c_utils_signal_flag.html" xlink:title="core_c_utils_signal_flag">
+<polygon fill="#337ab7" stroke="#337ab7" points="1846,-1015.82 1710,-1015.82 1710,-991.82 1846,-991.82 1846,-1015.82"/>
+<text text-anchor="middle" x="1778" y="-1001.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_c_utils_signal_flag</text>
+</a>
+</g>
+</g>
+<!-- module~core_fortran_utils_signal_flag_wrapper&#45;&gt;module~core_c_utils_signal_flag -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge95" class="edge">
+<title>module~core_fortran_utils_signal_flag_wrapper&#45;&gt;module~core_c_utils_signal_flag</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M1942.02,-973.86C1914.65,-978.89 1882.69,-984.76 1854.35,-989.97"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1853.69,-986.53 1844.49,-991.78 1854.96,-993.42 1853.69,-986.53"/>
+</g>
+<!-- stdlib_logger -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node66" class="node">
+<title>stdlib_logger</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="1818.5,-931.82 1737.5,-931.82 1737.5,-907.82 1818.5,-907.82 1818.5,-931.82"/>
+<text text-anchor="middle" x="1778" y="-917.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_logger</text>
+</g>
+<!-- module~core_fortran_utils_signal_flag_wrapper&#45;&gt;stdlib_logger -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge96" class="edge">
+<title>module~core_fortran_utils_signal_flag_wrapper&#45;&gt;stdlib_logger</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M1942.02,-949.79C1905.93,-943.15 1861.84,-935.05 1828.62,-928.94"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1829.15,-925.48 1818.68,-927.11 1827.88,-932.36 1829.15,-925.48"/>
+</g>
+<!-- module~core_fortran_utils_system_info_wrapper&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge98" class="edge">
+<title>module~core_fortran_utils_system_info_wrapper&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#8eff00" stroke-dasharray="5,2" d="M1896.65,-1176.19C1815.95,-1171.28 1704,-1165.82 1605.5,-1165.82 1605.5,-1165.82 1605.5,-1165.82 1431,-1165.82 1184.55,-1165.82 1122.19,-1181.2 876.5,-1161.82"/>
+</g>
+<!-- module~core_fortran_utils_system_info_wrapper&#45;&gt;stdlib_strings -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge102" class="edge">
+<title>module~core_fortran_utils_system_info_wrapper&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#8eff00" stroke-dasharray="5,2" d="M1997.77,-1171.58C1974.5,-1141.53 1915.75,-1060.87 1891,-982.82 1836.51,-810.99 1918.81,-747.42 1855,-578.82 1804.59,-445.64 1779.52,-405.46 1665,-320.82 1290.56,-44.07 1098.8,-107.23 634,-134.82 559.3,-139.26 539.84,-133.72 466,-145.82 418.13,-153.67 408.58,-167.39 360.5,-173.82"/>
+<path fill="none" stroke="#8eff00" stroke-dasharray="5,2" d="M358.5,-173.82C247.94,-181.95 214.56,-202.14 130,-273.82 95.25,-303.28 69.76,-351.15 57.06,-378.63"/>
+<polygon fill="#8eff00" stroke="#8eff00" points="53.87,-377.2 52.97,-387.75 60.26,-380.06 53.87,-377.2"/>
+</g>
+<!-- module~core_fortran_utils_system_info_wrapper&#45;&gt;module~core_system_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge101" class="edge">
+<title>module~core_fortran_utils_system_info_wrapper&#45;&gt;module~core_system_env</title>
+<path fill="none" stroke="#8eff00" stroke-dasharray="5,2" d="M1974.74,-1195.89C1944.23,-1206.45 1897.24,-1220.98 1855,-1226.82 1717.15,-1245.88 1297.04,-1217.97 1139.25,-1206.43"/>
+<polygon fill="#8eff00" stroke="#8eff00" points="1139.47,-1202.94 1129.24,-1205.69 1138.96,-1209.92 1139.47,-1202.94"/>
+</g>
+<!-- iso_c_binding -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node58" class="node">
+<title>iso_c_binding</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node58"><a xlink:href="http://fortranwiki.org/fortran/show/iso_c_binding" xlink:title="iso_c_binding">
+<polygon fill="#337ab7" stroke="#337ab7" points="1646.5,-1095.82 1562.5,-1095.82 1562.5,-1071.82 1646.5,-1071.82 1646.5,-1095.82"/>
+<text text-anchor="middle" x="1604.5" y="-1081.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_c_binding</text>
+</a>
+</g>
+</g>
+<!-- module~core_fortran_utils_system_info_wrapper&#45;&gt;iso_c_binding -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge97" class="edge">
+<title>module~core_fortran_utils_system_info_wrapper&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#8eff00" stroke-dasharray="5,2" d="M1913.45,-1171.77C1905.31,-1168.16 1897.66,-1163.59 1891,-1157.82 1856.88,-1128.25 1892.16,-1088.48 1855,-1062.82 1790.31,-1018.16 1692.51,-1047.08 1640.66,-1067.91"/>
+<polygon fill="#8eff00" stroke="#8eff00" points="1639.13,-1064.75 1631.23,-1071.81 1641.81,-1071.22 1639.13,-1064.75"/>
+</g>
+<!-- module~core_c_utils -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node59" class="node">
+<title>module~core_c_utils</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node59"><a xlink:href="../module/core_c_utils.html" xlink:title="core_c_utils">
+<polygon fill="#337ab7" stroke="#337ab7" points="1815,-1217.82 1741,-1217.82 1741,-1193.82 1815,-1193.82 1815,-1217.82"/>
+<text text-anchor="middle" x="1778" y="-1203.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_c_utils</text>
+</a>
+</g>
+</g>
+<!-- module~core_fortran_utils_system_info_wrapper&#45;&gt;module~core_c_utils -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge99" class="edge">
+<title>module~core_fortran_utils_system_info_wrapper&#45;&gt;module~core_c_utils</title>
+<path fill="none" stroke="#8eff00" stroke-dasharray="5,2" d="M1896.93,-1194.47C1871.59,-1196.91 1846.01,-1199.37 1825.19,-1201.37"/>
+<polygon fill="#8eff00" stroke="#8eff00" points="1824.68,-1197.91 1815.06,-1202.35 1825.35,-1204.88 1824.68,-1197.91"/>
+</g>
+<!-- module~core_c_utils_system_info -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node62" class="node">
+<title>module~core_c_utils_system_info</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node62"><a xlink:href="../module/core_c_utils_system_info.html" xlink:title="core_c_utils_system_info">
+<polygon fill="#337ab7" stroke="#337ab7" points="1849,-1095.82 1707,-1095.82 1707,-1071.82 1849,-1071.82 1849,-1095.82"/>
+<text text-anchor="middle" x="1778" y="-1081.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_c_utils_system_info</text>
+</a>
+</g>
+</g>
+<!-- module~core_fortran_utils_system_info_wrapper&#45;&gt;module~core_c_utils_system_info -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge100" class="edge">
+<title>module~core_fortran_utils_system_info_wrapper&#45;&gt;module~core_c_utils_system_info</title>
+<path fill="none" stroke="#8eff00" stroke-dasharray="5,2" d="M1919.24,-1171.72C1909.24,-1168.19 1899.57,-1163.65 1891,-1157.82 1867.45,-1141.82 1878.14,-1121.41 1855,-1104.82 1852.78,-1103.23 1850.45,-1101.76 1848.03,-1100.4"/>
+<polygon fill="#8eff00" stroke="#8eff00" points="1849.48,-1097.22 1838.96,-1095.95 1846.4,-1103.5 1849.48,-1097.22"/>
+</g>
+<!-- module~core_string_utils&#45;&gt;module~core_constants -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge105" class="edge">
+<title>module~core_string_utils&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#51ff00" stroke-dasharray="5,2" d="M853.02,-837.61C836.77,-827.25 815.24,-810.88 803,-790.82 763.91,-726.75 793.25,-696.14 767,-625.82 753.29,-589.08 729.99,-549.78 715.19,-526.52"/>
+<polygon fill="#51ff00" stroke="#51ff00" points="717.97,-524.38 709.61,-517.88 712.09,-528.17 717.97,-524.38"/>
+</g>
+<!-- module~core_string_utils&#45;&gt;core_allocate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge103" class="edge">
+<title>module~core_string_utils&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#51ff00" stroke-dasharray="5,2" d="M849.71,-837.64C819.57,-822.83 768.55,-797.77 734.95,-781.25"/>
+<polygon fill="#51ff00" stroke="#51ff00" points="736.48,-778.11 725.96,-776.84 733.39,-784.39 736.48,-778.11"/>
+</g>
+<!-- module~core_string_utils&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge104" class="edge">
+<title>module~core_string_utils&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#51ff00" stroke-dasharray="5,2" d="M699.5,-880.82C624.74,-867.72 608.05,-831.46 533,-842.82"/>
+</g>
+<!-- module~core_string_utils&#45;&gt;stdlib_strings -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge106" class="edge">
+<title>module~core_string_utils&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#51ff00" stroke-dasharray="5,2" d="M843.89,-861.86C809.32,-873.94 751.39,-889.57 701.5,-880.82"/>
+<path fill="none" stroke="#51ff00" stroke-dasharray="5,2" d="M699.5,-880.82C660.02,-873.9 657.62,-851.21 634,-818.82 612.21,-788.95 626.19,-767.75 598,-743.82 575.05,-724.34 553.56,-746.8 533,-724.82"/>
+</g>
+<!-- module~core_system_env&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge107" class="edge">
+<title>module~core_system_env&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#14ff00" stroke-dasharray="5,2" d="M1034.43,-1189.72C994.26,-1179.06 931.84,-1164.76 876.5,-1161.82"/>
+</g>
+<!-- module~core_types_coordinate&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge108" class="edge">
+<title>module~core_types_coordinate&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff28" stroke-dasharray="5,2" d="M633.72,-417.06C536.5,-425.56 349.05,-444.79 192.5,-477.82"/>
+</g>
+<!-- module~core_types_coordinate&#45;&gt;stdlib_optval -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge109" class="edge">
+<title>module~core_types_coordinate&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#00ff28" stroke-dasharray="5,2" d="M659.23,-399.8C650.43,-396.12 641.51,-391.5 634,-385.82 613.01,-369.95 618.28,-355.58 598,-338.82 520.32,-274.63 291.81,-118.73 192.5,-135.82"/>
+</g>
+<!-- module~core_types_coordinate&#45;&gt;stdlib_strings -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge110" class="edge">
+<title>module~core_types_coordinate&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#00ff28" stroke-dasharray="5,2" d="M662.02,-399.78C552.12,-364.89 235.73,-267.42 192.5,-287.82"/>
+</g>
+<!-- module~core_types_coordinate_array&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge111" class="edge">
+<title>module~core_types_coordinate_array&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M996.39,-741.9C991.91,-744.39 987.73,-747.34 984,-750.82 943.31,-788.83 987.99,-832.08 948,-870.82 924.38,-893.7 898.72,-865.58 876.5,-889.82"/>
+</g>
+<!-- module~core_types_coordinate_array&#45;&gt;module~core_memory -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge112" class="edge">
+<title>module~core_types_coordinate_array&#45;&gt;module~core_memory</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M994.29,-729C972.18,-728.78 948.87,-728.55 928.87,-728.35"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="928.78,-724.84 918.74,-728.24 928.71,-731.84 928.78,-724.84"/>
+</g>
+<!-- module~core_types_coordinate_array&#45;&gt;module~core_types_coordinate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge113" class="edge">
+<title>module~core_types_coordinate_array&#45;&gt;module~core_types_coordinate</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M1044.2,-717.7C1023.51,-708.19 998.01,-692.84 984,-670.82 917.84,-566.82 1026.33,-491 948,-395.82 926.7,-369.94 909.37,-378.39 876.5,-371.82"/>
+</g>
+<!-- module~core_types_datetime&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge114" class="edge">
+<title>module~core_types_datetime&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ffa3" stroke-dasharray="5,2" d="M699.5,-686.82C671.24,-699.58 655.6,-688.58 634,-710.82 598.75,-747.12 633.2,-782.48 598,-818.82 576.58,-840.94 563.51,-838.64 533,-842.82"/>
+</g>
+<!-- module~core_types_datetime&#45;&gt;stdlib_optval -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge115" class="edge">
+<title>module~core_types_datetime&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#00ffa3" stroke-dasharray="5,2" d="M833.2,-621.84C822.98,-625.61 812.3,-630.27 803,-635.82 784.61,-646.79 785.74,-657.47 767,-667.82 740.46,-682.47 729.13,-674.35 701.5,-686.82"/>
+<path fill="none" stroke="#00ffa3" stroke-dasharray="5,2" d="M699.5,-686.82C602.14,-730.77 539.05,-707.76 466,-629.82 403.04,-562.65 475.58,-505.81 430,-425.82 378.66,-335.73 347.97,-315.44 253,-273.82 202.97,-251.9 139.84,-247.57 96.95,-247.66"/>
+<polygon fill="#00ffa3" stroke="#00ffa3" points="96.73,-244.16 86.77,-247.77 96.8,-251.16 96.73,-244.16"/>
+</g>
+<!-- module~core_types_graph&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge116" class="edge">
+<title>module~core_types_graph&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ffe0" stroke-dasharray="5,2" d="M1378.79,-598.31C1278.84,-595.03 1054.58,-595.16 876.5,-649.82"/>
+<path fill="none" stroke="#00ffe0" stroke-dasharray="5,2" d="M874.5,-649.82C823.25,-662.87 816.15,-681.31 767,-700.82 709.26,-723.74 680.79,-702.95 634,-743.82 606.15,-768.15 625.34,-793.93 598,-818.82 575.23,-839.55 563.45,-838.21 533,-842.82"/>
+</g>
+<!-- module~core_types_math_gauss&#45;&gt;module~core_constants -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge120" class="edge">
+<title>module~core_types_math_gauss&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#00e0ff" stroke-dasharray="5,2" d="M805.63,-520.27C789.32,-518 772.14,-515.62 756.54,-513.46"/>
+<polygon fill="#00e0ff" stroke="#00e0ff" points="756.92,-509.98 746.54,-512.07 755.96,-516.91 756.92,-509.98"/>
+</g>
+<!-- module~core_types_math_gauss&#45;&gt;core_allocate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge117" class="edge">
+<title>module~core_types_math_gauss&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#00e0ff" stroke-dasharray="5,2" d="M854.2,-541.94C838.18,-552.47 816.37,-569.11 803,-588.82 773.65,-632.09 794.51,-656.36 767,-700.82 756.09,-718.45 739.3,-734.73 725.45,-746.46"/>
+<polygon fill="#00e0ff" stroke="#00e0ff" points="723.22,-743.76 717.7,-752.81 727.65,-749.17 723.22,-743.76"/>
+</g>
+<!-- module~core_types_math_gauss&#45;&gt;core_deallocate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge118" class="edge">
+<title>module~core_types_math_gauss&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#00e0ff" stroke-dasharray="5,2" d="M826.5,-541.85C818.08,-545.42 809.83,-549.99 803,-555.82 777.89,-577.27 791.8,-599.01 767,-620.82 762.92,-624.41 758.29,-627.53 753.42,-630.25"/>
+<polygon fill="#00e0ff" stroke="#00e0ff" points="751.86,-627.11 744.46,-634.7 754.97,-633.38 751.86,-627.11"/>
+</g>
+<!-- module~core_types_math_gauss&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge119" class="edge">
+<title>module~core_types_math_gauss&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00e0ff" stroke-dasharray="5,2" d="M835,-541.84C824.34,-545.71 812.99,-550.41 803,-555.82 785.41,-565.34 784.76,-573.62 767,-582.82 711.84,-611.4 675.02,-579.17 634,-625.82 576.38,-691.35 654.26,-752.13 598,-818.82 578.14,-842.36 563.52,-838.68 533,-842.82"/>
+<path fill="none" stroke="#00e0ff" stroke-dasharray="5,2" d="M531,-842.82C379.62,-863.56 323.88,-860.82 192.5,-782.82"/>
+</g>
+<!-- module~core_types_math_gauss&#45;&gt;module~core_types_coordinate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge121" class="edge">
+<title>module~core_types_math_gauss&#45;&gt;module~core_types_coordinate</title>
+<path fill="none" stroke="#00e0ff" stroke-dasharray="5,2" d="M856.64,-517.64C826,-496.74 763.29,-453.97 727.69,-429.69"/>
+<polygon fill="#00e0ff" stroke="#00e0ff" points="729.5,-426.68 719.27,-423.94 725.55,-432.47 729.5,-426.68"/>
+</g>
+<!-- module~core_types_physics_config_bc&#45;&gt;module~core_constants -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge123" class="edge">
+<title>module~core_types_physics_config_bc&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#00a3ff" stroke-dasharray="5,2" d="M994.45,-801.65C990.63,-799.16 987.1,-796.24 984,-792.82 898.51,-698.59 1042.94,-593.52 948,-508.82 892.98,-459.74 800.38,-475.36 745.7,-490.82"/>
+<polygon fill="#00a3ff" stroke="#00a3ff" points="744.55,-487.51 735.94,-493.7 746.52,-494.23 744.55,-487.51"/>
+</g>
+<!-- module~core_types_physics_config_bc&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge122" class="edge">
+<title>module~core_types_physics_config_bc&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00a3ff" stroke-dasharray="5,2" d="M1005.4,-825.85C997.54,-829.39 990.16,-833.95 984,-839.82 929.39,-891.86 951.83,-1165.83 876.5,-1161.82"/>
+<path fill="none" stroke="#00a3ff" stroke-dasharray="5,2" d="M874.5,-1161.82C841.03,-1160.04 831.74,-1155.08 803,-1137.82 749.77,-1105.86 758.96,-1065.34 701.5,-1041.82"/>
+</g>
+<!-- module~core_types_physics_config_bc&#45;&gt;module~core_memory -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge124" class="edge">
+<title>module~core_types_physics_config_bc&#45;&gt;module~core_memory</title>
+<path fill="none" stroke="#00a3ff" stroke-dasharray="5,2" d="M1002.51,-801.78C996.02,-799.33 989.74,-796.37 984,-792.82 962.51,-779.53 969.06,-762.78 948,-748.82 941.99,-744.84 935.22,-741.6 928.29,-738.96"/>
+<polygon fill="#00a3ff" stroke="#00a3ff" points="929.4,-735.64 918.81,-735.73 927.15,-742.27 929.4,-735.64"/>
+</g>
+<!-- module~core_types_physics_info&#45;&gt;core_deallocate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge125" class="edge">
+<title>module~core_types_physics_info&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M855.56,-462.03C839.91,-472.86 817.93,-489.85 803,-508.82 780.38,-537.56 788.4,-553.16 767,-582.82 754.91,-599.59 738.2,-615.83 724.69,-627.76"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="722.05,-625.41 716.76,-634.59 726.62,-630.72 722.05,-625.41"/>
+</g>
+<!-- module~core_types_physics_info&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge126" class="edge">
+<title>module~core_types_physics_info&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M859.9,-461.9C839.85,-478.1 802.26,-507.1 767,-526.82 711.03,-558.13 684.75,-543.61 634,-582.82 613.18,-598.91 619.05,-614.04 598,-629.82 507.43,-697.73 471.03,-697.39 360.5,-721.82"/>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M358.5,-721.82C327.1,-728.1 319.2,-730.18 289,-740.82 244.88,-756.36 232.72,-806.7 192.5,-782.82"/>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M190.5,-782.82C99.29,-728.67 63.12,-593.7 52.06,-540.19"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="55.43,-539.2 50.07,-530.06 48.57,-540.55 55.43,-539.2"/>
+</g>
+<!-- module~core_types_physics_info&#45;&gt;module~core_types_coordinate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge127" class="edge">
+<title>module~core_types_physics_info&#45;&gt;module~core_types_coordinate</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M819.76,-437.8C802.8,-434.07 783.94,-429.93 766.36,-426.07"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="766.7,-422.56 756.18,-423.83 765.2,-429.4 766.7,-422.56"/>
+</g>
+<!-- module~core_types_physics_meteorology&#45;&gt;module~core_constants -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge129" class="edge">
+<title>module~core_types_physics_meteorology&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#0028ff" stroke-dasharray="5,2" d="M1015.27,-481.78C1004.41,-478.22 993.53,-473.66 984,-467.82 963.89,-455.5 968.2,-441 948,-428.82 919.84,-411.84 908.29,-401.42 876.5,-409.82"/>
+</g>
+<!-- module~core_types_physics_meteorology&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge128" class="edge">
+<title>module~core_types_physics_meteorology&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#0028ff" stroke-dasharray="5,2" d="M1065.16,-506.09C1045.13,-528.55 1003.73,-578.58 984,-628.82 944.25,-730.04 1020.46,-789.75 948,-870.82 926.09,-895.34 898.72,-865.58 876.5,-889.82"/>
+<path fill="none" stroke="#0028ff" stroke-dasharray="5,2" d="M874.5,-889.82C805.34,-965.27 796.22,-1080.59 701.5,-1041.82"/>
+<path fill="none" stroke="#0028ff" stroke-dasharray="5,2" d="M699.5,-1041.82C592.78,-998.14 647.02,-825.55 533,-842.82"/>
+</g>
+<!-- module~core_types_physics_meteorology&#45;&gt;stdlib_optval -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge132" class="edge">
+<title>module~core_types_physics_meteorology&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#0028ff" stroke-dasharray="5,2" d="M1002.02,-481.75C995.23,-478.18 989.02,-473.62 984,-467.82 903.33,-374.62 1034.89,-280.26 948,-192.82 816.77,-60.76 710.56,-191.81 533,-135.82"/>
+<path fill="none" stroke="#0028ff" stroke-dasharray="5,2" d="M531,-135.82C458.87,-112.6 435.28,-123.59 360.5,-135.82"/>
+</g>
+<!-- module~core_types_physics_meteorology&#45;&gt;module~core_memory -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge130" class="edge">
+<title>module~core_types_physics_meteorology&#45;&gt;module~core_memory</title>
+<path fill="none" stroke="#0028ff" stroke-dasharray="5,2" d="M1068.52,-505.98C1049.36,-534.78 998.61,-608.83 948,-663.82 933,-680.11 914.31,-696.74 899.79,-708.96"/>
+<polygon fill="#0028ff" stroke="#0028ff" points="897.24,-706.53 891.79,-715.61 901.72,-711.91 897.24,-706.53"/>
+</g>
+<!-- module~core_types_physics_meteorology&#45;&gt;module~core_types_datetime -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge131" class="edge">
+<title>module~core_types_physics_meteorology&#45;&gt;module~core_types_datetime</title>
+<path fill="none" stroke="#0028ff" stroke-dasharray="5,2" d="M1009.27,-505.88C1000.21,-509.4 991.48,-513.95 984,-519.82 958.34,-539.99 972.89,-562.71 948,-583.82 943.72,-587.45 938.89,-590.6 933.81,-593.31"/>
+<polygon fill="#0028ff" stroke="#0028ff" points="932,-590.3 924.46,-597.75 935,-596.62 932,-590.3"/>
+</g>
+<!-- module~core_types_physics_state&#45;&gt;core_allocate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge133" class="edge">
+<title>module~core_types_physics_state&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#1400ff" stroke-dasharray="5,2" d="M802.89,-767.75C786.11,-767.27 768.56,-766.76 752.88,-766.31"/>
+<polygon fill="#1400ff" stroke="#1400ff" points="752.96,-762.81 742.86,-766.02 752.76,-769.8 752.96,-762.81"/>
+</g>
+<!-- module~core_types_physics_state&#45;&gt;core_deallocate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge134" class="edge">
+<title>module~core_types_physics_state&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#1400ff" stroke-dasharray="5,2" d="M816.8,-757.73C811.83,-755.29 807.13,-752.35 803,-748.82 774.58,-724.54 794.27,-698.38 767,-672.82 763.25,-669.3 758.96,-666.24 754.42,-663.58"/>
+<polygon fill="#1400ff" stroke="#1400ff" points="755.92,-660.41 745.43,-658.93 752.71,-666.63 755.92,-660.41"/>
+</g>
+<!-- module~core_types_physics_state&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge135" class="edge">
+<title>module~core_types_physics_state&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#1400ff" stroke-dasharray="5,2" d="M828.76,-781.87C763.6,-798.52 640.07,-828.15 533,-842.82"/>
+</g>
+<!-- module~core_types_physics_state&#45;&gt;module~core_types_coordinate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge136" class="edge">
+<title>module~core_types_physics_state&#45;&gt;module~core_types_coordinate</title>
+<path fill="none" stroke="#1400ff" stroke-dasharray="5,2" d="M813.57,-757.77C809.63,-755.31 806.04,-752.35 803,-748.82 725.78,-659.04 816.73,-592.29 767,-484.82 757.23,-463.7 739.22,-444.32 724.55,-430.85"/>
+<polygon fill="#1400ff" stroke="#1400ff" points="726.63,-428.01 716.82,-423.99 721.98,-433.25 726.63,-428.01"/>
+</g>
+<!-- module~core_types_pointer&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge137" class="edge">
+<title>module~core_types_pointer&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#5100ff" stroke-dasharray="5,2" d="M1213.68,-981.93C1174.44,-993.35 1119.32,-1013.32 1078.5,-1043.82"/>
+</g>
+<!-- module~core_types_solar&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge138" class="edge">
+<title>module~core_types_solar&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#8e00ff" stroke-dasharray="5,2" d="M1026.81,-641.87C985.6,-637.13 925.96,-634.64 876.5,-649.82"/>
+</g>
+<!-- module~core_types_solar&#45;&gt;module~core_types_datetime -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge139" class="edge">
+<title>module~core_types_solar&#45;&gt;module~core_types_datetime</title>
+<path fill="none" stroke="#8e00ff" stroke-dasharray="5,2" d="M1026.8,-639.88C1002.6,-635.04 973.07,-629.13 946.61,-623.84"/>
+<polygon fill="#8e00ff" stroke="#8e00ff" points="947.13,-620.38 936.64,-621.85 945.76,-627.24 947.13,-620.38"/>
+</g>
+<!-- module~core_vtk&#45;&gt;core_allocate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge140" class="edge">
+<title>module~core_vtk&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1431,-1089.82C1381.82,-1099.55 1369.93,-1105.36 1320,-1109.82 1250.88,-1116 993.11,-1109.22 984,-1104.82 909.75,-1068.96 761.1,-853.73 715.27,-785.53"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="717.98,-783.28 709.5,-776.92 712.16,-787.18 717.98,-783.28"/>
+</g>
+<!-- module~core_vtk&#45;&gt;core_deallocate -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge141" class="edge">
+<title>module~core_vtk&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1989.66,-825.71C1949.8,-798.67 1856.83,-735.64 1855,-734.82 1823.2,-720.64 1813.63,-712.21 1779,-715.82"/>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1777,-715.82C1575.37,-736.83 1064.22,-493.28 876.5,-569.82"/>
+</g>
+<!-- module~core_vtk&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge144" class="edge">
+<title>module~core_vtk&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1986.05,-849.97C1958.88,-866.63 1912.94,-899.29 1891,-940.82 1831.16,-1054.1 1919.35,-1116.04 1855,-1226.82 1833.79,-1263.33 1819.26,-1271.09 1779,-1283.82"/>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1777,-1283.82C1704.33,-1306.81 1681.3,-1275.85 1605.5,-1283.82"/>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_types -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge145" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_types</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M2002.14,-825.76C1985.61,-789.88 1931.82,-682.83 1855,-625.82 1845.56,-618.82 1834.09,-613.6 1822.96,-609.77"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1823.91,-606.4 1813.32,-606.73 1821.81,-613.07 1823.91,-606.4"/>
+</g>
+<!-- module~core_vtk&#45;&gt;stdlib_strings -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge152" class="edge">
+<title>module~core_vtk&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1998.18,-825.8C1975.31,-795.55 1916.42,-713.04 1891,-633.82 1867.04,-559.16 1910.54,-338.17 1855,-282.82 1619.15,-47.75 691.54,-137.79 360.5,-173.82"/>
+</g>
+<!-- module~core_vtk&#45;&gt;core_unique -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge142" class="edge">
+<title>module~core_vtk&#45;&gt;core_unique</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1603.5,-1043.82C1595.02,-1048.75 1442.73,-1088.55 1433,-1089.82"/>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1431,-1089.82C1322.91,-1103.99 1194.6,-1095.54 1126.52,-1089.08"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1126.82,-1085.6 1116.53,-1088.11 1126.14,-1092.56 1126.82,-1085.6"/>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_vtk_vtk_constants -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge146" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_vtk_vtk_constants</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1777,-715.82C1742.37,-719.43 1726.28,-710.89 1701,-734.82 1596.61,-833.64 1729.8,-971.63 1605.5,-1043.82"/>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1603.5,-1043.82C1554.24,-1072.43 1488.54,-1031.27 1454.9,-1005.28"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1457.07,-1002.54 1447.06,-999.05 1452.71,-1008.02 1457.07,-1002.54"/>
+</g>
+<!-- module~core_vtk&#45;&gt;mpi_f08 -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge149" class="edge">
+<title>module~core_vtk&#45;&gt;mpi_f08</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1992.9,-850.1C1966.83,-871.45 1909.84,-915.55 1855,-940.82 1842.64,-946.52 1828.42,-950.96 1815.64,-954.26"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1814.66,-950.89 1805.77,-956.66 1816.32,-957.69 1814.66,-950.89"/>
+</g>
+<!-- module~core_vtk&#45;&gt;iso_c_binding -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge143" class="edge">
+<title>module~core_vtk&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1979.73,-835.38C1912.13,-830.06 1741.6,-820.65 1701,-856.82 1633.24,-917.19 1721.22,-986.57 1665,-1057.82 1662.29,-1061.26 1659.03,-1064.25 1655.46,-1066.85"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1653.35,-1064.04 1646.65,-1072.24 1657.01,-1070.01 1653.35,-1064.04"/>
+</g>
+<!-- module~core_vtk_vtk_wrapper -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node64" class="node">
+<title>module~core_vtk_vtk_wrapper</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node64"><a xlink:href="../module/core_vtk_vtk_wrapper.html" xlink:title="core_vtk_vtk_wrapper">
+<polygon fill="#337ab7" stroke="#337ab7" points="1841.5,-809.82 1714.5,-809.82 1714.5,-785.82 1841.5,-785.82 1841.5,-809.82"/>
+<text text-anchor="middle" x="1778" y="-795.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_vtk_vtk_wrapper</text>
+</a>
+</g>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_vtk_vtk_wrapper -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge147" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_vtk_vtk_wrapper</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1979.94,-833C1948.33,-827.46 1895.26,-818.17 1851.59,-810.53"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1852.03,-807.05 1841.57,-808.77 1850.82,-813.95 1852.03,-807.05"/>
+</g>
+<!-- module~core_vtk_vtu_wrapper -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node65" class="node">
+<title>module~core_vtk_vtu_wrapper</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node65"><a xlink:href="../module/core_vtk_vtu_wrapper.html" xlink:title="core_vtk_vtu_wrapper">
+<polygon fill="#337ab7" stroke="#337ab7" points="1842,-889.82 1714,-889.82 1714,-865.82 1842,-865.82 1842,-889.82"/>
+<text text-anchor="middle" x="1778" y="-875.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_vtk_vtu_wrapper</text>
+</a>
+</g>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_vtk_vtu_wrapper -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge148" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_vtk_vtu_wrapper</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1979.94,-842.65C1948.44,-848.16 1895.63,-857.41 1852.05,-865.03"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1851.29,-861.61 1842.05,-866.78 1852.5,-868.51 1851.29,-861.61"/>
+</g>
+<!-- module~core_vtk&#45;&gt;stdlib_logger -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge150" class="edge">
+<title>module~core_vtk&#45;&gt;stdlib_logger</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1980.02,-849.89C1949.74,-862.93 1899.45,-883.84 1855,-898.82 1846.52,-901.68 1837.41,-904.45 1828.55,-906.99"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1827.38,-903.68 1818.7,-909.75 1829.27,-910.42 1827.38,-903.68"/>
+</g>
+<!-- stdlib_sorting -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node67" class="node">
+<title>stdlib_sorting</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="1819.5,-767.82 1736.5,-767.82 1736.5,-743.82 1819.5,-743.82 1819.5,-767.82"/>
+<text text-anchor="middle" x="1778" y="-753.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_sorting</text>
+</g>
+<!-- module~core_vtk&#45;&gt;stdlib_sorting -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge151" class="edge">
+<title>module~core_vtk&#45;&gt;stdlib_sorting</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1980.02,-825.75C1949.74,-812.72 1899.45,-791.8 1855,-776.82 1846.89,-774.09 1838.21,-771.44 1829.71,-768.99"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1830.45,-765.56 1819.88,-766.22 1828.56,-772.3 1830.45,-765.56"/>
+</g>
+<!-- module~core_vtk_vtk_constants&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge153" class="edge">
+<title>module~core_vtk_vtk_constants&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff00f4" stroke-dasharray="5,2" d="M1421.69,-999.02C1390.85,-1038.53 1287.32,-1163.76 1171,-1222.82 1133.58,-1241.82 1120.47,-1241.59 1078.5,-1241.82"/>
+<path fill="none" stroke="#ff00f4" stroke-dasharray="5,2" d="M1076.5,-1241.82C1034.65,-1238.63 1023.29,-1237.58 984,-1222.82 932.58,-1203.5 931.26,-1166.14 876.5,-1161.82"/>
+</g>
+<!-- module~core_vtk_vtk_constants&#45;&gt;stdlib_strings -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge154" class="edge">
+<title>module~core_vtk_vtk_constants&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#ff00f4" stroke-dasharray="5,2" d="M1397.67,-974.77C1375.72,-967 1346.29,-956.87 1320,-948.82 1172.07,-903.52 1121.85,-928.07 984,-857.82 965.69,-848.49 966.87,-836.96 948,-828.82 818.65,-773.05 757.67,-853.25 634,-785.82 612.41,-774.05 618.65,-757.16 598,-743.82 572.71,-727.5 553.56,-746.8 533,-724.82"/>
+<path fill="none" stroke="#ff00f4" stroke-dasharray="5,2" d="M531,-724.82C507.38,-699.82 485.25,-711.32 466,-682.82 418.86,-613.05 488.2,-557.67 430,-496.82 354.96,-418.38 297.7,-466.58 192.5,-439.82"/>
+<path fill="none" stroke="#ff00f4" stroke-dasharray="5,2" d="M190.5,-439.82C159.83,-430.56 125.23,-420.83 97.81,-413.29"/>
+<polygon fill="#ff00f4" stroke="#ff00f4" points="98.62,-409.88 88.05,-410.61 96.77,-416.63 98.62,-409.88"/>
+</g>
+<!-- module~linalg_mkl_backend&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge155" class="edge">
+<title>module~linalg_mkl_backend&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff00b7" stroke-dasharray="5,2" d="M2170.6,-1255.82C2128.18,-1265.5 2065.22,-1278.37 2009.5,-1283.82"/>
+</g>
+<!-- module~module_type_matrix&#45;&gt;module~core_types_matrix -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge156" class="edge">
+<title>module~module_type_matrix&#45;&gt;module~core_types_matrix</title>
+<path fill="none" stroke="#ff007a" stroke-dasharray="5,2" d="M1561.34,-528.78C1555.3,-526.25 1549.33,-523.28 1544,-519.82 1524.49,-507.15 1527.14,-495.04 1508,-481.82 1448.13,-440.46 1368.86,-411.17 1317.29,-394.89"/>
+<polygon fill="#ff007a" stroke="#ff007a" points="1318.26,-391.52 1307.67,-391.9 1316.18,-398.21 1318.26,-391.52"/>
+</g>
+<!-- module~core_types_matrix_factory -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_node63" class="node">
+<title>module~core_types_matrix_factory</title>
+<g id="a_module~~solver_preconditioner_iluk~~UsesGraph_node63"><a xlink:href="../module/core_types_matrix_factory.html" xlink:title="core_types_matrix_factory">
+<polygon fill="#337ab7" stroke="#337ab7" points="1508,-514.82 1356,-514.82 1356,-490.82 1508,-490.82 1508,-514.82"/>
+<text text-anchor="middle" x="1432" y="-500.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_matrix_factory</text>
+</a>
+</g>
+</g>
+<!-- module~module_type_matrix&#45;&gt;module~core_types_matrix_factory -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge157" class="edge">
+<title>module~module_type_matrix&#45;&gt;module~core_types_matrix_factory</title>
+<path fill="none" stroke="#ff007a" stroke-dasharray="5,2" d="M1549.55,-528.8C1532.83,-525.07 1514.25,-520.93 1496.92,-517.07"/>
+<polygon fill="#ff007a" stroke="#ff007a" points="1497.41,-513.59 1486.89,-514.83 1495.89,-520.42 1497.41,-513.59"/>
+</g>
+<!-- module~core_c_utils&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge159" class="edge">
+<title>module~core_c_utils&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1761.05,-1217.91C1731.95,-1238.8 1667.52,-1279.83 1605.5,-1283.82"/>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1603.5,-1283.82C1369.91,-1298.86 1311.9,-1259.65 1078.5,-1241.82"/>
+</g>
+<!-- module~core_c_utils&#45;&gt;iso_c_binding -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge158" class="edge">
+<title>module~core_c_utils&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1759.93,-1193.68C1729.62,-1172.12 1666.29,-1127.07 1630.87,-1101.87"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="1632.68,-1098.86 1622.5,-1095.92 1628.62,-1104.56 1632.68,-1098.86"/>
+</g>
+<!-- module~core_c_utils_memory_stats&#45;&gt;iso_c_binding -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge160" class="edge">
+<title>module~core_c_utils_memory_stats&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M1727.85,-1113.79C1705.44,-1108.3 1678.91,-1101.8 1656.3,-1096.26"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1657.09,-1092.85 1646.54,-1093.87 1655.42,-1099.65 1657.09,-1092.85"/>
+</g>
+<!-- module~core_c_utils_signal_flag&#45;&gt;iso_c_binding -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge161" class="edge">
+<title>module~core_c_utils_signal_flag&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1733.74,-1015.86C1722.75,-1019.65 1711.18,-1024.32 1701,-1029.82 1683.17,-1039.46 1682.42,-1047.46 1665,-1057.82 1659.14,-1061.31 1652.73,-1064.59 1646.36,-1067.59"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1644.79,-1064.45 1637.11,-1071.74 1647.66,-1070.83 1644.79,-1064.45"/>
+</g>
+<!-- module~core_c_utils_system_info&#45;&gt;iso_c_binding -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge162" class="edge">
+<title>module~core_c_utils_system_info&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M1706.75,-1083.82C1690.06,-1083.82 1672.55,-1083.82 1656.88,-1083.82"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1656.88,-1080.32 1646.88,-1083.82 1656.88,-1087.32 1656.88,-1080.32"/>
+</g>
+<!-- module~core_types_matrix_factory&#45;&gt;module~core_constants -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge164" class="edge">
+<title>module~core_types_matrix_factory&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1404.94,-490.71C1324.96,-455.2 1076.34,-357.02 876.5,-409.82"/>
+</g>
+<!-- module~core_types_matrix_factory&#45;&gt;module~core_types_matrix -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge165" class="edge">
+<title>module~core_types_matrix_factory&#45;&gt;module~core_types_matrix</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1408.94,-490.75C1393.22,-481.54 1372.11,-467.9 1356,-452.82 1336.79,-434.84 1340.5,-422.32 1320,-405.82 1315.75,-402.4 1310.98,-399.31 1306.06,-396.55"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1307.64,-393.42 1297.14,-391.95 1304.42,-399.64 1307.64,-393.42"/>
+</g>
+<!-- module~core_types_matrix_factory&#45;&gt;iso_fortran_env -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge163" class="edge">
+<title>module~core_types_matrix_factory&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1414.53,-515.07C1397.21,-528.86 1370.52,-552.88 1356,-579.82 1320.61,-645.52 1350.82,-675.86 1320,-743.82 1249.3,-899.7 1215.61,-941.35 1078.5,-1043.82"/>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1076.5,-1043.82C1041.59,-1067.13 1021.35,-1043.69 984,-1062.82 926.19,-1092.44 941.25,-1166.93 876.5,-1161.82"/>
+</g>
+<!-- module~core_vtk_vtk_wrapper&#45;&gt;iso_c_binding -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge166" class="edge">
+<title>module~core_vtk_vtk_wrapper&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M1719.12,-809.86C1712.24,-813.39 1705.92,-817.94 1701,-823.82 1633.46,-904.51 1729.16,-974.42 1665,-1057.82 1662.33,-1061.29 1659.11,-1064.3 1655.55,-1066.92"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1653.44,-1064.11 1646.77,-1072.34 1657.12,-1070.07 1653.44,-1064.11"/>
+</g>
+<!-- module~core_vtk_vtu_wrapper&#45;&gt;iso_c_binding -->
+<g id="module~~solver_preconditioner_iluk~~UsesGraph_edge167" class="edge">
+<title>module~core_vtk_vtu_wrapper&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#3200ff" stroke-dasharray="5,2" d="M1713.7,-889.18C1709.01,-891.79 1704.69,-894.96 1701,-898.82 1650.98,-951.24 1711.16,-1001.97 1665,-1057.82 1662.25,-1061.14 1659,-1064.06 1655.45,-1066.6"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="1653.46,-1063.72 1646.73,-1071.91 1657.1,-1069.7 1653.46,-1063.72"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panmodulesolver_preconditioner_ilukUsesGraph = svgPanZoom('#modulesolver_preconditioner_ilukUsesGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#UsesGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="UsesGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="518pt" height="32pt"
+ viewBox="0.00 0.00 517.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 513.5,-28 513.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node">
+<title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node">
+<title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="145.5,-24 72.5,-24 72.5,0 145.5,0 145.5,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 164,-24 164,0 234,0 234,-24"/>
+<text text-anchor="middle" x="199" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="310,-24 252,-24 252,0 310,0 310,-24"/>
+<text text-anchor="middle" x="281" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="386,-24 328,-24 328,0 386,0 386,-24"/>
+<text text-anchor="middle" x="357" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="509.5,-24 404.5,-24 404.5,0 509.5,0 509.5,-24"/>
+<text text-anchor="middle" x="457" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a submodule to the (sub)module which it is
+descended from. Dashed arrows point from a module or program unit to 
+modules which it uses.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+            </li>
+        </ul>
+      </div>
+    </div>
+
+      
+      <br>
+
+
+
+
+
+
+
+
+
+
+        <section>
+          <h2>Module Subroutines</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-apply_bsr_ilu0"></span> <h3>module subroutine <a href='../proc/apply_bsr_ilu0.html'>apply_bsr_ilu0</a>(self, r, z)  
+    <a href="../interface/apply_bsr_ilu0.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>ブロック ILU(0) 適用 (BSR)</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~92"></span>
+              class(<a href='../type/type_preconditioner_iluk.html'>type_preconditioner_iluk</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-r~20"></span>
+              type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>r</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-z~5"></span>
+              type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>z</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-apply_csr_ilu0"></span> <h3>module subroutine <a href='../proc/apply_csr_ilu0.html'>apply_csr_ilu0</a>(self, r, z)  
+    <a href="../interface/apply_csr_ilu0.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>スカラ ILU(0) 適用 (CSR)</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~91"></span>
+              class(<a href='../type/type_preconditioner_iluk.html'>type_preconditioner_iluk</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-r~19"></span>
+              type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>r</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-z~4"></span>
+              type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>z</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-apply_preconditioner_iluk"></span> <h3>module subroutine <a href='../proc/apply_preconditioner_iluk.html'>apply_preconditioner_iluk</a>(self, r, z)  
+    <a href="../interface/apply_preconditioner_iluk.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>前処理の適用</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~90"></span>
+              class(<a href='../type/type_preconditioner_iluk.html'>type_preconditioner_iluk</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-r~18"></span>
+              type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>r</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-z~3"></span>
+              type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>z</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-destroy_preconditioner_iluk"></span> <h3>module subroutine <a href='../proc/destroy_preconditioner_iluk.html'>destroy_preconditioner_iluk</a>(self)  
+    <a href="../interface/destroy_preconditioner_iluk.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>デストラクタ</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~93"></span>
+              class(<a href='../type/type_preconditioner_iluk.html'>type_preconditioner_iluk</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-initialize_preconditioner_iluk"></span> <h3>module subroutine <a href='../proc/initialize_preconditioner_iluk.html'>initialize_preconditioner_iluk</a>(self, info)  
+    <a href="../interface/initialize_preconditioner_iluk.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>ILU(k) 前処理インスタンスを初期化する</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~86"></span>
+              class(<a href='../type/type_preconditioner_iluk.html'>type_preconditioner_iluk</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-info~2"></span>
+              type(<a href='../type/type_preconditioner_settings.html'>type_preconditioner_settings</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>info</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-setup_bsr_ilu0"></span> <h3>module subroutine <a href='../proc/setup_bsr_ilu0.html'>setup_bsr_ilu0</a>(self, A)  
+    <a href="../interface/setup_bsr_ilu0.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>BSR行列に対するブロック ILU(0) 分解を実行する</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~89"></span>
+              class(<a href='../type/type_preconditioner_iluk.html'>type_preconditioner_iluk</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~3"></span>
+              class(<a href='../type/type_matrix_bsr.html'>type_matrix_bsr</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-setup_csr_ilu0"></span> <h3>module subroutine <a href='../proc/setup_csr_ilu0.html'>setup_csr_ilu0</a>(self, A)  
+    <a href="../interface/setup_csr_ilu0.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>CSR行列に対するスカラ ILU(0) 分解を実行する</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~88"></span>
+              class(<a href='../type/type_preconditioner_iluk.html'>type_preconditioner_iluk</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~2"></span>
+              class(<a href='../type/type_matrix_csr.html'>type_matrix_csr</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-setup_preconditioner_iluk"></span> <h3>module subroutine <a href='../proc/setup_preconditioner_iluk.html'>setup_preconditioner_iluk</a>(self, A)  
+    <a href="../interface/setup_preconditioner_iluk.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>行列 A に対する ILU(0) 分解のセットアップを行う</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~87"></span>
+              class(<a href='../type/type_preconditioner_iluk.html'>type_preconditioner_iluk</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a"></span>
+              class(<a href='../type/abst_matrix.html'>abst_matrix</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

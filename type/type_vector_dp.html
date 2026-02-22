@@ -1,0 +1,1775 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>type_vector_dp &ndash; FTDSS </title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>type_vector_dp
+      <small>Derived Type</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title="<p> 1.1% of total for derived types.</p>Including implementation: 25 statements,  0.1% of total for derived types.">25 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/vector_interface.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/vector_interface.f90.html'>vector_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_types_vector.html'>core_types_vector</a></li>
+            <li class="breadcrumb-item active" aria-current="page">type_vector_dp</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#vars-0"
+         aria-expanded="false" aria-controls="vars-0">
+         <h4 class="card-header bg-primary text-white">Variables</h4>
+      </a>
+      <div id="vars-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/type_vector_dp.html#variable-is_initialized_vector">is_initialized_vector</a>
+            <a class="list-group-item" href="../type/type_vector_dp.html#variable-num_blocks">num_blocks</a>
+            <a class="list-group-item" href="../type/type_vector_dp.html#variable-num_nodes~11">num_nodes</a>
+            <a class="list-group-item" href="../type/type_vector_dp.html#variable-status">status</a>
+            <a class="list-group-item" href="../type/type_vector_dp.html#variable-val~3">val</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#boundprocs-0"
+         aria-expanded="false" aria-controls="boundprocs-0">
+         <h4 class="card-header bg-primary text-white">Type-Bound Procedures</h4>
+      </a>
+      <div id="boundprocs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/type_vector_dp.html#boundprocedure-check">check</a>
+            <a class="list-group-item" href="../type/type_vector_dp.html#boundprocedure-copy~2">copy</a>
+            <a class="list-group-item" href="../type/type_vector_dp.html#boundprocedure-destroy~3">destroy</a>
+            <a class="list-group-item" href="../type/type_vector_dp.html#boundprocedure-display~9">display</a>
+            <a class="list-group-item" href="../type/type_vector_dp.html#boundprocedure-get_data">get_data</a>
+            <a class="list-group-item" href="../type/type_vector_dp.html#boundprocedure-get_size">get_size</a>
+            <a class="list-group-item" href="../type/type_vector_dp.html#boundprocedure-get_status">get_status</a>
+            <a class="list-group-item" href="../type/type_vector_dp.html#boundprocedure-initialize~7">initialize</a>
+            <a class="list-group-item" href="../type/type_vector_dp.html#boundprocedure-is_initialized~3">is_initialized</a>
+            <a class="list-group-item" href="../type/type_vector_dp.html#boundprocedure-scale">scale</a>
+            <a class="list-group-item" href="../type/type_vector_dp.html#boundprocedure-set">set</a>
+            <a class="list-group-item" href="../type/type_vector_dp.html#boundprocedure-set_array">set_array</a>
+            <a class="list-group-item" href="../type/type_vector_dp.html#boundprocedure-set_scalar">set_scalar</a>
+            <a class="list-group-item" href="../type/type_vector_dp.html#boundprocedure-set_value_at_index">set_value_at_index</a>
+            <a class="list-group-item" href="../type/type_vector_dp.html#boundprocedure-set_values_at_indices">set_values_at_indices</a>
+            <a class="list-group-item" href="../type/type_vector_dp.html#boundprocedure-zero~3">zero</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../type/type_vector_dp.html#src">type_vector_dp</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2 id="type-def-statement">
+        type, public :: type_vector_dp</h2>
+    
+<br>      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Inherited by</h3>
+        </div>
+        <div class="card-body">
+          <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: type~~type_vector_dp~~InheritedByGraph Pages: 1 -->
+<svg id="typetype_vector_dpInheritedByGraph" width="562pt" height="210pt"
+ viewBox="0.00 0.00 562.00 210.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_vector_dp~~InheritedByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 206)">
+<title>type~~type_vector_dp~~InheritedByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-206 558,-206 558,4 -4,4"/>
+<!-- type~type_vector_dp -->
+<g id="type~~type_vector_dp~~InheritedByGraph_node1" class="node">
+<title>type~type_vector_dp</title>
+<polygon fill="none" stroke="black" points="94,-114 0,-114 0,-90 94,-90 94,-114"/>
+<text text-anchor="middle" x="47" y="-99.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_vector_dp</text>
+</g>
+<!-- type~abst_solver -->
+<g id="type~~type_vector_dp~~InheritedByGraph_node2" class="node">
+<title>type~abst_solver</title>
+<g id="a_type~~type_vector_dp~~InheritedByGraph_node2"><a xlink:href="../type/abst_solver.html" xlink:title="abst_solver">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="322,-66 249,-66 249,-42 322,-42 322,-66"/>
+<text text-anchor="middle" x="285.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_solver</text>
+</a>
+</g>
+</g>
+<!-- type~abst_solver&#45;&gt;type~type_vector_dp -->
+<g id="type~~type_vector_dp~~InheritedByGraph_edge2" class="edge">
+<title>type~abst_solver&#45;&gt;type~type_vector_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M248.71,-56.66C213.51,-59.82 158.45,-66.21 112,-78 103.23,-80.23 94,-83.26 85.36,-86.42"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="84.03,-83.18 75.93,-90 86.52,-89.72 84.03,-83.18"/>
+<text text-anchor="middle" x="150.5" y="-80.4" font-family="Helvetica,sans-Serif" font-size="9.50">residual_history</text>
+</g>
+<!-- type~type_preconditioner_jacobi -->
+<g id="type~~type_vector_dp~~InheritedByGraph_node3" class="node">
+<title>type~type_preconditioner_jacobi</title>
+<g id="a_type~~type_vector_dp~~InheritedByGraph_node3"><a xlink:href="../type/type_preconditioner_jacobi.html" xlink:title="type_preconditioner_jacobi">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="364,-154 207,-154 207,-130 364,-130 364,-154"/>
+<text text-anchor="middle" x="285.5" y="-139.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_preconditioner_jacobi</text>
+</a>
+</g>
+</g>
+<!-- type~type_preconditioner_jacobi&#45;&gt;type~type_vector_dp -->
+<g id="type~~type_vector_dp~~InheritedByGraph_edge3" class="edge">
+<title>type~type_preconditioner_jacobi&#45;&gt;type~type_vector_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M206.61,-131.37C176.92,-127.03 142.83,-121.69 112,-116 109.36,-115.51 106.67,-115 103.96,-114.46"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="104.57,-111.02 94.07,-112.46 103.17,-117.88 104.57,-111.02"/>
+<text text-anchor="middle" x="150.5" y="-130.4" font-family="Helvetica,sans-Serif" font-size="9.50">M_inv</text>
+</g>
+<!-- type~type_residual_vector -->
+<g id="type~~type_vector_dp~~InheritedByGraph_node4" class="node">
+<title>type~type_residual_vector</title>
+<g id="a_type~~type_vector_dp~~InheritedByGraph_node4"><a xlink:href="../type/type_residual_vector.html" xlink:title="type_residual_vector">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="346.5,-24 224.5,-24 224.5,0 346.5,0 346.5,-24"/>
+<text text-anchor="middle" x="285.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_residual_vector</text>
+</a>
+</g>
+</g>
+<!-- type~type_residual_vector&#45;&gt;type~type_vector_dp -->
+<g id="type~~type_vector_dp~~InheritedByGraph_edge1" class="edge">
+<title>type~type_residual_vector&#45;&gt;type~type_vector_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M224.31,-17.73C190.07,-22.72 147.14,-31.96 112,-49 94.75,-57.36 78.16,-71.33 66.2,-82.82"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="63.67,-80.4 59.04,-89.93 68.6,-85.37 63.67,-80.4"/>
+<text text-anchor="middle" x="150.5" y="-51.4" font-family="Helvetica,sans-Serif" font-size="9.50">data</text>
+</g>
+<!-- type~type_solver_bicgstab -->
+<g id="type~~type_vector_dp~~InheritedByGraph_node5" class="node">
+<title>type~type_solver_bicgstab</title>
+<g id="a_type~~type_vector_dp~~InheritedByGraph_node5"><a xlink:href="../type/type_solver_bicgstab.html" xlink:title="type_solver_bicgstab">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="554,-114 430,-114 430,-90 554,-90 554,-114"/>
+<text text-anchor="middle" x="492" y="-99.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_solver_bicgstab</text>
+</a>
+</g>
+</g>
+<!-- type~type_solver_bicgstab&#45;&gt;type~type_vector_dp -->
+<g id="type~~type_vector_dp~~InheritedByGraph_edge4" class="edge">
+<title>type~type_solver_bicgstab&#45;&gt;type~type_vector_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M396,-102C293.57,-91.1 173.22,-94.72 104.25,-98.35"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="103.84,-94.87 94.04,-98.91 104.22,-101.86 103.84,-94.87"/>
+<text text-anchor="middle" x="285.5" y="-100.4" font-family="Helvetica,sans-Serif" font-size="9.50">p, phat, s, shat, r, r0, t, v, x</text>
+</g>
+<!-- type~type_solver_bicgstab&#45;&gt;type~abst_solver -->
+<g id="type~~type_vector_dp~~InheritedByGraph_edge8" class="edge">
+<title>type~type_solver_bicgstab&#45;&gt;type~abst_solver</title>
+<path fill="none" stroke="#ff0000" d="M429.87,-103.85C419.23,-103.64 408.28,-103.09 398,-102"/>
+<path fill="none" stroke="#ff0000" d="M396,-102C378.84,-100.17 379.44,-87.71 364,-80 353.89,-74.95 342.57,-70.53 331.77,-66.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="332.65,-63.43 322.05,-63.64 330.46,-70.09 332.65,-63.43"/>
+</g>
+<!-- type~type_solver_gmres -->
+<g id="type~~type_vector_dp~~InheritedByGraph_node6" class="node">
+<title>type~type_solver_gmres</title>
+<g id="a_type~~type_vector_dp~~InheritedByGraph_node6"><a xlink:href="../type/type_solver_gmres.html" xlink:title="type_solver_gmres">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="548,-202 436,-202 436,-178 548,-178 548,-202"/>
+<text text-anchor="middle" x="492" y="-187.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_solver_gmres</text>
+</a>
+</g>
+</g>
+<!-- type~type_solver_gmres&#45;&gt;type~type_vector_dp -->
+<g id="type~~type_vector_dp~~InheritedByGraph_edge5" class="edge">
+<title>type~type_solver_gmres&#45;&gt;type~type_vector_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M396,-190C272.76,-155.38 230.49,-190.44 112,-142 98.08,-136.31 83.78,-127.68 72.24,-119.9"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="74.21,-117.01 64,-114.17 70.21,-122.75 74.21,-117.01"/>
+<text text-anchor="middle" x="285.5" y="-183.4" font-family="Helvetica,sans-Serif" font-size="9.50">v, r, z, w, x_update</text>
+</g>
+<!-- type~type_solver_gmres&#45;&gt;type~abst_solver -->
+<g id="type~~type_vector_dp~~InheritedByGraph_edge7" class="edge">
+<title>type~type_solver_gmres&#45;&gt;type~abst_solver</title>
+<path fill="none" stroke="#ff0000" d="M435.73,-194.93C423.15,-194.7 409.97,-193.36 398,-190"/>
+<path fill="none" stroke="#ff0000" d="M396,-190C346.98,-176.23 399.26,-116.73 364,-80 355.4,-71.04 343.62,-65.17 331.85,-61.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="332.6,-57.9 322.03,-58.54 330.7,-64.63 332.6,-57.9"/>
+</g>
+<!-- type~type_ftdss -->
+<g id="type~~type_vector_dp~~InheritedByGraph_node7" class="node">
+<title>type~type_ftdss</title>
+<g id="a_type~~type_vector_dp~~InheritedByGraph_node7"><a xlink:href="../type/type_ftdss.html" xlink:title="type_ftdss">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="525,-45 459,-45 459,-21 525,-21 525,-45"/>
+<text text-anchor="middle" x="492" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss</text>
+</a>
+</g>
+</g>
+<!-- type~type_ftdss&#45;&gt;type~abst_solver -->
+<g id="type~~type_vector_dp~~InheritedByGraph_edge6" class="edge">
+<title>type~type_ftdss&#45;&gt;type~abst_solver</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M458.6,-36.33C424.62,-39.82 370.95,-45.33 332.58,-49.27"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="331.78,-45.83 322.19,-50.34 332.49,-52.8 331.78,-45.83"/>
+<text text-anchor="middle" x="397" y="-47.4" font-family="Helvetica,sans-Serif" font-size="9.50">solver</text>
+</g>
+<!-- type~type_ftdss&#45;&gt;type~type_residual_vector -->
+<g id="type~~type_vector_dp~~InheritedByGraph_edge9" class="edge">
+<title>type~type_ftdss&#45;&gt;type~type_residual_vector</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M458.6,-29.67C431.33,-26.87 391.37,-22.77 356.82,-19.22"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="357.07,-15.73 346.76,-18.19 356.35,-22.69 357.07,-15.73"/>
+<text text-anchor="middle" x="397" y="-27.4" font-family="Helvetica,sans-Serif" font-size="9.50">F, du</text>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#InheritedByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="InheritedByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="186pt" height="32pt"
+ viewBox="0.00 0.00 185.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 181.5,-28 181.5,4 -4,4"/>
+<!-- Type -->
+<g id="node1" class="node">
+<title>Type</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="177.5,-24 72.5,-24 72.5,0 177.5,0 177.5,-24"/>
+<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a derived type to the parent type which it
+extends. Dashed arrows point from a derived type to the other
+types it contains as a components, with a label listing the name(s) of
+said component(s).
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    <br>
+
+    <section>
+    <h2>Components</h2>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-is_initialized_vector"></span>
+              logical,
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>is_initialized_vector</strong></td>
+<td> =</td>
+                <td>.false.</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_blocks"></span>
+              integer(kind=int32),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_blocks</strong></td>
+<td> =</td>
+                <td>0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_nodes~11"></span>
+              integer(kind=int32),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_nodes</strong></td>
+<td> =</td>
+                <td>0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-status"></span>
+              integer(kind=int32),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>status</strong></td>
+<td> =</td>
+                <td>VECTOR_STATUS_SUCCESS</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-val~3"></span>
+              real(kind=real64),
+            </td>
+              <td>private,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>val</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    </section>
+    <br>
+    
+
+
+      <section>
+        <h2>Type-Bound Procedures</h2>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-check"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>check</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/check_vector_dp.html'>check_vector_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    public module subroutine check_vector_dp(self)  
+    <a href="../proc/check_vector_dp.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-copy~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>copy</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/copy_vector_dp.html'>copy_vector_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    public module subroutine copy_vector_dp(self, source_vector)  
+    <a href="../proc/copy_vector_dp.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>source_vector</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-destroy~3"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>destroy</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/destroy_vector_dp.html'>destroy_vector_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    public module subroutine destroy_vector_dp(self)  
+    <a href="../proc/destroy_vector_dp.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-display~9"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>display</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/display_vector_dp.html'>display_vector_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    public module subroutine display_vector_dp(self, unit_in)  
+    <a href="../proc/display_vector_dp.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>unit_in</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_data"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_data</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/get_data_vector_dp.html'>get_data_vector_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    public module function get_data_vector_dp(self) result(data)  
+    <a href="../proc/get_data_vector_dp.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>real(kind=real64), pointer, contiguous, dimension(:)</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_size"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_size</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/get_size_vector_dp.html'>get_size_vector_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    public pure module function get_size_vector_dp(self) result(vector_size)  
+    <a href="../proc/get_size_vector_dp.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>integer(kind=int32)</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_status"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_status</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/get_status_vector_dp.html'>get_status_vector_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    public pure module function get_status_vector_dp(self) result(status)  
+    <a href="../proc/get_status_vector_dp.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>integer(kind=int32)</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-initialize~7"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>initialize</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/initialize_vector_dp.html'>initialize_vector_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    public module subroutine initialize_vector_dp(self, num_nodes, num_blocks)  
+    <a href="../proc/initialize_vector_dp.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_nodes</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_blocks</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_initialized~3"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_initialized</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/is_initialized_vector_dp.html'>is_initialized_vector_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    public pure module function is_initialized_vector_dp(self) result(initialized)  
+    <a href="../proc/is_initialized_vector_dp.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-scale"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>scale</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/scale_vector_dp.html'>scale_vector_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    public module subroutine scale_vector_dp(self, op, alpha)  
+    <a href="../proc/scale_vector_dp~2.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>alpha</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-set"></span>
+      <h3>
+          generic, public ::
+  <strong>set</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_vector_dp.html#boundprocedure-set_scalar'>set_scalar</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_vector_dp.html#boundprocedure-set_array'>set_array</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_vector_dp.html#boundprocedure-set_value_at_index'>set_value_at_index</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_vector_dp.html#boundprocedure-set_values_at_indices'>set_values_at_indices</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    public  interface <a href='../interface/set_scalar_vector_dp.html'>set_scalar_vector_dp</a>()  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+    <em>None</em>
+
+          </li>
+          <li class="list-group-item">
+                    <h3>
+    public  interface <a href='../interface/set_array_vector_dp.html'>set_array_vector_dp</a>()  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+    <em>None</em>
+
+          </li>
+          <li class="list-group-item">
+                    <h3>
+    public  interface <a href='../interface/set_value_at_index_vector_dp.html'>set_value_at_index_vector_dp</a>()  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+    <em>None</em>
+
+          </li>
+          <li class="list-group-item">
+                    <h3>
+    public  interface <a href='../interface/set_values_at_indices_vector_dp.html'>set_values_at_indices_vector_dp</a>()  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+    <em>None</em>
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-set_array"></span>
+      <h3>
+          procedure, private, pass(self) ::
+  <strong>set_array</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/set_array_vector_dp.html'>set_array_vector_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    public module subroutine set_array_vector_dp(self, op, array_value, row_block)  
+    <a href="../proc/set_array_vector_dp.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>array_value</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_block</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-set_scalar"></span>
+      <h3>
+          procedure, private, pass(self) ::
+  <strong>set_scalar</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/set_scalar_vector_dp.html'>set_scalar_vector_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    public module subroutine set_scalar_vector_dp(self, op, scalar_value, row_block)  
+    <a href="../proc/set_scalar_vector_dp.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>scalar_value</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_block</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-set_value_at_index"></span>
+      <h3>
+          procedure, private, pass(self) ::
+  <strong>set_value_at_index</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/set_value_at_index_vector_dp.html'>set_value_at_index_vector_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    public module subroutine set_value_at_index_vector_dp(self, op, global_index, value, row_block)  
+    <a href="../proc/set_value_at_index_vector_dp.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>global_index</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_block</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-set_values_at_indices"></span>
+      <h3>
+          procedure, private, pass(self) ::
+  <strong>set_values_at_indices</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/set_values_at_indices_vector_dp.html'>set_values_at_indices_vector_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    public module subroutine set_values_at_indices_vector_dp(self, op, global_indices, new_values, row_block)  
+    <a href="../proc/set_values_at_indices_vector_dp.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>global_indices</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>new_values</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_block</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-zero~3"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>zero</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/zero_vector_dp.html'>zero_vector_dp</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    public module subroutine zero_vector_dp(self)  
+    <a href="../proc/zero_vector_dp.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+      </section>
+
+    <section>
+    <h3><span class="anchor" id="src"></span>Source Code</h3>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_vector_dp</span>
+<span class="w">        </span><span class="k">private</span>
+<span class="k">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">val</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_nodes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_blocks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_initialized_vector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">VECTOR_STATUS_SUCCESS</span>
+<span class="w">    </span><span class="k">contains</span>
+<span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">initialize_vector_dp</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">destroy</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">destroy_vector_dp</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_initialized</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_initialized_vector_dp</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_size</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_size_vector_dp</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_data</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_data_vector_dp</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_status</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_status_vector_dp</span>
+
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">set_scalar</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">set_scalar_vector_dp</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">set_array</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">set_array_vector_dp</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">set_value_at_index</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">set_value_at_index_vector_dp</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">set_values_at_indices</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">set_values_at_indices_vector_dp</span>
+<span class="w">        </span><span class="k">generic</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">set</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">set_scalar</span><span class="p">,</span><span class="w"> </span><span class="n">set_array</span><span class="p">,</span><span class="w"> </span><span class="n">set_value_at_index</span><span class="p">,</span><span class="w"> </span><span class="n">set_values_at_indices</span>
+
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="nb">scale</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">scale_vector_dp</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">copy</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">copy_vector_dp</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">zero</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">zero_vector_dp</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">display</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">display_vector_dp</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">check</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">check_vector_dp</span>
+<span class="w">    </span><span class="k">end type </span><span class="n">type_vector_dp</span>
+</pre></div>
+
+    </section>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

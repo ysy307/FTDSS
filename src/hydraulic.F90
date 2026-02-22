@@ -1,9 +1,8 @@
 module module_hydraulic
-    use :: main_hydraulic, only:abst_hydraulic, type_hydraulic_crs
+    use :: main_hydraulic, only:type_hydraulic
     implicit none
     private
 
-    public :: abst_hydraulic
-    public :: type_hydraulic_crs
+    public :: type_hydraulic
 
 end module module_hydraulic

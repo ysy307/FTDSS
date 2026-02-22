@@ -1,0 +1,629 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>initialize_element_manager &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>initialize_element_manager
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">40 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/domain_manager.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/domain_manager.f90.html'>domain_manager.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/domain_manager.html'>domain_manager</a></li>
+            <li class="breadcrumb-item active" aria-current="page">initialize_element_manager</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/initialize_element_manager.html#src">initialize_element_manager</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine initialize_element_manager(self, input)  
+</h2>
+    
+
+    <p>Initializes the element manager by reading and organizing element data.</p>
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_element_manager.html'>type_element_manager</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~11"></span>
+              class(<a href='../type/type_element_manager.html'>type_element_manager</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-input~4"></span>
+              type(<a href='../type/type_input.html'>type_input</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>input</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~initialize_element_manager~~CallsGraph Pages: 1 -->
+<svg id="procinitialize_element_managerCallsGraph" width="641pt" height="77pt"
+ viewBox="0.00 0.00 641.00 77.06" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~initialize_element_manager~~CallsGraph" class="graph" transform="scale(0.43 0.43) rotate(0) translate(4 175)">
+<title>proc~~initialize_element_manager~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-175 1485,-175 1485,4 -4,4"/>
+<!-- proc~initialize_element_manager -->
+<g id="proc~~initialize_element_manager~~CallsGraph_node1" class="node">
+<title>proc~initialize_element_manager</title>
+<polygon fill="none" stroke="black" points="297,-129 0,-129 0,-105 297,-105 297,-129"/>
+<text text-anchor="middle" x="148.5" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_element_manager%initialize_element_manager</text>
+</g>
+<!-- allocate_array -->
+<g id="proc~~initialize_element_manager~~CallsGraph_node2" class="node">
+<title>allocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="498.5,-171 409.5,-171 409.5,-147 498.5,-147 498.5,-171"/>
+<text text-anchor="middle" x="454" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</g>
+<!-- proc~initialize_element_manager&#45;&gt;allocate_array -->
+<g id="proc~~initialize_element_manager~~CallsGraph_edge1" class="edge">
+<title>proc~initialize_element_manager&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#ff0000" d="M236.47,-129.04C288.96,-136.3 354.18,-145.32 399.25,-151.56"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="399.01,-155.06 409.4,-152.97 399.97,-148.13 399.01,-155.06"/>
+</g>
+<!-- interface~type_vtk_cell_get_dimension -->
+<g id="proc~~initialize_element_manager~~CallsGraph_node3" class="node">
+<title>interface~type_vtk_cell_get_dimension</title>
+<g id="a_proc~~initialize_element_manager~~CallsGraph_node3"><a xlink:href="../interface/type_vtk_cell_get_dimension.html" xlink:title="type_vtk_cell%type_vtk_cell_get_dimension">
+<polygon fill="#a7506f" stroke="#a7506f" points="575,-129 333,-129 333,-105 575,-105 575,-129"/>
+<text text-anchor="middle" x="454" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vtk_cell%type_vtk_cell_get_dimension</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_element_manager&#45;&gt;interface~type_vtk_cell_get_dimension -->
+<g id="proc~~initialize_element_manager~~CallsGraph_edge2" class="edge">
+<title>proc~initialize_element_manager&#45;&gt;interface~type_vtk_cell_get_dimension</title>
+<path fill="none" stroke="#ff0000" d="M297.25,-117C305.72,-117 314.2,-117 322.59,-117"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="322.78,-120.5 332.78,-117 322.78,-113.5 322.78,-120.5"/>
+</g>
+<!-- proc~initialize_fe_manager -->
+<g id="proc~~initialize_element_manager~~CallsGraph_node4" class="node">
+<title>proc~initialize_fe_manager</title>
+<g id="a_proc~~initialize_element_manager~~CallsGraph_node4"><a xlink:href="../proc/initialize_fe_manager.html" xlink:title="type_fe_manager%initialize_fe_manager">
+<polygon fill="#d9534f" stroke="#d9534f" points="568.5,-87 339.5,-87 339.5,-63 568.5,-63 568.5,-87"/>
+<text text-anchor="middle" x="454" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_fe_manager%initialize_fe_manager</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_element_manager&#45;&gt;proc~initialize_fe_manager -->
+<g id="proc~~initialize_element_manager~~CallsGraph_edge3" class="edge">
+<title>proc~initialize_element_manager&#45;&gt;proc~initialize_fe_manager</title>
+<path fill="none" stroke="#ff0000" d="M236.47,-104.96C273.86,-99.79 317.7,-93.72 356.12,-88.41"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="356.85,-91.84 366.28,-87 355.89,-84.9 356.85,-91.84"/>
+</g>
+<!-- proc~type_vtk_cell_get_dimension -->
+<g id="proc~~initialize_element_manager~~CallsGraph_node6" class="node">
+<title>proc~type_vtk_cell_get_dimension</title>
+<g id="a_proc~~initialize_element_manager~~CallsGraph_node6"><a xlink:href="../proc/type_vtk_cell_get_dimension.html" xlink:title="type_vtk_cell_get_dimension">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="775,-129 611,-129 611,-105 775,-105 775,-129"/>
+<text text-anchor="middle" x="693" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vtk_cell_get_dimension</text>
+</a>
+</g>
+</g>
+<!-- interface~type_vtk_cell_get_dimension&#45;&gt;proc~type_vtk_cell_get_dimension -->
+<g id="proc~~initialize_element_manager~~CallsGraph_edge4" class="edge">
+<title>interface~type_vtk_cell_get_dimension&#45;&gt;proc~type_vtk_cell_get_dimension</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M575.24,-117C583.79,-117 592.33,-117 600.68,-117"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="600.76,-120.5 610.76,-117 600.76,-113.5 600.76,-120.5"/>
+</g>
+<!-- proc~create_fe -->
+<g id="proc~~initialize_element_manager~~CallsGraph_node5" class="node">
+<title>proc~create_fe</title>
+<g id="a_proc~~initialize_element_manager~~CallsGraph_node5"><a xlink:href="../proc/create_fe.html" xlink:title="create_fe">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="724,-87 662,-87 662,-63 724,-63 724,-87"/>
+<text text-anchor="middle" x="693" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">create_fe</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_fe_manager&#45;&gt;proc~create_fe -->
+<g id="proc~~initialize_element_manager~~CallsGraph_edge5" class="edge">
+<title>proc~initialize_fe_manager&#45;&gt;proc~create_fe</title>
+<path fill="none" stroke="#0000ff" d="M568.64,-75C598.52,-75 628.81,-75 651.89,-75"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="651.97,-78.5 661.97,-75 651.97,-71.5 651.97,-78.5"/>
+</g>
+<!-- unique -->
+<g id="proc~~initialize_element_manager~~CallsGraph_node7" class="node">
+<title>unique</title>
+<polygon fill="#777777" stroke="#777777" points="720,-45 666,-45 666,-21 720,-21 720,-45"/>
+<text text-anchor="middle" x="693" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">unique</text>
+</g>
+<!-- proc~initialize_fe_manager&#45;&gt;unique -->
+<g id="proc~~initialize_element_manager~~CallsGraph_edge6" class="edge">
+<title>proc~initialize_fe_manager&#45;&gt;unique</title>
+<path fill="none" stroke="#0000ff" d="M522.91,-62.96C566.05,-55.32 620.2,-45.72 655.43,-39.48"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="656.48,-42.85 665.72,-37.66 655.26,-35.96 656.48,-42.85"/>
+</g>
+<!-- log_error -->
+<g id="proc~~initialize_element_manager~~CallsGraph_node8" class="node">
+<title>log_error</title>
+<polygon fill="#777777" stroke="#777777" points="914.5,-129 853.5,-129 853.5,-105 914.5,-105 914.5,-129"/>
+<text text-anchor="middle" x="884" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">log_error</text>
+</g>
+<!-- proc~create_fe&#45;&gt;log_error -->
+<g id="proc~~initialize_element_manager~~CallsGraph_edge7" class="edge">
+<title>proc~create_fe&#45;&gt;log_error</title>
+<path fill="none" stroke="#ff0000" d="M724.37,-81.75C756.66,-88.92 807.86,-100.3 843.32,-108.18"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="842.81,-111.65 853.33,-110.41 844.33,-104.82 842.81,-111.65"/>
+</g>
+<!-- proc~initialize_factory_internal -->
+<g id="proc~~initialize_element_manager~~CallsGraph_node9" class="node">
+<title>proc~initialize_factory_internal</title>
+<g id="a_proc~~initialize_element_manager~~CallsGraph_node9"><a xlink:href="../proc/initialize_factory_internal.html" xlink:title="initialize_factory_internal">
+<polygon fill="#d9534f" stroke="#d9534f" points="957,-87 811,-87 811,-63 957,-63 957,-87"/>
+<text text-anchor="middle" x="884" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_factory_internal</text>
+</a>
+</g>
+</g>
+<!-- proc~create_fe&#45;&gt;proc~initialize_factory_internal -->
+<g id="proc~~initialize_element_manager~~CallsGraph_edge8" class="edge">
+<title>proc~create_fe&#45;&gt;proc~initialize_factory_internal</title>
+<path fill="none" stroke="#ff0000" d="M724.37,-75C745,-75 773.36,-75 800.39,-75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="800.67,-78.5 810.67,-75 800.67,-71.5 800.67,-78.5"/>
+</g>
+<!-- to_string -->
+<g id="proc~~initialize_element_manager~~CallsGraph_node10" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="1388,-24 1330,-24 1330,0 1388,0 1388,-24"/>
+<text text-anchor="middle" x="1359" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~create_fe&#45;&gt;to_string -->
+<g id="proc~~initialize_element_manager~~CallsGraph_edge9" class="edge">
+<title>proc~create_fe&#45;&gt;to_string</title>
+<path fill="none" stroke="#ff0000" d="M724.22,-69.04C747.79,-64.52 781.4,-58.36 811,-54 1000.7,-26.06 1230.31,-16.09 1319.75,-13.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1320.07,-16.6 1329.95,-12.78 1319.85,-9.6 1320.07,-16.6"/>
+</g>
+<!-- proc~get_cell_type -->
+<g id="proc~~initialize_element_manager~~CallsGraph_node11" class="node">
+<title>proc~get_cell_type</title>
+<g id="a_proc~~initialize_element_manager~~CallsGraph_node11"><a xlink:href="../proc/get_cell_type.html" xlink:title="type_vtk_constants%get_cell_type">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1193.5,-150 1000.5,-150 1000.5,-126 1193.5,-126 1193.5,-150"/>
+<text text-anchor="middle" x="1097" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vtk_constants%get_cell_type</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_factory_internal&#45;&gt;proc~get_cell_type -->
+<g id="proc~~initialize_element_manager~~CallsGraph_edge10" class="edge">
+<title>proc~initialize_factory_internal&#45;&gt;proc~get_cell_type</title>
+<path fill="none" stroke="#00ff00" d="M932.45,-87.04C940.76,-89.66 949.22,-92.66 957,-96 974.02,-103.31 975.69,-110.4 993,-117 999.19,-119.36 1005.69,-121.47 1012.29,-123.36"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1011.45,-126.76 1022.01,-125.97 1013.26,-120 1011.45,-126.76"/>
+</g>
+<!-- proc~get_max_cell_id -->
+<g id="proc~~initialize_element_manager~~CallsGraph_node12" class="node">
+<title>proc~get_max_cell_id</title>
+<g id="a_proc~~initialize_element_manager~~CallsGraph_node12"><a xlink:href="../proc/get_max_cell_id.html" xlink:title="type_vtk_constants%get_max_cell_id">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1201,-108 993,-108 993,-84 1201,-84 1201,-108"/>
+<text text-anchor="middle" x="1097" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vtk_constants%get_max_cell_id</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_factory_internal&#45;&gt;proc~get_max_cell_id -->
+<g id="proc~~initialize_element_manager~~CallsGraph_edge11" class="edge">
+<title>proc~initialize_factory_internal&#45;&gt;proc~get_max_cell_id</title>
+<path fill="none" stroke="#00ff00" d="M957.02,-82.17C965.44,-83.01 974.17,-83.87 982.97,-84.75"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="982.63,-88.23 992.92,-85.74 983.32,-81.27 982.63,-88.23"/>
+</g>
+<!-- proc~register_constructor -->
+<g id="proc~~initialize_element_manager~~CallsGraph_node13" class="node">
+<title>proc~register_constructor</title>
+<g id="a_proc~~initialize_element_manager~~CallsGraph_node13"><a xlink:href="../proc/register_constructor.html" xlink:title="register_constructor">
+<polygon fill="#d9534f" stroke="#d9534f" points="1156.5,-66 1037.5,-66 1037.5,-42 1156.5,-42 1156.5,-66"/>
+<text text-anchor="middle" x="1097" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">register_constructor</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_factory_internal&#45;&gt;proc~register_constructor -->
+<g id="proc~~initialize_element_manager~~CallsGraph_edge12" class="edge">
+<title>proc~initialize_factory_internal&#45;&gt;proc~register_constructor</title>
+<path fill="none" stroke="#00ff00" d="M957.02,-67.83C979.7,-65.58 1004.67,-63.09 1027.12,-60.86"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1027.63,-64.32 1037.24,-59.85 1026.94,-57.36 1027.63,-64.32"/>
+</g>
+<!-- strip -->
+<g id="proc~~initialize_element_manager~~CallsGraph_node16" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="1386,-150 1332,-150 1332,-126 1386,-126 1386,-150"/>
+<text text-anchor="middle" x="1359" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~get_cell_type&#45;&gt;strip -->
+<g id="proc~~initialize_element_manager~~CallsGraph_edge13" class="edge">
+<title>proc~get_cell_type&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M1193.71,-138C1238.26,-138 1288.6,-138 1321.68,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1321.79,-141.5 1331.79,-138 1321.79,-134.5 1321.79,-141.5"/>
+</g>
+<!-- proc~initialize_vtk_constants -->
+<g id="proc~~initialize_element_manager~~CallsGraph_node15" class="node">
+<title>proc~initialize_vtk_constants</title>
+<g id="a_proc~~initialize_element_manager~~CallsGraph_node15"><a xlink:href="../proc/initialize_vtk_constants.html" xlink:title="type_vtk_constants%initialize_vtk_constants">
+<polygon fill="#d9534f" stroke="#d9534f" points="1481,-108 1237,-108 1237,-84 1481,-84 1481,-108"/>
+<text text-anchor="middle" x="1359" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vtk_constants%initialize_vtk_constants</text>
+</a>
+</g>
+</g>
+<!-- proc~get_max_cell_id&#45;&gt;proc~initialize_vtk_constants -->
+<g id="proc~~initialize_element_manager~~CallsGraph_edge14" class="edge">
+<title>proc~get_max_cell_id&#45;&gt;proc~initialize_vtk_constants</title>
+<path fill="none" stroke="#00ff00" d="M1201.13,-96C1209.59,-96 1218.21,-96 1226.83,-96"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1226.95,-99.5 1236.95,-96 1226.95,-92.5 1226.95,-99.5"/>
+</g>
+<!-- proc~register_constructor&#45;&gt;to_string -->
+<g id="proc~~initialize_element_manager~~CallsGraph_edge16" class="edge">
+<title>proc~register_constructor&#45;&gt;to_string</title>
+<path fill="none" stroke="#0000ff" d="M1156.67,-44.52C1206.62,-36.45 1276.92,-25.1 1319.87,-18.16"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1320.59,-21.59 1329.9,-16.54 1319.47,-14.68 1320.59,-21.59"/>
+</g>
+<!-- log_warning -->
+<g id="proc~~initialize_element_manager~~CallsGraph_node14" class="node">
+<title>log_warning</title>
+<polygon fill="#777777" stroke="#777777" points="1397.5,-66 1320.5,-66 1320.5,-42 1397.5,-42 1397.5,-66"/>
+<text text-anchor="middle" x="1359" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">log_warning</text>
+</g>
+<!-- proc~register_constructor&#45;&gt;log_warning -->
+<g id="proc~~initialize_element_manager~~CallsGraph_edge15" class="edge">
+<title>proc~register_constructor&#45;&gt;log_warning</title>
+<path fill="none" stroke="#0000ff" d="M1156.67,-54C1203.03,-54 1266.9,-54 1310.18,-54"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1310.44,-57.5 1320.44,-54 1310.44,-50.5 1310.44,-57.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocinitialize_element_managerCallsGraph = svgPanZoom('#procinitialize_element_managerCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">initialize_element_manager</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">input</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_element_manager</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_input</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">input</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">ind</span><span class="p">,</span><span class="w"> </span><span class="n">num_total_cells</span><span class="p">,</span><span class="w"> </span><span class="n">num_total_connectivity</span>
+
+<span class="w">        </span><span class="n">num_total_cells</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">geometry</span><span class="p">%</span><span class="n">vtk</span><span class="p">%</span><span class="n">num_total_cells</span>
+
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">num_elements</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="n">num_total_connectivity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_total_cells</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">input</span><span class="p">%</span><span class="n">geometry</span><span class="p">%</span><span class="n">vtk</span><span class="p">%</span><span class="n">cells</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">get_dimension</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">parent</span><span class="p">%</span><span class="n">computation_dimension</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">self</span><span class="p">%</span><span class="n">num_elements</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_elements</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">                </span><span class="n">num_total_connectivity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">num_total_connectivity</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">geometry</span><span class="p">%</span><span class="n">vtk</span><span class="p">%</span><span class="n">cells</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">num_nodes_in_cell</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        end do</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">fe_types</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">fe_types</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">fe_material_ids</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">fe_material_ids</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">connectivity</span><span class="p">%</span><span class="n">ind</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">connectivity</span><span class="p">%</span><span class="n">ind</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">connectivity</span><span class="p">%</span><span class="n">val</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">connectivity</span><span class="p">%</span><span class="n">val</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_elements</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">fe_types</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_elements</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">fe_material_ids</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_elements</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">connectivity</span><span class="p">%</span><span class="n">ind</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_elements</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">connectivity</span><span class="p">%</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="n">num_total_connectivity</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_elements</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">self</span><span class="p">%</span><span class="n">connectivity</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">            </span><span class="n">ind</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">            </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_total_cells</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">input</span><span class="p">%</span><span class="n">geometry</span><span class="p">%</span><span class="n">vtk</span><span class="p">%</span><span class="n">cells</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">get_dimension</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">parent</span><span class="p">%</span><span class="n">computation_dimension</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    </span><span class="n">ind</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ind</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">fe_types</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">geometry</span><span class="p">%</span><span class="n">vtk</span><span class="p">%</span><span class="n">cells</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">cell_type</span>
+<span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">fe_material_ids</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">geometry</span><span class="p">%</span><span class="n">vtk</span><span class="p">%</span><span class="n">cells</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">cell_entity_id</span>
+<span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">connectivity</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">ind</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">connectivity</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">geometry</span><span class="p">%</span><span class="n">vtk</span><span class="p">%</span><span class="n">cells</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">num_nodes_in_cell</span>
+<span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">connectivity</span><span class="p">%</span><span class="n">val</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">connectivity</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">ind</span><span class="p">):</span><span class="n">self</span><span class="p">%</span><span class="n">connectivity</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">ind</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                        </span><span class="n">input</span><span class="p">%</span><span class="n">geometry</span><span class="p">%</span><span class="n">vtk</span><span class="p">%</span><span class="n">cells</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">connectivity</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">input</span><span class="p">%</span><span class="n">geometry</span><span class="p">%</span><span class="n">vtk</span><span class="p">%</span><span class="n">cells</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">num_nodes_in_cell</span><span class="p">)</span>
+<span class="w">                </span><span class="k">end if</span>
+<span class="k">            end do</span>
+<span class="k">        end if</span>
+
+<span class="k">        call </span><span class="n">self</span><span class="p">%</span><span class="n">fe_manager</span><span class="p">%</span><span class="n">initialize</span><span class="p">(</span><span class="n">input</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">geometry_settings</span><span class="p">%</span><span class="n">integration_order</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_elements</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">fe_types</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">colors</span><span class="p">%</span><span class="n">initialize</span><span class="p">(</span><span class="n">input</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">initialize_element_manager</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

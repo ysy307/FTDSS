@@ -1,0 +1,1450 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>apply_natural_bc_generic &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>apply_natural_bc_generic
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">65 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/ftdss_boundary.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/ftdss_boundary.f90.html'>ftdss_boundary.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/ftdss_boundary.html'>ftdss_boundary</a></li>
+            <li class="breadcrumb-item active" aria-current="page">apply_natural_bc_generic</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/apply_natural_bc_generic.html#src">apply_natural_bc_generic</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine apply_natural_bc_generic(self, physics_type, current_time, variable, dof_offset)  
+    <a href="../interface/apply_natural_bc_generic.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+    <p>Generic routine to integrate and assemble Natural BCs (Fluxes).</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~540"></span>
+              class(<a href='../type/type_ftdss.html'>type_ftdss</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-physics_type~18"></span>
+              type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-current_time~14"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_time</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-variable~11"></span>
+              type(type_variable),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>variable</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dof_offset~4"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>dof_offset</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~apply_natural_bc_generic~~CallsGraph Pages: 1 -->
+<svg id="procapply_natural_bc_genericCallsGraph" width="641pt" height="190pt"
+ viewBox="0.00 0.00 641.00 189.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~apply_natural_bc_generic~~CallsGraph" class="graph" transform="scale(0.35 0.35) rotate(0) translate(4 532)">
+<title>proc~~apply_natural_bc_generic~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-532 1809,-532 1809,4 -4,4"/>
+<!-- proc~apply_natural_bc_generic -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node1" class="node">
+<title>proc~apply_natural_bc_generic</title>
+<polygon fill="none" stroke="black" points="149,-192 0,-192 0,-168 149,-168 149,-192"/>
+<text text-anchor="middle" x="74.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50">apply_natural_bc_generic</text>
+</g>
+<!-- get_current -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node2" class="node">
+<title>get_current</title>
+<polygon fill="#777777" stroke="#777777" points="358.5,-360 285.5,-360 285.5,-336 358.5,-336 358.5,-360"/>
+<text text-anchor="middle" x="322" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_current</text>
+</g>
+<!-- proc~apply_natural_bc_generic&#45;&gt;get_current -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge1" class="edge">
+<title>proc~apply_natural_bc_generic&#45;&gt;get_current</title>
+<path fill="none" stroke="#ff0000" d="M80.52,-192.01C93.23,-220.77 129.65,-293.68 185,-327 211.95,-343.23 247.16,-348.31 275,-349.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="275.19,-352.94 285.28,-349.68 275.36,-345.94 275.19,-352.94"/>
+</g>
+<!-- interface~calc_flux_and_derivative_bc -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node3" class="node">
+<title>interface~calc_flux_and_derivative_bc</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node3"><a xlink:href="../interface/calc_flux_and_derivative_bc.html" xlink:title="abst_bc%calc_flux_and_derivative_bc">
+<polygon fill="#a7506f" stroke="#a7506f" points="427.5,-318 216.5,-318 216.5,-294 427.5,-294 427.5,-318"/>
+<text text-anchor="middle" x="322" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_bc%calc_flux_and_derivative_bc</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_natural_bc_generic&#45;&gt;interface~calc_flux_and_derivative_bc -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge2" class="edge">
+<title>proc~apply_natural_bc_generic&#45;&gt;interface~calc_flux_and_derivative_bc</title>
+<path fill="none" stroke="#ff0000" d="M84.11,-192.21C100.74,-214.74 139.66,-262.6 185,-285 191.93,-288.42 199.28,-291.31 206.83,-293.76"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="205.9,-297.13 216.49,-296.62 207.89,-290.42 205.9,-297.13"/>
+</g>
+<!-- interface~calc_shape_function_abst_fe -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node4" class="node">
+<title>interface~calc_shape_function_abst_fe</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node4"><a xlink:href="../interface/calc_shape_function_abst_fe.html" xlink:title="abst_fe%calc_shape_function_abst_fe">
+<polygon fill="#a7506f" stroke="#a7506f" points="428,-276 216,-276 216,-252 428,-252 428,-276"/>
+<text text-anchor="middle" x="322" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%calc_shape_function_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_natural_bc_generic&#45;&gt;interface~calc_shape_function_abst_fe -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge3" class="edge">
+<title>proc~apply_natural_bc_generic&#45;&gt;interface~calc_shape_function_abst_fe</title>
+<path fill="none" stroke="#ff0000" d="M92,-192.12C112.64,-206.64 149.61,-230.58 185,-243 192.05,-245.48 199.41,-247.66 206.9,-249.59"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="206.26,-253.03 216.8,-251.98 207.9,-246.23 206.26,-253.03"/>
+</g>
+<!-- interface~get_gauss -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node5" class="node">
+<title>interface~get_gauss</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node5"><a xlink:href="../interface/get_gauss.html" xlink:title="abst_fe%get_gauss">
+<polygon fill="#a7506f" stroke="#a7506f" points="379,-192 265,-192 265,-168 379,-168 379,-192"/>
+<text text-anchor="middle" x="322" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%get_gauss</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_natural_bc_generic&#45;&gt;interface~get_gauss -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge4" class="edge">
+<title>proc~apply_natural_bc_generic&#45;&gt;interface~get_gauss</title>
+<path fill="none" stroke="#ff0000" d="M149.16,-180C182.68,-180 222.04,-180 254.63,-180"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="254.96,-183.5 264.96,-180 254.96,-176.5 254.96,-183.5"/>
+</g>
+<!-- interface~get_num_gauss -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node6" class="node">
+<title>interface~get_num_gauss</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node6"><a xlink:href="../interface/get_num_gauss.html" xlink:title="abst_fe%get_num_gauss">
+<polygon fill="#a7506f" stroke="#a7506f" points="393.5,-150 250.5,-150 250.5,-126 393.5,-126 393.5,-150"/>
+<text text-anchor="middle" x="322" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%get_num_gauss</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_natural_bc_generic&#45;&gt;interface~get_num_gauss -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge5" class="edge">
+<title>proc~apply_natural_bc_generic&#45;&gt;interface~get_num_gauss</title>
+<path fill="none" stroke="#ff0000" d="M135.96,-168C151.89,-164.95 169.07,-161.76 185,-159 202.88,-155.91 222.11,-152.8 240.33,-149.96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="240.99,-153.4 250.33,-148.41 239.92,-146.48 240.99,-153.4"/>
+</g>
+<!-- interface~get_weight -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node7" class="node">
+<title>interface~get_weight</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node7"><a xlink:href="../interface/get_weight.html" xlink:title="abst_fe%get_weight">
+<polygon fill="#a7506f" stroke="#a7506f" points="381,-108 263,-108 263,-84 381,-84 381,-108"/>
+<text text-anchor="middle" x="322" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%get_weight</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_natural_bc_generic&#45;&gt;interface~get_weight -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge6" class="edge">
+<title>proc~apply_natural_bc_generic&#45;&gt;interface~get_weight</title>
+<path fill="none" stroke="#ff0000" d="M92,-167.88C112.64,-153.36 149.61,-129.42 185,-117 206.5,-109.45 230.86,-104.61 252.97,-101.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="253.48,-104.97 262.95,-100.21 252.58,-98.03 253.48,-104.97"/>
+</g>
+<!-- none~add~2 -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node8" class="node">
+<title>none~add~2</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node8"><a xlink:href="../type/type_residual_vector.html#boundprocedure-add~2" xlink:title="type_residual_vector%add">
+<polygon fill="#a7506f" stroke="#a7506f" points="398,-234 246,-234 246,-210 398,-210 398,-234"/>
+<text text-anchor="middle" x="322" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_residual_vector%add</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_natural_bc_generic&#45;&gt;none~add~2 -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge7" class="edge">
+<title>proc~apply_natural_bc_generic&#45;&gt;none~add~2</title>
+<path fill="none" stroke="#ff0000" d="M135.96,-192C151.89,-195.05 169.07,-198.24 185,-201 201.28,-203.82 218.69,-206.64 235.42,-209.27"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="235.32,-212.8 245.74,-210.88 236.4,-205.88 235.32,-212.8"/>
+</g>
+<!-- proc~get_element_connectivity_domain -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node9" class="node">
+<title>proc~get_element_connectivity_domain</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node9"><a xlink:href="../proc/get_element_connectivity_domain.html" xlink:title="type_domain%get_element_connectivity_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="459,-66 185,-66 185,-42 459,-42 459,-66"/>
+<text text-anchor="middle" x="322" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_element_connectivity_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_natural_bc_generic&#45;&gt;proc~get_element_connectivity_domain -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge8" class="edge">
+<title>proc~apply_natural_bc_generic&#45;&gt;proc~get_element_connectivity_domain</title>
+<path fill="none" stroke="#ff0000" d="M84.11,-167.79C100.74,-145.26 139.66,-97.4 185,-75 189.09,-72.98 193.32,-71.15 197.65,-69.48"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="199.01,-72.71 207.29,-66.09 196.69,-66.11 199.01,-72.71"/>
+</g>
+<!-- proc~get_fe -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node10" class="node">
+<title>proc~get_fe</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node10"><a xlink:href="../proc/get_fe.html" xlink:title="type_fe_manager%get_fe">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="396,-24 248,-24 248,0 396,0 396,-24"/>
+<text text-anchor="middle" x="322" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_fe_manager%get_fe</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_natural_bc_generic&#45;&gt;proc~get_fe -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge9" class="edge">
+<title>proc~apply_natural_bc_generic&#45;&gt;proc~get_fe</title>
+<path fill="none" stroke="#ff0000" d="M80.52,-167.99C93.23,-139.23 129.65,-66.32 185,-33 200.8,-23.49 219.44,-17.8 237.77,-14.5"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="238.57,-17.92 247.9,-12.9 237.48,-11 238.57,-17.92"/>
+</g>
+<!-- proc~calc_flux_and_derivative_bc -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node16" class="node">
+<title>proc~calc_flux_and_derivative_bc</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node16"><a xlink:href="../proc/calc_flux_and_derivative_bc.html" xlink:title="calc_flux_and_derivative_bc">
+<polygon fill="#d9534f" stroke="#d9534f" points="749,-448 588,-448 588,-424 749,-424 749,-448"/>
+<text text-anchor="middle" x="668.5" y="-433.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_flux_and_derivative_bc</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_flux_and_derivative_bc&#45;&gt;proc~calc_flux_and_derivative_bc -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge10" class="edge">
+<title>interface~calc_flux_and_derivative_bc&#45;&gt;proc~calc_flux_and_derivative_bc</title>
+<path fill="none" stroke="#ffaa00" stroke-dasharray="5,2" d="M427.71,-312.87C438.78,-316.27 449.46,-320.85 459,-327 483.56,-342.82 471.69,-364.38 495,-382 520.08,-400.96 551.94,-413.35 581.44,-421.41"/>
+<polygon fill="#ffaa00" stroke="#ffaa00" points="580.79,-424.85 591.34,-423.98 582.54,-418.08 580.79,-424.85"/>
+</g>
+<!-- proc~calc_shape_function_abst_fe -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node17" class="node">
+<title>proc~calc_shape_function_abst_fe</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node17"><a xlink:href="../proc/calc_shape_function_abst_fe.html" xlink:title="calc_shape_function_abst_fe">
+<polygon fill="#d9534f" stroke="#d9534f" points="1064,-380 900,-380 900,-356 1064,-356 1064,-380"/>
+<text text-anchor="middle" x="982" y="-365.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_shape_function_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_shape_function_abst_fe&#45;&gt;proc~calc_shape_function_abst_fe -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge11" class="edge">
+<title>interface~calc_shape_function_abst_fe&#45;&gt;proc~calc_shape_function_abst_fe</title>
+<path fill="none" stroke="#aaff00" stroke-dasharray="5,2" d="M428.08,-270.3C439.09,-273.8 449.65,-278.57 459,-285 485.57,-303.27 467.45,-331.24 495,-348 630.19,-430.22 827.83,-402.8 924.09,-382.19"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="924.9,-385.59 933.92,-380.03 923.4,-378.75 924.9,-385.59"/>
+</g>
+<!-- proc~get_gauss -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node18" class="node">
+<title>proc~get_gauss</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node18"><a xlink:href="../proc/get_gauss.html" xlink:title="get_gauss">
+<polygon fill="#d9534f" stroke="#d9534f" points="701.5,-129 635.5,-129 635.5,-105 701.5,-105 701.5,-129"/>
+<text text-anchor="middle" x="668.5" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_gauss</text>
+</a>
+</g>
+</g>
+<!-- interface~get_gauss&#45;&gt;proc~get_gauss -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge12" class="edge">
+<title>interface~get_gauss&#45;&gt;proc~get_gauss</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M379.08,-176.11C404.07,-173.17 433.55,-168.02 459,-159 476.46,-152.81 477.44,-143.91 495,-138 537.94,-123.55 589.86,-118.83 625.45,-117.39"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="625.61,-120.89 635.49,-117.06 625.38,-113.89 625.61,-120.89"/>
+</g>
+<!-- proc~get_num_gauss -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node19" class="node">
+<title>proc~get_num_gauss</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node19"><a xlink:href="../proc/get_num_gauss.html" xlink:title="get_num_gauss">
+<polygon fill="#d9534f" stroke="#d9534f" points="716,-87 621,-87 621,-63 716,-63 716,-87"/>
+<text text-anchor="middle" x="668.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_num_gauss</text>
+</a>
+</g>
+</g>
+<!-- interface~get_num_gauss&#45;&gt;proc~get_num_gauss -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge13" class="edge">
+<title>interface~get_num_gauss&#45;&gt;proc~get_num_gauss</title>
+<path fill="none" stroke="#00ffa9" stroke-dasharray="5,2" d="M393.77,-132.18C415.15,-129.07 438.4,-124.3 459,-117 476.46,-110.81 477.44,-101.91 495,-96 532.31,-83.44 576.41,-78.23 610.68,-76.14"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="611.18,-79.62 620.98,-75.59 610.81,-72.63 611.18,-79.62"/>
+</g>
+<!-- proc~get_weight -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node20" class="node">
+<title>proc~get_weight</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node20"><a xlink:href="../proc/get_weight.html" xlink:title="get_weight">
+<polygon fill="#d9534f" stroke="#d9534f" points="703.5,-45 633.5,-45 633.5,-21 703.5,-21 703.5,-45"/>
+<text text-anchor="middle" x="668.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_weight</text>
+</a>
+</g>
+</g>
+<!-- interface~get_weight&#45;&gt;proc~get_weight -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge14" class="edge">
+<title>interface~get_weight&#45;&gt;proc~get_weight</title>
+<path fill="none" stroke="#00a9ff" stroke-dasharray="5,2" d="M381.08,-91.87C405.64,-88.89 434.23,-83.78 459,-75 476.46,-68.81 477.44,-59.91 495,-54 537.03,-39.86 587.66,-35.03 623.17,-33.49"/>
+<polygon fill="#00a9ff" stroke="#00a9ff" points="623.35,-36.98 633.21,-33.12 623.09,-29.99 623.35,-36.98"/>
+</g>
+<!-- proc~add_array_residual_vector -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node11" class="node">
+<title>proc~add_array_residual_vector</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node11"><a xlink:href="../proc/add_array_residual_vector.html" xlink:title="type_residual_vector%add_array_residual_vector">
+<polygon fill="#d9534f" stroke="#d9534f" points="804.5,-255 532.5,-255 532.5,-231 804.5,-231 804.5,-255"/>
+<text text-anchor="middle" x="668.5" y="-240.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_residual_vector%add_array_residual_vector</text>
+</a>
+</g>
+</g>
+<!-- none~add~2&#45;&gt;proc~add_array_residual_vector -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge15" class="edge">
+<title>none~add~2&#45;&gt;proc~add_array_residual_vector</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M398.18,-226.58C434.56,-228.8 479.52,-231.54 522.21,-234.14"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="522.24,-237.65 532.43,-234.77 522.66,-230.66 522.24,-237.65"/>
+</g>
+<!-- proc~add_value_at_index_residual_vector -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node12" class="node">
+<title>proc~add_value_at_index_residual_vector</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node12"><a xlink:href="../proc/add_value_at_index_residual_vector.html" xlink:title="type_residual_vector%add_value_at_index_residual_vector">
+<polygon fill="#d9534f" stroke="#d9534f" points="829.5,-213 507.5,-213 507.5,-189 829.5,-189 829.5,-213"/>
+<text text-anchor="middle" x="668.5" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_residual_vector%add_value_at_index_residual_vector</text>
+</a>
+</g>
+</g>
+<!-- none~add~2&#45;&gt;proc~add_value_at_index_residual_vector -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge16" class="edge">
+<title>none~add~2&#45;&gt;proc~add_value_at_index_residual_vector</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M398.18,-217.42C427.46,-215.63 462.3,-213.51 497.04,-211.39"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="497.55,-214.87 507.32,-210.76 497.12,-207.88 497.55,-214.87"/>
+</g>
+<!-- proc~add_value_residual_vector -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node13" class="node">
+<title>proc~add_value_residual_vector</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node13"><a xlink:href="../proc/add_value_residual_vector.html" xlink:title="type_residual_vector%add_value_residual_vector">
+<polygon fill="#d9534f" stroke="#d9534f" points="805,-339 532,-339 532,-315 805,-315 805,-339"/>
+<text text-anchor="middle" x="668.5" y="-324.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_residual_vector%add_value_residual_vector</text>
+</a>
+</g>
+</g>
+<!-- none~add~2&#45;&gt;proc~add_value_residual_vector -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge17" class="edge">
+<title>none~add~2&#45;&gt;proc~add_value_residual_vector</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M398.04,-221.67C419.21,-224.6 441.28,-230.82 459,-243 485.57,-261.27 468.14,-288.15 495,-306 503.39,-311.57 512.52,-316.05 522.06,-319.62"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="521.13,-323 531.72,-322.9 523.38,-316.37 521.13,-323"/>
+</g>
+<!-- proc~add_values_at_indices_residual_vector -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node14" class="node">
+<title>proc~add_values_at_indices_residual_vector</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node14"><a xlink:href="../proc/add_values_at_indices_residual_vector.html" xlink:title="type_residual_vector%add_values_at_indices_residual_vector">
+<polygon fill="#d9534f" stroke="#d9534f" points="837,-297 500,-297 500,-273 837,-273 837,-297"/>
+<text text-anchor="middle" x="668.5" y="-282.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_residual_vector%add_values_at_indices_residual_vector</text>
+</a>
+</g>
+</g>
+<!-- none~add~2&#45;&gt;proc~add_values_at_indices_residual_vector -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge18" class="edge">
+<title>none~add~2&#45;&gt;proc~add_values_at_indices_residual_vector</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M398,-228.46C418.18,-231.57 439.75,-236.18 459,-243 476.46,-249.19 477.44,-258.09 495,-264 502.34,-266.47 509.94,-268.65 517.68,-270.59"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="517,-274.03 527.54,-272.9 518.6,-267.21 517,-274.03"/>
+</g>
+<!-- proc~add_values_from_vector_residual_vector -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node15" class="node">
+<title>proc~add_values_from_vector_residual_vector</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node15"><a xlink:href="../proc/add_values_from_vector_residual_vector.html" xlink:title="type_residual_vector%add_values_from_vector_residual_vector">
+<polygon fill="#d9534f" stroke="#d9534f" points="842,-171 495,-171 495,-147 842,-147 842,-171"/>
+<text text-anchor="middle" x="668.5" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_residual_vector%add_values_from_vector_residual_vector</text>
+</a>
+</g>
+</g>
+<!-- none~add~2&#45;&gt;proc~add_values_from_vector_residual_vector -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge19" class="edge">
+<title>none~add~2&#45;&gt;proc~add_values_from_vector_residual_vector</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M398,-215.54C418.18,-212.43 439.75,-207.82 459,-201 476.46,-194.81 477.44,-185.91 495,-180 502.34,-177.53 509.94,-175.35 517.68,-173.41"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="518.6,-176.79 527.54,-171.1 517,-169.97 518.6,-176.79"/>
+</g>
+<!-- none~set -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node28" class="node">
+<title>none~set</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node28"><a xlink:href="../type/type_vector_dp.html#boundprocedure-set" xlink:title="type_vector_dp%set">
+<polygon fill="#a7506f" stroke="#a7506f" points="1041.5,-234 922.5,-234 922.5,-210 1041.5,-210 1041.5,-234"/>
+<text text-anchor="middle" x="982" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%set</text>
+</a>
+</g>
+</g>
+<!-- proc~add_array_residual_vector&#45;&gt;none~set -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge20" class="edge">
+<title>proc~add_array_residual_vector&#45;&gt;none~set</title>
+<path fill="none" stroke="#ff0000" d="M804.77,-233.88C841.96,-231.37 880.73,-228.76 912.41,-226.62"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="912.69,-230.11 922.43,-225.95 912.22,-223.13 912.69,-230.11"/>
+</g>
+<!-- proc~add_value_at_index_residual_vector&#45;&gt;none~set -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge21" class="edge">
+<title>proc~add_value_at_index_residual_vector&#45;&gt;none~set</title>
+<path fill="none" stroke="#ff9900" d="M829.81,-211.81C858.77,-213.76 887.52,-215.7 912.04,-217.35"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="912.07,-220.86 922.29,-218.04 912.54,-213.88 912.07,-220.86"/>
+</g>
+<!-- proc~add_value_residual_vector&#45;&gt;none~set -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge22" class="edge">
+<title>proc~add_value_residual_vector&#45;&gt;none~set</title>
+<path fill="none" stroke="#cbff00" d="M805.4,-315.98C817.94,-313.32 830.31,-310.04 842,-306 886.06,-290.79 931.18,-260.2 957.62,-240.43"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="960,-243.02 965.84,-234.18 955.76,-237.45 960,-243.02"/>
+</g>
+<!-- proc~add_values_at_indices_residual_vector&#45;&gt;none~set -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge23" class="edge">
+<title>proc~add_values_at_indices_residual_vector&#45;&gt;none~set</title>
+<path fill="none" stroke="#33ff00" d="M790.58,-272.94C807.91,-270.44 825.47,-267.48 842,-264 874.52,-257.16 910.4,-246.23 937.56,-237.23"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="938.78,-240.52 947.15,-234.02 936.56,-233.88 938.78,-240.52"/>
+</g>
+<!-- interface~get_data_vector_dp -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node25" class="node">
+<title>interface~get_data_vector_dp</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node25"><a xlink:href="../interface/get_data_vector_dp.html" xlink:title="type_vector_dp%get_data_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="1086,-150 878,-150 878,-126 1086,-126 1086,-150"/>
+<text text-anchor="middle" x="982" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~add_values_from_vector_residual_vector&#45;&gt;interface~get_data_vector_dp -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge24" class="edge">
+<title>proc~add_values_from_vector_residual_vector&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#00ff66" d="M842.1,-147.36C850.69,-146.79 859.2,-146.21 867.54,-145.65"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="867.87,-149.13 877.61,-144.97 867.4,-142.15 867.87,-149.13"/>
+</g>
+<!-- proc~add_values_from_vector_residual_vector&#45;&gt;none~set -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge25" class="edge">
+<title>proc~add_values_from_vector_residual_vector&#45;&gt;none~set</title>
+<path fill="none" stroke="#00ff66" d="M790.58,-171.06C807.91,-173.56 825.47,-176.52 842,-180 874.52,-186.84 910.4,-197.77 937.56,-206.77"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="936.56,-210.12 947.15,-209.98 938.78,-203.48 936.56,-210.12"/>
+</g>
+<!-- interface~calc_values_raw_bc -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node24" class="node">
+<title>interface~calc_values_raw_bc</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node24"><a xlink:href="../interface/calc_values_raw_bc.html" xlink:title="abst_bc%calc_values_raw_bc">
+<polygon fill="#a7506f" stroke="#a7506f" points="1065.5,-475 898.5,-475 898.5,-451 1065.5,-451 1065.5,-475"/>
+<text text-anchor="middle" x="982" y="-460.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_bc%calc_values_raw_bc</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_flux_and_derivative_bc&#45;&gt;interface~calc_values_raw_bc -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge26" class="edge">
+<title>proc~calc_flux_and_derivative_bc&#45;&gt;interface~calc_values_raw_bc</title>
+<path fill="none" stroke="#00ffff" d="M749.31,-442.92C791.71,-446.59 844.04,-451.13 888.23,-454.96"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="888.14,-458.46 898.4,-455.84 888.74,-451.49 888.14,-458.46"/>
+</g>
+<!-- calc_dpsi -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node21" class="node">
+<title>calc_dpsi</title>
+<polygon fill="#777777" stroke="#777777" points="1290,-486 1229,-486 1229,-462 1290,-462 1290,-486"/>
+<text text-anchor="middle" x="1259.5" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_dpsi</text>
+</g>
+<!-- proc~calc_shape_function_abst_fe&#45;&gt;calc_dpsi -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge27" class="edge">
+<title>proc~calc_shape_function_abst_fe&#45;&gt;calc_dpsi</title>
+<path fill="none" stroke="#0066ff" d="M998.2,-380.15C1022.7,-399.03 1073.12,-435.12 1122,-453 1153.35,-464.47 1190.97,-469.67 1218.77,-472.04"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1218.67,-475.54 1228.91,-472.81 1219.2,-468.56 1218.67,-475.54"/>
+</g>
+<!-- calc_jacobian -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node22" class="node">
+<title>calc_jacobian</title>
+<polygon fill="#777777" stroke="#777777" points="1302,-444 1217,-444 1217,-420 1302,-420 1302,-444"/>
+<text text-anchor="middle" x="1259.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_jacobian</text>
+</g>
+<!-- proc~calc_shape_function_abst_fe&#45;&gt;calc_jacobian -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge28" class="edge">
+<title>proc~calc_shape_function_abst_fe&#45;&gt;calc_jacobian</title>
+<path fill="none" stroke="#0066ff" d="M1016.89,-380.02C1044.8,-389.55 1085.57,-402.61 1122,-411 1149.85,-417.41 1181.35,-422.41 1207.07,-425.91"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1206.61,-429.38 1216.98,-427.23 1207.53,-422.44 1206.61,-429.38"/>
+</g>
+<!-- calc_psi -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node23" class="node">
+<title>calc_psi</title>
+<polygon fill="#777777" stroke="#777777" points="1287,-402 1232,-402 1232,-378 1287,-378 1287,-402"/>
+<text text-anchor="middle" x="1259.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_psi</text>
+</g>
+<!-- proc~calc_shape_function_abst_fe&#45;&gt;calc_psi -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge29" class="edge">
+<title>proc~calc_shape_function_abst_fe&#45;&gt;calc_psi</title>
+<path fill="none" stroke="#0066ff" d="M1064.17,-374.48C1116.33,-378.65 1181.59,-383.86 1221.65,-387.06"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1221.51,-390.56 1231.76,-387.86 1222.07,-383.58 1221.51,-390.56"/>
+</g>
+<!-- interface~matrix_determinant -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node26" class="node">
+<title>interface~matrix_determinant</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node26"><a xlink:href="../interface/matrix_determinant.html" xlink:title="matrix_determinant">
+<polygon fill="#a7506f" stroke="#a7506f" points="1318.5,-318 1200.5,-318 1200.5,-294 1318.5,-294 1318.5,-318"/>
+<text text-anchor="middle" x="1259.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_determinant</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_shape_function_abst_fe&#45;&gt;interface~matrix_determinant -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge30" class="edge">
+<title>proc~calc_shape_function_abst_fe&#45;&gt;interface~matrix_determinant</title>
+<path fill="none" stroke="#0066ff" d="M1018.94,-355.95C1046.81,-346.97 1086.52,-334.92 1122,-327 1144.12,-322.06 1168.51,-317.9 1190.49,-314.63"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1191,-318.09 1200.4,-313.19 1190,-311.16 1191,-318.09"/>
+</g>
+<!-- interface~matrix_inverse -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node27" class="node">
+<title>interface~matrix_inverse</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node27"><a xlink:href="../interface/matrix_inverse.html" xlink:title="matrix_inverse">
+<polygon fill="#a7506f" stroke="#a7506f" points="1305,-360 1214,-360 1214,-336 1305,-336 1305,-360"/>
+<text text-anchor="middle" x="1259.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_inverse</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_shape_function_abst_fe&#45;&gt;interface~matrix_inverse -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge31" class="edge">
+<title>proc~calc_shape_function_abst_fe&#45;&gt;interface~matrix_inverse</title>
+<path fill="none" stroke="#0066ff" d="M1064.17,-362.11C1109.14,-358.84 1163.85,-354.87 1203.75,-351.97"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1204.09,-355.46 1213.81,-351.24 1203.59,-348.48 1204.09,-355.46"/>
+</g>
+<!-- proc~calc_values_raw_bc -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node33" class="node">
+<title>proc~calc_values_raw_bc</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node33"><a xlink:href="../proc/calc_values_raw_bc.html" xlink:title="calc_values_raw_bc">
+<polygon fill="#d9534f" stroke="#d9534f" points="1318,-528 1201,-528 1201,-504 1318,-504 1318,-528"/>
+<text text-anchor="middle" x="1259.5" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_values_raw_bc</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_values_raw_bc&#45;&gt;proc~calc_values_raw_bc -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge32" class="edge">
+<title>interface~calc_values_raw_bc&#45;&gt;proc~calc_values_raw_bc</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1031.38,-475.06C1058.02,-481.47 1091.72,-489.19 1122,-495 1144.36,-499.29 1168.91,-503.28 1190.96,-506.61"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="1190.48,-510.08 1200.89,-508.1 1191.52,-503.16 1190.48,-510.08"/>
+</g>
+<!-- proc~get_data_vector_dp -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node34" class="node">
+<title>proc~get_data_vector_dp</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node34"><a xlink:href="../proc/get_data_vector_dp.html" xlink:title="get_data_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1318,-108 1201,-108 1201,-84 1318,-84 1318,-108"/>
+<text text-anchor="middle" x="1259.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge33" class="edge">
+<title>interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1061.95,-125.96C1102.67,-119.76 1151.83,-112.26 1190.8,-106.32"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1191.64,-109.73 1200.99,-104.77 1190.58,-102.81 1191.64,-109.73"/>
+</g>
+<!-- proc~matrix_determinant_real64 -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node35" class="node">
+<title>proc~matrix_determinant_real64</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node35"><a xlink:href="../proc/matrix_determinant_real64.html" xlink:title="matrix_determinant_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1608,-318 1451,-318 1451,-294 1608,-294 1608,-318"/>
+<text text-anchor="middle" x="1529.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_determinant_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~matrix_determinant&#45;&gt;proc~matrix_determinant_real64 -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge34" class="edge">
+<title>interface~matrix_determinant&#45;&gt;proc~matrix_determinant_real64</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M1318.65,-306C1354.34,-306 1400.74,-306 1440.83,-306"/>
+<polygon fill="#003fff" stroke="#003fff" points="1440.88,-309.5 1450.88,-306 1440.88,-302.5 1440.88,-309.5"/>
+</g>
+<!-- proc~matrix_inverse_real64 -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node36" class="node">
+<title>proc~matrix_inverse_real64</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node36"><a xlink:href="../proc/matrix_inverse_real64.html" xlink:title="matrix_inverse_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1594.5,-360 1464.5,-360 1464.5,-336 1594.5,-336 1594.5,-360"/>
+<text text-anchor="middle" x="1529.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_inverse_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~matrix_inverse&#45;&gt;proc~matrix_inverse_real64 -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge35" class="edge">
+<title>interface~matrix_inverse&#45;&gt;proc~matrix_inverse_real64</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1305.06,-348C1345.63,-348 1406.34,-348 1454.25,-348"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1454.26,-351.5 1464.26,-348 1454.26,-344.5 1454.26,-351.5"/>
+</g>
+<!-- interface~set_array_vector_dp -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node29" class="node">
+<title>interface~set_array_vector_dp</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node29"><a xlink:href="../interface/set_array_vector_dp.html" xlink:title="type_vector_dp%set_array_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="1365,-150 1154,-150 1154,-126 1365,-126 1365,-150"/>
+<text text-anchor="middle" x="1259.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%set_array_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- none~set&#45;&gt;interface~set_array_vector_dp -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge36" class="edge">
+<title>none~set&#45;&gt;interface~set_array_vector_dp</title>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M1004.9,-209.79C1031.7,-195.41 1078.83,-171.84 1122,-159 1130.69,-156.41 1139.79,-154.14 1149,-152.13"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="1149.93,-155.51 1159.01,-150.05 1148.51,-148.65 1149.93,-155.51"/>
+</g>
+<!-- interface~set_scalar_vector_dp -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node30" class="node">
+<title>interface~set_scalar_vector_dp</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node30"><a xlink:href="../interface/set_scalar_vector_dp.html" xlink:title="type_vector_dp%set_scalar_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="1366.5,-234 1152.5,-234 1152.5,-210 1366.5,-210 1366.5,-234"/>
+<text text-anchor="middle" x="1259.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%set_scalar_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- none~set&#45;&gt;interface~set_scalar_vector_dp -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge37" class="edge">
+<title>none~set&#45;&gt;interface~set_scalar_vector_dp</title>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M1041.76,-222C1071.03,-222 1107.49,-222 1142.1,-222"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="1142.29,-225.5 1152.29,-222 1142.29,-218.5 1142.29,-225.5"/>
+</g>
+<!-- interface~set_value_at_index_vector_dp -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node31" class="node">
+<title>interface~set_value_at_index_vector_dp</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node31"><a xlink:href="../interface/set_value_at_index_vector_dp.html" xlink:title="type_vector_dp%set_value_at_index_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="1390,-192 1129,-192 1129,-168 1390,-168 1390,-192"/>
+<text text-anchor="middle" x="1259.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%set_value_at_index_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- none~set&#45;&gt;interface~set_value_at_index_vector_dp -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge38" class="edge">
+<title>none~set&#45;&gt;interface~set_value_at_index_vector_dp</title>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M1041.76,-213.04C1079,-207.37 1127.86,-199.92 1169.76,-193.53"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="1170.34,-196.98 1179.7,-192.01 1169.28,-190.06 1170.34,-196.98"/>
+</g>
+<!-- interface~set_values_at_indices_vector_dp -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node32" class="node">
+<title>interface~set_values_at_indices_vector_dp</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node32"><a xlink:href="../interface/set_values_at_indices_vector_dp.html" xlink:title="type_vector_dp%set_values_at_indices_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="1397,-276 1122,-276 1122,-252 1397,-252 1397,-276"/>
+<text text-anchor="middle" x="1259.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%set_values_at_indices_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- none~set&#45;&gt;interface~set_values_at_indices_vector_dp -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge39" class="edge">
+<title>none~set&#45;&gt;interface~set_values_at_indices_vector_dp</title>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M1041.76,-230.96C1079,-236.63 1127.86,-244.08 1169.76,-250.47"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="1169.28,-253.94 1179.7,-251.99 1170.34,-247.02 1169.28,-253.94"/>
+</g>
+<!-- proc~set_array_vector_dp -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node40" class="node">
+<title>proc~set_array_vector_dp</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node40"><a xlink:href="../proc/set_array_vector_dp.html" xlink:title="set_array_vector_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="1589.5,-150 1469.5,-150 1469.5,-126 1589.5,-126 1589.5,-150"/>
+<text text-anchor="middle" x="1529.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_array_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~set_array_vector_dp&#45;&gt;proc~set_array_vector_dp -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge40" class="edge">
+<title>interface~set_array_vector_dp&#45;&gt;proc~set_array_vector_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1365.27,-138C1396.78,-138 1430.56,-138 1459.16,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1459.46,-141.5 1469.45,-138 1459.45,-134.5 1459.46,-141.5"/>
+</g>
+<!-- proc~set_scalar_vector_dp -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node41" class="node">
+<title>proc~set_scalar_vector_dp</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node41"><a xlink:href="../proc/set_scalar_vector_dp.html" xlink:title="set_scalar_vector_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="1591.5,-234 1467.5,-234 1467.5,-210 1591.5,-210 1591.5,-234"/>
+<text text-anchor="middle" x="1529.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_scalar_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~set_scalar_vector_dp&#45;&gt;proc~set_scalar_vector_dp -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge41" class="edge">
+<title>interface~set_scalar_vector_dp&#45;&gt;proc~set_scalar_vector_dp</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1366.81,-222C1397,-222 1429.15,-222 1456.77,-222"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1457.12,-225.5 1467.12,-222 1457.12,-218.5 1457.12,-225.5"/>
+</g>
+<!-- proc~set_value_at_index_vector_dp -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node42" class="node">
+<title>proc~set_value_at_index_vector_dp</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node42"><a xlink:href="../proc/set_value_at_index_vector_dp.html" xlink:title="set_value_at_index_vector_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="1614.5,-192 1444.5,-192 1444.5,-168 1614.5,-168 1614.5,-192"/>
+<text text-anchor="middle" x="1529.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_value_at_index_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~set_value_at_index_vector_dp&#45;&gt;proc~set_value_at_index_vector_dp -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge42" class="edge">
+<title>interface~set_value_at_index_vector_dp&#45;&gt;proc~set_value_at_index_vector_dp</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M1390.18,-180C1405.02,-180 1419.93,-180 1434.18,-180"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1434.43,-183.5 1444.43,-180 1434.43,-176.5 1434.43,-183.5"/>
+</g>
+<!-- proc~set_values_at_indices_vector_dp -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node43" class="node">
+<title>proc~set_values_at_indices_vector_dp</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node43"><a xlink:href="../proc/set_values_at_indices_vector_dp.html" xlink:title="set_values_at_indices_vector_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="1621.5,-276 1437.5,-276 1437.5,-252 1621.5,-252 1621.5,-276"/>
+<text text-anchor="middle" x="1529.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_values_at_indices_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~set_values_at_indices_vector_dp&#45;&gt;proc~set_values_at_indices_vector_dp -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge43" class="edge">
+<title>interface~set_values_at_indices_vector_dp&#45;&gt;proc~set_values_at_indices_vector_dp</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1397.25,-264C1407.3,-264 1417.34,-264 1427.13,-264"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="1427.23,-267.5 1437.23,-264 1427.23,-260.5 1427.23,-267.5"/>
+</g>
+<!-- interface~calc_time_coefficient_bc -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node39" class="node">
+<title>interface~calc_time_coefficient_bc</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node39"><a xlink:href="../interface/calc_time_coefficient_bc.html" xlink:title="abst_bc%calc_time_coefficient_bc">
+<polygon fill="#a7506f" stroke="#a7506f" points="1626,-528 1433,-528 1433,-504 1626,-504 1626,-528"/>
+<text text-anchor="middle" x="1529.5" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_bc%calc_time_coefficient_bc</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_values_raw_bc&#45;&gt;interface~calc_time_coefficient_bc -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge44" class="edge">
+<title>proc~calc_values_raw_bc&#45;&gt;interface~calc_time_coefficient_bc</title>
+<path fill="none" stroke="#00ffff" d="M1318.32,-516C1348.71,-516 1386.93,-516 1422.42,-516"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1422.84,-519.5 1432.84,-516 1422.84,-512.5 1422.84,-519.5"/>
+</g>
+<!-- allocate_array -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node37" class="node">
+<title>allocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="1778,-297 1689,-297 1689,-273 1778,-273 1778,-297"/>
+<text text-anchor="middle" x="1733.5" y="-282.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</g>
+<!-- proc~matrix_determinant_real64&#45;&gt;allocate_array -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge45" class="edge">
+<title>proc~matrix_determinant_real64&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#7f00ff" d="M1608.02,-297.94C1631.65,-295.48 1657.09,-292.84 1678.78,-290.58"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1679.19,-294.06 1688.78,-289.55 1678.47,-287.1 1679.19,-294.06"/>
+</g>
+<!-- deallocate_array -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node38" class="node">
+<title>deallocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="1785,-339 1682,-339 1682,-315 1785,-315 1785,-339"/>
+<text text-anchor="middle" x="1733.5" y="-324.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_array</text>
+</g>
+<!-- proc~matrix_determinant_real64&#45;&gt;deallocate_array -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge46" class="edge">
+<title>proc~matrix_determinant_real64&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#7f00ff" d="M1608.02,-314.06C1629.05,-316.25 1651.53,-318.58 1671.51,-320.66"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1671.4,-324.17 1681.71,-321.72 1672.12,-317.2 1671.4,-324.17"/>
+</g>
+<!-- proc~matrix_inverse_real64&#45;&gt;allocate_array -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge47" class="edge">
+<title>proc~matrix_inverse_real64&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#ff00bf" d="M1594.51,-336.82C1605.19,-334.14 1616.04,-330.89 1626,-327 1643.25,-320.26 1645,-313.36 1662,-306 1667.41,-303.66 1673.15,-301.48 1678.94,-299.48"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="1680.26,-302.73 1688.67,-296.29 1678.08,-296.08 1680.26,-302.73"/>
+</g>
+<!-- proc~matrix_inverse_real64&#45;&gt;deallocate_array -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge48" class="edge">
+<title>proc~matrix_inverse_real64&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#ff00bf" d="M1594.69,-341.33C1619.36,-338.76 1647.41,-335.85 1671.74,-333.32"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="1672.34,-336.77 1681.92,-332.26 1671.62,-329.81 1672.34,-336.77"/>
+</g>
+<!-- proc~calc_time_coefficient_bc -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node45" class="node">
+<title>proc~calc_time_coefficient_bc</title>
+<g id="a_proc~~apply_natural_bc_generic~~CallsGraph_node45"><a xlink:href="../proc/calc_time_coefficient_bc.html" xlink:title="calc_time_coefficient_bc">
+<polygon fill="#d9534f" stroke="#d9534f" points="1805,-528 1662,-528 1662,-504 1805,-504 1805,-528"/>
+<text text-anchor="middle" x="1733.5" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_time_coefficient_bc</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_time_coefficient_bc&#45;&gt;proc~calc_time_coefficient_bc -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge49" class="edge">
+<title>interface~calc_time_coefficient_bc&#45;&gt;proc~calc_time_coefficient_bc</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M1626.18,-516C1634.73,-516 1643.34,-516 1651.75,-516"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="1651.89,-519.5 1661.89,-516 1651.89,-512.5 1651.89,-519.5"/>
+</g>
+<!-- check_match_length -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node44" class="node">
+<title>check_match_length</title>
+<polygon fill="#777777" stroke="#777777" points="1794.5,-129 1672.5,-129 1672.5,-105 1794.5,-105 1794.5,-129"/>
+<text text-anchor="middle" x="1733.5" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">check_match_length</text>
+</g>
+<!-- proc~set_array_vector_dp&#45;&gt;check_match_length -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge50" class="edge">
+<title>proc~set_array_vector_dp&#45;&gt;check_match_length</title>
+<path fill="none" stroke="#00ff91" d="M1589.74,-131.84C1612.46,-129.48 1638.59,-126.76 1662.24,-124.3"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="1662.62,-127.78 1672.21,-123.27 1661.9,-120.82 1662.62,-127.78"/>
+</g>
+<!-- value_in_range -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_node46" class="node">
+<title>value_in_range</title>
+<polygon fill="#777777" stroke="#777777" points="1780.5,-171 1686.5,-171 1686.5,-147 1780.5,-147 1780.5,-171"/>
+<text text-anchor="middle" x="1733.5" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">value_in_range</text>
+</g>
+<!-- proc~set_array_vector_dp&#45;&gt;value_in_range -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge51" class="edge">
+<title>proc~set_array_vector_dp&#45;&gt;value_in_range</title>
+<path fill="none" stroke="#00ff91" d="M1589.74,-144.16C1617.1,-147 1649.41,-150.36 1676.37,-153.17"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="1676.11,-156.66 1686.42,-154.21 1676.84,-149.69 1676.11,-156.66"/>
+</g>
+<!-- proc~set_values_at_indices_vector_dp&#45;&gt;allocate_array -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge52" class="edge">
+<title>proc~set_values_at_indices_vector_dp&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#ff00da" d="M1621.75,-273.49C1641.24,-275.51 1661.22,-277.59 1678.75,-279.41"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="1678.45,-282.9 1688.76,-280.45 1679.18,-275.94 1678.45,-282.9"/>
+</g>
+<!-- proc~set_values_at_indices_vector_dp&#45;&gt;deallocate_array -->
+<g id="proc~~apply_natural_bc_generic~~CallsGraph_edge53" class="edge">
+<title>proc~set_values_at_indices_vector_dp&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#ff00da" d="M1597.82,-276.03C1607.42,-278.54 1617.07,-281.51 1626,-285 1643.25,-291.74 1645,-298.64 1662,-306 1666.64,-308.01 1671.53,-309.9 1676.49,-311.66"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="1675.45,-315.01 1686.05,-314.88 1677.69,-308.37 1675.45,-315.01"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocapply_natural_bc_genericCallsGraph = svgPanZoom('#procapply_natural_bc_genericCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~apply_natural_bc_generic~~CalledByGraph Pages: 1 -->
+<svg id="procapply_natural_bc_genericCalledByGraph" width="641pt" height="35pt"
+ viewBox="0.00 0.00 641.00 34.72" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~apply_natural_bc_generic~~CalledByGraph" class="graph" transform="scale(0.47 0.47) rotate(0) translate(4 70)">
+<title>proc~~apply_natural_bc_generic~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 1362,-70 1362,4 -4,4"/>
+<!-- proc~apply_natural_bc_generic -->
+<g id="proc~~apply_natural_bc_generic~~CalledByGraph_node1" class="node">
+<title>proc~apply_natural_bc_generic</title>
+<polygon fill="none" stroke="black" points="1358,-45 1209,-45 1209,-21 1358,-21 1358,-45"/>
+<text text-anchor="middle" x="1283.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">apply_natural_bc_generic</text>
+</g>
+<!-- interface~apply_natural_bc_generic -->
+<g id="proc~~apply_natural_bc_generic~~CalledByGraph_node2" class="node">
+<title>interface~apply_natural_bc_generic</title>
+<g id="a_proc~~apply_natural_bc_generic~~CalledByGraph_node2"><a xlink:href="../interface/apply_natural_bc_generic.html" xlink:title="type_ftdss%apply_natural_bc_generic">
+<polygon fill="#a7506f" stroke="#a7506f" points="1173,-45 961,-45 961,-21 1173,-21 1173,-45"/>
+<text text-anchor="middle" x="1067" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%apply_natural_bc_generic</text>
+</a>
+</g>
+</g>
+<!-- interface~apply_natural_bc_generic&#45;&gt;proc~apply_natural_bc_generic -->
+<g id="proc~~apply_natural_bc_generic~~CalledByGraph_edge1" class="edge">
+<title>interface~apply_natural_bc_generic&#45;&gt;proc~apply_natural_bc_generic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1173.05,-33C1181.65,-33 1190.28,-33 1198.69,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1198.85,-36.5 1208.85,-33 1198.85,-29.5 1198.85,-36.5"/>
+</g>
+<!-- proc~apply_bc_ftdss -->
+<g id="proc~~apply_natural_bc_generic~~CalledByGraph_node3" class="node">
+<title>proc~apply_bc_ftdss</title>
+<g id="a_proc~~apply_natural_bc_generic~~CalledByGraph_node3"><a xlink:href="../proc/apply_bc_ftdss.html" xlink:title="apply_bc_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="925,-45 835,-45 835,-21 925,-21 925,-45"/>
+<text text-anchor="middle" x="880" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">apply_bc_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_bc_ftdss&#45;&gt;interface~apply_natural_bc_generic -->
+<g id="proc~~apply_natural_bc_generic~~CalledByGraph_edge2" class="edge">
+<title>proc~apply_bc_ftdss&#45;&gt;interface~apply_natural_bc_generic</title>
+<path fill="none" stroke="#ff0000" d="M925.31,-33C933.23,-33 941.81,-33 950.69,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="950.81,-36.5 960.81,-33 950.81,-29.5 950.81,-36.5"/>
+</g>
+<!-- interface~apply_bc_ftdss -->
+<g id="proc~~apply_natural_bc_generic~~CalledByGraph_node4" class="node">
+<title>interface~apply_bc_ftdss</title>
+<g id="a_proc~~apply_natural_bc_generic~~CalledByGraph_node4"><a xlink:href="../interface/apply_bc_ftdss.html" xlink:title="type_ftdss%apply_bc_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="799,-45 646,-45 646,-21 799,-21 799,-45"/>
+<text text-anchor="middle" x="722.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%apply_bc_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~apply_bc_ftdss&#45;&gt;proc~apply_bc_ftdss -->
+<g id="proc~~apply_natural_bc_generic~~CalledByGraph_edge3" class="edge">
+<title>interface~apply_bc_ftdss&#45;&gt;proc~apply_bc_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M799.43,-33C807.99,-33 816.59,-33 824.79,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="824.95,-36.5 834.95,-33 824.95,-29.5 824.95,-36.5"/>
+</g>
+<!-- proc~initialize_type_ftdss -->
+<g id="proc~~apply_natural_bc_generic~~CalledByGraph_node5" class="node">
+<title>proc~initialize_type_ftdss</title>
+<g id="a_proc~~apply_natural_bc_generic~~CalledByGraph_node5"><a xlink:href="../proc/initialize_type_ftdss.html" xlink:title="initialize_type_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="604,-66 489,-66 489,-42 604,-42 604,-66"/>
+<text text-anchor="middle" x="546.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_type_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_ftdss&#45;&gt;interface~apply_bc_ftdss -->
+<g id="proc~~apply_natural_bc_generic~~CalledByGraph_edge4" class="edge">
+<title>proc~initialize_type_ftdss&#45;&gt;interface~apply_bc_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M604.47,-47.12C614.46,-45.92 625.06,-44.64 635.62,-43.36"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="636.22,-46.82 645.73,-42.14 635.38,-39.87 636.22,-46.82"/>
+</g>
+<!-- proc~solve_time_step_ftdss -->
+<g id="proc~~apply_natural_bc_generic~~CalledByGraph_node6" class="node">
+<title>proc~solve_time_step_ftdss</title>
+<g id="a_proc~~apply_natural_bc_generic~~CalledByGraph_node6"><a xlink:href="../proc/solve_time_step_ftdss.html" xlink:title="solve_time_step_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="610,-24 483,-24 483,0 610,0 610,-24"/>
+<text text-anchor="middle" x="546.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~apply_bc_ftdss -->
+<g id="proc~~apply_natural_bc_generic~~CalledByGraph_edge5" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~apply_bc_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M610.32,-19.58C618.57,-20.58 627.15,-21.61 635.7,-22.65"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="635.37,-26.13 645.72,-23.85 636.21,-19.18 635.37,-26.13"/>
+</g>
+<!-- interface~initialize_type_ftdss -->
+<g id="proc~~apply_natural_bc_generic~~CalledByGraph_node7" class="node">
+<title>interface~initialize_type_ftdss</title>
+<g id="a_proc~~apply_natural_bc_generic~~CalledByGraph_node7"><a xlink:href="../interface/initialize_type_ftdss.html" xlink:title="type_ftdss%initialize_type_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="441,-66 263,-66 263,-42 441,-42 441,-66"/>
+<text text-anchor="middle" x="352" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%initialize_type_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_ftdss&#45;&gt;proc~initialize_type_ftdss -->
+<g id="proc~~apply_natural_bc_generic~~CalledByGraph_edge6" class="edge">
+<title>interface~initialize_type_ftdss&#45;&gt;proc~initialize_type_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M441.08,-54C453.77,-54 466.64,-54 478.82,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="478.86,-57.5 488.86,-54 478.86,-50.5 478.86,-57.5"/>
+</g>
+<!-- interface~solve_time_step_ftdss -->
+<g id="proc~~apply_natural_bc_generic~~CalledByGraph_node8" class="node">
+<title>interface~solve_time_step_ftdss</title>
+<g id="a_proc~~apply_natural_bc_generic~~CalledByGraph_node8"><a xlink:href="../interface/solve_time_step_ftdss.html" xlink:title="type_ftdss%solve_time_step_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="447,-24 257,-24 257,0 447,0 447,-24"/>
+<text text-anchor="middle" x="352" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss -->
+<g id="proc~~apply_natural_bc_generic~~CalledByGraph_edge7" class="edge">
+<title>interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M447.28,-12C455.88,-12 464.5,-12 472.87,-12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="472.93,-15.5 482.93,-12 472.93,-8.5 472.93,-15.5"/>
+</g>
+<!-- proc~run_ftdss -->
+<g id="proc~~apply_natural_bc_generic~~CalledByGraph_node9" class="node">
+<title>proc~run_ftdss</title>
+<g id="a_proc~~apply_natural_bc_generic~~CalledByGraph_node9"><a xlink:href="../proc/run_ftdss.html" xlink:title="run_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-24 160,-24 160,0 221,0 221,-24"/>
+<text text-anchor="middle" x="190.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss -->
+<g id="proc~~apply_natural_bc_generic~~CalledByGraph_edge8" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss</title>
+<path fill="none" stroke="#00ffff" d="M221.13,-12C228.8,-12 237.52,-12 246.72,-12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="246.86,-15.5 256.86,-12 246.86,-8.5 246.86,-15.5"/>
+</g>
+<!-- interface~run_ftdss -->
+<g id="proc~~apply_natural_bc_generic~~CalledByGraph_node10" class="node">
+<title>interface~run_ftdss</title>
+<g id="a_proc~~apply_natural_bc_generic~~CalledByGraph_node10"><a xlink:href="../interface/run_ftdss.html" xlink:title="type_ftdss%run_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="124,-24 0,-24 0,0 124,0 124,-24"/>
+<text text-anchor="middle" x="62" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftdss&#45;&gt;proc~run_ftdss -->
+<g id="proc~~apply_natural_bc_generic~~CalledByGraph_edge9" class="edge">
+<title>interface~run_ftdss&#45;&gt;proc~run_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M124.03,-12C132.82,-12 141.68,-12 149.91,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="149.94,-15.5 159.94,-12 149.94,-8.5 149.94,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocapply_natural_bc_genericCalledByGraph = svgPanZoom('#procapply_natural_bc_genericCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">apply_natural_bc_generic</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">physics_type</span><span class="p">,</span><span class="w"> </span><span class="n">current_time</span><span class="p">,</span><span class="w"> </span><span class="n">variable</span><span class="p">,</span><span class="w"> </span><span class="n">dof_offset</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_ftdss</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">),</span><span class="w"> </span><span class="k">target</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_constant_id</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">physics_type</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">current_time</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_variable</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">variable</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dof_offset</span>
+
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i_patch</span><span class="p">,</span><span class="w"> </span><span class="n">i_elem</span><span class="p">,</span><span class="w"> </span><span class="n">k_gp</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_nodes_loc</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_gp</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">u_curr</span><span class="p">,</span><span class="w"> </span><span class="n">q_flux</span><span class="p">,</span><span class="w"> </span><span class="n">dq_du</span><span class="p">,</span><span class="w"> </span><span class="n">w_vol</span><span class="p">,</span><span class="w"> </span><span class="n">det_j</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">psi</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dpsi_dx</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">node_coords</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">contiguous</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">fe_weights</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_coordinate_dp</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">contiguous</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">fe_gauss_pts</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_coordinate_dp</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">r</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">val</span>
+
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">contiguous</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">connectivity</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">abst_bc</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">bc_obj</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">abst_fe</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">fe</span>
+
+<span class="w">        </span><span class="k">associate</span><span class="w"> </span><span class="p">(</span><span class="n">bc_manager</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">domain</span><span class="p">%</span><span class="n">boundaries</span><span class="p">%</span><span class="n">physics</span><span class="p">(</span><span class="n">physics_type</span><span class="p">%</span><span class="n">id</span><span class="p">))</span>
+<span class="w">            </span><span class="k">do </span><span class="n">i_patch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">bc_manager</span><span class="p">%</span><span class="n">num_bcs</span>
+<span class="w">                </span><span class="n">bc_obj</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">bc_manager</span><span class="p">%</span><span class="n">bcs</span><span class="p">(</span><span class="n">i_patch</span><span class="p">)%</span><span class="n">condition</span>
+
+<span class="w">                </span><span class="k">select type</span><span class="w"> </span><span class="p">(</span><span class="n">bc_obj</span><span class="p">)</span>
+<span class="w">                </span><span class="k">type is</span><span class="w"> </span><span class="p">(</span><span class="n">type_bc_dirichlet</span><span class="p">)</span>
+<span class="w">                    </span><span class="k">cycle</span>
+<span class="k">                end select</span>
+
+<span class="k">                associate</span><span class="w"> </span><span class="p">(</span><span class="n">patch</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">bc_manager</span><span class="p">%</span><span class="n">bcs</span><span class="p">(</span><span class="n">i_patch</span><span class="p">))</span>
+<span class="w">                    </span><span class="c">! パッチ内の全ての境界要素についてFEタイプは同一と仮定して代表を取得 (index=1)</span>
+<span class="w">                    </span><span class="n">fe</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">patch</span><span class="p">%</span><span class="n">fe_manager</span><span class="p">%</span><span class="n">get_fe</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="w">                    </span><span class="k">do </span><span class="n">i_elem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">patch</span><span class="p">%</span><span class="n">num_elements</span>
+
+<span class="w">                        </span><span class="c">! コネクティビティ取得</span>
+<span class="w">                        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">domain</span><span class="p">%</span><span class="n">get_element_connectivity</span><span class="p">(</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                            </span><span class="n">patch</span><span class="p">%</span><span class="n">connectivity</span><span class="p">%</span><span class="n">val</span><span class="p">(</span><span class="n">patch</span><span class="p">%</span><span class="n">connectivity</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">i_elem</span><span class="p">)),</span><span class="w"> </span><span class="n">connectivity</span><span class="p">)</span>
+
+<span class="w">                        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">connectivity</span><span class="p">))</span><span class="w"> </span><span class="k">cycle</span>
+<span class="k">                        </span><span class="n">num_nodes_loc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">connectivity</span><span class="p">)</span>
+
+<span class="w">                        </span><span class="c">! 座標取得 (境界要素に対応するノード群)</span>
+<span class="w">                        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">node_coords</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">node_coords</span><span class="p">)</span>
+<span class="w">                        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">node_coords</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">domain</span><span class="p">%</span><span class="n">computation_dimension</span><span class="p">,</span><span class="w"> </span><span class="n">num_nodes_loc</span><span class="p">))</span>
+<span class="w">                        </span><span class="n">node_coords</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">domain</span><span class="p">%</span><span class="n">nodes</span><span class="p">%</span><span class="n">coordinates</span><span class="p">(:,</span><span class="w"> </span><span class="n">connectivity</span><span class="p">)</span>
+
+<span class="w">                        </span><span class="c">! ガウス積分情報</span>
+<span class="w">                        </span><span class="k">call </span><span class="n">fe</span><span class="p">%</span><span class="n">get_num_gauss</span><span class="p">(</span><span class="n">num_gp</span><span class="p">)</span>
+<span class="w">                        </span><span class="k">call </span><span class="n">fe</span><span class="p">%</span><span class="n">get_weight</span><span class="p">(</span><span class="n">fe_weights</span><span class="p">)</span>
+<span class="w">                        </span><span class="k">call </span><span class="n">fe</span><span class="p">%</span><span class="n">get_gauss</span><span class="p">(</span><span class="n">fe_gauss_pts</span><span class="p">)</span>
+
+<span class="w">                        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">psi</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">psi</span><span class="p">)</span>
+<span class="w">                        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">psi</span><span class="p">(</span><span class="n">num_nodes_loc</span><span class="p">))</span>
+
+<span class="w">                        </span><span class="k">do </span><span class="n">k_gp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_gp</span>
+<span class="w">                            </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fe_gauss_pts</span><span class="p">(</span><span class="n">k_gp</span><span class="p">)</span>
+<span class="w">                            </span><span class="k">call </span><span class="n">fe</span><span class="p">%</span><span class="n">calc_shape_function</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">node_coords</span><span class="p">,</span><span class="w"> </span><span class="n">psi</span><span class="o">=</span><span class="n">psi</span><span class="p">,</span><span class="w"> </span><span class="n">determinant_jacobian</span><span class="o">=</span><span class="n">det_j</span><span class="p">)</span>
+<span class="w">                            </span><span class="n">w_vol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fe_weights</span><span class="p">(</span><span class="n">k_gp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">det_j</span>
+
+<span class="w">                            </span><span class="n">u_curr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">                            </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_nodes_loc</span>
+<span class="w">                                </span><span class="k">call </span><span class="n">variable</span><span class="p">%</span><span class="n">get_current</span><span class="p">(</span><span class="n">connectivity</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">val</span><span class="p">)</span>
+<span class="w">                                </span><span class="n">u_curr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u_curr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">psi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">val</span>
+<span class="w">                            </span><span class="k">end do</span>
+
+<span class="k">                            call </span><span class="n">bc_obj</span><span class="p">%</span><span class="n">get_flux_and_derivative</span><span class="p">(</span><span class="n">current_time</span><span class="p">,</span><span class="w"> </span><span class="n">u_curr</span><span class="p">,</span><span class="w"> </span><span class="n">q_flux</span><span class="p">,</span><span class="w"> </span><span class="n">dq_du</span><span class="p">)</span>
+
+<span class="w">                            </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_nodes_loc</span>
+<span class="w">                                </span><span class="c">! Residual: add(row_dof, global_node_index, value)</span>
+<span class="w">                                </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">F</span><span class="p">%</span><span class="n">add</span><span class="p">(</span><span class="n">dof_offset</span><span class="p">,</span><span class="w"> </span><span class="n">connectivity</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">psi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">q_flux</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">w_vol</span><span class="p">)</span>
+
+<span class="w">                                </span><span class="k">do </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_nodes_loc</span>
+<span class="w">                                    </span><span class="c">! Jacobian: add(row_dof, col_dof, row_node, col_node, value)</span>
+<span class="w">                                    </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">K</span><span class="p">%</span><span class="n">add</span><span class="p">(</span><span class="n">dof_offset</span><span class="p">,</span><span class="w"> </span><span class="n">dof_offset</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                                    </span><span class="n">connectivity</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">connectivity</span><span class="p">(</span><span class="n">j</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                                    </span><span class="n">psi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dq_du</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">psi</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">w_vol</span><span class="p">)</span>
+<span class="w">                                </span><span class="k">end do</span>
+<span class="k">                            end do</span>
+<span class="k">                        end do</span>
+<span class="k">                    end do</span>
+<span class="k">                end associate</span>
+<span class="k">            end do</span>
+<span class="k">        end associate</span>
+
+<span class="k">    end subroutine </span><span class="n">apply_natural_bc_generic</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

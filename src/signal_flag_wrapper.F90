@@ -1,24 +1,37 @@
+!>
+!> Provides a Fortran wrapper for C functions that handle interrupt signals
+!> (e.g., Ctrl+C), allowing for graceful program termination.
+!>
 module core_fortran_utils_signal_flag_wrapper
-    use, intrinsic :: iso_fortran_env, only: logical32
-    use, intrinsic :: iso_c_binding, only: c_ptr, c_associated
     use :: stdlib_logger
     use :: core_c_utils_signal_flag, only:c_setup_signal_handler, c_get_interrupted_flag
     implicit none
 
     private
 
-    public :: setup_handler, was_interrupted
+    public :: setup_handler
+    public :: was_interrupted
 
 contains
 
-    ! C関数をFortranらしい名前でラップする
+    !>
+    !> Sets up the signal handler to catch interrupt signals.
+    !> This should be called once at the beginning of the program to enable
+    !> interrupt detection.
+    !>
     subroutine setup_handler()
+        implicit none
+
         call c_setup_signal_handler()
     end subroutine setup_handler
 
+    !>
+    !> Checks if an interrupt signal has been received since the handler was set up.
+    !>
     function was_interrupted() result(interrupted)
         implicit none
-        logical(logical32) :: interrupted
+        !> Returns `.true.` if an interrupt signal was caught, `.false.` otherwise.
+        logical :: interrupted
 
         if (c_get_interrupted_flag() /= 0) then
             interrupted = .true.

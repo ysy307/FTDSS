@@ -92,20 +92,20 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.4% of total for derived types.</p>Including implementation: 5 statements,  0.1% of total for derived types.">5 statements</a>
+                 title="<p> 0.3% of total for derived types.</p>Including implementation: 7 statements,  0.0% of total for derived types.">7 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/input_interface.F90"> Source File</a>
+              <a href="../src/output_interface.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/input_interface.f90.html'>input_interface.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/inout_input.html'>inout_input</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/output_interface.f90~2.html'>output_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/inout_input_output_conditions.html'>inout_input_output_conditions</a></li>
             <li class="breadcrumb-item active" aria-current="page">type_standard_output</li>
           </ol>
         </nav>
@@ -156,7 +156,18 @@
   
   
   
-  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#boundprocs-0"
+         aria-expanded="false" aria-controls="boundprocs-0">
+         <h4 class="card-header bg-primary text-white">Type-Bound Procedures</h4>
+      </a>
+      <div id="boundprocs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/type_standard_output.html#boundprocedure-display~38">display</a>
+        </div>
+      </div>
+    </div>
+
   
   
     <div class="card card-primary">
@@ -173,7 +184,7 @@
     
     <div class="col-md-9" id='text'>
       <h2 id="type-def-statement">
-        type, public :: type_standard_output</h2>
+        type, private :: type_standard_output</h2>
     
 <br>      <div class="card">
         <div class="card-header">
@@ -355,6 +366,64 @@ large graphs.</div>
     
 
 
+      <section>
+        <h2>Type-Bound Procedures</h2>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-display~38"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>display</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/display_output_settings_standard.html'>display_output_settings_standard</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine display_output_settings_standard(self)  
+    <a href="../proc/display_output_settings_standard.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_standard_output.html'>type_standard_output</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+      </section>
 
     <section>
     <h3><span class="anchor" id="src"></span>Source Code</h3>
@@ -362,6 +431,8 @@ large graphs.</div>
 <span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">print_progress</span>
 <span class="w">        </span><span class="kt">character</span><span class="p">(:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">print_progress_unit</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">print_progress_interval</span>
+<span class="w">    </span><span class="k">contains</span>
+<span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">display</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">display_output_settings_standard</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_standard_output</span>
 </pre></div>
 
@@ -378,14 +449,14 @@ large graphs.</div>
           <div class="col">
             <p>
               FTDSS
- was developed by Kikuchi Shun<br>              &copy; 2025 
+ was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
           <div class="col">
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-08-26 10:37 +0000             </p>
+ on 2026-02-22 12:12 +0000             </p>
           </div>
         </div>
         <br>

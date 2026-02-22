@@ -1,0 +1,692 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>vector_norminf &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>vector_norminf
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title="<p> 0.0% of total for procedures.</p>Including implementation: 26 statements,  0.1% of total for procedures.">4 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/vector_operations.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/vector_operations.f90.html'>vector_operations.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/linalg_vector_operations.html'>linalg_vector_operations</a></li>
+            <li class="breadcrumb-item active" aria-current="page">vector_norminf</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+        <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#modprocs-0"
+         aria-expanded="false" aria-controls="modprocs-0">
+         <h4 class="card-header bg-primary text-white">Module Procedures</h4>
+      </a>
+      <div id="modprocs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../interface/vector_norminf.html#moduleprocedure-norm_inf_native">norm_inf_native</a>
+            <a class="list-group-item" href="../interface/vector_norminf.html#moduleprocedure-norm_inf_vector_dp">norm_inf_vector_dp</a>
+        </div>
+      </div>
+    </div>
+
+  
+
+
+  </div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      <h2>public interface vector_norminf</h2>
+      
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Calls</h3>
+          </div>
+          <div class="card-body">
+            <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~vector_norminf~~CallsGraph Pages: 1 -->
+<svg id="interfacevector_norminfCallsGraph" width="641pt" height="73pt"
+ viewBox="0.00 0.00 641.00 72.64" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~vector_norminf~~CallsGraph" class="graph" transform="scale(0.98 0.98) rotate(0) translate(4 70)">
+<title>interface~~vector_norminf~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 649,-70 649,4 -4,4"/>
+<!-- interface~vector_norminf -->
+<g id="interface~~vector_norminf~~CallsGraph_node1" class="node">
+<title>interface~vector_norminf</title>
+<polygon fill="none" stroke="black" points="94,-46 0,-46 0,-22 94,-22 94,-46"/>
+<text text-anchor="middle" x="47" y="-31.6" font-family="Helvetica,sans-Serif" font-size="10.50">vector_norminf</text>
+</g>
+<!-- proc~norm_inf_native~2 -->
+<g id="interface~~vector_norminf~~CallsGraph_node2" class="node">
+<title>proc~norm_inf_native~2</title>
+<g id="a_interface~~vector_norminf~~CallsGraph_node2"><a xlink:href="../proc/norm_inf_native~2.html" xlink:title="norm_inf_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="437,-66 339,-66 339,-42 437,-42 437,-66"/>
+<text text-anchor="middle" x="388" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_inf_native</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norminf&#45;&gt;proc~norm_inf_native~2 -->
+<g id="interface~~vector_norminf~~CallsGraph_edge1" class="edge">
+<title>interface~vector_norminf&#45;&gt;proc~norm_inf_native~2</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M94.07,-36.72C154.9,-40.31 262.06,-46.63 328.53,-50.55"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="328.65,-54.06 338.84,-51.16 329.06,-47.08 328.65,-54.06"/>
+</g>
+<!-- proc~norm_inf_vector_dp -->
+<g id="interface~~vector_norminf~~CallsGraph_node3" class="node">
+<title>proc~norm_inf_vector_dp</title>
+<g id="a_interface~~vector_norminf~~CallsGraph_node3"><a xlink:href="../proc/norm_inf_vector_dp.html" xlink:title="norm_inf_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="248,-26 130,-26 130,-2 248,-2 248,-26"/>
+<text text-anchor="middle" x="189" y="-11.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_inf_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norminf&#45;&gt;proc~norm_inf_vector_dp -->
+<g id="interface~~vector_norminf~~CallsGraph_edge2" class="edge">
+<title>interface~vector_norminf&#45;&gt;proc~norm_inf_vector_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M94.23,-27.4C102.36,-26.23 110.97,-25 119.56,-23.78"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="120.18,-27.22 129.59,-22.34 119.19,-20.29 120.18,-27.22"/>
+</g>
+<!-- proc~norm_inf_vector_dp&#45;&gt;proc~norm_inf_native~2 -->
+<g id="interface~~vector_norminf~~CallsGraph_edge4" class="edge">
+<title>proc~norm_inf_vector_dp&#45;&gt;proc~norm_inf_native~2</title>
+<path fill="none" stroke="#00ffff" d="M248.04,-25.78C273.59,-30.97 303.54,-37.05 329.07,-42.24"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="328.49,-45.69 338.99,-44.25 329.89,-38.83 328.49,-45.69"/>
+</g>
+<!-- interface~get_data_vector_dp -->
+<g id="interface~~vector_norminf~~CallsGraph_node4" class="node">
+<title>interface~get_data_vector_dp</title>
+<g id="a_interface~~vector_norminf~~CallsGraph_node4"><a xlink:href="../interface/get_data_vector_dp.html" xlink:title="type_vector_dp%get_data_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="492,-24 284,-24 284,0 492,0 492,-24"/>
+<text text-anchor="middle" x="388" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~norm_inf_vector_dp&#45;&gt;interface~get_data_vector_dp -->
+<g id="interface~~vector_norminf~~CallsGraph_edge3" class="edge">
+<title>proc~norm_inf_vector_dp&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#00ffff" d="M248.04,-13.41C256.29,-13.33 264.99,-13.24 273.86,-13.15"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="273.96,-16.65 283.92,-13.05 273.89,-9.65 273.96,-16.65"/>
+</g>
+<!-- proc~get_data_vector_dp -->
+<g id="interface~~vector_norminf~~CallsGraph_node5" class="node">
+<title>proc~get_data_vector_dp</title>
+<g id="a_interface~~vector_norminf~~CallsGraph_node5"><a xlink:href="../proc/get_data_vector_dp.html" xlink:title="get_data_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="645,-24 528,-24 528,0 645,0 645,-24"/>
+<text text-anchor="middle" x="586.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp -->
+<g id="interface~~vector_norminf~~CallsGraph_edge5" class="edge">
+<title>interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M492.14,-12C500.74,-12 509.29,-12 517.53,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="517.77,-15.5 527.77,-12 517.77,-8.5 517.77,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacevector_norminfCallsGraph = svgPanZoom('#interfacevector_norminfCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Called by</h3>
+          </div>
+          <div class="card-body">
+            <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~vector_norminf~~CalledByGraph Pages: 1 -->
+<svg id="interfacevector_norminfCalledByGraph" width="641pt" height="10pt"
+ viewBox="0.00 0.00 641.00 10.45" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~vector_norminf~~CalledByGraph" class="graph" transform="scale(0.33 0.33) rotate(0) translate(4 28)">
+<title>interface~~vector_norminf~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 1959,-28 1959,4 -4,4"/>
+<!-- interface~vector_norminf -->
+<g id="interface~~vector_norminf~~CalledByGraph_node1" class="node">
+<title>interface~vector_norminf</title>
+<polygon fill="none" stroke="black" points="1955,-24 1861,-24 1861,0 1955,0 1955,-24"/>
+<text text-anchor="middle" x="1908" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">vector_norminf</text>
+</g>
+<!-- proc~check_convergence_criterion -->
+<g id="interface~~vector_norminf~~CalledByGraph_node2" class="node">
+<title>proc~check_convergence_criterion</title>
+<g id="a_interface~~vector_norminf~~CalledByGraph_node2"><a xlink:href="../proc/check_convergence_criterion.html" xlink:title="type_convergence_criterion%check_convergence_criterion">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1825,-24 1497,-24 1497,0 1825,0 1825,-24"/>
+<text text-anchor="middle" x="1661" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_convergence_criterion%check_convergence_criterion</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence_criterion&#45;&gt;interface~vector_norminf -->
+<g id="interface~~vector_norminf~~CalledByGraph_edge1" class="edge">
+<title>proc~check_convergence_criterion&#45;&gt;interface~vector_norminf</title>
+<path fill="none" stroke="#ff0000" d="M1825.08,-12C1834.12,-12 1842.83,-12 1850.98,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1850.98,-15.5 1860.98,-12 1850.98,-8.5 1850.98,-15.5"/>
+</g>
+<!-- proc~check_convergence -->
+<g id="interface~~vector_norminf~~CalledByGraph_node3" class="node">
+<title>proc~check_convergence</title>
+<g id="a_interface~~vector_norminf~~CalledByGraph_node3"><a xlink:href="../proc/check_convergence.html" xlink:title="type_iteration%check_convergence">
+<polygon fill="#d9534f" stroke="#d9534f" points="1461,-24 1259,-24 1259,0 1461,0 1461,-24"/>
+<text text-anchor="middle" x="1360" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%check_convergence</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence&#45;&gt;proc~check_convergence_criterion -->
+<g id="interface~~vector_norminf~~CalledByGraph_edge2" class="edge">
+<title>proc~check_convergence&#45;&gt;proc~check_convergence_criterion</title>
+<path fill="none" stroke="#ff0000" d="M1461.39,-12C1469.63,-12 1478.08,-12 1486.64,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1486.73,-15.5 1496.73,-12 1486.73,-8.5 1486.73,-15.5"/>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftdss -->
+<g id="interface~~vector_norminf~~CalledByGraph_node4" class="node">
+<title>proc~solve_time_step_check_convergence_ftdss</title>
+<g id="a_interface~~vector_norminf~~CalledByGraph_node4"><a xlink:href="../proc/solve_time_step_check_convergence_ftdss.html" xlink:title="solve_time_step_check_convergence_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1223,-24 984,-24 984,0 1223,0 1223,-24"/>
+<text text-anchor="middle" x="1103.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_check_convergence_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~check_convergence -->
+<g id="interface~~vector_norminf~~CalledByGraph_edge3" class="edge">
+<title>proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~check_convergence</title>
+<path fill="none" stroke="#ff0000" d="M1223.18,-12C1231.66,-12 1240.18,-12 1248.61,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1248.83,-15.5 1258.83,-12 1248.83,-8.5 1248.83,-15.5"/>
+</g>
+<!-- interface~solve_time_step_check_convergence_ftdss -->
+<g id="interface~~vector_norminf~~CalledByGraph_node5" class="node">
+<title>interface~solve_time_step_check_convergence_ftdss</title>
+<g id="a_interface~~vector_norminf~~CalledByGraph_node5"><a xlink:href="../interface/solve_time_step_check_convergence_ftdss.html" xlink:title="type_ftdss%solve_time_step_check_convergence_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="948,-24 646,-24 646,0 948,0 948,-24"/>
+<text text-anchor="middle" x="797" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_check_convergence_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_check_convergence_ftdss&#45;&gt;proc~solve_time_step_check_convergence_ftdss -->
+<g id="interface~~vector_norminf~~CalledByGraph_edge4" class="edge">
+<title>interface~solve_time_step_check_convergence_ftdss&#45;&gt;proc~solve_time_step_check_convergence_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M948.02,-12C956.56,-12 965.11,-12 973.55,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="973.81,-15.5 983.81,-12 973.8,-8.5 973.81,-15.5"/>
+</g>
+<!-- proc~solve_time_step_ftdss -->
+<g id="interface~~vector_norminf~~CalledByGraph_node6" class="node">
+<title>proc~solve_time_step_ftdss</title>
+<g id="a_interface~~vector_norminf~~CalledByGraph_node6"><a xlink:href="../proc/solve_time_step_ftdss.html" xlink:title="solve_time_step_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="610,-24 483,-24 483,0 610,0 610,-24"/>
+<text text-anchor="middle" x="546.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~solve_time_step_check_convergence_ftdss -->
+<g id="interface~~vector_norminf~~CalledByGraph_edge5" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~solve_time_step_check_convergence_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M610.21,-12C618.25,-12 626.76,-12 635.52,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="635.52,-15.5 645.52,-12 635.52,-8.5 635.52,-15.5"/>
+</g>
+<!-- interface~solve_time_step_ftdss -->
+<g id="interface~~vector_norminf~~CalledByGraph_node7" class="node">
+<title>interface~solve_time_step_ftdss</title>
+<g id="a_interface~~vector_norminf~~CalledByGraph_node7"><a xlink:href="../interface/solve_time_step_ftdss.html" xlink:title="type_ftdss%solve_time_step_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="447,-24 257,-24 257,0 447,0 447,-24"/>
+<text text-anchor="middle" x="352" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss -->
+<g id="interface~~vector_norminf~~CalledByGraph_edge6" class="edge">
+<title>interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M447.28,-12C455.88,-12 464.5,-12 472.87,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="472.93,-15.5 482.93,-12 472.93,-8.5 472.93,-15.5"/>
+</g>
+<!-- proc~run_ftdss -->
+<g id="interface~~vector_norminf~~CalledByGraph_node8" class="node">
+<title>proc~run_ftdss</title>
+<g id="a_interface~~vector_norminf~~CalledByGraph_node8"><a xlink:href="../proc/run_ftdss.html" xlink:title="run_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-24 160,-24 160,0 221,0 221,-24"/>
+<text text-anchor="middle" x="190.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss -->
+<g id="interface~~vector_norminf~~CalledByGraph_edge7" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M221.13,-12C228.8,-12 237.52,-12 246.72,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="246.86,-15.5 256.86,-12 246.86,-8.5 246.86,-15.5"/>
+</g>
+<!-- interface~run_ftdss -->
+<g id="interface~~vector_norminf~~CalledByGraph_node9" class="node">
+<title>interface~run_ftdss</title>
+<g id="a_interface~~vector_norminf~~CalledByGraph_node9"><a xlink:href="../interface/run_ftdss.html" xlink:title="type_ftdss%run_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="124,-24 0,-24 0,0 124,0 124,-24"/>
+<text text-anchor="middle" x="62" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftdss&#45;&gt;proc~run_ftdss -->
+<g id="interface~~vector_norminf~~CalledByGraph_edge8" class="edge">
+<title>interface~run_ftdss&#45;&gt;proc~run_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M124.03,-12C132.82,-12 141.68,-12 149.91,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="149.94,-15.5 159.94,-12 149.94,-8.5 149.94,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacevector_norminfCalledByGraph = svgPanZoom('#interfacevector_norminfCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+          </div>
+        </div>
+<br>
+
+
+        <h2>Module Procedures</h2>
+            <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-norm_inf_native~2"></span> <h3>public  function <a href='../proc/norm_inf_native~2.html'>norm_inf_native</a>(x) result(norm_value)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Computes the infinity-norm (maximum absolute value) of a vector using native Fortran intrinsics.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-x~39"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              contiguous
+            </td>
+            <td>::</td>
+            <td><strong>x</strong>(:)</td>
+            <td>
+<p>The input vector.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>real(kind=real64)</small>
+    </h4>
+    <p>The computed infinity-norm, <script type="math/tex"> \max(|x_i|) </script>.</p>
+
+    </div>
+  </div>
+
+            <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-norm_inf_vector_dp"></span> <h3>private  function <a href='../proc/norm_inf_vector_dp.html'>norm_inf_vector_dp</a>(x) result(norm_value)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Computes the infinity-norm (maximum absolute value) of a vector object, <script type="math/tex"> \max(|x_i|) </script>, using the initialized backend.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-x~12"></span>
+              type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>x</strong></td>
+            <td>
+<p>The input vector.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>real(kind=real64)</small>
+    </h4>
+    <p>The computed infinity-norm.</p>
+
+    </div>
+  </div>
+
+</div>
+  </div>
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

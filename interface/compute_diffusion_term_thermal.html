@@ -1,0 +1,1233 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>compute_diffusion_term_thermal &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>compute_diffusion_term_thermal
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.2% of total for procedures.">79 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/thermal_interface.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/thermal_interface.f90.html'>thermal_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/main_thermal.html'>main_thermal</a></li>
+            <li class="breadcrumb-item active" aria-current="page">compute_diffusion_term_thermal</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+    <em>None</em>
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>interface</h2>
+      
+      <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~compute_diffusion_term_thermal~~CallsGraph Pages: 1 -->
+<svg id="interfacecompute_diffusion_term_thermalCallsGraph" width="641pt" height="51pt"
+ viewBox="0.00 0.00 641.00 51.24" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph" class="graph" transform="scale(0.16 0.16) rotate(0) translate(4 318)">
+<title>interface~~compute_diffusion_term_thermal~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-318 4024,-318 4024,4 -4,4"/>
+<!-- interface~compute_diffusion_term_thermal -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node1" class="node">
+<title>interface~compute_diffusion_term_thermal</title>
+<polygon fill="none" stroke="black" points="269,-90 0,-90 0,-66 269,-66 269,-90"/>
+<text text-anchor="middle" x="134.5" y="-75.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_thermal%compute_diffusion_term_thermal</text>
+</g>
+<!-- proc~compute_diffusion_term_thermal -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node2" class="node">
+<title>proc~compute_diffusion_term_thermal</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node2"><a xlink:href="../proc/compute_diffusion_term_thermal.html" xlink:title="compute_diffusion_term_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="494,-90 305,-90 305,-66 494,-66 494,-90"/>
+<text text-anchor="middle" x="399.5" y="-75.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">compute_diffusion_term_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~compute_diffusion_term_thermal&#45;&gt;proc~compute_diffusion_term_thermal -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge1" class="edge">
+<title>interface~compute_diffusion_term_thermal&#45;&gt;proc~compute_diffusion_term_thermal</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M269.31,-78C277.88,-78 286.44,-78 294.84,-78"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="294.99,-81.5 304.99,-78 294.99,-74.5 294.99,-81.5"/>
+</g>
+<!-- none~calc_thermal_conductivity~2 -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node3" class="node">
+<title>none~calc_thermal_conductivity~2</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node3"><a xlink:href="../type/type_physics_manager.html#boundprocedure-calc_thermal_conductivity~2" xlink:title="type_physics_manager%calc_thermal_conductivity">
+<polygon fill="#a7506f" stroke="#a7506f" points="813,-90 530,-90 530,-66 813,-66 813,-90"/>
+<text text-anchor="middle" x="671.5" y="-75.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%calc_thermal_conductivity</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_diffusion_term_thermal&#45;&gt;none~calc_thermal_conductivity~2 -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge2" class="edge">
+<title>proc~compute_diffusion_term_thermal&#45;&gt;none~calc_thermal_conductivity~2</title>
+<path fill="none" stroke="#ff0000" d="M494.18,-78C502.5,-78 511.05,-78 519.69,-78"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="519.86,-81.5 529.86,-78 519.86,-74.5 519.86,-81.5"/>
+</g>
+<!-- proc~calc_thermal_conductivity_dispersivity~2 -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node4" class="node">
+<title>proc~calc_thermal_conductivity_dispersivity~2</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node4"><a xlink:href="../proc/calc_thermal_conductivity_dispersivity~2.html" xlink:title="type_physics_manager%calc_thermal_conductivity_dispersivity">
+<polygon fill="#d9534f" stroke="#d9534f" points="1207,-111 859,-111 859,-87 1207,-87 1207,-111"/>
+<text text-anchor="middle" x="1033" y="-96.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%calc_thermal_conductivity_dispersivity</text>
+</a>
+</g>
+</g>
+<!-- none~calc_thermal_conductivity~2&#45;&gt;proc~calc_thermal_conductivity_dispersivity~2 -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge3" class="edge">
+<title>none~calc_thermal_conductivity~2&#45;&gt;proc~calc_thermal_conductivity_dispersivity~2</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M813.04,-86.21C824.81,-86.9 836.81,-87.6 848.84,-88.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="848.75,-91.8 858.94,-88.89 849.16,-84.81 848.75,-91.8"/>
+</g>
+<!-- proc~calc_thermal_conductivity_nondispersivity~2 -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node5" class="node">
+<title>proc~calc_thermal_conductivity_nondispersivity~2</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node5"><a xlink:href="../proc/calc_thermal_conductivity_nondispersivity~2.html" xlink:title="type_physics_manager%calc_thermal_conductivity_nondispersivity">
+<polygon fill="#d9534f" stroke="#d9534f" points="1217,-69 849,-69 849,-45 1217,-45 1217,-69"/>
+<text text-anchor="middle" x="1033" y="-54.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%calc_thermal_conductivity_nondispersivity</text>
+</a>
+</g>
+</g>
+<!-- none~calc_thermal_conductivity~2&#45;&gt;proc~calc_thermal_conductivity_nondispersivity~2 -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge4" class="edge">
+<title>none~calc_thermal_conductivity~2&#45;&gt;proc~calc_thermal_conductivity_nondispersivity~2</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M813.04,-69.79C821.53,-69.29 830.14,-68.79 838.8,-68.29"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="839.2,-71.77 848.98,-67.69 838.79,-64.78 839.2,-71.77"/>
+</g>
+<!-- none~calc_thermal_conductivity -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node6" class="node">
+<title>none~calc_thermal_conductivity</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node6"><a xlink:href="../type/type_material_manager.html#boundprocedure-calc_thermal_conductivity" xlink:title="type_material_manager%calc_thermal_conductivity">
+<polygon fill="#a7506f" stroke="#a7506f" points="1542,-90 1253,-90 1253,-66 1542,-66 1542,-90"/>
+<text text-anchor="middle" x="1397.5" y="-75.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_material_manager%calc_thermal_conductivity</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thermal_conductivity_dispersivity~2&#45;&gt;none~calc_thermal_conductivity -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge5" class="edge">
+<title>proc~calc_thermal_conductivity_dispersivity~2&#45;&gt;none~calc_thermal_conductivity</title>
+<path fill="none" stroke="#ff0000" d="M1207.02,-88.98C1218.86,-88.29 1230.74,-87.6 1242.47,-86.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1242.95,-90.4 1252.73,-86.33 1242.55,-83.41 1242.95,-90.4"/>
+</g>
+<!-- proc~calc_thermal_conductivity_nondispersivity~2&#45;&gt;none~calc_thermal_conductivity -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge6" class="edge">
+<title>proc~calc_thermal_conductivity_nondispersivity~2&#45;&gt;none~calc_thermal_conductivity</title>
+<path fill="none" stroke="#00ffff" d="M1217.11,-67.61C1225.76,-68.11 1234.41,-68.61 1242.98,-69.11"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1242.8,-72.6 1252.99,-69.69 1243.21,-65.61 1242.8,-72.6"/>
+</g>
+<!-- proc~calc_thermal_conductivity_dispersivity -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node7" class="node">
+<title>proc~calc_thermal_conductivity_dispersivity</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node7"><a xlink:href="../proc/calc_thermal_conductivity_dispersivity.html" xlink:title="type_material_manager%calc_thermal_conductivity_dispersivity">
+<polygon fill="#d9534f" stroke="#d9534f" points="1942,-111 1588,-111 1588,-87 1942,-87 1942,-111"/>
+<text text-anchor="middle" x="1765" y="-96.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_material_manager%calc_thermal_conductivity_dispersivity</text>
+</a>
+</g>
+</g>
+<!-- none~calc_thermal_conductivity&#45;&gt;proc~calc_thermal_conductivity_dispersivity -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge7" class="edge">
+<title>none~calc_thermal_conductivity&#45;&gt;proc~calc_thermal_conductivity_dispersivity</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1542.17,-86.25C1553.88,-86.93 1565.82,-87.61 1577.77,-88.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1577.63,-91.8 1587.82,-88.88 1578.03,-84.81 1577.63,-91.8"/>
+</g>
+<!-- proc~calc_thermal_conductivity_nondispersivity -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node8" class="node">
+<title>proc~calc_thermal_conductivity_nondispersivity</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node8"><a xlink:href="../proc/calc_thermal_conductivity_nondispersivity.html" xlink:title="type_material_manager%calc_thermal_conductivity_nondispersivity">
+<polygon fill="#d9534f" stroke="#d9534f" points="1952,-69 1578,-69 1578,-45 1952,-45 1952,-69"/>
+<text text-anchor="middle" x="1765" y="-54.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_material_manager%calc_thermal_conductivity_nondispersivity</text>
+</a>
+</g>
+</g>
+<!-- none~calc_thermal_conductivity&#45;&gt;proc~calc_thermal_conductivity_nondispersivity -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge8" class="edge">
+<title>none~calc_thermal_conductivity&#45;&gt;proc~calc_thermal_conductivity_nondispersivity</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1542.17,-69.75C1550.57,-69.26 1559.09,-68.77 1567.65,-68.28"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1567.93,-71.77 1577.72,-67.7 1567.53,-64.78 1567.93,-71.77"/>
+</g>
+<!-- none~calc~15 -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node9" class="node">
+<title>none~calc~15</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node9"><a xlink:href="../type/abst_thc.html#boundprocedure-calc~15" xlink:title="abst_thc%calc">
+<polygon fill="#a7506f" stroke="#a7506f" points="2076,-90 1988,-90 1988,-66 2076,-66 2076,-90"/>
+<text text-anchor="middle" x="2032" y="-75.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_thc%calc</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thermal_conductivity_dispersivity&#45;&gt;none~calc~15 -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge9" class="edge">
+<title>proc~calc_thermal_conductivity_dispersivity&#45;&gt;none~calc~15</title>
+<path fill="none" stroke="#ff0000" d="M1917.46,-87C1938.98,-85.29 1959.81,-83.64 1977.63,-82.23"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1978.07,-85.71 1987.76,-81.43 1977.52,-78.73 1978.07,-85.71"/>
+</g>
+<!-- proc~calc_thermal_conductivity_nondispersivity&#45;&gt;none~calc~15 -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge10" class="edge">
+<title>proc~calc_thermal_conductivity_nondispersivity&#45;&gt;none~calc~15</title>
+<path fill="none" stroke="#00ffff" d="M1917.46,-69C1938.98,-70.71 1959.81,-72.36 1977.63,-73.77"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1977.52,-77.27 1987.76,-74.57 1978.07,-70.29 1977.52,-77.27"/>
+</g>
+<!-- interface~calc_thc_dispersivity_gp_4phase -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node10" class="node">
+<title>interface~calc_thc_dispersivity_gp_4phase</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node10"><a xlink:href="../interface/calc_thc_dispersivity_gp_4phase.html" xlink:title="type_thc_4phase%calc_thc_dispersivity_gp_4phase">
+<polygon fill="#a7506f" stroke="#a7506f" points="2395,-110 2112,-110 2112,-86 2395,-86 2395,-110"/>
+<text text-anchor="middle" x="2253.5" y="-95.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thc_4phase%calc_thc_dispersivity_gp_4phase</text>
+</a>
+</g>
+</g>
+<!-- none~calc~15&#45;&gt;interface~calc_thc_dispersivity_gp_4phase -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge11" class="edge">
+<title>none~calc~15&#45;&gt;interface~calc_thc_dispersivity_gp_4phase</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2076.1,-81.93C2086.55,-82.88 2098.29,-83.95 2110.62,-85.07"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2110.34,-88.56 2120.62,-85.98 2110.98,-81.59 2110.34,-88.56"/>
+</g>
+<!-- interface~calc_thc_gp_4phase -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node11" class="node">
+<title>interface~calc_thc_gp_4phase</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node11"><a xlink:href="../interface/calc_thc_gp_4phase.html" xlink:title="type_thc_4phase%calc_thc_gp_4phase">
+<polygon fill="#a7506f" stroke="#a7506f" points="3190.5,-70 2972.5,-70 2972.5,-46 3190.5,-46 3190.5,-70"/>
+<text text-anchor="middle" x="3081.5" y="-55.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thc_4phase%calc_thc_gp_4phase</text>
+</a>
+</g>
+</g>
+<!-- none~calc~15&#45;&gt;interface~calc_thc_gp_4phase -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge12" class="edge">
+<title>none~calc~15&#45;&gt;interface~calc_thc_gp_4phase</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2076.02,-77.18C2226.14,-74.31 2730.26,-64.69 2962.07,-60.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2962.3,-63.76 2972.23,-60.07 2962.16,-56.76 2962.3,-63.76"/>
+</g>
+<!-- proc~calc_thc_dispersivity_gp_4phase -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node12" class="node">
+<title>proc~calc_thc_dispersivity_gp_4phase</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node12"><a xlink:href="../proc/calc_thc_dispersivity_gp_4phase.html" xlink:title="calc_thc_dispersivity_gp_4phase">
+<polygon fill="#d9534f" stroke="#d9534f" points="2615,-170 2431,-170 2431,-146 2615,-146 2615,-170"/>
+<text text-anchor="middle" x="2523" y="-155.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_thc_dispersivity_gp_4phase</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_thc_dispersivity_gp_4phase&#45;&gt;proc~calc_thc_dispersivity_gp_4phase -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge13" class="edge">
+<title>interface~calc_thc_dispersivity_gp_4phase&#45;&gt;proc~calc_thc_dispersivity_gp_4phase</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2308.31,-110.07C2351.66,-119.79 2412.71,-133.49 2458.46,-143.75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2457.75,-147.18 2468.28,-145.95 2459.28,-140.35 2457.75,-147.18"/>
+</g>
+<!-- proc~calc_thc_gp_4phase -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node13" class="node">
+<title>proc~calc_thc_gp_4phase</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node13"><a xlink:href="../proc/calc_thc_gp_4phase.html" xlink:title="calc_thc_gp_4phase">
+<polygon fill="#d9534f" stroke="#d9534f" points="3420.5,-68 3301.5,-68 3301.5,-44 3420.5,-44 3420.5,-68"/>
+<text text-anchor="middle" x="3361" y="-53.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_thc_gp_4phase</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_thc_gp_4phase&#45;&gt;proc~calc_thc_gp_4phase -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge14" class="edge">
+<title>interface~calc_thc_gp_4phase&#45;&gt;proc~calc_thc_gp_4phase</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M3190.58,-57.22C3224.49,-56.98 3260.97,-56.71 3291.36,-56.49"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="3291.45,-59.99 3301.42,-56.42 3291.4,-52.99 3291.45,-59.99"/>
+</g>
+<!-- interface~calc_lambda_dispersivity_abst_thc -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node14" class="node">
+<title>interface~calc_lambda_dispersivity_abst_thc</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node14"><a xlink:href="../interface/calc_lambda_dispersivity_abst_thc.html" xlink:title="abst_thc%calc_lambda_dispersivity_abst_thc">
+<polygon fill="#a7506f" stroke="#a7506f" points="2912.5,-284 2663.5,-284 2663.5,-260 2912.5,-260 2912.5,-284"/>
+<text text-anchor="middle" x="2788" y="-269.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_thc%calc_lambda_dispersivity_abst_thc</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thc_dispersivity_gp_4phase&#45;&gt;interface~calc_lambda_dispersivity_abst_thc -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge15" class="edge">
+<title>proc~calc_thc_dispersivity_gp_4phase&#45;&gt;interface~calc_lambda_dispersivity_abst_thc</title>
+<path fill="none" stroke="#ff0000" d="M2538.64,-170.1C2561.3,-188.22 2606.87,-222.27 2651,-241 2667.12,-247.84 2684.98,-253.29 2702.32,-257.59"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2701.91,-261.09 2712.45,-259.99 2703.52,-254.28 2701.91,-261.09"/>
+</g>
+<!-- none~calc~21 -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node17" class="node">
+<title>none~calc~21</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node17"><a xlink:href="../type/type_thc_4phase.html#boundprocedure-calc~21" xlink:title="type_thc_4phase%calc">
+<polygon fill="#a7506f" stroke="#a7506f" points="2854.5,-110 2721.5,-110 2721.5,-86 2854.5,-86 2854.5,-110"/>
+<text text-anchor="middle" x="2788" y="-95.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thc_4phase%calc</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thc_dispersivity_gp_4phase&#45;&gt;none~calc~21 -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge16" class="edge">
+<title>proc~calc_thc_dispersivity_gp_4phase&#45;&gt;none~calc~21</title>
+<path fill="none" stroke="#ff0000" d="M2565.85,-145.97C2590.52,-139.09 2622.41,-130.55 2651,-124 2670.54,-119.52 2691.79,-115.2 2711.55,-111.41"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2712.26,-114.84 2721.43,-109.54 2710.95,-107.96 2712.26,-114.84"/>
+</g>
+<!-- proc~calc_water_cp_abst_material -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node18" class="node">
+<title>proc~calc_water_cp_abst_material</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node18"><a xlink:href="../proc/calc_water_cp_abst_material.html" xlink:title="abst_material%calc_water_cp_abst_material">
+<polygon fill="#d9534f" stroke="#d9534f" points="2912,-232 2664,-232 2664,-208 2912,-208 2912,-232"/>
+<text text-anchor="middle" x="2788" y="-217.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_material%calc_water_cp_abst_material</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thc_dispersivity_gp_4phase&#45;&gt;proc~calc_water_cp_abst_material -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge17" class="edge">
+<title>proc~calc_thc_dispersivity_gp_4phase&#45;&gt;proc~calc_water_cp_abst_material</title>
+<path fill="none" stroke="#ff0000" d="M2556.49,-170.07C2581.91,-179.13 2618.31,-191.25 2651,-199 2662.26,-201.67 2674.13,-204.08 2685.97,-206.23"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2685.44,-209.7 2695.9,-207.98 2686.66,-202.8 2685.44,-209.7"/>
+</g>
+<!-- proc~calc_water_density_abst_material -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node19" class="node">
+<title>proc~calc_water_density_abst_material</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node19"><a xlink:href="../proc/calc_water_density_abst_material.html" xlink:title="abst_material%calc_water_density_abst_material">
+<polygon fill="#d9534f" stroke="#d9534f" points="2925,-190 2651,-190 2651,-166 2925,-166 2925,-190"/>
+<text text-anchor="middle" x="2788" y="-175.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_material%calc_water_density_abst_material</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thc_dispersivity_gp_4phase&#45;&gt;proc~calc_water_density_abst_material -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge18" class="edge">
+<title>proc~calc_thc_dispersivity_gp_4phase&#45;&gt;proc~calc_water_density_abst_material</title>
+<path fill="none" stroke="#ff0000" d="M2615.25,-164.94C2623.56,-165.57 2632.12,-166.22 2640.76,-166.88"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2640.7,-170.38 2650.93,-167.65 2641.23,-163.4 2640.7,-170.38"/>
+</g>
+<!-- proc~get_all_state -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node20" class="node">
+<title>proc~get_all_state</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node20"><a xlink:href="../proc/get_all_state.html" xlink:title="type_state%get_all_state">
+<polygon fill="#d9534f" stroke="#d9534f" points="3153.5,-148 3009.5,-148 3009.5,-124 3153.5,-124 3153.5,-148"/>
+<text text-anchor="middle" x="3081.5" y="-133.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_state%get_all_state</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thc_dispersivity_gp_4phase&#45;&gt;proc~get_all_state -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge19" class="edge">
+<title>proc~calc_thc_dispersivity_gp_4phase&#45;&gt;proc~get_all_state</title>
+<path fill="none" stroke="#ff0000" d="M2615.27,-154.39C2721.85,-150.18 2896.54,-143.27 2998.82,-139.23"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2999.24,-142.72 3009.09,-138.82 2998.96,-135.72 2999.24,-142.72"/>
+</g>
+<!-- interface~calc_thc_4 -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node15" class="node">
+<title>interface~calc_thc_4</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node15"><a xlink:href="../interface/calc_thc_4.html" xlink:title="calc_thc_4">
+<polygon fill="#a7506f" stroke="#a7506f" points="3707.5,-24 3639.5,-24 3639.5,0 3707.5,0 3707.5,-24"/>
+<text text-anchor="middle" x="3673.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_thc_4</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thc_gp_4phase&#45;&gt;interface~calc_thc_4 -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge20" class="edge">
+<title>proc~calc_thc_gp_4phase&#45;&gt;interface~calc_thc_4</title>
+<path fill="none" stroke="#00ffff" d="M3420.51,-47.37C3450.29,-43.01 3487.07,-37.66 3520,-33 3556.81,-27.79 3598.64,-22.04 3629.17,-17.88"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="3630.03,-21.29 3639.47,-16.47 3629.09,-14.36 3630.03,-21.29"/>
+</g>
+<!-- interface~calc_thc_4_vadoze -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node16" class="node">
+<title>interface~calc_thc_4_vadoze</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node16"><a xlink:href="../interface/calc_thc_4_vadoze.html" xlink:title="calc_thc_4_vadoze">
+<polygon fill="#a7506f" stroke="#a7506f" points="3729.5,-66 3617.5,-66 3617.5,-42 3729.5,-42 3729.5,-66"/>
+<text text-anchor="middle" x="3673.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_thc_4_vadoze</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thc_gp_4phase&#45;&gt;interface~calc_thc_4_vadoze -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge21" class="edge">
+<title>proc~calc_thc_gp_4phase&#45;&gt;interface~calc_thc_4_vadoze</title>
+<path fill="none" stroke="#00ffff" d="M3420.77,-55.62C3473.98,-55.28 3552.25,-54.77 3607.35,-54.42"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="3607.38,-57.92 3617.36,-54.36 3607.34,-50.92 3607.38,-57.92"/>
+</g>
+<!-- proc~get_material_phi -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node21" class="node">
+<title>proc~get_material_phi</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node21"><a xlink:href="../proc/get_material_phi.html" xlink:title="abst_material%get_material_phi">
+<polygon fill="#d9534f" stroke="#d9534f" points="3765.5,-108 3581.5,-108 3581.5,-84 3765.5,-84 3765.5,-108"/>
+<text text-anchor="middle" x="3673.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_material%get_material_phi</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thc_gp_4phase&#45;&gt;proc~get_material_phi -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge22" class="edge">
+<title>proc~calc_thc_gp_4phase&#45;&gt;proc~get_material_phi</title>
+<path fill="none" stroke="#00ffff" d="M3420.77,-63.57C3463.12,-69.03 3521.35,-76.53 3571.14,-82.94"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="3570.93,-86.44 3581.3,-84.25 3571.83,-79.5 3570.93,-86.44"/>
+</g>
+<!-- proc~calc_lambda_dispersivity_abst_thc -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node23" class="node">
+<title>proc~calc_lambda_dispersivity_abst_thc</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node23"><a xlink:href="../proc/calc_lambda_dispersivity_abst_thc.html" xlink:title="calc_lambda_dispersivity_abst_thc">
+<polygon fill="#d9534f" stroke="#d9534f" points="3179,-294 2984,-294 2984,-270 3179,-270 3179,-294"/>
+<text text-anchor="middle" x="3081.5" y="-279.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_lambda_dispersivity_abst_thc</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_lambda_dispersivity_abst_thc&#45;&gt;proc~calc_lambda_dispersivity_abst_thc -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge23" class="edge">
+<title>interface~calc_lambda_dispersivity_abst_thc&#45;&gt;proc~calc_lambda_dispersivity_abst_thc</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2912.62,-276.24C2932.84,-276.93 2953.64,-277.65 2973.41,-278.33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2973.54,-281.83 2983.65,-278.68 2973.78,-274.84 2973.54,-281.83"/>
+</g>
+<!-- proc~calc_thc_4 -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node25" class="node">
+<title>proc~calc_thc_4</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node25"><a xlink:href="../proc/calc_thc_4.html" xlink:title="calc_thc_4">
+<polygon fill="#d9534f" stroke="#d9534f" points="3975.5,-24 3907.5,-24 3907.5,0 3975.5,0 3975.5,-24"/>
+<text text-anchor="middle" x="3941.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_thc_4</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_thc_4&#45;&gt;proc~calc_thc_4 -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge24" class="edge">
+<title>interface~calc_thc_4&#45;&gt;proc~calc_thc_4</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M3707.65,-12C3755.57,-12 3844.24,-12 3897.25,-12"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="3897.35,-15.5 3907.35,-12 3897.35,-8.5 3897.35,-15.5"/>
+</g>
+<!-- proc~calc_thc_4_vadoze -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node26" class="node">
+<title>proc~calc_thc_4_vadoze</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node26"><a xlink:href="../proc/calc_thc_4_vadoze.html" xlink:title="calc_thc_4_vadoze">
+<polygon fill="#d9534f" stroke="#d9534f" points="3997.5,-66 3885.5,-66 3885.5,-42 3997.5,-42 3997.5,-66"/>
+<text text-anchor="middle" x="3941.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_thc_4_vadoze</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_thc_4_vadoze&#45;&gt;proc~calc_thc_4_vadoze -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge25" class="edge">
+<title>interface~calc_thc_4_vadoze&#45;&gt;proc~calc_thc_4_vadoze</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M3729.62,-54C3771.97,-54 3830.59,-54 3875.28,-54"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="3875.46,-57.5 3885.46,-54 3875.46,-50.5 3875.46,-57.5"/>
+</g>
+<!-- none~calc~21&#45;&gt;interface~calc_thc_dispersivity_gp_4phase -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge26" class="edge">
+<title>none~calc~21&#45;&gt;interface~calc_thc_dispersivity_gp_4phase</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M2721.29,-98C2642.96,-98 2509.58,-98 2405.41,-98"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="2405.1,-94.5 2395.1,-98 2405.1,-101.5 2405.1,-94.5"/>
+</g>
+<!-- none~calc~21&#45;&gt;interface~calc_thc_gp_4phase -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge27" class="edge">
+<title>none~calc~21&#45;&gt;interface~calc_thc_gp_4phase</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M2854.78,-88.97C2892.56,-83.79 2940.71,-77.18 2982.84,-71.4"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="2983.41,-74.86 2992.84,-70.03 2982.46,-67.92 2983.41,-74.86"/>
+</g>
+<!-- proc~calc_cp_water_abst_physics -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node22" class="node">
+<title>proc~calc_cp_water_abst_physics</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node22"><a xlink:href="../proc/calc_cp_water_abst_physics.html" xlink:title="abst_physics%calc_cp_water_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="3199.5,-232 2963.5,-232 2963.5,-208 3199.5,-208 3199.5,-232"/>
+<text text-anchor="middle" x="3081.5" y="-217.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_cp_water_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_water_cp_abst_material&#45;&gt;proc~calc_cp_water_abst_physics -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge28" class="edge">
+<title>proc~calc_water_cp_abst_material&#45;&gt;proc~calc_cp_water_abst_physics</title>
+<path fill="none" stroke="#00ffff" d="M2912.2,-220C2925.7,-220 2939.46,-220 2953,-220"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2953.31,-223.5 2963.31,-220 2953.31,-216.5 2953.31,-223.5"/>
+</g>
+<!-- proc~calc_rho_water_abst_physics -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node24" class="node">
+<title>proc~calc_rho_water_abst_physics</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node24"><a xlink:href="../proc/calc_rho_water_abst_physics.html" xlink:title="abst_physics%calc_rho_water_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="3202,-190 2961,-190 2961,-166 3202,-166 3202,-190"/>
+<text text-anchor="middle" x="3081.5" y="-175.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_rho_water_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_water_density_abst_material&#45;&gt;proc~calc_rho_water_abst_physics -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge29" class="edge">
+<title>proc~calc_water_density_abst_material&#45;&gt;proc~calc_rho_water_abst_physics</title>
+<path fill="none" stroke="#003fff" d="M2925.36,-178C2933.79,-178 2942.26,-178 2950.66,-178"/>
+<polygon fill="#003fff" stroke="#003fff" points="2950.86,-181.5 2960.86,-178 2950.86,-174.5 2950.86,-181.5"/>
+</g>
+<!-- proc~get_field_dp -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node27" class="node">
+<title>proc~get_field_dp</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node27"><a xlink:href="../proc/get_field_dp.html" xlink:title="type_field_dp%get_field_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="4020,-148 3863,-148 3863,-124 4020,-124 4020,-148"/>
+<text text-anchor="middle" x="3941.5" y="-133.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_field_dp%get_field_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~get_all_state&#45;&gt;proc~get_field_dp -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge30" class="edge">
+<title>proc~get_all_state&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#7f00ff" d="M3153.81,-136C3310.06,-136 3682.24,-136 3852.62,-136"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="3852.8,-139.5 3862.8,-136 3852.8,-132.5 3852.8,-139.5"/>
+</g>
+<!-- proc~get_material_phi&#45;&gt;proc~get_field_dp -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge31" class="edge">
+<title>proc~get_material_phi&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#ff00bf" d="M3754.31,-108C3785.24,-112.65 3820.77,-118 3852.44,-122.76"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="3852.17,-126.26 3862.58,-124.28 3853.21,-119.33 3852.17,-126.26"/>
+</g>
+<!-- calc_cp -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node28" class="node">
+<title>calc_cp</title>
+<polygon fill="#777777" stroke="#777777" points="3388,-272 3334,-272 3334,-248 3388,-248 3388,-272"/>
+<text text-anchor="middle" x="3361" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_cp</text>
+</g>
+<!-- proc~calc_cp_water_abst_physics&#45;&gt;calc_cp -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge32" class="edge">
+<title>proc~calc_cp_water_abst_physics&#45;&gt;calc_cp</title>
+<path fill="none" stroke="#ff0000" d="M3165.76,-232C3218.37,-239.59 3283.73,-249.01 3323.63,-254.76"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3323.29,-258.24 3333.68,-256.21 3324.29,-251.32 3323.29,-258.24"/>
+</g>
+<!-- proc~get_thermo_state_tp -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node31" class="node">
+<title>proc~get_thermo_state_tp</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node31"><a xlink:href="../proc/get_thermo_state_tp.html" xlink:title="abst_physics%get_thermo_state_TP">
+<polygon fill="#d9534f" stroke="#d9534f" points="3461,-230 3261,-230 3261,-206 3461,-206 3461,-230"/>
+<text text-anchor="middle" x="3361" y="-215.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%get_thermo_state_TP</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_cp_water_abst_physics&#45;&gt;proc~get_thermo_state_tp -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge33" class="edge">
+<title>proc~calc_cp_water_abst_physics&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#ff0000" d="M3199.78,-219.15C3216.56,-219.03 3233.78,-218.91 3250.4,-218.79"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3250.7,-222.29 3260.67,-218.72 3250.65,-215.29 3250.7,-222.29"/>
+</g>
+<!-- interface~reset_thc_dispersivity -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node30" class="node">
+<title>interface~reset_thc_dispersivity</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node30"><a xlink:href="../interface/reset_thc_dispersivity.html" xlink:title="type_thc_dispersivity%reset_thc_dispersivity">
+<polygon fill="#a7506f" stroke="#a7506f" points="3484,-314 3238,-314 3238,-290 3484,-290 3484,-314"/>
+<text text-anchor="middle" x="3361" y="-299.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thc_dispersivity%reset_thc_dispersivity</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_lambda_dispersivity_abst_thc&#45;&gt;interface~reset_thc_dispersivity -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge34" class="edge">
+<title>proc~calc_lambda_dispersivity_abst_thc&#45;&gt;interface~reset_thc_dispersivity</title>
+<path fill="none" stroke="#ffff00" d="M3179.17,-288.97C3194.84,-290.1 3211.31,-291.28 3227.65,-292.46"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="3227.58,-295.97 3237.81,-293.19 3228.08,-288.98 3227.58,-295.97"/>
+</g>
+<!-- calc_rho -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node29" class="node">
+<title>calc_rho</title>
+<polygon fill="#777777" stroke="#777777" points="3390,-188 3332,-188 3332,-164 3390,-164 3390,-188"/>
+<text text-anchor="middle" x="3361" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_rho</text>
+</g>
+<!-- proc~calc_rho_water_abst_physics&#45;&gt;calc_rho -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge35" class="edge">
+<title>proc~calc_rho_water_abst_physics&#45;&gt;calc_rho</title>
+<path fill="none" stroke="#00ff00" d="M3202.2,-177.14C3245.11,-176.83 3290.49,-176.5 3321.52,-176.28"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="3321.89,-179.77 3331.87,-176.2 3321.84,-172.78 3321.89,-179.77"/>
+</g>
+<!-- proc~calc_rho_water_abst_physics&#45;&gt;proc~get_thermo_state_tp -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge36" class="edge">
+<title>proc~calc_rho_water_abst_physics&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#00ff00" d="M3165.76,-190C3197.44,-194.57 3233.75,-199.8 3266.34,-204.5"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="3265.92,-207.98 3276.32,-205.94 3266.92,-201.05 3265.92,-207.98"/>
+</g>
+<!-- proc~reset_thc_dispersivity -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node32" class="node">
+<title>proc~reset_thc_dispersivity</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node32"><a xlink:href="../proc/reset_thc_dispersivity.html" xlink:title="reset_thc_dispersivity">
+<polygon fill="#d9534f" stroke="#d9534f" points="3736.5,-314 3610.5,-314 3610.5,-290 3736.5,-290 3736.5,-314"/>
+<text text-anchor="middle" x="3673.5" y="-299.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">reset_thc_dispersivity</text>
+</a>
+</g>
+</g>
+<!-- interface~reset_thc_dispersivity&#45;&gt;proc~reset_thc_dispersivity -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge37" class="edge">
+<title>interface~reset_thc_dispersivity&#45;&gt;proc~reset_thc_dispersivity</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M3484.27,-302C3523.34,-302 3565.32,-302 3599.7,-302"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="3600.12,-305.5 3610.12,-302 3600.12,-298.5 3600.12,-305.5"/>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge38" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#7f00ff" d="M3446.74,-205.99C3555.39,-190.59 3742.85,-164.02 3852.87,-148.42"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="3853.54,-151.86 3862.95,-146.99 3852.55,-144.93 3853.54,-151.86"/>
+</g>
+<!-- proc~shift_pressure_absolute_abst_physics -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node33" class="node">
+<title>proc~shift_pressure_absolute_abst_physics</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node33"><a xlink:href="../proc/shift_pressure_absolute_abst_physics.html" xlink:title="abst_physics%shift_pressure_absolute_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="3816,-271 3531,-271 3531,-247 3816,-247 3816,-271"/>
+<text text-anchor="middle" x="3673.5" y="-256.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%shift_pressure_absolute_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_physics -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge39" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_physics</title>
+<path fill="none" stroke="#7f00ff" d="M3453.06,-230.02C3490.19,-234.93 3533.25,-240.61 3571.35,-245.64"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="3571.07,-249.14 3581.44,-246.98 3571.98,-242.2 3571.07,-249.14"/>
+</g>
+<!-- proc~shift_temperature_absolute_abst_physics -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_node34" class="node">
+<title>proc~shift_temperature_absolute_abst_physics</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CallsGraph_node34"><a xlink:href="../proc/shift_temperature_absolute_abst_physics.html" xlink:title="abst_physics%shift_temperature_absolute_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="3827,-229 3520,-229 3520,-205 3827,-205 3827,-229"/>
+<text text-anchor="middle" x="3673.5" y="-214.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%shift_temperature_absolute_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="interface~~compute_diffusion_term_thermal~~CallsGraph_edge40" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#7f00ff" d="M3461.1,-217.68C3476.6,-217.63 3492.97,-217.58 3509.46,-217.53"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="3509.75,-221.02 3519.73,-217.49 3509.72,-214.02 3509.75,-221.02"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacecompute_diffusion_term_thermalCallsGraph = svgPanZoom('#interfacecompute_diffusion_term_thermalCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~compute_diffusion_term_thermal~~CalledByGraph Pages: 1 -->
+<svg id="interfacecompute_diffusion_term_thermalCalledByGraph" width="641pt" height="18pt"
+ viewBox="0.00 0.00 641.00 18.32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph" class="graph" transform="scale(0.25 0.25) rotate(0) translate(4 70)">
+<title>interface~~compute_diffusion_term_thermal~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 2585,-70 2585,4 -4,4"/>
+<!-- interface~compute_diffusion_term_thermal -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_node1" class="node">
+<title>interface~compute_diffusion_term_thermal</title>
+<polygon fill="none" stroke="black" points="2581,-45 2312,-45 2312,-21 2581,-21 2581,-45"/>
+<text text-anchor="middle" x="2446.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_thermal%compute_diffusion_term_thermal</text>
+</g>
+<!-- proc~assemble_local_newton_thermal -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_node2" class="node">
+<title>proc~assemble_local_newton_thermal</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CalledByGraph_node2"><a xlink:href="../proc/assemble_local_newton_thermal.html" xlink:title="assemble_local_newton_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="2276,-66 2090,-66 2090,-42 2276,-42 2276,-66"/>
+<text text-anchor="middle" x="2183" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_newton_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_newton_thermal&#45;&gt;interface~compute_diffusion_term_thermal -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_edge1" class="edge">
+<title>proc~assemble_local_newton_thermal&#45;&gt;interface~compute_diffusion_term_thermal</title>
+<path fill="none" stroke="#ff0000" d="M2276.2,-46.6C2284.54,-45.93 2293.12,-45.24 2301.78,-44.54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2302.28,-48.01 2311.97,-43.72 2301.72,-41.04 2302.28,-48.01"/>
+</g>
+<!-- proc~assemble_local_picard_thermal -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_node3" class="node">
+<title>proc~assemble_local_picard_thermal</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CalledByGraph_node3"><a xlink:href="../proc/assemble_local_picard_thermal.html" xlink:title="assemble_local_picard_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="2273.5,-24 2092.5,-24 2092.5,0 2273.5,0 2273.5,-24"/>
+<text text-anchor="middle" x="2183" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_picard_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_picard_thermal&#45;&gt;interface~compute_diffusion_term_thermal -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_edge2" class="edge">
+<title>proc~assemble_local_picard_thermal&#45;&gt;interface~compute_diffusion_term_thermal</title>
+<path fill="none" stroke="#ff0000" d="M2273.63,-19.2C2282.64,-19.92 2291.94,-20.67 2301.34,-21.42"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2301.31,-24.93 2311.56,-22.24 2301.87,-17.95 2301.31,-24.93"/>
+</g>
+<!-- interface~assemble_local_newton_thermal -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_node4" class="node">
+<title>interface~assemble_local_newton_thermal</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CalledByGraph_node4"><a xlink:href="../interface/assemble_local_newton_thermal.html" xlink:title="type_thermal%assemble_local_newton_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="2054,-66 1788,-66 1788,-42 2054,-42 2054,-66"/>
+<text text-anchor="middle" x="1921" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%assemble_local_newton_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_newton_thermal&#45;&gt;proc~assemble_local_newton_thermal -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_edge3" class="edge">
+<title>interface~assemble_local_newton_thermal&#45;&gt;proc~assemble_local_newton_thermal</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2054.29,-54C2062.85,-54 2071.4,-54 2079.78,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2079.92,-57.5 2089.92,-54 2079.92,-50.5 2079.92,-57.5"/>
+</g>
+<!-- interface~assemble_local_picard_thermal -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_node5" class="node">
+<title>interface~assemble_local_picard_thermal</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CalledByGraph_node5"><a xlink:href="../interface/assemble_local_picard_thermal.html" xlink:title="type_thermal%assemble_local_picard_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="2051.5,-24 1790.5,-24 1790.5,0 2051.5,0 2051.5,-24"/>
+<text text-anchor="middle" x="1921" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%assemble_local_picard_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_picard_thermal&#45;&gt;proc~assemble_local_picard_thermal -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_edge4" class="edge">
+<title>interface~assemble_local_picard_thermal&#45;&gt;proc~assemble_local_picard_thermal</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M2051.62,-12C2061.82,-12 2072.01,-12 2081.97,-12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2082.24,-15.5 2092.24,-12 2082.24,-8.5 2082.24,-15.5"/>
+</g>
+<!-- proc~assemble_local_thermal -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_node6" class="node">
+<title>proc~assemble_local_thermal</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CalledByGraph_node6"><a xlink:href="../proc/assemble_local_thermal.html" xlink:title="assemble_local_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="1752,-45 1610,-45 1610,-21 1752,-21 1752,-45"/>
+<text text-anchor="middle" x="1681" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_thermal&#45;&gt;interface~assemble_local_newton_thermal -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_edge5" class="edge">
+<title>proc~assemble_local_thermal&#45;&gt;interface~assemble_local_newton_thermal</title>
+<path fill="none" stroke="#ff0000" d="M1752.12,-39.19C1760.39,-39.92 1769.04,-40.68 1777.87,-41.46"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1777.63,-44.95 1787.9,-42.34 1778.24,-37.98 1777.63,-44.95"/>
+</g>
+<!-- proc~assemble_local_thermal&#45;&gt;interface~assemble_local_picard_thermal -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_edge6" class="edge">
+<title>proc~assemble_local_thermal&#45;&gt;interface~assemble_local_picard_thermal</title>
+<path fill="none" stroke="#00ffff" d="M1752.12,-26.81C1761.08,-26.02 1770.48,-25.19 1780.07,-24.35"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1780.47,-27.83 1790.12,-23.46 1779.85,-20.85 1780.47,-27.83"/>
+</g>
+<!-- interface~assemble_local_thermal -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_node7" class="node">
+<title>interface~assemble_local_thermal</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CalledByGraph_node7"><a xlink:href="../interface/assemble_local_thermal.html" xlink:title="type_thermal%assemble_local_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="1574,-45 1352,-45 1352,-21 1574,-21 1574,-45"/>
+<text text-anchor="middle" x="1463" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%assemble_local_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_thermal&#45;&gt;proc~assemble_local_thermal -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_edge7" class="edge">
+<title>interface~assemble_local_thermal&#45;&gt;proc~assemble_local_thermal</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1574.21,-33C1582.87,-33 1591.5,-33 1599.89,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1599.99,-36.5 1609.99,-33 1599.99,-29.5 1599.99,-36.5"/>
+</g>
+<!-- proc~assemble_local_ftdss -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_node8" class="node">
+<title>proc~assemble_local_ftdss</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CalledByGraph_node8"><a xlink:href="../proc/assemble_local_ftdss.html" xlink:title="assemble_local_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1316,-45 1192,-45 1192,-21 1316,-21 1316,-45"/>
+<text text-anchor="middle" x="1254" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_ftdss&#45;&gt;interface~assemble_local_thermal -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_edge8" class="edge">
+<title>proc~assemble_local_ftdss&#45;&gt;interface~assemble_local_thermal</title>
+<path fill="none" stroke="#ff0000" d="M1316.27,-33C1324.5,-33 1333.15,-33 1341.98,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1341.99,-36.5 1351.99,-33 1341.99,-29.5 1341.99,-36.5"/>
+</g>
+<!-- interface~assemble_local_ftdss -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_node9" class="node">
+<title>interface~assemble_local_ftdss</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CalledByGraph_node9"><a xlink:href="../interface/assemble_local_ftdss.html" xlink:title="type_ftdss%assemble_local_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1156,-45 969,-45 969,-21 1156,-21 1156,-45"/>
+<text text-anchor="middle" x="1062.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_local_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_ftdss&#45;&gt;proc~assemble_local_ftdss -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_edge9" class="edge">
+<title>interface~assemble_local_ftdss&#45;&gt;proc~assemble_local_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1156.03,-33C1164.65,-33 1173.29,-33 1181.67,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1181.74,-36.5 1191.74,-33 1181.74,-29.5 1181.74,-36.5"/>
+</g>
+<!-- proc~assemble_ftdss -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_node10" class="node">
+<title>proc~assemble_ftdss</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CalledByGraph_node10"><a xlink:href="../proc/assemble_ftdss.html" xlink:title="assemble_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="933,-45 839,-45 839,-21 933,-21 933,-45"/>
+<text text-anchor="middle" x="886" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_ftdss&#45;&gt;interface~assemble_local_ftdss -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_edge10" class="edge">
+<title>proc~assemble_ftdss&#45;&gt;interface~assemble_local_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M933.3,-33C941.3,-33 949.89,-33 958.7,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="958.72,-36.5 968.72,-33 958.72,-29.5 958.72,-36.5"/>
+</g>
+<!-- interface~assemble_ftdss -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_node11" class="node">
+<title>interface~assemble_ftdss</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CalledByGraph_node11"><a xlink:href="../interface/assemble_ftdss.html" xlink:title="type_ftdss%assemble_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="803,-45 646,-45 646,-21 803,-21 803,-45"/>
+<text text-anchor="middle" x="724.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_edge11" class="edge">
+<title>interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M803.38,-33C811.94,-33 820.54,-33 828.76,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="828.95,-36.5 838.95,-33 828.95,-29.5 828.95,-36.5"/>
+</g>
+<!-- proc~solve_time_step_ftdss -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_node12" class="node">
+<title>proc~solve_time_step_ftdss</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CalledByGraph_node12"><a xlink:href="../proc/solve_time_step_ftdss.html" xlink:title="solve_time_step_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="610,-45 483,-45 483,-21 610,-21 610,-45"/>
+<text text-anchor="middle" x="546.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_edge12" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M610.05,-33C618.36,-33 627,-33 635.63,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="635.75,-36.5 645.75,-33 635.75,-29.5 635.75,-36.5"/>
+</g>
+<!-- interface~solve_time_step_ftdss -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_node13" class="node">
+<title>interface~solve_time_step_ftdss</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CalledByGraph_node13"><a xlink:href="../interface/solve_time_step_ftdss.html" xlink:title="type_ftdss%solve_time_step_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="447,-45 257,-45 257,-21 447,-21 447,-45"/>
+<text text-anchor="middle" x="352" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_edge13" class="edge">
+<title>interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M447.28,-33C455.88,-33 464.5,-33 472.87,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="472.93,-36.5 482.93,-33 472.93,-29.5 472.93,-36.5"/>
+</g>
+<!-- proc~run_ftdss -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_node14" class="node">
+<title>proc~run_ftdss</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CalledByGraph_node14"><a xlink:href="../proc/run_ftdss.html" xlink:title="run_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-45 160,-45 160,-21 221,-21 221,-45"/>
+<text text-anchor="middle" x="190.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_edge14" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M221.13,-33C228.8,-33 237.52,-33 246.72,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="246.86,-36.5 256.86,-33 246.86,-29.5 246.86,-36.5"/>
+</g>
+<!-- interface~run_ftdss -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_node15" class="node">
+<title>interface~run_ftdss</title>
+<g id="a_interface~~compute_diffusion_term_thermal~~CalledByGraph_node15"><a xlink:href="../interface/run_ftdss.html" xlink:title="type_ftdss%run_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="124,-45 0,-45 0,-21 124,-21 124,-45"/>
+<text text-anchor="middle" x="62" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftdss&#45;&gt;proc~run_ftdss -->
+<g id="interface~~compute_diffusion_term_thermal~~CalledByGraph_edge15" class="edge">
+<title>interface~run_ftdss&#45;&gt;proc~run_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M124.03,-33C132.82,-33 141.68,-33 149.91,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="149.94,-36.5 159.94,-33 149.94,-29.5 149.94,-36.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacecompute_diffusion_term_thermalCalledByGraph = svgPanZoom('#interfacecompute_diffusion_term_thermalCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+      <h2>private module subroutine compute_diffusion_term_thermal(self, material_id, state, D_TT)  
+    <a href="../proc/compute_diffusion_term_thermal.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h2>
+
+    
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~172"></span>
+              class(<a href='../type/type_thermal.html'>type_thermal</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-material_id~7"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>material_id</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-state~8"></span>
+              type(<a href='../type/type_state.html'>type_state</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-d_tt"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>D_TT</strong>(:,:)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+
+ </div>
+</div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,988 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>compute_diffusion_term_hydraulic &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>compute_diffusion_term_hydraulic
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">17 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/hydraulic_coefficients.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/hydraulic_coefficients.f90.html'>hydraulic_coefficients.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/hydraulic_coefficients.html'>hydraulic_coefficients</a></li>
+            <li class="breadcrumb-item active" aria-current="page">compute_diffusion_term_hydraulic</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/compute_diffusion_term_hydraulic.html#src">compute_diffusion_term_hydraulic</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine compute_diffusion_term_hydraulic(self, material_id, state, D_HH)  
+    <a href="../interface/compute_diffusion_term_hydraulic.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+    <p>@details
+  J_m_diff = - D_HH * grad P
+  From Darcy: q = -K/rho_w g * grad P ...
+  J_m = rho_w * q = - K/g * grad P
+  D_HH = K_eff / g</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~869"></span>
+              class(<a href='../type/type_hydraulic.html'>type_hydraulic</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-material_id~63"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>material_id</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-state~163"></span>
+              type(<a href='../type/type_state.html'>type_state</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-d_hh~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>D_HH</strong>(:,:)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~compute_diffusion_term_hydraulic~~CallsGraph Pages: 1 -->
+<svg id="proccompute_diffusion_term_hydraulicCallsGraph" width="641pt" height="81pt"
+ viewBox="0.00 0.00 641.00 81.03" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph" class="graph" transform="scale(0.29 0.29) rotate(0) translate(4 276)">
+<title>proc~~compute_diffusion_term_hydraulic~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-276 2211,-276 2211,4 -4,4"/>
+<!-- proc~compute_diffusion_term_hydraulic -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node1" class="node">
+<title>proc~compute_diffusion_term_hydraulic</title>
+<polygon fill="none" stroke="black" points="196,-211 0,-211 0,-187 196,-187 196,-211"/>
+<text text-anchor="middle" x="98" y="-196.6" font-family="Helvetica,sans-Serif" font-size="10.50">compute_diffusion_term_hydraulic</text>
+</g>
+<!-- proc~calc_kflh~2 -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node2" class="node">
+<title>proc~calc_kflh~2</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CallsGraph_node2"><a xlink:href="../proc/calc_kflh~2.html" xlink:title="type_physics_manager%calc_Kflh">
+<polygon fill="#d9534f" stroke="#d9534f" points="423,-232 232,-232 232,-208 423,-208 423,-232"/>
+<text text-anchor="middle" x="327.5" y="-217.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%calc_Kflh</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_diffusion_term_hydraulic&#45;&gt;proc~calc_kflh~2 -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge1" class="edge">
+<title>proc~compute_diffusion_term_hydraulic&#45;&gt;proc~calc_kflh~2</title>
+<path fill="none" stroke="#ff0000" d="M196.14,-207.97C204.65,-208.75 213.28,-209.55 221.84,-210.34"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="221.58,-213.83 231.85,-211.26 222.22,-206.86 221.58,-213.83"/>
+</g>
+<!-- proc~calc_kvh~2 -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node3" class="node">
+<title>proc~calc_kvh~2</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CallsGraph_node3"><a xlink:href="../proc/calc_kvh~2.html" xlink:title="type_physics_manager%calc_Kvh">
+<polygon fill="#d9534f" stroke="#d9534f" points="422.5,-190 232.5,-190 232.5,-166 422.5,-166 422.5,-190"/>
+<text text-anchor="middle" x="327.5" y="-175.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%calc_Kvh</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_diffusion_term_hydraulic&#45;&gt;proc~calc_kvh~2 -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge2" class="edge">
+<title>proc~compute_diffusion_term_hydraulic&#45;&gt;proc~calc_kvh~2</title>
+<path fill="none" stroke="#ff0000" d="M196.14,-190.03C204.73,-189.24 213.46,-188.43 222.11,-187.64"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="222.58,-191.11 232.22,-186.7 221.94,-184.14 222.58,-191.11"/>
+</g>
+<!-- proc~calc_kflh -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node4" class="node">
+<title>proc~calc_kflh</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CallsGraph_node4"><a xlink:href="../proc/calc_kflh.html" xlink:title="type_models_manager%calc_Kflh">
+<polygon fill="#d9534f" stroke="#d9534f" points="650,-232 459,-232 459,-208 650,-208 650,-232"/>
+<text text-anchor="middle" x="554.5" y="-217.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_models_manager%calc_Kflh</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_kflh~2&#45;&gt;proc~calc_kflh -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge3" class="edge">
+<title>proc~calc_kflh~2&#45;&gt;proc~calc_kflh</title>
+<path fill="none" stroke="#ff0000" d="M423.27,-220C431.64,-220 440.14,-220 448.58,-220"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="448.84,-223.5 458.84,-220 448.84,-216.5 448.84,-223.5"/>
+</g>
+<!-- proc~calc_kvh -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node5" class="node">
+<title>proc~calc_kvh</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CallsGraph_node5"><a xlink:href="../proc/calc_kvh.html" xlink:title="type_models_manager%calc_Kvh">
+<polygon fill="#d9534f" stroke="#d9534f" points="649.5,-190 459.5,-190 459.5,-166 649.5,-166 649.5,-190"/>
+<text text-anchor="middle" x="554.5" y="-175.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_models_manager%calc_Kvh</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_kvh~2&#45;&gt;proc~calc_kvh -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge4" class="edge">
+<title>proc~calc_kvh~2&#45;&gt;proc~calc_kvh</title>
+<path fill="none" stroke="#00ffff" d="M422.62,-178C431.45,-178 440.45,-178 449.37,-178"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="449.4,-181.5 459.4,-178 449.4,-174.5 449.4,-181.5"/>
+</g>
+<!-- calc_Kflh -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node6" class="node">
+<title>calc_Kflh</title>
+<polygon fill="#777777" stroke="#777777" points="783.5,-232 723.5,-232 723.5,-208 783.5,-208 783.5,-232"/>
+<text text-anchor="middle" x="753.5" y="-217.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_Kflh</text>
+</g>
+<!-- proc~calc_kflh&#45;&gt;calc_Kflh -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge5" class="edge">
+<title>proc~calc_kflh&#45;&gt;calc_Kflh</title>
+<path fill="none" stroke="#ff0000" d="M650.25,-220C672.5,-220 695,-220 713.21,-220"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="713.4,-223.5 723.4,-220 713.4,-216.5 713.4,-223.5"/>
+</g>
+<!-- interface~calc_kvh_hcf -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node7" class="node">
+<title>interface~calc_kvh_hcf</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CallsGraph_node7"><a xlink:href="../interface/calc_kvh_hcf.html" xlink:title="abst_hcf%calc_Kvh_hcf">
+<polygon fill="#a7506f" stroke="#a7506f" points="821,-190 686,-190 686,-166 821,-166 821,-190"/>
+<text text-anchor="middle" x="753.5" y="-175.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_hcf%calc_Kvh_hcf</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_kvh&#45;&gt;interface~calc_kvh_hcf -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge6" class="edge">
+<title>proc~calc_kvh&#45;&gt;interface~calc_kvh_hcf</title>
+<path fill="none" stroke="#00ffff" d="M649.67,-178C658.49,-178 667.35,-178 675.98,-178"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="675.98,-181.5 685.98,-178 675.98,-174.5 675.98,-181.5"/>
+</g>
+<!-- proc~calc_kvh_hcf -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node8" class="node">
+<title>proc~calc_kvh_hcf</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CallsGraph_node8"><a xlink:href="../proc/calc_kvh_hcf.html" xlink:title="calc_Kvh_hcf">
+<polygon fill="#d9534f" stroke="#d9534f" points="938,-190 857,-190 857,-166 938,-166 938,-190"/>
+<text text-anchor="middle" x="897.5" y="-175.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_Kvh_hcf</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_kvh_hcf&#45;&gt;proc~calc_kvh_hcf -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge7" class="edge">
+<title>interface~calc_kvh_hcf&#45;&gt;proc~calc_kvh_hcf</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M821.34,-178C829.84,-178 838.42,-178 846.58,-178"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="846.67,-181.5 856.67,-178 846.67,-174.5 846.67,-181.5"/>
+</g>
+<!-- interface~calc_kvh_vapor -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node9" class="node">
+<title>interface~calc_kvh_vapor</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CallsGraph_node9"><a xlink:href="../interface/calc_kvh_vapor.html" xlink:title="type_hcf_vapor%calc_Kvh_vapor">
+<polygon fill="#a7506f" stroke="#a7506f" points="1160,-190 974,-190 974,-166 1160,-166 1160,-190"/>
+<text text-anchor="middle" x="1067" y="-175.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_vapor%calc_Kvh_vapor</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_kvh_hcf&#45;&gt;interface~calc_kvh_vapor -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge8" class="edge">
+<title>proc~calc_kvh_hcf&#45;&gt;interface~calc_kvh_vapor</title>
+<path fill="none" stroke="#ff0000" d="M938.2,-178C946.07,-178 954.67,-178 963.56,-178"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="963.71,-181.5 973.71,-178 963.71,-174.5 963.71,-181.5"/>
+</g>
+<!-- proc~calc_kvh_vapor -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node10" class="node">
+<title>proc~calc_kvh_vapor</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CallsGraph_node10"><a xlink:href="../proc/calc_kvh_vapor.html" xlink:title="calc_Kvh_vapor">
+<polygon fill="#d9534f" stroke="#d9534f" points="1291,-190 1196,-190 1196,-166 1291,-166 1291,-190"/>
+<text text-anchor="middle" x="1243.5" y="-175.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_Kvh_vapor</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_kvh_vapor&#45;&gt;proc~calc_kvh_vapor -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge9" class="edge">
+<title>interface~calc_kvh_vapor&#45;&gt;proc~calc_kvh_vapor</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1160.1,-178C1168.75,-178 1177.32,-178 1185.5,-178"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1185.61,-181.5 1195.61,-178 1185.61,-174.5 1185.61,-181.5"/>
+</g>
+<!-- interface~calc_diffusivity_vapor_in_air -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node11" class="node">
+<title>interface~calc_diffusivity_vapor_in_air</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CallsGraph_node11"><a xlink:href="../interface/calc_diffusivity_vapor_in_air.html" xlink:title="type_hcf_vapor%calc_diffusivity_vapor_in_air">
+<polygon fill="#a7506f" stroke="#a7506f" points="1603.5,-272 1351.5,-272 1351.5,-248 1603.5,-248 1603.5,-272"/>
+<text text-anchor="middle" x="1477.5" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_vapor%calc_diffusivity_vapor_in_air</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_kvh_vapor&#45;&gt;interface~calc_diffusivity_vapor_in_air -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge10" class="edge">
+<title>proc~calc_kvh_vapor&#45;&gt;interface~calc_diffusivity_vapor_in_air</title>
+<path fill="none" stroke="#ff0000" d="M1256.69,-190.15C1271.79,-204.4 1298.97,-227.54 1327,-239 1332.52,-241.26 1338.23,-243.28 1344.07,-245.09"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1343.42,-248.54 1354,-247.94 1345.35,-241.81 1343.42,-248.54"/>
+</g>
+<!-- interface~calc_tortuosity_factor_vapor -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node12" class="node">
+<title>interface~calc_tortuosity_factor_vapor</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CallsGraph_node12"><a xlink:href="../interface/calc_tortuosity_factor_vapor.html" xlink:title="type_hcf_vapor%calc_tortuosity_factor_vapor">
+<polygon fill="#a7506f" stroke="#a7506f" points="1604,-230 1351,-230 1351,-206 1604,-206 1604,-230"/>
+<text text-anchor="middle" x="1477.5" y="-215.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_vapor%calc_tortuosity_factor_vapor</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_kvh_vapor&#45;&gt;interface~calc_tortuosity_factor_vapor -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge11" class="edge">
+<title>proc~calc_kvh_vapor&#45;&gt;interface~calc_tortuosity_factor_vapor</title>
+<path fill="none" stroke="#ff0000" d="M1291.17,-186.05C1321.28,-191.24 1361.23,-198.13 1396.33,-204.18"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1396.11,-207.69 1406.56,-205.94 1397.3,-200.79 1396.11,-207.69"/>
+</g>
+<!-- proc~calc_rho_vapor_saturation_abst_physics -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node13" class="node">
+<title>proc~calc_rho_vapor_saturation_abst_physics</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CallsGraph_node13"><a xlink:href="../proc/calc_rho_vapor_saturation_abst_physics.html" xlink:title="abst_physics%calc_rho_vapor_saturation_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="1628,-150 1327,-150 1327,-126 1628,-126 1628,-150"/>
+<text text-anchor="middle" x="1477.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_rho_vapor_saturation_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_kvh_vapor&#45;&gt;proc~calc_rho_vapor_saturation_abst_physics -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge12" class="edge">
+<title>proc~calc_kvh_vapor&#45;&gt;proc~calc_rho_vapor_saturation_abst_physics</title>
+<path fill="none" stroke="#ff0000" d="M1291.17,-169.95C1321.28,-164.76 1361.23,-157.87 1396.33,-151.82"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1397.3,-155.21 1406.56,-150.06 1396.11,-148.31 1397.3,-155.21"/>
+</g>
+<!-- proc~calc_rho_water_abst_physics -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node14" class="node">
+<title>proc~calc_rho_water_abst_physics</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CallsGraph_node14"><a xlink:href="../proc/calc_rho_water_abst_physics.html" xlink:title="abst_physics%calc_rho_water_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="1598,-66 1357,-66 1357,-42 1598,-42 1598,-66"/>
+<text text-anchor="middle" x="1477.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_rho_water_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_kvh_vapor&#45;&gt;proc~calc_rho_water_abst_physics -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge13" class="edge">
+<title>proc~calc_kvh_vapor&#45;&gt;proc~calc_rho_water_abst_physics</title>
+<path fill="none" stroke="#ff0000" d="M1258.68,-165.87C1274.57,-152.68 1301.46,-131.55 1327,-117 1360.79,-97.75 1401.61,-80.94 1432.06,-69.54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1433.39,-72.78 1441.56,-66.03 1430.96,-66.21 1433.39,-72.78"/>
+</g>
+<!-- proc~get_field_dp -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node15" class="node">
+<title>proc~get_field_dp</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CallsGraph_node15"><a xlink:href="../proc/get_field_dp.html" xlink:title="type_field_dp%get_field_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="2132,-108 1975,-108 1975,-84 2132,-84 2132,-108"/>
+<text text-anchor="middle" x="2053.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_field_dp%get_field_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_kvh_vapor&#45;&gt;proc~get_field_dp -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge14" class="edge">
+<title>proc~calc_kvh_vapor&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#ff0000" d="M1291.22,-181.17C1395.14,-187.21 1652.94,-196.67 1864,-159 1918.26,-149.32 1978.19,-127.19 2015.59,-111.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2017.16,-115.06 2025.06,-108 2014.48,-108.59 2017.16,-115.06"/>
+</g>
+<!-- proc~calc_diffusivity_vapor_in_air -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node18" class="node">
+<title>proc~calc_diffusivity_vapor_in_air</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CallsGraph_node18"><a xlink:href="../proc/calc_diffusivity_vapor_in_air.html" xlink:title="calc_diffusivity_vapor_in_air">
+<polygon fill="#d9534f" stroke="#d9534f" points="1844.5,-272 1683.5,-272 1683.5,-248 1844.5,-248 1844.5,-272"/>
+<text text-anchor="middle" x="1764" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_diffusivity_vapor_in_air</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_diffusivity_vapor_in_air&#45;&gt;proc~calc_diffusivity_vapor_in_air -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge15" class="edge">
+<title>interface~calc_diffusivity_vapor_in_air&#45;&gt;proc~calc_diffusivity_vapor_in_air</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1603.7,-260C1626.99,-260 1650.91,-260 1672.89,-260"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1673.18,-263.5 1683.18,-260 1673.18,-256.5 1673.18,-263.5"/>
+</g>
+<!-- proc~calc_tortuosity_factor_vapor -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node19" class="node">
+<title>proc~calc_tortuosity_factor_vapor</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CallsGraph_node19"><a xlink:href="../proc/calc_tortuosity_factor_vapor.html" xlink:title="calc_tortuosity_factor_vapor">
+<polygon fill="#d9534f" stroke="#d9534f" points="1845.5,-230 1682.5,-230 1682.5,-206 1845.5,-206 1845.5,-230"/>
+<text text-anchor="middle" x="1764" y="-215.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_tortuosity_factor_vapor</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_tortuosity_factor_vapor&#45;&gt;proc~calc_tortuosity_factor_vapor -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge16" class="edge">
+<title>interface~calc_tortuosity_factor_vapor&#45;&gt;proc~calc_tortuosity_factor_vapor</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M1604.11,-218C1626.99,-218 1650.44,-218 1672.07,-218"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1672.2,-221.5 1682.2,-218 1672.2,-214.5 1672.2,-221.5"/>
+</g>
+<!-- calc_saturation_density -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node17" class="node">
+<title>calc_saturation_density</title>
+<polygon fill="#777777" stroke="#777777" points="1832.5,-150 1695.5,-150 1695.5,-126 1832.5,-126 1832.5,-150"/>
+<text text-anchor="middle" x="1764" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_saturation_density</text>
+</g>
+<!-- proc~calc_rho_vapor_saturation_abst_physics&#45;&gt;calc_saturation_density -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge17" class="edge">
+<title>proc~calc_rho_vapor_saturation_abst_physics&#45;&gt;calc_saturation_density</title>
+<path fill="none" stroke="#00ff66" d="M1628.25,-138C1647.83,-138 1667.22,-138 1684.94,-138"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1685.16,-141.5 1695.16,-138 1685.16,-134.5 1685.16,-141.5"/>
+</g>
+<!-- proc~get_thermo_state_t -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node20" class="node">
+<title>proc~get_thermo_state_t</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CallsGraph_node20"><a xlink:href="../proc/get_thermo_state_t.html" xlink:title="abst_physics%get_thermo_state_T">
+<polygon fill="#d9534f" stroke="#d9534f" points="1861,-108 1667,-108 1667,-84 1861,-84 1861,-108"/>
+<text text-anchor="middle" x="1764" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%get_thermo_state_T</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_rho_vapor_saturation_abst_physics&#45;&gt;proc~get_thermo_state_t -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge18" class="edge">
+<title>proc~calc_rho_vapor_saturation_abst_physics&#45;&gt;proc~get_thermo_state_t</title>
+<path fill="none" stroke="#00ff66" d="M1560.03,-125.96C1594.85,-120.82 1635.64,-114.8 1671.49,-109.51"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1672.08,-112.96 1681.46,-108.04 1671.06,-106.04 1672.08,-112.96"/>
+</g>
+<!-- calc_rho -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node16" class="node">
+<title>calc_rho</title>
+<polygon fill="#777777" stroke="#777777" points="1793,-66 1735,-66 1735,-42 1793,-42 1793,-66"/>
+<text text-anchor="middle" x="1764" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_rho</text>
+</g>
+<!-- proc~calc_rho_water_abst_physics&#45;&gt;calc_rho -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge19" class="edge">
+<title>proc~calc_rho_water_abst_physics&#45;&gt;calc_rho</title>
+<path fill="none" stroke="#0066ff" d="M1598.33,-54C1643.63,-54 1692.03,-54 1724.55,-54"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1724.95,-57.5 1734.95,-54 1724.95,-50.5 1724.95,-57.5"/>
+</g>
+<!-- proc~get_thermo_state_tp -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node21" class="node">
+<title>proc~get_thermo_state_tp</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CallsGraph_node21"><a xlink:href="../proc/get_thermo_state_tp.html" xlink:title="abst_physics%get_thermo_state_TP">
+<polygon fill="#d9534f" stroke="#d9534f" points="1864,-24 1664,-24 1664,0 1864,0 1864,-24"/>
+<text text-anchor="middle" x="1764" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%get_thermo_state_TP</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_rho_water_abst_physics&#45;&gt;proc~get_thermo_state_tp -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge20" class="edge">
+<title>proc~calc_rho_water_abst_physics&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#0066ff" d="M1560.03,-41.96C1594.85,-36.82 1635.64,-30.8 1671.49,-25.51"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1672.08,-28.96 1681.46,-24.04 1671.06,-22.04 1672.08,-28.96"/>
+</g>
+<!-- proc~get_thermo_state_t&#45;&gt;proc~get_field_dp -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge21" class="edge">
+<title>proc~get_thermo_state_t&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#0000ff" d="M1861.13,-96C1894.57,-96 1931.87,-96 1964.61,-96"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1964.61,-99.5 1974.61,-96 1964.61,-92.5 1964.61,-99.5"/>
+</g>
+<!-- proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node23" class="node">
+<title>proc~shift_temperature_absolute_abst_physics</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CallsGraph_node23"><a xlink:href="../proc/shift_temperature_absolute_abst_physics.html" xlink:title="abst_physics%shift_temperature_absolute_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="2207,-66 1900,-66 1900,-42 2207,-42 2207,-66"/>
+<text text-anchor="middle" x="2053.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%shift_temperature_absolute_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_t&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge22" class="edge">
+<title>proc~get_thermo_state_t&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#0000ff" d="M1840.65,-83.99C1859.99,-80.99 1880.76,-77.82 1900,-75 1917.13,-72.49 1935.36,-69.9 1953.03,-67.44"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1953.93,-70.85 1963.36,-66.01 1952.97,-63.92 1953.93,-70.85"/>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge23" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#ff00ff" d="M1844.85,-24.05C1851.55,-26.51 1858.03,-29.46 1864,-33 1885.14,-45.55 1878.42,-63.22 1900,-75 1919.53,-85.66 1942.49,-91.6 1964.57,-94.78"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="1964.29,-98.27 1974.64,-96.05 1965.16,-91.32 1964.29,-98.27"/>
+</g>
+<!-- proc~shift_pressure_absolute_abst_physics -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_node22" class="node">
+<title>proc~shift_pressure_absolute_abst_physics</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CallsGraph_node22"><a xlink:href="../proc/shift_pressure_absolute_abst_physics.html" xlink:title="abst_physics%shift_pressure_absolute_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="2196,-24 1911,-24 1911,0 2196,0 2196,-24"/>
+<text text-anchor="middle" x="2053.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%shift_pressure_absolute_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_physics -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge24" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_physics</title>
+<path fill="none" stroke="#ff00ff" d="M1864.34,-12C1876.07,-12 1888.24,-12 1900.49,-12"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="1900.78,-15.5 1910.78,-12 1900.78,-8.5 1900.78,-15.5"/>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CallsGraph_edge25" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#ff00ff" d="M1840.65,-24.01C1859.99,-27.01 1880.76,-30.18 1900,-33 1917.13,-35.51 1935.36,-38.1 1953.03,-40.56"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="1952.97,-44.08 1963.36,-41.99 1953.93,-37.15 1952.97,-44.08"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccompute_diffusion_term_hydraulicCallsGraph = svgPanZoom('#proccompute_diffusion_term_hydraulicCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~compute_diffusion_term_hydraulic~~CalledByGraph Pages: 1 -->
+<svg id="proccompute_diffusion_term_hydraulicCalledByGraph" width="641pt" height="31pt"
+ viewBox="0.00 0.00 641.00 31.04" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~compute_diffusion_term_hydraulic~~CalledByGraph" class="graph" transform="scale(0.42 0.42) rotate(0) translate(4 70)">
+<title>proc~~compute_diffusion_term_hydraulic~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 1524,-70 1524,4 -4,4"/>
+<!-- proc~compute_diffusion_term_hydraulic -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CalledByGraph_node1" class="node">
+<title>proc~compute_diffusion_term_hydraulic</title>
+<polygon fill="none" stroke="black" points="1520,-45 1324,-45 1324,-21 1520,-21 1520,-45"/>
+<text text-anchor="middle" x="1422" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">compute_diffusion_term_hydraulic</text>
+</g>
+<!-- interface~compute_diffusion_term_hydraulic -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CalledByGraph_node2" class="node">
+<title>interface~compute_diffusion_term_hydraulic</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CalledByGraph_node2"><a xlink:href="../interface/compute_diffusion_term_hydraulic.html" xlink:title="type_hydraulic%compute_diffusion_term_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="1288,-45 1004,-45 1004,-21 1288,-21 1288,-45"/>
+<text text-anchor="middle" x="1146" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%compute_diffusion_term_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~compute_diffusion_term_hydraulic&#45;&gt;proc~compute_diffusion_term_hydraulic -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CalledByGraph_edge1" class="edge">
+<title>interface~compute_diffusion_term_hydraulic&#45;&gt;proc~compute_diffusion_term_hydraulic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1288.01,-33C1296.59,-33 1305.15,-33 1313.54,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1313.7,-36.5 1323.7,-33 1313.7,-29.5 1313.7,-36.5"/>
+</g>
+<!-- proc~assemble_local_newton_hydraulic -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CalledByGraph_node3" class="node">
+<title>proc~assemble_local_newton_hydraulic</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CalledByGraph_node3"><a xlink:href="../proc/assemble_local_newton_hydraulic.html" xlink:title="assemble_local_newton_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="968,-66 775,-66 775,-42 968,-42 968,-66"/>
+<text text-anchor="middle" x="871.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_newton_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_newton_hydraulic&#45;&gt;interface~compute_diffusion_term_hydraulic -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CalledByGraph_edge2" class="edge">
+<title>proc~assemble_local_newton_hydraulic&#45;&gt;interface~compute_diffusion_term_hydraulic</title>
+<path fill="none" stroke="#ff0000" d="M968.19,-46.63C976.46,-45.99 984.94,-45.33 993.51,-44.67"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="993.9,-48.16 1003.6,-43.9 993.36,-41.18 993.9,-48.16"/>
+</g>
+<!-- proc~assemble_local_picard_hydraulic -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CalledByGraph_node4" class="node">
+<title>proc~assemble_local_picard_hydraulic</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CalledByGraph_node4"><a xlink:href="../proc/assemble_local_picard_hydraulic.html" xlink:title="assemble_local_picard_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="965.5,-24 777.5,-24 777.5,0 965.5,0 965.5,-24"/>
+<text text-anchor="middle" x="871.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_picard_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_picard_hydraulic&#45;&gt;interface~compute_diffusion_term_hydraulic -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CalledByGraph_edge3" class="edge">
+<title>proc~assemble_local_picard_hydraulic&#45;&gt;interface~compute_diffusion_term_hydraulic</title>
+<path fill="none" stroke="#ff0000" d="M965.52,-19.17C974.67,-19.87 984.12,-20.6 993.66,-21.34"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="993.4,-24.83 1003.64,-22.11 993.94,-17.85 993.4,-24.83"/>
+</g>
+<!-- interface~assemble_local_newton_hydraulic -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CalledByGraph_node5" class="node">
+<title>interface~assemble_local_newton_hydraulic</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CalledByGraph_node5"><a xlink:href="../interface/assemble_local_newton_hydraulic.html" xlink:title="type_hydraulic%assemble_local_newton_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="739,-66 458,-66 458,-42 739,-42 739,-66"/>
+<text text-anchor="middle" x="598.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%assemble_local_newton_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_newton_hydraulic&#45;&gt;proc~assemble_local_newton_hydraulic -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CalledByGraph_edge4" class="edge">
+<title>interface~assemble_local_newton_hydraulic&#45;&gt;proc~assemble_local_newton_hydraulic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M739.37,-54C747.92,-54 756.46,-54 764.83,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="764.96,-57.5 774.96,-54 764.96,-50.5 764.96,-57.5"/>
+</g>
+<!-- interface~assemble_local_picard_hydraulic -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CalledByGraph_node6" class="node">
+<title>interface~assemble_local_picard_hydraulic</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CalledByGraph_node6"><a xlink:href="../interface/assemble_local_picard_hydraulic.html" xlink:title="type_hydraulic%assemble_local_picard_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="736.5,-24 460.5,-24 460.5,0 736.5,0 736.5,-24"/>
+<text text-anchor="middle" x="598.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%assemble_local_picard_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_picard_hydraulic&#45;&gt;proc~assemble_local_picard_hydraulic -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CalledByGraph_edge5" class="edge">
+<title>interface~assemble_local_picard_hydraulic&#45;&gt;proc~assemble_local_picard_hydraulic</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M736.59,-12C746.82,-12 757.04,-12 767.01,-12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="767.31,-15.5 777.31,-12 767.31,-8.5 767.31,-15.5"/>
+</g>
+<!-- proc~assemble_local_hydraulic -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CalledByGraph_node7" class="node">
+<title>proc~assemble_local_hydraulic</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CalledByGraph_node7"><a xlink:href="../proc/assemble_local_hydraulic.html" xlink:title="assemble_local_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="422,-45 273,-45 273,-21 422,-21 422,-45"/>
+<text text-anchor="middle" x="347.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_newton_hydraulic -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CalledByGraph_edge6" class="edge">
+<title>proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_newton_hydraulic</title>
+<path fill="none" stroke="#ff0000" d="M422.2,-39.22C430.34,-39.9 438.83,-40.62 447.5,-41.35"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="447.48,-44.86 457.74,-42.21 448.07,-37.88 447.48,-44.86"/>
+</g>
+<!-- proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_picard_hydraulic -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CalledByGraph_edge7" class="edge">
+<title>proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_picard_hydraulic</title>
+<path fill="none" stroke="#00ffff" d="M422.2,-26.78C431.14,-26.03 440.5,-25.24 450.05,-24.44"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="450.39,-27.92 460.06,-23.59 449.8,-20.94 450.39,-27.92"/>
+</g>
+<!-- interface~assemble_local_hydraulic -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CalledByGraph_node8" class="node">
+<title>interface~assemble_local_hydraulic</title>
+<g id="a_proc~~compute_diffusion_term_hydraulic~~CalledByGraph_node8"><a xlink:href="../interface/assemble_local_hydraulic.html" xlink:title="type_hydraulic%assemble_local_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="237,-45 0,-45 0,-21 237,-21 237,-45"/>
+<text text-anchor="middle" x="118.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%assemble_local_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_hydraulic&#45;&gt;proc~assemble_local_hydraulic -->
+<g id="proc~~compute_diffusion_term_hydraulic~~CalledByGraph_edge8" class="edge">
+<title>interface~assemble_local_hydraulic&#45;&gt;proc~assemble_local_hydraulic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M237.32,-33C245.92,-33 254.48,-33 262.81,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="262.85,-36.5 272.85,-33 262.85,-29.5 262.85,-36.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccompute_diffusion_term_hydraulicCalledByGraph = svgPanZoom('#proccompute_diffusion_term_hydraulicCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">compute_diffusion_term_hydraulic</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">material_id</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">D_HH</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_hydraulic</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">material_id</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_state</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">state</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">D_HH</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">K_flh</span><span class="p">,</span><span class="w"> </span><span class="n">K_vP</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">coeff_D</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span>
+
+<span class="w">        </span><span class="c">! K_flh: Liquid Hydraulic Conductivity [m/s]</span>
+<span class="w">        </span><span class="c">! K_vP: Vapor Hydraulic Conductivity (equivalent) [m/s]</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">physics</span><span class="p">%</span><span class="n">calc_Kflh</span><span class="p">(</span><span class="n">material_id</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">K_flh</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">physics</span><span class="p">%</span><span class="n">calc_Kvh</span><span class="p">(</span><span class="n">material_id</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">K_vP</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! D_HH = (K_liquid + K_vapor) / g</span>
+<span class="w">        </span><span class="c">! Unit: [m/s] / [m/s^2] = [s]</span>
+<span class="w">        </span><span class="c">! Flux J = - D * grad P [s * Pa/m] = [s * N/m^3] = [s * kg m/s^2 / m^3] = [kg/m^2 s] (Mass Flux)</span>
+<span class="w">        </span><span class="n">coeff_D</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">K_flh</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">K_vP</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">g</span>
+
+<span class="w">        </span><span class="n">D_HH</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">computation_dimension</span>
+<span class="w">            </span><span class="n">D_HH</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">coeff_D</span>
+<span class="w">        </span><span class="k">end do</span>
+
+<span class="k">    end subroutine </span><span class="n">compute_diffusion_term_hydraulic</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

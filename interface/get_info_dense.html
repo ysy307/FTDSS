@@ -1,0 +1,1124 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>get_info_dense &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>get_info_dense
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.2% of total for procedures.">85 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/matrix_interface.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/matrix_interface.f90.html'>matrix_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_types_matrix.html'>core_types_matrix</a></li>
+            <li class="breadcrumb-item active" aria-current="page">get_info_dense</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+    <em>None</em>
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>interface</h2>
+      
+      <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~get_info_dense~~CallsGraph Pages: 1 -->
+<svg id="interfaceget_info_denseCallsGraph" width="340pt" height="32pt"
+ viewBox="0.00 0.00 340.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~get_info_dense~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>interface~~get_info_dense~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 336,-28 336,4 -4,4"/>
+<!-- interface~get_info_dense -->
+<g id="interface~~get_info_dense~~CallsGraph_node1" class="node">
+<title>interface~get_info_dense</title>
+<polygon fill="none" stroke="black" points="203,-24 0,-24 0,0 203,0 203,-24"/>
+<text text-anchor="middle" x="101.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_matrix_dense%get_info_dense</text>
+</g>
+<!-- proc~get_info_dense -->
+<g id="interface~~get_info_dense~~CallsGraph_node2" class="node">
+<title>proc~get_info_dense</title>
+<g id="a_interface~~get_info_dense~~CallsGraph_node2"><a xlink:href="../proc/get_info_dense.html" xlink:title="get_info_dense">
+<polygon fill="#d9534f" stroke="#d9534f" points="332,-24 239,-24 239,0 332,0 332,-24"/>
+<text text-anchor="middle" x="285.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_info_dense</text>
+</a>
+</g>
+</g>
+<!-- interface~get_info_dense&#45;&gt;proc~get_info_dense -->
+<g id="interface~~get_info_dense~~CallsGraph_edge1" class="edge">
+<title>interface~get_info_dense&#45;&gt;proc~get_info_dense</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M203.08,-12C211.87,-12 220.53,-12 228.75,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="228.88,-15.5 238.88,-12 228.88,-8.5 228.88,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~get_info_dense~~CalledByGraph Pages: 1 -->
+<svg id="interfaceget_info_denseCalledByGraph" width="641pt" height="39pt"
+ viewBox="0.00 0.00 641.00 39.31" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~get_info_dense~~CalledByGraph" class="graph" transform="scale(0.14 0.14) rotate(0) translate(4 272.37)">
+<title>interface~~get_info_dense~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-272.37 4503,-272.37 4503,4 -4,4"/>
+<!-- interface~get_info_dense -->
+<g id="interface~~get_info_dense~~CalledByGraph_node1" class="node">
+<title>interface~get_info_dense</title>
+<polygon fill="none" stroke="black" points="4499,-236.37 4296,-236.37 4296,-212.37 4499,-212.37 4499,-236.37"/>
+<text text-anchor="middle" x="4397.5" y="-221.97" font-family="Helvetica,sans-Serif" font-size="10.50">type_matrix_dense%get_info_dense</text>
+</g>
+<!-- proc~check_initialize_matrix -->
+<g id="interface~~get_info_dense~~CalledByGraph_node2" class="node">
+<title>proc~check_initialize_matrix</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node2"><a xlink:href="../proc/check_initialize_matrix.html" xlink:title="check_initialize_matrix">
+<polygon fill="#d9534f" stroke="#d9534f" points="3976,-268.37 3843,-268.37 3843,-244.37 3976,-244.37 3976,-268.37"/>
+<text text-anchor="middle" x="3909.5" y="-253.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">check_initialize_matrix</text>
+</a>
+</g>
+</g>
+<!-- proc~check_initialize_matrix&#45;&gt;interface~get_info_dense -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge1" class="edge">
+<title>proc~check_initialize_matrix&#45;&gt;interface~get_info_dense</title>
+<path fill="none" stroke="#ff0000" d="M3976.04,-252.06C4055.37,-246.84 4190.17,-237.96 4285.74,-231.67"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4285.98,-235.16 4295.73,-231.01 4285.52,-228.17 4285.98,-235.16"/>
+</g>
+<!-- proc~gemv_matrix_dense -->
+<g id="interface~~get_info_dense~~CalledByGraph_node3" class="node">
+<title>proc~gemv_matrix_dense</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node3"><a xlink:href="../proc/gemv_matrix_dense.html" xlink:title="gemv_matrix_dense">
+<polygon fill="#d9534f" stroke="#d9534f" points="4260,-216.37 4140,-216.37 4140,-192.37 4260,-192.37 4260,-216.37"/>
+<text text-anchor="middle" x="4200" y="-201.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gemv_matrix_dense</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_dense&#45;&gt;interface~get_info_dense -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge2" class="edge">
+<title>proc~gemv_matrix_dense&#45;&gt;interface~get_info_dense</title>
+<path fill="none" stroke="#ff0000" d="M4260.19,-210.43C4268.43,-211.27 4277.12,-212.16 4285.94,-213.06"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4285.65,-216.55 4295.95,-214.09 4286.36,-209.59 4285.65,-216.55"/>
+</g>
+<!-- interface~matrix_gemv -->
+<g id="interface~~get_info_dense~~CalledByGraph_node4" class="node">
+<title>interface~matrix_gemv</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node4"><a xlink:href="../interface/matrix_gemv.html" xlink:title="matrix_gemv">
+<polygon fill="#a7506f" stroke="#a7506f" points="4099,-216.37 4017,-216.37 4017,-192.37 4099,-192.37 4099,-216.37"/>
+<text text-anchor="middle" x="4058" y="-201.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_gemv</text>
+</a>
+</g>
+</g>
+<!-- interface~matrix_gemv&#45;&gt;proc~gemv_matrix_dense -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge5" class="edge">
+<title>interface~matrix_gemv&#45;&gt;proc~gemv_matrix_dense</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M4099.12,-204.37C4108.73,-204.37 4119.27,-204.37 4129.79,-204.37"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="4129.83,-207.88 4139.83,-204.37 4129.83,-200.88 4129.83,-207.88"/>
+</g>
+<!-- proc~assemble_initialize_ftdss -->
+<g id="interface~~get_info_dense~~CalledByGraph_node5" class="node">
+<title>proc~assemble_initialize_ftdss</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node5"><a xlink:href="../proc/assemble_initialize_ftdss.html" xlink:title="assemble_initialize_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="2905.5,-231.37 2762.5,-231.37 2762.5,-207.37 2905.5,-207.37 2905.5,-231.37"/>
+<text text-anchor="middle" x="2834" y="-216.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_initialize_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_initialize_ftdss&#45;&gt;proc~check_initialize_matrix -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge3" class="edge">
+<title>proc~assemble_initialize_ftdss&#45;&gt;proc~check_initialize_matrix</title>
+<path fill="none" stroke="#ff0000" d="M2905.51,-227.21C2950.51,-231.87 3010.11,-237.44 3063,-240.37 3346.62,-256.1 3684.49,-257.19 3832.6,-256.79"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3832.94,-260.29 3842.93,-256.76 3832.92,-253.29 3832.94,-260.29"/>
+</g>
+<!-- proc~lerp_states -->
+<g id="interface~~get_info_dense~~CalledByGraph_node27" class="node">
+<title>proc~lerp_states</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node27"><a xlink:href="../proc/lerp_states.html" xlink:title="type_assemble_workspace%lerp_states">
+<polygon fill="#d9534f" stroke="#d9534f" points="3285,-231.37 3063,-231.37 3063,-207.37 3285,-207.37 3285,-231.37"/>
+<text text-anchor="middle" x="3174" y="-216.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assemble_workspace%lerp_states</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_initialize_ftdss&#45;&gt;proc~lerp_states -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge32" class="edge">
+<title>proc~assemble_initialize_ftdss&#45;&gt;proc~lerp_states</title>
+<path fill="none" stroke="#0000ff" d="M2905.86,-219.37C2948.41,-219.37 3003.68,-219.37 3052.9,-219.37"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="3052.97,-222.88 3062.97,-219.37 3052.97,-215.88 3052.97,-222.88"/>
+</g>
+<!-- proc~matvec_matrix -->
+<g id="interface~~get_info_dense~~CalledByGraph_node6" class="node">
+<title>proc~matvec_matrix</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node6"><a xlink:href="../proc/matvec_matrix.html" xlink:title="matvec_matrix">
+<polygon fill="#d9534f" stroke="#d9534f" points="4104,-169.37 4012,-169.37 4012,-145.37 4104,-145.37 4104,-169.37"/>
+<text text-anchor="middle" x="4058" y="-154.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matvec_matrix</text>
+</a>
+</g>
+</g>
+<!-- proc~matvec_matrix&#45;&gt;proc~gemv_matrix_dense -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge4" class="edge">
+<title>proc~matvec_matrix&#45;&gt;proc~gemv_matrix_dense</title>
+<path fill="none" stroke="#00ffff" d="M4095.05,-169.48C4112.85,-175.45 4134.52,-182.73 4153.45,-189.08"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="4152.47,-192.45 4163.07,-192.31 4154.7,-185.81 4152.47,-192.45"/>
+</g>
+<!-- interface~assemble_initialize_ftdss -->
+<g id="interface~~get_info_dense~~CalledByGraph_node7" class="node">
+<title>interface~assemble_initialize_ftdss</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node7"><a xlink:href="../interface/assemble_initialize_ftdss.html" xlink:title="type_ftdss%assemble_initialize_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1175,-227.37 969,-227.37 969,-203.37 1175,-203.37 1175,-227.37"/>
+<text text-anchor="middle" x="1072" y="-212.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_initialize_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_initialize_ftdss&#45;&gt;proc~assemble_initialize_ftdss -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge6" class="edge">
+<title>interface~assemble_initialize_ftdss&#45;&gt;proc~assemble_initialize_ftdss</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1175.03,-216.14C1259.14,-216.7 1381.56,-217.37 1488.5,-217.37 1488.5,-217.37 1488.5,-217.37 2243.5,-217.37 2425.3,-217.37 2638.64,-218.34 2752.21,-218.93"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="2752.2,-222.43 2762.22,-218.98 2752.24,-215.43 2752.2,-222.43"/>
+</g>
+<!-- interface~matvec -->
+<g id="interface~~get_info_dense~~CalledByGraph_node8" class="node">
+<title>interface~matvec</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node8"><a xlink:href="../interface/matvec.html" xlink:title="matvec">
+<polygon fill="#a7506f" stroke="#a7506f" points="3936.5,-149.37 3882.5,-149.37 3882.5,-125.37 3936.5,-125.37 3936.5,-149.37"/>
+<text text-anchor="middle" x="3909.5" y="-134.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matvec</text>
+</a>
+</g>
+</g>
+<!-- interface~matvec&#45;&gt;proc~matvec_matrix -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge7" class="edge">
+<title>interface~matvec&#45;&gt;proc~matvec_matrix</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M3936.69,-140.95C3954.75,-143.42 3979.42,-146.78 4001.72,-149.83"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="4001.39,-153.32 4011.77,-151.2 4002.34,-146.38 4001.39,-153.32"/>
+</g>
+<!-- proc~assemble_ftdss -->
+<g id="interface~~get_info_dense~~CalledByGraph_node9" class="node">
+<title>proc~assemble_ftdss</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node9"><a xlink:href="../proc/assemble_ftdss.html" xlink:title="assemble_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="933,-205.37 839,-205.37 839,-181.37 933,-181.37 933,-205.37"/>
+<text text-anchor="middle" x="886" y="-190.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_ftdss&#45;&gt;interface~assemble_initialize_ftdss -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge8" class="edge">
+<title>proc~assemble_ftdss&#45;&gt;interface~assemble_initialize_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M933.43,-198.93C941.8,-199.93 950.83,-201.01 960.14,-202.12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="959.98,-205.63 970.33,-203.34 960.81,-198.68 959.98,-205.63"/>
+</g>
+<!-- interface~assemble_local_ftdss -->
+<g id="interface~~get_info_dense~~CalledByGraph_node37" class="node">
+<title>interface~assemble_local_ftdss</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node37"><a xlink:href="../interface/assemble_local_ftdss.html" xlink:title="type_ftdss%assemble_local_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1165.5,-184.37 978.5,-184.37 978.5,-160.37 1165.5,-160.37 1165.5,-184.37"/>
+<text text-anchor="middle" x="1072" y="-169.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_local_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_ftdss&#45;&gt;interface~assemble_local_ftdss -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge44" class="edge">
+<title>proc~assemble_ftdss&#45;&gt;interface~assemble_local_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M933.43,-188.08C944.16,-186.85 956,-185.5 968.09,-184.12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="968.75,-187.57 978.28,-182.96 967.95,-180.61 968.75,-187.57"/>
+</g>
+<!-- proc~assemble_local_newton_hydraulic -->
+<g id="interface~~get_info_dense~~CalledByGraph_node10" class="node">
+<title>proc~assemble_local_newton_hydraulic</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node10"><a xlink:href="../proc/assemble_local_newton_hydraulic.html" xlink:title="assemble_local_newton_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="2339,-27.37 2146,-27.37 2146,-3.37 2339,-3.37 2339,-27.37"/>
+<text text-anchor="middle" x="2242.5" y="-12.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_newton_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_newton_hydraulic&#45;&gt;interface~matvec -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge9" class="edge">
+<title>proc~assemble_local_newton_hydraulic&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#00ffff" d="M2339.22,-15.37C2455.85,-15.37 2658.89,-15.37 2833,-15.37 2833,-15.37 2833,-15.37 3460.5,-15.37 3614.73,-15.37 3666.41,29.04 3807,-34.37 3846.16,-52.04 3878.33,-92.12 3895.34,-116.75"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="3892.64,-118.99 3901.11,-125.35 3898.45,-115.1 3892.64,-118.99"/>
+</g>
+<!-- none~compute_k2 -->
+<g id="interface~~get_info_dense~~CalledByGraph_node34" class="node">
+<title>none~compute_k2</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node34"><a xlink:href="../type/type_assemble_workspace.html#boundprocedure-compute_k2" xlink:title="type_assemble_workspace%compute_K2">
+<polygon fill="#a7506f" stroke="#a7506f" points="2605,-89.37 2375,-89.37 2375,-65.37 2605,-65.37 2605,-89.37"/>
+<text text-anchor="middle" x="2490" y="-74.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assemble_workspace%compute_K2</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_newton_hydraulic&#45;&gt;none~compute_k2 -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge38" class="edge">
+<title>proc~assemble_local_newton_hydraulic&#45;&gt;none~compute_k2</title>
+<path fill="none" stroke="#ff0000" d="M2300.42,-27.4C2313.14,-30.22 2326.56,-33.31 2339,-36.37 2371.83,-44.47 2408.43,-54.45 2437.27,-62.54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2436.55,-65.98 2447.12,-65.32 2438.44,-59.24 2436.55,-65.98"/>
+</g>
+<!-- proc~assemble_local_newton_thermal -->
+<g id="interface~~get_info_dense~~CalledByGraph_node11" class="node">
+<title>proc~assemble_local_newton_thermal</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node11"><a xlink:href="../proc/assemble_local_newton_thermal.html" xlink:title="assemble_local_newton_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="2335.5,-153.37 2149.5,-153.37 2149.5,-129.37 2335.5,-129.37 2335.5,-153.37"/>
+<text text-anchor="middle" x="2242.5" y="-138.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_newton_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_newton_thermal&#45;&gt;interface~matvec -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge10" class="edge">
+<title>proc~assemble_local_newton_thermal&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#00ffff" d="M2335.65,-140.36C2451.67,-139.18 2657.09,-137.37 2833,-137.37 2833,-137.37 2833,-137.37 3460.5,-137.37 3613.52,-137.37 3795.95,-137.37 3872.2,-137.37"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="3872.24,-140.88 3882.24,-137.37 3872.24,-133.88 3872.24,-140.88"/>
+</g>
+<!-- proc~assemble_local_newton_thermal&#45;&gt;none~compute_k2 -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge39" class="edge">
+<title>proc~assemble_local_newton_thermal&#45;&gt;none~compute_k2</title>
+<path fill="none" stroke="#ff0000" d="M2300.95,-129.35C2313.53,-126.55 2326.74,-123.48 2339,-120.37 2372.71,-111.85 2410.33,-101.06 2439.46,-92.42"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2440.81,-95.67 2449.39,-89.46 2438.81,-88.96 2440.81,-95.67"/>
+</g>
+<!-- proc~compute_k2_diffusion_abst_fe -->
+<g id="interface~~get_info_dense~~CalledByGraph_node12" class="node">
+<title>proc~compute_k2_diffusion_abst_fe</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node12"><a xlink:href="../proc/compute_k2_diffusion_abst_fe.html" xlink:title="compute_K2_diffusion_abst_fe">
+<polygon fill="#d9534f" stroke="#d9534f" points="3807,-109.37 3634,-109.37 3634,-85.37 3807,-85.37 3807,-109.37"/>
+<text text-anchor="middle" x="3720.5" y="-94.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">compute_K2_diffusion_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_k2_diffusion_abst_fe&#45;&gt;interface~matvec -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge11" class="edge">
+<title>proc~compute_k2_diffusion_abst_fe&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#00ffff" d="M3777.61,-109.38C3808.28,-115.94 3845.39,-123.88 3872.25,-129.62"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="3871.85,-133.12 3882.36,-131.78 3873.32,-126.27 3871.85,-133.12"/>
+</g>
+<!-- proc~dlerp_abst_fe -->
+<g id="interface~~get_info_dense~~CalledByGraph_node13" class="node">
+<title>proc~dlerp_abst_fe</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node13"><a xlink:href="../proc/dlerp_abst_fe.html" xlink:title="dlerp_abst_fe">
+<polygon fill="#d9534f" stroke="#d9534f" points="3762.5,-189.37 3678.5,-189.37 3678.5,-165.37 3762.5,-165.37 3762.5,-189.37"/>
+<text text-anchor="middle" x="3720.5" y="-174.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dlerp_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- proc~dlerp_abst_fe&#45;&gt;interface~matvec -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge12" class="edge">
+<title>proc~dlerp_abst_fe&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#00ffff" d="M3762.54,-168.6C3795.28,-161.59 3840.72,-151.87 3872.16,-145.15"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="3873.2,-148.5 3882.25,-142.99 3871.74,-141.66 3873.2,-148.5"/>
+</g>
+<!-- proc~solve_type_solver_bicgstab -->
+<g id="interface~~get_info_dense~~CalledByGraph_node14" class="node">
+<title>proc~solve_type_solver_bicgstab</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node14"><a xlink:href="../proc/solve_type_solver_bicgstab.html" xlink:title="solve_type_solver_bicgstab">
+<polygon fill="#d9534f" stroke="#d9534f" points="3799,-67.37 3642,-67.37 3642,-43.37 3799,-43.37 3799,-67.37"/>
+<text text-anchor="middle" x="3720.5" y="-52.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_bicgstab</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_bicgstab&#45;&gt;interface~matvec -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge13" class="edge">
+<title>proc~solve_type_solver_bicgstab&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#00ffff" d="M3780.66,-67.44C3789.63,-69.97 3798.66,-72.94 3807,-76.37 3834.69,-87.79 3863.74,-105.97 3883.63,-119.52"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="3881.87,-122.56 3892.08,-125.37 3885.86,-116.8 3881.87,-122.56"/>
+</g>
+<!-- proc~solve_type_solver_gmres -->
+<g id="interface~~get_info_dense~~CalledByGraph_node15" class="node">
+<title>proc~solve_type_solver_gmres</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node15"><a xlink:href="../proc/solve_type_solver_gmres.html" xlink:title="solve_type_solver_gmres">
+<polygon fill="#d9534f" stroke="#d9534f" points="3793,-231.37 3648,-231.37 3648,-207.37 3793,-207.37 3793,-231.37"/>
+<text text-anchor="middle" x="3720.5" y="-216.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_gmres</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;interface~matvec -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge14" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#00ffff" d="M3780.66,-207.31C3789.63,-204.78 3798.66,-201.81 3807,-198.37 3834.69,-186.96 3863.74,-168.78 3883.63,-155.23"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="3885.86,-157.95 3892.08,-149.38 3881.87,-152.19 3885.86,-157.95"/>
+</g>
+<!-- interface~assemble_ftdss -->
+<g id="interface~~get_info_dense~~CalledByGraph_node16" class="node">
+<title>interface~assemble_ftdss</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node16"><a xlink:href="../interface/assemble_ftdss.html" xlink:title="type_ftdss%assemble_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="803,-205.37 646,-205.37 646,-181.37 803,-181.37 803,-205.37"/>
+<text text-anchor="middle" x="724.5" y="-190.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge15" class="edge">
+<title>interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M803.38,-193.37C811.94,-193.37 820.54,-193.37 828.76,-193.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="828.95,-196.88 838.95,-193.37 828.95,-189.88 828.95,-196.88"/>
+</g>
+<!-- interface~assemble_local_newton_hydraulic -->
+<g id="interface~~get_info_dense~~CalledByGraph_node17" class="node">
+<title>interface~assemble_local_newton_hydraulic</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node17"><a xlink:href="../interface/assemble_local_newton_hydraulic.html" xlink:title="type_hydraulic%assemble_local_newton_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="2110,-27.37 1829,-27.37 1829,-3.37 2110,-3.37 2110,-27.37"/>
+<text text-anchor="middle" x="1969.5" y="-12.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%assemble_local_newton_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_newton_hydraulic&#45;&gt;proc~assemble_local_newton_hydraulic -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge16" class="edge">
+<title>interface~assemble_local_newton_hydraulic&#45;&gt;proc~assemble_local_newton_hydraulic</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M2110.37,-15.37C2118.92,-15.37 2127.46,-15.37 2135.83,-15.37"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="2135.96,-18.88 2145.96,-15.37 2135.96,-11.88 2135.96,-18.88"/>
+</g>
+<!-- interface~assemble_local_newton_thermal -->
+<g id="interface~~get_info_dense~~CalledByGraph_node18" class="node">
+<title>interface~assemble_local_newton_thermal</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node18"><a xlink:href="../interface/assemble_local_newton_thermal.html" xlink:title="type_thermal%assemble_local_newton_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="2102.5,-153.37 1836.5,-153.37 1836.5,-129.37 2102.5,-129.37 2102.5,-153.37"/>
+<text text-anchor="middle" x="1969.5" y="-138.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%assemble_local_newton_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_newton_thermal&#45;&gt;proc~assemble_local_newton_thermal -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge17" class="edge">
+<title>interface~assemble_local_newton_thermal&#45;&gt;proc~assemble_local_newton_thermal</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M2102.82,-141.37C2114.98,-141.37 2127.18,-141.37 2139.01,-141.37"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="2139.31,-144.88 2149.31,-141.37 2139.31,-137.88 2139.31,-144.88"/>
+</g>
+<!-- interface~compute_k2_diffusion_abst_fe -->
+<g id="interface~~get_info_dense~~CalledByGraph_node19" class="node">
+<title>interface~compute_k2_diffusion_abst_fe</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node19"><a xlink:href="../interface/compute_k2_diffusion_abst_fe.html" xlink:title="abst_fe%compute_K2_diffusion_abst_fe">
+<polygon fill="#a7506f" stroke="#a7506f" points="3570,-109.37 3349,-109.37 3349,-85.37 3570,-85.37 3570,-109.37"/>
+<text text-anchor="middle" x="3459.5" y="-94.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%compute_K2_diffusion_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- interface~compute_k2_diffusion_abst_fe&#45;&gt;proc~compute_k2_diffusion_abst_fe -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge18" class="edge">
+<title>interface~compute_k2_diffusion_abst_fe&#45;&gt;proc~compute_k2_diffusion_abst_fe</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M3570.34,-97.37C3588.09,-97.37 3606.34,-97.37 3623.72,-97.37"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="3623.85,-100.88 3633.85,-97.37 3623.85,-93.88 3623.85,-100.88"/>
+</g>
+<!-- interface~dlerp_abst_fe -->
+<g id="interface~~get_info_dense~~CalledByGraph_node20" class="node">
+<title>interface~dlerp_abst_fe</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node20"><a xlink:href="../interface/dlerp_abst_fe.html" xlink:title="abst_fe%dlerp_abst_fe">
+<polygon fill="#a7506f" stroke="#a7506f" points="3525.5,-189.37 3393.5,-189.37 3393.5,-165.37 3525.5,-165.37 3525.5,-189.37"/>
+<text text-anchor="middle" x="3459.5" y="-174.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%dlerp_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- interface~dlerp_abst_fe&#45;&gt;proc~dlerp_abst_fe -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge19" class="edge">
+<title>interface~dlerp_abst_fe&#45;&gt;proc~dlerp_abst_fe</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M3525.52,-177.37C3569.73,-177.37 3627.39,-177.37 3668.32,-177.37"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="3668.35,-180.88 3678.35,-177.37 3668.35,-173.88 3668.35,-180.88"/>
+</g>
+<!-- interface~solve_type_solver_bicgstab -->
+<g id="interface~~get_info_dense~~CalledByGraph_node21" class="node">
+<title>interface~solve_type_solver_bicgstab</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node21"><a xlink:href="../interface/solve_type_solver_bicgstab.html" xlink:title="type_solver_bicgstab%solve_type_solver_bicgstab">
+<polygon fill="#a7506f" stroke="#a7506f" points="3598,-67.37 3321,-67.37 3321,-43.37 3598,-43.37 3598,-67.37"/>
+<text text-anchor="middle" x="3459.5" y="-52.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_solver_bicgstab%solve_type_solver_bicgstab</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_type_solver_bicgstab&#45;&gt;proc~solve_type_solver_bicgstab -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge20" class="edge">
+<title>interface~solve_type_solver_bicgstab&#45;&gt;proc~solve_type_solver_bicgstab</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M3598.34,-55.37C3609.6,-55.37 3620.78,-55.37 3631.53,-55.37"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="3631.69,-58.88 3641.69,-55.37 3631.69,-51.88 3631.69,-58.88"/>
+</g>
+<!-- interface~solve_type_solver_gmres -->
+<g id="interface~~get_info_dense~~CalledByGraph_node22" class="node">
+<title>interface~solve_type_solver_gmres</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node22"><a xlink:href="../interface/solve_type_solver_gmres.html" xlink:title="type_solver_gmres%solve_type_solver_gmres">
+<polygon fill="#a7506f" stroke="#a7506f" points="3586,-231.37 3333,-231.37 3333,-207.37 3586,-207.37 3586,-231.37"/>
+<text text-anchor="middle" x="3459.5" y="-216.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_solver_gmres%solve_type_solver_gmres</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_type_solver_gmres&#45;&gt;proc~solve_type_solver_gmres -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge21" class="edge">
+<title>interface~solve_type_solver_gmres&#45;&gt;proc~solve_type_solver_gmres</title>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M3586.21,-219.37C3603.71,-219.37 3621.31,-219.37 3637.72,-219.37"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="3637.77,-222.88 3647.77,-219.37 3637.77,-215.88 3637.77,-222.88"/>
+</g>
+<!-- none~compute_k2~2 -->
+<g id="interface~~get_info_dense~~CalledByGraph_node23" class="node">
+<title>none~compute_k2~2</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node23"><a xlink:href="../type/abst_fe.html#boundprocedure-compute_k2~2" xlink:title="abst_fe%compute_K2">
+<polygon fill="#a7506f" stroke="#a7506f" points="3237.5,-109.37 3110.5,-109.37 3110.5,-85.37 3237.5,-85.37 3237.5,-109.37"/>
+<text text-anchor="middle" x="3174" y="-94.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%compute_K2</text>
+</a>
+</g>
+</g>
+<!-- none~compute_k2~2&#45;&gt;interface~compute_k2_diffusion_abst_fe -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge25" class="edge">
+<title>none~compute_k2~2&#45;&gt;interface~compute_k2_diffusion_abst_fe</title>
+<path fill="none" stroke="#00ff91" d="M3237.57,-97.37C3267.32,-97.37 3303.93,-97.37 3338.73,-97.37"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="3338.98,-100.88 3348.98,-97.37 3338.98,-93.88 3338.98,-100.88"/>
+</g>
+<!-- proc~assemble_local_hydraulic -->
+<g id="interface~~get_info_dense~~CalledByGraph_node24" class="node">
+<title>proc~assemble_local_hydraulic</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node24"><a xlink:href="../proc/assemble_local_hydraulic.html" xlink:title="assemble_local_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="1793,-48.37 1644,-48.37 1644,-24.37 1793,-24.37 1793,-48.37"/>
+<text text-anchor="middle" x="1718.5" y="-33.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_newton_hydraulic -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge23" class="edge">
+<title>proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_newton_hydraulic</title>
+<path fill="none" stroke="#ffda00" d="M1793.2,-30.16C1801.34,-29.47 1809.83,-28.76 1818.5,-28.03"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="1819.07,-31.49 1828.74,-27.16 1818.48,-24.51 1819.07,-31.49"/>
+</g>
+<!-- interface~assemble_local_picard_hydraulic -->
+<g id="interface~~get_info_dense~~CalledByGraph_node41" class="node">
+<title>interface~assemble_local_picard_hydraulic</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node41"><a xlink:href="../interface/assemble_local_picard_hydraulic.html" xlink:title="type_hydraulic%assemble_local_picard_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="2107.5,-69.37 1831.5,-69.37 1831.5,-45.37 2107.5,-45.37 2107.5,-69.37"/>
+<text text-anchor="middle" x="1969.5" y="-54.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%assemble_local_picard_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_picard_hydraulic -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge47" class="edge">
+<title>proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_picard_hydraulic</title>
+<path fill="none" stroke="#ff0000" d="M1793.2,-42.59C1802.14,-43.34 1811.5,-44.13 1821.05,-44.94"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1820.8,-48.43 1831.06,-45.78 1821.39,-41.46 1820.8,-48.43"/>
+</g>
+<!-- proc~assemble_local_thermal -->
+<g id="interface~~get_info_dense~~CalledByGraph_node25" class="node">
+<title>proc~assemble_local_thermal</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node25"><a xlink:href="../proc/assemble_local_thermal.html" xlink:title="assemble_local_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="1789.5,-153.37 1647.5,-153.37 1647.5,-129.37 1789.5,-129.37 1789.5,-153.37"/>
+<text text-anchor="middle" x="1718.5" y="-138.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_thermal&#45;&gt;interface~assemble_local_newton_thermal -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge24" class="edge">
+<title>proc~assemble_local_thermal&#45;&gt;interface~assemble_local_newton_thermal</title>
+<path fill="none" stroke="#48ff00" d="M1789.52,-141.37C1801.1,-141.37 1813.46,-141.37 1826.07,-141.37"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="1826.23,-144.88 1836.23,-141.37 1826.23,-137.88 1826.23,-144.88"/>
+</g>
+<!-- interface~assemble_local_picard_thermal -->
+<g id="interface~~get_info_dense~~CalledByGraph_node42" class="node">
+<title>interface~assemble_local_picard_thermal</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node42"><a xlink:href="../interface/assemble_local_picard_thermal.html" xlink:title="type_thermal%assemble_local_picard_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="2100,-111.37 1839,-111.37 1839,-87.37 2100,-87.37 2100,-111.37"/>
+<text text-anchor="middle" x="1969.5" y="-96.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%assemble_local_picard_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_thermal&#45;&gt;interface~assemble_local_picard_thermal -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge48" class="edge">
+<title>proc~assemble_local_thermal&#45;&gt;interface~assemble_local_picard_thermal</title>
+<path fill="none" stroke="#00ffff" d="M1779.95,-129.33C1795.88,-126.28 1813.07,-123.1 1829,-120.37 1843.85,-117.83 1859.62,-115.3 1875.01,-112.92"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1875.7,-116.35 1885.06,-111.38 1874.64,-109.44 1875.7,-116.35"/>
+</g>
+<!-- proc~dlerp_domain -->
+<g id="interface~~get_info_dense~~CalledByGraph_node26" class="node">
+<title>proc~dlerp_domain</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node26"><a xlink:href="../proc/dlerp_domain.html" xlink:title="type_domain%dlerp_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="3256.5,-189.37 3091.5,-189.37 3091.5,-165.37 3256.5,-165.37 3256.5,-189.37"/>
+<text text-anchor="middle" x="3174" y="-174.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%dlerp_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~dlerp_domain&#45;&gt;interface~dlerp_abst_fe -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge26" class="edge">
+<title>proc~dlerp_domain&#45;&gt;interface~dlerp_abst_fe</title>
+<path fill="none" stroke="#0091ff" d="M3256.62,-177.37C3296.41,-177.37 3343.96,-177.37 3382.92,-177.37"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="3383.15,-180.88 3393.15,-177.37 3383.15,-173.88 3383.15,-180.88"/>
+</g>
+<!-- proc~lerp_states&#45;&gt;interface~dlerp_abst_fe -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge27" class="edge">
+<title>proc~lerp_states&#45;&gt;interface~dlerp_abst_fe</title>
+<path fill="none" stroke="#0091ff" d="M3256.24,-207.34C3296.19,-201.42 3344.04,-194.33 3383.17,-188.54"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="3384.06,-191.94 3393.43,-187.01 3383.03,-185.02 3384.06,-191.94"/>
+</g>
+<!-- proc~solve_time_step_ftdss -->
+<g id="interface~~get_info_dense~~CalledByGraph_node28" class="node">
+<title>proc~solve_time_step_ftdss</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node28"><a xlink:href="../proc/solve_time_step_ftdss.html" xlink:title="solve_time_step_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="610,-205.37 483,-205.37 483,-181.37 610,-181.37 610,-205.37"/>
+<text text-anchor="middle" x="546.5" y="-190.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge22" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M610.05,-193.37C618.36,-193.37 627,-193.37 635.63,-193.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="635.75,-196.88 645.75,-193.37 635.75,-189.88 635.75,-196.88"/>
+</g>
+<!-- interface~assemble_local_hydraulic -->
+<g id="interface~~get_info_dense~~CalledByGraph_node29" class="node">
+<title>interface~assemble_local_hydraulic</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node29"><a xlink:href="../interface/assemble_local_hydraulic.html" xlink:title="type_hydraulic%assemble_local_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="1608,-48.37 1371,-48.37 1371,-24.37 1608,-24.37 1608,-48.37"/>
+<text text-anchor="middle" x="1489.5" y="-33.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%assemble_local_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_hydraulic&#45;&gt;proc~assemble_local_hydraulic -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge30" class="edge">
+<title>interface~assemble_local_hydraulic&#45;&gt;proc~assemble_local_hydraulic</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M1608.32,-36.37C1616.92,-36.37 1625.48,-36.37 1633.81,-36.37"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="1633.85,-39.88 1643.85,-36.37 1633.85,-32.88 1633.85,-39.88"/>
+</g>
+<!-- interface~assemble_local_thermal -->
+<g id="interface~~get_info_dense~~CalledByGraph_node30" class="node">
+<title>interface~assemble_local_thermal</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node30"><a xlink:href="../interface/assemble_local_thermal.html" xlink:title="type_thermal%assemble_local_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="1600.5,-171.37 1378.5,-171.37 1378.5,-147.37 1600.5,-147.37 1600.5,-171.37"/>
+<text text-anchor="middle" x="1489.5" y="-156.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%assemble_local_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_thermal&#45;&gt;proc~assemble_local_thermal -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge31" class="edge">
+<title>interface~assemble_local_thermal&#45;&gt;proc~assemble_local_thermal</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1600.68,-150.64C1612.99,-149.66 1625.37,-148.68 1637.21,-147.74"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1637.77,-151.21 1647.46,-146.93 1637.22,-144.23 1637.77,-151.21"/>
+</g>
+<!-- interface~solve_time_step_ftdss -->
+<g id="interface~~get_info_dense~~CalledByGraph_node31" class="node">
+<title>interface~solve_time_step_ftdss</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node31"><a xlink:href="../interface/solve_time_step_ftdss.html" xlink:title="type_ftdss%solve_time_step_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="447,-205.37 257,-205.37 257,-181.37 447,-181.37 447,-205.37"/>
+<text text-anchor="middle" x="352" y="-190.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge33" class="edge">
+<title>interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M447.28,-193.37C455.88,-193.37 464.5,-193.37 472.87,-193.37"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="472.93,-196.88 482.93,-193.37 472.93,-189.88 472.93,-196.88"/>
+</g>
+<!-- proc~compute_k2_assemble_workspace -->
+<g id="interface~~get_info_dense~~CalledByGraph_node32" class="node">
+<title>proc~compute_k2_assemble_workspace</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node32"><a xlink:href="../proc/compute_k2_assemble_workspace.html" xlink:title="type_assemble_workspace%compute_K2_assemble_workspace">
+<polygon fill="#d9534f" stroke="#d9534f" points="3008.5,-67.37 2659.5,-67.37 2659.5,-43.37 3008.5,-43.37 3008.5,-67.37"/>
+<text text-anchor="middle" x="2834" y="-52.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assemble_workspace%compute_K2_assemble_workspace</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_k2_assemble_workspace&#45;&gt;none~compute_k2~2 -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge28" class="edge">
+<title>proc~compute_k2_assemble_workspace&#45;&gt;none~compute_k2~2</title>
+<path fill="none" stroke="#ff0000" d="M2950.82,-67.4C2975.95,-70.19 3002.38,-73.26 3027,-76.37 3050.79,-79.39 3076.71,-83 3100.02,-86.38"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3099.78,-89.88 3110.18,-87.86 3100.79,-82.96 3099.78,-89.88"/>
+</g>
+<!-- proc~compute_k2_scalar_assemble_workspace -->
+<g id="interface~~get_info_dense~~CalledByGraph_node33" class="node">
+<title>proc~compute_k2_scalar_assemble_workspace</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node33"><a xlink:href="../proc/compute_k2_scalar_assemble_workspace.html" xlink:title="type_assemble_workspace%compute_K2_scalar_assemble_workspace">
+<polygon fill="#d9534f" stroke="#d9534f" points="3027,-109.37 2641,-109.37 2641,-85.37 3027,-85.37 3027,-109.37"/>
+<text text-anchor="middle" x="2834" y="-94.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assemble_workspace%compute_K2_scalar_assemble_workspace</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_k2_scalar_assemble_workspace&#45;&gt;none~compute_k2~2 -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge29" class="edge">
+<title>proc~compute_k2_scalar_assemble_workspace&#45;&gt;none~compute_k2~2</title>
+<path fill="none" stroke="#ff0000" d="M3027.21,-97.37C3053.12,-97.37 3078.3,-97.37 3100.23,-97.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3100.4,-100.88 3110.4,-97.37 3100.4,-93.88 3100.4,-100.88"/>
+</g>
+<!-- none~compute_k2&#45;&gt;proc~compute_k2_assemble_workspace -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge36" class="edge">
+<title>none~compute_k2&#45;&gt;proc~compute_k2_assemble_workspace</title>
+<path fill="none" stroke="#0066ff" d="M2605.36,-70.02C2619.48,-69.11 2634.18,-68.16 2649.01,-67.21"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="2649.54,-70.68 2659.3,-66.55 2649.09,-63.7 2649.54,-70.68"/>
+</g>
+<!-- none~compute_k2&#45;&gt;proc~compute_k2_scalar_assemble_workspace -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge37" class="edge">
+<title>none~compute_k2&#45;&gt;proc~compute_k2_scalar_assemble_workspace</title>
+<path fill="none" stroke="#cc00ff" d="M2605.36,-84.06C2613.66,-84.55 2622.17,-85.05 2630.78,-85.55"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="2630.75,-89.05 2640.94,-86.14 2631.16,-82.07 2630.75,-89.05"/>
+</g>
+<!-- proc~assemble_local_ftdss -->
+<g id="interface~~get_info_dense~~CalledByGraph_node35" class="node">
+<title>proc~assemble_local_ftdss</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node35"><a xlink:href="../proc/assemble_local_ftdss.html" xlink:title="assemble_local_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1335,-175.37 1211,-175.37 1211,-151.37 1335,-151.37 1335,-175.37"/>
+<text text-anchor="middle" x="1273" y="-160.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_ftdss&#45;&gt;interface~assemble_local_thermal -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge34" class="edge">
+<title>proc~assemble_local_ftdss&#45;&gt;interface~assemble_local_thermal</title>
+<path fill="none" stroke="#cbff00" d="M1335.18,-162.23C1345.62,-162.04 1356.78,-161.83 1368.14,-161.62"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1368.22,-165.12 1378.15,-161.43 1368.09,-158.12 1368.22,-165.12"/>
+</g>
+<!-- proc~run_ftdss -->
+<g id="interface~~get_info_dense~~CalledByGraph_node36" class="node">
+<title>proc~run_ftdss</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node36"><a xlink:href="../proc/run_ftdss.html" xlink:title="run_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-205.37 160,-205.37 160,-181.37 221,-181.37 221,-205.37"/>
+<text text-anchor="middle" x="190.5" y="-190.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge35" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss</title>
+<path fill="none" stroke="#00ff66" d="M221.13,-193.37C228.8,-193.37 237.52,-193.37 246.72,-193.37"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="246.86,-196.88 256.86,-193.37 246.86,-189.88 246.86,-196.88"/>
+</g>
+<!-- interface~assemble_local_ftdss&#45;&gt;proc~assemble_local_ftdss -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge42" class="edge">
+<title>interface~assemble_local_ftdss&#45;&gt;proc~assemble_local_ftdss</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1165.51,-168.19C1177.32,-167.66 1189.27,-167.12 1200.67,-166.6"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1201.14,-170.08 1210.97,-166.13 1200.83,-163.09 1201.14,-170.08"/>
+</g>
+<!-- interface~run_ftdss -->
+<g id="interface~~get_info_dense~~CalledByGraph_node38" class="node">
+<title>interface~run_ftdss</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node38"><a xlink:href="../interface/run_ftdss.html" xlink:title="type_ftdss%run_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="124,-205.37 0,-205.37 0,-181.37 124,-181.37 124,-205.37"/>
+<text text-anchor="middle" x="62" y="-190.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftdss&#45;&gt;proc~run_ftdss -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge43" class="edge">
+<title>interface~run_ftdss&#45;&gt;proc~run_ftdss</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M124.03,-193.37C132.82,-193.37 141.68,-193.37 149.91,-193.37"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="149.94,-196.88 159.94,-193.37 149.94,-189.88 149.94,-196.88"/>
+</g>
+<!-- proc~assemble_local_picard_hydraulic -->
+<g id="interface~~get_info_dense~~CalledByGraph_node39" class="node">
+<title>proc~assemble_local_picard_hydraulic</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node39"><a xlink:href="../proc/assemble_local_picard_hydraulic.html" xlink:title="assemble_local_picard_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="2336.5,-69.37 2148.5,-69.37 2148.5,-45.37 2336.5,-45.37 2336.5,-69.37"/>
+<text text-anchor="middle" x="2242.5" y="-54.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_picard_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_picard_hydraulic&#45;&gt;none~compute_k2 -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge40" class="edge">
+<title>proc~assemble_local_picard_hydraulic&#45;&gt;none~compute_k2</title>
+<path fill="none" stroke="#ff0000" d="M2336.66,-64.96C2345.83,-65.71 2355.23,-66.48 2364.64,-67.24"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2364.59,-70.75 2374.84,-68.08 2365.16,-63.77 2364.59,-70.75"/>
+</g>
+<!-- proc~assemble_local_picard_thermal -->
+<g id="interface~~get_info_dense~~CalledByGraph_node40" class="node">
+<title>proc~assemble_local_picard_thermal</title>
+<g id="a_interface~~get_info_dense~~CalledByGraph_node40"><a xlink:href="../proc/assemble_local_picard_thermal.html" xlink:title="assemble_local_picard_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="2333,-111.37 2152,-111.37 2152,-87.37 2333,-87.37 2333,-111.37"/>
+<text text-anchor="middle" x="2242.5" y="-96.97" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_picard_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_picard_thermal&#45;&gt;none~compute_k2 -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge41" class="edge">
+<title>proc~assemble_local_picard_thermal&#45;&gt;none~compute_k2</title>
+<path fill="none" stroke="#ff0000" d="M2333.17,-91.34C2343.45,-90.42 2354.06,-89.47 2364.69,-88.52"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2365.22,-91.98 2374.87,-87.6 2364.6,-85.01 2365.22,-91.98"/>
+</g>
+<!-- interface~assemble_local_picard_hydraulic&#45;&gt;proc~assemble_local_picard_hydraulic -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge45" class="edge">
+<title>interface~assemble_local_picard_hydraulic&#45;&gt;proc~assemble_local_picard_hydraulic</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M2107.59,-57.37C2117.82,-57.37 2128.04,-57.37 2138.01,-57.37"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2138.31,-60.88 2148.31,-57.37 2138.31,-53.88 2138.31,-60.88"/>
+</g>
+<!-- interface~assemble_local_picard_thermal&#45;&gt;proc~assemble_local_picard_thermal -->
+<g id="interface~~get_info_dense~~CalledByGraph_edge46" class="edge">
+<title>interface~assemble_local_picard_thermal&#45;&gt;proc~assemble_local_picard_thermal</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M2100.05,-99.37C2114.04,-99.37 2128.11,-99.37 2141.67,-99.37"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="2141.93,-102.88 2151.93,-99.37 2141.93,-95.88 2141.93,-102.88"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfaceget_info_denseCalledByGraph = svgPanZoom('#interfaceget_info_denseCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+      <h2>private module subroutine get_info_dense(self, info)  
+    <a href="../proc/get_info_dense.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h2>
+
+    
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~997"></span>
+              class(<a href='../type/type_matrix_dense.html'>type_matrix_dense</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                <p>The matrix object.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-info~11"></span>
+              type(<a href='../type/type_matrix_info.html'>type_matrix_info</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>info</strong></td>
+            <td>
+                <p>The matrix information structure to populate.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+
+ </div>
+</div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

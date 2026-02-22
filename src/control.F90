@@ -1,10 +1,14 @@
 module module_control
     use, intrinsic :: iso_fortran_env
+    use :: stdlib_strings, only:strip
     use :: module_core
-    use :: control_time, only:type_time
-    use :: control_iteration, only:type_iteration
-    use :: control_openmp, only:initialize_openmp
     use :: module_input, only:type_input
+    use :: control_time, only:type_time
+    use :: control_time_profiler, only:type_profiler
+    use :: control_iteration, only:type_iteration
+    use :: control_output, only:type_output_manager
+    use :: control_openmp, only:initialize_openmp
+    use :: module_linalg
     implicit none
     private
 
@@ -12,26 +16,53 @@ module module_control
     public :: type_iteration
     public :: type_controls
 
-    public :: calc_thermal, calc_hydraulic, calc_mechanical
-    integer(int32), parameter :: calc_thermal = 1
-    integer(int32), parameter :: calc_hydraulic = 2
-    integer(int32), parameter :: calc_mechanical = 3
+    type :: type_aitken_params
+        real(real64), private :: relaxation_factor(PHYSICS_TYPES%NUM_ID) = 0.5d0
+        real(real64), private :: previous_relaxation_factor(PHYSICS_TYPES%NUM_ID) = 0.5d0
+        real(real64), allocatable, private :: du_raw(:, :)
+        real(real64), private :: max_relaxation = 1.0d0
+        real(real64), private :: min_relaxation = 0.05d0
+    contains
+        procedure, public, pass(self) :: initialize => initialize_aitken_params
+        procedure, public, pass(self) :: destory => destory_aitken_params
+        procedure, public, pass(self) :: reset => reset_aitken_params
+        procedure, public, pass(self) :: compute_relaxation => compute_aitken_relaxation
+        procedure, public, pass(self) :: get_relaxation => get_aitken_relaxation
+        procedure, public, pass(self) :: set_du => set_du_raw_aitken
+        procedure, public, pass(self) :: reach_min_relaxation => reach_min_relaxation_aitken
+    end type type_aitken_params
 
     type :: type_controls
-        logical :: calculate_thermal
-        logical :: calculate_hydraulic
-        logical :: calculate_mechanical
-        character(:), allocatable :: coupling_mode
-        ! --- マテリアルごとのフラグ ---
+        private
+        logical :: is_active(PHYSICS_TYPES%NUM_ID) = .false.
+        type(type_constant_id) :: coupling_mode
         logical, allocatable :: thermal(:)
         logical, allocatable :: hydraulic(:)
         logical, allocatable :: mechanical(:)
 
-        type(type_iteration) :: iteration
-        type(type_time) :: time
+        type(type_iteration), public :: iteration
+        type(type_time), public :: time
+        type(type_profiler), public :: profiler
+
+        type(type_output_manager), public :: out_field
+        type(type_output_manager), public :: out_history
+
+        type(type_aitken_params), public :: aitken
+
     contains
-        procedure :: initialize => initialize_type_controls
-        procedure :: is_target => should_calculate_target
+        procedure, pass(self), public :: initialize => initialize_type_controls
+        procedure, pass(self), public :: is_physics_active => is_physics_active_control
+        procedure, pass(self), public :: is_target => is_target_control
+        procedure, pass(self), public :: get_coupling_mode => get_coupling_mode_control
+
+        procedure, pass(self), public :: is_monolithic => is_monolithic_control
+        procedure, pass(self), public :: is_staggered => is_staggered_control
+
+        procedure, pass(self), public :: is_end_time => is_end_time_control
+
+        procedure, pass(self), public :: update => update_controls
+
+        procedure, pass(self), public :: display => display_controls
     end type type_controls
 
 contains
@@ -44,13 +75,14 @@ contains
         integer(int32) :: ierr
         integer(int32) :: i, num_unique_regions, max_region_id
         integer(int32) :: current_material_id
+        character(len=10), allocatable :: profiler_labels(:)
+        real(real64) :: current_time_s
 
         ierr = 0
-        ! アクティブなマテリアル領域の情報を取得
-        call input%geometry%vtk%get_active_region_info(unique_material_ids, ierr)
+        call input%geometry%vtk%get_active_region_info(unique_material_ids)
         if (ierr /= 0) return
         if (.not. allocated(unique_material_ids) .or. size(unique_material_ids) == 0) then
-            ierr = -1 ! エラーコード
+            ierr = -1
             print *, "Error: No active material regions found."
             stop 1
         end if
@@ -58,113 +90,395 @@ contains
         num_unique_regions = size(unique_material_ids)
         max_region_id = maxval(unique_material_ids)
 
-        ! 全体的な計算フラグを設定し、配列を割り当てて初期化
-        if (input%basic%analysis_controls%calculate_thermal) then
-            self%calculate_thermal = .true.
+        self%is_active(PHYSICS_TYPE_THERMAL) = input%basic%analysis_controls%is_active(PHYSICS_TYPE_THERMAL)
+        if (self%is_active(PHYSICS_TYPE_THERMAL)) then
             allocate (self%thermal(max_region_id))
-            self%thermal = .false. ! 配列全体を .false. で初期化
-        else
-            self%calculate_thermal = .false.
+            self%thermal = .false.
         end if
 
-        if (input%basic%analysis_controls%calculate_hydraulic) then
-            self%calculate_hydraulic = .true.
+        self%is_active(PHYSICS_TYPE_HYDRAULIC) = input%basic%analysis_controls%is_active(PHYSICS_TYPE_HYDRAULIC)
+        if (self%is_active(PHYSICS_TYPE_HYDRAULIC)) then
             allocate (self%hydraulic(max_region_id))
             self%hydraulic = .false.
-        else
-            self%calculate_hydraulic = .false.
         end if
 
-        if (input%basic%analysis_controls%calculate_mechanical) then
-            self%calculate_mechanical = .true.
+        self%is_active(PHYSICS_TYPE_MECHANICAL) = input%basic%analysis_controls%is_active(PHYSICS_TYPE_MECHANICAL)
+        if (self%is_active(PHYSICS_TYPE_MECHANICAL)) then
             allocate (self%mechanical(max_region_id))
             self%mechanical = .false.
-        else
-            self%calculate_mechanical = .false.
         end if
 
-        ! アクティブな各マテリアル領域に対してフラグを立てる
         do i = 1, num_unique_regions
             current_material_id = unique_material_ids(i)
-            if (self%calculate_thermal) then
-                ! materials配列の添え字として実際の材料IDを使用
-                self%thermal(current_material_id) = input%basic%materials(i)%calculate_thermal
+            if (current_material_id > size(input%basic%materials)) cycle
+
+            if (self%is_active(PHYSICS_TYPE_THERMAL)) then
+                self%thermal(current_material_id) = &
+                    input%basic%materials(current_material_id)%is_active(PHYSICS_TYPE_THERMAL)
             end if
 
-            if (self%calculate_hydraulic) then
-                ! materials配列の添え字として実際の材料IDを使用
-                self%hydraulic(current_material_id) = input%basic%materials(i)%calculate_hydraulic
+            if (self%is_active(PHYSICS_TYPE_HYDRAULIC)) then
+                self%hydraulic(current_material_id) = &
+                    input%basic%materials(current_material_id)%is_active(PHYSICS_TYPE_HYDRAULIC)
             end if
 
-            if (self%calculate_mechanical) then
-                ! materials配列の添え字として実際の材料IDを使用
-                self%mechanical(current_material_id) = input%basic%materials(i)%calculate_mechanical
+            if (self%is_active(PHYSICS_TYPE_MECHANICAL)) then
+                self%mechanical(current_material_id) = &
+                    input%basic%materials(current_material_id)%is_active(PHYSICS_TYPE_MECHANICAL)
             end if
         end do
 
-        ! print *,
+        self%coupling_mode = COUPLING_MODES%to_object(input%basic%analysis_controls%coupling_mode)
 
-        ! coupling_modeの設定
-        self%coupling_mode = input%basic%analysis_controls%coupling_mode
-
-        ! call self%time%initialize(input)
-        ! call self%iteration%initialize(input)
-
+        call self%time%initialize(input)
+        call self%iteration%initialize(input)
         call initialize_openmp(input)
+
+        call self%aitken%initialize(input%geometry%vtk%num_points)
+
+        call self%time%get_time(current_time_s)
+        associate (field_output => input%output_settings%field_output)
+            call self%out_field%initialize(field_output%output_interval_step, &
+                                           field_output%output_interval_unit, &
+                                           field_output%output_time_unit, &
+                                           field_output%file_format, &
+                                           current_time_s)
+        end associate
+        associate (history_output => input%output_settings%history_output)
+            call self%out_history%initialize(history_output%output_interval_step, &
+                                             history_output%output_interval_unit, &
+                                             history_output%output_time_unit, &
+                                             history_output%file_format, &
+                                             current_time_s)
+        end associate
 
         call deallocate_array(unique_material_ids)
 
     end subroutine initialize_type_controls
 
     ! -----------------------------------------------------------------
-    ! <<< ここからが追加した関数 >>>
     ! 指定された物理現象と材料IDが計算対象かどうかを判定する
     ! -----------------------------------------------------------------
-    pure function should_calculate_target(self, target_id, i_material) result(is_active)
+    pure function is_target_control(self, target_physics, material_id) result(is_active)
         implicit none
         class(type_controls), intent(in) :: self
-        integer, intent(in) :: target_id
-        integer(int32), intent(in) :: i_material
+        integer, intent(in) :: target_physics
+        integer(int32), intent(in) :: material_id
         logical :: is_active
+
+        if (.not. self%is_active(target_physics)) then
+            is_active = .false.
+            return
+        end if
 
         is_active = .false.
 
-        ! 高速な整数比較
-        select case (target_id)
-        case (calc_thermal)
-#ifdef USE_DEBUG
+        select case (target_physics)
+        case (PHYSICS_TYPE_THERMAL)
             if (allocated(self%thermal)) then
-                if (i_material <= ubound(self%thermal, 1)) then
-#endif
-                    is_active = self%thermal(i_material)
-#ifdef USE_DEBUG
+                if (material_id <= ubound(self%thermal, 1)) then
+                    is_active = self%thermal(material_id)
                 end if
             end if
-#endif
 
-        case (calc_hydraulic)
-#ifdef USE_DEBUG
+        case (PHYSICS_TYPE_HYDRAULIC)
             if (allocated(self%hydraulic)) then
-                if (i_material <= ubound(self%hydraulic, 1)) then
-#endif
-                    is_active = self%hydraulic(i_material)
-#ifdef USE_DEBUG
+                if (material_id <= ubound(self%hydraulic, 1)) then
+                    is_active = self%hydraulic(material_id)
                 end if
             end if
-#endif
 
-        case (calc_mechanical)
-#ifdef USE_DEBUG
+        case (PHYSICS_TYPE_MECHANICAL)
             if (allocated(self%mechanical)) then
-                if (i_material <= ubound(self%mechanical, 1)) then
-#endif
-                    is_active = self%mechanical(i_material)
-#ifdef USE_DEBUG
+                if (material_id <= ubound(self%mechanical, 1)) then
+                    is_active = self%mechanical(material_id)
                 end if
             end if
-#endif
         end select
-    end function should_calculate_target
+    end function is_target_control
+
+    !>
+    !> 指定された物理定数が計算対象かどうかを判定する
+    pure function is_physics_active_control(self, physics_type) result(is_active)
+        implicit none
+        !> Instance of control settings
+        class(type_controls), intent(in) :: self
+        !> Physics type identifier in PHYSICS_TYPES
+        type(type_constant_id), intent(in) :: physics_type
+        !> Returns `true` if the physics type is active
+        logical :: is_active
+
+        if (PHYSICS_TYPES%in_group(physics_type)) then
+            if (physics_type%id < 1 .or. physics_type%id > PHYSICS_TYPES%NUM_ID) then
+                is_active = .false.
+            end if
+            is_active = self%is_active(physics_type%id)
+        else
+            is_active = .false.
+        end if
+
+    end function is_physics_active_control
+
+    subroutine get_coupling_mode_control(self, coupling_mode)
+        implicit none
+        class(type_controls), intent(in), target :: self
+        type(type_constant_id), intent(inout), pointer :: coupling_mode
+
+        coupling_mode => self%coupling_mode
+    end subroutine get_coupling_mode_control
+
+    pure function is_monolithic_control(self) result(is_monolithic)
+        implicit none
+        class(type_controls), intent(in) :: self
+        logical :: is_monolithic
+
+        is_monolithic = (self%coupling_mode == COUPLING_MODES%MONOLITHIC)
+
+    end function is_monolithic_control
+
+    pure function is_staggered_control(self) result(is_staggered)
+        implicit none
+        class(type_controls), intent(in) :: self
+        logical :: is_staggered
+
+        is_staggered = (self%coupling_mode == COUPLING_MODES%STAGGERED)
+
+    end function is_staggered_control
+
+    subroutine reset_controls(self)
+        implicit none
+        class(type_controls), intent(inout) :: self
+
+        call self%iteration%reset()
+
+    end subroutine reset_controls
+
+    subroutine display_controls(self)
+        implicit none
+        class(type_controls), intent(in) :: self
+        integer(int32) :: i
+
+        write (*, '(a)') "# Control Settings"
+        write (*, '(a)') "## Active Physics Types:"
+        if (self%is_active(PHYSICS_TYPE_THERMAL)) then
+            write (*, '(a)') "- Thermal"
+        end if
+        if (self%is_active(PHYSICS_TYPE_HYDRAULIC)) then
+            write (*, '(a)') "- Hydraulic"
+        end if
+        if (self%is_active(PHYSICS_TYPE_MECHANICAL)) then
+            write (*, '(a)') "- Mechanical"
+        end if
+
+        write (*, '(a)') "## Coupling Mode:"
+        write (*, '(a)') "- "//trim(self%coupling_mode%name)
+
+        if (allocated(self%thermal)) then
+            write (*, '(a)') "### Thermal Material Flags:"
+            do i = 1, size(self%thermal)
+                write (*, '(a,i0,a,l1)') "- Material ID ", i, ": ", self%thermal(i)
+            end do
+        end if
+
+        if (allocated(self%hydraulic)) then
+            write (*, '(a)') "### Hydraulic Material Flags:"
+            do i = 1, size(self%hydraulic)
+                write (*, '(a,i0,a,l1)') "- Material ID ", i, ": ", self%hydraulic(i)
+            end do
+        end if
+
+        if (allocated(self%mechanical)) then
+            write (*, '(a)') "### Mechanical Material Flags:"
+            do i = 1, size(self%mechanical)
+                write (*, '(a,i0,a,l1)') "- Material ID ", i, ": ", self%mechanical(i)
+            end do
+        end if
+
+        write (*, '(a)') "## Time and Iteration Settings"
+        call self%time%display()
+        ! call self%iteration%display()
+
+        write (*, '(a)') "---"
+    end subroutine display_controls
+
+    subroutine initialize_aitken_params(self, num_dofs)
+        implicit none
+        class(type_aitken_params), intent(inout) :: self
+        integer(int32), intent(in) :: num_dofs
+
+        call allocate_array(self%du_raw, num_dofs, PHYSICS_TYPES%NUM_ID)
+
+        call self%reset()
+    end subroutine initialize_aitken_params
+
+    subroutine destory_aitken_params(self)
+        implicit none
+        class(type_aitken_params), intent(inout) :: self
+
+        call deallocate_array(self%du_raw)
+
+        self%relaxation_factor(:) = 0.0d0
+        self%previous_relaxation_factor(:) = 0.0d0
+
+    end subroutine destory_aitken_params
+
+    subroutine reset_aitken_params(self)
+        implicit none
+        class(type_aitken_params), intent(inout) :: self
+
+        self%relaxation_factor(:) = 0.5d0
+        self%previous_relaxation_factor(:) = 0.5d0
+    end subroutine reset_aitken_params
+
+    subroutine compute_aitken_relaxation(self, physics_type, du_new)
+        implicit none
+        class(type_aitken_params), intent(inout), target :: self
+        type(type_constant_id), intent(in) :: physics_type
+        real(real64), intent(in) :: du_new(:)
+
+        real(real64), pointer, contiguous, dimension(:) :: du_old => null()
+
+        integer(int32) :: pid
+        real(real64) :: numerator
+        real(real64) :: denominator
+
+        if (.not. PHYSICS_TYPES%is_valid(physics_type)) then
+            call raise_error(ERROR_CODES%INVALID_TYPE, opt=strip(physics_type%name))
+        end if
+
+        pid = physics_type%id
+        du_old => self%du_raw(:, pid)
+
+        numerator = vector_dot((du_new - du_old), du_old)
+        denominator = vector_dot(du_new - du_old, du_new - du_old)
+
+        if (denominator > epsilon(1.0d0)) then
+            self%relaxation_factor(pid) = -self%previous_relaxation_factor(pid) * (numerator / denominator)
+            ! Relaxation factor limits
+            if (self%relaxation_factor(pid) < self%min_relaxation) then
+                self%relaxation_factor(pid) = self%min_relaxation
+            else if (self%relaxation_factor(pid) > self%max_relaxation) then
+                self%relaxation_factor(pid) = self%max_relaxation
+            end if
+            self%previous_relaxation_factor(pid) = self%relaxation_factor(pid)
+        else
+            ! If denominator is too small, keep previous relaxation factor
+            self%relaxation_factor(pid) = self%previous_relaxation_factor(pid)
+        end if
+
+    end subroutine compute_aitken_relaxation
+
+    pure subroutine get_aitken_relaxation(self, physics_type, relaxation_factor)
+        implicit none
+        class(type_aitken_params), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        real(real64), intent(inout) :: relaxation_factor
+
+        if (.not. PHYSICS_TYPES%is_valid(physics_type)) then
+            call raise_error(ERROR_CODES%INVALID_TYPE, opt=strip(physics_type%name))
+        end if
+
+        relaxation_factor = self%relaxation_factor(physics_type%id)
+
+    end subroutine get_aitken_relaxation
+
+    subroutine set_du_raw_aitken(self, physics_type, du)
+        implicit none
+        class(type_aitken_params), intent(inout) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        real(real64), intent(in) :: du(:)
+
+        if (.not. PHYSICS_TYPES%is_valid(physics_type)) then
+            call raise_error(ERROR_CODES%INVALID_TYPE, opt=strip(physics_type%name))
+        end if
+
+        self%du_raw(:, physics_type%id) = du(:)
+
+    end subroutine set_du_raw_aitken
+
+    pure function reach_min_relaxation_aitken(self, physics_type) result(is_min_exceeded)
+        implicit none
+        class(type_aitken_params), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        logical :: is_min_exceeded
+
+        if (.not. PHYSICS_TYPES%is_valid(physics_type)) then
+            call raise_error(ERROR_CODES%INVALID_TYPE, opt=strip(physics_type%name))
+        end if
+
+        is_min_exceeded = self%relaxation_factor(physics_type%id) <= self%min_relaxation
+
+    end function reach_min_relaxation_aitken
+
+    pure function is_end_time_control(self) result(is_end_time)
+        implicit none
+        class(type_controls), intent(in) :: self
+        logical :: is_end_time
+
+        is_end_time = self%time%is_end_time()
+    end function is_end_time_control
+
+    ! !> Comprehensive update of all control states (Time, ATS, Iteration, Output)
+    ! subroutine update_controls(self, success)
+    !     implicit none
+    !     class(type_controls), intent(inout) :: self
+    !     logical, intent(in) :: success
+    !     integer(int32) :: iter_count
+    !     real(real64) :: t_target
+
+    !     ! 1. 現在のステップで要した反復回数を取得
+    !     call self%iteration%get_nonlinear_iter(iter_count)
+
+    !     ! 2. 同期のターゲット時刻を決定（終了時刻，または各出力時刻の最小値）
+    !     call self%time%get_end_time(t_target)
+
+    !     if (self%out_field%is_enabled()) then
+    !         t_target = min(t_target, self%out_field%get_next_time())
+    !     end if
+    !     if (self%out_history%is_enabled()) then
+    !         t_target = min(t_target, self%out_history%get_next_time())
+    !     end if
+
+    !     ! 3. 時間管理・ATSロジックを一括実行
+    !     call self%time%update(success, iter_count, t_target)
+
+    ! end subroutine update_controls
+
+    subroutine update_controls(self, success)
+        implicit none
+        class(type_controls), intent(inout) :: self
+        logical, intent(in) :: success
+        integer(int32) :: iter_count
+        real(real64) :: t_target
+        real(real64) :: t_arrival ! 計算によって到達する時刻
+        real(real64) :: t_target_out
+        real(real64) :: current_time_s, dt_s
+
+        ! 1. 反復回数の取得
+        call self%iteration%get_nonlinear_iter(iter_count)
+
+        ! 2. 到達予測時刻 (t_new = t_old + dt)
+        !    成功していれば，この後 time%update で時刻がここまで進む
+        call self%time%get_time(current_time_s)
+        call self%time%get_dt(dt_s)
+        t_arrival = current_time_s + dt_s
+
+        ! 3. ターゲット時刻の決定
+        call self%time%get_end_time(t_target)
+
+        ! 到達時刻(300) を渡して，次のターゲット(600) を取得する
+        if (self%out_field%is_enabled()) then
+            call self%out_field%get_next_target_time(t_arrival, t_target_out)
+            t_target = min(t_target, t_target_out)
+        end if
+        if (self%out_history%is_enabled()) then
+            call self%out_history%get_next_target_time(t_arrival, t_target_out)
+            t_target = min(t_target, t_target_out)
+        end if
+
+        ! 4. 更新実行 (t_target=600 なので，残り300に合わせて dt が制限される)
+        call self%time%update(success, iter_count, t_target)
+
+    end subroutine update_controls
 
 end module module_control
-

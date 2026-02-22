@@ -1,0 +1,2502 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>thermal_base.F90 &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>thermal_base.F90
+      <small>Source File</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.2% of total for source files.">63 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/thermal_base.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+            <li class="breadcrumb-item active" aria-current="page">thermal_base.F90</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+        <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#submods-0"
+         aria-expanded="false" aria-controls="submods-0">
+         <h4 class="card-header bg-primary text-white">Submodules</h4>
+      </a>
+      <div id="submods-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/thermal_base.html">thermal_base</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../sourcefile/thermal_base.f90.html#src">thermal_base.F90</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    <div class="col-md-9" id='text'>
+      
+      <br>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">This file depends on</h3>
+          </div>
+          <div class="card-body">
+            <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: sourcefile~~thermal_base.f90~~EfferentGraph Pages: 1 -->
+<svg id="sourcefilethermal_basef90EfferentGraph" width="641pt" height="138pt"
+ viewBox="0.00 0.00 641.00 138.21" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph" class="graph" transform="scale(0.12 0.12) rotate(0) translate(4 1127.74)">
+<title>sourcefile~~thermal_base.f90~~EfferentGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1127.74 5245,-1127.74 5245,4 -4,4"/>
+<!-- sourcefile~thermal_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node1" class="node">
+<title>sourcefile~thermal_base.f90</title>
+<polygon fill="none" stroke="black" points="5241,-1016.43 5133,-1016.43 5133,-992.43 5241,-992.43 5241,-1016.43"/>
+<text text-anchor="middle" x="5187" y="-1002.03" font-family="Helvetica,sans-Serif" font-size="10.50">thermal_base.F90</text>
+</g>
+<!-- sourcefile~thermal_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node2" class="node">
+<title>sourcefile~thermal_interface.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node2"><a xlink:href="../sourcefile/thermal_interface.f90.html" xlink:title="thermal_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="5097,-1016.43 4967,-1016.43 4967,-992.43 5097,-992.43 5097,-1016.43"/>
+<text text-anchor="middle" x="5032" y="-1002.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">thermal_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~thermal_base.f90&#45;&gt;sourcefile~thermal_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge1" class="edge">
+<title>sourcefile~thermal_base.f90&#45;&gt;sourcefile~thermal_interface.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M5132.92,-1004.43C5124.6,-1004.43 5115.88,-1004.43 5107.2,-1004.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="5107.06,-1000.93 5097.06,-1004.43 5107.06,-1007.93 5107.06,-1000.93"/>
+</g>
+<!-- sourcefile~control.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node3" class="node">
+<title>sourcefile~control.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node3"><a xlink:href="../sourcefile/control.f90.html" xlink:title="control.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="4052,-938.43 3980,-938.43 3980,-914.43 4052,-914.43 4052,-938.43"/>
+<text text-anchor="middle" x="4016" y="-924.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">control.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~thermal_interface.f90&#45;&gt;sourcefile~control.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge2" class="edge">
+<title>sourcefile~thermal_interface.f90&#45;&gt;sourcefile~control.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M4763,-734.43C4687.93,-723.77 4153.41,-796.08 4088,-834.43 4059.78,-850.97 4038.82,-883.47 4027.25,-905.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4024.05,-903.64 4022.6,-914.14 4030.28,-906.84 4024.05,-903.64"/>
+</g>
+<!-- sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node4" class="node">
+<title>sourcefile~core.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node4"><a xlink:href="../sourcefile/core.f90.html" xlink:title="core.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1906,-484.43 1848,-484.43 1848,-460.43 1906,-460.43 1906,-484.43"/>
+<text text-anchor="middle" x="1877" y="-470.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~thermal_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge3" class="edge">
+<title>sourcefile~thermal_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M5015.87,-1016.61C4976.84,-1046.76 4868.57,-1122.43 4765,-1122.43 4765,-1122.43 4765,-1122.43 4481,-1122.43 4337.67,-1122.43 4301.83,-1123.74 4158.5,-1122.43"/>
+</g>
+<!-- sourcefile~input.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node5" class="node">
+<title>sourcefile~input.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node5"><a xlink:href="../sourcefile/input.f90.html" xlink:title="input.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="3587.5,-949.43 3525.5,-949.43 3525.5,-925.43 3587.5,-925.43 3587.5,-949.43"/>
+<text text-anchor="middle" x="3556.5" y="-935.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">input.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~thermal_interface.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge4" class="edge">
+<title>sourcefile~thermal_interface.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M4156.5,-692.43C3945.29,-687.3 3868.71,-641.87 3684,-744.43"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3682,-744.43C3615.04,-782.88 3578.15,-873.59 3564.14,-915.5"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3560.73,-914.67 3561,-925.26 3567.4,-916.82 3560.73,-914.67"/>
+</g>
+<!-- sourcefile~linalg.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node6" class="node">
+<title>sourcefile~linalg.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node6"><a xlink:href="../sourcefile/linalg.f90.html" xlink:title="linalg.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2236,-740.43 2172,-740.43 2172,-716.43 2236,-716.43 2236,-740.43"/>
+<text text-anchor="middle" x="2204" y="-726.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">linalg.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~thermal_interface.f90&#45;&gt;sourcefile~linalg.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge5" class="edge">
+<title>sourcefile~thermal_interface.f90&#45;&gt;sourcefile~linalg.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M4481,-654.43C4339.47,-626.16 4302.72,-697.82 4158.5,-692.43"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M4156.5,-692.43C4042.12,-684.67 4024.64,-616.43 3910,-616.43 3910,-616.43 3910,-616.43 3682,-616.43 3677.64,-616.43 3076.52,-766.74 3072.5,-768.43"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3070.5,-768.43C3068.25,-769.24 2918.38,-844.17 2916,-844.43"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2914,-844.43C2640.32,-874.23 2559.66,-865.01 2298,-779.43 2274,-771.58 2249.04,-757.51 2231.02,-746.13"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2232.57,-742.97 2222.27,-740.48 2228.77,-748.85 2232.57,-742.97"/>
+</g>
+<!-- sourcefile~main_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node7" class="node">
+<title>sourcefile~main_base.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node7"><a xlink:href="../sourcefile/main_base.f90.html" xlink:title="main_base.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="4931,-1016.43 4838,-1016.43 4838,-992.43 4931,-992.43 4931,-1016.43"/>
+<text text-anchor="middle" x="4884.5" y="-1002.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">main_base.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~thermal_interface.f90&#45;&gt;sourcefile~main_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge6" class="edge">
+<title>sourcefile~thermal_interface.f90&#45;&gt;sourcefile~main_base.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M4966.76,-1004.43C4958.21,-1004.43 4949.5,-1004.43 4941.11,-1004.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4941.07,-1000.93 4931.07,-1004.43 4941.07,-1007.93 4941.07,-1000.93"/>
+</g>
+<!-- sourcefile~physics.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node8" class="node">
+<title>sourcefile~physics.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node8"><a xlink:href="../sourcefile/physics.f90.html" xlink:title="physics.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2952,-546.43 2878,-546.43 2878,-522.43 2952,-522.43 2952,-546.43"/>
+<text text-anchor="middle" x="2915" y="-532.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">physics.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~thermal_interface.f90&#45;&gt;sourcefile~physics.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge7" class="edge">
+<title>sourcefile~thermal_interface.f90&#45;&gt;sourcefile~physics.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M5025.84,-992.39C5003.52,-942.41 4909.89,-753.01 4765,-734.43"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M4763,-734.43C4642.72,-686.64 4610.74,-675.22 4483,-654.43"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M4481,-654.43C4445.03,-644.19 4437.83,-636.16 4402,-625.43 4189.42,-561.76 4131.91,-540.43 3910,-540.43 3910,-540.43 3910,-540.43 3399,-540.43 3253.89,-540.43 3202.67,-604.56 3072.5,-540.43"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3070.5,-540.43C3037.14,-523.46 2994.3,-523.2 2962.19,-526.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2961.7,-523.01 2952.17,-527.64 2962.51,-529.96 2961.7,-523.01"/>
+</g>
+<!-- sourcefile~control.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge8" class="edge">
+<title>sourcefile~control.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3682,-1062.43C3624.47,-1068.5 3615.28,-1103.35 3557.5,-1100.43"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3555.5,-1100.43C3484.66,-1096.84 3471.78,-1055.87 3401,-1060.43"/>
+</g>
+<!-- sourcefile~control.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge9" class="edge">
+<title>sourcefile~control.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3908,-930.43C3859.68,-928.71 3847.79,-940.82 3799.5,-938.43"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3797.5,-938.43C3744.08,-935.77 3737.2,-892.86 3684,-898.43"/>
+</g>
+<!-- sourcefile~control.f90&#45;&gt;sourcefile~linalg.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge11" class="edge">
+<title>sourcefile~control.f90&#45;&gt;sourcefile~linalg.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3979.52,-929.07C3959.18,-930.27 3933.15,-931.25 3910,-930.43"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3908,-930.43C3869,-929.04 3874.02,-892.43 3838,-877.43 3520.78,-745.27 3396.57,-654.08 3072.5,-768.43"/>
+</g>
+<!-- sourcefile~iteration.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node13" class="node">
+<title>sourcefile~iteration.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node13"><a xlink:href="../sourcefile/iteration.f90.html" xlink:title="iteration.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="3723,-950.43 3643,-950.43 3643,-926.43 3723,-926.43 3723,-950.43"/>
+<text text-anchor="middle" x="3683" y="-936.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iteration.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~control.f90&#45;&gt;sourcefile~iteration.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge10" class="edge">
+<title>sourcefile~control.f90&#45;&gt;sourcefile~iteration.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3797.5,-938.43C3776.47,-937.38 3753.21,-937.21 3733.26,-937.36"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3733.12,-933.86 3723.16,-937.47 3733.19,-940.86 3733.12,-933.86"/>
+</g>
+<!-- sourcefile~openmp.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node18" class="node">
+<title>sourcefile~openmp.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node18"><a xlink:href="../sourcefile/openmp.f90.html" xlink:title="openmp.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="3838,-910.43 3759,-910.43 3759,-886.43 3838,-886.43 3838,-910.43"/>
+<text text-anchor="middle" x="3798.5" y="-896.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">openmp.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~control.f90&#45;&gt;sourcefile~openmp.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge12" class="edge">
+<title>sourcefile~control.f90&#45;&gt;sourcefile~openmp.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3908,-930.43C3883.26,-929.55 3856.58,-921.78 3835.87,-914.12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3837.1,-910.84 3826.51,-910.51 3834.58,-917.37 3837.1,-910.84"/>
+</g>
+<!-- sourcefile~output.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node19" class="node">
+<title>sourcefile~output.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node19"><a xlink:href="../sourcefile/output.f90.html" xlink:title="output.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="3944,-990.43 3874,-990.43 3874,-966.43 3944,-966.43 3944,-990.43"/>
+<text text-anchor="middle" x="3909" y="-976.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">output.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~control.f90&#45;&gt;sourcefile~output.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge13" class="edge">
+<title>sourcefile~control.f90&#45;&gt;sourcefile~output.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3990.65,-938.49C3976.7,-945.39 3958.99,-954.16 3943.72,-961.73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3941.99,-958.68 3934.58,-966.25 3945.1,-964.95 3941.99,-958.68"/>
+</g>
+<!-- sourcefile~time.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node23" class="node">
+<title>sourcefile~time.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node23"><a xlink:href="../sourcefile/time.f90.html" xlink:title="time.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="3828,-990.43 3769,-990.43 3769,-966.43 3828,-966.43 3828,-990.43"/>
+<text text-anchor="middle" x="3798.5" y="-976.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">time.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~control.f90&#45;&gt;sourcefile~time.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge14" class="edge">
+<title>sourcefile~control.f90&#45;&gt;sourcefile~time.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3908,-930.43C3892.07,-929.86 3855.75,-947.52 3829.52,-961.58"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3827.82,-958.51 3820.71,-966.36 3831.16,-964.66 3827.82,-958.51"/>
+</g>
+<!-- sourcefile~time_profiler.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node24" class="node">
+<title>sourcefile~time_profiler.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node24"><a xlink:href="../sourcefile/time_profiler.f90.html" xlink:title="time_profiler.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="3607,-1072.43 3506,-1072.43 3506,-1048.43 3607,-1048.43 3607,-1072.43"/>
+<text text-anchor="middle" x="3556.5" y="-1058.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">time_profiler.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~control.f90&#45;&gt;sourcefile~time_profiler.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge15" class="edge">
+<title>sourcefile~control.f90&#45;&gt;sourcefile~time_profiler.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3996.78,-938.48C3991.13,-942.6 3985.07,-947.43 3980,-952.43 3961.26,-970.89 3965.45,-984.18 3944,-999.43 3847.09,-1068.32 3802.6,-1054.03 3684,-1062.43"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3682,-1062.43C3660.94,-1064.65 3637.77,-1064.88 3617.19,-1064.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3617.11,-1060.81 3607,-1063.97 3616.88,-1067.81 3617.11,-1060.81"/>
+</g>
+<!-- sourcefile~constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node9" class="node">
+<title>sourcefile~constants.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node9"><a xlink:href="../sourcefile/constants.f90.html" xlink:title="constants.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="559,-457.43 473,-457.43 473,-433.43 559,-433.43 559,-457.43"/>
+<text text-anchor="middle" x="516" y="-443.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">constants.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge16" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~constants.f90</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M1865.3,-484.59C1828.86,-524.58 1704.66,-649.43 1574,-649.43 1574,-649.43 1574,-649.43 1094.5,-649.43 963.61,-649.43 928.64,-673.6 800,-649.43"/>
+</g>
+<!-- sourcefile~interop.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node12" class="node">
+<title>sourcefile~interop.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node12"><a xlink:href="../sourcefile/interop.f90.html" xlink:title="interop.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1768.5,-197.43 1695.5,-197.43 1695.5,-173.43 1768.5,-173.43 1768.5,-197.43"/>
+<text text-anchor="middle" x="1732" y="-183.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interop.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~interop.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge17" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~interop.f90</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M1848,-469.18C1835.48,-466.38 1821.45,-461.15 1812,-451.43 1777.37,-415.8 1747.26,-264.92 1736.87,-207.62"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="1740.26,-206.7 1735.06,-197.47 1733.37,-207.93 1740.26,-206.7"/>
+</g>
+<!-- sourcefile~memory.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node16" class="node">
+<title>sourcefile~memory.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node16"><a xlink:href="../sourcefile/memory.f90.html" xlink:title="memory.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1135,-425.43 1056,-425.43 1056,-401.43 1135,-401.43 1135,-425.43"/>
+<text text-anchor="middle" x="1095.5" y="-411.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">memory.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~memory.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge18" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~memory.f90</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M1731,-413.43C1620.72,-385.19 1274.91,-402.55 1145.78,-410.28"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="1145.18,-406.81 1135.41,-410.91 1145.61,-413.8 1145.18,-406.81"/>
+</g>
+<!-- sourcefile~types.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node26" class="node">
+<title>sourcefile~types.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node26"><a xlink:href="../sourcefile/types.f90.html" xlink:title="types.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1435,-259.43 1371,-259.43 1371,-235.43 1435,-235.43 1435,-259.43"/>
+<text text-anchor="middle" x="1403" y="-245.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">types.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~types.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge19" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~types.f90</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M1847.99,-464.11C1836.69,-460.53 1823.61,-456.1 1812,-451.43 1775.86,-436.88 1770.89,-422.5 1733,-413.43"/>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M1731,-413.43C1687.86,-403.1 1690.2,-374.97 1652,-352.43 1571.08,-304.68 1544.91,-304.13 1458,-268.43 1453.75,-266.68 1449.3,-264.89 1444.85,-263.12"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="1445.79,-259.73 1435.2,-259.33 1443.23,-266.25 1445.79,-259.73"/>
+</g>
+<!-- sourcefile~utils.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node27" class="node">
+<title>sourcefile~utils.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node27"><a xlink:href="../sourcefile/utils.f90.html" xlink:title="utils.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1601.5,-465.43 1544.5,-465.43 1544.5,-441.43 1601.5,-441.43 1601.5,-465.43"/>
+<text text-anchor="middle" x="1573" y="-451.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">utils.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~utils.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge20" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~utils.f90</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M1731,-413.43C1719.38,-410.64 1654.05,-429.17 1611.4,-441.95"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="1610.19,-438.66 1601.62,-444.9 1612.21,-445.36 1610.19,-438.66"/>
+</g>
+<!-- sourcefile~validation.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node28" class="node">
+<title>sourcefile~validation.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node28"><a xlink:href="../sourcefile/validation.f90.html" xlink:title="validation.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1776,-543.43 1688,-543.43 1688,-519.43 1776,-519.43 1776,-543.43"/>
+<text text-anchor="middle" x="1732" y="-529.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">validation.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~validation.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge21" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~validation.f90</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M1847.75,-484.08C1826,-493.06 1795.7,-505.56 1771.7,-515.46"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="1770.08,-512.34 1762.18,-519.39 1772.75,-518.81 1770.08,-512.34"/>
+</g>
+<!-- sourcefile~input_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node11" class="node">
+<title>sourcefile~input_interface.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node11"><a xlink:href="../sourcefile/input_interface.f90.html" xlink:title="input_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="3294,-949.43 3179,-949.43 3179,-925.43 3294,-925.43 3294,-949.43"/>
+<text text-anchor="middle" x="3236.5" y="-935.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">input_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~input.f90&#45;&gt;sourcefile~input_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge22" class="edge">
+<title>sourcefile~input.f90&#45;&gt;sourcefile~input_interface.f90</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M3525.3,-937.43C3474.86,-937.43 3372.34,-937.43 3304.28,-937.43"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="3304.08,-933.93 3294.08,-937.43 3304.08,-940.93 3304.08,-933.93"/>
+</g>
+<!-- sourcefile~translator_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node25" class="node">
+<title>sourcefile~translator_interface.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node25"><a xlink:href="../sourcefile/translator_interface.f90.html" xlink:title="translator_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="3470,-1027.43 3330,-1027.43 3330,-1003.43 3470,-1003.43 3470,-1027.43"/>
+<text text-anchor="middle" x="3400" y="-1013.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">translator_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~input.f90&#45;&gt;sourcefile~translator_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge23" class="edge">
+<title>sourcefile~input.f90&#45;&gt;sourcefile~translator_interface.f90</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M3531.7,-949.44C3505.5,-962.67 3463.22,-984.02 3433.87,-998.83"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="3432.18,-995.76 3424.83,-1003.4 3435.33,-1002.01 3432.18,-995.76"/>
+</g>
+<!-- sourcefile~matrix_operations.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node15" class="node">
+<title>sourcefile~matrix_operations.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node15"><a xlink:href="../sourcefile/matrix_operations.f90.html" xlink:title="matrix_operations.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2110,-740.43 1978,-740.43 1978,-716.43 2110,-716.43 2110,-740.43"/>
+<text text-anchor="middle" x="2044" y="-726.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_operations.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~linalg.f90&#45;&gt;sourcefile~matrix_operations.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge24" class="edge">
+<title>sourcefile~linalg.f90&#45;&gt;sourcefile~matrix_operations.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M2171.78,-728.43C2156.91,-728.43 2138.42,-728.43 2120.2,-728.43"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2120.13,-724.93 2110.13,-728.43 2120.13,-731.93 2120.13,-724.93"/>
+</g>
+<!-- sourcefile~vector_operations.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node29" class="node">
+<title>sourcefile~vector_operations.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node29"><a xlink:href="../sourcefile/vector_operations.f90.html" xlink:title="vector_operations.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2109.5,-660.43 1978.5,-660.43 1978.5,-636.43 2109.5,-636.43 2109.5,-660.43"/>
+<text text-anchor="middle" x="2044" y="-646.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_operations.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~linalg.f90&#45;&gt;sourcefile~vector_operations.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge25" class="edge">
+<title>sourcefile~linalg.f90&#45;&gt;sourcefile~vector_operations.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M2179,-716.28C2152.05,-702.63 2108.14,-680.4 2077.98,-665.12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2079.21,-661.82 2068.7,-660.43 2076.05,-668.07 2079.21,-661.82"/>
+</g>
+<!-- sourcefile~main_base.f90&#45;&gt;sourcefile~control.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge26" class="edge">
+<title>sourcefile~main_base.f90&#45;&gt;sourcefile~control.f90</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M4838.89,-1016.48C4745.63,-1040.43 4522.98,-1091.18 4333.5,-1084.43"/>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M4331.5,-1084.43C4269.63,-1083.46 4108.8,-985.12 4044.32,-944.09"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="4045.84,-940.91 4035.53,-938.47 4042.07,-946.81 4045.84,-940.91"/>
+</g>
+<!-- sourcefile~main_base.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge27" class="edge">
+<title>sourcefile~main_base.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M4331.5,-1084.43C4252.82,-1081.75 4237.17,-1119.56 4158.5,-1122.43"/>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M4156.5,-1122.43C4101.54,-1124.43 3963.02,-1085.83 3910,-1100.43"/>
+</g>
+<!-- sourcefile~domain.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node10" class="node">
+<title>sourcefile~domain.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node10"><a xlink:href="../sourcefile/domain.f90.html" xlink:title="domain.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="4802,-919.43 4726,-919.43 4726,-895.43 4802,-895.43 4802,-919.43"/>
+<text text-anchor="middle" x="4764" y="-905.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">domain.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~main_base.f90&#45;&gt;sourcefile~domain.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge28" class="edge">
+<title>sourcefile~main_base.f90&#45;&gt;sourcefile~domain.f90</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M4868.49,-992.14C4848.1,-975.45 4811.47,-945.47 4787.71,-926.01"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="4789.84,-923.24 4779.89,-919.61 4785.41,-928.65 4789.84,-923.24"/>
+</g>
+<!-- sourcefile~materials.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node14" class="node">
+<title>sourcefile~materials.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node14"><a xlink:href="../sourcefile/materials.f90.html" xlink:title="materials.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2643,-428.43 2558,-428.43 2558,-404.43 2643,-404.43 2643,-428.43"/>
+<text text-anchor="middle" x="2600.5" y="-414.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">materials.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~physics.f90&#45;&gt;sourcefile~materials.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge29" class="edge">
+<title>sourcefile~physics.f90&#45;&gt;sourcefile~materials.f90</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M2765.5,-416.43C2730.55,-400.4 2686.84,-401.28 2653.34,-405.69"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="2652.68,-402.25 2643.29,-407.16 2653.69,-409.18 2652.68,-402.25"/>
+</g>
+<!-- sourcefile~models.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node17" class="node">
+<title>sourcefile~models.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node17"><a xlink:href="../sourcefile/models.f90.html" xlink:title="models.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2637.5,-546.43 2563.5,-546.43 2563.5,-522.43 2637.5,-522.43 2637.5,-546.43"/>
+<text text-anchor="middle" x="2600.5" y="-532.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">models.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~physics.f90&#45;&gt;sourcefile~models.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge30" class="edge">
+<title>sourcefile~physics.f90&#45;&gt;sourcefile~models.f90</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M2877.85,-534.43C2820.93,-534.43 2710.47,-534.43 2647.81,-534.43"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="2647.81,-530.93 2637.81,-534.43 2647.81,-537.93 2647.81,-530.93"/>
+</g>
+<!-- sourcefile~physics_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node20" class="node">
+<title>sourcefile~physics_base.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node20"><a xlink:href="../sourcefile/physics_base.f90.html" xlink:title="physics_base.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2096.5,-504.43 1991.5,-504.43 1991.5,-480.43 2096.5,-480.43 2096.5,-504.43"/>
+<text text-anchor="middle" x="2044" y="-490.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">physics_base.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~physics.f90&#45;&gt;sourcefile~physics_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge31" class="edge">
+<title>sourcefile~physics.f90&#45;&gt;sourcefile~physics_base.f90</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M2765.5,-416.43C2748.45,-408.61 2620.22,-455.3 2601.5,-456.43"/>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M2599.5,-456.43C2420.52,-467.17 2209.13,-481.29 2106.75,-488.22"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="2106.33,-484.74 2096.59,-488.91 2106.8,-491.72 2106.33,-484.74"/>
+</g>
+<!-- sourcefile~physics_constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node21" class="node">
+<title>sourcefile~physics_constants.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node21"><a xlink:href="../sourcefile/physics_constants.f90.html" xlink:title="physics_constants.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1942,-385.43 1812,-385.43 1812,-361.43 1942,-361.43 1942,-385.43"/>
+<text text-anchor="middle" x="1877" y="-371.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">physics_constants.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~physics.f90&#45;&gt;sourcefile~physics_constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge32" class="edge">
+<title>sourcefile~physics.f90&#45;&gt;sourcefile~physics_constants.f90</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M2906.87,-522.11C2894.12,-501.18 2865.42,-458.69 2830,-435.43 2805.73,-419.49 2793.89,-428.53 2767.5,-416.43"/>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M2765.5,-416.43C2634.11,-356.17 2632.88,-283.41 2498,-231.43 2351.46,-174.95 2302.98,-195.76 2146,-200.43 2071.23,-202.65 2042.16,-171.97 1978,-210.43 1924.61,-242.43 1895.78,-314.99 1884.18,-351.53"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="1880.79,-350.64 1881.24,-361.23 1887.49,-352.67 1880.79,-350.64"/>
+</g>
+<!-- sourcefile~physics_manager.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node22" class="node">
+<title>sourcefile~physics_manager.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node22"><a xlink:href="../sourcefile/physics_manager.f90.html" xlink:title="physics_manager.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2830,-468.43 2703,-468.43 2703,-444.43 2830,-444.43 2830,-468.43"/>
+<text text-anchor="middle" x="2766.5" y="-454.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">physics_manager.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~physics.f90&#45;&gt;sourcefile~physics_manager.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge33" class="edge">
+<title>sourcefile~physics.f90&#45;&gt;sourcefile~physics_manager.f90</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M2891.43,-522.41C2866.77,-509.28 2827.07,-488.14 2799.27,-473.34"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="2800.81,-470.2 2790.34,-468.58 2797.52,-476.37 2800.81,-470.2"/>
+</g>
+<!-- sourcefile~constants_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node35" class="node">
+<title>sourcefile~constants_base.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node35"><a xlink:href="../sourcefile/constants_base.f90.html" xlink:title="constants_base.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="117,-519.43 0,-519.43 0,-495.43 117,-495.43 117,-519.43"/>
+<text text-anchor="middle" x="58.5" y="-505.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">constants_base.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~constants.f90&#45;&gt;sourcefile~constants_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge34" class="edge">
+<title>sourcefile~constants.f90&#45;&gt;sourcefile~constants_base.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M379.5,-527.43C293.01,-540.29 192.16,-529.84 127.15,-519.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="127.46,-516.34 117.04,-518.24 126.37,-523.26 127.46,-516.34"/>
+</g>
+<!-- sourcefile~constants_parallel.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node36" class="node">
+<title>sourcefile~constants_parallel.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node36"><a xlink:href="../sourcefile/constants_parallel.f90.html" xlink:title="constants_parallel.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="286.5,-457.43 154.5,-457.43 154.5,-433.43 286.5,-433.43 286.5,-457.43"/>
+<text text-anchor="middle" x="220.5" y="-443.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">constants_parallel.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~constants.f90&#45;&gt;sourcefile~constants_parallel.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge35" class="edge">
+<title>sourcefile~constants.f90&#45;&gt;sourcefile~constants_parallel.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M503.15,-457.45C481.4,-478.34 432.62,-519.82 381.5,-527.43"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M379.5,-527.43C331.16,-534.62 332.07,-487.55 288,-466.43 283.96,-464.49 279.7,-462.67 275.37,-460.99"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="276.41,-457.64 265.82,-457.49 274.01,-464.22 276.41,-457.64"/>
+</g>
+<!-- sourcefile~constants_physical.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node37" class="node">
+<title>sourcefile~constants_physical.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node37"><a xlink:href="../sourcefile/constants_physical.f90.html" xlink:title="constants_physical.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="288,-499.43 153,-499.43 153,-475.43 288,-475.43 288,-499.43"/>
+<text text-anchor="middle" x="220.5" y="-485.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">constants_physical.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~constants.f90&#45;&gt;sourcefile~constants_physical.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge36" class="edge">
+<title>sourcefile~constants.f90&#45;&gt;sourcefile~constants_physical.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M379.5,-527.43C357.76,-530.66 304.23,-515.24 265.49,-502.62"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="266.59,-499.29 255.99,-499.48 264.39,-505.94 266.59,-499.29"/>
+</g>
+<!-- sourcefile~constants_solver.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node38" class="node">
+<title>sourcefile~constants_solver.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node38"><a xlink:href="../sourcefile/constants_solver.f90.html" xlink:title="constants_solver.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="281.5,-415.43 159.5,-415.43 159.5,-391.43 281.5,-391.43 281.5,-415.43"/>
+<text text-anchor="middle" x="220.5" y="-401.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">constants_solver.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~constants.f90&#45;&gt;sourcefile~constants_solver.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge37" class="edge">
+<title>sourcefile~constants.f90&#45;&gt;sourcefile~constants_solver.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M475.21,-433.35C463.04,-430.03 449.56,-426.71 437,-424.43 389,-415.69 334.27,-410.41 291.98,-407.33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="292.01,-403.83 281.79,-406.62 291.52,-410.81 292.01,-403.83"/>
+</g>
+<!-- sourcefile~constants_utils.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node39" class="node">
+<title>sourcefile~constants_utils.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node39"><a xlink:href="../sourcefile/constants_utils.f90.html" xlink:title="constants_utils.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="437,-457.43 324,-457.43 324,-433.43 437,-433.43 437,-457.43"/>
+<text text-anchor="middle" x="380.5" y="-443.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">constants_utils.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~constants.f90&#45;&gt;sourcefile~constants_utils.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge38" class="edge">
+<title>sourcefile~constants.f90&#45;&gt;sourcefile~constants_utils.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M472.76,-445.43C464.63,-445.43 455.95,-445.43 447.28,-445.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="447.15,-441.93 437.15,-445.43 447.15,-448.93 447.15,-441.93"/>
+</g>
+<!-- sourcefile~adjacency.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node30" class="node">
+<title>sourcefile~adjacency.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node30"><a xlink:href="../sourcefile/adjacency.f90.html" xlink:title="adjacency.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="4526,-1018.43 4438,-1018.43 4438,-994.43 4526,-994.43 4526,-1018.43"/>
+<text text-anchor="middle" x="4482" y="-1004.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">adjacency.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~domain.f90&#45;&gt;sourcefile~adjacency.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge39" class="edge">
+<title>sourcefile~domain.f90&#45;&gt;sourcefile~adjacency.f90</title>
+<path fill="none" stroke="#ff4800" stroke-dasharray="5,2" d="M4728.95,-919.47C4678.21,-937.4 4582.78,-971.15 4526.88,-990.91"/>
+<polygon fill="#ff4800" stroke="#ff4800" points="4525.52,-987.68 4517.25,-994.31 4527.85,-994.28 4525.52,-987.68"/>
+</g>
+<!-- sourcefile~domain_manager.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node44" class="node">
+<title>sourcefile~domain_manager.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node44"><a xlink:href="../sourcefile/domain_manager.f90.html" xlink:title="domain_manager.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="4690,-919.43 4562,-919.43 4562,-895.43 4690,-895.43 4690,-919.43"/>
+<text text-anchor="middle" x="4626" y="-905.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">domain_manager.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~domain.f90&#45;&gt;sourcefile~domain_manager.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge40" class="edge">
+<title>sourcefile~domain.f90&#45;&gt;sourcefile~domain_manager.f90</title>
+<path fill="none" stroke="#ff4800" stroke-dasharray="5,2" d="M4725.84,-907.43C4717.78,-907.43 4708.99,-907.43 4700.08,-907.43"/>
+<polygon fill="#ff4800" stroke="#ff4800" points="4700.01,-903.93 4690.01,-907.43 4700.01,-910.93 4700.01,-903.93"/>
+</g>
+<!-- sourcefile~fe.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node46" class="node">
+<title>sourcefile~fe.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node46"><a xlink:href="../sourcefile/fe.f90.html" xlink:title="fe.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="3098.5,-682.43 3044.5,-682.43 3044.5,-658.43 3098.5,-658.43 3098.5,-682.43"/>
+<text text-anchor="middle" x="3071.5" y="-668.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fe.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~domain.f90&#45;&gt;sourcefile~fe.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge41" class="edge">
+<title>sourcefile~domain.f90&#45;&gt;sourcefile~fe.f90</title>
+<path fill="none" stroke="#ff4800" stroke-dasharray="5,2" d="M4749.25,-895.25C4735.14,-883.2 4712.16,-864.81 4690,-852.43 4369.25,-673.19 4277.43,-578.43 3910,-578.43 3910,-578.43 3910,-578.43 3682,-578.43 3603.05,-578.43 3581.47,-579.27 3506,-602.43 3456.21,-617.7 3452.67,-647.93 3401,-654.43"/>
+<path fill="none" stroke="#ff4800" stroke-dasharray="5,2" d="M3399,-654.43C3294.1,-665.37 3169.44,-668.85 3108.99,-669.94"/>
+<polygon fill="#ff4800" stroke="#ff4800" points="3108.75,-666.45 3098.81,-670.12 3108.87,-673.45 3108.75,-666.45"/>
+</g>
+<!-- sourcefile~multicoloring.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node59" class="node">
+<title>sourcefile~multicoloring.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node59"><a xlink:href="../sourcefile/multicoloring.f90.html" xlink:title="multicoloring.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="4210.5,-782.43 4104.5,-782.43 4104.5,-758.43 4210.5,-758.43 4210.5,-782.43"/>
+<text text-anchor="middle" x="4157.5" y="-768.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">multicoloring.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~domain.f90&#45;&gt;sourcefile~multicoloring.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge42" class="edge">
+<title>sourcefile~domain.f90&#45;&gt;sourcefile~multicoloring.f90</title>
+<path fill="none" stroke="#ff4800" stroke-dasharray="5,2" d="M4725.99,-896.27C4714.5,-892.95 4701.76,-889.4 4690,-886.43 4521.35,-843.81 4320.27,-802.48 4220.71,-782.63"/>
+<polygon fill="#ff4800" stroke="#ff4800" points="4221.31,-779.18 4210.82,-780.67 4219.94,-786.05 4221.31,-779.18"/>
+</g>
+<!-- sourcefile~input_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge45" class="edge">
+<title>sourcefile~input_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ff9100" stroke-dasharray="5,2" d="M3178.89,-928.14C3147.53,-924.2 3107.84,-921.17 3072.5,-924.43"/>
+<path fill="none" stroke="#ff9100" stroke-dasharray="5,2" d="M3070.5,-924.43C3002.12,-930.72 2978.71,-896.45 2916,-924.43"/>
+</g>
+<!-- sourcefile~input_interface.f90&#45;&gt;sourcefile~physics.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge49" class="edge">
+<title>sourcefile~input_interface.f90&#45;&gt;sourcefile~physics.f90</title>
+<path fill="none" stroke="#ff9100" stroke-dasharray="5,2" d="M3235.53,-925.41C3234.94,-867.27 3223.55,-614.85 3072.5,-540.43"/>
+</g>
+<!-- sourcefile~basic_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node32" class="node">
+<title>sourcefile~basic_interface.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node32"><a xlink:href="../sourcefile/basic_interface.f90.html" xlink:title="basic_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="3129.5,-896.43 3013.5,-896.43 3013.5,-872.43 3129.5,-872.43 3129.5,-896.43"/>
+<text text-anchor="middle" x="3071.5" y="-882.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">basic_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~input_interface.f90&#45;&gt;sourcefile~basic_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge43" class="edge">
+<title>sourcefile~input_interface.f90&#45;&gt;sourcefile~basic_interface.f90</title>
+<path fill="none" stroke="#ff9100" stroke-dasharray="5,2" d="M3198.51,-925.4C3175.05,-917.77 3144.48,-907.83 3119.32,-899.65"/>
+<polygon fill="#ff9100" stroke="#ff9100" points="3120.21,-896.26 3109.62,-896.5 3118.05,-902.92 3120.21,-896.26"/>
+</g>
+<!-- sourcefile~conditions_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node33" class="node">
+<title>sourcefile~conditions_interface.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node33"><a xlink:href="../sourcefile/conditions_interface.f90.html" xlink:title="conditions_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="3143,-976.43 3000,-976.43 3000,-952.43 3143,-952.43 3143,-976.43"/>
+<text text-anchor="middle" x="3071.5" y="-962.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">conditions_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~input_interface.f90&#45;&gt;sourcefile~conditions_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge44" class="edge">
+<title>sourcefile~input_interface.f90&#45;&gt;sourcefile~conditions_interface.f90</title>
+<path fill="none" stroke="#ff9100" stroke-dasharray="5,2" d="M3178.95,-946.79C3170.53,-948.19 3161.72,-949.65 3152.93,-951.1"/>
+<polygon fill="#ff9100" stroke="#ff9100" points="3152.32,-947.66 3143.03,-952.74 3153.46,-954.56 3152.32,-947.66"/>
+</g>
+<!-- sourcefile~geometry_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node49" class="node">
+<title>sourcefile~geometry_interface.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node49"><a xlink:href="../sourcefile/geometry_interface.f90.html" xlink:title="geometry_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="3141.5,-1018.43 3001.5,-1018.43 3001.5,-994.43 3141.5,-994.43 3141.5,-1018.43"/>
+<text text-anchor="middle" x="3071.5" y="-1004.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">geometry_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~input_interface.f90&#45;&gt;sourcefile~geometry_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge46" class="edge">
+<title>sourcefile~input_interface.f90&#45;&gt;sourcefile~geometry_interface.f90</title>
+<path fill="none" stroke="#ff9100" stroke-dasharray="5,2" d="M3215.09,-949.45C3196.69,-959.93 3168.66,-975.05 3143,-985.43 3137.97,-987.46 3132.66,-989.4 3127.32,-991.21"/>
+<polygon fill="#ff9100" stroke="#ff9100" points="3126.12,-987.92 3117.69,-994.35 3128.29,-994.58 3126.12,-987.92"/>
+</g>
+<!-- sourcefile~input_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node53" class="node">
+<title>sourcefile~input_base.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node53"><a xlink:href="../sourcefile/input_base.f90.html" xlink:title="input_base.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2961.5,-1020.43 2868.5,-1020.43 2868.5,-996.43 2961.5,-996.43 2961.5,-1020.43"/>
+<text text-anchor="middle" x="2915" y="-1006.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">input_base.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~input_interface.f90&#45;&gt;sourcefile~input_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge47" class="edge">
+<title>sourcefile~input_interface.f90&#45;&gt;sourcefile~input_base.f90</title>
+<path fill="none" stroke="#ff9100" stroke-dasharray="5,2" d="M3070.5,-924.43C3038.19,-927.4 3029.06,-928.99 3000,-943.43 2975.95,-955.37 2952.08,-974.76 2935.97,-989.25"/>
+<polygon fill="#ff9100" stroke="#ff9100" points="2933.28,-986.98 2928.29,-996.33 2938.02,-992.13 2933.28,-986.98"/>
+</g>
+<!-- sourcefile~output_interface.f90~2 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node60" class="node">
+<title>sourcefile~output_interface.f90~2</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node60"><a xlink:href="../sourcefile/output_interface.f90~2.html" xlink:title="output_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="3133,-1060.43 3010,-1060.43 3010,-1036.43 3133,-1036.43 3133,-1060.43"/>
+<text text-anchor="middle" x="3071.5" y="-1046.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">output_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~input_interface.f90&#45;&gt;sourcefile~output_interface.f90~2 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge48" class="edge">
+<title>sourcefile~input_interface.f90&#45;&gt;sourcefile~output_interface.f90~2</title>
+<path fill="none" stroke="#ff9100" stroke-dasharray="5,2" d="M3226.35,-949.51C3211.14,-968.79 3178.75,-1006.45 3143,-1027.43 3139.84,-1029.28 3136.5,-1030.98 3133.07,-1032.54"/>
+<polygon fill="#ff9100" stroke="#ff9100" points="3131.72,-1029.31 3123.8,-1036.35 3134.38,-1035.79 3131.72,-1029.31"/>
+</g>
+<!-- sourcefile~memory_stats_wrapper.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node56" class="node">
+<title>sourcefile~memory_stats_wrapper.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node56"><a xlink:href="../sourcefile/memory_stats_wrapper.f90.html" xlink:title="memory_stats_wrapper.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1652,-124.43 1494,-124.43 1494,-100.43 1652,-100.43 1652,-124.43"/>
+<text text-anchor="middle" x="1573" y="-110.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">memory_stats_wrapper.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~interop.f90&#45;&gt;sourcefile~memory_stats_wrapper.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge50" class="edge">
+<title>sourcefile~interop.f90&#45;&gt;sourcefile~memory_stats_wrapper.f90</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M1709.13,-173.4C1693.41,-164.93 1671.63,-153.52 1652,-144.43 1640.05,-138.89 1626.87,-133.29 1614.8,-128.36"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="1615.98,-125.06 1605.4,-124.56 1613.36,-131.56 1615.98,-125.06"/>
+</g>
+<!-- sourcefile~signal_flag_wrapper.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node64" class="node">
+<title>sourcefile~signal_flag_wrapper.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node64"><a xlink:href="../sourcefile/signal_flag_wrapper.f90.html" xlink:title="signal_flag_wrapper.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1643,-71.43 1503,-71.43 1503,-47.43 1643,-47.43 1643,-71.43"/>
+<text text-anchor="middle" x="1573" y="-57.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">signal_flag_wrapper.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~interop.f90&#45;&gt;sourcefile~signal_flag_wrapper.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge51" class="edge">
+<title>sourcefile~interop.f90&#45;&gt;sourcefile~signal_flag_wrapper.f90</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M1723.49,-173.11C1710.92,-153.41 1683.85,-114.68 1652,-91.43 1643.31,-85.08 1633.18,-79.74 1623.15,-75.35"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="1624.2,-72 1613.62,-71.44 1621.54,-78.48 1624.2,-72"/>
+</g>
+<!-- sourcefile~system_info_wrapper.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node70" class="node">
+<title>sourcefile~system_info_wrapper.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node70"><a xlink:href="../sourcefile/system_info_wrapper.f90.html" xlink:title="system_info_wrapper.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1646,-385.43 1500,-385.43 1500,-361.43 1646,-361.43 1646,-385.43"/>
+<text text-anchor="middle" x="1573" y="-371.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">system_info_wrapper.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~interop.f90&#45;&gt;sourcefile~system_info_wrapper.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge52" class="edge">
+<title>sourcefile~interop.f90&#45;&gt;sourcefile~system_info_wrapper.f90</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M1720.94,-197.47C1694.64,-228.97 1623.61,-314.02 1590.91,-353.18"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="1587.9,-351.32 1584.18,-361.24 1593.28,-355.8 1587.9,-351.32"/>
+</g>
+<!-- sourcefile~vtk.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node74" class="node">
+<title>sourcefile~vtk.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node74"><a xlink:href="../sourcefile/vtk.f90.html" xlink:title="vtk.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1600,-177.43 1546,-177.43 1546,-153.43 1600,-153.43 1600,-177.43"/>
+<text text-anchor="middle" x="1573" y="-163.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~interop.f90&#45;&gt;sourcefile~vtk.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge53" class="edge">
+<title>sourcefile~interop.f90&#45;&gt;sourcefile~vtk.f90</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M1695.37,-180.89C1669.93,-177.65 1635.81,-173.3 1610.23,-170.04"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="1610.55,-166.55 1600.19,-168.76 1609.67,-173.5 1610.55,-166.55"/>
+</g>
+<!-- sourcefile~vtk_constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node75" class="node">
+<title>sourcefile~vtk_constants.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node75"><a xlink:href="../sourcefile/vtk_constants.f90.html" xlink:title="vtk_constants.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1456.5,-217.43 1349.5,-217.43 1349.5,-193.43 1456.5,-193.43 1456.5,-217.43"/>
+<text text-anchor="middle" x="1403" y="-203.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk_constants.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~interop.f90&#45;&gt;sourcefile~vtk_constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge54" class="edge">
+<title>sourcefile~interop.f90&#45;&gt;sourcefile~vtk_constants.f90</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M1695.38,-187.6C1640.51,-190.96 1534.55,-197.44 1466.66,-201.59"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="1466.28,-198.11 1456.52,-202.21 1466.71,-205.1 1466.28,-198.11"/>
+</g>
+<!-- sourcefile~iteration.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge55" class="edge">
+<title>sourcefile~iteration.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#daff00" stroke-dasharray="5,2" d="M3555.5,-979.43C3531.17,-985.43 3526.72,-992.34 3506,-1006.43 3488.78,-1018.14 3488.13,-1026.17 3470,-1036.43 3441.74,-1052.41 3433.4,-1058.34 3401,-1060.43"/>
+<path fill="none" stroke="#daff00" stroke-dasharray="5,2" d="M3399,-1060.43C3327.37,-1065.04 3308.88,-1052.93 3237.5,-1060.43"/>
+</g>
+<!-- sourcefile~iteration.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge56" class="edge">
+<title>sourcefile~iteration.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#daff00" stroke-dasharray="5,2" d="M3642.95,-938.11C3628.6,-938 3612.34,-937.87 3597.88,-937.75"/>
+<polygon fill="#daff00" stroke="#daff00" points="3597.75,-934.25 3587.72,-937.67 3597.69,-941.25 3597.75,-934.25"/>
+</g>
+<!-- sourcefile~iteration.f90&#45;&gt;sourcefile~linalg.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge57" class="edge">
+<title>sourcefile~iteration.f90&#45;&gt;sourcefile~linalg.f90</title>
+<path fill="none" stroke="#daff00" stroke-dasharray="5,2" d="M3647.88,-950.5C3622.99,-959.1 3588.36,-970.64 3557.5,-979.43"/>
+<path fill="none" stroke="#daff00" stroke-dasharray="5,2" d="M3555.5,-979.43C3463.92,-1005.5 3236.7,-880.36 3143,-863.43 3043.37,-845.42 3016.52,-832.4 2916,-844.43"/>
+</g>
+<!-- sourcefile~materials.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge58" class="edge">
+<title>sourcefile~materials.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#91ff00" stroke-dasharray="5,2" d="M2591.11,-428.71C2569.03,-460.9 2510.19,-545.92 2498,-555.43 2422.38,-614.41 2384.47,-594.94 2298,-636.43 2255.3,-656.91 2252.28,-685.73 2205,-688.43"/>
+</g>
+<!-- sourcefile~density_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node43" class="node">
+<title>sourcefile~density_interface.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node43"><a xlink:href="../sourcefile/density_interface.f90.html" xlink:title="density_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2461.5,-306.43 2334.5,-306.43 2334.5,-282.43 2461.5,-282.43 2461.5,-306.43"/>
+<text text-anchor="middle" x="2398" y="-292.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">density_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~materials.f90&#45;&gt;sourcefile~density_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge59" class="edge">
+<title>sourcefile~materials.f90&#45;&gt;sourcefile~density_interface.f90</title>
+<path fill="none" stroke="#91ff00" stroke-dasharray="5,2" d="M2590.26,-404.39C2573.91,-383.97 2537.86,-342.57 2498,-320.43 2489.7,-315.81 2480.55,-311.99 2471.27,-308.84"/>
+<polygon fill="#91ff00" stroke="#91ff00" points="2472.17,-305.45 2461.58,-305.78 2470.06,-312.13 2472.17,-305.45"/>
+</g>
+<!-- sourcefile~heat_capacity_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node52" class="node">
+<title>sourcefile~heat_capacity_interface.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node52"><a xlink:href="../sourcefile/heat_capacity_interface.f90.html" xlink:title="heat_capacity_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2479.5,-264.43 2316.5,-264.43 2316.5,-240.43 2479.5,-240.43 2479.5,-264.43"/>
+<text text-anchor="middle" x="2398" y="-250.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">heat_capacity_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~materials.f90&#45;&gt;sourcefile~heat_capacity_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge60" class="edge">
+<title>sourcefile~materials.f90&#45;&gt;sourcefile~heat_capacity_interface.f90</title>
+<path fill="none" stroke="#91ff00" stroke-dasharray="5,2" d="M2594.54,-404.11C2582.55,-376.02 2549.14,-307.03 2498,-273.43 2495.08,-271.51 2492.03,-269.77 2488.86,-268.18"/>
+<polygon fill="#91ff00" stroke="#91ff00" points="2490.27,-264.97 2479.71,-264.1 2487.42,-271.37 2490.27,-264.97"/>
+</g>
+<!-- sourcefile~materials_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node54" class="node">
+<title>sourcefile~materials_base.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node54"><a xlink:href="../sourcefile/materials_base.f90.html" xlink:title="materials_base.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2262,-352.43 2146,-352.43 2146,-328.43 2262,-328.43 2262,-352.43"/>
+<text text-anchor="middle" x="2204" y="-338.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">materials_base.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~materials.f90&#45;&gt;sourcefile~materials_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge61" class="edge">
+<title>sourcefile~materials.f90&#45;&gt;sourcefile~materials_base.f90</title>
+<path fill="none" stroke="#91ff00" stroke-dasharray="5,2" d="M2585.22,-404.2C2566.58,-389.07 2532.28,-364.03 2498,-353.43 2423.27,-330.32 2332.73,-330.26 2272.26,-333.91"/>
+<polygon fill="#91ff00" stroke="#91ff00" points="2271.82,-330.43 2262.07,-334.58 2272.28,-337.42 2271.82,-330.43"/>
+</g>
+<!-- sourcefile~specific_heat_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node66" class="node">
+<title>sourcefile~specific_heat_interface.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node66"><a xlink:href="../sourcefile/specific_heat_interface.f90.html" xlink:title="specific_heat_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2477,-428.43 2319,-428.43 2319,-404.43 2477,-404.43 2477,-428.43"/>
+<text text-anchor="middle" x="2398" y="-414.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">specific_heat_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~materials.f90&#45;&gt;sourcefile~specific_heat_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge62" class="edge">
+<title>sourcefile~materials.f90&#45;&gt;sourcefile~specific_heat_interface.f90</title>
+<path fill="none" stroke="#91ff00" stroke-dasharray="5,2" d="M2557.96,-416.43C2537.49,-416.43 2511.99,-416.43 2487.44,-416.43"/>
+<polygon fill="#91ff00" stroke="#91ff00" points="2487.36,-412.93 2477.36,-416.43 2487.36,-419.93 2487.36,-412.93"/>
+</g>
+<!-- sourcefile~thermal_conductivity_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node71" class="node">
+<title>sourcefile~thermal_conductivity_interface.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node71"><a xlink:href="../sourcefile/thermal_conductivity_interface.f90.html" xlink:title="thermal_conductivity_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2498,-386.43 2298,-386.43 2298,-362.43 2498,-362.43 2498,-386.43"/>
+<text text-anchor="middle" x="2398" y="-372.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">thermal_conductivity_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~materials.f90&#45;&gt;sourcefile~thermal_conductivity_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge63" class="edge">
+<title>sourcefile~materials.f90&#45;&gt;sourcefile~thermal_conductivity_interface.f90</title>
+<path fill="none" stroke="#91ff00" stroke-dasharray="5,2" d="M2557.96,-407.72C2531.57,-402.2 2496.82,-394.92 2466.54,-388.57"/>
+<polygon fill="#91ff00" stroke="#91ff00" points="2466.96,-385.09 2456.46,-386.46 2465.53,-391.94 2466.96,-385.09"/>
+</g>
+<!-- sourcefile~matrix_operations.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge64" class="edge">
+<title>sourcefile~matrix_operations.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M1999.25,-716.43C1991.51,-712.85 1984.02,-708.27 1978,-702.43 1916.67,-642.89 1890.6,-539.41 1881.77,-494.39"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="1885.2,-493.7 1879.93,-484.51 1878.32,-494.98 1885.2,-493.7"/>
+</g>
+<!-- sourcefile~models.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge65" class="edge">
+<title>sourcefile~models.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#00ff48" stroke-dasharray="5,2" d="M2397,-650.43C2355.06,-661.94 2248.41,-685.66 2205,-688.43"/>
+</g>
+<!-- sourcefile~gcc_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node48" class="node">
+<title>sourcefile~gcc_interface.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node48"><a xlink:href="../sourcefile/gcc_interface.f90.html" xlink:title="gcc_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2257.5,-588.43 2150.5,-588.43 2150.5,-564.43 2257.5,-564.43 2257.5,-588.43"/>
+<text text-anchor="middle" x="2204" y="-574.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gcc_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~models.f90&#45;&gt;sourcefile~gcc_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge66" class="edge">
+<title>sourcefile~models.f90&#45;&gt;sourcefile~gcc_interface.f90</title>
+<path fill="none" stroke="#00ff48" stroke-dasharray="5,2" d="M2563.06,-543.19C2543.82,-547.5 2519.75,-552.41 2498,-555.43 2418.97,-566.38 2327.11,-571.79 2267.61,-574.34"/>
+<polygon fill="#00ff48" stroke="#00ff48" points="2267.46,-570.84 2257.62,-574.75 2267.75,-577.84 2267.46,-570.84"/>
+</g>
+<!-- sourcefile~hcf_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node51" class="node">
+<title>sourcefile~hcf_interface.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node51"><a xlink:href="../sourcefile/hcf_interface.f90.html" xlink:title="hcf_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2256.5,-630.43 2151.5,-630.43 2151.5,-606.43 2256.5,-606.43 2256.5,-630.43"/>
+<text text-anchor="middle" x="2204" y="-616.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hcf_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~models.f90&#45;&gt;sourcefile~hcf_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge67" class="edge">
+<title>sourcefile~models.f90&#45;&gt;sourcefile~hcf_interface.f90</title>
+<path fill="none" stroke="#00ff48" stroke-dasharray="5,2" d="M2586.22,-546.62C2559.3,-571.31 2500.59,-625.06 2498,-626.43 2457.99,-647.62 2442.66,-638.44 2399,-650.43"/>
+<path fill="none" stroke="#00ff48" stroke-dasharray="5,2" d="M2397,-650.43C2344.13,-664.94 2281.15,-648.2 2242.12,-634"/>
+<polygon fill="#00ff48" stroke="#00ff48" points="2243.32,-630.71 2232.73,-630.46 2240.85,-637.26 2243.32,-630.71"/>
+</g>
+<!-- sourcefile~phase_systems.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node61" class="node">
+<title>sourcefile~phase_systems.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node61"><a xlink:href="../sourcefile/phase_systems.f90.html" xlink:title="phase_systems.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2455.5,-546.43 2340.5,-546.43 2340.5,-522.43 2455.5,-522.43 2455.5,-546.43"/>
+<text text-anchor="middle" x="2398" y="-532.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">phase_systems.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~models.f90&#45;&gt;sourcefile~phase_systems.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge68" class="edge">
+<title>sourcefile~models.f90&#45;&gt;sourcefile~phase_systems.f90</title>
+<path fill="none" stroke="#00ff48" stroke-dasharray="5,2" d="M2563.19,-534.43C2536.21,-534.43 2498.61,-534.43 2466.21,-534.43"/>
+<polygon fill="#00ff48" stroke="#00ff48" points="2465.89,-530.93 2455.89,-534.43 2465.89,-537.93 2465.89,-530.93"/>
+</g>
+<!-- sourcefile~vaporization.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node72" class="node">
+<title>sourcefile~vaporization.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node72"><a xlink:href="../sourcefile/vaporization.f90.html" xlink:title="vaporization.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2254.5,-546.43 2153.5,-546.43 2153.5,-522.43 2254.5,-522.43 2254.5,-546.43"/>
+<text text-anchor="middle" x="2204" y="-532.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vaporization.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~models.f90&#45;&gt;sourcefile~vaporization.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge69" class="edge">
+<title>sourcefile~models.f90&#45;&gt;sourcefile~vaporization.f90</title>
+<path fill="none" stroke="#00ff48" stroke-dasharray="5,2" d="M2563.14,-525.03C2543.92,-520.54 2519.84,-515.66 2498,-513.43 2409.57,-504.37 2386.34,-503.58 2298,-513.43 2285.28,-514.84 2271.76,-517.32 2259.08,-520.09"/>
+<polygon fill="#00ff48" stroke="#00ff48" points="2258.1,-516.72 2249.13,-522.36 2259.65,-523.55 2258.1,-516.72"/>
+</g>
+<!-- sourcefile~openmp.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge70" class="edge">
+<title>sourcefile~openmp.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M3758.78,-896.44C3736.8,-895.8 3708.79,-895.83 3684,-898.43"/>
+</g>
+<!-- sourcefile~output.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge71" class="edge">
+<title>sourcefile~output.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#00ffda" stroke-dasharray="5,2" d="M3873.74,-989.87C3862.46,-993.32 3849.78,-996.87 3838,-999.43 3770.49,-1014.06 3752.8,-1014.22 3684,-1020.43"/>
+</g>
+<!-- sourcefile~output.f90&#45;&gt;sourcefile~time.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge72" class="edge">
+<title>sourcefile~output.f90&#45;&gt;sourcefile~time.f90</title>
+<path fill="none" stroke="#00ffda" stroke-dasharray="5,2" d="M3873.97,-978.43C3862.74,-978.43 3850.16,-978.43 3838.58,-978.43"/>
+<polygon fill="#00ffda" stroke="#00ffda" points="3838.3,-974.93 3828.3,-978.43 3838.3,-981.93 3838.3,-974.93"/>
+</g>
+<!-- sourcefile~physics_base.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge73" class="edge">
+<title>sourcefile~physics_base.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#00daff" stroke-dasharray="5,2" d="M1991.25,-486.15C1966.93,-483.21 1938.46,-479.75 1916.15,-477.05"/>
+<polygon fill="#00daff" stroke="#00daff" points="1916.4,-473.56 1906.05,-475.83 1915.56,-480.5 1916.4,-473.56"/>
+</g>
+<!-- sourcefile~physics_base.f90&#45;&gt;sourcefile~physics_constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge74" class="edge">
+<title>sourcefile~physics_base.f90&#45;&gt;sourcefile~physics_constants.f90</title>
+<path fill="none" stroke="#00daff" stroke-dasharray="5,2" d="M2029.87,-480.36C2011.15,-463.46 1975.34,-432.24 1942,-409.43 1932.17,-402.7 1921,-396.09 1910.76,-390.41"/>
+<polygon fill="#00daff" stroke="#00daff" points="1912.15,-387.18 1901.7,-385.47 1908.81,-393.33 1912.15,-387.18"/>
+</g>
+<!-- sourcefile~physics_manager.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge75" class="edge">
+<title>sourcefile~physics_manager.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#0048ff" stroke-dasharray="5,2" d="M2756.97,-468.85C2735.24,-499.29 2674.36,-577.38 2601.5,-608.43"/>
+<path fill="none" stroke="#0048ff" stroke-dasharray="5,2" d="M2599.5,-608.43C2571.61,-620.31 2559.99,-611.82 2534,-627.43 2514.33,-639.24 2517.93,-653.06 2498,-664.43 2458.68,-686.86 2444.06,-684.02 2399,-688.43"/>
+<path fill="none" stroke="#0048ff" stroke-dasharray="5,2" d="M2397,-688.43C2312.07,-696.73 2290.15,-682.88 2205,-688.43"/>
+</g>
+<!-- sourcefile~physics_manager.f90&#45;&gt;sourcefile~materials.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge76" class="edge">
+<title>sourcefile~physics_manager.f90&#45;&gt;sourcefile~materials.f90</title>
+<path fill="none" stroke="#0048ff" stroke-dasharray="5,2" d="M2716.29,-444.42C2696.36,-439.56 2673.33,-433.94 2653.15,-429.02"/>
+<polygon fill="#0048ff" stroke="#0048ff" points="2653.74,-425.56 2643.19,-426.6 2652.08,-432.37 2653.74,-425.56"/>
+</g>
+<!-- sourcefile~physics_manager.f90&#45;&gt;sourcefile~models.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge77" class="edge">
+<title>sourcefile~physics_manager.f90&#45;&gt;sourcefile~models.f90</title>
+<path fill="none" stroke="#0048ff" stroke-dasharray="5,2" d="M2740.23,-468.44C2712.31,-481.73 2667.15,-503.2 2635.98,-518.03"/>
+<polygon fill="#0048ff" stroke="#0048ff" points="2634.32,-514.94 2626.79,-522.4 2637.33,-521.26 2634.32,-514.94"/>
+</g>
+<!-- sourcefile~physics_manager.f90&#45;&gt;sourcefile~physics_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge78" class="edge">
+<title>sourcefile~physics_manager.f90&#45;&gt;sourcefile~physics_base.f90</title>
+<path fill="none" stroke="#0048ff" stroke-dasharray="5,2" d="M2702.76,-454.67C2672.18,-454.26 2634.89,-454.42 2601.5,-456.43"/>
+</g>
+<!-- sourcefile~time.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge80" class="edge">
+<title>sourcefile~time.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M3775.71,-990.44C3753.45,-1001.76 3717.48,-1017.41 3684,-1020.43"/>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M3682,-1020.43C3626.89,-1025.4 3611.69,-1009.24 3557.5,-1020.43"/>
+</g>
+<!-- sourcefile~time.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge81" class="edge">
+<title>sourcefile~time.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M3778.22,-966.38C3771.92,-962.19 3765.01,-957.31 3759,-952.43 3727.13,-926.51 3724.85,-894.15 3684,-898.43"/>
+</g>
+<!-- sourcefile~ats.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node31" class="node">
+<title>sourcefile~ats.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node31"><a xlink:href="../sourcefile/ats.f90.html" xlink:title="ats.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="3710,-992.43 3656,-992.43 3656,-968.43 3710,-968.43 3710,-992.43"/>
+<text text-anchor="middle" x="3683" y="-978.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ats.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~time.f90&#45;&gt;sourcefile~ats.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge79" class="edge">
+<title>sourcefile~time.f90&#45;&gt;sourcefile~ats.f90</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M3768.86,-978.93C3754.24,-979.19 3736.29,-979.5 3720.67,-979.78"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="3720.23,-976.29 3710.3,-979.96 3720.36,-983.29 3720.23,-976.29"/>
+</g>
+<!-- sourcefile~time_profiler.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge82" class="edge">
+<title>sourcefile~time_profiler.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M3505.7,-1058.8C3475.4,-1058.22 3435.93,-1058.18 3401,-1060.43"/>
+</g>
+<!-- sourcefile~translator_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge83" class="edge">
+<title>sourcefile~translator_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#9100ff" stroke-dasharray="5,2" d="M3364.87,-1027.51C3332.53,-1038.33 3282.38,-1053.53 3237.5,-1060.43"/>
+<path fill="none" stroke="#9100ff" stroke-dasharray="5,2" d="M3235.5,-1060.43C3131.97,-1076.33 3103.96,-1082.22 3000,-1069.43 2961.81,-1064.72 2954.41,-1050.86 2916,-1048.43"/>
+</g>
+<!-- sourcefile~translator_interface.f90&#45;&gt;sourcefile~input_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge84" class="edge">
+<title>sourcefile~translator_interface.f90&#45;&gt;sourcefile~input_interface.f90</title>
+<path fill="none" stroke="#9100ff" stroke-dasharray="5,2" d="M3363.83,-1003.35C3352.85,-999.26 3340.79,-994.46 3330,-989.43 3307.82,-979.09 3283.75,-965.47 3265.73,-954.77"/>
+<polygon fill="#9100ff" stroke="#9100ff" points="3267.27,-951.62 3256.89,-949.47 3263.67,-957.62 3267.27,-951.62"/>
+</g>
+<!-- sourcefile~config_bc.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node34" class="node">
+<title>sourcefile~config_bc.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node34"><a xlink:href="../sourcefile/config_bc.f90.html" xlink:title="config_bc.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1292.5,-465.43 1206.5,-465.43 1206.5,-441.43 1292.5,-441.43 1292.5,-465.43"/>
+<text text-anchor="middle" x="1249.5" y="-451.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">config_bc.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~config_bc.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge85" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~config_bc.f90</title>
+<path fill="none" stroke="#da00ff" stroke-dasharray="5,2" d="M1370.74,-254.13C1362.39,-257.26 1354.03,-261.81 1348,-268.43 1308.77,-311.47 1342.05,-344.54 1312,-394.43 1302.61,-410.02 1288.03,-424.25 1275.43,-434.83"/>
+<polygon fill="#da00ff" stroke="#da00ff" points="1273.09,-432.23 1267.51,-441.23 1277.49,-437.67 1273.09,-432.23"/>
+</g>
+<!-- sourcefile~coordinate.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node40" class="node">
+<title>sourcefile~coordinate.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node40"><a xlink:href="../sourcefile/coordinate.f90.html" xlink:title="coordinate.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1142,-95.43 1049,-95.43 1049,-71.43 1142,-71.43 1142,-95.43"/>
+<text text-anchor="middle" x="1095.5" y="-81.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">coordinate.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~coordinate.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge86" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~coordinate.f90</title>
+<path fill="none" stroke="#da00ff" stroke-dasharray="5,2" d="M1370.85,-241.32C1362.3,-238.21 1353.8,-233.51 1348,-226.43 1289.09,-154.54 1383.15,-80.22 1312,-20.43 1269.47,15.32 1240.01,-3.79 1187,-20.43 1159.69,-29 1133.4,-49.05 1116.27,-64.25"/>
+<polygon fill="#da00ff" stroke="#da00ff" points="1113.64,-61.91 1108.62,-71.25 1118.36,-67.07 1113.64,-61.91"/>
+</g>
+<!-- sourcefile~coordinate_array.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node41" class="node">
+<title>sourcefile~coordinate_array.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node41"><a xlink:href="../sourcefile/coordinate_array.f90.html" xlink:title="coordinate_array.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1312,-343.43 1187,-343.43 1187,-319.43 1312,-319.43 1312,-343.43"/>
+<text text-anchor="middle" x="1249.5" y="-329.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">coordinate_array.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~coordinate_array.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge87" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~coordinate_array.f90</title>
+<path fill="none" stroke="#da00ff" stroke-dasharray="5,2" d="M1370.96,-256.51C1363.08,-259.6 1354.89,-263.54 1348,-268.43 1327.94,-282.64 1332.35,-296.63 1312,-310.43 1309.59,-312.06 1307.05,-313.57 1304.41,-314.98"/>
+<polygon fill="#da00ff" stroke="#da00ff" points="1302.73,-311.9 1295.2,-319.36 1305.74,-318.23 1302.73,-311.9"/>
+</g>
+<!-- sourcefile~datetime.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node42" class="node">
+<title>sourcefile~datetime.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node42"><a xlink:href="../sourcefile/datetime.f90.html" xlink:title="datetime.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1137,-505.43 1054,-505.43 1054,-481.43 1137,-481.43 1137,-505.43"/>
+<text text-anchor="middle" x="1095.5" y="-491.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">datetime.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~datetime.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge88" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~datetime.f90</title>
+<path fill="none" stroke="#da00ff" stroke-dasharray="5,2" d="M1370.85,-253.53C1362.3,-256.65 1353.8,-261.35 1348,-268.43 1289.09,-340.32 1380.46,-411.56 1312,-474.43 1268.1,-514.75 1195.8,-512.37 1147.19,-504.75"/>
+<polygon fill="#da00ff" stroke="#da00ff" points="1147.64,-501.28 1137.2,-503.06 1146.47,-508.18 1147.64,-501.28"/>
+</g>
+<!-- sourcefile~gauss.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node47" class="node">
+<title>sourcefile~gauss.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node47"><a xlink:href="../sourcefile/gauss.f90.html" xlink:title="gauss.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1282.5,-217.43 1216.5,-217.43 1216.5,-193.43 1282.5,-193.43 1282.5,-217.43"/>
+<text text-anchor="middle" x="1249.5" y="-203.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gauss.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~gauss.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge89" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~gauss.f90</title>
+<path fill="none" stroke="#da00ff" stroke-dasharray="5,2" d="M1370.98,-238.83C1348.3,-232.54 1317.3,-223.94 1292.42,-217.05"/>
+<polygon fill="#da00ff" stroke="#da00ff" points="1293.1,-213.6 1282.53,-214.3 1291.23,-220.35 1293.1,-213.6"/>
+</g>
+<!-- sourcefile~graph.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node50" class="node">
+<title>sourcefile~graph.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node50"><a xlink:href="../sourcefile/graph.f90.html" xlink:title="graph.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1283,-301.43 1216,-301.43 1216,-277.43 1283,-277.43 1283,-301.43"/>
+<text text-anchor="middle" x="1249.5" y="-287.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">graph.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~graph.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge90" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~graph.f90</title>
+<path fill="none" stroke="#da00ff" stroke-dasharray="5,2" d="M1370.98,-256.03C1348.45,-262.27 1317.72,-270.79 1292.92,-277.67"/>
+<polygon fill="#da00ff" stroke="#da00ff" points="1291.75,-274.36 1283.05,-280.4 1293.62,-281.1 1291.75,-274.36"/>
+</g>
+<!-- sourcefile~matrix.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node55" class="node">
+<title>sourcefile~matrix.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node55"><a xlink:href="../sourcefile/matrix.f90.html" xlink:title="matrix.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1284.5,-259.43 1214.5,-259.43 1214.5,-235.43 1284.5,-235.43 1284.5,-259.43"/>
+<text text-anchor="middle" x="1249.5" y="-245.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~matrix.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge91" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~matrix.f90</title>
+<path fill="none" stroke="#da00ff" stroke-dasharray="5,2" d="M1370.98,-247.43C1349.01,-247.43 1319.22,-247.43 1294.77,-247.43"/>
+<polygon fill="#da00ff" stroke="#da00ff" points="1294.65,-243.93 1284.65,-247.43 1294.65,-250.93 1294.65,-243.93"/>
+</g>
+<!-- sourcefile~meteorology.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node57" class="node">
+<title>sourcefile~meteorology.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node57"><a xlink:href="../sourcefile/meteorology.f90.html" xlink:title="meteorology.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1300,-385.43 1199,-385.43 1199,-361.43 1300,-361.43 1300,-385.43"/>
+<text text-anchor="middle" x="1249.5" y="-371.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">meteorology.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~meteorology.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge92" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~meteorology.f90</title>
+<path fill="none" stroke="#da00ff" stroke-dasharray="5,2" d="M1370.98,-254.74C1362.73,-257.87 1354.36,-262.27 1348,-268.43 1318.8,-296.65 1341.79,-324.81 1312,-352.43 1310.69,-353.64 1309.31,-354.78 1307.87,-355.86"/>
+<polygon fill="#da00ff" stroke="#da00ff" points="1305.71,-353.08 1299.07,-361.34 1309.41,-359.02 1305.71,-353.08"/>
+</g>
+<!-- sourcefile~physics_info.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node62" class="node">
+<title>sourcefile~physics_info.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node62"><a xlink:href="../sourcefile/physics_info.f90.html" xlink:title="physics_info.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1299,-95.43 1200,-95.43 1200,-71.43 1299,-71.43 1299,-95.43"/>
+<text text-anchor="middle" x="1249.5" y="-81.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">physics_info.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~physics_info.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge93" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~physics_info.f90</title>
+<path fill="none" stroke="#da00ff" stroke-dasharray="5,2" d="M1370.83,-240.64C1362.48,-237.52 1354.1,-232.98 1348,-226.43 1310.95,-186.59 1348.47,-149.8 1312,-109.43 1308.95,-106.04 1305.38,-103.09 1301.53,-100.51"/>
+<polygon fill="#da00ff" stroke="#da00ff" points="1303.15,-97.4 1292.74,-95.43 1299.65,-103.46 1303.15,-97.4"/>
+</g>
+<!-- sourcefile~pointer.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node63" class="node">
+<title>sourcefile~pointer.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node63"><a xlink:href="../sourcefile/pointer.f90.html" xlink:title="pointer.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1285.5,-175.43 1213.5,-175.43 1213.5,-151.43 1285.5,-151.43 1285.5,-175.43"/>
+<text text-anchor="middle" x="1249.5" y="-161.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pointer.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~pointer.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge94" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~pointer.f90</title>
+<path fill="none" stroke="#da00ff" stroke-dasharray="5,2" d="M1370.96,-238.34C1363.08,-235.25 1354.89,-231.31 1348,-226.43 1327.94,-212.21 1332.35,-198.22 1312,-184.43 1306.79,-180.9 1300.93,-177.91 1294.95,-175.39"/>
+<polygon fill="#da00ff" stroke="#da00ff" points="1296.13,-172.09 1285.54,-171.82 1293.64,-178.64 1296.13,-172.09"/>
+</g>
+<!-- sourcefile~solar.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node65" class="node">
+<title>sourcefile~solar.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node65"><a xlink:href="../sourcefile/solar.f90.html" xlink:title="solar.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1279.5,-545.43 1219.5,-545.43 1219.5,-521.43 1279.5,-521.43 1279.5,-545.43"/>
+<text text-anchor="middle" x="1249.5" y="-531.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solar.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~solar.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge95" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~solar.f90</title>
+<path fill="none" stroke="#da00ff" stroke-dasharray="5,2" d="M1370.75,-253.44C1362.19,-256.56 1353.72,-261.28 1348,-268.43 1280.9,-352.31 1377.88,-422.58 1312,-507.43 1306.21,-514.89 1297.87,-520.24 1289.19,-524.06"/>
+<polygon fill="#da00ff" stroke="#da00ff" points="1287.86,-520.82 1279.75,-527.63 1290.34,-527.37 1287.86,-520.82"/>
+</g>
+<!-- sourcefile~state.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node67" class="node">
+<title>sourcefile~state.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node67"><a xlink:href="../sourcefile/state.f90.html" xlink:title="state.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1280,-53.43 1219,-53.43 1219,-29.43 1280,-29.43 1280,-53.43"/>
+<text text-anchor="middle" x="1249.5" y="-39.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">state.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~state.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge96" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~state.f90</title>
+<path fill="none" stroke="#da00ff" stroke-dasharray="5,2" d="M1370.76,-241.06C1362.31,-237.94 1353.89,-233.3 1348,-226.43 1299.47,-169.74 1361.7,-118.09 1312,-62.43 1306.17,-55.89 1298.22,-51.39 1289.97,-48.29"/>
+<polygon fill="#da00ff" stroke="#da00ff" points="1290.85,-44.9 1280.26,-45.25 1288.76,-51.58 1290.85,-44.9"/>
+</g>
+<!-- sourcefile~vector.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node73" class="node">
+<title>sourcefile~vector.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node73"><a xlink:href="../sourcefile/vector.f90.html" xlink:title="vector.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="832.5,-333.43 765.5,-333.43 765.5,-309.43 832.5,-309.43 832.5,-333.43"/>
+<text text-anchor="middle" x="799" y="-319.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~vector.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge97" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~vector.f90</title>
+<path fill="none" stroke="#da00ff" stroke-dasharray="5,2" d="M1370.98,-240.11C1362.73,-236.98 1354.36,-232.58 1348,-226.43 1318.8,-198.2 1345.91,-164.79 1312,-142.43 1265.62,-111.84 1241.26,-130.49 1187,-142.43 1042.59,-174.21 887.93,-265.37 826.93,-303.9"/>
+<polygon fill="#da00ff" stroke="#da00ff" points="824.84,-301.08 818.29,-309.4 828.6,-306.98 824.84,-301.08"/>
+</g>
+<!-- sourcefile~string_utils.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node68" class="node">
+<title>sourcefile~string_utils.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node68"><a xlink:href="../sourcefile/string_utils.f90.html" xlink:title="string_utils.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="845,-581.43 753,-581.43 753,-557.43 845,-557.43 845,-581.43"/>
+<text text-anchor="middle" x="799" y="-567.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">string_utils.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~utils.f90&#45;&gt;sourcefile~string_utils.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge98" class="edge">
+<title>sourcefile~utils.f90&#45;&gt;sourcefile~string_utils.f90</title>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M1548.81,-465.57C1504.34,-488.13 1403.36,-535.92 1312,-554.43 1148.61,-587.53 949.95,-580.19 855.3,-573.89"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="855.32,-570.39 845.1,-573.19 854.84,-577.37 855.32,-570.39"/>
+</g>
+<!-- sourcefile~system_env.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node69" class="node">
+<title>sourcefile~system_env.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node69"><a xlink:href="../sourcefile/system_env.f90.html" xlink:title="system_env.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1451.5,-385.43 1354.5,-385.43 1354.5,-361.43 1451.5,-361.43 1451.5,-385.43"/>
+<text text-anchor="middle" x="1403" y="-371.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">system_env.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~utils.f90&#45;&gt;sourcefile~system_env.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge99" class="edge">
+<title>sourcefile~utils.f90&#45;&gt;sourcefile~system_env.f90</title>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M1546.48,-441.28C1517.58,-427.51 1470.33,-405.01 1438.23,-389.73"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="1439.74,-386.57 1429.21,-385.43 1436.73,-392.89 1439.74,-386.57"/>
+</g>
+<!-- sourcefile~error.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node45" class="node">
+<title>sourcefile~error.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node45"><a xlink:href="../sourcefile/error.f90.html" xlink:title="error.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="972.5,-621.43 912.5,-621.43 912.5,-597.43 972.5,-597.43 972.5,-621.43"/>
+<text text-anchor="middle" x="942.5" y="-607.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~validation.f90&#45;&gt;sourcefile~error.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge100" class="edge">
+<title>sourcefile~validation.f90&#45;&gt;sourcefile~error.f90</title>
+<path fill="none" stroke="#ff0091" stroke-dasharray="5,2" d="M1701.83,-543.58C1645.38,-565.96 1516.8,-611.43 1404,-611.43 1404,-611.43 1404,-611.43 1248.5,-611.43 1153.04,-611.43 1040.77,-610.43 982.71,-609.85"/>
+<polygon fill="#ff0091" stroke="#ff0091" points="982.55,-606.35 972.52,-609.74 982.48,-613.35 982.55,-606.35"/>
+</g>
+<!-- sourcefile~vector_operations.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge101" class="edge">
+<title>sourcefile~vector_operations.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ff0048" stroke-dasharray="5,2" d="M2001.74,-636.28C1993.36,-632.66 1984.98,-628.09 1978,-622.43 1933.92,-586.66 1902.1,-526.28 1887.3,-494.12"/>
+<polygon fill="#ff0048" stroke="#ff0048" points="1890.38,-492.43 1883.1,-484.73 1883.99,-495.29 1890.38,-492.43"/>
+</g>
+<!-- sourcefile~mkl_backend.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node58" class="node">
+<title>sourcefile~mkl_backend.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node58"><a xlink:href="../sourcefile/mkl_backend.f90.html" xlink:title="mkl_backend.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1930,-442.43 1824,-442.43 1824,-418.43 1930,-418.43 1930,-442.43"/>
+<text text-anchor="middle" x="1877" y="-428.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mkl_backend.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~vector_operations.f90&#45;&gt;sourcefile~mkl_backend.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge102" class="edge">
+<title>sourcefile~vector_operations.f90&#45;&gt;sourcefile~mkl_backend.f90</title>
+<path fill="none" stroke="#ff0048" stroke-dasharray="5,2" d="M1996.27,-636.37C1989.36,-632.84 1982.93,-628.29 1978,-622.43 1928.03,-562.97 1993.83,-509.27 1942,-451.43 1940.95,-450.26 1939.84,-449.15 1938.67,-448.11"/>
+<polygon fill="#ff0048" stroke="#ff0048" points="1940.39,-445.04 1930.22,-442.07 1936.32,-450.73 1940.39,-445.04"/>
+</g>
+<!-- sourcefile~node.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node85" class="node">
+<title>sourcefile~node.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node85"><a xlink:href="../sourcefile/node.f90.html" xlink:title="node.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="4047,-1089.43 3985,-1089.43 3985,-1065.43 4047,-1065.43 4047,-1089.43"/>
+<text text-anchor="middle" x="4016" y="-1075.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">node.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~adjacency.f90&#45;&gt;sourcefile~node.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge103" class="edge">
+<title>sourcefile~adjacency.f90&#45;&gt;sourcefile~node.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M4439.83,-1018.46C4427.72,-1021.7 4414.39,-1024.99 4402,-1027.43 4277.45,-1051.96 4127.79,-1067.46 4057.37,-1073.93"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4056.81,-1070.47 4047.17,-1074.86 4057.44,-1077.44 4056.81,-1070.47"/>
+</g>
+<!-- sourcefile~node_element.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node86" class="node">
+<title>sourcefile~node_element.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node86"><a xlink:href="../sourcefile/node_element.f90.html" xlink:title="node_element.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="4388.5,-1018.43 4276.5,-1018.43 4276.5,-994.43 4388.5,-994.43 4388.5,-1018.43"/>
+<text text-anchor="middle" x="4332.5" y="-1004.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">node_element.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~adjacency.f90&#45;&gt;sourcefile~node_element.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge104" class="edge">
+<title>sourcefile~adjacency.f90&#45;&gt;sourcefile~node_element.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M4437.94,-1006.43C4425.68,-1006.43 4412.03,-1006.43 4398.76,-1006.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4398.71,-1002.93 4388.71,-1006.43 4398.71,-1009.93 4398.71,-1002.93"/>
+</g>
+<!-- sourcefile~ats.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge105" class="edge">
+<title>sourcefile~ats.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ff2100" stroke-dasharray="5,2" d="M3655.73,-990.69C3630.83,-999.98 3592.19,-1013.27 3557.5,-1020.43"/>
+<path fill="none" stroke="#ff2100" stroke-dasharray="5,2" d="M3555.5,-1020.43C3486.03,-1034.76 3471.78,-1055.87 3401,-1060.43"/>
+</g>
+<!-- sourcefile~ats.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge106" class="edge">
+<title>sourcefile~ats.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#ff2100" stroke-dasharray="5,2" d="M3655.9,-971.41C3638.9,-965.54 3616.39,-957.77 3597.19,-951.14"/>
+<polygon fill="#ff2100" stroke="#ff2100" points="3598.1,-947.75 3587.5,-947.79 3595.81,-954.36 3598.1,-947.75"/>
+</g>
+<!-- sourcefile~basic_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge107" class="edge">
+<title>sourcefile~basic_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ff4200" stroke-dasharray="5,2" d="M3013.2,-894.51C2983.4,-900.92 2946.87,-910.65 2916,-924.43"/>
+</g>
+<!-- sourcefile~basic_interface.f90&#45;&gt;sourcefile~physics.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge109" class="edge">
+<title>sourcefile~basic_interface.f90&#45;&gt;sourcefile~physics.f90</title>
+<path fill="none" stroke="#ff4200" stroke-dasharray="5,2" d="M3065.18,-872.38C3042.67,-821.38 2955.02,-622.81 2925.65,-556.29"/>
+<polygon fill="#ff4200" stroke="#ff4200" points="2928.7,-554.52 2921.46,-546.79 2922.29,-557.35 2928.7,-554.52"/>
+</g>
+<!-- sourcefile~basic_interface.f90&#45;&gt;sourcefile~input_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge108" class="edge">
+<title>sourcefile~basic_interface.f90&#45;&gt;sourcefile~input_base.f90</title>
+<path fill="none" stroke="#ff4200" stroke-dasharray="5,2" d="M3027.02,-896.52C3017.66,-900.17 3008.14,-904.76 3000,-910.43 2969.9,-931.36 2943.96,-965.57 2929.16,-987.53"/>
+<polygon fill="#ff4200" stroke="#ff4200" points="2926.08,-985.84 2923.52,-996.12 2931.94,-989.68 2926.08,-985.84"/>
+</g>
+<!-- sourcefile~conditions_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge110" class="edge">
+<title>sourcefile~conditions_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ff6300" stroke-dasharray="5,2" d="M3017.34,-976.46C3011.24,-978.93 3005.32,-981.89 3000,-985.43 2978.97,-999.43 2984.4,-1014.52 2964,-1029.43 2945.47,-1042.96 2938.9,-1049.88 2916,-1048.43"/>
+<path fill="none" stroke="#ff6300" stroke-dasharray="5,2" d="M2914,-1048.43C2846.64,-1044.16 2834.91,-1005.11 2767.5,-1008.43"/>
+</g>
+<!-- sourcefile~conditions_interface.f90&#45;&gt;sourcefile~input_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge111" class="edge">
+<title>sourcefile~conditions_interface.f90&#45;&gt;sourcefile~input_base.f90</title>
+<path fill="none" stroke="#ff6300" stroke-dasharray="5,2" d="M3028.28,-976.45C3009.63,-981.76 2987.53,-988.06 2967.88,-993.65"/>
+<polygon fill="#ff6300" stroke="#ff6300" points="2966.83,-990.31 2958.17,-996.42 2968.74,-997.04 2966.83,-990.31"/>
+</g>
+<!-- sourcefile~config_bc.f90&#45;&gt;sourcefile~constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge112" class="edge">
+<title>sourcefile~config_bc.f90&#45;&gt;sourcefile~constants.f90</title>
+<path fill="none" stroke="#ff8500" stroke-dasharray="5,2" d="M1206.45,-447.79C1147.05,-441.1 1035.56,-433.19 943.5,-453.43"/>
+</g>
+<!-- sourcefile~config_bc.f90&#45;&gt;sourcefile~memory.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge113" class="edge">
+<title>sourcefile~config_bc.f90&#45;&gt;sourcefile~memory.f90</title>
+<path fill="none" stroke="#ff8500" stroke-dasharray="5,2" d="M1206.16,-442.28C1187.15,-437.28 1164.61,-431.35 1144.93,-426.17"/>
+<polygon fill="#ff8500" stroke="#ff8500" points="1145.79,-422.78 1135.23,-423.62 1144.01,-429.55 1145.79,-422.78"/>
+</g>
+<!-- sourcefile~constants_physical.f90&#45;&gt;sourcefile~constants_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge114" class="edge">
+<title>sourcefile~constants_physical.f90&#45;&gt;sourcefile~constants_base.f90</title>
+<path fill="none" stroke="#ffe800" stroke-dasharray="5,2" d="M152.57,-495.79C144.17,-496.84 135.57,-497.92 127.16,-498.97"/>
+<polygon fill="#ffe800" stroke="#ffe800" points="126.51,-495.52 117.02,-500.24 127.37,-502.47 126.51,-495.52"/>
+</g>
+<!-- sourcefile~constants_utils.f90&#45;&gt;sourcefile~constants_parallel.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge115" class="edge">
+<title>sourcefile~constants_utils.f90&#45;&gt;sourcefile~constants_parallel.f90</title>
+<path fill="none" stroke="#d2ff00" stroke-dasharray="5,2" d="M323.8,-445.43C315.08,-445.43 305.95,-445.43 296.88,-445.43"/>
+<polygon fill="#d2ff00" stroke="#d2ff00" points="296.7,-441.93 286.7,-445.43 296.7,-448.93 296.7,-441.93"/>
+</g>
+<!-- sourcefile~constants_utils.f90&#45;&gt;sourcefile~constants_physical.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge116" class="edge">
+<title>sourcefile~constants_utils.f90&#45;&gt;sourcefile~constants_physical.f90</title>
+<path fill="none" stroke="#d2ff00" stroke-dasharray="5,2" d="M334.22,-457.46C316.29,-462.23 295.5,-467.75 276.7,-472.75"/>
+<polygon fill="#d2ff00" stroke="#d2ff00" points="275.55,-469.44 266.78,-475.39 277.35,-476.2 275.55,-469.44"/>
+</g>
+<!-- sourcefile~constants_utils.f90&#45;&gt;sourcefile~constants_solver.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge117" class="edge">
+<title>sourcefile~constants_utils.f90&#45;&gt;sourcefile~constants_solver.f90</title>
+<path fill="none" stroke="#d2ff00" stroke-dasharray="5,2" d="M334.22,-433.39C316.29,-428.62 295.5,-423.1 276.7,-418.1"/>
+<polygon fill="#d2ff00" stroke="#d2ff00" points="277.35,-414.65 266.78,-415.46 275.55,-421.42 277.35,-414.65"/>
+</g>
+<!-- sourcefile~coordinate_array.f90&#45;&gt;sourcefile~memory.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge119" class="edge">
+<title>sourcefile~coordinate_array.f90&#45;&gt;sourcefile~memory.f90</title>
+<path fill="none" stroke="#90ff00" stroke-dasharray="5,2" d="M1205.05,-343.54C1198.79,-346.06 1192.58,-349 1187,-352.43 1167.98,-364.09 1169.31,-374.67 1151,-387.43 1146.15,-390.8 1140.79,-393.95 1135.39,-396.81"/>
+<polygon fill="#90ff00" stroke="#90ff00" points="1133.71,-393.74 1126.33,-401.34 1136.84,-400 1133.71,-393.74"/>
+</g>
+<!-- sourcefile~coordinate_array.f90&#45;&gt;sourcefile~coordinate.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge118" class="edge">
+<title>sourcefile~coordinate_array.f90&#45;&gt;sourcefile~coordinate.f90</title>
+<path fill="none" stroke="#90ff00" stroke-dasharray="5,2" d="M1199.53,-319.27C1194.97,-316.84 1190.68,-313.92 1187,-310.43 1126.77,-253.15 1105.73,-150.61 1099.16,-105.62"/>
+<polygon fill="#90ff00" stroke="#90ff00" points="1102.6,-104.92 1097.79,-95.48 1095.66,-105.86 1102.6,-104.92"/>
+</g>
+<!-- sourcefile~density_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge120" class="edge">
+<title>sourcefile~density_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#4dff00" stroke-dasharray="5,2" d="M2203,-262.43C2146.45,-261.15 2017.77,-341.2 1978,-381.43 1953.4,-406.31 1968.61,-428.72 1942,-451.43 1934.62,-457.73 1925.3,-462.15 1916.07,-465.25"/>
+<polygon fill="#4dff00" stroke="#4dff00" points="1914.82,-461.97 1906.19,-468.12 1916.77,-468.69 1914.82,-461.97"/>
+</g>
+<!-- sourcefile~density_interface.f90&#45;&gt;sourcefile~physics_constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge122" class="edge">
+<title>sourcefile~density_interface.f90&#45;&gt;sourcefile~physics_constants.f90</title>
+<path fill="none" stroke="#4dff00" stroke-dasharray="5,2" d="M2336.19,-282.36C2289.86,-273.53 2229.92,-262.99 2205,-262.43"/>
+<path fill="none" stroke="#4dff00" stroke-dasharray="5,2" d="M2203,-262.43C2132.8,-260.84 2114.12,-250.01 2045,-262.43"/>
+<path fill="none" stroke="#4dff00" stroke-dasharray="5,2" d="M2043,-262.43C2012.69,-267.87 2004.49,-270.73 1978,-286.43 1946.33,-305.19 1915.19,-334.47 1896.29,-353.8"/>
+<polygon fill="#4dff00" stroke="#4dff00" points="1893.61,-351.54 1889.2,-361.17 1898.66,-356.39 1893.61,-351.54"/>
+</g>
+<!-- sourcefile~density_interface.f90&#45;&gt;sourcefile~materials_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge121" class="edge">
+<title>sourcefile~density_interface.f90&#45;&gt;sourcefile~materials_base.f90</title>
+<path fill="none" stroke="#4dff00" stroke-dasharray="5,2" d="M2346.55,-306.51C2321.53,-312.51 2291.13,-319.79 2264.93,-326.07"/>
+<polygon fill="#4dff00" stroke="#4dff00" points="2264.02,-322.69 2255.11,-328.42 2265.65,-329.49 2264.02,-322.69"/>
+</g>
+<!-- sourcefile~domain_manager.f90&#45;&gt;sourcefile~control.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge125" class="edge">
+<title>sourcefile~domain_manager.f90&#45;&gt;sourcefile~control.f90</title>
+<path fill="none" stroke="#2cff00" stroke-dasharray="5,2" d="M4156.5,-848.43C4124.53,-852.75 4116.41,-857.14 4088,-872.43 4069.93,-882.15 4051.55,-896.27 4038.01,-907.64"/>
+<polygon fill="#2cff00" stroke="#2cff00" points="4035.57,-905.12 4030.26,-914.29 4040.13,-910.44 4035.57,-905.12"/>
+</g>
+<!-- sourcefile~domain_manager.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge126" class="edge">
+<title>sourcefile~domain_manager.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#2cff00" stroke-dasharray="5,2" d="M4573.3,-919.47C4558.12,-922.72 4541.45,-926 4526,-928.43 4363.79,-953.94 4321.72,-948.46 4158.5,-966.43"/>
+</g>
+<!-- sourcefile~domain_manager.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge128" class="edge">
+<title>sourcefile~domain_manager.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#2cff00" stroke-dasharray="5,2" d="M4331.5,-848.43C4255.98,-833.96 4234.69,-838.12 4158.5,-848.43"/>
+<path fill="none" stroke="#2cff00" stroke-dasharray="5,2" d="M4156.5,-848.43C4095.06,-856.74 4077.2,-863.25 4017,-848.43"/>
+<path fill="none" stroke="#2cff00" stroke-dasharray="5,2" d="M4015,-848.43C3996.28,-843.82 3700.96,-735.26 3684,-744.43"/>
+</g>
+<!-- sourcefile~domain_manager.f90&#45;&gt;sourcefile~adjacency.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge123" class="edge">
+<title>sourcefile~domain_manager.f90&#45;&gt;sourcefile~adjacency.f90</title>
+<path fill="none" stroke="#2cff00" stroke-dasharray="5,2" d="M4609.54,-919.51C4590.33,-934.37 4556.35,-960.12 4526,-980.43 4521.67,-983.32 4517.02,-986.28 4512.44,-989.12"/>
+<polygon fill="#2cff00" stroke="#2cff00" points="4510.52,-986.18 4503.8,-994.37 4514.16,-992.17 4510.52,-986.18"/>
+</g>
+<!-- sourcefile~domain_manager.f90&#45;&gt;sourcefile~fe.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge127" class="edge">
+<title>sourcefile~domain_manager.f90&#45;&gt;sourcefile~fe.f90</title>
+<path fill="none" stroke="#2cff00" stroke-dasharray="5,2" d="M4600.86,-895.24C4580.98,-885.37 4551.94,-871.37 4526,-860.43 4395.4,-805.31 4361.41,-794.46 4227,-749.43 4218.28,-746.51 3919.19,-654.43 3910,-654.43 3910,-654.43 3910,-654.43 3682,-654.43 3557.11,-654.43 3525,-639.59 3401,-654.43"/>
+</g>
+<!-- sourcefile~domain_manager.f90&#45;&gt;sourcefile~multicoloring.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge129" class="edge">
+<title>sourcefile~domain_manager.f90&#45;&gt;sourcefile~multicoloring.f90</title>
+<path fill="none" stroke="#2cff00" stroke-dasharray="5,2" d="M4578.71,-895.36C4521.55,-881.1 4421.14,-858.07 4333.5,-848.43"/>
+<path fill="none" stroke="#2cff00" stroke-dasharray="5,2" d="M4331.5,-848.43C4276.78,-837.95 4218.87,-807.28 4185.85,-787.66"/>
+<polygon fill="#2cff00" stroke="#2cff00" points="4187.6,-784.63 4177.23,-782.45 4183.98,-790.62 4187.6,-784.63"/>
+</g>
+<!-- sourcefile~boundary.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node76" class="node">
+<title>sourcefile~boundary.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node76"><a xlink:href="../sourcefile/boundary.f90.html" xlink:title="boundary.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="4524.5,-919.43 4439.5,-919.43 4439.5,-895.43 4524.5,-895.43 4524.5,-919.43"/>
+<text text-anchor="middle" x="4482" y="-905.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">boundary.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~domain_manager.f90&#45;&gt;sourcefile~boundary.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge124" class="edge">
+<title>sourcefile~domain_manager.f90&#45;&gt;sourcefile~boundary.f90</title>
+<path fill="none" stroke="#2cff00" stroke-dasharray="5,2" d="M4561.89,-907.43C4552.84,-907.43 4543.62,-907.43 4534.82,-907.43"/>
+<polygon fill="#2cff00" stroke="#2cff00" points="4534.72,-903.93 4524.72,-907.43 4534.72,-910.93 4534.72,-903.93"/>
+</g>
+<!-- sourcefile~error.f90&#45;&gt;sourcefile~constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge130" class="edge">
+<title>sourcefile~error.f90&#45;&gt;sourcefile~constants.f90</title>
+<path fill="none" stroke="#0bff00" stroke-dasharray="5,2" d="M912.46,-620.95C877.71,-634.14 821.51,-653.47 800,-649.43"/>
+<path fill="none" stroke="#0bff00" stroke-dasharray="5,2" d="M798,-649.43C727.19,-636.12 725.38,-592.13 657,-569.43"/>
+</g>
+<!-- sourcefile~element_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node77" class="node">
+<title>sourcefile~element_interface.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node77"><a xlink:href="../sourcefile/element_interface.f90.html" xlink:title="element_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2667,-778.43 2534,-778.43 2534,-754.43 2667,-754.43 2667,-778.43"/>
+<text text-anchor="middle" x="2600.5" y="-764.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">element_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~fe.f90&#45;&gt;sourcefile~element_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge131" class="edge">
+<title>sourcefile~fe.f90&#45;&gt;sourcefile~element_interface.f90</title>
+<path fill="none" stroke="#00ff16" stroke-dasharray="5,2" d="M2914,-806.43C2849.78,-817.17 2832.49,-810.33 2767.5,-806.43"/>
+<path fill="none" stroke="#00ff16" stroke-dasharray="5,2" d="M2765.5,-806.43C2723.88,-803.93 2677.86,-791.85 2645.19,-781.61"/>
+<polygon fill="#00ff16" stroke="#00ff16" points="2646.09,-778.23 2635.5,-778.51 2643.96,-784.89 2646.09,-778.23"/>
+</g>
+<!-- sourcefile~fe_factory.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node78" class="node">
+<title>sourcefile~fe_factory.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node78"><a xlink:href="../sourcefile/fe_factory.f90.html" xlink:title="fe_factory.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2810,-698.43 2723,-698.43 2723,-674.43 2810,-674.43 2810,-698.43"/>
+<text text-anchor="middle" x="2766.5" y="-684.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fe_factory.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~fe.f90&#45;&gt;sourcefile~fe_factory.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge132" class="edge">
+<title>sourcefile~fe.f90&#45;&gt;sourcefile~fe_factory.f90</title>
+<path fill="none" stroke="#00ff16" stroke-dasharray="5,2" d="M3059.7,-682.8C3030.98,-715.17 2952.48,-800.32 2916,-806.43"/>
+<path fill="none" stroke="#00ff16" stroke-dasharray="5,2" d="M2914,-806.43C2852.08,-816.78 2801.03,-744.93 2779.08,-707.75"/>
+<polygon fill="#00ff16" stroke="#00ff16" points="2781.91,-705.64 2773.91,-698.69 2775.83,-709.11 2781.91,-705.64"/>
+</g>
+<!-- sourcefile~fe_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node79" class="node">
+<title>sourcefile~fe_interface.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node79"><a xlink:href="../sourcefile/fe_interface.f90.html" xlink:title="fe_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2447.5,-740.43 2348.5,-740.43 2348.5,-716.43 2447.5,-716.43 2447.5,-740.43"/>
+<text text-anchor="middle" x="2398" y="-726.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fe_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~fe.f90&#45;&gt;sourcefile~fe_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge133" class="edge">
+<title>sourcefile~fe.f90&#45;&gt;sourcefile~fe_interface.f90</title>
+<path fill="none" stroke="#00ff16" stroke-dasharray="5,2" d="M2765.5,-806.43C2662.45,-800.24 2634.1,-812.66 2534,-787.43 2496.51,-777.97 2456.22,-759.11 2429.51,-745.25"/>
+<polygon fill="#00ff16" stroke="#00ff16" points="2431.13,-742.15 2420.65,-740.58 2427.87,-748.34 2431.13,-742.15"/>
+</g>
+<!-- sourcefile~fe_manager.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node80" class="node">
+<title>sourcefile~fe_manager.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node80"><a xlink:href="../sourcefile/fe_manager.f90.html" xlink:title="fe_manager.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2964,-698.43 2866,-698.43 2866,-674.43 2964,-674.43 2964,-698.43"/>
+<text text-anchor="middle" x="2915" y="-684.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fe_manager.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~fe.f90&#45;&gt;sourcefile~fe_manager.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge134" class="edge">
+<title>sourcefile~fe.f90&#45;&gt;sourcefile~fe_manager.f90</title>
+<path fill="none" stroke="#00ff16" stroke-dasharray="5,2" d="M3044.29,-673.14C3025.16,-675.12 2998.46,-677.89 2974.37,-680.38"/>
+<polygon fill="#00ff16" stroke="#00ff16" points="2973.83,-676.92 2964.24,-681.43 2974.55,-683.88 2973.83,-676.92"/>
+</g>
+<!-- sourcefile~side_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node87" class="node">
+<title>sourcefile~side_interface.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node87"><a xlink:href="../sourcefile/side_interface.f90.html" xlink:title="side_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2655.5,-660.43 2545.5,-660.43 2545.5,-636.43 2655.5,-636.43 2655.5,-660.43"/>
+<text text-anchor="middle" x="2600.5" y="-646.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">side_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~fe.f90&#45;&gt;sourcefile~side_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge135" class="edge">
+<title>sourcefile~fe.f90&#45;&gt;sourcefile~side_interface.f90</title>
+<path fill="none" stroke="#00ff16" stroke-dasharray="5,2" d="M3044.24,-669.19C3022.68,-668.18 2991.36,-666.71 2964,-665.43 2859.63,-660.53 2738.35,-654.84 2665.88,-651.44"/>
+<polygon fill="#00ff16" stroke="#00ff16" points="2665.7,-647.93 2655.55,-650.96 2665.37,-654.92 2665.7,-647.93"/>
+</g>
+<!-- sourcefile~gauss.f90&#45;&gt;sourcefile~constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge136" class="edge">
+<title>sourcefile~gauss.f90&#45;&gt;sourcefile~constants.f90</title>
+<path fill="none" stroke="#00ff37" stroke-dasharray="5,2" d="M1216.26,-210.4C1205.75,-213.46 1194.79,-218.42 1187,-226.43 1149.37,-265.13 1184.83,-300.36 1151,-342.43 1133.54,-364.14 1121.08,-360.3 1096.5,-373.43"/>
+<path fill="none" stroke="#00ff37" stroke-dasharray="5,2" d="M1094.5,-373.43C1071.87,-385.51 1063.1,-381.28 1040,-392.43 994.3,-414.48 992.95,-442.05 943.5,-453.43"/>
+</g>
+<!-- sourcefile~gauss.f90&#45;&gt;sourcefile~coordinate.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge137" class="edge">
+<title>sourcefile~gauss.f90&#45;&gt;sourcefile~coordinate.f90</title>
+<path fill="none" stroke="#00ff37" stroke-dasharray="5,2" d="M1216.41,-197.87C1206.49,-194.67 1195.84,-190.28 1187,-184.43 1154.39,-162.84 1125.99,-126.74 1110.07,-104.05"/>
+<polygon fill="#00ff37" stroke="#00ff37" points="1112.76,-101.79 1104.23,-95.51 1106.99,-105.74 1112.76,-101.79"/>
+</g>
+<!-- sourcefile~gcc_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge138" class="edge">
+<title>sourcefile~gcc_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#00ff58" stroke-dasharray="5,2" d="M2150.45,-579.13C2119.42,-579.57 2079.57,-578.11 2045,-570.43"/>
+</g>
+<!-- sourcefile~gcc_interface.f90&#45;&gt;sourcefile~physics_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge139" class="edge">
+<title>sourcefile~gcc_interface.f90&#45;&gt;sourcefile~physics_base.f90</title>
+<path fill="none" stroke="#00ff58" stroke-dasharray="5,2" d="M2163.26,-564.41C2157.26,-561.86 2151.31,-558.87 2146,-555.43 2126.76,-542.93 2129.07,-531.19 2110,-518.43 2104.44,-514.7 2098.26,-511.38 2091.98,-508.45"/>
+<polygon fill="#00ff58" stroke="#00ff58" points="2093.35,-505.23 2082.79,-504.45 2090.56,-511.65 2093.35,-505.23"/>
+</g>
+<!-- sourcefile~gcc_interface.f90&#45;&gt;sourcefile~physics_constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge140" class="edge">
+<title>sourcefile~gcc_interface.f90&#45;&gt;sourcefile~physics_constants.f90</title>
+<path fill="none" stroke="#00ff58" stroke-dasharray="5,2" d="M2150.33,-564.39C2087.9,-549.71 1990.7,-525.38 1978,-513.43 1942.39,-479.9 1973.35,-446.97 1942,-409.43 1935.63,-401.8 1927.21,-395.48 1918.57,-390.38"/>
+<polygon fill="#00ff58" stroke="#00ff58" points="1920.04,-387.19 1909.58,-385.5 1916.7,-393.35 1920.04,-387.19"/>
+</g>
+<!-- sourcefile~geometry_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge141" class="edge">
+<title>sourcefile~geometry_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#00ff79" stroke-dasharray="5,2" d="M3028.77,-1018.48C2985.01,-1031.02 2921.76,-1048.79 2916,-1048.43"/>
+</g>
+<!-- sourcefile~geometry_interface.f90&#45;&gt;sourcefile~input_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge142" class="edge">
+<title>sourcefile~geometry_interface.f90&#45;&gt;sourcefile~input_base.f90</title>
+<path fill="none" stroke="#00ff79" stroke-dasharray="5,2" d="M3001.38,-1007.32C2991.47,-1007.45 2981.38,-1007.58 2971.77,-1007.7"/>
+<polygon fill="#00ff79" stroke="#00ff79" points="2971.51,-1004.21 2961.56,-1007.84 2971.6,-1011.21 2971.51,-1004.21"/>
+</g>
+<!-- sourcefile~hcf_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge143" class="edge">
+<title>sourcefile~hcf_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#00ffbc" stroke-dasharray="5,2" d="M2043,-608.43C2015.27,-595.03 2003.45,-601.76 1978,-584.43 1941.16,-559.34 1908.92,-517.79 1891.57,-492.97"/>
+<polygon fill="#00ffbc" stroke="#00ffbc" points="1894.4,-490.92 1885.87,-484.64 1888.63,-494.87 1894.4,-490.92"/>
+</g>
+<!-- sourcefile~hcf_interface.f90&#45;&gt;sourcefile~physics_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge144" class="edge">
+<title>sourcefile~hcf_interface.f90&#45;&gt;sourcefile~physics_base.f90</title>
+<path fill="none" stroke="#00ffbc" stroke-dasharray="5,2" d="M2162.5,-606.38C2156.73,-603.86 2151.04,-600.89 2146,-597.43 2126.01,-583.7 2126.65,-574.06 2110,-556.43 2095.41,-540.98 2078.26,-524.15 2065.24,-511.62"/>
+<polygon fill="#00ffbc" stroke="#00ffbc" points="2067.37,-508.82 2057.73,-504.43 2062.53,-513.87 2067.37,-508.82"/>
+</g>
+<!-- sourcefile~hcf_interface.f90&#45;&gt;sourcefile~physics_constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge145" class="edge">
+<title>sourcefile~hcf_interface.f90&#45;&gt;sourcefile~physics_constants.f90</title>
+<path fill="none" stroke="#00ffbc" stroke-dasharray="5,2" d="M2151.42,-624.73C2119.27,-626.41 2077.91,-624.33 2045,-608.43"/>
+<path fill="none" stroke="#00ffbc" stroke-dasharray="5,2" d="M2043,-608.43C2007.33,-591.19 1998.24,-581.48 1978,-547.43 1945.62,-492.93 1980.7,-459.62 1942,-409.43 1936.05,-401.71 1927.95,-395.39 1919.51,-390.32"/>
+<polygon fill="#00ffbc" stroke="#00ffbc" points="1921.12,-387.22 1910.66,-385.49 1917.76,-393.36 1921.12,-387.22"/>
+</g>
+<!-- sourcefile~heat_capacity_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge146" class="edge">
+<title>sourcefile~heat_capacity_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#00ffdd" stroke-dasharray="5,2" d="M2043,-224.43C2006.43,-244.01 1997.74,-254.93 1978,-291.43 1943.33,-355.54 1991.01,-397.48 1942,-451.43 1935.23,-458.88 1925.77,-463.69 1916.21,-466.8"/>
+<polygon fill="#00ffdd" stroke="#00ffdd" points="1915.05,-463.49 1906.3,-469.46 1916.87,-470.25 1915.05,-463.49"/>
+</g>
+<!-- sourcefile~heat_capacity_interface.f90&#45;&gt;sourcefile~physics_constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge148" class="edge">
+<title>sourcefile~heat_capacity_interface.f90&#45;&gt;sourcefile~physics_constants.f90</title>
+<path fill="none" stroke="#00ffdd" stroke-dasharray="5,2" d="M2366.49,-240.35C2303.16,-217.29 2154.21,-173.59 2045,-224.43"/>
+<path fill="none" stroke="#00ffdd" stroke-dasharray="5,2" d="M2043,-224.43C2015.85,-238.97 2002.98,-230.41 1978,-248.43 1938.48,-276.93 1906.19,-325.02 1889.76,-352.5"/>
+<polygon fill="#00ffdd" stroke="#00ffdd" points="1886.64,-350.9 1884.62,-361.3 1892.69,-354.43 1886.64,-350.9"/>
+</g>
+<!-- sourcefile~heat_capacity_interface.f90&#45;&gt;sourcefile~materials_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge147" class="edge">
+<title>sourcefile~heat_capacity_interface.f90&#45;&gt;sourcefile~materials_base.f90</title>
+<path fill="none" stroke="#00ffdd" stroke-dasharray="5,2" d="M2323.46,-264.43C2314.71,-266.9 2306.03,-269.87 2298,-273.43 2270.95,-285.4 2243.95,-306.06 2226.07,-321.28"/>
+<polygon fill="#00ffdd" stroke="#00ffdd" points="2223.3,-319.05 2218.06,-328.26 2227.9,-324.33 2223.3,-319.05"/>
+</g>
+<!-- sourcefile~input_base.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge149" class="edge">
+<title>sourcefile~input_base.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M2868.44,-1007.27C2839.51,-1006.83 2801.29,-1006.76 2767.5,-1008.43"/>
+</g>
+<!-- sourcefile~materials_base.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge150" class="edge">
+<title>sourcefile~materials_base.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#00ddff" stroke-dasharray="5,2" d="M2176.63,-352.53C2129.86,-373.78 2029.11,-418.68 1942,-451.43 1933.57,-454.6 1924.42,-457.76 1915.75,-460.63"/>
+<polygon fill="#00ddff" stroke="#00ddff" points="1914.64,-457.31 1906.22,-463.74 1916.81,-463.97 1914.64,-457.31"/>
+</g>
+<!-- sourcefile~materials_base.f90&#45;&gt;sourcefile~physics_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge151" class="edge">
+<title>sourcefile~materials_base.f90&#45;&gt;sourcefile~physics_base.f90</title>
+<path fill="none" stroke="#00ddff" stroke-dasharray="5,2" d="M2190.86,-352.54C2178.74,-364.97 2159.96,-385.15 2146,-404.43 2127.31,-430.23 2134.11,-445.59 2110,-466.43 2105.86,-470 2101.17,-473.12 2096.25,-475.84"/>
+<polygon fill="#00ddff" stroke="#00ddff" points="2094.62,-472.74 2087.21,-480.31 2097.72,-479.02 2094.62,-472.74"/>
+</g>
+<!-- sourcefile~materials_base.f90&#45;&gt;sourcefile~physics_constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge152" class="edge">
+<title>sourcefile~materials_base.f90&#45;&gt;sourcefile~physics_constants.f90</title>
+<path fill="none" stroke="#00ddff" stroke-dasharray="5,2" d="M2175.91,-328.39C2166.41,-324.08 2155.69,-319.13 2146,-314.43 2100.57,-292.39 2094.72,-253.65 2045,-262.43"/>
+</g>
+<!-- sourcefile~matrix_factory.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node82" class="node">
+<title>sourcefile~matrix_factory.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node82"><a xlink:href="../sourcefile/matrix_factory.f90.html" xlink:title="matrix_factory.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1151,-333.43 1040,-333.43 1040,-309.43 1151,-309.43 1151,-333.43"/>
+<text text-anchor="middle" x="1095.5" y="-319.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_factory.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~matrix.f90&#45;&gt;sourcefile~matrix_factory.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge153" class="edge">
+<title>sourcefile~matrix.f90&#45;&gt;sourcefile~matrix_factory.f90</title>
+<path fill="none" stroke="#00bcff" stroke-dasharray="5,2" d="M1214.19,-257.78C1205.2,-260.86 1195.62,-264.48 1187,-268.43 1164.73,-278.63 1140.87,-292.74 1123.24,-303.84"/>
+<polygon fill="#00bcff" stroke="#00bcff" points="1121.18,-301.01 1114.63,-309.34 1124.95,-306.91 1121.18,-301.01"/>
+</g>
+<!-- sourcefile~matrix_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node83" class="node">
+<title>sourcefile~matrix_interface.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node83"><a xlink:href="../sourcefile/matrix_interface.f90.html" xlink:title="matrix_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1004,-333.43 881,-333.43 881,-309.43 1004,-309.43 1004,-333.43"/>
+<text text-anchor="middle" x="942.5" y="-319.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~matrix.f90&#45;&gt;sourcefile~matrix_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge154" class="edge">
+<title>sourcefile~matrix.f90&#45;&gt;sourcefile~matrix_interface.f90</title>
+<path fill="none" stroke="#00bcff" stroke-dasharray="5,2" d="M1214.4,-255.7C1163.2,-268.12 1065.76,-291.76 1002.77,-307.05"/>
+<polygon fill="#00bcff" stroke="#00bcff" points="1001.86,-303.67 992.96,-309.43 1003.51,-310.47 1001.86,-303.67"/>
+</g>
+<!-- sourcefile~memory_stats.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node84" class="node">
+<title>sourcefile~memory_stats.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node84"><a xlink:href="../sourcefile/memory_stats.f90.html" xlink:title="memory_stats.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1458,-91.43 1348,-91.43 1348,-67.43 1458,-67.43 1458,-91.43"/>
+<text text-anchor="middle" x="1403" y="-77.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">memory_stats.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~memory_stats_wrapper.f90&#45;&gt;sourcefile~memory_stats.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge155" class="edge">
+<title>sourcefile~memory_stats_wrapper.f90&#45;&gt;sourcefile~memory_stats.f90</title>
+<path fill="none" stroke="#009bff" stroke-dasharray="5,2" d="M1510.87,-100.42C1496.98,-97.69 1482.19,-94.78 1468.17,-92.03"/>
+<polygon fill="#009bff" stroke="#009bff" points="1468.62,-88.55 1458.13,-90.06 1467.27,-95.42 1468.62,-88.55"/>
+</g>
+<!-- sourcefile~meteorology.f90&#45;&gt;sourcefile~constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge156" class="edge">
+<title>sourcefile~meteorology.f90&#45;&gt;sourcefile~constants.f90</title>
+<path fill="none" stroke="#0079ff" stroke-dasharray="5,2" d="M1198.74,-362.03C1167.58,-357.54 1127.57,-356.83 1096.5,-373.43"/>
+</g>
+<!-- sourcefile~meteorology.f90&#45;&gt;sourcefile~memory.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge158" class="edge">
+<title>sourcefile~meteorology.f90&#45;&gt;sourcefile~memory.f90</title>
+<path fill="none" stroke="#0079ff" stroke-dasharray="5,2" d="M1202.89,-385.43C1184.59,-390.25 1163.46,-395.81 1144.88,-400.69"/>
+<polygon fill="#0079ff" stroke="#0079ff" points="1143.92,-397.33 1135.14,-403.26 1145.7,-404.1 1143.92,-397.33"/>
+</g>
+<!-- sourcefile~meteorology.f90&#45;&gt;sourcefile~datetime.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge157" class="edge">
+<title>sourcefile~meteorology.f90&#45;&gt;sourcefile~datetime.f90</title>
+<path fill="none" stroke="#0079ff" stroke-dasharray="5,2" d="M1233.09,-385.59C1206.46,-406.62 1151.67,-449.87 1120.17,-474.74"/>
+<polygon fill="#0079ff" stroke="#0079ff" points="1117.63,-472.28 1111.95,-481.23 1121.97,-477.78 1117.63,-472.28"/>
+</g>
+<!-- sourcefile~multicoloring.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge159" class="edge">
+<title>sourcefile~multicoloring.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#0037ff" stroke-dasharray="5,2" d="M4104.45,-766.92C4034.92,-762.18 3907.89,-753.28 3799.5,-744.43"/>
+<path fill="none" stroke="#0037ff" stroke-dasharray="5,2" d="M3797.5,-744.43C3764.06,-740.32 3756.55,-733.55 3723,-730.43 3626.87,-721.47 3601.38,-725.46 3506,-740.43 3277.36,-776.31 3210.05,-766.26 3000,-863.43 2958.12,-882.8 2958.13,-905.63 2916,-924.43"/>
+<path fill="none" stroke="#0037ff" stroke-dasharray="5,2" d="M2914,-924.43C2844.65,-953.13 2842.46,-1004.73 2767.5,-1008.43"/>
+<path fill="none" stroke="#0037ff" stroke-dasharray="5,2" d="M2765.5,-1008.43C2602.81,-1016.44 2561.89,-1008.43 2399,-1008.43 2399,-1008.43 2399,-1008.43 2203,-1008.43 1958.6,-1008.43 1892.89,-595.92 1880.44,-494.67"/>
+<polygon fill="#0037ff" stroke="#0037ff" points="1883.9,-494.15 1879.26,-484.63 1876.95,-494.97 1883.9,-494.15"/>
+</g>
+<!-- sourcefile~multicoloring.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge160" class="edge">
+<title>sourcefile~multicoloring.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#0037ff" stroke-dasharray="5,2" d="M3797.5,-744.43C3747.22,-740.32 3728.38,-720.45 3684,-744.43"/>
+</g>
+<!-- sourcefile~output_interface.f90~2&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge161" class="edge">
+<title>sourcefile~output_interface.f90~2&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#0016ff" stroke-dasharray="5,2" d="M3009.91,-1050.2C2981.39,-1050.58 2946.92,-1050.39 2916,-1048.43"/>
+</g>
+<!-- sourcefile~output_interface.f90~2&#45;&gt;sourcefile~input_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge162" class="edge">
+<title>sourcefile~output_interface.f90~2&#45;&gt;sourcefile~input_base.f90</title>
+<path fill="none" stroke="#0016ff" stroke-dasharray="5,2" d="M3024.14,-1036.42C3007.58,-1032.14 2988.74,-1027.26 2971.48,-1022.79"/>
+<polygon fill="#0016ff" stroke="#0016ff" points="2972.08,-1019.33 2961.52,-1020.21 2970.33,-1026.11 2972.08,-1019.33"/>
+</g>
+<!-- sourcefile~phase_systems.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge163" class="edge">
+<title>sourcefile~phase_systems.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#0b00ff" stroke-dasharray="5,2" d="M2374.55,-546.54C2353.64,-558.36 2322.17,-577.56 2298,-598.43 2254.46,-636.01 2262.4,-684.79 2205,-688.43"/>
+<path fill="none" stroke="#0b00ff" stroke-dasharray="5,2" d="M2203,-688.43C2102.84,-694.77 2061.24,-725.48 1978,-669.43 1916.52,-628.03 1890.88,-536.89 1882,-494.68"/>
+<polygon fill="#0b00ff" stroke="#0b00ff" points="1885.38,-493.74 1880.01,-484.61 1878.51,-495.1 1885.38,-493.74"/>
+</g>
+<!-- sourcefile~phase_systems.f90&#45;&gt;sourcefile~physics_constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge165" class="edge">
+<title>sourcefile~phase_systems.f90&#45;&gt;sourcefile~physics_constants.f90</title>
+<path fill="none" stroke="#0b00ff" stroke-dasharray="5,2" d="M2347.49,-522.38C2293.97,-507.62 2208.02,-478.7 2146,-432.43 2125.47,-417.11 2128.37,-405.27 2110,-387.43 2084.05,-362.22 2080.63,-344.68 2045,-338.43"/>
+</g>
+<!-- sourcefile~phase_systems.f90&#45;&gt;sourcefile~gcc_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge164" class="edge">
+<title>sourcefile~phase_systems.f90&#45;&gt;sourcefile~gcc_interface.f90</title>
+<path fill="none" stroke="#0b00ff" stroke-dasharray="5,2" d="M2341.98,-546.46C2318.81,-551.53 2291.71,-557.46 2267.76,-562.7"/>
+<polygon fill="#0b00ff" stroke="#0b00ff" points="2266.73,-559.34 2257.71,-564.9 2268.23,-566.18 2266.73,-559.34"/>
+</g>
+<!-- sourcefile~phase_systems.f90&#45;&gt;sourcefile~vaporization.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge166" class="edge">
+<title>sourcefile~phase_systems.f90&#45;&gt;sourcefile~vaporization.f90</title>
+<path fill="none" stroke="#0b00ff" stroke-dasharray="5,2" d="M2340.43,-534.43C2316.62,-534.43 2288.9,-534.43 2264.75,-534.43"/>
+<polygon fill="#0b00ff" stroke="#0b00ff" points="2264.65,-530.93 2254.65,-534.43 2264.65,-537.93 2264.65,-530.93"/>
+</g>
+<!-- sourcefile~physics_info.f90&#45;&gt;sourcefile~coordinate.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge167" class="edge">
+<title>sourcefile~physics_info.f90&#45;&gt;sourcefile~coordinate.f90</title>
+<path fill="none" stroke="#2c00ff" stroke-dasharray="5,2" d="M1199.99,-83.43C1184.81,-83.43 1167.94,-83.43 1152.3,-83.43"/>
+<polygon fill="#2c00ff" stroke="#2c00ff" points="1152.22,-79.93 1142.22,-83.43 1152.22,-86.93 1152.22,-79.93"/>
+</g>
+<!-- sourcefile~signal_flag.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node88" class="node">
+<title>sourcefile~signal_flag.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node88"><a xlink:href="../sourcefile/signal_flag.f90.html" xlink:title="signal_flag.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1449,-49.43 1357,-49.43 1357,-25.43 1449,-25.43 1449,-49.43"/>
+<text text-anchor="middle" x="1403" y="-35.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">signal_flag.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~signal_flag_wrapper.f90&#45;&gt;sourcefile~signal_flag.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge168" class="edge">
+<title>sourcefile~signal_flag_wrapper.f90&#45;&gt;sourcefile~signal_flag.f90</title>
+<path fill="none" stroke="#6e00ff" stroke-dasharray="5,2" d="M1502.7,-50.35C1488.29,-48.46 1473.29,-46.5 1459.46,-44.69"/>
+<polygon fill="#6e00ff" stroke="#6e00ff" points="1459.52,-41.17 1449.15,-43.34 1458.61,-48.11 1459.52,-41.17"/>
+</g>
+<!-- sourcefile~solar.f90&#45;&gt;sourcefile~datetime.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge169" class="edge">
+<title>sourcefile~solar.f90&#45;&gt;sourcefile~datetime.f90</title>
+<path fill="none" stroke="#9000ff" stroke-dasharray="5,2" d="M1219.19,-525.71C1198.81,-520.35 1171.12,-513.06 1147.2,-506.77"/>
+<polygon fill="#9000ff" stroke="#9000ff" points="1147.77,-503.3 1137.21,-504.14 1145.99,-510.07 1147.77,-503.3"/>
+</g>
+<!-- sourcefile~specific_heat_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge170" class="edge">
+<title>sourcefile~specific_heat_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#b100ff" stroke-dasharray="5,2" d="M2203,-418.43C2131.33,-413.67 2115.11,-436.78 2045,-452.43"/>
+</g>
+<!-- sourcefile~specific_heat_interface.f90&#45;&gt;sourcefile~physics_constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge172" class="edge">
+<title>sourcefile~specific_heat_interface.f90&#45;&gt;sourcefile~physics_constants.f90</title>
+<path fill="none" stroke="#b100ff" stroke-dasharray="5,2" d="M2318.92,-419.95C2284.03,-420.82 2242.42,-420.91 2205,-418.43"/>
+<path fill="none" stroke="#b100ff" stroke-dasharray="5,2" d="M2203,-418.43C2124.46,-413.22 2122.53,-352.03 2045,-338.43"/>
+<path fill="none" stroke="#b100ff" stroke-dasharray="5,2" d="M2043,-338.43C1998.37,-330.59 1947.42,-345.01 1914.08,-357.65"/>
+<polygon fill="#b100ff" stroke="#b100ff" points="1912.78,-354.4 1904.75,-361.32 1915.34,-360.92 1912.78,-354.4"/>
+</g>
+<!-- sourcefile~specific_heat_interface.f90&#45;&gt;sourcefile~materials_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge171" class="edge">
+<title>sourcefile~specific_heat_interface.f90&#45;&gt;sourcefile~materials_base.f90</title>
+<path fill="none" stroke="#b100ff" stroke-dasharray="5,2" d="M2326.4,-404.41C2316.71,-401.9 2307,-398.93 2298,-395.43 2273.74,-385.97 2248.45,-370.6 2230.37,-358.51"/>
+<polygon fill="#b100ff" stroke="#b100ff" points="2231.86,-355.28 2221.62,-352.53 2227.91,-361.06 2231.86,-355.28"/>
+</g>
+<!-- sourcefile~state.f90&#45;&gt;sourcefile~coordinate.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge173" class="edge">
+<title>sourcefile~state.f90&#45;&gt;sourcefile~coordinate.f90</title>
+<path fill="none" stroke="#d200ff" stroke-dasharray="5,2" d="M1218.83,-49.62C1199.25,-55.03 1173.04,-62.28 1149.9,-68.67"/>
+<polygon fill="#d200ff" stroke="#d200ff" points="1148.91,-65.31 1140.2,-71.35 1150.77,-72.06 1148.91,-65.31"/>
+</g>
+<!-- sourcefile~string_utils.f90&#45;&gt;sourcefile~constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge174" class="edge">
+<title>sourcefile~string_utils.f90&#45;&gt;sourcefile~constants.f90</title>
+<path fill="none" stroke="#f300ff" stroke-dasharray="5,2" d="M752.71,-576.56C724.47,-579.29 687.78,-579.65 657,-569.43"/>
+</g>
+<!-- sourcefile~system_info_wrapper.f90&#45;&gt;sourcefile~system_env.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge176" class="edge">
+<title>sourcefile~system_info_wrapper.f90&#45;&gt;sourcefile~system_env.f90</title>
+<path fill="none" stroke="#ff00c7" stroke-dasharray="5,2" d="M1499.78,-373.43C1487.13,-373.43 1474.12,-373.43 1461.93,-373.43"/>
+<polygon fill="#ff00c7" stroke="#ff00c7" points="1461.9,-369.93 1451.9,-373.43 1461.9,-376.93 1461.9,-369.93"/>
+</g>
+<!-- sourcefile~interop_utils.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node81" class="node">
+<title>sourcefile~interop_utils.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node81"><a xlink:href="../sourcefile/interop_utils.f90.html" xlink:title="interop_utils.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1453,-301.43 1353,-301.43 1353,-277.43 1453,-277.43 1453,-301.43"/>
+<text text-anchor="middle" x="1403" y="-287.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interop_utils.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~system_info_wrapper.f90&#45;&gt;sourcefile~interop_utils.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge175" class="edge">
+<title>sourcefile~system_info_wrapper.f90&#45;&gt;sourcefile~interop_utils.f90</title>
+<path fill="none" stroke="#ff00c7" stroke-dasharray="5,2" d="M1523.76,-361.35C1513.52,-357.7 1503.07,-353.12 1494,-347.43 1474.57,-335.23 1477.13,-323.1 1458,-310.43 1455.6,-308.84 1453.07,-307.34 1450.45,-305.94"/>
+<polygon fill="#ff00c7" stroke="#ff00c7" points="1451.88,-302.74 1441.36,-301.52 1448.82,-309.04 1451.88,-302.74"/>
+</g>
+<!-- sourcefile~system_info.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node89" class="node">
+<title>sourcefile~system_info.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node89"><a xlink:href="../sourcefile/system_info.f90.html" xlink:title="system_info.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1451.5,-343.43 1354.5,-343.43 1354.5,-319.43 1451.5,-319.43 1451.5,-343.43"/>
+<text text-anchor="middle" x="1403" y="-329.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">system_info.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~system_info_wrapper.f90&#45;&gt;sourcefile~system_info.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge177" class="edge">
+<title>sourcefile~system_info_wrapper.f90&#45;&gt;sourcefile~system_info.f90</title>
+<path fill="none" stroke="#ff00c7" stroke-dasharray="5,2" d="M1523.86,-361.39C1504.36,-356.52 1481.69,-350.85 1461.34,-345.76"/>
+<polygon fill="#ff00c7" stroke="#ff00c7" points="1462.12,-342.35 1451.57,-343.32 1460.42,-349.14 1462.12,-342.35"/>
+</g>
+<!-- sourcefile~thermal_conductivity_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge178" class="edge">
+<title>sourcefile~thermal_conductivity_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ff00a6" stroke-dasharray="5,2" d="M2297.96,-377.42C2250.99,-381.05 2194.64,-388.68 2146,-404.43 2128.59,-410.06 2126.43,-416.35 2110,-424.43 2081.77,-438.3 2075.7,-445.58 2045,-452.43"/>
+<path fill="none" stroke="#ff00a6" stroke-dasharray="5,2" d="M2043,-452.43C2000.14,-461.16 1950.18,-466.56 1916.56,-469.52"/>
+<polygon fill="#ff00a6" stroke="#ff00a6" points="1915.92,-466.06 1906.25,-470.39 1916.51,-473.03 1915.92,-466.06"/>
+</g>
+<!-- sourcefile~thermal_conductivity_interface.f90&#45;&gt;sourcefile~physics_constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge180" class="edge">
+<title>sourcefile~thermal_conductivity_interface.f90&#45;&gt;sourcefile~physics_constants.f90</title>
+<path fill="none" stroke="#ff00a6" stroke-dasharray="5,2" d="M2370.43,-362.42C2300.17,-331.24 2110.36,-250.89 2045,-262.43"/>
+</g>
+<!-- sourcefile~thermal_conductivity_interface.f90&#45;&gt;sourcefile~materials_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge179" class="edge">
+<title>sourcefile~thermal_conductivity_interface.f90&#45;&gt;sourcefile~materials_base.f90</title>
+<path fill="none" stroke="#ff00a6" stroke-dasharray="5,2" d="M2329.04,-362.39C2310.56,-359.12 2290.56,-355.58 2272.13,-352.31"/>
+<polygon fill="#ff00a6" stroke="#ff00a6" points="2272.53,-348.83 2262.07,-350.53 2271.31,-355.72 2272.53,-348.83"/>
+</g>
+<!-- sourcefile~vaporization.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge181" class="edge">
+<title>sourcefile~vaporization.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ff0085" stroke-dasharray="5,2" d="M2166.6,-546.52C2127.46,-558.85 2067.8,-575.49 2045,-570.43"/>
+<path fill="none" stroke="#ff0085" stroke-dasharray="5,2" d="M2043,-570.43C2012.94,-563.75 2005.09,-561.07 1978,-546.43 1948.9,-530.7 1918.84,-507.32 1899.37,-491.06"/>
+<polygon fill="#ff0085" stroke="#ff0085" points="1901.6,-488.36 1891.71,-484.57 1897.08,-493.7 1901.6,-488.36"/>
+</g>
+<!-- sourcefile~vaporization.f90&#45;&gt;sourcefile~physics_base.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge182" class="edge">
+<title>sourcefile~vaporization.f90&#45;&gt;sourcefile~physics_base.f90</title>
+<path fill="none" stroke="#ff0085" stroke-dasharray="5,2" d="M2157.72,-522.39C2139.79,-517.62 2119,-512.1 2100.2,-507.1"/>
+<polygon fill="#ff0085" stroke="#ff0085" points="2100.85,-503.65 2090.28,-504.46 2099.05,-510.42 2100.85,-503.65"/>
+</g>
+<!-- sourcefile~vaporization.f90&#45;&gt;sourcefile~physics_constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge183" class="edge">
+<title>sourcefile~vaporization.f90&#45;&gt;sourcefile~physics_constants.f90</title>
+<path fill="none" stroke="#ff0085" stroke-dasharray="5,2" d="M2192.68,-522.29C2172.77,-499.14 2129.34,-449.95 2110,-438.43 2061.52,-409.55 1999.71,-393.06 1952.08,-383.91"/>
+<polygon fill="#ff0085" stroke="#ff0085" points="1952.61,-380.45 1942.14,-382.07 1951.34,-387.34 1952.61,-380.45"/>
+</g>
+<!-- sourcefile~vector_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node90" class="node">
+<title>sourcefile~vector_interface.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node90"><a xlink:href="../sourcefile/vector_interface.f90.html" xlink:title="vector_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="717,-437.43 595,-437.43 595,-413.43 717,-413.43 717,-437.43"/>
+<text text-anchor="middle" x="656" y="-423.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~vector.f90&#45;&gt;sourcefile~vector_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge184" class="edge">
+<title>sourcefile~vector.f90&#45;&gt;sourcefile~vector_interface.f90</title>
+<path fill="none" stroke="#ff0063" stroke-dasharray="5,2" d="M781.55,-333.56C756.93,-351.72 710.32,-386.1 681.63,-407.26"/>
+<polygon fill="#ff0063" stroke="#ff0063" points="679.32,-404.62 673.35,-413.37 683.47,-410.25 679.32,-404.62"/>
+</g>
+<!-- sourcefile~vtk.f90&#45;&gt;sourcefile~types.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge185" class="edge">
+<title>sourcefile~vtk.f90&#45;&gt;sourcefile~types.f90</title>
+<path fill="none" stroke="#ff0042" stroke-dasharray="5,2" d="M1551.37,-177.44C1528.82,-190.34 1491.44,-211.04 1458,-226.43 1453.66,-228.42 1449.07,-230.4 1444.47,-232.3"/>
+<polygon fill="#ff0042" stroke="#ff0042" points="1443.08,-229.09 1435.11,-236.07 1445.69,-235.58 1443.08,-229.09"/>
+</g>
+<!-- sourcefile~vtk.f90&#45;&gt;sourcefile~vtk_constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge186" class="edge">
+<title>sourcefile~vtk.f90&#45;&gt;sourcefile~vtk_constants.f90</title>
+<path fill="none" stroke="#ff0042" stroke-dasharray="5,2" d="M1545.75,-171.68C1524.05,-176.84 1492.39,-184.38 1464.49,-191.02"/>
+<polygon fill="#ff0042" stroke="#ff0042" points="1463.32,-187.7 1454.41,-193.42 1464.94,-194.51 1463.32,-187.7"/>
+</g>
+<!-- sourcefile~vtk_wrapper.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node91" class="node">
+<title>sourcefile~vtk_wrapper.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node91"><a xlink:href="../sourcefile/vtk_wrapper.f90.html" xlink:title="vtk_wrapper.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1452.5,-175.43 1353.5,-175.43 1353.5,-151.43 1452.5,-151.43 1452.5,-175.43"/>
+<text text-anchor="middle" x="1403" y="-161.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk_wrapper.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~vtk.f90&#45;&gt;sourcefile~vtk_wrapper.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge187" class="edge">
+<title>sourcefile~vtk.f90&#45;&gt;sourcefile~vtk_wrapper.f90</title>
+<path fill="none" stroke="#ff0042" stroke-dasharray="5,2" d="M1545.75,-165.11C1523.64,-164.85 1491.19,-164.46 1462.91,-164.13"/>
+<polygon fill="#ff0042" stroke="#ff0042" points="1462.75,-160.63 1452.71,-164.01 1462.66,-167.62 1462.75,-160.63"/>
+</g>
+<!-- sourcefile~vtu_wrapper.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node92" class="node">
+<title>sourcefile~vtu_wrapper.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node92"><a xlink:href="../sourcefile/vtu_wrapper.f90.html" xlink:title="vtu_wrapper.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1453,-133.43 1353,-133.43 1353,-109.43 1453,-109.43 1453,-133.43"/>
+<text text-anchor="middle" x="1403" y="-119.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtu_wrapper.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~vtk.f90&#45;&gt;sourcefile~vtu_wrapper.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge188" class="edge">
+<title>sourcefile~vtk.f90&#45;&gt;sourcefile~vtu_wrapper.f90</title>
+<path fill="none" stroke="#ff0042" stroke-dasharray="5,2" d="M1545.75,-158.55C1522.88,-152.56 1488.95,-143.67 1460.02,-136.1"/>
+<polygon fill="#ff0042" stroke="#ff0042" points="1460.58,-132.63 1450.02,-133.48 1458.8,-139.4 1460.58,-132.63"/>
+</g>
+<!-- sourcefile~boundary_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node93" class="node">
+<title>sourcefile~boundary_interface.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node93"><a xlink:href="../sourcefile/boundary_interface.f90.html" xlink:title="boundary_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="4227,-938.43 4088,-938.43 4088,-914.43 4227,-914.43 4227,-938.43"/>
+<text text-anchor="middle" x="4157.5" y="-924.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">boundary_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~boundary.f90&#45;&gt;sourcefile~boundary_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge189" class="edge">
+<title>sourcefile~boundary.f90&#45;&gt;sourcefile~boundary_interface.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M4439.5,-909.87C4388.55,-912.87 4301.07,-918.03 4237.22,-921.79"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4236.96,-918.3 4227.18,-922.38 4237.37,-925.29 4236.96,-918.3"/>
+</g>
+<!-- sourcefile~boundary_manager.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_node94" class="node">
+<title>sourcefile~boundary_manager.f90</title>
+<g id="a_sourcefile~~thermal_base.f90~~EfferentGraph_node94"><a xlink:href="../sourcefile/boundary_manager.f90.html" xlink:title="boundary_manager.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="4402,-900.43 4263,-900.43 4263,-876.43 4402,-876.43 4402,-900.43"/>
+<text text-anchor="middle" x="4332.5" y="-886.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">boundary_manager.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~boundary.f90&#45;&gt;sourcefile~boundary_manager.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge190" class="edge">
+<title>sourcefile~boundary.f90&#45;&gt;sourcefile~boundary_manager.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M4439.13,-902.03C4430.68,-900.94 4421.55,-899.77 4412.31,-898.58"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4412.63,-895.09 4402.27,-897.28 4411.74,-902.03 4412.63,-895.09"/>
+</g>
+<!-- sourcefile~element_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge191" class="edge">
+<title>sourcefile~element_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ff5900" stroke-dasharray="5,2" d="M2533.72,-776.97C2470,-784.01 2372.37,-786.2 2298,-749.43 2275.96,-738.53 2282.4,-721.14 2262,-707.43 2239.84,-692.53 2231.65,-686.73 2205,-688.43"/>
+</g>
+<!-- sourcefile~element_interface.f90&#45;&gt;sourcefile~fe_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge192" class="edge">
+<title>sourcefile~element_interface.f90&#45;&gt;sourcefile~fe_interface.f90</title>
+<path fill="none" stroke="#ff5900" stroke-dasharray="5,2" d="M2536.06,-754.4C2510.95,-749.64 2482.27,-744.21 2457.65,-739.54"/>
+<polygon fill="#ff5900" stroke="#ff5900" points="2458.2,-736.08 2447.73,-737.66 2456.9,-742.96 2458.2,-736.08"/>
+</g>
+<!-- sourcefile~fe_factory.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge193" class="edge">
+<title>sourcefile~fe_factory.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ffb300" stroke-dasharray="5,2" d="M2722.99,-685.94C2689.86,-685.81 2642.72,-686.15 2601.5,-688.43"/>
+<path fill="none" stroke="#ffb300" stroke-dasharray="5,2" d="M2599.5,-688.43C2510.52,-693.35 2487.69,-679.75 2399,-688.43"/>
+</g>
+<!-- sourcefile~fe_factory.f90&#45;&gt;sourcefile~element_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge194" class="edge">
+<title>sourcefile~fe_factory.f90&#45;&gt;sourcefile~element_interface.f90</title>
+<path fill="none" stroke="#ffb300" stroke-dasharray="5,2" d="M2740.59,-698.58C2712.49,-712.28 2666.64,-734.65 2635.32,-749.93"/>
+<polygon fill="#ffb300" stroke="#ffb300" points="2633.56,-746.89 2626.11,-754.42 2636.63,-753.19 2633.56,-746.89"/>
+</g>
+<!-- sourcefile~fe_factory.f90&#45;&gt;sourcefile~fe_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge195" class="edge">
+<title>sourcefile~fe_factory.f90&#45;&gt;sourcefile~fe_interface.f90</title>
+<path fill="none" stroke="#ffb300" stroke-dasharray="5,2" d="M2599.5,-688.43C2548.37,-691.25 2491.19,-703.6 2451.02,-713.84"/>
+<polygon fill="#ffb300" stroke="#ffb300" points="2449.99,-710.49 2441.18,-716.39 2451.74,-717.26 2449.99,-710.49"/>
+</g>
+<!-- sourcefile~fe_factory.f90&#45;&gt;sourcefile~side_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge196" class="edge">
+<title>sourcefile~fe_factory.f90&#45;&gt;sourcefile~side_interface.f90</title>
+<path fill="none" stroke="#ffb300" stroke-dasharray="5,2" d="M2722.84,-676.54C2704.65,-672.33 2683.08,-667.33 2663.21,-662.72"/>
+<polygon fill="#ffb300" stroke="#ffb300" points="2663.84,-659.28 2653.31,-660.43 2662.26,-666.1 2663.84,-659.28"/>
+</g>
+<!-- sourcefile~fe_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge197" class="edge">
+<title>sourcefile~fe_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#f0ff00" stroke-dasharray="5,2" d="M2352.53,-716.36C2305.13,-704.01 2233.13,-686.82 2205,-688.43"/>
+</g>
+<!-- sourcefile~fe_interface.f90&#45;&gt;sourcefile~linalg.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge198" class="edge">
+<title>sourcefile~fe_interface.f90&#45;&gt;sourcefile~linalg.f90</title>
+<path fill="none" stroke="#f0ff00" stroke-dasharray="5,2" d="M2348.05,-728.43C2316.55,-728.43 2276.06,-728.43 2246.2,-728.43"/>
+<polygon fill="#f0ff00" stroke="#f0ff00" points="2246.12,-724.93 2236.12,-728.43 2246.12,-731.93 2246.12,-724.93"/>
+</g>
+<!-- sourcefile~fe_manager.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge199" class="edge">
+<title>sourcefile~fe_manager.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#96ff00" stroke-dasharray="5,2" d="M2896.45,-674.42C2847.92,-642.82 2708.5,-562.83 2601.5,-608.43"/>
+</g>
+<!-- sourcefile~fe_manager.f90&#45;&gt;sourcefile~fe_factory.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge200" class="edge">
+<title>sourcefile~fe_manager.f90&#45;&gt;sourcefile~fe_factory.f90</title>
+<path fill="none" stroke="#96ff00" stroke-dasharray="5,2" d="M2865.62,-686.43C2851.27,-686.43 2835.47,-686.43 2820.83,-686.43"/>
+<polygon fill="#96ff00" stroke="#96ff00" points="2820.4,-682.93 2810.4,-686.43 2820.4,-689.93 2820.4,-682.93"/>
+</g>
+<!-- sourcefile~fe_manager.f90&#45;&gt;sourcefile~fe_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge201" class="edge">
+<title>sourcefile~fe_manager.f90&#45;&gt;sourcefile~fe_interface.f90</title>
+<path fill="none" stroke="#96ff00" stroke-dasharray="5,2" d="M2872.45,-698.53C2859.02,-701.98 2843.98,-705.36 2830,-707.43 2698.03,-726.94 2541.12,-729.47 2457.81,-729.2"/>
+<polygon fill="#96ff00" stroke="#96ff00" points="2457.8,-725.7 2447.78,-729.15 2457.76,-732.7 2457.8,-725.7"/>
+</g>
+<!-- sourcefile~matrix_factory.f90&#45;&gt;sourcefile~constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge202" class="edge">
+<title>sourcefile~matrix_factory.f90&#45;&gt;sourcefile~constants.f90</title>
+<path fill="none" stroke="#00ff1e" stroke-dasharray="5,2" d="M1075.53,-333.54C1064.79,-340.67 1051.29,-350.1 1040,-359.43 993.84,-397.56 1001.98,-440.57 943.5,-453.43"/>
+<path fill="none" stroke="#00ff1e" stroke-dasharray="5,2" d="M941.5,-453.43C880.08,-466.93 853.41,-420.22 800,-453.43"/>
+</g>
+<!-- sourcefile~matrix_factory.f90&#45;&gt;sourcefile~matrix_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge203" class="edge">
+<title>sourcefile~matrix_factory.f90&#45;&gt;sourcefile~matrix_interface.f90</title>
+<path fill="none" stroke="#00ff1e" stroke-dasharray="5,2" d="M1039.99,-321.43C1031.61,-321.43 1022.85,-321.43 1014.18,-321.43"/>
+<polygon fill="#00ff1e" stroke="#00ff1e" points="1014.07,-317.93 1004.07,-321.43 1014.07,-324.93 1014.07,-317.93"/>
+</g>
+<!-- sourcefile~matrix_interface.f90&#45;&gt;sourcefile~constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge204" class="edge">
+<title>sourcefile~matrix_interface.f90&#45;&gt;sourcefile~constants.f90</title>
+<path fill="none" stroke="#00ff78" stroke-dasharray="5,2" d="M931.37,-333.66C909.7,-359.15 856.2,-418.48 800,-453.43"/>
+<path fill="none" stroke="#00ff78" stroke-dasharray="5,2" d="M798,-453.43C729.09,-496.28 734.01,-595 657,-569.43"/>
+<path fill="none" stroke="#00ff78" stroke-dasharray="5,2" d="M655,-569.43C599.36,-550.95 553.07,-496.05 530.97,-465.87"/>
+<polygon fill="#00ff78" stroke="#00ff78" points="533.8,-463.82 525.15,-457.72 528.11,-467.89 533.8,-463.82"/>
+</g>
+<!-- sourcefile~matrix_interface.f90&#45;&gt;sourcefile~vector.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge205" class="edge">
+<title>sourcefile~matrix_interface.f90&#45;&gt;sourcefile~vector.f90</title>
+<path fill="none" stroke="#00ff78" stroke-dasharray="5,2" d="M880.67,-321.43C867.92,-321.43 854.74,-321.43 842.82,-321.43"/>
+<polygon fill="#00ff78" stroke="#00ff78" points="842.71,-317.93 832.71,-321.43 842.71,-324.93 842.71,-317.93"/>
+</g>
+<!-- sourcefile~node.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge206" class="edge">
+<title>sourcefile~node.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#00d1ff" stroke-dasharray="5,2" d="M3984.71,-1084.23C3963.75,-1088.9 3935.21,-1095.17 3910,-1100.43"/>
+</g>
+<!-- sourcefile~side_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge207" class="edge">
+<title>sourcefile~side_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#001dff" stroke-dasharray="5,2" d="M2552.9,-660.46C2512.51,-670.23 2452.34,-683.21 2399,-688.43"/>
+</g>
+<!-- sourcefile~side_interface.f90&#45;&gt;sourcefile~fe_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge208" class="edge">
+<title>sourcefile~side_interface.f90&#45;&gt;sourcefile~fe_interface.f90</title>
+<path fill="none" stroke="#001dff" stroke-dasharray="5,2" d="M2563.63,-660.55C2553.76,-664.45 2543.24,-669.14 2534,-674.43 2516.4,-684.49 2516.17,-693.45 2498,-702.43 2485.44,-708.63 2471.22,-713.48 2457.56,-717.22"/>
+<polygon fill="#001dff" stroke="#001dff" points="2456.55,-713.87 2447.74,-719.76 2458.3,-720.65 2456.55,-713.87"/>
+</g>
+<!-- sourcefile~vector_interface.f90&#45;&gt;sourcefile~constants.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge209" class="edge">
+<title>sourcefile~vector_interface.f90&#45;&gt;sourcefile~constants.f90</title>
+<path fill="none" stroke="#f000ff" stroke-dasharray="5,2" d="M594.87,-434.14C586.3,-435.38 577.54,-436.65 569.14,-437.87"/>
+<polygon fill="#f000ff" stroke="#f000ff" points="568.5,-434.43 559.1,-439.32 569.5,-441.35 568.5,-434.43"/>
+</g>
+<!-- sourcefile~boundary_interface.f90&#45;&gt;sourcefile~control.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge210" class="edge">
+<title>sourcefile~boundary_interface.f90&#45;&gt;sourcefile~control.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M4087.98,-926.43C4079.26,-926.43 4070.51,-926.43 4062.28,-926.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4062.18,-922.93 4052.18,-926.43 4062.18,-929.93 4062.18,-922.93"/>
+</g>
+<!-- sourcefile~boundary_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge211" class="edge">
+<title>sourcefile~boundary_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M4090.37,-938.52C4066.26,-944.66 4039.43,-953.62 4017,-966.43"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M4015,-966.43C3949.29,-1003.93 3984.07,-1084.98 3910,-1100.43"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3908,-1100.43C3755.5,-1132.23 3713.08,-1108.3 3557.5,-1100.43"/>
+</g>
+<!-- sourcefile~boundary_interface.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge212" class="edge">
+<title>sourcefile~boundary_interface.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M4100.23,-914.39C4084.65,-911.25 4067.7,-908.03 4052,-905.43 3922.94,-884.04 3888.6,-859.62 3759,-877.43 3724.71,-882.14 3718.43,-894.83 3684,-898.43"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3682,-898.43C3650.44,-899.95 3616.31,-911.39 3591.78,-921.49"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3590.38,-918.28 3582.55,-925.41 3593.12,-924.72 3590.38,-918.28"/>
+</g>
+<!-- sourcefile~boundary_manager.f90&#45;&gt;sourcefile~control.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge214" class="edge">
+<title>sourcefile~boundary_manager.f90&#45;&gt;sourcefile~control.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M4156.5,-886.43C4119.76,-886.35 4079.62,-899.33 4051.87,-910.53"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="4050.48,-907.31 4042.6,-914.39 4053.17,-913.78 4050.48,-907.31"/>
+</g>
+<!-- sourcefile~boundary_manager.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge215" class="edge">
+<title>sourcefile~boundary_manager.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M4314.4,-900.58C4284.51,-920.76 4220.07,-959.65 4158.5,-966.43"/>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M4156.5,-966.43C4094.87,-973.21 4070.85,-935.69 4017,-966.43"/>
+</g>
+<!-- sourcefile~boundary_manager.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge216" class="edge">
+<title>sourcefile~boundary_manager.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M4262.89,-887.34C4231.13,-886.91 4192.89,-886.5 4158.5,-886.43"/>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M4156.5,-886.43C4092.24,-886.29 4079.39,-863.79 4017,-848.43"/>
+</g>
+<!-- sourcefile~boundary_manager.f90&#45;&gt;sourcefile~boundary_interface.f90 -->
+<g id="sourcefile~~thermal_base.f90~~EfferentGraph_edge213" class="edge">
+<title>sourcefile~boundary_manager.f90&#45;&gt;sourcefile~boundary_interface.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M4276.76,-900.45C4259.8,-904.18 4240.94,-908.32 4223.36,-912.18"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="4222.2,-908.85 4213.18,-914.42 4223.7,-915.69 4222.2,-908.85"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var pansourcefilethermal_basef90EfferentGraph = svgPanZoom('#sourcefilethermal_basef90EfferentGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#EfferentGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="EfferentGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="202pt" height="32pt"
+ viewBox="0.00 0.00 201.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 197.5,-28 197.5,4 -4,4"/>
+<!-- Source File -->
+<g id="node1" class="node">
+<title>Source File</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Source File</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="193.5,-24 88.5,-24 88.5,0 193.5,0 193.5,-24"/>
+<text text-anchor="middle" x="141" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a file to a file which it depends on. A file
+is dependent upon another if the latter must be compiled before the former
+can be.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+          </div>
+        </div>
+<br>
+      <section>
+        <h2><span class="anchor" id="src"></span>Source Code</h2>
+        <div class="hl codehilite"><pre><span></span><a id="ln-1" name="ln-1" href="#ln-1"></a><span class="k">submodule</span><span class="p">(</span><span class="n">main_thermal</span><span class="p">)</span><span class="w"> </span><span class="n">thermal_base</span>
+<a id="ln-2" name="ln-2" href="#ln-2"></a><span class="w">    </span><span class="k">implicit none</span>
+<a id="ln-3" name="ln-3" href="#ln-3"></a><span class="k">contains</span>
+<a id="ln-4" name="ln-4" href="#ln-4"></a><span class="k">    module subroutine </span><span class="n">initialize_type_thermal</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="n">active_region_ids</span><span class="p">)</span>
+<a id="ln-5" name="ln-5" href="#ln-5"></a><span class="w">        </span><span class="k">implicit none</span>
+<a id="ln-6" name="ln-6" href="#ln-6"></a><span class="k">        class</span><span class="p">(</span><span class="n">type_thermal</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<a id="ln-7" name="ln-7" href="#ln-7"></a><span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_input</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">input</span>
+<a id="ln-8" name="ln-8" href="#ln-8"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">active_region_ids</span><span class="p">(:)</span>
+<a id="ln-9" name="ln-9" href="#ln-9"></a>
+<a id="ln-10" name="ln-10" href="#ln-10"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_materials</span>
+<a id="ln-11" name="ln-11" href="#ln-11"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_phases</span>
+<a id="ln-12" name="ln-12" href="#ln-12"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span>
+<a id="ln-13" name="ln-13" href="#ln-13"></a>
+<a id="ln-14" name="ln-14" href="#ln-14"></a><span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_physics_info</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">density_info</span><span class="p">(:)</span>
+<a id="ln-15" name="ln-15" href="#ln-15"></a><span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_physics_info</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">specific_heat_info</span><span class="p">(:)</span>
+<a id="ln-16" name="ln-16" href="#ln-16"></a><span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_physics_info</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">heat_capacity_info</span><span class="p">(:)</span>
+<a id="ln-17" name="ln-17" href="#ln-17"></a><span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_physics_info</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">thermal_conductivity_info</span><span class="p">(:)</span>
+<a id="ln-18" name="ln-18" href="#ln-18"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">wrf_ids</span><span class="p">(:)</span>
+<a id="ln-19" name="ln-19" href="#ln-19"></a><span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_wrf_params</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">wrf_model_info</span><span class="p">(:)</span>
+<a id="ln-20" name="ln-20" href="#ln-20"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">hcf_ids</span><span class="p">(:)</span>
+<a id="ln-21" name="ln-21" href="#ln-21"></a><span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_hcf_params</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">hcf_model_info</span><span class="p">(:)</span>
+<a id="ln-22" name="ln-22" href="#ln-22"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">gcc_model_info</span><span class="p">(:)</span>
+<a id="ln-23" name="ln-23" href="#ln-23"></a>
+<a id="ln-24" name="ln-24" href="#ln-24"></a><span class="w">        </span><span class="c">! Initialize thermal physics components</span>
+<a id="ln-25" name="ln-25" href="#ln-25"></a>
+<a id="ln-26" name="ln-26" href="#ln-26"></a><span class="w">        </span><span class="n">num_materials</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">num_materials</span>
+<a id="ln-27" name="ln-27" href="#ln-27"></a>
+<a id="ln-28" name="ln-28" href="#ln-28"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">density_info</span><span class="p">(</span><span class="n">num_materials</span><span class="p">))</span>
+<a id="ln-29" name="ln-29" href="#ln-29"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">specific_heat_info</span><span class="p">(</span><span class="n">num_materials</span><span class="p">))</span>
+<a id="ln-30" name="ln-30" href="#ln-30"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">heat_capacity_info</span><span class="p">(</span><span class="n">num_materials</span><span class="p">))</span>
+<a id="ln-31" name="ln-31" href="#ln-31"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">thermal_conductivity_info</span><span class="p">(</span><span class="n">num_materials</span><span class="p">))</span>
+<a id="ln-32" name="ln-32" href="#ln-32"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">wrf_ids</span><span class="p">(</span><span class="n">num_materials</span><span class="p">))</span>
+<a id="ln-33" name="ln-33" href="#ln-33"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">wrf_model_info</span><span class="p">(</span><span class="n">num_materials</span><span class="p">))</span>
+<a id="ln-34" name="ln-34" href="#ln-34"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">hcf_ids</span><span class="p">(</span><span class="n">num_materials</span><span class="p">))</span>
+<a id="ln-35" name="ln-35" href="#ln-35"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">hcf_model_info</span><span class="p">(</span><span class="n">num_materials</span><span class="p">))</span>
+<a id="ln-36" name="ln-36" href="#ln-36"></a><span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">gcc_model_info</span><span class="p">(</span><span class="n">num_materials</span><span class="p">))</span>
+<a id="ln-37" name="ln-37" href="#ln-37"></a>
+<a id="ln-38" name="ln-38" href="#ln-38"></a><span class="w">        </span><span class="n">gcc_model_info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="c">! ID 0 は「モデルなし」として扱う</span>
+<a id="ln-39" name="ln-39" href="#ln-39"></a><span class="w">        </span><span class="n">hcf_ids</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="c">! ID 0 は「モデルなし」として扱う</span>
+<a id="ln-40" name="ln-40" href="#ln-40"></a><span class="w">        </span><span class="n">wrf_ids</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<a id="ln-41" name="ln-41" href="#ln-41"></a>
+<a id="ln-42" name="ln-42" href="#ln-42"></a><span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_materials</span>
+<a id="ln-43" name="ln-43" href="#ln-43"></a><span class="w">            </span><span class="k">do </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">active_region_ids</span><span class="p">)</span>
+<a id="ln-44" name="ln-44" href="#ln-44"></a><span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">input</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">active_region_ids</span><span class="p">(</span><span class="n">j</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<a id="ln-45" name="ln-45" href="#ln-45"></a>
+<a id="ln-46" name="ln-46" href="#ln-46"></a><span class="k">                    call </span><span class="n">density_info</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">reset</span><span class="p">()</span>
+<a id="ln-47" name="ln-47" href="#ln-47"></a><span class="w">                    </span><span class="k">call </span><span class="n">specific_heat_info</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">reset</span><span class="p">()</span>
+<a id="ln-48" name="ln-48" href="#ln-48"></a><span class="w">                    </span><span class="k">call </span><span class="n">heat_capacity_info</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">reset</span><span class="p">()</span>
+<a id="ln-49" name="ln-49" href="#ln-49"></a><span class="w">                    </span><span class="k">call </span><span class="n">thermal_conductivity_info</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">reset</span><span class="p">()</span>
+<a id="ln-50" name="ln-50" href="#ln-50"></a>
+<a id="ln-51" name="ln-51" href="#ln-51"></a><span class="w">                    </span><span class="k">call </span><span class="n">input</span><span class="p">%</span><span class="n">get_density_info</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">density_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<a id="ln-52" name="ln-52" href="#ln-52"></a><span class="w">                    </span><span class="k">call </span><span class="n">input</span><span class="p">%</span><span class="n">get_specific_heat_info</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">specific_heat_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<a id="ln-53" name="ln-53" href="#ln-53"></a><span class="w">                    </span><span class="k">call </span><span class="n">input</span><span class="p">%</span><span class="n">get_volumetric_heat_capacity_info</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">heat_capacity_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<a id="ln-54" name="ln-54" href="#ln-54"></a><span class="w">                    </span><span class="k">call </span><span class="n">input</span><span class="p">%</span><span class="n">get_thermal_conductivity_info</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">thermal_conductivity_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<a id="ln-55" name="ln-55" href="#ln-55"></a><span class="w">                    </span><span class="k">call </span><span class="n">input</span><span class="p">%</span><span class="n">get_wrf_info</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">wrf_model_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<a id="ln-56" name="ln-56" href="#ln-56"></a><span class="w">                    </span><span class="k">call </span><span class="n">input</span><span class="p">%</span><span class="n">get_gcc_info</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">gcc_model_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<a id="ln-57" name="ln-57" href="#ln-57"></a><span class="w">                    </span><span class="k">call </span><span class="n">input</span><span class="p">%</span><span class="n">get_hcf_info</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">hcf_model_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<a id="ln-58" name="ln-58" href="#ln-58"></a>
+<a id="ln-59" name="ln-59" href="#ln-59"></a><span class="w">                    </span><span class="n">wrf_ids</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span>
+<a id="ln-60" name="ln-60" href="#ln-60"></a><span class="w">                    </span><span class="n">hcf_ids</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span>
+<a id="ln-61" name="ln-61" href="#ln-61"></a>
+<a id="ln-62" name="ln-62" href="#ln-62"></a><span class="w">                </span><span class="k">end if</span>
+<a id="ln-63" name="ln-63" href="#ln-63"></a><span class="k">            end do</span>
+<a id="ln-64" name="ln-64" href="#ln-64"></a><span class="k">        end do</span>
+<a id="ln-65" name="ln-65" href="#ln-65"></a>
+<a id="ln-66" name="ln-66" href="#ln-66"></a><span class="k">        call </span><span class="n">self</span><span class="p">%</span><span class="n">physics</span><span class="p">%</span><span class="n">initialize</span><span class="p">(</span><span class="n">active_region_ids</span><span class="p">,</span><span class="w"> </span><span class="n">density_info</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="ln-67" name="ln-67" href="#ln-67"></a><span class="w">                                     </span><span class="n">specific_heat_info</span><span class="p">,</span><span class="w"> </span><span class="n">heat_capacity_info</span><span class="p">,</span><span class="w"> </span><span class="n">thermal_conductivity_info</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="ln-68" name="ln-68" href="#ln-68"></a><span class="w">                                     </span><span class="n">wrf_ids</span><span class="p">,</span><span class="w"> </span><span class="n">wrf_model_info</span><span class="p">,</span><span class="w"> </span><span class="n">hcf_ids</span><span class="p">,</span><span class="w"> </span><span class="n">hcf_model_info</span><span class="p">,</span><span class="w"> </span><span class="n">gcc_model_info</span><span class="p">)</span>
+<a id="ln-69" name="ln-69" href="#ln-69"></a>
+<a id="ln-70" name="ln-70" href="#ln-70"></a><span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">computation_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">simulation_settings</span><span class="p">%</span><span class="n">calculate_type</span>
+<a id="ln-71" name="ln-71" href="#ln-71"></a><span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">computation_dimension</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">simulation_settings</span><span class="p">%</span><span class="n">calculate_dimension</span>
+<a id="ln-72" name="ln-72" href="#ln-72"></a>
+<a id="ln-73" name="ln-73" href="#ln-73"></a><span class="w">    </span><span class="k">end subroutine </span><span class="n">initialize_type_thermal</span>
+<a id="ln-74" name="ln-74" href="#ln-74"></a>
+<a id="ln-75" name="ln-75" href="#ln-75"></a><span class="w">    </span><span class="k">module subroutine </span><span class="n">destroy_type_thermal</span><span class="p">(</span><span class="n">self</span><span class="p">)</span>
+<a id="ln-76" name="ln-76" href="#ln-76"></a><span class="w">        </span><span class="k">implicit none</span>
+<a id="ln-77" name="ln-77" href="#ln-77"></a><span class="k">        class</span><span class="p">(</span><span class="n">type_thermal</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<a id="ln-78" name="ln-78" href="#ln-78"></a>
+<a id="ln-79" name="ln-79" href="#ln-79"></a><span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">computation_dimension</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<a id="ln-80" name="ln-80" href="#ln-80"></a><span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">computation_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<a id="ln-81" name="ln-81" href="#ln-81"></a>
+<a id="ln-82" name="ln-82" href="#ln-82"></a><span class="w">    </span><span class="k">end subroutine </span><span class="n">destroy_type_thermal</span>
+<a id="ln-83" name="ln-83" href="#ln-83"></a><span class="k">end submodule </span><span class="n">thermal_base</span>
+</pre></div>
+
+      </section>
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

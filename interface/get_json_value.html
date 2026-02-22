@@ -1,0 +1,2336 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>get_json_value &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>get_json_value
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title="<p> 0.0% of total for procedures.</p>Including implementation: 258 statements,  0.6% of total for procedures.">9 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/input_base.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/input_base.f90.html'>input_base.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/inout_input_base.html'>inout_input_base</a></li>
+            <li class="breadcrumb-item active" aria-current="page">get_json_value</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+        <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#modprocs-0"
+         aria-expanded="false" aria-controls="modprocs-0">
+         <h4 class="card-header bg-primary text-white">Module Procedures</h4>
+      </a>
+      <div id="modprocs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../interface/get_json_value.html#moduleprocedure-get_json_integer32">get_json_integer32</a>
+            <a class="list-group-item" href="../interface/get_json_value.html#moduleprocedure-get_json_real64">get_json_real64</a>
+            <a class="list-group-item" href="../interface/get_json_value.html#moduleprocedure-get_json_logical">get_json_logical</a>
+            <a class="list-group-item" href="../interface/get_json_value.html#moduleprocedure-get_json_string">get_json_string</a>
+            <a class="list-group-item" href="../interface/get_json_value.html#moduleprocedure-get_json_integer32_array">get_json_integer32_array</a>
+            <a class="list-group-item" href="../interface/get_json_value.html#moduleprocedure-get_json_real64_array">get_json_real64_array</a>
+            <a class="list-group-item" href="../interface/get_json_value.html#moduleprocedure-get_json_string_array">get_json_string_array</a>
+        </div>
+      </div>
+    </div>
+
+  
+
+
+  </div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      <h2>public interface get_json_value</h2>
+      
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Calls</h3>
+          </div>
+          <div class="card-body">
+            <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~get_json_value~~CallsGraph Pages: 1 -->
+<svg id="interfaceget_json_valueCallsGraph" width="641pt" height="299pt"
+ viewBox="0.00 0.00 641.00 298.55" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~get_json_value~~CallsGraph" class="graph" transform="scale(0.93 0.93) rotate(0) translate(4 316.44)">
+<title>interface~~get_json_value~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-316.44 684,-316.44 684,4 -4,4"/>
+<!-- interface~get_json_value -->
+<g id="interface~~get_json_value~~CallsGraph_node1" class="node">
+<title>interface~get_json_value</title>
+<polygon fill="none" stroke="black" points="91,-166.55 0,-166.55 0,-142.55 91,-142.55 91,-166.55"/>
+<text text-anchor="middle" x="45.5" y="-152.15" font-family="Helvetica,sans-Serif" font-size="10.50">get_json_value</text>
+</g>
+<!-- proc~get_json_integer32 -->
+<g id="interface~~get_json_value~~CallsGraph_node2" class="node">
+<title>proc~get_json_integer32</title>
+<g id="a_interface~~get_json_value~~CallsGraph_node2"><a xlink:href="../proc/get_json_integer32.html" xlink:title="get_json_integer32">
+<polygon fill="#d9534f" stroke="#d9534f" points="258,-40.55 144,-40.55 144,-16.55 258,-16.55 258,-40.55"/>
+<text text-anchor="middle" x="201" y="-26.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_integer32</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_integer32 -->
+<g id="interface~~get_json_value~~CallsGraph_edge1" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_integer32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M52.42,-142.46C63.78,-120.55 90.75,-74.27 127,-49.55 129.4,-47.92 131.93,-46.41 134.54,-45.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="136.15,-48.13 143.72,-40.71 133.18,-41.79 136.15,-48.13"/>
+</g>
+<!-- proc~get_json_integer32_array -->
+<g id="interface~~get_json_value~~CallsGraph_node3" class="node">
+<title>proc~get_json_integer32_array</title>
+<g id="a_interface~~get_json_value~~CallsGraph_node3"><a xlink:href="../proc/get_json_integer32_array.html" xlink:title="get_json_integer32_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="275,-124.55 127,-124.55 127,-100.55 275,-100.55 275,-124.55"/>
+<text text-anchor="middle" x="201" y="-110.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_integer32_array</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_integer32_array -->
+<g id="interface~~get_json_value~~CallsGraph_edge2" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_integer32_array</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M90.49,-142.52C107.83,-137.77 127.92,-132.28 146.12,-127.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="147.28,-130.61 156.01,-124.59 145.44,-123.86 147.28,-130.61"/>
+</g>
+<!-- proc~get_json_logical -->
+<g id="interface~~get_json_value~~CallsGraph_node4" class="node">
+<title>proc~get_json_logical</title>
+<g id="a_interface~~get_json_value~~CallsGraph_node4"><a xlink:href="../proc/get_json_logical.html" xlink:title="get_json_logical">
+<polygon fill="#d9534f" stroke="#d9534f" points="249.5,-208.55 152.5,-208.55 152.5,-184.55 249.5,-184.55 249.5,-208.55"/>
+<text text-anchor="middle" x="201" y="-194.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_logical</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_logical -->
+<g id="interface~~get_json_value~~CallsGraph_edge3" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_logical</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M90.49,-166.59C107.83,-171.34 127.92,-176.83 146.12,-181.81"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="145.44,-185.25 156.01,-184.52 147.28,-178.5 145.44,-185.25"/>
+</g>
+<!-- proc~get_json_real64 -->
+<g id="interface~~get_json_value~~CallsGraph_node5" class="node">
+<title>proc~get_json_real64</title>
+<g id="a_interface~~get_json_value~~CallsGraph_node5"><a xlink:href="../proc/get_json_real64.html" xlink:title="get_json_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="249,-292.55 153,-292.55 153,-268.55 249,-268.55 249,-292.55"/>
+<text text-anchor="middle" x="201" y="-278.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_real64 -->
+<g id="interface~~get_json_value~~CallsGraph_edge4" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M52.42,-166.64C63.78,-188.56 90.75,-234.84 127,-259.55 131.96,-262.93 137.46,-265.77 143.15,-268.16"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="142.26,-271.57 152.85,-271.77 144.7,-265 142.26,-271.57"/>
+</g>
+<!-- proc~get_json_real64_array -->
+<g id="interface~~get_json_value~~CallsGraph_node6" class="node">
+<title>proc~get_json_real64_array</title>
+<g id="a_interface~~get_json_value~~CallsGraph_node6"><a xlink:href="../proc/get_json_real64_array.html" xlink:title="get_json_real64_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="266,-250.55 136,-250.55 136,-226.55 266,-226.55 266,-250.55"/>
+<text text-anchor="middle" x="201" y="-236.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_real64_array</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_real64_array -->
+<g id="interface~~get_json_value~~CallsGraph_edge5" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_real64_array</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M58.82,-166.71C73.76,-180.83 100.29,-203.92 127,-217.55 130.94,-219.57 135.1,-221.41 139.35,-223.1"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="138.18,-226.39 148.77,-226.54 140.58,-219.82 138.18,-226.39"/>
+</g>
+<!-- proc~get_json_string -->
+<g id="interface~~get_json_value~~CallsGraph_node7" class="node">
+<title>proc~get_json_string</title>
+<g id="a_interface~~get_json_value~~CallsGraph_node7"><a xlink:href="../proc/get_json_string.html" xlink:title="get_json_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="247,-82.55 155,-82.55 155,-58.55 247,-58.55 247,-82.55"/>
+<text text-anchor="middle" x="201" y="-68.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_string</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_string -->
+<g id="interface~~get_json_value~~CallsGraph_edge6" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_string</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M58.82,-142.4C73.76,-128.28 100.29,-105.19 127,-91.55 132.7,-88.64 138.87,-86.08 145.12,-83.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="146.56,-87.05 154.95,-80.58 144.36,-80.4 146.56,-87.05"/>
+</g>
+<!-- proc~get_json_string_array -->
+<g id="interface~~get_json_value~~CallsGraph_node8" class="node">
+<title>proc~get_json_string_array</title>
+<g id="a_interface~~get_json_value~~CallsGraph_node8"><a xlink:href="../proc/get_json_string_array.html" xlink:title="get_json_string_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="264,-166.55 138,-166.55 138,-142.55 264,-142.55 264,-166.55"/>
+<text text-anchor="middle" x="201" y="-152.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_string_array</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_string_array -->
+<g id="interface~~get_json_value~~CallsGraph_edge7" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_string_array</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M91.31,-154.55C102.65,-154.55 115.12,-154.55 127.44,-154.55"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="127.74,-158.05 137.74,-154.55 127.74,-151.05 127.74,-158.05"/>
+</g>
+<!-- get -->
+<g id="interface~~get_json_value~~CallsGraph_node9" class="node">
+<title>get</title>
+<polygon fill="#777777" stroke="#777777" points="399,-166.55 345,-166.55 345,-142.55 399,-142.55 399,-166.55"/>
+<text text-anchor="middle" x="372" y="-152.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get</text>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;get -->
+<g id="interface~~get_json_value~~CallsGraph_edge8" class="edge">
+<title>proc~get_json_integer32&#45;&gt;get</title>
+<path fill="none" stroke="#ff0000" d="M258.13,-38.99C264.26,-41.73 270.06,-45.19 275,-49.55 305.46,-76.43 281.32,-105.83 311,-133.55 317.74,-139.85 326.47,-144.27 335.18,-147.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="334.3,-150.77 344.89,-150.34 336.35,-144.07 334.3,-150.77"/>
+</g>
+<!-- print_error_message -->
+<g id="interface~~get_json_value~~CallsGraph_node10" class="node">
+<title>print_error_message</title>
+<polygon fill="#777777" stroke="#777777" points="433,-208.55 311,-208.55 311,-184.55 433,-184.55 433,-208.55"/>
+<text text-anchor="middle" x="372" y="-194.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">print_error_message</text>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;print_error_message -->
+<g id="interface~~get_json_value~~CallsGraph_edge9" class="edge">
+<title>proc~get_json_integer32&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#ff0000" d="M258.32,-38.23C264.49,-41.1 270.25,-44.79 275,-49.55 316.15,-90.77 271.04,-133.19 311,-175.55 312.04,-176.66 313.14,-177.7 314.3,-178.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="312.36,-181.61 322.56,-184.47 316.37,-175.87 312.36,-181.61"/>
+</g>
+<!-- proc~raise_error -->
+<g id="interface~~get_json_value~~CallsGraph_node11" class="node">
+<title>proc~raise_error</title>
+<g id="a_interface~~get_json_value~~CallsGraph_node11"><a xlink:href="../proc/raise_error.html" xlink:title="raise_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="407,-124.55 337,-124.55 337,-100.55 407,-100.55 407,-124.55"/>
+<text text-anchor="middle" x="372" y="-110.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">raise_error</text>
+</a>
+</g>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;proc~raise_error -->
+<g id="interface~~get_json_value~~CallsGraph_edge10" class="edge">
+<title>proc~get_json_integer32&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff0000" d="M251.43,-40.58C259.46,-43.15 267.57,-46.14 275,-49.55 301.43,-61.69 328.92,-80.46 347.67,-94.35"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="345.79,-97.32 355.88,-100.54 350,-91.73 345.79,-97.32"/>
+</g>
+<!-- strip -->
+<g id="interface~~get_json_value~~CallsGraph_node12" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="680,-144.55 626,-144.55 626,-120.55 680,-120.55 680,-144.55"/>
+<text text-anchor="middle" x="653" y="-130.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;strip -->
+<g id="interface~~get_json_value~~CallsGraph_edge11" class="edge">
+<title>proc~get_json_integer32&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M251.68,-16.52C329.32,-0.54 481.73,19.21 590,-40.55 617.37,-55.66 634.95,-88.59 644.16,-110.67"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="641,-112.2 647.91,-120.23 647.52,-109.65 641,-112.2"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;get -->
+<g id="interface~~get_json_value~~CallsGraph_edge12" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;get</title>
+<path fill="none" stroke="#ffda00" d="M250.43,-124.59C277.23,-131.25 309.98,-139.39 334.59,-145.51"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="334.04,-148.98 344.59,-147.99 335.73,-142.18 334.04,-148.98"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;print_error_message -->
+<g id="interface~~get_json_value~~CallsGraph_edge13" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#ffda00" d="M257.34,-124.69C263.53,-127.14 269.56,-130.06 275,-133.55 295.68,-146.85 290.7,-161.68 311,-175.55 313.39,-177.19 315.92,-178.71 318.54,-180.12"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="317.17,-183.34 327.7,-184.51 320.2,-177.03 317.17,-183.34"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;proc~raise_error -->
+<g id="interface~~get_json_value~~CallsGraph_edge14" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ffda00" d="M275.14,-112.55C292.54,-112.55 310.59,-112.55 326.27,-112.55"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="326.71,-116.05 336.71,-112.55 326.71,-109.05 326.71,-116.05"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;strip -->
+<g id="interface~~get_json_value~~CallsGraph_edge15" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;strip</title>
+<path fill="none" stroke="#ffda00" d="M246.51,-100.53C319.87,-82.8 470,-55.47 590,-91.55 604.97,-96.06 619.65,-105.48 630.97,-114.15"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="628.93,-117.01 638.92,-120.55 633.32,-111.55 628.93,-117.01"/>
+</g>
+<!-- proc~get_json_logical&#45;&gt;get -->
+<g id="interface~~get_json_value~~CallsGraph_edge16" class="edge">
+<title>proc~get_json_logical&#45;&gt;get</title>
+<path fill="none" stroke="#48ff00" d="M249.53,-184.74C276.64,-178 310.08,-169.69 335.01,-163.5"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="335.93,-166.88 344.79,-161.07 334.24,-160.08 335.93,-166.88"/>
+</g>
+<!-- proc~get_json_logical&#45;&gt;print_error_message -->
+<g id="interface~~get_json_value~~CallsGraph_edge17" class="edge">
+<title>proc~get_json_logical&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#48ff00" d="M249.53,-196.55C265.44,-196.55 283.53,-196.55 300.81,-196.55"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="300.86,-200.05 310.86,-196.55 300.86,-193.05 300.86,-200.05"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;get -->
+<g id="interface~~get_json_value~~CallsGraph_edge18" class="edge">
+<title>proc~get_json_real64&#45;&gt;get</title>
+<path fill="none" stroke="#00ff91" d="M249.13,-273.59C258.5,-270.49 267.68,-266.01 275,-259.55 305.46,-232.68 281.32,-203.28 311,-175.55 317.74,-169.26 326.47,-164.84 335.18,-161.74"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="336.35,-165.04 344.89,-158.76 334.3,-158.34 336.35,-165.04"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;print_error_message -->
+<g id="interface~~get_json_value~~CallsGraph_edge19" class="edge">
+<title>proc~get_json_real64&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#00ff91" d="M249.1,-269.27C257.88,-266.53 266.85,-263.3 275,-259.55 301.43,-247.42 328.92,-228.65 347.67,-214.76"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="350,-217.38 355.88,-208.57 345.79,-211.79 350,-217.38"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;proc~raise_error -->
+<g id="interface~~get_json_value~~CallsGraph_edge20" class="edge">
+<title>proc~get_json_real64&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ff91" d="M249.02,-274.53C258.61,-271.38 267.92,-266.65 275,-259.55 316.15,-218.33 271.04,-175.92 311,-133.55 315.52,-128.76 321.2,-125.06 327.25,-122.2"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="328.93,-125.3 336.94,-118.38 326.36,-118.79 328.93,-125.3"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;strip -->
+<g id="interface~~get_json_value~~CallsGraph_edge21" class="edge">
+<title>proc~get_json_real64&#45;&gt;strip</title>
+<path fill="none" stroke="#00ff91" d="M245.89,-292.57C323.36,-310.99 485.99,-336.8 590,-262.55 626.07,-236.81 641.91,-184.4 648.25,-154.59"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="651.69,-155.2 650.17,-144.72 644.82,-153.87 651.69,-155.2"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;get -->
+<g id="interface~~get_json_value~~CallsGraph_edge22" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;get</title>
+<path fill="none" stroke="#0091ff" d="M257.34,-226.42C263.53,-223.97 269.56,-221.05 275,-217.55 295.68,-204.26 290.7,-189.42 311,-175.55 318.27,-170.59 326.84,-166.68 335.18,-163.65"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="336.39,-166.93 344.79,-160.48 334.2,-160.29 336.39,-166.93"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;print_error_message -->
+<g id="interface~~get_json_value~~CallsGraph_edge23" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#0091ff" d="M250.43,-226.52C269.88,-221.69 292.46,-216.07 312.79,-211.02"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="313.7,-214.4 322.56,-208.59 312.02,-207.61 313.7,-214.4"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;proc~raise_error -->
+<g id="interface~~get_json_value~~CallsGraph_edge24" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#0091ff" d="M261.76,-226.39C266.54,-223.96 271.04,-221.04 275,-217.55 305.46,-190.68 281.32,-161.28 311,-133.55 315.71,-129.15 321.4,-125.67 327.36,-122.91"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="328.87,-126.08 336.88,-119.15 326.29,-119.57 328.87,-126.08"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;strip -->
+<g id="interface~~get_json_value~~CallsGraph_edge25" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;strip</title>
+<path fill="none" stroke="#0091ff" d="M247.45,-250.62C323.82,-268.2 480.27,-292.46 590,-230.55 619.17,-214.1 636.62,-177.64 645.25,-154.13"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="648.57,-155.24 648.52,-144.65 641.95,-152.96 648.57,-155.24"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;get -->
+<g id="interface~~get_json_value~~CallsGraph_edge26" class="edge">
+<title>proc~get_json_string&#45;&gt;get</title>
+<path fill="none" stroke="#4800ff" d="M247.01,-79.07C256.71,-82.08 266.57,-86.14 275,-91.55 295.68,-104.85 290.7,-119.68 311,-133.55 318.27,-138.52 326.84,-142.43 335.18,-145.46"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="334.2,-148.82 344.79,-148.63 336.39,-142.18 334.2,-148.82"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;print_error_message -->
+<g id="interface~~get_json_value~~CallsGraph_edge27" class="edge">
+<title>proc~get_json_string&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#4800ff" d="M247.23,-76.9C257.25,-80.02 267.19,-84.66 275,-91.55 305.46,-118.43 281.32,-147.83 311,-175.55 312.3,-176.77 313.68,-177.92 315.12,-179"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="313.57,-182.16 323.9,-184.5 317.28,-176.23 313.57,-182.16"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;proc~raise_error -->
+<g id="interface~~get_json_value~~CallsGraph_edge28" class="edge">
+<title>proc~get_json_string&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#4800ff" d="M247.29,-81.81C272.04,-87.96 302.55,-95.54 327.08,-101.64"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="326.3,-105.05 336.85,-104.07 327.99,-98.26 326.3,-105.05"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;strip -->
+<g id="interface~~get_json_value~~CallsGraph_edge29" class="edge">
+<title>proc~get_json_string&#45;&gt;strip</title>
+<path fill="none" stroke="#4800ff" d="M247.2,-59.8C321.87,-44.33 474.25,-22.61 590,-70.55 610.15,-78.9 627.16,-97.32 638.24,-111.93"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="635.66,-114.34 644.35,-120.41 641.34,-110.25 635.66,-114.34"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;get -->
+<g id="interface~~get_json_value~~CallsGraph_edge30" class="edge">
+<title>proc~get_json_string_array&#45;&gt;get</title>
+<path fill="none" stroke="#ff00da" d="M264.45,-154.55C288.15,-154.55 314.34,-154.55 334.82,-154.55"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="334.97,-158.05 344.97,-154.55 334.97,-151.05 334.97,-158.05"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;print_error_message -->
+<g id="interface~~get_json_value~~CallsGraph_edge31" class="edge">
+<title>proc~get_json_string_array&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#ff00da" d="M250.43,-166.59C269.88,-171.42 292.46,-177.04 312.79,-182.09"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="312.02,-185.5 322.56,-184.52 313.7,-178.71 312.02,-185.5"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;proc~raise_error -->
+<g id="interface~~get_json_value~~CallsGraph_edge32" class="edge">
+<title>proc~get_json_string_array&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff00da" d="M250.43,-142.52C274.58,-136.52 303.57,-129.31 327.08,-123.47"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="327.92,-126.87 336.78,-121.06 326.23,-120.07 327.92,-126.87"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;strip -->
+<g id="interface~~get_json_value~~CallsGraph_edge33" class="edge">
+<title>proc~get_json_string_array&#45;&gt;strip</title>
+<path fill="none" stroke="#ff00da" d="M257.34,-166.69C263.53,-169.14 269.56,-172.06 275,-175.55 295.68,-188.85 288.66,-207.28 311,-217.55 330.97,-226.74 579.98,-218.66 590,-213.55 614.83,-200.89 632.57,-173.18 642.55,-153.71"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="645.72,-155.19 646.93,-144.66 639.42,-152.13 645.72,-155.19"/>
+</g>
+<!-- proc~raise_error&#45;&gt;strip -->
+<g id="interface~~get_json_value~~CallsGraph_edge35" class="edge">
+<title>proc~raise_error&#45;&gt;strip</title>
+<path fill="none" stroke="#00ffff" d="M407.36,-121.95C425.53,-126.44 448.31,-131.32 469,-133.55 522.47,-139.33 536.22,-133.99 590,-133.55 598.25,-133.49 607.12,-133.37 615.49,-133.24"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="615.81,-136.74 625.76,-133.07 615.7,-129.74 615.81,-136.74"/>
+</g>
+<!-- proc~replace_placeholder -->
+<g id="interface~~get_json_value~~CallsGraph_node13" class="node">
+<title>proc~replace_placeholder</title>
+<g id="a_interface~~get_json_value~~CallsGraph_node13"><a xlink:href="../proc/replace_placeholder.html" xlink:title="replace_placeholder">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="590,-124.55 469,-124.55 469,-100.55 590,-100.55 590,-124.55"/>
+<text text-anchor="middle" x="529.5" y="-110.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">replace_placeholder</text>
+</a>
+</g>
+</g>
+<!-- proc~raise_error&#45;&gt;proc~replace_placeholder -->
+<g id="interface~~get_json_value~~CallsGraph_edge34" class="edge">
+<title>proc~raise_error&#45;&gt;proc~replace_placeholder</title>
+<path fill="none" stroke="#00ffff" d="M407.13,-112.55C422.22,-112.55 440.56,-112.55 458.37,-112.55"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="458.76,-116.05 468.76,-112.55 458.76,-109.05 458.76,-116.05"/>
+</g>
+<!-- to_string -->
+<g id="interface~~get_json_value~~CallsGraph_node14" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="558.5,-204.55 500.5,-204.55 500.5,-180.55 558.5,-180.55 558.5,-204.55"/>
+<text text-anchor="middle" x="529.5" y="-190.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~raise_error&#45;&gt;to_string -->
+<g id="interface~~get_json_value~~CallsGraph_edge36" class="edge">
+<title>proc~raise_error&#45;&gt;to_string</title>
+<path fill="none" stroke="#00ffff" d="M407.09,-121.81C415.85,-124.9 425.05,-128.79 433,-133.55 451.62,-144.7 450.81,-154.72 469,-166.55 475.78,-170.96 483.43,-174.94 490.93,-178.39"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="489.71,-181.67 500.27,-182.46 492.5,-175.26 489.71,-181.67"/>
+</g>
+<!-- proc~replace_placeholder&#45;&gt;strip -->
+<g id="interface~~get_json_value~~CallsGraph_edge37" class="edge">
+<title>proc~replace_placeholder&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M590.18,-122.38C598.86,-123.81 607.57,-125.24 615.6,-126.56"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="615.27,-130.05 625.7,-128.23 616.4,-123.15 615.27,-130.05"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfaceget_json_valueCallsGraph = svgPanZoom('#interfaceget_json_valueCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Called by</h3>
+          </div>
+          <div class="card-body">
+            <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~get_json_value~~CalledByGraph Pages: 1 -->
+<svg id="interfaceget_json_valueCalledByGraph" width="641pt" height="262pt"
+ viewBox="0.00 0.00 641.00 261.68" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~get_json_value~~CalledByGraph" class="graph" transform="scale(0.31 0.31) rotate(0) translate(4 853.7)">
+<title>interface~~get_json_value~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-853.7 2097,-853.7 2097,4 -4,4"/>
+<!-- interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_node1" class="node">
+<title>interface~get_json_value</title>
+<polygon fill="none" stroke="black" points="2093,-414 2002,-414 2002,-390 2093,-390 2093,-414"/>
+<text text-anchor="middle" x="2047.5" y="-399.6" font-family="Helvetica,sans-Serif" font-size="10.50">get_json_value</text>
+</g>
+<!-- proc~read_conditions_boundary_conditions -->
+<g id="interface~~get_json_value~~CalledByGraph_node2" class="node">
+<title>proc~read_conditions_boundary_conditions</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node2"><a xlink:href="../proc/read_conditions_boundary_conditions.html" xlink:title="read_conditions_boundary_conditions">
+<polygon fill="#d9534f" stroke="#d9534f" points="1595.5,-786 1382.5,-786 1382.5,-762 1595.5,-762 1595.5,-786"/>
+<text text-anchor="middle" x="1489" y="-771.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_conditions_boundary_conditions</text>
+</a>
+</g>
+</g>
+<!-- proc~read_conditions_boundary_conditions&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge1" class="edge">
+<title>proc~read_conditions_boundary_conditions&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1516.7,-786.07C1595.65,-819.73 1830.93,-905.21 1966,-795 2024.26,-747.47 2041.51,-500.55 2045.48,-424.39"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2048.99,-424.22 2045.99,-414.06 2042,-423.88 2048.99,-424.22"/>
+</g>
+<!-- proc~read_conditions_boundary_conditions_local -->
+<g id="interface~~get_json_value~~CalledByGraph_node3" class="node">
+<title>proc~read_conditions_boundary_conditions_local</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node3"><a xlink:href="../proc/read_conditions_boundary_conditions_local.html" xlink:title="read_conditions_boundary_conditions_local">
+<polygon fill="#d9534f" stroke="#d9534f" points="1928.5,-786 1684.5,-786 1684.5,-762 1928.5,-762 1928.5,-786"/>
+<text text-anchor="middle" x="1806.5" y="-771.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_conditions_boundary_conditions_local</text>
+</a>
+</g>
+</g>
+<!-- proc~read_conditions_boundary_conditions&#45;&gt;proc~read_conditions_boundary_conditions_local -->
+<g id="interface~~get_json_value~~CalledByGraph_edge23" class="edge">
+<title>proc~read_conditions_boundary_conditions&#45;&gt;proc~read_conditions_boundary_conditions_local</title>
+<path fill="none" stroke="#ff4800" d="M1595.93,-774C1620.98,-774 1647.99,-774 1674.02,-774"/>
+<polygon fill="#ff4800" stroke="#ff4800" points="1674.33,-777.5 1684.33,-774 1674.33,-770.5 1674.33,-777.5"/>
+</g>
+<!-- proc~read_conditions_boundary_conditions_local&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge2" class="edge">
+<title>proc~read_conditions_boundary_conditions_local&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1928.7,-773.76C1942.45,-769.35 1955.33,-762.72 1966,-753 2015.27,-708.15 2038.3,-494.68 2044.63,-424.45"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2048.15,-424.38 2045.53,-414.11 2041.18,-423.77 2048.15,-424.38"/>
+</g>
+<!-- proc~read_conditions_initial_conditions -->
+<g id="interface~~get_json_value~~CalledByGraph_node4" class="node">
+<title>proc~read_conditions_initial_conditions</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node4"><a xlink:href="../proc/read_conditions_initial_conditions.html" xlink:title="read_conditions_initial_conditions">
+<polygon fill="#d9534f" stroke="#d9534f" points="1902,-744 1711,-744 1711,-720 1902,-720 1902,-744"/>
+<text text-anchor="middle" x="1806.5" y="-729.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_conditions_initial_conditions</text>
+</a>
+</g>
+</g>
+<!-- proc~read_conditions_initial_conditions&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge3" class="edge">
+<title>proc~read_conditions_initial_conditions&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1902.34,-737.21C1925.46,-734.01 1948.53,-726.44 1966,-711 2009.69,-672.38 2035.94,-488.57 2043.9,-424.27"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2047.41,-424.39 2045.14,-414.04 2040.47,-423.55 2047.41,-424.39"/>
+</g>
+<!-- proc~read_conditions_time_controls_adaptive_stepping -->
+<g id="interface~~get_json_value~~CalledByGraph_node5" class="node">
+<title>proc~read_conditions_time_controls_adaptive_stepping</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node5"><a xlink:href="../proc/read_conditions_time_controls_adaptive_stepping.html" xlink:title="read_conditions_time_controls_adaptive_stepping">
+<polygon fill="#d9534f" stroke="#d9534f" points="1944.5,-702 1668.5,-702 1668.5,-678 1944.5,-678 1944.5,-702"/>
+<text text-anchor="middle" x="1806.5" y="-687.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_conditions_time_controls_adaptive_stepping</text>
+</a>
+</g>
+</g>
+<!-- proc~read_conditions_time_controls_adaptive_stepping&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge4" class="edge">
+<title>proc~read_conditions_time_controls_adaptive_stepping&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1944.78,-682.59C1952.39,-678.96 1959.55,-674.49 1966,-669 2040.38,-605.73 2047.53,-476.41 2047.21,-424.4"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2050.71,-424.2 2047.04,-414.26 2043.71,-424.31 2050.71,-424.2"/>
+</g>
+<!-- proc~read_conditions_time_controls_simulation_period -->
+<g id="interface~~get_json_value~~CalledByGraph_node6" class="node">
+<title>proc~read_conditions_time_controls_simulation_period</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node6"><a xlink:href="../proc/read_conditions_time_controls_simulation_period.html" xlink:title="read_conditions_time_controls_simulation_period">
+<polygon fill="#d9534f" stroke="#d9534f" points="1943.5,-660 1669.5,-660 1669.5,-636 1943.5,-636 1943.5,-660"/>
+<text text-anchor="middle" x="1806.5" y="-645.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_conditions_time_controls_simulation_period</text>
+</a>
+</g>
+</g>
+<!-- proc~read_conditions_time_controls_simulation_period&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge5" class="edge">
+<title>proc~read_conditions_time_controls_simulation_period&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1943.7,-640.55C1951.67,-636.95 1959.2,-632.49 1966,-627 2029.51,-575.7 2042.95,-470.33 2045.76,-424.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2049.27,-424.37 2046.27,-414.21 2042.28,-424.03 2049.27,-424.37"/>
+</g>
+<!-- proc~read_conditions_time_controls_time_stepping -->
+<g id="interface~~get_json_value~~CalledByGraph_node7" class="node">
+<title>proc~read_conditions_time_controls_time_stepping</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node7"><a xlink:href="../proc/read_conditions_time_controls_time_stepping.html" xlink:title="read_conditions_time_controls_time_stepping">
+<polygon fill="#d9534f" stroke="#d9534f" points="1933,-618 1680,-618 1680,-594 1933,-594 1933,-618"/>
+<text text-anchor="middle" x="1806.5" y="-603.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_conditions_time_controls_time_stepping</text>
+</a>
+</g>
+</g>
+<!-- proc~read_conditions_time_controls_time_stepping&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge6" class="edge">
+<title>proc~read_conditions_time_controls_time_stepping&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1933.07,-601.87C1944.89,-597.89 1956.12,-592.42 1966,-585 2018.77,-545.38 2037.56,-463.67 2043.73,-424.25"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2047.2,-424.71 2045.16,-414.32 2040.27,-423.72 2047.2,-424.71"/>
+</g>
+<!-- proc~read_output_settings_fields -->
+<g id="interface~~get_json_value~~CalledByGraph_node8" class="node">
+<title>proc~read_output_settings_fields</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node8"><a xlink:href="../proc/read_output_settings_fields.html" xlink:title="read_output_settings_fields">
+<polygon fill="#d9534f" stroke="#d9534f" points="1885,-576 1728,-576 1728,-552 1885,-552 1885,-576"/>
+<text text-anchor="middle" x="1806.5" y="-561.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_output_settings_fields</text>
+</a>
+</g>
+</g>
+<!-- proc~read_output_settings_fields&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge7" class="edge">
+<title>proc~read_output_settings_fields&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1885.06,-567.49C1912.57,-565.34 1942.5,-558.8 1966,-543 2008.24,-514.6 2030.95,-456.1 2040.66,-424.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2044.06,-424.93 2043.46,-414.35 2037.33,-422.99 2044.06,-424.93"/>
+</g>
+<!-- proc~read_output_settings_history -->
+<g id="interface~~get_json_value~~CalledByGraph_node9" class="node">
+<title>proc~read_output_settings_history</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node9"><a xlink:href="../proc/read_output_settings_history.html" xlink:title="read_output_settings_history">
+<polygon fill="#d9534f" stroke="#d9534f" points="1888.5,-534 1724.5,-534 1724.5,-510 1888.5,-510 1888.5,-534"/>
+<text text-anchor="middle" x="1806.5" y="-519.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_output_settings_history</text>
+</a>
+</g>
+</g>
+<!-- proc~read_output_settings_history&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge8" class="edge">
+<title>proc~read_output_settings_history&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1888.59,-522.89C1914.64,-520.21 1942.74,-514.01 1966,-501 1998.14,-483.02 2022.49,-446.64 2035.61,-423.34"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2038.85,-424.71 2040.53,-414.25 2032.69,-421.38 2038.85,-424.71"/>
+</g>
+<!-- proc~read_output_settings_standard -->
+<g id="interface~~get_json_value~~CalledByGraph_node10" class="node">
+<title>proc~read_output_settings_standard</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node10"><a xlink:href="../proc/read_output_settings_standard.html" xlink:title="read_output_settings_standard">
+<polygon fill="#d9534f" stroke="#d9534f" points="1894,-492 1719,-492 1719,-468 1894,-468 1894,-492"/>
+<text text-anchor="middle" x="1806.5" y="-477.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_output_settings_standard</text>
+</a>
+</g>
+</g>
+<!-- proc~read_output_settings_standard&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge9" class="edge">
+<title>proc~read_output_settings_standard&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1894.34,-472.31C1918.1,-468.46 1943.49,-462.68 1966,-454 1986.89,-445.94 2008.07,-431.99 2023.45,-420.56"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2025.97,-423.04 2031.8,-414.19 2021.72,-417.47 2025.97,-423.04"/>
+</g>
+<!-- proc~read_parameters_analysis_controls -->
+<g id="interface~~get_json_value~~CalledByGraph_node11" class="node">
+<title>proc~read_parameters_analysis_controls</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node11"><a xlink:href="../proc/read_parameters_analysis_controls.html" xlink:title="read_parameters_analysis_controls">
+<polygon fill="#d9534f" stroke="#d9534f" points="1277.5,-452 1078.5,-452 1078.5,-428 1277.5,-428 1277.5,-452"/>
+<text text-anchor="middle" x="1178" y="-437.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_analysis_controls</text>
+</a>
+</g>
+</g>
+<!-- proc~read_parameters_analysis_controls&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge10" class="edge">
+<title>proc~read_parameters_analysis_controls&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1277.69,-440.37C1426.99,-440.12 1719.06,-436.41 1966,-414 1974.4,-413.24 1983.25,-412.18 1991.89,-411"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1992.49,-414.45 2001.9,-409.58 1991.51,-407.52 1992.49,-414.45"/>
+</g>
+<!-- proc~read_parameters_geometry_settings -->
+<g id="interface~~get_json_value~~CalledByGraph_node12" class="node">
+<title>proc~read_parameters_geometry_settings</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node12"><a xlink:href="../proc/read_parameters_geometry_settings.html" xlink:title="read_parameters_geometry_settings">
+<polygon fill="#d9534f" stroke="#d9534f" points="1282,-410 1074,-410 1074,-386 1282,-386 1282,-410"/>
+<text text-anchor="middle" x="1178" y="-395.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_geometry_settings</text>
+</a>
+</g>
+</g>
+<!-- proc~read_parameters_geometry_settings&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge11" class="edge">
+<title>proc~read_parameters_geometry_settings&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1282.35,-398.48C1467.31,-399.33 1848.9,-401.09 1991.31,-401.75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1991.53,-405.25 2001.54,-401.79 1991.56,-398.25 1991.53,-405.25"/>
+</g>
+<!-- proc~read_parameters_materials_basic -->
+<g id="interface~~get_json_value~~CalledByGraph_node13" class="node">
+<title>proc~read_parameters_materials_basic</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node13"><a xlink:href="../proc/read_parameters_materials_basic.html" xlink:title="read_parameters_materials_basic">
+<polygon fill="#d9534f" stroke="#d9534f" points="1585.5,-144 1392.5,-144 1392.5,-120 1585.5,-120 1585.5,-144"/>
+<text text-anchor="middle" x="1489" y="-129.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_materials_basic</text>
+</a>
+</g>
+</g>
+<!-- proc~read_parameters_materials_basic&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge12" class="edge">
+<title>proc~read_parameters_materials_basic&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1585.51,-123.35C1707.11,-114.4 1908.4,-107.19 1966,-151 2039.15,-206.63 2047.07,-329.43 2047.09,-379.79"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2043.59,-379.88 2046.98,-389.91 2050.59,-379.95 2043.59,-379.88"/>
+</g>
+<!-- proc~read_parameters_materials_hydraulic_model -->
+<g id="interface~~get_json_value~~CalledByGraph_node14" class="node">
+<title>proc~read_parameters_materials_hydraulic_model</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node14"><a xlink:href="../proc/read_parameters_materials_hydraulic_model.html" xlink:title="read_parameters_materials_hydraulic_model">
+<polygon fill="#d9534f" stroke="#d9534f" points="1933,-66 1680,-66 1680,-42 1933,-42 1933,-66"/>
+<text text-anchor="middle" x="1806.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_materials_hydraulic_model</text>
+</a>
+</g>
+</g>
+<!-- proc~read_parameters_materials_hydraulic_model&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge13" class="edge">
+<title>proc~read_parameters_materials_hydraulic_model&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1933.05,-60.09C1945.16,-64.77 1956.46,-71.22 1966,-80 2010.78,-121.23 2036.48,-313.73 2044.09,-379.73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2040.63,-380.31 2045.23,-389.86 2047.59,-379.53 2040.63,-380.31"/>
+</g>
+<!-- proc~read_parameters_materials_physics -->
+<g id="interface~~get_json_value~~CalledByGraph_node15" class="node">
+<title>proc~read_parameters_materials_physics</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node15"><a xlink:href="../proc/read_parameters_materials_physics.html" xlink:title="read_parameters_materials_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="1591,-84 1387,-84 1387,-60 1591,-60 1591,-84"/>
+<text text-anchor="middle" x="1489" y="-69.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_materials_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~read_parameters_materials_physics&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge14" class="edge">
+<title>proc~read_parameters_materials_physics&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1591.05,-74.65C1722.24,-79 1937.83,-89.63 1966,-113 2007.79,-147.67 2034.91,-317.6 2043.53,-379.44"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2040.11,-380.24 2044.93,-389.68 2047.04,-379.29 2040.11,-380.24"/>
+</g>
+<!-- proc~read_parameters_materials_physics&#45;&gt;proc~read_parameters_materials_hydraulic_model -->
+<g id="interface~~get_json_value~~CalledByGraph_edge34" class="edge">
+<title>proc~read_parameters_materials_physics&#45;&gt;proc~read_parameters_materials_hydraulic_model</title>
+<path fill="none" stroke="#0091ff" d="M1591.13,-66.23C1616.14,-64.8 1643.34,-63.25 1669.71,-61.75"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="1669.98,-65.24 1679.77,-61.17 1669.58,-58.25 1669.98,-65.24"/>
+</g>
+<!-- proc~read_parameters_materials_swcc -->
+<g id="interface~~get_json_value~~CalledByGraph_node16" class="node">
+<title>proc~read_parameters_materials_swcc</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node16"><a xlink:href="../proc/read_parameters_materials_swcc.html" xlink:title="read_parameters_materials_swcc">
+<polygon fill="#d9534f" stroke="#d9534f" points="1901.5,-24 1711.5,-24 1711.5,0 1901.5,0 1901.5,-24"/>
+<text text-anchor="middle" x="1806.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_materials_swcc</text>
+</a>
+</g>
+</g>
+<!-- proc~read_parameters_materials_physics&#45;&gt;proc~read_parameters_materials_swcc -->
+<g id="interface~~get_json_value~~CalledByGraph_edge36" class="edge">
+<title>proc~read_parameters_materials_physics&#45;&gt;proc~read_parameters_materials_swcc</title>
+<path fill="none" stroke="#0000ff" d="M1533.03,-59.93C1564.42,-51.47 1608.09,-40.39 1647,-33 1664.49,-29.68 1683.16,-26.71 1701.32,-24.11"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1701.93,-27.56 1711.35,-22.71 1700.97,-20.63 1701.93,-27.56"/>
+</g>
+<!-- proc~read_parameters_materials_swcc&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge15" class="edge">
+<title>proc~read_parameters_materials_swcc&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1901.53,-6.15C1925.06,-9.25 1948.54,-16.93 1966,-33 2017.64,-80.52 2039.2,-306.55 2044.88,-379.35"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2041.42,-379.96 2045.66,-389.67 2048.4,-379.43 2041.42,-379.96"/>
+</g>
+<!-- proc~read_parameters_simulation_settings -->
+<g id="interface~~get_json_value~~CalledByGraph_node17" class="node">
+<title>proc~read_parameters_simulation_settings</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node17"><a xlink:href="../proc/read_parameters_simulation_settings.html" xlink:title="read_parameters_simulation_settings">
+<polygon fill="#d9534f" stroke="#d9534f" points="1283.5,-368 1072.5,-368 1072.5,-344 1283.5,-344 1283.5,-368"/>
+<text text-anchor="middle" x="1178" y="-353.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_simulation_settings</text>
+</a>
+</g>
+</g>
+<!-- proc~read_parameters_simulation_settings&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge16" class="edge">
+<title>proc~read_parameters_simulation_settings&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1283.75,-360.54C1434.61,-367.25 1721.76,-380.69 1966,-396 1974.34,-396.52 1983.17,-397.13 1991.8,-397.75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1991.58,-401.24 2001.8,-398.48 1992.09,-394.26 1991.58,-401.24"/>
+</g>
+<!-- proc~read_parameters_solver_parallel_settings -->
+<g id="interface~~get_json_value~~CalledByGraph_node18" class="node">
+<title>proc~read_parameters_solver_parallel_settings</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node18"><a xlink:href="../proc/read_parameters_solver_parallel_settings.html" xlink:title="read_parameters_solver_parallel_settings">
+<polygon fill="#d9534f" stroke="#d9534f" points="1606,-298 1372,-298 1372,-274 1606,-274 1606,-298"/>
+<text text-anchor="middle" x="1489" y="-283.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_solver_parallel_settings</text>
+</a>
+</g>
+</g>
+<!-- proc~read_parameters_solver_parallel_settings&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge17" class="edge">
+<title>proc~read_parameters_solver_parallel_settings&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1606.26,-282.28C1726.41,-280.21 1904.78,-282.59 1966,-312 1996.95,-326.87 2021.24,-359.54 2034.73,-381.16"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2031.85,-383.16 2040,-389.94 2037.85,-379.56 2031.85,-383.16"/>
+</g>
+<!-- proc~read_parameters_solver_settings -->
+<g id="interface~~get_json_value~~CalledByGraph_node19" class="node">
+<title>proc~read_parameters_solver_settings</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node19"><a xlink:href="../proc/read_parameters_solver_settings.html" xlink:title="read_parameters_solver_settings">
+<polygon fill="#d9534f" stroke="#d9534f" points="1272,-298 1084,-298 1084,-274 1272,-274 1272,-298"/>
+<text text-anchor="middle" x="1178" y="-283.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_solver_settings</text>
+</a>
+</g>
+</g>
+<!-- proc~read_parameters_solver_settings&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge18" class="edge">
+<title>proc~read_parameters_solver_settings&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1272.3,-296.42C1480.61,-319.7 1965.47,-373.88 1966,-374 1979.68,-377.1 1994.28,-381.75 2007.23,-386.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2006.17,-389.71 2016.77,-389.87 2008.58,-383.14 2006.17,-389.71"/>
+</g>
+<!-- proc~read_parameters_solver_settings&#45;&gt;proc~read_parameters_solver_parallel_settings -->
+<g id="interface~~get_json_value~~CalledByGraph_edge38" class="edge">
+<title>proc~read_parameters_solver_settings&#45;&gt;proc~read_parameters_solver_parallel_settings</title>
+<path fill="none" stroke="#9100ff" d="M1272.13,-286C1300.31,-286 1331.74,-286 1361.7,-286"/>
+<polygon fill="#9100ff" stroke="#9100ff" points="1361.8,-289.5 1371.8,-286 1361.8,-282.5 1361.8,-289.5"/>
+</g>
+<!-- proc~read_parameters_solver_settings_linear -->
+<g id="interface~~get_json_value~~CalledByGraph_node20" class="node">
+<title>proc~read_parameters_solver_settings_linear</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node20"><a xlink:href="../proc/read_parameters_solver_settings_linear.html" xlink:title="read_parameters_solver_settings_linear">
+<polygon fill="#d9534f" stroke="#d9534f" points="1601,-256 1377,-256 1377,-232 1601,-232 1601,-256"/>
+<text text-anchor="middle" x="1489" y="-241.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_solver_settings_linear</text>
+</a>
+</g>
+</g>
+<!-- proc~read_parameters_solver_settings&#45;&gt;proc~read_parameters_solver_settings_linear -->
+<g id="interface~~get_json_value~~CalledByGraph_edge40" class="edge">
+<title>proc~read_parameters_solver_settings&#45;&gt;proc~read_parameters_solver_settings_linear</title>
+<path fill="none" stroke="#ff00da" d="M1267.55,-273.96C1305.61,-268.79 1350.25,-262.72 1389.36,-257.41"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="1390.27,-260.82 1399.71,-256 1389.33,-253.88 1390.27,-260.82"/>
+</g>
+<!-- proc~read_parameters_solver_settings_nonlinear -->
+<g id="interface~~get_json_value~~CalledByGraph_node21" class="node">
+<title>proc~read_parameters_solver_settings_nonlinear</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node21"><a xlink:href="../proc/read_parameters_solver_settings_nonlinear.html" xlink:title="read_parameters_solver_settings_nonlinear">
+<polygon fill="#d9534f" stroke="#d9534f" points="1611,-214 1367,-214 1367,-190 1611,-190 1611,-214"/>
+<text text-anchor="middle" x="1489" y="-199.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_solver_settings_nonlinear</text>
+</a>
+</g>
+</g>
+<!-- proc~read_parameters_solver_settings&#45;&gt;proc~read_parameters_solver_settings_nonlinear -->
+<g id="interface~~get_json_value~~CalledByGraph_edge41" class="edge">
+<title>proc~read_parameters_solver_settings&#45;&gt;proc~read_parameters_solver_settings_nonlinear</title>
+<path fill="none" stroke="#ff0091" d="M1210.17,-273.93C1247.11,-260.01 1310.77,-237.21 1367,-223 1377.21,-220.42 1387.98,-218.05 1398.72,-215.91"/>
+<polygon fill="#ff0091" stroke="#ff0091" points="1399.4,-219.35 1408.55,-214.01 1398.07,-212.47 1399.4,-219.35"/>
+</g>
+<!-- proc~read_parameters_solver_settings_linear&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge19" class="edge">
+<title>proc~read_parameters_solver_settings_linear&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1601.26,-240.72C1722.29,-239.09 1906.47,-242.87 1966,-278 2004.98,-301 2028.46,-351.15 2039.29,-380.14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2036.07,-381.52 2042.72,-389.77 2042.66,-379.17 2036.07,-381.52"/>
+</g>
+<!-- proc~read_parameters_solver_settings_nonlinear&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge20" class="edge">
+<title>proc~read_parameters_solver_settings_nonlinear&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1611.24,-197.5C1732.94,-195.31 1910.16,-199.2 1966,-237 2015.27,-270.36 2035.49,-342.81 2042.83,-379.6"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2039.45,-380.59 2044.71,-389.79 2046.34,-379.32 2039.45,-380.59"/>
+</g>
+<!-- proc~read_parameters_solver_settings_nonlinear_convergence -->
+<g id="interface~~get_json_value~~CalledByGraph_node22" class="node">
+<title>proc~read_parameters_solver_settings_nonlinear_convergence</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node22"><a xlink:href="../proc/read_parameters_solver_settings_nonlinear_convergence.html" xlink:title="read_parameters_solver_settings_nonlinear_convergence">
+<polygon fill="#d9534f" stroke="#d9534f" points="1966,-184 1647,-184 1647,-160 1966,-160 1966,-184"/>
+<text text-anchor="middle" x="1806.5" y="-169.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_solver_settings_nonlinear_convergence</text>
+</a>
+</g>
+</g>
+<!-- proc~read_parameters_solver_settings_nonlinear&#45;&gt;proc~read_parameters_solver_settings_nonlinear_convergence -->
+<g id="interface~~get_json_value~~CalledByGraph_edge42" class="edge">
+<title>proc~read_parameters_solver_settings_nonlinear&#45;&gt;proc~read_parameters_solver_settings_nonlinear_convergence</title>
+<path fill="none" stroke="#ff0048" d="M1611.08,-190.49C1630.09,-188.68 1649.86,-186.8 1669.19,-184.96"/>
+<polygon fill="#ff0048" stroke="#ff0048" points="1669.63,-188.44 1679.25,-184 1668.97,-181.47 1669.63,-188.44"/>
+</g>
+<!-- proc~read_parameters_solver_settings_nonlinear_convergence&#45;&gt;interface~get_json_value -->
+<g id="interface~~get_json_value~~CalledByGraph_edge21" class="edge">
+<title>proc~read_parameters_solver_settings_nonlinear_convergence&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M1943.24,-184.01C1951.37,-187.79 1959.05,-192.4 1966,-198 2023.4,-244.3 2040.02,-337.32 2044.72,-379.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2041.25,-380.37 2045.71,-389.98 2048.22,-379.69 2041.25,-380.37"/>
+</g>
+<!-- interface~read_conditions_boundary_conditions -->
+<g id="interface~~get_json_value~~CalledByGraph_node23" class="node">
+<title>interface~read_conditions_boundary_conditions</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node23"><a xlink:href="../interface/read_conditions_boundary_conditions.html" xlink:title="type_conditions%read_conditions_boundary_conditions">
+<polygon fill="#a7506f" stroke="#a7506f" points="1331,-786 1025,-786 1025,-762 1331,-762 1331,-786"/>
+<text text-anchor="middle" x="1178" y="-771.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_conditions%read_conditions_boundary_conditions</text>
+</a>
+</g>
+</g>
+<!-- interface~read_conditions_boundary_conditions&#45;&gt;proc~read_conditions_boundary_conditions -->
+<g id="interface~~get_json_value~~CalledByGraph_edge22" class="edge">
+<title>interface~read_conditions_boundary_conditions&#45;&gt;proc~read_conditions_boundary_conditions</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1331.24,-774C1344.95,-774 1358.7,-774 1372.03,-774"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1372.14,-777.5 1382.14,-774 1372.14,-770.5 1372.14,-777.5"/>
+</g>
+<!-- interface~read_conditions_initial_conditions -->
+<g id="interface~~get_json_value~~CalledByGraph_node24" class="node">
+<title>interface~read_conditions_initial_conditions</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node24"><a xlink:href="../interface/read_conditions_initial_conditions.html" xlink:title="type_conditions%read_conditions_initial_conditions">
+<polygon fill="#a7506f" stroke="#a7506f" points="1320,-744 1036,-744 1036,-720 1320,-720 1320,-744"/>
+<text text-anchor="middle" x="1178" y="-729.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_conditions%read_conditions_initial_conditions</text>
+</a>
+</g>
+</g>
+<!-- interface~read_conditions_initial_conditions&#45;&gt;proc~read_conditions_initial_conditions -->
+<g id="interface~~get_json_value~~CalledByGraph_edge24" class="edge">
+<title>interface~read_conditions_initial_conditions&#45;&gt;proc~read_conditions_initial_conditions</title>
+<path fill="none" stroke="#ff9100" stroke-dasharray="5,2" d="M1320.38,-732C1435.81,-732 1596.34,-732 1700.58,-732"/>
+<polygon fill="#ff9100" stroke="#ff9100" points="1700.8,-735.5 1710.8,-732 1700.8,-728.5 1700.8,-735.5"/>
+</g>
+<!-- interface~read_output_settings_fields -->
+<g id="interface~~get_json_value~~CalledByGraph_node25" class="node">
+<title>interface~read_output_settings_fields</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node25"><a xlink:href="../interface/read_output_settings_fields.html" xlink:title="read_output_settings_fields">
+<polygon fill="#a7506f" stroke="#a7506f" points="1567.5,-576 1410.5,-576 1410.5,-552 1567.5,-552 1567.5,-576"/>
+<text text-anchor="middle" x="1489" y="-561.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_output_settings_fields</text>
+</a>
+</g>
+</g>
+<!-- interface~read_output_settings_fields&#45;&gt;proc~read_output_settings_fields -->
+<g id="interface~~get_json_value~~CalledByGraph_edge28" class="edge">
+<title>interface~read_output_settings_fields&#45;&gt;proc~read_output_settings_fields</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M1567.58,-564C1613.05,-564 1670.63,-564 1717.75,-564"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="1717.94,-567.5 1727.94,-564 1717.94,-560.5 1717.94,-567.5"/>
+</g>
+<!-- interface~read_output_settings_history -->
+<g id="interface~~get_json_value~~CalledByGraph_node26" class="node">
+<title>interface~read_output_settings_history</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node26"><a xlink:href="../interface/read_output_settings_history.html" xlink:title="read_output_settings_history">
+<polygon fill="#a7506f" stroke="#a7506f" points="1571,-534 1407,-534 1407,-510 1571,-510 1571,-534"/>
+<text text-anchor="middle" x="1489" y="-519.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_output_settings_history</text>
+</a>
+</g>
+</g>
+<!-- interface~read_output_settings_history&#45;&gt;proc~read_output_settings_history -->
+<g id="interface~~get_json_value~~CalledByGraph_edge29" class="edge">
+<title>interface~read_output_settings_history&#45;&gt;proc~read_output_settings_history</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1571.25,-522C1614.96,-522 1669,-522 1714.17,-522"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1714.25,-525.5 1724.25,-522 1714.25,-518.5 1714.25,-525.5"/>
+</g>
+<!-- interface~read_output_settings_standard -->
+<g id="interface~~get_json_value~~CalledByGraph_node27" class="node">
+<title>interface~read_output_settings_standard</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node27"><a xlink:href="../interface/read_output_settings_standard.html" xlink:title="read_output_settings_standard">
+<polygon fill="#a7506f" stroke="#a7506f" points="1576.5,-492 1401.5,-492 1401.5,-468 1576.5,-468 1576.5,-492"/>
+<text text-anchor="middle" x="1489" y="-477.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_output_settings_standard</text>
+</a>
+</g>
+</g>
+<!-- interface~read_output_settings_standard&#45;&gt;proc~read_output_settings_standard -->
+<g id="interface~~get_json_value~~CalledByGraph_edge30" class="edge">
+<title>interface~read_output_settings_standard&#45;&gt;proc~read_output_settings_standard</title>
+<path fill="none" stroke="#00ff48" stroke-dasharray="5,2" d="M1576.63,-480C1617.58,-480 1666.63,-480 1708.79,-480"/>
+<polygon fill="#00ff48" stroke="#00ff48" points="1708.79,-483.5 1718.79,-480 1708.79,-476.5 1708.79,-483.5"/>
+</g>
+<!-- interface~read_parameters_analysis_controls -->
+<g id="interface~~get_json_value~~CalledByGraph_node28" class="node">
+<title>interface~read_parameters_analysis_controls</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node28"><a xlink:href="../interface/read_parameters_analysis_controls.html" xlink:title="read_parameters_analysis_controls">
+<polygon fill="#a7506f" stroke="#a7506f" points="983,-452 784,-452 784,-428 983,-428 983,-452"/>
+<text text-anchor="middle" x="883.5" y="-437.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_analysis_controls</text>
+</a>
+</g>
+</g>
+<!-- interface~read_parameters_analysis_controls&#45;&gt;proc~read_parameters_analysis_controls -->
+<g id="interface~~get_json_value~~CalledByGraph_edge31" class="edge">
+<title>interface~read_parameters_analysis_controls&#45;&gt;proc~read_parameters_analysis_controls</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M983.12,-440C1010.45,-440 1040.26,-440 1068.14,-440"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="1068.31,-443.5 1078.31,-440 1068.31,-436.5 1068.31,-443.5"/>
+</g>
+<!-- interface~read_parameters_geometry_settings -->
+<g id="interface~~get_json_value~~CalledByGraph_node29" class="node">
+<title>interface~read_parameters_geometry_settings</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node29"><a xlink:href="../interface/read_parameters_geometry_settings.html" xlink:title="read_parameters_geometry_settings">
+<polygon fill="#a7506f" stroke="#a7506f" points="987.5,-410 779.5,-410 779.5,-386 987.5,-386 987.5,-410"/>
+<text text-anchor="middle" x="883.5" y="-395.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_geometry_settings</text>
+</a>
+</g>
+</g>
+<!-- interface~read_parameters_geometry_settings&#45;&gt;proc~read_parameters_geometry_settings -->
+<g id="interface~~get_json_value~~CalledByGraph_edge32" class="edge">
+<title>interface~read_parameters_geometry_settings&#45;&gt;proc~read_parameters_geometry_settings</title>
+<path fill="none" stroke="#00ffda" stroke-dasharray="5,2" d="M987.62,-398C1012.2,-398 1038.56,-398 1063.57,-398"/>
+<polygon fill="#00ffda" stroke="#00ffda" points="1063.82,-401.5 1073.82,-398 1063.82,-394.5 1063.82,-401.5"/>
+</g>
+<!-- interface~read_parameters_simulation_settings -->
+<g id="interface~~get_json_value~~CalledByGraph_node30" class="node">
+<title>interface~read_parameters_simulation_settings</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node30"><a xlink:href="../interface/read_parameters_simulation_settings.html" xlink:title="read_parameters_simulation_settings">
+<polygon fill="#a7506f" stroke="#a7506f" points="989,-368 778,-368 778,-344 989,-344 989,-368"/>
+<text text-anchor="middle" x="883.5" y="-353.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_simulation_settings</text>
+</a>
+</g>
+</g>
+<!-- interface~read_parameters_simulation_settings&#45;&gt;proc~read_parameters_simulation_settings -->
+<g id="interface~~get_json_value~~CalledByGraph_edge37" class="edge">
+<title>interface~read_parameters_simulation_settings&#45;&gt;proc~read_parameters_simulation_settings</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M989.27,-356C1012.94,-356 1038.19,-356 1062.24,-356"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="1062.47,-359.5 1072.47,-356 1062.47,-352.5 1062.47,-359.5"/>
+</g>
+<!-- interface~read_parameters_solver_settings -->
+<g id="interface~~get_json_value~~CalledByGraph_node31" class="node">
+<title>interface~read_parameters_solver_settings</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node31"><a xlink:href="../interface/read_parameters_solver_settings.html" xlink:title="read_parameters_solver_settings">
+<polygon fill="#a7506f" stroke="#a7506f" points="977.5,-312 789.5,-312 789.5,-288 977.5,-288 977.5,-312"/>
+<text text-anchor="middle" x="883.5" y="-297.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_solver_settings</text>
+</a>
+</g>
+</g>
+<!-- interface~read_parameters_solver_settings&#45;&gt;proc~read_parameters_solver_settings -->
+<g id="interface~~get_json_value~~CalledByGraph_edge39" class="edge">
+<title>interface~read_parameters_solver_settings&#45;&gt;proc~read_parameters_solver_settings</title>
+<path fill="none" stroke="#da00ff" stroke-dasharray="5,2" d="M977.85,-295.53C1008.4,-294.07 1042.51,-292.44 1073.75,-290.94"/>
+<polygon fill="#da00ff" stroke="#da00ff" points="1073.96,-294.44 1083.78,-290.46 1073.63,-287.44 1073.96,-294.44"/>
+</g>
+<!-- proc~read_conditions_time_controls -->
+<g id="interface~~get_json_value~~CalledByGraph_node32" class="node">
+<title>proc~read_conditions_time_controls</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node32"><a xlink:href="../proc/read_conditions_time_controls.html" xlink:title="read_conditions_time_controls">
+<polygon fill="#d9534f" stroke="#d9534f" points="1575.5,-681 1402.5,-681 1402.5,-657 1575.5,-657 1575.5,-681"/>
+<text text-anchor="middle" x="1489" y="-666.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_conditions_time_controls</text>
+</a>
+</g>
+</g>
+<!-- proc~read_conditions_time_controls&#45;&gt;proc~read_conditions_time_controls_adaptive_stepping -->
+<g id="interface~~get_json_value~~CalledByGraph_edge25" class="edge">
+<title>proc~read_conditions_time_controls&#45;&gt;proc~read_conditions_time_controls_adaptive_stepping</title>
+<path fill="none" stroke="#ffda00" d="M1575.8,-674.71C1601.34,-676.41 1630.09,-678.32 1658.38,-680.21"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="1658.15,-683.7 1668.36,-680.87 1658.62,-676.72 1658.15,-683.7"/>
+</g>
+<!-- proc~read_conditions_time_controls&#45;&gt;proc~read_conditions_time_controls_simulation_period -->
+<g id="interface~~get_json_value~~CalledByGraph_edge26" class="edge">
+<title>proc~read_conditions_time_controls&#45;&gt;proc~read_conditions_time_controls_simulation_period</title>
+<path fill="none" stroke="#daff00" d="M1575.8,-663.29C1601.58,-661.57 1630.64,-659.64 1659.19,-657.74"/>
+<polygon fill="#daff00" stroke="#daff00" points="1659.52,-661.22 1669.27,-657.07 1659.06,-654.24 1659.52,-661.22"/>
+</g>
+<!-- proc~read_conditions_time_controls&#45;&gt;proc~read_conditions_time_controls_time_stepping -->
+<g id="interface~~get_json_value~~CalledByGraph_edge27" class="edge">
+<title>proc~read_conditions_time_controls&#45;&gt;proc~read_conditions_time_controls_time_stepping</title>
+<path fill="none" stroke="#91ff00" d="M1529.35,-656.95C1560.9,-647.66 1606.46,-635.07 1647,-627 1660.82,-624.25 1675.4,-621.76 1689.89,-619.54"/>
+<polygon fill="#91ff00" stroke="#91ff00" points="1690.52,-622.99 1699.89,-618.05 1689.48,-616.06 1690.52,-622.99"/>
+</g>
+<!-- proc~read_parameters_materials -->
+<g id="interface~~get_json_value~~CalledByGraph_node33" class="node">
+<title>proc~read_parameters_materials</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node33"><a xlink:href="../proc/read_parameters_materials.html" xlink:title="read_parameters_materials">
+<polygon fill="#d9534f" stroke="#d9534f" points="1258,-144 1098,-144 1098,-120 1258,-120 1258,-144"/>
+<text text-anchor="middle" x="1178" y="-129.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_materials</text>
+</a>
+</g>
+</g>
+<!-- proc~read_parameters_materials&#45;&gt;proc~read_parameters_materials_basic -->
+<g id="interface~~get_json_value~~CalledByGraph_edge33" class="edge">
+<title>proc~read_parameters_materials&#45;&gt;proc~read_parameters_materials_basic</title>
+<path fill="none" stroke="#00daff" d="M1258.17,-132C1295.84,-132 1341.42,-132 1382.02,-132"/>
+<polygon fill="#00daff" stroke="#00daff" points="1382.22,-135.5 1392.22,-132 1382.22,-128.5 1382.22,-135.5"/>
+</g>
+<!-- proc~read_parameters_materials&#45;&gt;proc~read_parameters_materials_physics -->
+<g id="interface~~get_json_value~~CalledByGraph_edge35" class="edge">
+<title>proc~read_parameters_materials&#45;&gt;proc~read_parameters_materials_physics</title>
+<path fill="none" stroke="#0048ff" d="M1241.16,-119.93C1291.66,-110.12 1362.94,-96.28 1415.93,-85.99"/>
+<polygon fill="#0048ff" stroke="#0048ff" points="1416.79,-89.39 1425.94,-84.05 1415.46,-82.52 1416.79,-89.39"/>
+</g>
+<!-- interface~read_conditions_time_controls -->
+<g id="interface~~get_json_value~~CalledByGraph_node34" class="node">
+<title>interface~read_conditions_time_controls</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node34"><a xlink:href="../interface/read_conditions_time_controls.html" xlink:title="type_conditions%read_conditions_time_controls">
+<polygon fill="#a7506f" stroke="#a7506f" points="1311,-692 1045,-692 1045,-668 1311,-668 1311,-692"/>
+<text text-anchor="middle" x="1178" y="-677.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_conditions%read_conditions_time_controls</text>
+</a>
+</g>
+</g>
+<!-- interface~read_conditions_time_controls&#45;&gt;proc~read_conditions_time_controls -->
+<g id="interface~~get_json_value~~CalledByGraph_edge52" class="edge">
+<title>interface~read_conditions_time_controls&#45;&gt;proc~read_conditions_time_controls</title>
+<path fill="none" stroke="#e700ff" stroke-dasharray="5,2" d="M1311.39,-675.29C1338.57,-674.32 1366.69,-673.32 1392.28,-672.41"/>
+<polygon fill="#e700ff" stroke="#e700ff" points="1392.46,-675.9 1402.33,-672.05 1392.22,-668.91 1392.46,-675.9"/>
+</g>
+<!-- interface~read_parameters_materials -->
+<g id="interface~~get_json_value~~CalledByGraph_node35" class="node">
+<title>interface~read_parameters_materials</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node35"><a xlink:href="../interface/read_parameters_materials.html" xlink:title="read_parameters_materials">
+<polygon fill="#a7506f" stroke="#a7506f" points="963.5,-214 803.5,-214 803.5,-190 963.5,-190 963.5,-214"/>
+<text text-anchor="middle" x="883.5" y="-199.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_materials</text>
+</a>
+</g>
+</g>
+<!-- interface~read_parameters_materials&#45;&gt;proc~read_parameters_materials -->
+<g id="interface~~get_json_value~~CalledByGraph_edge53" class="edge">
+<title>interface~read_parameters_materials&#45;&gt;proc~read_parameters_materials</title>
+<path fill="none" stroke="#ff008b" stroke-dasharray="5,2" d="M934.78,-189.97C985.22,-177.9 1062.92,-159.3 1116.65,-146.44"/>
+<polygon fill="#ff008b" stroke="#ff008b" points="1117.48,-149.84 1126.39,-144.11 1115.85,-143.03 1117.48,-149.84"/>
+</g>
+<!-- proc~initialize_type_conditions -->
+<g id="interface~~get_json_value~~CalledByGraph_node36" class="node">
+<title>proc~initialize_type_conditions</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node36"><a xlink:href="../proc/initialize_type_conditions.html" xlink:title="initialize_type_conditions">
+<polygon fill="#d9534f" stroke="#d9534f" points="956,-744 811,-744 811,-720 956,-720 956,-744"/>
+<text text-anchor="middle" x="883.5" y="-729.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_type_conditions</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_conditions&#45;&gt;interface~read_conditions_boundary_conditions -->
+<g id="interface~~get_json_value~~CalledByGraph_edge43" class="edge">
+<title>proc~initialize_type_conditions&#45;&gt;interface~read_conditions_boundary_conditions</title>
+<path fill="none" stroke="#ff0000" d="M956.31,-742.89C978.34,-746.19 1002.66,-749.79 1025,-753 1042.19,-755.47 1060.49,-758.05 1078.21,-760.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1078.18,-764.04 1088.56,-761.95 1079.14,-757.11 1078.18,-764.04"/>
+</g>
+<!-- proc~initialize_type_conditions&#45;&gt;interface~read_conditions_initial_conditions -->
+<g id="interface~~get_json_value~~CalledByGraph_edge44" class="edge">
+<title>proc~initialize_type_conditions&#45;&gt;interface~read_conditions_initial_conditions</title>
+<path fill="none" stroke="#ff8b00" d="M956.05,-732C977.31,-732 1001.44,-732 1025.76,-732"/>
+<polygon fill="#ff8b00" stroke="#ff8b00" points="1025.82,-735.5 1035.82,-732 1025.82,-728.5 1025.82,-735.5"/>
+</g>
+<!-- proc~initialize_type_conditions&#45;&gt;interface~read_conditions_time_controls -->
+<g id="interface~~get_json_value~~CalledByGraph_edge54" class="edge">
+<title>proc~initialize_type_conditions&#45;&gt;interface~read_conditions_time_controls</title>
+<path fill="none" stroke="#ff0000" d="M952.34,-719.94C996.29,-712.13 1053.64,-701.93 1099.4,-693.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1100.04,-697.24 1109.27,-692.04 1098.82,-690.34 1100.04,-697.24"/>
+</g>
+<!-- proc~initialize_type_input_basic -->
+<g id="interface~~get_json_value~~CalledByGraph_node37" class="node">
+<title>proc~initialize_type_input_basic</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node37"><a xlink:href="../proc/initialize_type_input_basic.html" xlink:title="initialize_type_input_basic">
+<polygon fill="#d9534f" stroke="#d9534f" points="698.5,-368 547.5,-368 547.5,-344 698.5,-344 698.5,-368"/>
+<text text-anchor="middle" x="623" y="-353.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_type_input_basic</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_input_basic&#45;&gt;interface~read_parameters_analysis_controls -->
+<g id="interface~~get_json_value~~CalledByGraph_edge48" class="edge">
+<title>proc~initialize_type_input_basic&#45;&gt;interface~read_parameters_analysis_controls</title>
+<path fill="none" stroke="#00ffb9" d="M649.34,-368.12C679.43,-382.09 731.4,-404.93 778,-419 786.09,-421.44 794.61,-423.68 803.16,-425.71"/>
+<polygon fill="#00ffb9" stroke="#00ffb9" points="802.65,-429.19 813.18,-428 804.21,-422.36 802.65,-429.19"/>
+</g>
+<!-- proc~initialize_type_input_basic&#45;&gt;interface~read_parameters_geometry_settings -->
+<g id="interface~~get_json_value~~CalledByGraph_edge49" class="edge">
+<title>proc~initialize_type_input_basic&#45;&gt;interface~read_parameters_geometry_settings</title>
+<path fill="none" stroke="#00b9ff" d="M698.08,-368.04C729.44,-373.13 766.15,-379.1 798.52,-384.35"/>
+<polygon fill="#00b9ff" stroke="#00b9ff" points="797.98,-387.81 808.41,-385.96 799.1,-380.9 797.98,-387.81"/>
+</g>
+<!-- proc~initialize_type_input_basic&#45;&gt;interface~read_parameters_simulation_settings -->
+<g id="interface~~get_json_value~~CalledByGraph_edge50" class="edge">
+<title>proc~initialize_type_input_basic&#45;&gt;interface~read_parameters_simulation_settings</title>
+<path fill="none" stroke="#002eff" d="M698.77,-356C720.2,-356 744.08,-356 767.34,-356"/>
+<polygon fill="#002eff" stroke="#002eff" points="767.62,-359.5 777.62,-356 767.62,-352.5 767.62,-359.5"/>
+</g>
+<!-- proc~initialize_type_input_basic&#45;&gt;interface~read_parameters_solver_settings -->
+<g id="interface~~get_json_value~~CalledByGraph_edge51" class="edge">
+<title>proc~initialize_type_input_basic&#45;&gt;interface~read_parameters_solver_settings</title>
+<path fill="none" stroke="#5c00ff" d="M679.45,-343.99C719.7,-335.27 774.29,-323.44 816.73,-314.25"/>
+<polygon fill="#5c00ff" stroke="#5c00ff" points="817.66,-317.63 826.69,-312.09 816.18,-310.79 817.66,-317.63"/>
+</g>
+<!-- proc~initialize_type_input_basic&#45;&gt;interface~read_parameters_materials -->
+<g id="interface~~get_json_value~~CalledByGraph_edge55" class="edge">
+<title>proc~initialize_type_input_basic&#45;&gt;interface~read_parameters_materials</title>
+<path fill="none" stroke="#cbff00" d="M644.28,-343.92C689.87,-316.76 800.56,-250.82 853.44,-219.31"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="855.51,-222.15 862.31,-214.03 851.93,-216.14 855.51,-222.15"/>
+</g>
+<!-- proc~initialize_type_output_settings -->
+<g id="interface~~get_json_value~~CalledByGraph_node38" class="node">
+<title>proc~initialize_type_output_settings</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node38"><a xlink:href="../proc/initialize_type_output_settings.html" xlink:title="type_output_settings%initialize_type_output_settings">
+<polygon fill="#d9534f" stroke="#d9534f" points="1323.5,-534 1032.5,-534 1032.5,-510 1323.5,-510 1323.5,-534"/>
+<text text-anchor="middle" x="1178" y="-519.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output_settings%initialize_type_output_settings</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_output_settings&#45;&gt;interface~read_output_settings_fields -->
+<g id="interface~~get_json_value~~CalledByGraph_edge45" class="edge">
+<title>proc~initialize_type_output_settings&#45;&gt;interface~read_output_settings_fields</title>
+<path fill="none" stroke="#e7ff00" d="M1267.55,-534.04C1309.23,-539.7 1358.8,-546.44 1400.36,-552.09"/>
+<polygon fill="#e7ff00" stroke="#e7ff00" points="1400.09,-555.58 1410.47,-553.46 1401.04,-548.65 1400.09,-555.58"/>
+</g>
+<!-- proc~initialize_type_output_settings&#45;&gt;interface~read_output_settings_history -->
+<g id="interface~~get_json_value~~CalledByGraph_edge46" class="edge">
+<title>proc~initialize_type_output_settings&#45;&gt;interface~read_output_settings_history</title>
+<path fill="none" stroke="#5cff00" d="M1323.55,-522C1348.45,-522 1373.7,-522 1396.69,-522"/>
+<polygon fill="#5cff00" stroke="#5cff00" points="1396.74,-525.5 1406.74,-522 1396.74,-518.5 1396.74,-525.5"/>
+</g>
+<!-- proc~initialize_type_output_settings&#45;&gt;interface~read_output_settings_standard -->
+<g id="interface~~get_json_value~~CalledByGraph_edge47" class="edge">
+<title>proc~initialize_type_output_settings&#45;&gt;interface~read_output_settings_standard</title>
+<path fill="none" stroke="#00ff2e" d="M1267.55,-509.96C1306.26,-504.7 1351.78,-498.51 1391.38,-493.13"/>
+<polygon fill="#00ff2e" stroke="#00ff2e" points="1391.87,-496.6 1401.31,-491.78 1390.93,-489.66 1391.87,-496.6"/>
+</g>
+<!-- interface~initialize_type_conditions -->
+<g id="interface~~get_json_value~~CalledByGraph_node39" class="node">
+<title>interface~initialize_type_conditions</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node39"><a xlink:href="../interface/initialize_type_conditions.html" xlink:title="type_conditions%initialize_type_conditions">
+<polygon fill="#a7506f" stroke="#a7506f" points="742,-744 504,-744 504,-720 742,-720 742,-744"/>
+<text text-anchor="middle" x="623" y="-729.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_conditions%initialize_type_conditions</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_conditions&#45;&gt;proc~initialize_type_conditions -->
+<g id="interface~~get_json_value~~CalledByGraph_edge56" class="edge">
+<title>interface~initialize_type_conditions&#45;&gt;proc~initialize_type_conditions</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M742.28,-732C762.02,-732 782.11,-732 800.68,-732"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="800.83,-735.5 810.83,-732 800.83,-728.5 800.83,-735.5"/>
+</g>
+<!-- interface~initialize_type_input_basic -->
+<g id="interface~~get_json_value~~CalledByGraph_node40" class="node">
+<title>interface~initialize_type_input_basic</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node40"><a xlink:href="../interface/initialize_type_input_basic.html" xlink:title="type_input_basic%initialize_type_input_basic">
+<polygon fill="#a7506f" stroke="#a7506f" points="468,-368 219,-368 219,-344 468,-344 468,-368"/>
+<text text-anchor="middle" x="343.5" y="-353.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input_basic%initialize_type_input_basic</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_input_basic&#45;&gt;proc~initialize_type_input_basic -->
+<g id="interface~~get_json_value~~CalledByGraph_edge57" class="edge">
+<title>interface~initialize_type_input_basic&#45;&gt;proc~initialize_type_input_basic</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M468.24,-356C491.57,-356 515.47,-356 537.27,-356"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="537.46,-359.5 547.46,-356 537.46,-352.5 537.46,-359.5"/>
+</g>
+<!-- proc~initialize_type_input -->
+<g id="interface~~get_json_value~~CalledByGraph_node41" class="node">
+<title>proc~initialize_type_input</title>
+<g id="a_interface~~get_json_value~~CalledByGraph_node41"><a xlink:href="../proc/initialize_type_input.html" xlink:title="type_input%initialize_type_input">
+<polygon fill="#d9534f" stroke="#d9534f" points="183,-368 0,-368 0,-344 183,-344 183,-368"/>
+<text text-anchor="middle" x="91.5" y="-353.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input%initialize_type_input</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_input&#45;&gt;interface~initialize_type_input_basic -->
+<g id="interface~~get_json_value~~CalledByGraph_edge58" class="edge">
+<title>proc~initialize_type_input&#45;&gt;interface~initialize_type_input_basic</title>
+<path fill="none" stroke="#00ffff" d="M183.11,-356C191.45,-356 200,-356 208.62,-356"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="208.75,-359.5 218.75,-356 208.75,-352.5 208.75,-359.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfaceget_json_valueCalledByGraph = svgPanZoom('#interfaceget_json_valueCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+          </div>
+        </div>
+<br>
+
+
+        <h2>Module Procedures</h2>
+            <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_json_integer32"></span> <h3>private  subroutine <a href='../proc/get_json_integer32.html'>get_json_integer32</a>(json, key, target_var, is_required, default_value, valid_range, valid_list)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json~3"></span>
+              class(json_file),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>json</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-key~2"></span>
+              character(len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>key</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-target_var"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>target_var</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-is_required"></span>
+              logical,
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>is_required</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-default_value"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>default_value</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-valid_range"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>valid_range</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-valid_list~2"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>valid_list</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+            <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_json_real64"></span> <h3>private  subroutine <a href='../proc/get_json_real64.html'>get_json_real64</a>(json, key, target_var, is_required, default_value, valid_range)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json~4"></span>
+              class(json_file),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>json</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-key~3"></span>
+              character(len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>key</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-target_var~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>target_var</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-is_required~2"></span>
+              logical,
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>is_required</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-default_value~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>default_value</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-valid_range~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>valid_range</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+            <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_json_logical"></span> <h3>private  subroutine <a href='../proc/get_json_logical.html'>get_json_logical</a>(json, key, target_var, is_required, default_value)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json~5"></span>
+              class(json_file),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>json</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-key~4"></span>
+              character(len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>key</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-target_var~3"></span>
+              logical,
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>target_var</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-is_required~3"></span>
+              logical,
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>is_required</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-default_value~3"></span>
+              logical,
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>default_value</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+            <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_json_string"></span> <h3>private  subroutine <a href='../proc/get_json_string.html'>get_json_string</a>(json, key, target_var, is_required, default_value, valid_list)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json~6"></span>
+              class(json_file),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>json</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-key~5"></span>
+              character(len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>key</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-target_var~4"></span>
+              character(len=:),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>target_var</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-is_required~4"></span>
+              logical,
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>is_required</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-default_value~4"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>default_value</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-valid_list~3"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>valid_list</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+            <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_json_integer32_array"></span> <h3>private  subroutine <a href='../proc/get_json_integer32_array.html'>get_json_integer32_array</a>(json, key, target_var, is_required, default_value, valid_range, valid_list, array_size)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json~7"></span>
+              class(json_file),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>json</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-key~6"></span>
+              character(len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>key</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-target_var~5"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              allocatable, dimension(:)
+            </td>
+            <td>::</td>
+            <td><strong>target_var</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-is_required~5"></span>
+              logical,
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>is_required</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-default_value~5"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>default_value</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-valid_range~3"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>valid_range</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-valid_list~4"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>valid_list</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-array_size"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>array_size</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+            <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_json_real64_array"></span> <h3>private  subroutine <a href='../proc/get_json_real64_array.html'>get_json_real64_array</a>(json, key, target_var, is_required, default_value, valid_range, valid_list, array_size)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json~8"></span>
+              class(json_file),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>json</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-key~7"></span>
+              character(len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>key</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-target_var~6"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              allocatable, dimension(:)
+            </td>
+            <td>::</td>
+            <td><strong>target_var</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-is_required~6"></span>
+              logical,
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>is_required</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-default_value~6"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>default_value</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-valid_range~4"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>valid_range</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-valid_list~5"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>valid_list</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-array_size~2"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>array_size</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+            <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_json_string_array"></span> <h3>private  subroutine <a href='../proc/get_json_string_array.html'>get_json_string_array</a>(json, key, target_var, is_required, default_value, valid_list, array_size)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json~9"></span>
+              class(json_file),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>json</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-key~8"></span>
+              character(len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>key</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-target_var~7"></span>
+              character(len=:),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>target_var</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-is_required~7"></span>
+              logical,
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>is_required</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-default_value~7"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>default_value</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-valid_list~6"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>valid_list</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-array_size~3"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>array_size</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+</div>
+  </div>
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

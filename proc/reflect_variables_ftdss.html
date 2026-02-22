@@ -1,0 +1,1810 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>reflect_variables_ftdss &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>reflect_variables_ftdss
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">65 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/ftdss_base.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/ftdss_base.f90.html'>ftdss_base.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/ftdss_base.html'>ftdss_base</a></li>
+            <li class="breadcrumb-item active" aria-current="page">reflect_variables_ftdss</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/reflect_variables_ftdss.html#src">reflect_variables_ftdss</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine reflect_variables_ftdss(self)  
+    <a href="../interface/reflect_variables_ftdss.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~397"></span>
+              class(<a href='../type/type_ftdss.html'>type_ftdss</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~reflect_variables_ftdss~~CallsGraph Pages: 1 -->
+<svg id="procreflect_variables_ftdssCallsGraph" width="641pt" height="268pt"
+ viewBox="0.00 0.00 641.00 268.26" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~reflect_variables_ftdss~~CallsGraph" class="graph" transform="scale(0.25 0.25) rotate(0) translate(4 1087.47)">
+<title>proc~~reflect_variables_ftdss~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1087.47 2604,-1087.47 2604,4 -4,4"/>
+<!-- proc~reflect_variables_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node1" class="node">
+<title>proc~reflect_variables_ftdss</title>
+<polygon fill="none" stroke="black" points="130,-541.47 0,-541.47 0,-517.47 130,-517.47 130,-541.47"/>
+<text text-anchor="middle" x="65" y="-527.07" font-family="Helvetica,sans-Serif" font-size="10.50">reflect_variables_ftdss</text>
+</g>
+<!-- compute_time_derivative -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node2" class="node">
+<title>compute_time_derivative</title>
+<polygon fill="#777777" stroke="#777777" points="365,-1083.47 217,-1083.47 217,-1059.47 365,-1059.47 365,-1083.47"/>
+<text text-anchor="middle" x="291" y="-1069.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">compute_time_derivative</text>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;compute_time_derivative -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge1" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;compute_time_derivative</title>
+<path fill="none" stroke="#ff0000" d="M66.58,-541.58C70.23,-612.22 92.21,-970.54 166,-1045.47 177.02,-1056.66 191.53,-1063.63 206.73,-1067.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="206.25,-1071.34 216.79,-1070.27 207.87,-1064.54 206.25,-1071.34"/>
+</g>
+<!-- deallocate_array -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node3" class="node">
+<title>deallocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="2600,-650.47 2497,-650.47 2497,-626.47 2600,-626.47 2600,-650.47"/>
+<text text-anchor="middle" x="2548.5" y="-636.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_array</text>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;deallocate_array -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge2" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#ff0000" d="M67.06,-541.67C71.38,-584.43 91.16,-729.63 166,-815.47 304.46,-974.29 377.3,-1031.47 588,-1031.47 588,-1031.47 588,-1031.47 2165,-1031.47 2374.09,-1031.47 2505.93,-742.27 2539.18,-660.04"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2542.47,-661.25 2542.91,-650.66 2535.96,-658.67 2542.47,-661.25"/>
+</g>
+<!-- get_current -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node4" class="node">
+<title>get_current</title>
+<polygon fill="#777777" stroke="#777777" points="932,-793.47 859,-793.47 859,-769.47 932,-769.47 932,-793.47"/>
+<text text-anchor="middle" x="895.5" y="-779.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_current</text>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;get_current -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge3" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;get_current</title>
+<path fill="none" stroke="#ff0000" d="M66.91,-541.57C70.63,-581.25 88.4,-707.89 166,-760.47 383.01,-907.52 725.9,-830.31 848.79,-795.52"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="849.98,-798.82 858.63,-792.69 848.05,-792.09 849.98,-798.82"/>
+</g>
+<!-- interface~calc_gradient_pressure_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node5" class="node">
+<title>interface~calc_gradient_pressure_ftdss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node5"><a xlink:href="../interface/calc_gradient_pressure_ftdss.html" xlink:title="type_ftdss%calc_gradient_pressure_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="405,-751.47 177,-751.47 177,-727.47 405,-727.47 405,-751.47"/>
+<text text-anchor="middle" x="291" y="-737.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%calc_gradient_pressure_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;interface~calc_gradient_pressure_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge4" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;interface~calc_gradient_pressure_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M68.52,-541.65C76.26,-575.81 103.12,-673.02 166,-718.47 168.09,-719.98 170.25,-721.4 172.47,-722.73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="170.84,-725.82 181.32,-727.41 174.12,-719.64 170.84,-725.82"/>
+</g>
+<!-- interface~calc_gradient_temperature_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node6" class="node">
+<title>interface~calc_gradient_temperature_ftdss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node6"><a xlink:href="../interface/calc_gradient_temperature_ftdss.html" xlink:title="type_ftdss%calc_gradient_temperature_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="416,-709.47 166,-709.47 166,-685.47 416,-685.47 416,-709.47"/>
+<text text-anchor="middle" x="291" y="-695.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%calc_gradient_temperature_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;interface~calc_gradient_temperature_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge5" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;interface~calc_gradient_temperature_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M70.47,-541.84C81.6,-570.74 113.53,-642.8 166,-676.47 168.63,-678.16 171.34,-679.72 174.14,-681.17"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="172.75,-684.38 183.29,-685.41 175.69,-678.03 172.75,-684.38"/>
+</g>
+<!-- interface~get_variable_increment_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node7" class="node">
+<title>interface~get_variable_increment_ftdss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node7"><a xlink:href="../interface/get_variable_increment_ftdss.html" xlink:title="type_ftdss%get_variable_increment_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="406.5,-583.47 175.5,-583.47 175.5,-559.47 406.5,-559.47 406.5,-583.47"/>
+<text text-anchor="middle" x="291" y="-569.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%get_variable_increment_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;interface~get_variable_increment_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge6" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;interface~get_variable_increment_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M121.46,-541.52C135.94,-544.56 151.53,-547.73 166,-550.47 178.91,-552.92 192.6,-555.38 205.99,-557.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="205.7,-561.21 216.15,-559.45 206.89,-554.31 205.7,-561.21"/>
+</g>
+<!-- interface~is_active_hydraulic_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node8" class="node">
+<title>interface~is_active_hydraulic_ftdss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node8"><a xlink:href="../interface/is_active_hydraulic_ftdss.html" xlink:title="type_ftdss%is_active_hydraulic_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="394,-667.47 188,-667.47 188,-643.47 394,-643.47 394,-667.47"/>
+<text text-anchor="middle" x="291" y="-653.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%is_active_hydraulic_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;interface~is_active_hydraulic_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge7" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;interface~is_active_hydraulic_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M73.62,-541.62C88.41,-564.06 123.33,-611.78 166,-634.47 169.96,-636.58 174.08,-638.48 178.31,-640.2"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="177.13,-643.49 187.72,-643.67 179.55,-636.93 177.13,-643.49"/>
+</g>
+<!-- interface~is_active_thermal_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node9" class="node">
+<title>interface~is_active_thermal_ftdss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node9"><a xlink:href="../interface/is_active_thermal_ftdss.html" xlink:title="type_ftdss%is_active_thermal_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="390.5,-625.47 191.5,-625.47 191.5,-601.47 390.5,-601.47 390.5,-625.47"/>
+<text text-anchor="middle" x="291" y="-611.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%is_active_thermal_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;interface~is_active_thermal_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge8" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;interface~is_active_thermal_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M80.91,-541.55C99.62,-556.05 133.22,-579.95 166,-592.47 172.24,-594.85 178.75,-596.97 185.39,-598.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="184.62,-602.26 195.18,-601.42 186.4,-595.49 184.62,-602.26"/>
+</g>
+<!-- none~start~3 -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node10" class="node">
+<title>none~start~3</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node10"><a xlink:href="../type/type_profiler.html#boundprocedure-start~3" xlink:title="type_profiler%start">
+<polygon fill="#a7506f" stroke="#a7506f" points="347.5,-541.47 234.5,-541.47 234.5,-517.47 347.5,-517.47 347.5,-541.47"/>
+<text text-anchor="middle" x="291" y="-527.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_profiler%start</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;none~start~3 -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge9" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;none~start~3</title>
+<path fill="none" stroke="#ff0000" d="M130.19,-529.47C159.56,-529.47 194.34,-529.47 223.94,-529.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="224.17,-532.97 234.17,-529.47 224.17,-525.97 224.17,-532.97"/>
+</g>
+<!-- proc~compute_aitken_relaxation -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node11" class="node">
+<title>proc~compute_aitken_relaxation</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node11"><a xlink:href="../proc/compute_aitken_relaxation.html" xlink:title="type_aitken_params%compute_aitken_relaxation">
+<polygon fill="#d9534f" stroke="#d9534f" points="726,-233.47 452,-233.47 452,-209.47 726,-209.47 726,-233.47"/>
+<text text-anchor="middle" x="589" y="-219.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_aitken_params%compute_aitken_relaxation</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;proc~compute_aitken_relaxation -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge10" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;proc~compute_aitken_relaxation</title>
+<path fill="none" stroke="#ff0000" d="M121.47,-517.45C135.94,-514.41 151.54,-511.23 166,-508.47 276.74,-487.33 333.66,-542.49 416,-465.47 465.75,-418.93 413.58,-372.74 452,-316.47 476.58,-280.47 519.63,-253.84 550.72,-238.07"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="552.52,-241.09 559.95,-233.53 549.43,-234.81 552.52,-241.09"/>
+</g>
+<!-- proc~get_aitken_relaxation -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node12" class="node">
+<title>proc~get_aitken_relaxation</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node12"><a xlink:href="../proc/get_aitken_relaxation.html" xlink:title="type_aitken_params%get_aitken_relaxation">
+<polygon fill="#d9534f" stroke="#d9534f" points="711,-191.47 467,-191.47 467,-167.47 711,-167.47 711,-191.47"/>
+<text text-anchor="middle" x="589" y="-177.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_aitken_params%get_aitken_relaxation</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;proc~get_aitken_relaxation -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge11" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;proc~get_aitken_relaxation</title>
+<path fill="none" stroke="#ff0000" d="M80.48,-517.25C99.01,-502.35 132.7,-477.64 166,-465.47 218.63,-446.24 375.93,-471.64 416,-432.47 490.62,-359.53 378.19,-274.23 452,-200.47 453.96,-198.51 456.02,-196.69 458.17,-194.99"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="460.58,-197.58 466.87,-189.05 456.64,-191.8 460.58,-197.58"/>
+</g>
+<!-- proc~get_bdf_coeffs -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node13" class="node">
+<title>proc~get_bdf_coeffs</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node13"><a xlink:href="../proc/get_bdf_coeffs.html" xlink:title="type_time%get_bdf_coeffs">
+<polygon fill="#d9534f" stroke="#d9534f" points="367,-423.47 215,-423.47 215,-399.47 367,-399.47 367,-423.47"/>
+<text text-anchor="middle" x="291" y="-409.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time%get_bdf_coeffs</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;proc~get_bdf_coeffs -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge12" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;proc~get_bdf_coeffs</title>
+<path fill="none" stroke="#ff0000" d="M75.33,-517.42C91.5,-497.44 126.77,-457.66 166,-437.47 178.12,-431.24 191.64,-426.5 205.16,-422.89"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="206.13,-426.26 215,-420.46 204.45,-419.46 206.13,-426.26"/>
+</g>
+<!-- proc~get_bdf_order -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node14" class="node">
+<title>proc~get_bdf_order</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node14"><a xlink:href="../proc/get_bdf_order.html" xlink:title="type_time%get_bdf_order">
+<polygon fill="#d9534f" stroke="#d9534f" points="365.5,-381.47 216.5,-381.47 216.5,-357.47 365.5,-357.47 365.5,-381.47"/>
+<text text-anchor="middle" x="291" y="-367.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time%get_bdf_order</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;proc~get_bdf_order -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge13" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;proc~get_bdf_order</title>
+<path fill="none" stroke="#ff0000" d="M70.84,-517.36C82.56,-489.74 115.29,-422.08 166,-390.47 178.19,-382.87 192.31,-377.79 206.56,-374.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="207.35,-377.85 216.43,-372.38 205.92,-370.99 207.35,-377.85"/>
+</g>
+<!-- proc~get_nonlinear_iter -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node15" class="node">
+<title>proc~get_nonlinear_iter</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node15"><a xlink:href="../proc/get_nonlinear_iter.html" xlink:title="type_iteration%get_nonlinear_iter">
+<polygon fill="#d9534f" stroke="#d9534f" points="387.5,-339.47 194.5,-339.47 194.5,-315.47 387.5,-315.47 387.5,-339.47"/>
+<text text-anchor="middle" x="291" y="-325.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%get_nonlinear_iter</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;proc~get_nonlinear_iter -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge14" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;proc~get_nonlinear_iter</title>
+<path fill="none" stroke="#ff0000" d="M68.8,-517.32C77.14,-484.16 105.09,-391.67 166,-348.47 171.74,-344.4 178.01,-341.02 184.57,-338.22"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="186.25,-341.33 194.37,-334.53 183.78,-334.78 186.25,-341.33"/>
+</g>
+<!-- proc~is_none_method_iteration -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node16" class="node">
+<title>proc~is_none_method_iteration</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node16"><a xlink:href="../proc/is_none_method_iteration.html" xlink:title="type_iteration%is_none_method_iteration">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="407.5,-297.47 174.5,-297.47 174.5,-273.47 407.5,-273.47 407.5,-297.47"/>
+<text text-anchor="middle" x="291" y="-283.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%is_none_method_iteration</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;proc~is_none_method_iteration -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge15" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;proc~is_none_method_iteration</title>
+<path fill="none" stroke="#ff0000" d="M67.47,-517.39C72.76,-479.43 94.52,-361.78 166,-306.47 167.65,-305.19 169.35,-303.98 171.1,-302.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="173.25,-305.63 180.16,-297.6 169.75,-299.57 173.25,-305.63"/>
+</g>
+<!-- proc~set_du_raw_aitken -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node17" class="node">
+<title>proc~set_du_raw_aitken</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node17"><a xlink:href="../proc/set_du_raw_aitken.html" xlink:title="type_aitken_params%set_du_raw_aitken">
+<polygon fill="#d9534f" stroke="#d9534f" points="702.5,-149.47 475.5,-149.47 475.5,-125.47 702.5,-125.47 702.5,-149.47"/>
+<text text-anchor="middle" x="589" y="-135.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_aitken_params%set_du_raw_aitken</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;proc~set_du_raw_aitken -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge16" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;proc~set_du_raw_aitken</title>
+<path fill="none" stroke="#ff0000" d="M66.5,-517.28C68.94,-474.67 83.25,-331.45 166,-264.47 253.36,-193.77 324.36,-291.53 416,-226.47 443.88,-206.68 424.14,-178.3 452,-158.47 456.33,-155.39 460.93,-152.69 465.73,-150.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="467.43,-153.39 475.17,-146.16 464.61,-146.99 467.43,-153.39"/>
+</g>
+<!-- set_delta -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node18" class="node">
+<title>set_delta</title>
+<polygon fill="#777777" stroke="#777777" points="321.5,-217.47 260.5,-217.47 260.5,-193.47 321.5,-193.47 321.5,-217.47"/>
+<text text-anchor="middle" x="291" y="-203.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_delta</text>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;set_delta -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge17" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;set_delta</title>
+<path fill="none" stroke="#ff0000" d="M66.07,-517.26C67.05,-471.78 76.9,-310.71 166,-231.47 188.78,-211.21 223.24,-205.27 250.06,-204.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="250.37,-207.57 260.29,-203.83 250.21,-200.57 250.37,-207.57"/>
+</g>
+<!-- proc~calc_gradient_pressure_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node21" class="node">
+<title>proc~calc_gradient_pressure_ftdss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node21"><a xlink:href="../proc/calc_gradient_pressure_ftdss.html" xlink:title="calc_gradient_pressure_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="671.5,-751.47 506.5,-751.47 506.5,-727.47 671.5,-727.47 671.5,-751.47"/>
+<text text-anchor="middle" x="589" y="-737.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_gradient_pressure_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_gradient_pressure_ftdss&#45;&gt;proc~calc_gradient_pressure_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge18" class="edge">
+<title>interface~calc_gradient_pressure_ftdss&#45;&gt;proc~calc_gradient_pressure_ftdss</title>
+<path fill="none" stroke="#f0ff00" stroke-dasharray="5,2" d="M405.17,-739.47C435.25,-739.47 467.36,-739.47 496.14,-739.47"/>
+<polygon fill="#f0ff00" stroke="#f0ff00" points="496.17,-742.97 506.17,-739.47 496.17,-735.97 496.17,-742.97"/>
+</g>
+<!-- proc~calc_gradient_temperature_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node22" class="node">
+<title>proc~calc_gradient_temperature_ftdss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node22"><a xlink:href="../proc/calc_gradient_temperature_ftdss.html" xlink:title="calc_gradient_temperature_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="682.5,-709.47 495.5,-709.47 495.5,-685.47 682.5,-685.47 682.5,-709.47"/>
+<text text-anchor="middle" x="589" y="-695.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_gradient_temperature_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_gradient_temperature_ftdss&#45;&gt;proc~calc_gradient_temperature_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge19" class="edge">
+<title>interface~calc_gradient_temperature_ftdss&#45;&gt;proc~calc_gradient_temperature_ftdss</title>
+<path fill="none" stroke="#96ff00" stroke-dasharray="5,2" d="M416.24,-697.47C439.16,-697.47 462.85,-697.47 485.05,-697.47"/>
+<polygon fill="#96ff00" stroke="#96ff00" points="485.13,-700.97 495.13,-697.47 485.13,-693.97 485.13,-700.97"/>
+</g>
+<!-- proc~get_variable_increment_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node23" class="node">
+<title>proc~get_variable_increment_ftdss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node23"><a xlink:href="../proc/get_variable_increment_ftdss.html" xlink:title="get_variable_increment_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="673,-547.47 505,-547.47 505,-523.47 673,-523.47 673,-547.47"/>
+<text text-anchor="middle" x="589" y="-533.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_variable_increment_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~get_variable_increment_ftdss&#45;&gt;proc~get_variable_increment_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge20" class="edge">
+<title>interface~get_variable_increment_ftdss&#45;&gt;proc~get_variable_increment_ftdss</title>
+<path fill="none" stroke="#3cff00" stroke-dasharray="5,2" d="M390.98,-559.43C424.48,-555.36 461.77,-550.82 494.81,-546.81"/>
+<polygon fill="#3cff00" stroke="#3cff00" points="495.42,-550.26 504.92,-545.58 494.57,-543.31 495.42,-550.26"/>
+</g>
+<!-- proc~is_active_hydraulic_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node24" class="node">
+<title>proc~is_active_hydraulic_ftdss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node24"><a xlink:href="../proc/is_active_hydraulic_ftdss.html" xlink:title="is_active_hydraulic_ftdss">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="660.5,-667.47 517.5,-667.47 517.5,-643.47 660.5,-643.47 660.5,-667.47"/>
+<text text-anchor="middle" x="589" y="-653.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">is_active_hydraulic_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~is_active_hydraulic_ftdss&#45;&gt;proc~is_active_hydraulic_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge21" class="edge">
+<title>interface~is_active_hydraulic_ftdss&#45;&gt;proc~is_active_hydraulic_ftdss</title>
+<path fill="none" stroke="#00ff1e" stroke-dasharray="5,2" d="M394.28,-655.47C431.24,-655.47 472.42,-655.47 507.27,-655.47"/>
+<polygon fill="#00ff1e" stroke="#00ff1e" points="507.4,-658.97 517.4,-655.47 507.4,-651.97 507.4,-658.97"/>
+</g>
+<!-- proc~is_active_thermal_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node25" class="node">
+<title>proc~is_active_thermal_ftdss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node25"><a xlink:href="../proc/is_active_thermal_ftdss.html" xlink:title="is_active_thermal_ftdss">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="657,-625.47 521,-625.47 521,-601.47 657,-601.47 657,-625.47"/>
+<text text-anchor="middle" x="589" y="-611.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">is_active_thermal_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~is_active_thermal_ftdss&#45;&gt;proc~is_active_thermal_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge22" class="edge">
+<title>interface~is_active_thermal_ftdss&#45;&gt;proc~is_active_thermal_ftdss</title>
+<path fill="none" stroke="#00ff78" stroke-dasharray="5,2" d="M390.56,-613.47C429.61,-613.47 473.84,-613.47 510.53,-613.47"/>
+<polygon fill="#00ff78" stroke="#00ff78" points="510.67,-616.97 520.67,-613.47 510.67,-609.97 510.67,-616.97"/>
+</g>
+<!-- proc~start_profile_by_id -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node27" class="node">
+<title>proc~start_profile_by_id</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node27"><a xlink:href="../proc/start_profile_by_id.html" xlink:title="type_profiler%start_profile_by_id">
+<polygon fill="#d9534f" stroke="#d9534f" points="988,-389.47 803,-389.47 803,-365.47 988,-365.47 988,-389.47"/>
+<text text-anchor="middle" x="895.5" y="-375.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_profiler%start_profile_by_id</text>
+</a>
+</g>
+</g>
+<!-- none~start~3&#45;&gt;proc~start_profile_by_id -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge23" class="edge">
+<title>none~start~3&#45;&gt;proc~start_profile_by_id</title>
+<path fill="none" stroke="#00ffd1" stroke-dasharray="5,2" d="M347.8,-518.86C369.22,-514.5 393.84,-509.15 416,-503.47 571.68,-463.61 605.38,-434.47 762,-398.47 773.44,-395.84 785.51,-393.44 797.52,-391.26"/>
+<polygon fill="#00ffd1" stroke="#00ffd1" points="798.33,-394.67 807.57,-389.5 797.12,-387.78 798.33,-394.67"/>
+</g>
+<!-- proc~start_profile_by_name -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node28" class="node">
+<title>proc~start_profile_by_name</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node28"><a xlink:href="../proc/start_profile_by_name.html" xlink:title="type_profiler%start_profile_by_name">
+<polygon fill="#d9534f" stroke="#d9534f" points="692,-349.47 486,-349.47 486,-325.47 692,-325.47 692,-349.47"/>
+<text text-anchor="middle" x="589" y="-335.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_profiler%start_profile_by_name</text>
+</a>
+</g>
+</g>
+<!-- none~start~3&#45;&gt;proc~start_profile_by_name -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge24" class="edge">
+<title>none~start~3&#45;&gt;proc~start_profile_by_name</title>
+<path fill="none" stroke="#00ffd1" stroke-dasharray="5,2" d="M347.69,-528.71C370.94,-525.81 396.92,-518.89 416,-503.47 446.64,-478.71 426.17,-452.21 452,-422.47 478.77,-391.65 519.49,-368.25 549.4,-353.88"/>
+<polygon fill="#00ffd1" stroke="#00ffd1" points="551.12,-356.94 558.7,-349.54 548.16,-350.6 551.12,-356.94"/>
+</g>
+<!-- interface~vector_dot -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node19" class="node">
+<title>interface~vector_dot</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node19"><a xlink:href="../interface/vector_dot.html" xlink:title="vector_dot">
+<polygon fill="#a7506f" stroke="#a7506f" points="1584.5,-447.47 1515.5,-447.47 1515.5,-423.47 1584.5,-423.47 1584.5,-447.47"/>
+<text text-anchor="middle" x="1550" y="-433.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_dot</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_aitken_relaxation&#45;&gt;interface~vector_dot -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge25" class="edge">
+<title>proc~compute_aitken_relaxation&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#00d1ff" d="M674.73,-233.53C702.49,-237.15 733.52,-240.86 762,-243.47 892.32,-255.45 1227.75,-229.75 1350,-276.47 1428.78,-306.58 1500.62,-380.07 1532.14,-415.6"/>
+<polygon fill="#00d1ff" stroke="#00d1ff" points="1529.72,-418.14 1538.93,-423.37 1534.99,-413.53 1529.72,-418.14"/>
+</g>
+<!-- is_valid -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node20" class="node">
+<title>is_valid</title>
+<polygon fill="#777777" stroke="#777777" points="922.5,-191.47 868.5,-191.47 868.5,-167.47 922.5,-167.47 922.5,-191.47"/>
+<text text-anchor="middle" x="895.5" y="-177.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">is_valid</text>
+</g>
+<!-- proc~compute_aitken_relaxation&#45;&gt;is_valid -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge26" class="edge">
+<title>proc~compute_aitken_relaxation&#45;&gt;is_valid</title>
+<path fill="none" stroke="#00d1ff" d="M677.26,-209.44C737.29,-201.16 813.93,-190.59 858.28,-184.47"/>
+<polygon fill="#00d1ff" stroke="#00d1ff" points="858.87,-187.92 868.3,-183.09 857.92,-180.99 858.87,-187.92"/>
+</g>
+<!-- proc~raise_error -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node26" class="node">
+<title>proc~raise_error</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node26"><a xlink:href="../proc/raise_error.html" xlink:title="raise_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="930.5,-149.47 860.5,-149.47 860.5,-125.47 930.5,-125.47 930.5,-149.47"/>
+<text text-anchor="middle" x="895.5" y="-135.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">raise_error</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_aitken_relaxation&#45;&gt;proc~raise_error -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge27" class="edge">
+<title>proc~compute_aitken_relaxation&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00d1ff" d="M706.19,-209.42C713.07,-206.91 719.74,-203.96 726,-200.47 747.48,-188.52 740.54,-170.47 762,-158.47 788.74,-143.53 822.99,-138.39 849.96,-136.94"/>
+<polygon fill="#00d1ff" stroke="#00d1ff" points="850.43,-140.42 860.28,-136.54 850.16,-133.43 850.43,-140.42"/>
+</g>
+<!-- strip -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node29" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="1577,-151.47 1523,-151.47 1523,-127.47 1577,-127.47 1577,-151.47"/>
+<text text-anchor="middle" x="1550" y="-137.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~compute_aitken_relaxation&#45;&gt;strip -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge28" class="edge">
+<title>proc~compute_aitken_relaxation&#45;&gt;strip</title>
+<path fill="none" stroke="#00d1ff" d="M726.27,-228.68C879.18,-234.24 1134.1,-235.87 1350,-200.47 1408.68,-190.85 1474.14,-168.39 1513.43,-153.58"/>
+<polygon fill="#00d1ff" stroke="#00d1ff" points="1514.74,-156.83 1522.83,-149.99 1512.24,-150.29 1514.74,-156.83"/>
+</g>
+<!-- proc~get_aitken_relaxation&#45;&gt;is_valid -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge29" class="edge">
+<title>proc~get_aitken_relaxation&#45;&gt;is_valid</title>
+<path fill="none" stroke="#0078ff" d="M711.22,-179.47C764.05,-179.47 822.09,-179.47 858.41,-179.47"/>
+<polygon fill="#0078ff" stroke="#0078ff" points="858.5,-182.97 868.5,-179.47 858.5,-175.97 858.5,-182.97"/>
+</g>
+<!-- proc~get_aitken_relaxation&#45;&gt;proc~raise_error -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge30" class="edge">
+<title>proc~get_aitken_relaxation&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#0078ff" d="M677.26,-167.44C733.83,-159.63 805.15,-149.8 850.3,-143.57"/>
+<polygon fill="#0078ff" stroke="#0078ff" points="850.93,-147.02 860.36,-142.18 849.97,-140.08 850.93,-147.02"/>
+</g>
+<!-- proc~get_aitken_relaxation&#45;&gt;strip -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge31" class="edge">
+<title>proc~get_aitken_relaxation&#45;&gt;strip</title>
+<path fill="none" stroke="#0078ff" d="M706.19,-167.42C713.07,-164.91 719.74,-161.96 726,-158.47 747.48,-146.52 740.35,-128.12 762,-116.47 877.32,-54.45 1220.51,-59.07 1350,-78.47 1408.81,-87.28 1474.24,-109.97 1513.48,-125.06"/>
+<polygon fill="#0078ff" stroke="#0078ff" points="1512.28,-128.35 1522.87,-128.71 1514.82,-121.82 1512.28,-128.35"/>
+</g>
+<!-- proc~set_du_raw_aitken&#45;&gt;is_valid -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge32" class="edge">
+<title>proc~set_du_raw_aitken&#45;&gt;is_valid</title>
+<path fill="none" stroke="#ff00b4" d="M677.26,-149.51C737.29,-157.79 813.93,-168.36 858.28,-174.48"/>
+<polygon fill="#ff00b4" stroke="#ff00b4" points="857.92,-177.96 868.3,-175.86 858.87,-171.03 857.92,-177.96"/>
+</g>
+<!-- proc~set_du_raw_aitken&#45;&gt;proc~raise_error -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge33" class="edge">
+<title>proc~set_du_raw_aitken&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff00b4" d="M702.52,-137.47C753.62,-137.47 811.15,-137.47 849.79,-137.47"/>
+<polygon fill="#ff00b4" stroke="#ff00b4" points="850.16,-140.97 860.16,-137.47 850.16,-133.97 850.16,-140.97"/>
+</g>
+<!-- proc~set_du_raw_aitken&#45;&gt;strip -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge34" class="edge">
+<title>proc~set_du_raw_aitken&#45;&gt;strip</title>
+<path fill="none" stroke="#ff00b4" d="M605.96,-125.4C635.07,-104.22 699.59,-61.12 762,-45.47 1015.49,18.06 1095,11.72 1350,-45.47 1415.65,-60.2 1485.13,-99.14 1522.12,-122.01"/>
+<polygon fill="#ff00b4" stroke="#ff00b4" points="1520.47,-125.11 1530.8,-127.46 1524.19,-119.18 1520.47,-125.11"/>
+</g>
+<!-- proc~dot_native~2 -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node33" class="node">
+<title>proc~dot_native~2</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node33"><a xlink:href="../proc/dot_native~2.html" xlink:title="dot_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="2198,-469.47 2130,-469.47 2130,-445.47 2198,-445.47 2198,-469.47"/>
+<text text-anchor="middle" x="2164" y="-455.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dot_native</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_dot&#45;&gt;proc~dot_native~2 -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge35" class="edge">
+<title>interface~vector_dot&#45;&gt;proc~dot_native~2</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1584.78,-436.69C1688.66,-440.42 2003.39,-451.73 2119.43,-455.91"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2119.58,-459.41 2129.7,-456.28 2119.84,-452.42 2119.58,-459.41"/>
+</g>
+<!-- proc~dot_vector_dp -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node34" class="node">
+<title>proc~dot_vector_dp</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node34"><a xlink:href="../proc/dot_vector_dp.html" xlink:title="dot_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1931,-427.47 1843,-427.47 1843,-403.47 1931,-403.47 1931,-427.47"/>
+<text text-anchor="middle" x="1887" y="-413.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dot_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_dot&#45;&gt;proc~dot_vector_dp -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge36" class="edge">
+<title>interface~vector_dot&#45;&gt;proc~dot_vector_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1584.65,-433.46C1642.89,-429.99 1762.89,-422.82 1832.61,-418.66"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1833.16,-422.13 1842.94,-418.04 1832.75,-415.15 1833.16,-422.13"/>
+</g>
+<!-- proc~calc_gradient_pressure_ftdss&#45;&gt;get_current -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge37" class="edge">
+<title>proc~calc_gradient_pressure_ftdss&#45;&gt;get_current</title>
+<path fill="none" stroke="#e7ff00" d="M671.6,-750.73C728.27,-758.54 801.71,-768.67 848.49,-775.13"/>
+<polygon fill="#e7ff00" stroke="#e7ff00" points="848.24,-778.62 858.62,-776.52 849.2,-771.69 848.24,-778.62"/>
+</g>
+<!-- get_current_gradient -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node31" class="node">
+<title>get_current_gradient</title>
+<polygon fill="#777777" stroke="#777777" points="957.5,-751.47 833.5,-751.47 833.5,-727.47 957.5,-727.47 957.5,-751.47"/>
+<text text-anchor="middle" x="895.5" y="-737.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_current_gradient</text>
+</g>
+<!-- proc~calc_gradient_pressure_ftdss&#45;&gt;get_current_gradient -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge38" class="edge">
+<title>proc~calc_gradient_pressure_ftdss&#45;&gt;get_current_gradient</title>
+<path fill="none" stroke="#e7ff00" d="M671.6,-739.47C718.93,-739.47 777.97,-739.47 823.39,-739.47"/>
+<polygon fill="#e7ff00" stroke="#e7ff00" points="823.45,-742.97 833.45,-739.47 823.45,-735.97 823.45,-742.97"/>
+</g>
+<!-- interface~calc_gradient_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node32" class="node">
+<title>interface~calc_gradient_ftdss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node32"><a xlink:href="../interface/calc_gradient_ftdss.html" xlink:title="type_ftdss%calc_gradient_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="984.5,-709.47 806.5,-709.47 806.5,-685.47 984.5,-685.47 984.5,-709.47"/>
+<text text-anchor="middle" x="895.5" y="-695.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%calc_gradient_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_pressure_ftdss&#45;&gt;interface~calc_gradient_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge39" class="edge">
+<title>proc~calc_gradient_pressure_ftdss&#45;&gt;interface~calc_gradient_ftdss</title>
+<path fill="none" stroke="#e7ff00" d="M671.6,-728.22C710.25,-722.89 756.71,-716.48 797.19,-710.9"/>
+<polygon fill="#e7ff00" stroke="#e7ff00" points="797.91,-714.33 807.34,-709.49 796.95,-707.39 797.91,-714.33"/>
+</g>
+<!-- proc~is_physics_active_control -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node41" class="node">
+<title>proc~is_physics_active_control</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node41"><a xlink:href="../proc/is_physics_active_control.html" xlink:title="type_controls%is_physics_active_control">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1008,-667.47 783,-667.47 783,-643.47 1008,-643.47 1008,-667.47"/>
+<text text-anchor="middle" x="895.5" y="-653.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_controls%is_physics_active_control</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_pressure_ftdss&#45;&gt;proc~is_physics_active_control -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge40" class="edge">
+<title>proc~calc_gradient_pressure_ftdss&#45;&gt;proc~is_physics_active_control</title>
+<path fill="none" stroke="#e7ff00" d="M671.84,-736.33C690.49,-733.09 709.61,-727.59 726,-718.47 747.48,-706.52 740.54,-688.47 762,-676.47 765.72,-674.39 769.58,-672.51 773.54,-670.79"/>
+<polygon fill="#e7ff00" stroke="#e7ff00" points="774.94,-674.01 782.97,-667.1 772.39,-667.49 774.94,-674.01"/>
+</g>
+<!-- proc~calc_gradient_temperature_ftdss&#45;&gt;get_current -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge41" class="edge">
+<title>proc~calc_gradient_temperature_ftdss&#45;&gt;get_current</title>
+<path fill="none" stroke="#5cff00" d="M682.56,-702.73C697.69,-706.09 712.74,-711.1 726,-718.47 747.48,-730.42 740.54,-748.48 762,-760.47 788.29,-775.17 821.84,-780.38 848.6,-781.93"/>
+<polygon fill="#5cff00" stroke="#5cff00" points="848.72,-785.44 858.86,-782.37 849.02,-778.45 848.72,-785.44"/>
+</g>
+<!-- proc~calc_gradient_temperature_ftdss&#45;&gt;get_current_gradient -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge42" class="edge">
+<title>proc~calc_gradient_temperature_ftdss&#45;&gt;get_current_gradient</title>
+<path fill="none" stroke="#5cff00" d="M677.26,-709.51C723.56,-715.89 779.74,-723.64 823.36,-729.66"/>
+<polygon fill="#5cff00" stroke="#5cff00" points="822.94,-733.13 833.32,-731.03 823.89,-726.2 822.94,-733.13"/>
+</g>
+<!-- proc~calc_gradient_temperature_ftdss&#45;&gt;interface~calc_gradient_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge43" class="edge">
+<title>proc~calc_gradient_temperature_ftdss&#45;&gt;interface~calc_gradient_ftdss</title>
+<path fill="none" stroke="#5cff00" d="M682.6,-697.47C718.51,-697.47 759.67,-697.47 796.11,-697.47"/>
+<polygon fill="#5cff00" stroke="#5cff00" points="796.25,-700.97 806.25,-697.47 796.25,-693.97 796.25,-700.97"/>
+</g>
+<!-- proc~calc_gradient_temperature_ftdss&#45;&gt;proc~is_physics_active_control -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge44" class="edge">
+<title>proc~calc_gradient_temperature_ftdss&#45;&gt;proc~is_physics_active_control</title>
+<path fill="none" stroke="#5cff00" d="M677.26,-685.44C714.77,-680.26 758.75,-674.2 797.3,-668.88"/>
+<polygon fill="#5cff00" stroke="#5cff00" points="798.07,-672.31 807.49,-667.47 797.11,-665.37 798.07,-672.31"/>
+</g>
+<!-- proc~get_variable_increment_ftdss&#45;&gt;deallocate_array -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge46" class="edge">
+<title>proc~get_variable_increment_ftdss&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#00ff2e" d="M673.26,-535.47C791.72,-535.47 1015.72,-535.47 1206.5,-535.47 1206.5,-535.47 1206.5,-535.47 2165,-535.47 2297.75,-535.47 2344.39,-512.03 2461,-575.47 2482.6,-587.22 2477.11,-603.03 2497,-617.47 2499.05,-618.96 2501.22,-620.37 2503.47,-621.69"/>
+<polygon fill="#00ff2e" stroke="#00ff2e" points="2501.92,-624.83 2512.39,-626.41 2505.18,-618.64 2501.92,-624.83"/>
+</g>
+<!-- proc~get_variable_increment_ftdss&#45;&gt;is_valid -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge47" class="edge">
+<title>proc~get_variable_increment_ftdss&#45;&gt;is_valid</title>
+<path fill="none" stroke="#00ff2e" d="M601.01,-523.34C625.72,-495.69 686.52,-425.17 726,-358.47 746.27,-324.22 737.09,-307.51 762,-276.47 789.69,-241.96 832.51,-213.65 861.93,-196.69"/>
+<polygon fill="#00ff2e" stroke="#00ff2e" points="863.98,-199.56 870.98,-191.6 860.55,-193.46 863.98,-199.56"/>
+</g>
+<!-- allocate_array -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node30" class="node">
+<title>allocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="2593,-608.47 2504,-608.47 2504,-584.47 2593,-584.47 2593,-608.47"/>
+<text text-anchor="middle" x="2548.5" y="-594.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</g>
+<!-- proc~get_variable_increment_ftdss&#45;&gt;allocate_array -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge45" class="edge">
+<title>proc~get_variable_increment_ftdss&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#00ff2e" d="M673.16,-527.09C791.5,-515.9 1015.35,-497.47 1206.5,-497.47 1206.5,-497.47 1206.5,-497.47 2165,-497.47 2296.99,-497.47 2339.31,-470.37 2461,-521.47 2489.61,-533.49 2515.49,-558.73 2531.33,-576.61"/>
+<polygon fill="#00ff2e" stroke="#00ff2e" points="2528.71,-578.93 2537.88,-584.23 2534.02,-574.36 2528.71,-578.93"/>
+</g>
+<!-- proc~get_data_vector -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node36" class="node">
+<title>proc~get_data_vector</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node36"><a xlink:href="../proc/get_data_vector.html" xlink:title="type_residual_vector%get_data_vector">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1316,-450.47 1099,-450.47 1099,-426.47 1316,-426.47 1316,-450.47"/>
+<text text-anchor="middle" x="1207.5" y="-436.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_residual_vector%get_data_vector</text>
+</a>
+</g>
+</g>
+<!-- proc~get_variable_increment_ftdss&#45;&gt;proc~get_data_vector -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge48" class="edge">
+<title>proc~get_variable_increment_ftdss&#45;&gt;proc~get_data_vector</title>
+<path fill="none" stroke="#00ff2e" d="M623.13,-523.37C657.42,-511.34 712.75,-493.31 762,-483.47 871.49,-461.59 998.39,-450.09 1088.51,-444.21"/>
+<polygon fill="#00ff2e" stroke="#00ff2e" points="1089,-447.69 1098.76,-443.56 1088.56,-440.7 1089,-447.69"/>
+</g>
+<!-- proc~get_num_dofs_per_node_domain -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node37" class="node">
+<title>proc~get_num_dofs_per_node_domain</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node37"><a xlink:href="../proc/get_num_dofs_per_node_domain.html" xlink:title="type_domain%get_num_dofs_per_node_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="1029,-431.47 762,-431.47 762,-407.47 1029,-407.47 1029,-431.47"/>
+<text text-anchor="middle" x="895.5" y="-417.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_num_dofs_per_node_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~get_variable_increment_ftdss&#45;&gt;proc~get_num_dofs_per_node_domain -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge49" class="edge">
+<title>proc~get_variable_increment_ftdss&#45;&gt;proc~get_num_dofs_per_node_domain</title>
+<path fill="none" stroke="#00ff2e" d="M608.78,-523.31C639.55,-503.94 703.18,-466.14 762,-445.47 775.3,-440.8 789.66,-436.89 803.85,-433.64"/>
+<polygon fill="#00ff2e" stroke="#00ff2e" points="804.61,-437.05 813.63,-431.49 803.11,-430.22 804.61,-437.05"/>
+</g>
+<!-- proc~get_num_nodes_domain -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node38" class="node">
+<title>proc~get_num_nodes_domain</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node38"><a xlink:href="../proc/get_num_nodes_domain.html" xlink:title="type_domain%get_num_nodes_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="1660.5,-587.47 1439.5,-587.47 1439.5,-563.47 1660.5,-563.47 1660.5,-587.47"/>
+<text text-anchor="middle" x="1550" y="-573.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_num_nodes_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~get_variable_increment_ftdss&#45;&gt;proc~get_num_nodes_domain -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge50" class="edge">
+<title>proc~get_variable_increment_ftdss&#45;&gt;proc~get_num_nodes_domain</title>
+<path fill="none" stroke="#00ff2e" d="M615.2,-547.49C648.08,-562.45 707.83,-587.15 762,-596.47 886.5,-617.9 1241.53,-597.43 1429.26,-584.4"/>
+<polygon fill="#00ff2e" stroke="#00ff2e" points="1429.72,-587.88 1439.45,-583.69 1429.23,-580.9 1429.72,-587.88"/>
+</g>
+<!-- proc~get_target_dof_domain -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node40" class="node">
+<title>proc~get_target_dof_domain</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node40"><a xlink:href="../proc/get_target_dof_domain.html" xlink:title="type_domain%get_target_dof_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="1002.5,-587.47 788.5,-587.47 788.5,-563.47 1002.5,-563.47 1002.5,-587.47"/>
+<text text-anchor="middle" x="895.5" y="-573.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_target_dof_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~get_variable_increment_ftdss&#45;&gt;proc~get_target_dof_domain -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge51" class="edge">
+<title>proc~get_variable_increment_ftdss&#45;&gt;proc~get_target_dof_domain</title>
+<path fill="none" stroke="#00ff2e" d="M673.21,-546.4C710.14,-551.25 753.95,-557.01 792.81,-562.11"/>
+<polygon fill="#00ff2e" stroke="#00ff2e" points="792.73,-565.63 803.1,-563.47 793.64,-558.69 792.73,-565.63"/>
+</g>
+<!-- proc~get_variable_increment_ftdss&#45;&gt;proc~is_physics_active_control -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge52" class="edge">
+<title>proc~get_variable_increment_ftdss&#45;&gt;proc~is_physics_active_control</title>
+<path fill="none" stroke="#00ff2e" d="M630.22,-547.55C658.48,-557.14 696.38,-572.29 726,-592.47 744.96,-605.39 741.83,-618.54 762,-629.47 769.95,-633.78 778.51,-637.37 787.31,-640.38"/>
+<polygon fill="#00ff2e" stroke="#00ff2e" points="786.36,-643.75 796.95,-643.42 788.46,-637.07 786.36,-643.75"/>
+</g>
+<!-- proc~is_active_hydraulic_ftdss&#45;&gt;proc~is_physics_active_control -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge53" class="edge">
+<title>proc~is_active_hydraulic_ftdss&#45;&gt;proc~is_physics_active_control</title>
+<path fill="none" stroke="#00ffb9" d="M660.62,-655.47C693.93,-655.47 734.63,-655.47 772.69,-655.47"/>
+<polygon fill="#00ffb9" stroke="#00ffb9" points="772.82,-658.97 782.82,-655.47 772.82,-651.97 772.82,-658.97"/>
+</g>
+<!-- proc~is_active_thermal_ftdss&#45;&gt;proc~is_physics_active_control -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge54" class="edge">
+<title>proc~is_active_thermal_ftdss&#45;&gt;proc~is_physics_active_control</title>
+<path fill="none" stroke="#00b9ff" d="M657.2,-622.74C698.4,-628.42 751.83,-635.79 797.56,-642.1"/>
+<polygon fill="#00b9ff" stroke="#00b9ff" points="797.11,-645.57 807.5,-643.47 798.07,-638.64 797.11,-645.57"/>
+</g>
+<!-- proc~raise_error&#45;&gt;strip -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge56" class="edge">
+<title>proc~raise_error&#45;&gt;strip</title>
+<path fill="none" stroke="#002eff" d="M930.66,-137.58C1042.67,-137.92 1398.19,-139.01 1512.92,-139.36"/>
+<polygon fill="#002eff" stroke="#002eff" points="1512.94,-142.86 1522.95,-139.39 1512.96,-135.86 1512.94,-142.86"/>
+</g>
+<!-- proc~replace_placeholder -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node42" class="node">
+<title>proc~replace_placeholder</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node42"><a xlink:href="../proc/replace_placeholder.html" xlink:title="replace_placeholder">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1268,-111.47 1147,-111.47 1147,-87.47 1268,-87.47 1268,-111.47"/>
+<text text-anchor="middle" x="1207.5" y="-97.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">replace_placeholder</text>
+</a>
+</g>
+</g>
+<!-- proc~raise_error&#45;&gt;proc~replace_placeholder -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge55" class="edge">
+<title>proc~raise_error&#45;&gt;proc~replace_placeholder</title>
+<path fill="none" stroke="#002eff" d="M930.56,-133.3C979.98,-127.24 1072.66,-115.88 1136.89,-108"/>
+<polygon fill="#002eff" stroke="#002eff" points="1137.45,-111.46 1146.95,-106.77 1136.59,-104.52 1137.45,-111.46"/>
+</g>
+<!-- to_string -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node43" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="1236.5,-191.47 1178.5,-191.47 1178.5,-167.47 1236.5,-167.47 1236.5,-191.47"/>
+<text text-anchor="middle" x="1207.5" y="-177.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~raise_error&#45;&gt;to_string -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge57" class="edge">
+<title>proc~raise_error&#45;&gt;to_string</title>
+<path fill="none" stroke="#002eff" d="M930.56,-142.09C988.85,-149.98 1107.31,-166.03 1168.31,-174.3"/>
+<polygon fill="#002eff" stroke="#002eff" points="1167.91,-177.78 1178.29,-175.65 1168.85,-170.84 1167.91,-177.78"/>
+</g>
+<!-- proc~get_current_wall_time -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node35" class="node">
+<title>proc~get_current_wall_time</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node35"><a xlink:href="../proc/get_current_wall_time.html" xlink:title="type_profiler%get_current_wall_time">
+<polygon fill="#d9534f" stroke="#d9534f" points="1310,-389.47 1105,-389.47 1105,-365.47 1310,-365.47 1310,-389.47"/>
+<text text-anchor="middle" x="1207.5" y="-375.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_profiler%get_current_wall_time</text>
+</a>
+</g>
+</g>
+<!-- proc~start_profile_by_id&#45;&gt;proc~get_current_wall_time -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge58" class="edge">
+<title>proc~start_profile_by_id&#45;&gt;proc~get_current_wall_time</title>
+<path fill="none" stroke="#5c00ff" d="M988.25,-377.47C1021.65,-377.47 1059.77,-377.47 1094.7,-377.47"/>
+<polygon fill="#5c00ff" stroke="#5c00ff" points="1094.95,-380.97 1104.95,-377.47 1094.95,-373.97 1094.95,-380.97"/>
+</g>
+<!-- proc~start_profile_by_name&#45;&gt;proc~raise_error -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge60" class="edge">
+<title>proc~start_profile_by_name&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#e700ff" d="M615.27,-325.37C645.27,-309.88 695.1,-280.45 726,-242.47 751.63,-210.97 729.95,-183.43 762,-158.47 786.77,-139.19 822.18,-134.39 850.17,-134.17"/>
+<polygon fill="#e700ff" stroke="#e700ff" points="850.46,-137.67 860.49,-134.29 850.54,-130.67 850.46,-137.67"/>
+</g>
+<!-- proc~start_profile_by_name&#45;&gt;proc~start_profile_by_id -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge61" class="edge">
+<title>proc~start_profile_by_name&#45;&gt;proc~start_profile_by_id</title>
+<path fill="none" stroke="#e700ff" d="M681.36,-349.47C716.51,-354.09 756.84,-359.39 792.89,-364.12"/>
+<polygon fill="#e700ff" stroke="#e700ff" points="792.57,-367.61 802.94,-365.44 793.48,-360.67 792.57,-367.61"/>
+</g>
+<!-- proc~start_profile_by_name&#45;&gt;strip -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge62" class="edge">
+<title>proc~start_profile_by_name&#45;&gt;strip</title>
+<path fill="none" stroke="#e700ff" d="M692.27,-343.58C871.29,-352.85 1233.5,-364.84 1350,-318.47 1433.89,-285.09 1505.08,-199.26 1534.51,-159.83"/>
+<polygon fill="#e700ff" stroke="#e700ff" points="1537.37,-161.86 1540.46,-151.73 1531.73,-157.72 1537.37,-161.86"/>
+</g>
+<!-- proc~get_profiler_id -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node39" class="node">
+<title>proc~get_profiler_id</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node39"><a xlink:href="../proc/get_profiler_id.html" xlink:title="type_profiler%get_profiler_id">
+<polygon fill="#d9534f" stroke="#d9534f" points="978,-309.47 813,-309.47 813,-285.47 978,-285.47 978,-309.47"/>
+<text text-anchor="middle" x="895.5" y="-295.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_profiler%get_profiler_id</text>
+</a>
+</g>
+</g>
+<!-- proc~start_profile_by_name&#45;&gt;proc~get_profiler_id -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge59" class="edge">
+<title>proc~start_profile_by_name&#45;&gt;proc~get_profiler_id</title>
+<path fill="none" stroke="#e700ff" d="M681.36,-325.47C719.71,-320.43 764.24,-314.58 802.64,-309.54"/>
+<polygon fill="#e700ff" stroke="#e700ff" points="803.33,-312.98 812.79,-308.21 802.41,-306.04 803.33,-312.98"/>
+</g>
+<!-- proc~calc_gradient_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node47" class="node">
+<title>proc~calc_gradient_ftdss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node47"><a xlink:href="../proc/calc_gradient_ftdss.html" xlink:title="calc_gradient_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1265,-755.47 1150,-755.47 1150,-731.47 1265,-731.47 1265,-755.47"/>
+<text text-anchor="middle" x="1207.5" y="-741.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_gradient_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_gradient_ftdss&#45;&gt;proc~calc_gradient_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge63" class="edge">
+<title>interface~calc_gradient_ftdss&#45;&gt;proc~calc_gradient_ftdss</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M977.54,-709.5C1028.02,-716.99 1092.16,-726.51 1139.7,-733.56"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="1139.48,-737.07 1149.89,-735.07 1140.51,-730.14 1139.48,-737.07"/>
+</g>
+<!-- proc~dot_vector_dp&#45;&gt;proc~dot_native~2 -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge66" class="edge">
+<title>proc~dot_vector_dp&#45;&gt;proc~dot_native~2</title>
+<path fill="none" stroke="#48ff00" d="M1931.27,-422.08C1982.78,-429.95 2068.28,-443.01 2119.77,-450.87"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="2119.49,-454.37 2129.91,-452.42 2120.55,-447.45 2119.49,-454.37"/>
+</g>
+<!-- check_match_length -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node44" class="node">
+<title>check_match_length</title>
+<polygon fill="#777777" stroke="#777777" points="2225,-427.47 2103,-427.47 2103,-403.47 2225,-403.47 2225,-427.47"/>
+<text text-anchor="middle" x="2164" y="-413.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">check_match_length</text>
+</g>
+<!-- proc~dot_vector_dp&#45;&gt;check_match_length -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge64" class="edge">
+<title>proc~dot_vector_dp&#45;&gt;check_match_length</title>
+<path fill="none" stroke="#48ff00" d="M1931.27,-415.47C1974.5,-415.47 2041.68,-415.47 2092.59,-415.47"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="2092.87,-418.97 2102.87,-415.47 2092.87,-411.97 2092.87,-418.97"/>
+</g>
+<!-- interface~get_data_vector_dp -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node46" class="node">
+<title>interface~get_data_vector_dp</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node46"><a xlink:href="../interface/get_data_vector_dp.html" xlink:title="type_vector_dp%get_data_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="2268,-385.47 2060,-385.47 2060,-361.47 2268,-361.47 2268,-385.47"/>
+<text text-anchor="middle" x="2164" y="-371.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~dot_vector_dp&#45;&gt;interface~get_data_vector_dp -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge65" class="edge">
+<title>proc~dot_vector_dp&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#48ff00" d="M1931.27,-408.86C1969.47,-403.03 2026.36,-394.34 2074.21,-387.03"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="2074.92,-390.47 2084.28,-385.5 2073.86,-383.55 2074.92,-390.47"/>
+</g>
+<!-- proc~get_data_vector&#45;&gt;interface~get_data_vector_dp -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge67" class="edge">
+<title>proc~get_data_vector&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#00ff91" d="M1287.43,-426.43C1318.13,-422.11 1353.65,-417.54 1386,-414.47 1621.31,-392.14 1897.95,-381.18 2049.49,-376.48"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="2049.85,-379.97 2059.74,-376.17 2049.63,-372.97 2049.85,-379.97"/>
+</g>
+<!-- proc~match_profiler_section_label -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node48" class="node">
+<title>proc~match_profiler_section_label</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node48"><a xlink:href="../proc/match_profiler_section_label.html" xlink:title="type_profiler_section%match_profiler_section_label">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1350,-309.47 1065,-309.47 1065,-285.47 1350,-285.47 1350,-309.47"/>
+<text text-anchor="middle" x="1207.5" y="-295.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_profiler_section%match_profiler_section_label</text>
+</a>
+</g>
+</g>
+<!-- proc~get_profiler_id&#45;&gt;proc~match_profiler_section_label -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge68" class="edge">
+<title>proc~get_profiler_id&#45;&gt;proc~match_profiler_section_label</title>
+<path fill="none" stroke="#0024ff" d="M978.35,-297.47C1001.9,-297.47 1028.36,-297.47 1054.7,-297.47"/>
+<polygon fill="#0024ff" stroke="#0024ff" points="1054.78,-300.97 1064.78,-297.47 1054.78,-293.97 1054.78,-300.97"/>
+</g>
+<!-- in_group -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node45" class="node">
+<title>in_group</title>
+<polygon fill="#777777" stroke="#777777" points="1236.5,-667.47 1178.5,-667.47 1178.5,-643.47 1236.5,-643.47 1236.5,-667.47"/>
+<text text-anchor="middle" x="1207.5" y="-653.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_group</text>
+</g>
+<!-- proc~is_physics_active_control&#45;&gt;in_group -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge69" class="edge">
+<title>proc~is_physics_active_control&#45;&gt;in_group</title>
+<path fill="none" stroke="#b600ff" d="M1008.42,-655.47C1064.46,-655.47 1128.66,-655.47 1168.4,-655.47"/>
+<polygon fill="#b600ff" stroke="#b600ff" points="1168.44,-658.97 1178.44,-655.47 1168.44,-651.97 1168.44,-658.97"/>
+</g>
+<!-- proc~replace_placeholder&#45;&gt;strip -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge70" class="edge">
+<title>proc~replace_placeholder&#45;&gt;strip</title>
+<path fill="none" stroke="#ff00da" d="M1268.2,-106.49C1338.77,-114.78 1453.97,-128.31 1512.46,-135.18"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="1512.35,-138.69 1522.69,-136.38 1513.17,-131.74 1512.35,-138.69"/>
+</g>
+<!-- proc~get_data_vector_dp -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node54" class="node">
+<title>proc~get_data_vector_dp</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node54"><a xlink:href="../proc/get_data_vector_dp.html" xlink:title="get_data_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="2441,-385.47 2324,-385.47 2324,-361.47 2441,-361.47 2441,-385.47"/>
+<text text-anchor="middle" x="2382.5" y="-371.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge71" class="edge">
+<title>interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M2268.18,-373.47C2283.6,-373.47 2299.16,-373.47 2313.61,-373.47"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="2313.91,-376.97 2323.91,-373.47 2313.91,-369.97 2313.91,-376.97"/>
+</g>
+<!-- proc~calc_gradient_ftdss&#45;&gt;interface~vector_dot -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge76" class="edge">
+<title>proc~calc_gradient_ftdss&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#0066ff" d="M1257.46,-731.4C1288.1,-721.46 1326.14,-704.35 1350,-676.47 1386.75,-633.52 1353.45,-600.69 1386,-554.47 1419.2,-507.33 1477.07,-471.63 1514.17,-452.13"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1515.84,-455.21 1523.13,-447.53 1512.64,-448.99 1515.84,-455.21"/>
+</g>
+<!-- proc~calc_gradient_ftdss&#45;&gt;proc~get_num_nodes_domain -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge82" class="edge">
+<title>proc~calc_gradient_ftdss&#45;&gt;proc~get_num_nodes_domain</title>
+<path fill="none" stroke="#0066ff" d="M1252.92,-731.4C1283.53,-721.13 1323.35,-703.64 1350,-676.47 1377.3,-648.64 1354.68,-619.7 1386,-596.47 1398.81,-586.97 1413.8,-580.62 1429.4,-576.49"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1430.25,-579.89 1439.18,-574.2 1428.65,-573.08 1430.25,-579.89"/>
+</g>
+<!-- interface~calc_shape_function_abst_fe -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node49" class="node">
+<title>interface~calc_shape_function_abst_fe</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node49"><a xlink:href="../interface/calc_shape_function_abst_fe.html" xlink:title="abst_fe%calc_shape_function_abst_fe">
+<polygon fill="#a7506f" stroke="#a7506f" points="1656,-713.47 1444,-713.47 1444,-689.47 1656,-689.47 1656,-713.47"/>
+<text text-anchor="middle" x="1550" y="-699.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%calc_shape_function_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_ftdss&#45;&gt;interface~calc_shape_function_abst_fe -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge72" class="edge">
+<title>proc~calc_gradient_ftdss&#45;&gt;interface~calc_shape_function_abst_fe</title>
+<path fill="none" stroke="#0066ff" d="M1265.11,-736.49C1313.02,-730.58 1383.02,-721.95 1441.53,-714.73"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1442.06,-718.19 1451.56,-713.49 1441.2,-711.24 1442.06,-718.19"/>
+</g>
+<!-- interface~get_gauss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node50" class="node">
+<title>interface~get_gauss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node50"><a xlink:href="../interface/get_gauss.html" xlink:title="abst_fe%get_gauss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1607,-671.47 1493,-671.47 1493,-647.47 1607,-647.47 1607,-671.47"/>
+<text text-anchor="middle" x="1550" y="-657.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%get_gauss</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_ftdss&#45;&gt;interface~get_gauss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge73" class="edge">
+<title>proc~calc_gradient_ftdss&#45;&gt;interface~get_gauss</title>
+<path fill="none" stroke="#0066ff" d="M1236.53,-731.42C1271.04,-717.07 1331.77,-693.43 1386,-680.47 1417.28,-673 1452.61,-668.03 1482.36,-664.82"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1483.05,-668.27 1492.64,-663.75 1482.33,-661.3 1483.05,-668.27"/>
+</g>
+<!-- interface~get_num_gauss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node51" class="node">
+<title>interface~get_num_gauss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node51"><a xlink:href="../interface/get_num_gauss.html" xlink:title="abst_fe%get_num_gauss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1621.5,-629.47 1478.5,-629.47 1478.5,-605.47 1621.5,-605.47 1621.5,-629.47"/>
+<text text-anchor="middle" x="1550" y="-615.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%get_num_gauss</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_ftdss&#45;&gt;interface~get_num_gauss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge74" class="edge">
+<title>proc~calc_gradient_ftdss&#45;&gt;interface~get_num_gauss</title>
+<path fill="none" stroke="#0066ff" d="M1242.73,-731.4C1272.65,-719.92 1316.44,-700.8 1350,-676.47 1368.83,-662.82 1365.26,-649.01 1386,-638.47 1410.92,-625.8 1440.64,-619.76 1467.84,-617.12"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1468.45,-620.58 1478.13,-616.27 1467.87,-613.6 1468.45,-620.58"/>
+</g>
+<!-- interface~get_weight -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node52" class="node">
+<title>interface~get_weight</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node52"><a xlink:href="../interface/get_weight.html" xlink:title="abst_fe%get_weight">
+<polygon fill="#a7506f" stroke="#a7506f" points="1609,-1003.47 1491,-1003.47 1491,-979.47 1609,-979.47 1609,-1003.47"/>
+<text text-anchor="middle" x="1550" y="-989.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%get_weight</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_ftdss&#45;&gt;interface~get_weight -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge75" class="edge">
+<title>proc~calc_gradient_ftdss&#45;&gt;interface~get_weight</title>
+<path fill="none" stroke="#0066ff" d="M1213.75,-755.52C1231.44,-794.46 1292.97,-917.5 1386,-970.47 1414.4,-986.65 1450.02,-992.55 1480.72,-994.14"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1480.79,-997.64 1490.92,-994.52 1481.06,-990.65 1480.79,-997.64"/>
+</g>
+<!-- proc~get_computation_dimension_domain -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node53" class="node">
+<title>proc~get_computation_dimension_domain</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node53"><a xlink:href="../proc/get_computation_dimension_domain.html" xlink:title="type_domain%get_computation_dimension_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="1694,-961.47 1406,-961.47 1406,-937.47 1694,-937.47 1694,-961.47"/>
+<text text-anchor="middle" x="1550" y="-947.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_computation_dimension_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_ftdss&#45;&gt;proc~get_computation_dimension_domain -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge77" class="edge">
+<title>proc~calc_gradient_ftdss&#45;&gt;proc~get_computation_dimension_domain</title>
+<path fill="none" stroke="#0066ff" d="M1216.32,-755.68C1238.38,-788.98 1304.83,-881.7 1386,-923.47 1394.32,-927.75 1403.17,-931.37 1412.28,-934.41"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1411.27,-937.76 1421.86,-937.38 1413.34,-931.08 1411.27,-937.76"/>
+</g>
+<!-- proc~get_element_connectivity_domain -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node55" class="node">
+<title>proc~get_element_connectivity_domain</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node55"><a xlink:href="../proc/get_element_connectivity_domain.html" xlink:title="type_domain%get_element_connectivity_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="2024,-901.47 1750,-901.47 1750,-877.47 2024,-877.47 2024,-901.47"/>
+<text text-anchor="middle" x="1887" y="-887.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_element_connectivity_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_ftdss&#45;&gt;proc~get_element_connectivity_domain -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge78" class="edge">
+<title>proc~calc_gradient_ftdss&#45;&gt;proc~get_element_connectivity_domain</title>
+<path fill="none" stroke="#0066ff" d="M1217.99,-755.78C1242.09,-785.89 1309.21,-862.8 1386,-890.47 1533.89,-943.76 1722.75,-921.16 1820.61,-903.37"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1821.46,-906.77 1830.65,-901.5 1820.18,-899.89 1821.46,-906.77"/>
+</g>
+<!-- proc~get_element_coordinate_domain -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node56" class="node">
+<title>proc~get_element_coordinate_domain</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node56"><a xlink:href="../proc/get_element_coordinate_domain.html" xlink:title="type_domain%get_element_coordinate_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="1683.5,-881.47 1416.5,-881.47 1416.5,-857.47 1683.5,-857.47 1683.5,-881.47"/>
+<text text-anchor="middle" x="1550" y="-867.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_element_coordinate_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_ftdss&#45;&gt;proc~get_element_coordinate_domain -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge79" class="edge">
+<title>proc~calc_gradient_ftdss&#45;&gt;proc~get_element_coordinate_domain</title>
+<path fill="none" stroke="#0066ff" d="M1224.05,-755.69C1253.65,-778.23 1320.99,-826.12 1386,-848.47 1393.13,-850.92 1400.52,-853.09 1408.05,-855.01"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1407.47,-858.47 1418.01,-857.39 1409.1,-851.66 1407.47,-858.47"/>
+</g>
+<!-- proc~get_element_domain -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node57" class="node">
+<title>proc~get_element_domain</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node57"><a xlink:href="../proc/get_element_domain.html" xlink:title="type_domain%get_element_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="1652,-839.47 1448,-839.47 1448,-815.47 1652,-815.47 1652,-839.47"/>
+<text text-anchor="middle" x="1550" y="-825.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_element_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_ftdss&#45;&gt;proc~get_element_domain -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge80" class="edge">
+<title>proc~calc_gradient_ftdss&#45;&gt;proc~get_element_domain</title>
+<path fill="none" stroke="#0066ff" d="M1236.53,-755.52C1271.04,-769.87 1331.77,-793.51 1386,-806.47 1402.59,-810.44 1420.31,-813.69 1437.74,-816.36"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1437.56,-819.87 1447.96,-817.86 1438.58,-812.94 1437.56,-819.87"/>
+</g>
+<!-- proc~get_num_elements_domain -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node58" class="node">
+<title>proc~get_num_elements_domain</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node58"><a xlink:href="../proc/get_num_elements_domain.html" xlink:title="type_domain%get_num_elements_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="1669,-797.47 1431,-797.47 1431,-773.47 1669,-773.47 1669,-797.47"/>
+<text text-anchor="middle" x="1550" y="-783.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_num_elements_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_ftdss&#45;&gt;proc~get_num_elements_domain -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge81" class="edge">
+<title>proc~calc_gradient_ftdss&#45;&gt;proc~get_num_elements_domain</title>
+<path fill="none" stroke="#0066ff" d="M1265.11,-750.45C1313.02,-756.36 1383.02,-765 1441.53,-772.22"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1441.2,-775.7 1451.56,-773.45 1442.06,-768.76 1441.2,-775.7"/>
+</g>
+<!-- proc~zero_type_coordinate_array_dp -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node59" class="node">
+<title>proc~zero_type_coordinate_array_dp</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node59"><a xlink:href="../proc/zero_type_coordinate_array_dp.html" xlink:title="type_coordinate_array_dp%zero_type_coordinate_array_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="1714,-755.47 1386,-755.47 1386,-731.47 1714,-731.47 1714,-755.47"/>
+<text text-anchor="middle" x="1550" y="-741.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_coordinate_array_dp%zero_type_coordinate_array_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_ftdss&#45;&gt;proc~zero_type_coordinate_array_dp -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge83" class="edge">
+<title>proc~calc_gradient_ftdss&#45;&gt;proc~zero_type_coordinate_array_dp</title>
+<path fill="none" stroke="#0066ff" d="M1265.11,-743.47C1295.79,-743.47 1335.54,-743.47 1375.52,-743.47"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1375.68,-746.97 1385.68,-743.47 1375.68,-739.97 1375.68,-746.97"/>
+</g>
+<!-- proc~match_profiler_section_label&#45;&gt;strip -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge84" class="edge">
+<title>proc~match_profiler_section_label&#45;&gt;strip</title>
+<path fill="none" stroke="#cc00ff" d="M1235.42,-285.45C1263.94,-272.69 1310.23,-251.86 1350,-233.47 1407.87,-206.72 1474.84,-174.91 1514.47,-156"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1516.42,-158.94 1523.93,-151.48 1513.4,-152.63 1516.42,-158.94"/>
+</g>
+<!-- proc~calc_shape_function_abst_fe -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node60" class="node">
+<title>proc~calc_shape_function_abst_fe</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node60"><a xlink:href="../proc/calc_shape_function_abst_fe.html" xlink:title="calc_shape_function_abst_fe">
+<polygon fill="#d9534f" stroke="#d9534f" points="1969,-713.47 1805,-713.47 1805,-689.47 1969,-689.47 1969,-713.47"/>
+<text text-anchor="middle" x="1887" y="-699.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_shape_function_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_shape_function_abst_fe&#45;&gt;proc~calc_shape_function_abst_fe -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge85" class="edge">
+<title>interface~calc_shape_function_abst_fe&#45;&gt;proc~calc_shape_function_abst_fe</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1656.08,-701.47C1700.58,-701.47 1751.94,-701.47 1794.81,-701.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1794.95,-704.97 1804.95,-701.47 1794.95,-697.97 1794.95,-704.97"/>
+</g>
+<!-- proc~get_gauss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node62" class="node">
+<title>proc~get_gauss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node62"><a xlink:href="../proc/get_gauss.html" xlink:title="get_gauss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1920,-671.47 1854,-671.47 1854,-647.47 1920,-647.47 1920,-671.47"/>
+<text text-anchor="middle" x="1887" y="-657.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_gauss</text>
+</a>
+</g>
+</g>
+<!-- interface~get_gauss&#45;&gt;proc~get_gauss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge86" class="edge">
+<title>interface~get_gauss&#45;&gt;proc~get_gauss</title>
+<path fill="none" stroke="#ff8b00" stroke-dasharray="5,2" d="M1607.07,-659.47C1673.67,-659.47 1783.27,-659.47 1843.34,-659.47"/>
+<polygon fill="#ff8b00" stroke="#ff8b00" points="1843.6,-662.97 1853.6,-659.47 1843.6,-655.97 1843.6,-662.97"/>
+</g>
+<!-- proc~get_num_gauss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node63" class="node">
+<title>proc~get_num_gauss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node63"><a xlink:href="../proc/get_num_gauss.html" xlink:title="get_num_gauss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1934.5,-629.47 1839.5,-629.47 1839.5,-605.47 1934.5,-605.47 1934.5,-629.47"/>
+<text text-anchor="middle" x="1887" y="-615.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_num_gauss</text>
+</a>
+</g>
+</g>
+<!-- interface~get_num_gauss&#45;&gt;proc~get_num_gauss -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge87" class="edge">
+<title>interface~get_num_gauss&#45;&gt;proc~get_num_gauss</title>
+<path fill="none" stroke="#e7ff00" stroke-dasharray="5,2" d="M1621.64,-617.47C1683.26,-617.47 1771.53,-617.47 1828.82,-617.47"/>
+<polygon fill="#e7ff00" stroke="#e7ff00" points="1829.14,-620.97 1839.14,-617.47 1829.14,-613.97 1829.14,-620.97"/>
+</g>
+<!-- proc~get_weight -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node64" class="node">
+<title>proc~get_weight</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node64"><a xlink:href="../proc/get_weight.html" xlink:title="get_weight">
+<polygon fill="#d9534f" stroke="#d9534f" points="1922,-1003.47 1852,-1003.47 1852,-979.47 1922,-979.47 1922,-1003.47"/>
+<text text-anchor="middle" x="1887" y="-989.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_weight</text>
+</a>
+</g>
+</g>
+<!-- interface~get_weight&#45;&gt;proc~get_weight -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge88" class="edge">
+<title>interface~get_weight&#45;&gt;proc~get_weight</title>
+<path fill="none" stroke="#5cff00" stroke-dasharray="5,2" d="M1609.35,-991.47C1675.49,-991.47 1781.84,-991.47 1841.58,-991.47"/>
+<polygon fill="#5cff00" stroke="#5cff00" points="1841.82,-994.97 1851.82,-991.47 1841.82,-987.97 1841.82,-994.97"/>
+</g>
+<!-- proc~get_element_coordinate_domain&#45;&gt;proc~get_element_connectivity_domain -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge89" class="edge">
+<title>proc~get_element_coordinate_domain&#45;&gt;proc~get_element_connectivity_domain</title>
+<path fill="none" stroke="#002eff" d="M1683.88,-877.41C1702.31,-878.51 1721.32,-879.64 1739.97,-880.75"/>
+<polygon fill="#002eff" stroke="#002eff" points="1739.79,-884.25 1749.99,-881.35 1740.21,-877.26 1739.79,-884.25"/>
+</g>
+<!-- proc~get_fe -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node61" class="node">
+<title>proc~get_fe</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node61"><a xlink:href="../proc/get_fe.html" xlink:title="type_fe_manager%get_fe">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1961,-839.47 1813,-839.47 1813,-815.47 1961,-815.47 1961,-839.47"/>
+<text text-anchor="middle" x="1887" y="-825.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_fe_manager%get_fe</text>
+</a>
+</g>
+</g>
+<!-- proc~get_element_domain&#45;&gt;proc~get_fe -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge90" class="edge">
+<title>proc~get_element_domain&#45;&gt;proc~get_fe</title>
+<path fill="none" stroke="#5c00ff" d="M1652.42,-827.47C1700.49,-827.47 1757.21,-827.47 1802.72,-827.47"/>
+<polygon fill="#5c00ff" stroke="#5c00ff" points="1802.84,-830.97 1812.84,-827.47 1802.84,-823.97 1802.84,-830.97"/>
+</g>
+<!-- calc_dpsi -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node65" class="node">
+<title>calc_dpsi</title>
+<polygon fill="#777777" stroke="#777777" points="2194.5,-734.47 2133.5,-734.47 2133.5,-710.47 2194.5,-710.47 2194.5,-734.47"/>
+<text text-anchor="middle" x="2164" y="-720.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_dpsi</text>
+</g>
+<!-- proc~calc_shape_function_abst_fe&#45;&gt;calc_dpsi -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge91" class="edge">
+<title>proc~calc_shape_function_abst_fe&#45;&gt;calc_dpsi</title>
+<path fill="none" stroke="#ff0000" d="M1969.02,-707.66C2019.78,-711.54 2082.96,-716.36 2123.15,-719.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2123.11,-722.94 2133.35,-720.21 2123.65,-715.96 2123.11,-722.94"/>
+</g>
+<!-- calc_jacobian -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node66" class="node">
+<title>calc_jacobian</title>
+<polygon fill="#777777" stroke="#777777" points="2206.5,-692.47 2121.5,-692.47 2121.5,-668.47 2206.5,-668.47 2206.5,-692.47"/>
+<text text-anchor="middle" x="2164" y="-678.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_jacobian</text>
+</g>
+<!-- proc~calc_shape_function_abst_fe&#45;&gt;calc_jacobian -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge92" class="edge">
+<title>proc~calc_shape_function_abst_fe&#45;&gt;calc_jacobian</title>
+<path fill="none" stroke="#ff0000" d="M1969.02,-695.29C2015.08,-691.77 2071.37,-687.47 2111.42,-684.41"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2111.79,-687.89 2121.49,-683.64 2111.26,-680.91 2111.79,-687.89"/>
+</g>
+<!-- calc_psi -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node67" class="node">
+<title>calc_psi</title>
+<polygon fill="#777777" stroke="#777777" points="2191.5,-650.47 2136.5,-650.47 2136.5,-626.47 2191.5,-626.47 2191.5,-650.47"/>
+<text text-anchor="middle" x="2164" y="-636.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_psi</text>
+</g>
+<!-- proc~calc_shape_function_abst_fe&#45;&gt;calc_psi -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge93" class="edge">
+<title>proc~calc_shape_function_abst_fe&#45;&gt;calc_psi</title>
+<path fill="none" stroke="#ff0000" d="M1969.06,-694.04C1987.45,-690.97 2006.66,-686.62 2024,-680.47 2041.46,-674.28 2042.69,-666.08 2060,-659.47 2081.2,-651.38 2106.1,-646.2 2126.11,-643"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2126.71,-646.45 2136.08,-641.51 2125.67,-639.53 2126.71,-646.45"/>
+</g>
+<!-- interface~matrix_determinant -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node68" class="node">
+<title>interface~matrix_determinant</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node68"><a xlink:href="../interface/matrix_determinant.html" xlink:title="matrix_determinant">
+<polygon fill="#a7506f" stroke="#a7506f" points="2223,-608.47 2105,-608.47 2105,-584.47 2223,-584.47 2223,-608.47"/>
+<text text-anchor="middle" x="2164" y="-594.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_determinant</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_shape_function_abst_fe&#45;&gt;interface~matrix_determinant -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge94" class="edge">
+<title>proc~calc_shape_function_abst_fe&#45;&gt;interface~matrix_determinant</title>
+<path fill="none" stroke="#ff0000" d="M1969.06,-700.88C1988.34,-697.64 2007.96,-691.51 2024,-680.47 2050.57,-662.2 2033.87,-636.38 2060,-617.47 2070.27,-610.04 2082.54,-605.1 2094.98,-601.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2095.98,-605.2 2104.96,-599.57 2094.43,-598.38 2095.98,-605.2"/>
+</g>
+<!-- interface~matrix_inverse -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node69" class="node">
+<title>interface~matrix_inverse</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node69"><a xlink:href="../interface/matrix_inverse.html" xlink:title="matrix_inverse">
+<polygon fill="#a7506f" stroke="#a7506f" points="2209.5,-776.47 2118.5,-776.47 2118.5,-752.47 2209.5,-752.47 2209.5,-776.47"/>
+<text text-anchor="middle" x="2164" y="-762.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_inverse</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_shape_function_abst_fe&#45;&gt;interface~matrix_inverse -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge95" class="edge">
+<title>proc~calc_shape_function_abst_fe&#45;&gt;interface~matrix_inverse</title>
+<path fill="none" stroke="#ff0000" d="M1935.34,-713.55C1969.82,-722.22 2017.71,-734 2060,-743.47 2075.63,-746.97 2092.65,-750.54 2108.27,-753.72"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2107.81,-757.2 2118.31,-755.75 2109.2,-750.34 2107.81,-757.2"/>
+</g>
+<!-- proc~matrix_determinant_real64 -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node70" class="node">
+<title>proc~matrix_determinant_real64</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node70"><a xlink:href="../proc/matrix_determinant_real64.html" xlink:title="matrix_determinant_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="2461,-608.47 2304,-608.47 2304,-584.47 2461,-584.47 2461,-608.47"/>
+<text text-anchor="middle" x="2382.5" y="-594.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_determinant_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~matrix_determinant&#45;&gt;proc~matrix_determinant_real64 -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge96" class="edge">
+<title>interface~matrix_determinant&#45;&gt;proc~matrix_determinant_real64</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M2223.02,-596.47C2244.72,-596.47 2269.88,-596.47 2293.67,-596.47"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="2293.77,-599.97 2303.77,-596.47 2293.77,-592.97 2293.77,-599.97"/>
+</g>
+<!-- proc~matrix_inverse_real64 -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_node71" class="node">
+<title>proc~matrix_inverse_real64</title>
+<g id="a_proc~~reflect_variables_ftdss~~CallsGraph_node71"><a xlink:href="../proc/matrix_inverse_real64.html" xlink:title="matrix_inverse_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="2447.5,-650.47 2317.5,-650.47 2317.5,-626.47 2447.5,-626.47 2447.5,-650.47"/>
+<text text-anchor="middle" x="2382.5" y="-636.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_inverse_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~matrix_inverse&#45;&gt;proc~matrix_inverse_real64 -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge97" class="edge">
+<title>interface~matrix_inverse&#45;&gt;proc~matrix_inverse_real64</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M2209.61,-760.75C2228.41,-757.84 2250.06,-752.67 2268,-743.47 2308.81,-722.55 2345.7,-682.78 2365.73,-658.65"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="2368.5,-660.79 2372.09,-650.82 2363.07,-656.37 2368.5,-660.79"/>
+</g>
+<!-- proc~matrix_determinant_real64&#45;&gt;deallocate_array -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge99" class="edge">
+<title>proc~matrix_determinant_real64&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#ff0000" d="M2430.5,-608.51C2449.28,-613.32 2471.08,-618.9 2490.74,-623.94"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2489.94,-627.34 2500.5,-626.44 2491.68,-620.56 2489.94,-627.34"/>
+</g>
+<!-- proc~matrix_determinant_real64&#45;&gt;allocate_array -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge98" class="edge">
+<title>proc~matrix_determinant_real64&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#ff0000" d="M2461.18,-596.47C2472.11,-596.47 2483.14,-596.47 2493.49,-596.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2493.59,-599.97 2503.59,-596.47 2493.59,-592.97 2493.59,-599.97"/>
+</g>
+<!-- proc~matrix_inverse_real64&#45;&gt;deallocate_array -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge101" class="edge">
+<title>proc~matrix_inverse_real64&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#00ffff" d="M2447.85,-638.47C2460.54,-638.47 2473.82,-638.47 2486.4,-638.47"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2486.77,-641.97 2496.77,-638.47 2486.77,-634.97 2486.77,-641.97"/>
+</g>
+<!-- proc~matrix_inverse_real64&#45;&gt;allocate_array -->
+<g id="proc~~reflect_variables_ftdss~~CallsGraph_edge100" class="edge">
+<title>proc~matrix_inverse_real64&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#00ffff" d="M2430.5,-626.44C2450.34,-621.35 2473.56,-615.41 2494.05,-610.16"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2495.05,-613.52 2503.87,-607.65 2493.31,-606.74 2495.05,-613.52"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocreflect_variables_ftdssCallsGraph = svgPanZoom('#procreflect_variables_ftdssCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~reflect_variables_ftdss~~CalledByGraph Pages: 1 -->
+<svg id="procreflect_variables_ftdssCalledByGraph" width="641pt" height="20pt"
+ viewBox="0.00 0.00 641.00 20.25" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~reflect_variables_ftdss~~CalledByGraph" class="graph" transform="scale(0.63 0.63) rotate(0) translate(4 28)">
+<title>proc~~reflect_variables_ftdss~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 1009,-28 1009,4 -4,4"/>
+<!-- proc~reflect_variables_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CalledByGraph_node1" class="node">
+<title>proc~reflect_variables_ftdss</title>
+<polygon fill="none" stroke="black" points="1005,-24 875,-24 875,0 1005,0 1005,-24"/>
+<text text-anchor="middle" x="940" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">reflect_variables_ftdss</text>
+</g>
+<!-- interface~reflect_variables_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CalledByGraph_node2" class="node">
+<title>interface~reflect_variables_ftdss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CalledByGraph_node2"><a xlink:href="../interface/reflect_variables_ftdss.html" xlink:title="type_ftdss%reflect_variables_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="839,-24 646,-24 646,0 839,0 839,-24"/>
+<text text-anchor="middle" x="742.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%reflect_variables_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~reflect_variables_ftdss&#45;&gt;proc~reflect_variables_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CalledByGraph_edge1" class="edge">
+<title>interface~reflect_variables_ftdss&#45;&gt;proc~reflect_variables_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M839.25,-12C847.84,-12 856.46,-12 864.83,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="864.91,-15.5 874.91,-12 864.91,-8.5 864.91,-15.5"/>
+</g>
+<!-- proc~solve_time_step_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CalledByGraph_node3" class="node">
+<title>proc~solve_time_step_ftdss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CalledByGraph_node3"><a xlink:href="../proc/solve_time_step_ftdss.html" xlink:title="solve_time_step_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="610,-24 483,-24 483,0 610,0 610,-24"/>
+<text text-anchor="middle" x="546.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~reflect_variables_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CalledByGraph_edge2" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~reflect_variables_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M610.22,-12C618.41,-12 626.98,-12 635.65,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="635.85,-15.5 645.85,-12 635.85,-8.5 635.85,-15.5"/>
+</g>
+<!-- interface~solve_time_step_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CalledByGraph_node4" class="node">
+<title>interface~solve_time_step_ftdss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CalledByGraph_node4"><a xlink:href="../interface/solve_time_step_ftdss.html" xlink:title="type_ftdss%solve_time_step_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="447,-24 257,-24 257,0 447,0 447,-24"/>
+<text text-anchor="middle" x="352" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CalledByGraph_edge3" class="edge">
+<title>interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M447.28,-12C455.88,-12 464.5,-12 472.87,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="472.93,-15.5 482.93,-12 472.93,-8.5 472.93,-15.5"/>
+</g>
+<!-- proc~run_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CalledByGraph_node5" class="node">
+<title>proc~run_ftdss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CalledByGraph_node5"><a xlink:href="../proc/run_ftdss.html" xlink:title="run_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-24 160,-24 160,0 221,0 221,-24"/>
+<text text-anchor="middle" x="190.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CalledByGraph_edge4" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M221.13,-12C228.8,-12 237.52,-12 246.72,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="246.86,-15.5 256.86,-12 246.86,-8.5 246.86,-15.5"/>
+</g>
+<!-- interface~run_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CalledByGraph_node6" class="node">
+<title>interface~run_ftdss</title>
+<g id="a_proc~~reflect_variables_ftdss~~CalledByGraph_node6"><a xlink:href="../interface/run_ftdss.html" xlink:title="type_ftdss%run_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="124,-24 0,-24 0,0 124,0 124,-24"/>
+<text text-anchor="middle" x="62" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftdss&#45;&gt;proc~run_ftdss -->
+<g id="proc~~reflect_variables_ftdss~~CalledByGraph_edge5" class="edge">
+<title>interface~run_ftdss&#45;&gt;proc~run_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M124.03,-12C132.82,-12 141.68,-12 149.91,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="149.94,-15.5 159.94,-12 149.94,-8.5 149.94,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocreflect_variables_ftdssCalledByGraph = svgPanZoom('#procreflect_variables_ftdssCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">reflect_variables_ftdss</span><span class="p">(</span><span class="n">self</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_ftdss</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">iter</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">bdf_coeffs</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">bdf_order</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">contiguous</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">current</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">du</span><span class="p">(:)</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">relaxation_factor</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_none</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">controls</span><span class="p">%</span><span class="n">profiler</span><span class="p">%</span><span class="n">start</span><span class="p">(</span><span class="s2">&quot;Setup&quot;</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">nullify</span><span class="w"> </span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+<span class="w">        </span><span class="k">nullify</span><span class="w"> </span><span class="p">(</span><span class="n">bdf_coeffs</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">controls</span><span class="p">%</span><span class="n">iteration</span><span class="p">%</span><span class="n">get_nonlinear_iter</span><span class="p">(</span><span class="n">iter</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">controls</span><span class="p">%</span><span class="nb">time</span><span class="p">%</span><span class="n">get_bdf_coeffs</span><span class="p">(</span><span class="n">bdf_coeffs</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">controls</span><span class="p">%</span><span class="nb">time</span><span class="p">%</span><span class="n">get_bdf_order</span><span class="p">(</span><span class="n">bdf_order</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">is_none</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">controls</span><span class="p">%</span><span class="n">iteration</span><span class="p">%</span><span class="n">is_none</span><span class="p">()</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">is_active_thermal</span><span class="p">())</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">get_variable_increment</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">THERMAL</span><span class="p">,</span><span class="w"> </span><span class="n">du</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">temperature</span><span class="p">%</span><span class="n">get_current</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">associated</span><span class="p">(</span><span class="n">current</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">is_none</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    if</span><span class="w"> </span><span class="p">(</span><span class="n">iter</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                        call </span><span class="n">self</span><span class="p">%</span><span class="n">controls</span><span class="p">%</span><span class="n">aitken</span><span class="p">%</span><span class="n">compute_relaxation</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">THERMAL</span><span class="p">,</span><span class="w"> </span><span class="n">du</span><span class="p">)</span>
+<span class="w">                    </span><span class="k">end if</span>
+<span class="k">                    call </span><span class="n">self</span><span class="p">%</span><span class="n">controls</span><span class="p">%</span><span class="n">aitken</span><span class="p">%</span><span class="n">get_relaxation</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">THERMAL</span><span class="p">,</span><span class="w"> </span><span class="n">relaxation_factor</span><span class="p">)</span>
+<span class="w">                    </span><span class="k">write</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(&quot;   [Aitken] Iter:&quot;, I3, &quot; Omega:&quot;, F6.4)&#39;</span><span class="p">)</span><span class="w"> </span><span class="n">iter</span><span class="p">,</span><span class="w"> </span><span class="n">relaxation_factor</span>
+<span class="w">                </span><span class="k">else</span>
+<span class="k">                    </span><span class="n">relaxation_factor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span>
+<span class="w">                </span><span class="k">end if</span>
+<span class="k">                </span><span class="n">current</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current</span><span class="p">(:)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">relaxation_factor</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">du</span><span class="p">(:)</span>
+<span class="w">                </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">temperature</span><span class="p">%</span><span class="n">set_delta</span><span class="p">(</span><span class="n">relaxation_factor</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">du</span><span class="p">(:))</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">is_none</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    call </span><span class="n">self</span><span class="p">%</span><span class="n">controls</span><span class="p">%</span><span class="n">aitken</span><span class="p">%</span><span class="n">set_du</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">THERMAL</span><span class="p">,</span><span class="w"> </span><span class="n">du</span><span class="p">)</span>
+<span class="w">                </span><span class="k">end if</span>
+<span class="k">            end if</span>
+
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">calc_gradient_temperature</span><span class="p">()</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">temperature</span><span class="p">%</span><span class="n">compute_time_derivative</span><span class="p">(</span><span class="n">bdf_coeffs</span><span class="p">,</span><span class="w"> </span><span class="n">bdf_order</span><span class="p">)</span>
+
+<span class="w">            </span><span class="k">call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">du</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">is_active_hydraulic</span><span class="p">())</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">get_variable_increment</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">HYDRAULIC</span><span class="p">,</span><span class="w"> </span><span class="n">du</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">pressure</span><span class="p">%</span><span class="n">get_current</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">associated</span><span class="p">(</span><span class="n">current</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">is_none</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    if</span><span class="w"> </span><span class="p">(</span><span class="n">iter</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                        call </span><span class="n">self</span><span class="p">%</span><span class="n">controls</span><span class="p">%</span><span class="n">aitken</span><span class="p">%</span><span class="n">compute_relaxation</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">HYDRAULIC</span><span class="p">,</span><span class="w"> </span><span class="n">du</span><span class="p">)</span>
+<span class="w">                    </span><span class="k">end if</span>
+<span class="k">                    call </span><span class="n">self</span><span class="p">%</span><span class="n">controls</span><span class="p">%</span><span class="n">aitken</span><span class="p">%</span><span class="n">get_relaxation</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">HYDRAULIC</span><span class="p">,</span><span class="w"> </span><span class="n">relaxation_factor</span><span class="p">)</span>
+<span class="w">                    </span><span class="k">write</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(&quot;   [Aitken] Iter:&quot;, I3, &quot; Omega:&quot;, F6.4)&#39;</span><span class="p">)</span><span class="w"> </span><span class="n">iter</span><span class="p">,</span><span class="w"> </span><span class="n">relaxation_factor</span>
+<span class="w">                </span><span class="k">else</span>
+<span class="k">                    </span><span class="n">relaxation_factor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span>
+<span class="w">                </span><span class="k">end if</span>
+<span class="k">                </span><span class="n">current</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current</span><span class="p">(:)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">relaxation_factor</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">du</span><span class="p">(:)</span>
+<span class="w">                </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">pressure</span><span class="p">%</span><span class="n">set_delta</span><span class="p">(</span><span class="n">relaxation_factor</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">du</span><span class="p">(:))</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">is_none</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    call </span><span class="n">self</span><span class="p">%</span><span class="n">controls</span><span class="p">%</span><span class="n">aitken</span><span class="p">%</span><span class="n">set_du</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">HYDRAULIC</span><span class="p">,</span><span class="w"> </span><span class="n">du</span><span class="p">)</span>
+<span class="w">                </span><span class="k">end if</span>
+<span class="k">            end if</span>
+
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">calc_gradient_pressure</span><span class="p">()</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">pressure</span><span class="p">%</span><span class="n">compute_time_derivative</span><span class="p">(</span><span class="n">bdf_coeffs</span><span class="p">,</span><span class="w"> </span><span class="n">bdf_order</span><span class="p">)</span>
+
+<span class="w">            </span><span class="k">call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">du</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        call </span><span class="n">self</span><span class="p">%</span><span class="n">controls</span><span class="p">%</span><span class="n">profiler</span><span class="p">%</span><span class="k">stop</span><span class="p">(</span><span class="s2">&quot;Setup&quot;</span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">reflect_variables_ftdss</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

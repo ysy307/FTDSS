@@ -1,0 +1,1879 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>core_types_matrix_csr &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>core_types_matrix_csr
+      <small>Submodule</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.8% of total for modules and submodules.">223 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/matrix_csr.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/matrix_csr.f90.html'>matrix_csr.F90</a></li>
+            <li class="breadcrumb-item active" aria-current="page">core_types_matrix_csr</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3">
+        <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#modfuncs-0"
+         aria-expanded="false" aria-controls="modfuncs-0">
+         <h4 class="card-header bg-primary text-white">Module Functions</h4>
+      </a>
+      <div id="modfuncs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/core_types_matrix_csr.html#proc-find_csr">find_csr</a>
+            <a class="list-group-item" href="../module/core_types_matrix_csr.html#proc-get_ind_csr">get_ind_csr</a>
+            <a class="list-group-item" href="../module/core_types_matrix_csr.html#proc-get_ptr_csr">get_ptr_csr</a>
+            <a class="list-group-item" href="../module/core_types_matrix_csr.html#proc-get_val_csr">get_val_csr</a>
+        </div>
+      </div>
+    </div>
+
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#modsubs-0"
+         aria-expanded="false" aria-controls="modsubs-0">
+         <h4 class="card-header bg-primary text-white">Module Subroutines</h4>
+      </a>
+      <div id="modsubs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/core_types_matrix_csr.html#proc-destroy_csr">destroy_csr</a>
+            <a class="list-group-item" href="../module/core_types_matrix_csr.html#proc-display_csr">display_csr</a>
+            <a class="list-group-item" href="../module/core_types_matrix_csr.html#proc-get_diagonal_csr">get_diagonal_csr</a>
+            <a class="list-group-item" href="../module/core_types_matrix_csr.html#proc-get_info_csr">get_info_csr</a>
+            <a class="list-group-item" href="../module/core_types_matrix_csr.html#proc-initialize_type_matrix_csr">initialize_type_matrix_csr</a>
+            <a class="list-group-item" href="../module/core_types_matrix_csr.html#proc-scale_csr">scale_csr</a>
+            <a class="list-group-item" href="../module/core_types_matrix_csr.html#proc-set_all_csr">set_all_csr</a>
+            <a class="list-group-item" href="../module/core_types_matrix_csr.html#proc-set_row_csr">set_row_csr</a>
+            <a class="list-group-item" href="../module/core_types_matrix_csr.html#proc-set_value_block_csr">set_value_block_csr</a>
+            <a class="list-group-item" href="../module/core_types_matrix_csr.html#proc-set_value_csr">set_value_csr</a>
+            <a class="list-group-item" href="../module/core_types_matrix_csr.html#proc-zero_all_csr">zero_all_csr</a>
+            <a class="list-group-item" href="../module/core_types_matrix_csr.html#proc-zero_row_csr">zero_row_csr</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+
+
+  </div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      <p>Implements the procedures for a Degree-of-Freedom (DOF) based Compressed
+Row Storage (csr) sparse matrix.</p>
+<br>          <div class="card mb-4">
+      <h3 class="card-header card-title bg-light">Uses</h3>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <ul class="list-inline">
+                <li><h5>Ancestors:</h5></li>
+                  <li class="list-inline-item"><a href='core_types_matrix.html'>core_types_matrix</a></li>
+              </ul>
+            </li>
+            <li class="list-group-item">
+              <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: module~~core_types_matrix_csr~~UsesGraph Pages: 1 -->
+<svg id="modulecore_types_matrix_csrUsesGraph" width="641pt" height="161pt"
+ viewBox="0.00 0.00 641.00 161.04" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~core_types_matrix_csr~~UsesGraph" class="graph" transform="scale(0.47 0.47) rotate(0) translate(4 339.45)">
+<title>module~~core_types_matrix_csr~~UsesGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-339.45 1363,-339.45 1363,4 -4,4"/>
+<!-- module~core_types_matrix_csr -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node1" class="node">
+<title>module~core_types_matrix_csr</title>
+<polygon fill="none" stroke="black" points="1359,-156.07 1229,-156.07 1229,-132.07 1359,-132.07 1359,-156.07"/>
+<text text-anchor="middle" x="1294" y="-141.67" font-family="Helvetica,sans-Serif" font-size="10.50">core_types_matrix_csr</text>
+</g>
+<!-- module~core_types_matrix -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node2" class="node">
+<title>module~core_types_matrix</title>
+<g id="a_module~~core_types_matrix_csr~~UsesGraph_node2"><a xlink:href="../module/core_types_matrix.html" xlink:title="core_types_matrix">
+<polygon fill="#337ab7" stroke="#337ab7" points="1193,-156.07 1084,-156.07 1084,-132.07 1193,-132.07 1193,-156.07"/>
+<text text-anchor="middle" x="1138.5" y="-141.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_matrix</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_matrix_csr&#45;&gt;module~core_types_matrix -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge1" class="edge">
+<title>module~core_types_matrix_csr&#45;&gt;module~core_types_matrix</title>
+<path fill="none" stroke="#ff0000" d="M1228.79,-144.07C1220.38,-144.07 1211.76,-144.07 1203.36,-144.07"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1203.24,-140.57 1193.24,-144.07 1203.24,-147.57 1203.24,-140.57"/>
+</g>
+<!-- core_allocate -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node3" class="node">
+<title>core_allocate</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="732,-281.07 648,-281.07 648,-257.07 732,-257.07 732,-281.07"/>
+<text text-anchor="middle" x="690" y="-266.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_allocate</text>
+</g>
+<!-- module~core_types_matrix&#45;&gt;core_allocate -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge2" class="edge">
+<title>module~core_types_matrix&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M835.5,-309.07C797.55,-309.32 755.95,-296.31 727.17,-285.06"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="728.14,-281.68 717.56,-281.18 725.52,-288.17 728.14,-281.68"/>
+</g>
+<!-- core_check_range -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node4" class="node">
+<title>core_check_range</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="744.5,-239.07 635.5,-239.07 635.5,-215.07 744.5,-215.07 744.5,-239.07"/>
+<text text-anchor="middle" x="690" y="-224.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_check_range</text>
+</g>
+<!-- module~core_types_matrix&#45;&gt;core_check_range -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge3" class="edge">
+<title>module~core_types_matrix&#45;&gt;core_check_range</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1127.13,-156.17C1090.83,-197.02 964.72,-326.4 837.5,-309.07"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M835.5,-309.07C787.36,-309.38 788.67,-270.37 746,-248.07 742.68,-246.34 739.18,-244.67 735.63,-243.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="736.74,-239.75 726.16,-239.09 734.01,-246.2 736.74,-239.75"/>
+</g>
+<!-- core_deallocate -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node5" class="node">
+<title>core_deallocate</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="738.5,-197.07 641.5,-197.07 641.5,-173.07 738.5,-173.07 738.5,-197.07"/>
+<text text-anchor="middle" x="690" y="-182.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_deallocate</text>
+</g>
+<!-- module~core_types_matrix&#45;&gt;core_deallocate -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge4" class="edge">
+<title>module~core_types_matrix&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1083.85,-148.87C1041.31,-152.69 980.35,-158.18 927,-163.07 866.3,-168.64 796.83,-175.13 749.06,-179.61"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="748.54,-176.15 738.91,-180.57 749.19,-183.12 748.54,-176.15"/>
+</g>
+<!-- core_findings -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node6" class="node">
+<title>core_findings</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="1029,-196.07 946,-196.07 946,-172.07 1029,-172.07 1029,-196.07"/>
+<text text-anchor="middle" x="987.5" y="-181.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_findings</text>
+</g>
+<!-- module~core_types_matrix&#45;&gt;core_findings -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge5" class="edge">
+<title>module~core_types_matrix&#45;&gt;core_findings</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1092.8,-156.07C1075.88,-160.61 1056.52,-165.81 1039.11,-170.49"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1037.86,-167.2 1029.11,-173.17 1039.68,-173.96 1037.86,-167.2"/>
+</g>
+<!-- iso_fortran_env -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node7" class="node">
+<title>iso_fortran_env</title>
+<g id="a_module~~core_types_matrix_csr~~UsesGraph_node7"><a xlink:href="http://fortranwiki.org/fortran/show/iso_fortran_env" xlink:title="iso_fortran_env">
+<polygon fill="#337ab7" stroke="#337ab7" points="94,-199.07 0,-199.07 0,-175.07 94,-175.07 94,-199.07"/>
+<text text-anchor="middle" x="47" y="-184.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_matrix&#45;&gt;iso_fortran_env -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge6" class="edge">
+<title>module~core_types_matrix&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M835.5,-309.07C701.06,-309.93 661.21,-268.62 533,-309.07"/>
+</g>
+<!-- module~core_constants -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node8" class="node">
+<title>module~core_constants</title>
+<g id="a_module~~core_types_matrix_csr~~UsesGraph_node8"><a xlink:href="../module/core_constants.html" xlink:title="core_constants">
+<polygon fill="#337ab7" stroke="#337ab7" points="736,-75.07 644,-75.07 644,-51.07 736,-51.07 736,-75.07"/>
+<text text-anchor="middle" x="690" y="-60.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_matrix&#45;&gt;module~core_constants -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge7" class="edge">
+<title>module~core_types_matrix&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M835.5,-23.07C799.03,-25.55 759.08,-37.35 730.45,-47.49"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="729.03,-44.29 720.82,-51 731.42,-50.87 729.03,-44.29"/>
+</g>
+<!-- module~module_type_vector -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node9" class="node">
+<title>module~module_type_vector</title>
+<g id="a_module~~core_types_matrix_csr~~UsesGraph_node9"><a xlink:href="../module/module_type_vector.html" xlink:title="module_type_vector">
+<polygon fill="#337ab7" stroke="#337ab7" points="1048,-116.07 927,-116.07 927,-92.07 1048,-92.07 1048,-116.07"/>
+<text text-anchor="middle" x="987.5" y="-101.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">module_type_vector</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_matrix&#45;&gt;module~module_type_vector -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge8" class="edge">
+<title>module~core_types_matrix&#45;&gt;module~module_type_vector</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1092.8,-132.07C1077.25,-127.9 1059.63,-123.17 1043.36,-118.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1044,-115.35 1033.43,-116.13 1042.18,-122.11 1044,-115.35"/>
+</g>
+<!-- stdlib_optval -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node10" class="node">
+<title>stdlib_optval</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="86.5,-37.07 7.5,-37.07 7.5,-13.07 86.5,-13.07 86.5,-37.07"/>
+<text text-anchor="middle" x="47" y="-22.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_optval</text>
+</g>
+<!-- module~core_types_matrix&#45;&gt;stdlib_optval -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge9" class="edge">
+<title>module~core_types_matrix&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1122.88,-131.91C1105.86,-118.29 1076.44,-96.39 1048,-83.07 959.9,-41.82 934.56,-16.48 837.5,-23.07"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M835.5,-23.07C771.33,-20.52 754.12,-34.94 691,-23.07"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M689,-23.07C471.27,17.86 204.54,-6.08 96.69,-18.75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="96.27,-15.27 86.75,-19.94 97.1,-22.22 96.27,-15.27"/>
+</g>
+<!-- core_constants_error -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node11" class="node">
+<title>core_constants_error</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="594,-159.07 470,-159.07 470,-135.07 594,-135.07 594,-159.07"/>
+<text text-anchor="middle" x="532" y="-144.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_error</text>
+</g>
+<!-- module~core_constants&#45;&gt;core_constants_error -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge10" class="edge">
+<title>module~core_constants&#45;&gt;core_constants_error</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M650.18,-75.07C644.51,-77.61 638.93,-80.6 634,-84.07 613.9,-98.23 618.47,-112.45 598,-126.07 595.47,-127.76 592.79,-129.32 590.02,-130.76"/>
+<polygon fill="#003fff" stroke="#003fff" points="588.53,-127.59 580.93,-134.97 591.47,-133.94 588.53,-127.59"/>
+</g>
+<!-- core_constants_ids -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node12" class="node">
+<title>core_constants_ids</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="588,-117.07 476,-117.07 476,-93.07 588,-93.07 588,-117.07"/>
+<text text-anchor="middle" x="532" y="-102.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_ids</text>
+</g>
+<!-- module~core_constants&#45;&gt;core_constants_ids -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge11" class="edge">
+<title>module~core_constants&#45;&gt;core_constants_ids</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M644.3,-75.11C626.59,-79.88 606.07,-85.4 587.5,-90.4"/>
+<polygon fill="#003fff" stroke="#003fff" points="586.46,-87.06 577.71,-93.04 588.28,-93.82 586.46,-87.06"/>
+</g>
+<!-- core_constants_values -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node13" class="node">
+<title>core_constants_values</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="598,-75.07 466,-75.07 466,-51.07 598,-51.07 598,-75.07"/>
+<text text-anchor="middle" x="532" y="-60.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_values</text>
+</g>
+<!-- module~core_constants&#45;&gt;core_constants_values -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge12" class="edge">
+<title>module~core_constants&#45;&gt;core_constants_values</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M643.88,-63.07C632.7,-63.07 620.42,-63.07 608.23,-63.07"/>
+<polygon fill="#003fff" stroke="#003fff" points="608.04,-59.57 598.04,-63.07 608.04,-66.57 608.04,-59.57"/>
+</g>
+<!-- module~core_constants_base -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node14" class="node">
+<title>module~core_constants_base</title>
+<g id="a_module~~core_types_matrix_csr~~UsesGraph_node14"><a xlink:href="../module/core_constants_base.html" xlink:title="core_constants_base">
+<polygon fill="#337ab7" stroke="#337ab7" points="253,-79.07 130,-79.07 130,-55.07 253,-55.07 253,-79.07"/>
+<text text-anchor="middle" x="191.5" y="-64.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_base</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_base -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge13" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_base</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M645.84,-51C630.82,-47.37 613.79,-43.87 598,-42.07 481.06,-28.76 344.29,-43.42 263.22,-55.25"/>
+<polygon fill="#003fff" stroke="#003fff" points="262.5,-51.81 253.13,-56.75 263.53,-58.74 262.5,-51.81"/>
+</g>
+<!-- module~core_constants_parallel -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node15" class="node">
+<title>module~core_constants_parallel</title>
+<g id="a_module~~core_types_matrix_csr~~UsesGraph_node15"><a xlink:href="../module/core_constants_parallel.html" xlink:title="core_constants_parallel">
+<polygon fill="#337ab7" stroke="#337ab7" points="428.5,-281.07 290.5,-281.07 290.5,-257.07 428.5,-257.07 428.5,-281.07"/>
+<text text-anchor="middle" x="359.5" y="-266.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_parallel</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_parallel -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge14" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_parallel</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M531,-268.07C502.58,-280.07 469.04,-282.46 439.27,-281.09"/>
+<polygon fill="#003fff" stroke="#003fff" points="439.1,-277.57 428.91,-280.45 438.67,-284.56 439.1,-277.57"/>
+</g>
+<!-- module~core_constants_physical -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node16" class="node">
+<title>module~core_constants_physical</title>
+<g id="a_module~~core_types_matrix_csr~~UsesGraph_node16"><a xlink:href="../module/core_constants_physical.html" xlink:title="core_constants_physical">
+<polygon fill="#337ab7" stroke="#337ab7" points="430,-159.07 289,-159.07 289,-135.07 430,-135.07 430,-159.07"/>
+<text text-anchor="middle" x="359.5" y="-144.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_physical</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_physical -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge15" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_physical</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M646.63,-75.11C642.03,-77.57 637.69,-80.53 634,-84.07 604.71,-112.21 631.91,-145.71 598,-168.07 570.13,-186.45 483.12,-173.34 422.55,-161.12"/>
+<polygon fill="#003fff" stroke="#003fff" points="423.19,-157.68 412.69,-159.09 421.78,-164.53 423.19,-157.68"/>
+</g>
+<!-- module~core_constants_solver -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node17" class="node">
+<title>module~core_constants_solver</title>
+<g id="a_module~~core_types_matrix_csr~~UsesGraph_node17"><a xlink:href="../module/core_constants_solver.html" xlink:title="core_constants_solver">
+<polygon fill="#337ab7" stroke="#337ab7" points="424.5,-239.07 294.5,-239.07 294.5,-215.07 424.5,-215.07 424.5,-239.07"/>
+<text text-anchor="middle" x="359.5" y="-224.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_solver</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_solver -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge16" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_solver</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M644.88,-75.09C640.81,-77.55 637.07,-80.51 634,-84.07 585.3,-140.61 648.55,-193.18 598,-248.07 577.53,-270.31 560.85,-256.32 533,-268.07"/>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M531,-268.07C519.8,-272.8 456.16,-255.66 409.91,-242.1"/>
+<polygon fill="#003fff" stroke="#003fff" points="410.62,-238.66 400.03,-239.18 408.63,-245.37 410.62,-238.66"/>
+</g>
+<!-- module~core_constants_utils -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node18" class="node">
+<title>module~core_constants_utils</title>
+<g id="a_module~~core_types_matrix_csr~~UsesGraph_node18"><a xlink:href="../module/core_constants_utils.html" xlink:title="core_constants_utils">
+<polygon fill="#337ab7" stroke="#337ab7" points="591.5,-239.07 472.5,-239.07 472.5,-215.07 591.5,-215.07 591.5,-239.07"/>
+<text text-anchor="middle" x="532" y="-224.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_utils</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_utils -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge17" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_utils</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M645.44,-75.2C641.21,-77.64 637.28,-80.57 634,-84.07 596.82,-123.8 634.86,-161.06 598,-201.07 594.91,-204.43 591.32,-207.37 587.45,-209.93"/>
+<polygon fill="#003fff" stroke="#003fff" points="585.58,-206.96 578.62,-214.95 589.04,-213.05 585.58,-206.96"/>
+</g>
+<!-- module~core_types_vector -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node19" class="node">
+<title>module~core_types_vector</title>
+<g id="a_module~~core_types_matrix_csr~~UsesGraph_node19"><a xlink:href="../module/core_types_vector.html" xlink:title="core_types_vector">
+<polygon fill="#337ab7" stroke="#337ab7" points="891,-75.07 782,-75.07 782,-51.07 891,-51.07 891,-75.07"/>
+<text text-anchor="middle" x="836.5" y="-60.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_vector</text>
+</a>
+</g>
+</g>
+<!-- module~module_type_vector&#45;&gt;module~core_types_vector -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge18" class="edge">
+<title>module~module_type_vector&#45;&gt;module~core_types_vector</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M942.6,-91.99C926.46,-87.55 907.99,-82.47 891.09,-77.82"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="891.91,-74.42 881.34,-75.14 890.06,-81.16 891.91,-74.42"/>
+</g>
+<!-- module~core_constants_base&#45;&gt;iso_fortran_env -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge19" class="edge">
+<title>module~core_constants_base&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M155.15,-79.13C146.51,-82.9 137.58,-87.55 130,-93.07 114.89,-104.08 82.87,-142.99 63.61,-167.17"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="60.85,-165.02 57.39,-175.03 66.34,-169.37 60.85,-165.02"/>
+</g>
+<!-- module~core_constants_base&#45;&gt;stdlib_optval -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge20" class="edge">
+<title>module~core_constants_base&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M149.67,-55.04C133.17,-50.17 113.99,-44.52 96.76,-39.44"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="97.46,-36 86.88,-36.53 95.48,-42.72 97.46,-36"/>
+</g>
+<!-- stdlib_strings -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node22" class="node">
+<title>stdlib_strings</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="88,-119.07 6,-119.07 6,-95.07 88,-95.07 88,-119.07"/>
+<text text-anchor="middle" x="47" y="-104.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_strings</text>
+</g>
+<!-- module~core_constants_base&#45;&gt;stdlib_strings -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge21" class="edge">
+<title>module~core_constants_base&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M147.75,-79.07C132.13,-83.46 114.33,-88.45 98.13,-93"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="96.97,-89.69 88.28,-95.77 98.86,-96.43 96.97,-89.69"/>
+</g>
+<!-- module~core_constants_parallel&#45;&gt;iso_fortran_env -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge22" class="edge">
+<title>module~core_constants_parallel&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ffa9" stroke-dasharray="5,2" d="M324.27,-281.18C283.33,-294.98 217.24,-314.91 192.5,-309.07"/>
+</g>
+<!-- module~core_constants_physical&#45;&gt;iso_fortran_env -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge23" class="edge">
+<title>module~core_constants_physical&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00a9ff" stroke-dasharray="5,2" d="M190.5,-107.07C141.35,-107.97 93.46,-144.29 67.64,-167.68"/>
+<polygon fill="#00a9ff" stroke="#00a9ff" points="64.98,-165.38 60.05,-174.76 69.75,-170.49 64.98,-165.38"/>
+</g>
+<!-- module~core_constants_physical&#45;&gt;module~core_constants_base -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge24" class="edge">
+<title>module~core_constants_physical&#45;&gt;module~core_constants_base</title>
+<path fill="none" stroke="#00a9ff" stroke-dasharray="5,2" d="M336.08,-135.04C314.87,-123.79 282.05,-106.73 253,-93.07 246.03,-89.8 238.54,-86.44 231.28,-83.28"/>
+<polygon fill="#00a9ff" stroke="#00a9ff" points="232.17,-79.85 221.6,-79.11 229.4,-86.28 232.17,-79.85"/>
+</g>
+<!-- stdlib_ascii -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node21" class="node">
+<title>stdlib_ascii</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="226.5,-159.07 156.5,-159.07 156.5,-135.07 226.5,-135.07 226.5,-159.07"/>
+<text text-anchor="middle" x="191.5" y="-144.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_ascii</text>
+</g>
+<!-- module~core_constants_physical&#45;&gt;stdlib_ascii -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge25" class="edge">
+<title>module~core_constants_physical&#45;&gt;stdlib_ascii</title>
+<path fill="none" stroke="#00a9ff" stroke-dasharray="5,2" d="M288.58,-147.07C270.99,-147.07 252.6,-147.07 236.67,-147.07"/>
+<polygon fill="#00a9ff" stroke="#00a9ff" points="236.59,-143.57 226.59,-147.07 236.59,-150.57 236.59,-143.57"/>
+</g>
+<!-- module~core_constants_physical&#45;&gt;stdlib_strings -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge26" class="edge">
+<title>module~core_constants_physical&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#00a9ff" stroke-dasharray="5,2" d="M328.73,-135.06C295.9,-122.96 241.26,-106.19 192.5,-107.07"/>
+<path fill="none" stroke="#00a9ff" stroke-dasharray="5,2" d="M190.5,-107.07C159.9,-107.63 125.6,-107.65 98.32,-107.52"/>
+<polygon fill="#00a9ff" stroke="#00a9ff" points="98.25,-104.02 88.24,-107.46 98.22,-111.02 98.25,-104.02"/>
+</g>
+<!-- module~core_constants_solver&#45;&gt;iso_fortran_env -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge27" class="edge">
+<title>module~core_constants_solver&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M312.24,-239.13C304.35,-241.73 296.34,-244.72 289,-248.07 242.85,-269.16 241.88,-320.73 192.5,-309.07"/>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M190.5,-309.07C132.51,-295.38 84.63,-238.96 62.03,-207.87"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="64.72,-205.61 56.08,-199.46 59,-209.65 64.72,-205.61"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;iso_fortran_env -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge28" class="edge">
+<title>module~core_constants_utils&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#aa00ff" stroke-dasharray="5,2" d="M190.5,-187.07C162.26,-183.24 130.58,-182.85 104.27,-183.59"/>
+<polygon fill="#aa00ff" stroke="#aa00ff" points="103.97,-180.1 94.1,-183.94 104.21,-187.1 103.97,-180.1"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;module~core_constants_parallel -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge29" class="edge">
+<title>module~core_constants_utils&#45;&gt;module~core_constants_parallel</title>
+<path fill="none" stroke="#aa00ff" stroke-dasharray="5,2" d="M482.14,-239.11C462.52,-243.94 439.74,-249.55 419.23,-254.61"/>
+<polygon fill="#aa00ff" stroke="#aa00ff" points="418.24,-251.25 409.37,-257.04 419.91,-258.04 418.24,-251.25"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;module~core_constants_physical -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge30" class="edge">
+<title>module~core_constants_utils&#45;&gt;module~core_constants_physical</title>
+<path fill="none" stroke="#aa00ff" stroke-dasharray="5,2" d="M495.75,-215.05C485.86,-211.13 475.28,-206.39 466,-201.07 448.42,-190.99 447.7,-182.96 430,-173.07 423.2,-169.27 415.73,-165.82 408.3,-162.76"/>
+<polygon fill="#aa00ff" stroke="#aa00ff" points="409.53,-159.48 398.94,-159.09 406.98,-166 409.53,-159.48"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;module~core_constants_solver -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge31" class="edge">
+<title>module~core_constants_utils&#45;&gt;module~core_constants_solver</title>
+<path fill="none" stroke="#aa00ff" stroke-dasharray="5,2" d="M472.32,-227.07C460.16,-227.07 447.2,-227.07 434.57,-227.07"/>
+<polygon fill="#aa00ff" stroke="#aa00ff" points="434.53,-223.57 424.53,-227.07 434.53,-230.57 434.53,-223.57"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;stdlib_ascii -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge32" class="edge">
+<title>module~core_constants_utils&#45;&gt;stdlib_ascii</title>
+<path fill="none" stroke="#aa00ff" stroke-dasharray="5,2" d="M486.06,-215.04C451.85,-206.25 403.48,-194.59 360.5,-187.07"/>
+<path fill="none" stroke="#aa00ff" stroke-dasharray="5,2" d="M358.5,-187.07C316.69,-179.76 269.72,-168.11 236.44,-159.27"/>
+<polygon fill="#aa00ff" stroke="#aa00ff" points="237.14,-155.83 226.57,-156.62 235.32,-162.59 237.14,-155.83"/>
+</g>
+<!-- module~core_constants_utils&#45;&gt;stdlib_strings -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge33" class="edge">
+<title>module~core_constants_utils&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#aa00ff" stroke-dasharray="5,2" d="M358.5,-187.07C285.83,-174.36 265.61,-197 192.5,-187.07"/>
+<path fill="none" stroke="#aa00ff" stroke-dasharray="5,2" d="M190.5,-187.07C162.57,-183.28 155.1,-180.89 130,-168.07 107.53,-156.6 84.72,-139.05 68.88,-125.72"/>
+<polygon fill="#aa00ff" stroke="#aa00ff" points="71.14,-123.04 61.27,-119.18 66.58,-128.35 71.14,-123.04"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;core_allocate -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge34" class="edge">
+<title>module~core_types_vector&#45;&gt;core_allocate</title>
+<path fill="none" stroke="#ff00aa" stroke-dasharray="5,2" d="M832.9,-75.32C825.35,-108 800.42,-198.14 746,-248.07 744.35,-249.59 742.58,-251 740.71,-252.31"/>
+<polygon fill="#ff00aa" stroke="#ff00aa" points="738.89,-249.32 732.09,-257.45 742.48,-255.34 738.89,-249.32"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;core_check_range -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge36" class="edge">
+<title>module~core_types_vector&#45;&gt;core_check_range</title>
+<path fill="none" stroke="#ff00aa" stroke-dasharray="5,2" d="M831.02,-75.27C820.42,-102.52 791.25,-168.87 746,-206.07 744.27,-207.5 742.43,-208.83 740.51,-210.08"/>
+<polygon fill="#ff00aa" stroke="#ff00aa" points="738.72,-207.07 731.73,-215.03 742.16,-213.17 738.72,-207.07"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;core_deallocate -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge37" class="edge">
+<title>module~core_types_vector&#45;&gt;core_deallocate</title>
+<path fill="none" stroke="#ff00aa" stroke-dasharray="5,2" d="M826.52,-75.39C811.62,-95.14 780.04,-134.2 746,-159.07 741.42,-162.42 736.33,-165.51 731.16,-168.3"/>
+<polygon fill="#ff00aa" stroke="#ff00aa" points="729.2,-165.37 721.85,-172.99 732.35,-171.62 729.2,-165.37"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;iso_fortran_env -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge38" class="edge">
+<title>module~core_types_vector&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff00aa" stroke-dasharray="5,2" d="M821.13,-75.16C804.11,-89 774.46,-111.61 746,-126.07 699.14,-149.89 670.59,-126.33 634,-164.07 595.83,-203.44 634.83,-241.46 598,-282.07 576.99,-305.25 563.39,-301.66 533,-309.07"/>
+<path fill="none" stroke="#ff00aa" stroke-dasharray="5,2" d="M531,-309.07C384.84,-344.74 338.92,-343.64 192.5,-309.07"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;module~core_constants -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge39" class="edge">
+<title>module~core_types_vector&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#ff00aa" stroke-dasharray="5,2" d="M781.69,-63.07C770.15,-63.07 757.93,-63.07 746.33,-63.07"/>
+<polygon fill="#ff00aa" stroke="#ff00aa" points="746.33,-59.57 736.33,-63.07 746.33,-66.57 746.33,-59.57"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;stdlib_optval -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge40" class="edge">
+<title>module~core_types_vector&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#ff00aa" stroke-dasharray="5,2" d="M798.78,-51.06C769.81,-42.04 728.22,-30.07 691,-23.07"/>
+</g>
+<!-- core_check_length -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_node20" class="node">
+<title>core_check_length</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="746,-117.07 634,-117.07 634,-93.07 746,-93.07 746,-117.07"/>
+<text text-anchor="middle" x="690" y="-102.67" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_check_length</text>
+</g>
+<!-- module~core_types_vector&#45;&gt;core_check_length -->
+<g id="module~~core_types_matrix_csr~~UsesGraph_edge35" class="edge">
+<title>module~core_types_vector&#45;&gt;core_check_length</title>
+<path fill="none" stroke="#ff00aa" stroke-dasharray="5,2" d="M794.09,-75.11C777.92,-79.81 759.21,-85.25 742.2,-90.19"/>
+<polygon fill="#ff00aa" stroke="#ff00aa" points="741.04,-86.88 732.41,-93.04 742.99,-93.61 741.04,-86.88"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panmodulecore_types_matrix_csrUsesGraph = svgPanZoom('#modulecore_types_matrix_csrUsesGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#UsesGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="UsesGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="518pt" height="32pt"
+ viewBox="0.00 0.00 517.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 513.5,-28 513.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node">
+<title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node">
+<title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="145.5,-24 72.5,-24 72.5,0 145.5,0 145.5,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 164,-24 164,0 234,0 234,-24"/>
+<text text-anchor="middle" x="199" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="310,-24 252,-24 252,0 310,0 310,-24"/>
+<text text-anchor="middle" x="281" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="386,-24 328,-24 328,0 386,0 386,-24"/>
+<text text-anchor="middle" x="357" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="509.5,-24 404.5,-24 404.5,0 509.5,0 509.5,-24"/>
+<text text-anchor="middle" x="457" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a submodule to the (sub)module which it is
+descended from. Dashed arrows point from a module or program unit to 
+modules which it uses.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+            </li>
+        </ul>
+      </div>
+    </div>
+
+      
+      <br>
+
+
+
+
+
+
+
+
+
+        <section>
+          <h2>Module Functions</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-find_csr"></span> <h3>pure module function <a href='../proc/find_csr.html'>find_csr</a>(self, row, col) result(index)  
+    <a href="../interface/find_csr.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Finds the 1-based index in the <code>val</code> and <code>ind</code> arrays corresponding to a specific matrix entry.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~468"></span>
+              class(<a href='../type/type_matrix_csr.html'>type_matrix_csr</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>The csr matrix object.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row~27"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong></td>
+            <td>
+<p>The 1-based node index for the row.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-col~24"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col</strong></td>
+            <td>
+<p>The 1-based node index for the column.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>integer(kind=int32)</small>
+    </h4>
+    <p>The 1-based index in the <code>val</code>/<code>ind</code> arrays, or 0 if not found.</p>
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_ind_csr"></span> <h3>module function <a href='../proc/get_ind_csr.html'>get_ind_csr</a>(self) result(ind)  
+    <a href="../interface/get_ind_csr.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Returns a pointer to the internal CSR column index array (<code>ind</code>).</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~459"></span>
+              class(<a href='../type/type_matrix_csr.html'>type_matrix_csr</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>The csr matrix object.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>integer(kind=int32), dimension(:), pointer</small>
+    </h4>
+    <p>A pointer to the CSR <code>ind</code> array.</p>
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_ptr_csr"></span> <h3>module function <a href='../proc/get_ptr_csr.html'>get_ptr_csr</a>(self) result(ptr)  
+    <a href="../interface/get_ptr_csr.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Returns a pointer to the internal CSR pointer array (<code>ptr</code>).</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~458"></span>
+              class(<a href='../type/type_matrix_csr.html'>type_matrix_csr</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>The csr matrix object.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>integer(kind=int32), dimension(:), pointer</small>
+    </h4>
+    <p>A pointer to the CSR <code>ptr</code> array.</p>
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_val_csr"></span> <h3>module function <a href='../proc/get_val_csr.html'>get_val_csr</a>(self) result(val)  
+    <a href="../interface/get_val_csr.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Returns a pointer to the internal CSR value array (<code>val</code>).</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~460"></span>
+              class(<a href='../type/type_matrix_csr.html'>type_matrix_csr</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>The csr matrix object.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>real(kind=real64), dimension(:), pointer</small>
+    </h4>
+    <p>A pointer to the CSR <code>val</code> array.</p>
+
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+        <section>
+          <h2>Module Subroutines</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-destroy_csr"></span> <h3>module subroutine <a href='../proc/destroy_csr.html'>destroy_csr</a>(self)  
+    <a href="../interface/destroy_csr.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Deallocates all internal arrays of the csr matrix object.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~455"></span>
+              class(<a href='../type/type_matrix_csr.html'>type_matrix_csr</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-display_csr"></span> <h3>module subroutine <a href='../proc/display_csr.html'>display_csr</a>(self, unit_in)  
+    <a href="../interface/display_csr.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Prints the non-zero contents of the sparse matrix to standard output.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~469"></span>
+              class(<a href='../type/type_matrix_csr.html'>type_matrix_csr</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>The csr matrix object to display.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-unit_in~8"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>unit_in</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_diagonal_csr"></span> <h3>module subroutine <a href='../proc/get_diagonal_csr.html'>get_diagonal_csr</a>(self, diagonal)  
+    <a href="../interface/get_diagonal_csr.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~457"></span>
+              class(<a href='../type/type_matrix_csr.html'>type_matrix_csr</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-diagonal~4"></span>
+              type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>diagonal</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_info_csr"></span> <h3>module subroutine <a href='../proc/get_info_csr.html'>get_info_csr</a>(self, info)  
+    <a href="../interface/get_info_csr.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Returns the number of rows in the matrix.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~456"></span>
+              class(<a href='../type/type_matrix_csr.html'>type_matrix_csr</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>The matrix object.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-info~7"></span>
+              type(<a href='../type/type_matrix_info.html'>type_matrix_info</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>info</strong></td>
+            <td>
+<p>The matrix information structure to populate.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-initialize_type_matrix_csr"></span> <h3>module subroutine <a href='../proc/initialize_type_matrix_csr.html'>initialize_type_matrix_csr</a>(self, num_nodes, row, col, row_blocks, col_blocks)  
+    <a href="../interface/initialize_type_matrix_csr.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Initializes the DOF-level csr matrix structure from a node-level adjacency pattern.
+It assumes the input node-level column indices (<code>col</code>) are sorted for each row segment.
+This routine expands the node-level graph into a full DOF-level matrix sparsity pattern.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~454"></span>
+              class(<a href='../type/type_matrix_csr.html'>type_matrix_csr</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_nodes~35"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_nodes</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row~22"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-col~20"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row_blocks~4"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_blocks</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-col_blocks~4"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col_blocks</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-scale_csr"></span> <h3>module subroutine <a href='../proc/scale_csr.html'>scale_csr</a>(self, op, alpha)  
+    <a href="../interface/scale_csr.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Scales all stored values in the CSR matrix.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~465"></span>
+              class(<a href='../type/type_matrix_csr.html'>type_matrix_csr</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>The CSR matrix object.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-op~29"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+<p>The operation to perform</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-alpha~13"></span>
+              type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>alpha</strong></td>
+            <td>
+<p>The scaling vector.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-set_all_csr"></span> <h3>module subroutine <a href='../proc/set_all_csr.html'>set_all_csr</a>(self, op, value)  
+    <a href="../interface/set_all_csr.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Sets all stored non-zero values in the matrix to a single scalar value.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~464"></span>
+              class(<a href='../type/type_matrix_csr.html'>type_matrix_csr</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>The csr matrix object.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-op~28"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+<p>The operation to perform.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~28"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+<p>The scalar value to assign to all non-zero entries.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-set_row_csr"></span> <h3>module subroutine <a href='../proc/set_row_csr.html'>set_row_csr</a>(self, op, row, value, row_block)  
+    <a href="../interface/set_row_csr.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Sets all non-zero entries in a specific row to a single scalar value.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~463"></span>
+              class(<a href='../type/type_matrix_csr.html'>type_matrix_csr</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>The csr matrix object.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-op~27"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+<p>The operation to perform.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row~25"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong></td>
+            <td>
+<p>The 1-based node index for the row.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~27"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+<p>The scalar value to assign.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row_block~19"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_block</strong></td>
+            <td>
+<p>The block row index.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-set_value_block_csr"></span> <h3>module subroutine <a href='../proc/set_value_block_csr.html'>set_value_block_csr</a>(self, op, row, col, row_block, col_block, value)  
+    <a href="../interface/set_value_block_csr.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Sets the value of a specific entry in the sparse matrix.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~462"></span>
+              class(<a href='../type/type_matrix_csr.html'>type_matrix_csr</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>The csr matrix object.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-op~26"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+<p>The operation to perform.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row~24"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong></td>
+            <td>
+<p>The 1-based node index for the row.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-col~22"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col</strong></td>
+            <td>
+<p>The 1-based node index for the column.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row_block~18"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_block</strong></td>
+            <td>
+<p>The block row index within the block.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-col_block~4"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col_block</strong></td>
+            <td>
+<p>The block column index within the block.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~26"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+<p>The value to set at the specified entry.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-set_value_csr"></span> <h3>module subroutine <a href='../proc/set_value_csr.html'>set_value_csr</a>(self, op, row, col, value)  
+    <a href="../interface/set_value_csr.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Sets the value of a specific entry in the sparse matrix.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~461"></span>
+              class(<a href='../type/type_matrix_csr.html'>type_matrix_csr</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>The csr matrix object.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-op~25"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+<p>The operation to perform.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row~23"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong></td>
+            <td>
+<p>The 1-based node index for the row.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-col~21"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col</strong></td>
+            <td>
+<p>The 1-based node index for the column.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~25"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+<p>The value to set at the specified entry.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-zero_all_csr"></span> <h3>module subroutine <a href='../proc/zero_all_csr.html'>zero_all_csr</a>(self)  
+    <a href="../interface/zero_all_csr.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Sets all stored values in the matrix to zero.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~466"></span>
+              class(<a href='../type/type_matrix_csr.html'>type_matrix_csr</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>The csr matrix object.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-zero_row_csr"></span> <h3>module subroutine <a href='../proc/zero_row_csr.html'>zero_row_csr</a>(self, row, row_block)  
+    <a href="../interface/zero_row_csr.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Sets all stored values in a specific row to zero.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~467"></span>
+              class(<a href='../type/type_matrix_csr.html'>type_matrix_csr</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>The csr matrix object.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row~26"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong></td>
+            <td>
+<p>The 1-based node index for the row.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row_block~20"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_block</strong></td>
+            <td>
+<p>The block row index.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

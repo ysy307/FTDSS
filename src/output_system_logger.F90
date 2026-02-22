@@ -1,129 +1,122 @@
-submodule(input_output) input_output_system_logger
+submodule(inout_output) inout_output_system_logger
     implicit none
+
 contains
-    module subroutine output_system_log(self, time, Matrix, domain)
+
+    module subroutine output_system_log(self, start_time_str, end_time_str, &
+                                        sec_labels, sec_total_times, sec_call_counts, sec_percentages)
         implicit none
         class(type_output), intent(inout) :: self
-        type(type_time), intent(in) :: time
-        type(type_crs), intent(in) :: Matrix
-        type(type_domain), intent(inout) :: domain
+        ! Receive primitive data instead of control object
+        character(*), intent(in) :: start_time_str
+        character(*), intent(in) :: end_time_str
+        character(*), intent(in) :: sec_labels(:)
+        real(real64), intent(in) :: sec_total_times(:)
+        integer(int32), intent(in) :: sec_call_counts(:)
+        real(real64), intent(in) :: sec_percentages(:)
 
+        ! For system information
         character(:), allocatable :: username
         character(:), allocatable :: hostname
         character(:), allocatable :: compiler
         character(:), allocatable :: compiler_version
         character(:), allocatable :: architecture
-        character(:), allocatable :: os
-!$      character(:), allocatable :: openmp_version
-!$      integer(int32) :: max_threads
-!$      integer(int32) :: num_threads
-        integer(int32) :: num_unit, ios
-        integer(int64) :: rss_kb
-        real(real64) :: rss_mb
+        character(:), allocatable :: os_name
 
-        integer(int32) :: i
-        real(real64) :: component_total_time ! 「Total」を除いた合計時間
-        real(real64) :: total_section_time ! 「Total」セクションの時間
-        integer(int32), parameter :: nRepeat = 50
-
-        character(len=32) :: fmt
+        integer(int32) :: num_unit, ios, i
         integer(int32) :: width
+        real(real64) :: rss_mb
+        character(len=32) :: fmt
 
-        ! 保険として初期化
+        ! --- Initialization ---
         fmt = ''
 
+        ! --- Get system information ---
         username = get_username()
         hostname = get_hostname()
         compiler = get_compiler_name()
         compiler_version = get_compiler_version()
         architecture = get_cpu_architecture()
-        os = get_os()
-!$      openmp_version = get_openmp_version()
-!$      max_threads = omp_get_num_procs()
-!$      num_threads = omp_get_max_threads()
-
+        os_name = get_os()
         rss_mb = get_memory_usage()
-        ! 幅の計算。log10(0) の回避と最小幅保証
-        width = max(6, int(log10(max(1.0d0, rss_mb))) + 6)
-        ! フォーマット文字列の構築
+
+        ! --- Dynamic generation of format ---
+        if (rss_mb > 0.0d0) then
+            width = max(6, int(log10(rss_mb)) + 6)
+        else
+            width = 6
+        end if
+        ! Generate format string like: (a,f10.4,a) for the memory usage line
         write (fmt, '(a,i0,a)') '(a,f', width, '.4,a)'
 
+        ! --- Open log file ---
         open (newunit=num_unit, file=self%log_file_name, status='replace', action='write', iostat=ios)
         if (ios /= 0) then
-            write (*, *) "Error opening log file: ", self%log_file_name
-            stop
+            call raise_error(ERROR_CODES%OPEN_FILE_FAILED, opt=self%log_file_name)
         end if
-        write (num_unit, '(a)') repeat('=', nRepeat)
-        write (num_unit, '(a)') "FTDSS System Log" !&
-        write (num_unit, '(a)') repeat('=', nRepeat)
-        write (num_unit, '(a)') "Username           : "//trim(username) !&
-        write (num_unit, '(a)') "Hostname           : "//trim(hostname) !&
-        write (num_unit, '(a)') "OS                 : "//trim(os) !&
-        write (num_unit, '(a)') "Architecture       : "//trim(architecture) !&
-        write (num_unit, '(a)') "Compiler           : "//trim(compiler) !&
-        write (num_unit, '(a)') "Compiler Version   : "//trim(compiler_version) !&
-        write (num_unit, fmt)   "RSS Memory Usage   : ", rss_mb, " MB" !&
-!$      write (num_unit, '(a)') "OpenMP Version     : "//trim(openmp_version) !&
-!$      write (num_unit, '(a)') "OpenMP Max Threads : "//trim(to_string(max_threads)) !&
-!$      write (num_unit, '(a)') "OpenMP Threads     : "//trim(to_string(num_threads)) !&
-        write (num_unit, '(a)') repeat('=', nRepeat)
-        write (num_unit, '(a)') "Time Information" !&
-        write (num_unit, '(a)') repeat('=', nRepeat)
-        write (num_unit, '(a)') trim(time%start%label)//" Time : "//time%start%date(1:4)//"-"//time%start%date(5:6)//"-"//time%start%date(7:8)//"T"//time%start%time(1:2)//":"//time%start%time(3:4)//":"//time%start%time(5:6)//trim(time%start%zone)
-        write (num_unit, '(a)') trim(time%end%label)//" Time   : "//time%end%date(1:4)//"-"//time%end%date(5:6)//"-"//time%end%date(7:8)//"T"//time%end%time(1:2)//":"//time%end%time(3:4)//":"//time%end%time(5:6)//trim(time%end%zone)
 
-        component_total_time = 0.0d0
-        total_section_time = 0.0d0
+        ! --- Output Header (Markdown) ---
+        write (num_unit, '(a)') "# FTDSS System Log"
+        write (num_unit, '(a)') ""
 
-        ! --- 先に合計を計算 ---
-        do i = 1, size(time%sections)
-            ! 'Total'セクションは別で保持し、部品の合計からは除外する
-            if (trim(adjustl(time%sections(i)%label)) == "Total") then
-                total_section_time = time%sections(i)%total_time
-            else
-                component_total_time = component_total_time + time%sections(i)%total_time
-            end if
-        end do
+        ! --- System Information (Markdown List) ---
+        write (num_unit, '(a)') "## System Information"
+        write (num_unit, '(a)') ""
+        write (num_unit, '(a)') "- **Username**: "//strip(username)
+        write (num_unit, '(a)') "- **Hostname**: "//strip(hostname)
+        write (num_unit, '(a)') "- **OS**: "//strip(os_name)
+        write (num_unit, '(a)') "- **Architecture**: "//strip(architecture)
+        write (num_unit, '(a)') "- **Compiler**: "//strip(compiler)
+        write (num_unit, '(a)') "- **Compiler Version**: "//strip(compiler_version)
+#ifdef _OPENMP
+        write (num_unit, '(a, i0)') "- **Number of Processors**: ", omp_get_num_procs()
+        write (num_unit, '(a, i0)') "- **OpenMP Threads**: ", omp_get_max_threads()
+#else
+        write (num_unit, '(a)') "- **OpenMP Threads**: 1 (Serial)"
+#endif
+        ! Output RSS Memory Usage using the dynamically generated format
+        write (num_unit, fmt) "- **RSS Memory Usage**: ", rss_mb, " MB"
+        write (num_unit, '(a)') ""
 
-        write (num_unit, '(a)') repeat('=', nRepeat)
-        write (num_unit, '(a)') "Performance Profiling Report"
-        write (num_unit, '(a)') repeat('=', nRepeat)
-        write (num_unit, '(a10, a15, a15)') "Section", "Time (sec)", "Percentage"
-        write (num_unit, '(a)') repeat('-', nRepeat)
+        ! --- Time Information (Markdown List) ---
+        write (num_unit, '(a)') "## Time Information"
+        write (num_unit, '(a)') ""
 
-        ! --- 各セクションの結果を出力 ---
-        do i = 1, size(time%sections)
-            if (trim(adjustl(time%sections(i)%label)) == "Total") cycle
-
-            if (component_total_time > 0.0d0) then
-                write (num_unit, '(a10, f15.4, f14.4, a)') trim(time%sections(i)%label), &
-                    time%sections(i)%total_time, &
-                    (time%sections(i)%total_time / component_total_time) * 100.0d0, " %"
-            else
-                write (num_unit, '(a10, f15.4, a)') trim(time%sections(i)%label), time%sections(i)%total_time, " (N/A %)"
-            end if
-        end do
-
-        write (num_unit, '(a)') repeat('-', nRepeat)
-
-        ! 'Total'セクションが計測されていれば、それも表示
-        if (total_section_time > 0.0d0) then
-            write (num_unit, '(a10, f15.4, a)') "Total", total_section_time, ""
+        if (len_trim(start_time_str) > 0) then
+            write (num_unit, '(a)') "- **Start Time**: "//strip(start_time_str)
         else
-            write (num_unit, '(a10, f15.4, a)') "Total", component_total_time, ""
+            write (num_unit, '(a)') "- **Start Time**: (Not recorded)"
         end if
 
-        write (num_unit, '(a)') repeat('=', nRepeat)
-        write (num_unit, '(a)') "Matrix Information"
-        write (num_unit, '(a)') repeat('-', nRepeat)
-        write (num_unit, '(a)') "Matrix type : CRS"
-        write (num_unit, '(a,i0)') "Matrix size : ", Matrix%num_row
-        write (num_unit, '(a,i0)') "Matrix nnz  : ", Matrix%nnz
-        write (num_unit, '(a)') repeat('-', nRepeat)
-        write (num_unit, '(a,i0)') "Coloring Count : ", Domain%Colors%num_colors
-        write (num_unit, '(a)') repeat('=', nRepeat)
+        if (len_trim(end_time_str) > 0) then
+            write (num_unit, '(a)') "- **End Time**: "//strip(end_time_str)
+        else
+            write (num_unit, '(a)') "- **End Time**: (Not recorded)"
+        end if
+        write (num_unit, '(a)') ""
+
+        ! --- Profiling Report (Markdown Table) ---
+        write (num_unit, '(a)') "## Performance Profiling Report"
+        write (num_unit, '(a)') ""
+
+        if (size(sec_labels) > 0) then
+            ! Table Header
+            write (num_unit, '(a)') "| Section            | Time (s)   | Calls | Percentage |"
+            write (num_unit, '(a)') "|:-------------------|:----------:|:-----:|:----------:|"
+
+            ! Table Body
+            do i = 1, size(sec_labels)
+                write (num_unit, '("|", a20, "| ", es10.3, " | ", i5, " |   ", f6.1, " % |")') &
+                    sec_labels(i), sec_total_times(i), sec_call_counts(i), sec_percentages(i)
+            end do
+        else
+            write (num_unit, '(a)') "(No sections recorded)"
+        end if
+
+        write (num_unit, '(a)') ""
 
         close (num_unit)
+
     end subroutine output_system_log
 
-end submodule input_output_system_logger
+end submodule inout_output_system_logger

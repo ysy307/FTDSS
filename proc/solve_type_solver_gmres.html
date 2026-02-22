@@ -1,0 +1,1765 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>solve_type_solver_gmres &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>solve_type_solver_gmres
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.2% of total for procedures.">88 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/solve_gmres.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/solve_gmres.f90.html'>solve_gmres.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/solve_type_solver_gmres.html'>solve_type_solver_gmres</a></li>
+            <li class="breadcrumb-item active" aria-current="page">solve_type_solver_gmres</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/solve_type_solver_gmres.html#src">solve_type_solver_gmres</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine solve_type_solver_gmres(self, A, b, x)  
+    <a href="../interface/solve_type_solver_gmres.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+    <p>Solve the linear system <script type="math/tex"> Ax = b </script> using the GMRES(m) method.
+Implements Right Preconditioning and Restarting.</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~580"></span>
+              class(<a href='../type/type_solver_gmres.html'>type_solver_gmres</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                <p>Solver instance</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~5"></span>
+              class(<a href='../type/abst_matrix.html'>abst_matrix</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+                <p>System matrix <script type="math/tex"> A </script>
+</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~23"></span>
+              type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong></td>
+            <td>
+                <p>Right-hand side vector <script type="math/tex"> b </script>
+</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-x~30"></span>
+              type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>x</strong></td>
+            <td>
+                <p>Solution vector (initial guess on input, result on output)</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~solve_type_solver_gmres~~CallsGraph Pages: 1 -->
+<svg id="procsolve_type_solver_gmresCallsGraph" width="641pt" height="488pt"
+ viewBox="0.00 0.00 641.00 488.17" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~solve_type_solver_gmres~~CallsGraph" class="graph" transform="scale(0.56 0.56) rotate(0) translate(4 868)">
+<title>proc~~solve_type_solver_gmres~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-868 1141,-868 1141,4 -4,4"/>
+<!-- proc~solve_type_solver_gmres -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node1" class="node">
+<title>proc~solve_type_solver_gmres</title>
+<polygon fill="none" stroke="black" points="145,-276 0,-276 0,-252 145,-252 145,-276"/>
+<text text-anchor="middle" x="72.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50">solve_type_solver_gmres</text>
+</g>
+<!-- apply -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node2" class="node">
+<title>apply</title>
+<polygon fill="#777777" stroke="#777777" points="301.5,-570 247.5,-570 247.5,-546 301.5,-546 301.5,-570"/>
+<text text-anchor="middle" x="274.5" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">apply</text>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;apply -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge1" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;apply</title>
+<path fill="none" stroke="#ff0000" d="M74.39,-276.06C78.21,-318.9 97.13,-464.99 181,-537 196.5,-550.31 218.69,-555.65 237.45,-557.62"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="237.22,-561.11 247.46,-558.4 237.76,-554.13 237.22,-561.11"/>
+</g>
+<!-- interface~copy_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node3" class="node">
+<title>interface~copy_vector_dp</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node3"><a xlink:href="../interface/copy_vector_dp.html" xlink:title="type_vector_dp%copy_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="368,-528 181,-528 181,-504 368,-504 368,-528"/>
+<text text-anchor="middle" x="274.5" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%copy_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;interface~copy_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge2" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;interface~copy_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M75.33,-276.08C81.83,-314.63 107.52,-435.67 181,-495 182.77,-496.43 184.62,-497.76 186.53,-499.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="184.86,-502.09 195.29,-503.95 188.3,-495.99 184.86,-502.09"/>
+</g>
+<!-- interface~matvec -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node4" class="node">
+<title>interface~matvec</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node4"><a xlink:href="../interface/matvec.html" xlink:title="matvec">
+<polygon fill="#a7506f" stroke="#a7506f" points="301.5,-486 247.5,-486 247.5,-462 301.5,-462 301.5,-486"/>
+<text text-anchor="middle" x="274.5" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matvec</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;interface~matvec -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge3" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M80.39,-276.11C95.9,-302.7 135.77,-367.26 181,-411 199.48,-428.88 223.58,-445.11 242.54,-456.62"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="241.01,-459.77 251.39,-461.87 244.58,-453.76 241.01,-459.77"/>
+</g>
+<!-- interface~vector_axpy -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node5" class="node">
+<title>interface~vector_axpy</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node5"><a xlink:href="../interface/vector_axpy.html" xlink:title="vector_axpy">
+<polygon fill="#a7506f" stroke="#a7506f" points="313,-402 236,-402 236,-378 313,-378 313,-402"/>
+<text text-anchor="middle" x="274.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_axpy</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;interface~vector_axpy -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge4" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;interface~vector_axpy</title>
+<path fill="none" stroke="#ff0000" d="M82.31,-276.26C98.93,-298.45 137.23,-345.18 181,-369 194.63,-376.42 210.76,-381.22 225.71,-384.33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="225.35,-387.82 235.82,-386.22 226.63,-380.94 225.35,-387.82"/>
+</g>
+<!-- interface~vector_axpyz -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node6" class="node">
+<title>interface~vector_axpyz</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node6"><a xlink:href="../interface/vector_axpyz.html" xlink:title="vector_axpyz">
+<polygon fill="#a7506f" stroke="#a7506f" points="315.5,-360 233.5,-360 233.5,-336 315.5,-336 315.5,-360"/>
+<text text-anchor="middle" x="274.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_axpyz</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;interface~vector_axpyz -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge5" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;interface~vector_axpyz</title>
+<path fill="none" stroke="#ff0000" d="M90.53,-276.22C111.04,-290.4 147,-313.55 181,-327 194.31,-332.26 209.24,-336.37 223.16,-339.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="222.57,-342.96 233.08,-341.62 224.03,-336.11 222.57,-342.96"/>
+</g>
+<!-- interface~vector_dot -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node7" class="node">
+<title>interface~vector_dot</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node7"><a xlink:href="../interface/vector_dot.html" xlink:title="vector_dot">
+<polygon fill="#a7506f" stroke="#a7506f" points="309,-276 240,-276 240,-252 309,-252 309,-276"/>
+<text text-anchor="middle" x="274.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_dot</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;interface~vector_dot -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge6" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M145.14,-264C173.39,-264 204.92,-264 229.67,-264"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="229.83,-267.5 239.83,-264 229.83,-260.5 229.83,-267.5"/>
+</g>
+<!-- interface~vector_norm2 -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node8" class="node">
+<title>interface~vector_norm2</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node8"><a xlink:href="../interface/vector_norm2.html" xlink:title="vector_norm2">
+<polygon fill="#a7506f" stroke="#a7506f" points="318,-234 231,-234 231,-210 318,-210 318,-234"/>
+<text text-anchor="middle" x="274.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_norm2</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge7" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#ff0000" d="M130.81,-251.96C159.19,-246.01 193.2,-238.86 220.91,-233.04"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="221.74,-236.45 230.81,-230.97 220.3,-229.6 221.74,-236.45"/>
+</g>
+<!-- interface~vector_scale -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node9" class="node">
+<title>interface~vector_scale</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node9"><a xlink:href="../interface/vector_scale.html" xlink:title="vector_scale">
+<polygon fill="#a7506f" stroke="#a7506f" points="314,-318 235,-318 235,-294 314,-294 314,-318"/>
+<text text-anchor="middle" x="274.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_scale</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;interface~vector_scale -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge8" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;interface~vector_scale</title>
+<path fill="none" stroke="#ff0000" d="M130.81,-276.04C160.52,-282.27 196.42,-289.81 224.78,-295.77"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="224.35,-299.26 234.86,-297.89 225.79,-292.4 224.35,-299.26"/>
+</g>
+<!-- proc~backward_substitution -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node10" class="node">
+<title>proc~backward_substitution</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node10"><a xlink:href="../proc/backward_substitution.html" xlink:title="backward_substitution">
+<polygon fill="#d9534f" stroke="#d9534f" points="340,-192 209,-192 209,-168 340,-168 340,-192"/>
+<text text-anchor="middle" x="274.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">backward_substitution</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;proc~backward_substitution -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge9" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;proc~backward_substitution</title>
+<path fill="none" stroke="#ff0000" d="M90.53,-251.78C111.04,-237.6 147,-214.45 181,-201 186.73,-198.73 192.76,-196.68 198.88,-194.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="199.88,-198.18 208.54,-192.08 197.96,-191.45 199.88,-198.18"/>
+</g>
+<!-- proc~generate_givens_rotation -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node11" class="node">
+<title>proc~generate_givens_rotation</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node11"><a xlink:href="../proc/generate_givens_rotation.html" xlink:title="generate_givens_rotation">
+<polygon fill="#d9534f" stroke="#d9534f" points="348.5,-150 200.5,-150 200.5,-126 348.5,-126 348.5,-150"/>
+<text text-anchor="middle" x="274.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">generate_givens_rotation</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;proc~generate_givens_rotation -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge10" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;proc~generate_givens_rotation</title>
+<path fill="none" stroke="#ff0000" d="M82.31,-251.74C98.93,-229.55 137.23,-182.82 181,-159 184.66,-157.01 188.5,-155.2 192.45,-153.57"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="193.69,-156.84 201.83,-150.06 191.24,-150.29 193.69,-156.84"/>
+</g>
+<!-- set -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node12" class="node">
+<title>set</title>
+<polygon fill="#777777" stroke="#777777" points="301.5,-108 247.5,-108 247.5,-84 301.5,-84 301.5,-108"/>
+<text text-anchor="middle" x="274.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set</text>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;set -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge11" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;set</title>
+<path fill="none" stroke="#ff0000" d="M78.71,-251.82C91.55,-223.32 127.62,-152.07 181,-117 197.64,-106.06 219.21,-100.77 237.32,-98.24"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="237.74,-101.71 247.26,-97.06 236.92,-94.76 237.74,-101.71"/>
+</g>
+<!-- setup -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node13" class="node">
+<title>setup</title>
+<polygon fill="#777777" stroke="#777777" points="301.5,-66 247.5,-66 247.5,-42 301.5,-42 301.5,-66"/>
+<text text-anchor="middle" x="274.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">setup</text>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;setup -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge12" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;setup</title>
+<path fill="none" stroke="#ff0000" d="M76.63,-251.98C86.09,-218.24 117.65,-122.02 181,-75 197.1,-63.05 218.82,-57.72 237.16,-55.41"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="237.63,-58.88 247.22,-54.39 236.92,-51.92 237.63,-58.88"/>
+</g>
+<!-- zero -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node14" class="node">
+<title>zero</title>
+<polygon fill="#777777" stroke="#777777" points="301.5,-24 247.5,-24 247.5,0 301.5,0 301.5,-24"/>
+<text text-anchor="middle" x="274.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">zero</text>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;zero -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge13" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;zero</title>
+<path fill="none" stroke="#ff0000" d="M75.33,-251.92C81.83,-213.37 107.52,-92.33 181,-33 196.71,-20.32 218.59,-14.96 237.13,-12.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="237.65,-16.3 247.3,-11.93 237.03,-9.33 237.65,-16.3"/>
+</g>
+<!-- proc~copy_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node19" class="node">
+<title>proc~copy_vector_dp</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node19"><a xlink:href="../proc/copy_vector_dp.html" xlink:title="copy_vector_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="507.5,-822 411.5,-822 411.5,-798 507.5,-798 507.5,-822"/>
+<text text-anchor="middle" x="459.5" y="-807.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">copy_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~copy_vector_dp&#45;&gt;proc~copy_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge14" class="edge">
+<title>interface~copy_vector_dp&#45;&gt;proc~copy_vector_dp</title>
+<path fill="none" stroke="#ff7500" stroke-dasharray="5,2" d="M355.58,-528.12C360.06,-530.6 364.25,-533.53 368,-537 407.62,-573.66 387.15,-601.72 404,-653 419.95,-701.55 439.92,-758.07 450.71,-788.29"/>
+<polygon fill="#ff7500" stroke="#ff7500" points="447.46,-789.6 454.12,-797.83 454.05,-787.24 447.46,-789.6"/>
+</g>
+<!-- proc~matvec_matrix -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node22" class="node">
+<title>proc~matvec_matrix</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node22"><a xlink:href="../proc/matvec_matrix.html" xlink:title="matvec_matrix">
+<polygon fill="#d9534f" stroke="#d9534f" points="505.5,-528 413.5,-528 413.5,-504 505.5,-504 505.5,-528"/>
+<text text-anchor="middle" x="459.5" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matvec_matrix</text>
+</a>
+</g>
+</g>
+<!-- interface~matvec&#45;&gt;proc~matvec_matrix -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge15" class="edge">
+<title>interface~matvec&#45;&gt;proc~matvec_matrix</title>
+<path fill="none" stroke="#ffeb00" stroke-dasharray="5,2" d="M301.82,-479.94C320.34,-484.13 345.69,-489.88 368,-495 379.43,-497.62 391.67,-500.45 403.33,-503.15"/>
+<polygon fill="#ffeb00" stroke="#ffeb00" points="402.87,-506.64 413.4,-505.49 404.45,-499.82 402.87,-506.64"/>
+</g>
+<!-- proc~matvec_real64 -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node23" class="node">
+<title>proc~matvec_real64</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node23"><a xlink:href="../proc/matvec_real64.html" xlink:title="matvec_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="505,-644 414,-644 414,-620 505,-620 505,-644"/>
+<text text-anchor="middle" x="459.5" y="-629.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matvec_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~matvec&#45;&gt;proc~matvec_real64 -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge16" class="edge">
+<title>interface~matvec&#45;&gt;proc~matvec_real64</title>
+<path fill="none" stroke="#ffeb00" stroke-dasharray="5,2" d="M301.51,-474.76C321.29,-476.48 348.36,-481.42 368,-495 389.96,-510.19 428.26,-576.55 447.21,-611.02"/>
+<polygon fill="#ffeb00" stroke="#ffeb00" points="444.16,-612.73 452.02,-619.83 450.3,-609.38 444.16,-612.73"/>
+</g>
+<!-- proc~axpy_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node15" class="node">
+<title>proc~axpy_vector_dp</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node15"><a xlink:href="../proc/axpy_vector_dp.html" xlink:title="axpy_vector_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="507.5,-402 411.5,-402 411.5,-378 507.5,-378 507.5,-402"/>
+<text text-anchor="middle" x="459.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">axpy_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_axpy&#45;&gt;proc~axpy_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge17" class="edge">
+<title>interface~vector_axpy&#45;&gt;proc~axpy_vector_dp</title>
+<path fill="none" stroke="#9cff00" stroke-dasharray="5,2" d="M313.42,-390C338.69,-390 372.37,-390 400.92,-390"/>
+<polygon fill="#9cff00" stroke="#9cff00" points="401.19,-393.5 411.19,-390 401.19,-386.5 401.19,-393.5"/>
+</g>
+<!-- proc~axpy_vector_int -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node16" class="node">
+<title>proc~axpy_vector_int</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node16"><a xlink:href="../proc/axpy_vector_int.html" xlink:title="axpy_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="507.5,-486 411.5,-486 411.5,-462 507.5,-462 507.5,-486"/>
+<text text-anchor="middle" x="459.5" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">axpy_vector_int</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_axpy&#45;&gt;proc~axpy_vector_int -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge18" class="edge">
+<title>interface~vector_axpy&#45;&gt;proc~axpy_vector_int</title>
+<path fill="none" stroke="#9cff00" stroke-dasharray="5,2" d="M298.43,-402C323.91,-415.16 366.43,-436.59 404,-453 407.92,-454.71 412.03,-456.43 416.16,-458.11"/>
+<polygon fill="#9cff00" stroke="#9cff00" points="415.16,-461.48 425.74,-461.92 417.74,-454.97 415.16,-461.48"/>
+</g>
+<!-- proc~axpyz_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node17" class="node">
+<title>proc~axpyz_vector_dp</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node17"><a xlink:href="../proc/axpyz_vector_dp.html" xlink:title="axpyz_vector_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="510,-360 409,-360 409,-336 510,-336 510,-360"/>
+<text text-anchor="middle" x="459.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">axpyz_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_axpyz&#45;&gt;proc~axpyz_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge19" class="edge">
+<title>interface~vector_axpyz&#45;&gt;proc~axpyz_vector_dp</title>
+<path fill="none" stroke="#27ff00" stroke-dasharray="5,2" d="M315.66,-348C340.01,-348 371.53,-348 398.77,-348"/>
+<polygon fill="#27ff00" stroke="#27ff00" points="398.97,-351.5 408.97,-348 398.97,-344.5 398.97,-351.5"/>
+</g>
+<!-- proc~axpyz_vector_int -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node18" class="node">
+<title>proc~axpyz_vector_int</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node18"><a xlink:href="../proc/axpyz_vector_int.html" xlink:title="axpyz_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="510,-444 409,-444 409,-420 510,-420 510,-444"/>
+<text text-anchor="middle" x="459.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">axpyz_vector_int</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_axpyz&#45;&gt;proc~axpyz_vector_int -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge20" class="edge">
+<title>interface~vector_axpyz&#45;&gt;proc~axpyz_vector_int</title>
+<path fill="none" stroke="#27ff00" stroke-dasharray="5,2" d="M315.84,-351.49C332.88,-354.36 352.35,-359.56 368,-369 389.05,-381.7 383.92,-396.82 404,-411 406.21,-412.56 408.56,-414.03 410.99,-415.4"/>
+<polygon fill="#27ff00" stroke="#27ff00" points="409.53,-418.59 420.03,-419.96 412.68,-412.34 409.53,-418.59"/>
+</g>
+<!-- proc~dot_native~2 -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node20" class="node">
+<title>proc~dot_native~2</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node20"><a xlink:href="../proc/dot_native~2.html" xlink:title="dot_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="689,-192 621,-192 621,-168 689,-168 689,-192"/>
+<text text-anchor="middle" x="655" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dot_native</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_dot&#45;&gt;proc~dot_native~2 -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge21" class="edge">
+<title>interface~vector_dot&#45;&gt;proc~dot_native~2</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M309.09,-261.54C327.55,-258.97 350.23,-253.72 368,-243 389.05,-230.3 382.11,-212.2 404,-201 469.84,-167.31 558.32,-169.07 610.45,-174.08"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="610.38,-177.59 620.69,-175.15 611.1,-170.63 610.38,-177.59"/>
+</g>
+<!-- proc~dot_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node21" class="node">
+<title>proc~dot_vector_dp</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node21"><a xlink:href="../proc/dot_vector_dp.html" xlink:title="dot_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="503.5,-234 415.5,-234 415.5,-210 503.5,-210 503.5,-234"/>
+<text text-anchor="middle" x="459.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dot_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_dot&#45;&gt;proc~dot_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge22" class="edge">
+<title>interface~vector_dot&#45;&gt;proc~dot_vector_dp</title>
+<path fill="none" stroke="#00ff4e" stroke-dasharray="5,2" d="M309.34,-256.36C326.85,-252.39 348.58,-247.46 368,-243 380.04,-240.24 392.97,-237.25 405.18,-234.42"/>
+<polygon fill="#00ff4e" stroke="#00ff4e" points="406.29,-237.75 415.24,-232.08 404.71,-230.93 406.29,-237.75"/>
+</g>
+<!-- proc~norm_2_native~2 -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node24" class="node">
+<title>proc~norm_2_native~2</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node24"><a xlink:href="../proc/norm_2_native~2.html" xlink:title="norm_2_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="700.5,-132 609.5,-132 609.5,-108 700.5,-108 700.5,-132"/>
+<text text-anchor="middle" x="655" y="-117.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_2_native</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norm2&#45;&gt;proc~norm_2_native~2 -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge23" class="edge">
+<title>interface~vector_norm2&#45;&gt;proc~norm_2_native~2</title>
+<path fill="none" stroke="#00ffc4" stroke-dasharray="5,2" d="M318.23,-220.42C335.27,-217.86 354.11,-212.36 368,-201 398.18,-176.31 371.3,-142.24 404,-121 464.02,-82.02 550.42,-92.84 604.33,-105.47"/>
+<polygon fill="#00ffc4" stroke="#00ffc4" points="603.79,-108.94 614.34,-107.93 605.46,-102.15 603.79,-108.94"/>
+</g>
+<!-- proc~norm_2_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node25" class="node">
+<title>proc~norm_2_vector_dp</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node25"><a xlink:href="../proc/norm_2_vector_dp.html" xlink:title="norm_2_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="515,-154 404,-154 404,-130 515,-130 515,-154"/>
+<text text-anchor="middle" x="459.5" y="-139.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_2_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norm2&#45;&gt;proc~norm_2_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge24" class="edge">
+<title>interface~vector_norm2&#45;&gt;proc~norm_2_vector_dp</title>
+<path fill="none" stroke="#00ffc4" stroke-dasharray="5,2" d="M318.1,-217.08C334.37,-214 352.68,-209.02 368,-201 387.23,-190.93 386.01,-180.14 404,-168 408.95,-164.66 414.41,-161.51 419.89,-158.65"/>
+<polygon fill="#00ffc4" stroke="#00ffc4" points="421.65,-161.68 429.06,-154.1 418.54,-155.41 421.65,-161.68"/>
+</g>
+<!-- proc~scale_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node26" class="node">
+<title>proc~scale_vector_dp</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node26"><a xlink:href="../proc/scale_vector_dp.html" xlink:title="scale_vector_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="508.5,-276 410.5,-276 410.5,-252 508.5,-252 508.5,-276"/>
+<text text-anchor="middle" x="459.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">scale_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_scale&#45;&gt;proc~scale_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge25" class="edge">
+<title>interface~vector_scale&#45;&gt;proc~scale_vector_dp</title>
+<path fill="none" stroke="#00c4ff" stroke-dasharray="5,2" d="M314.21,-297.25C330.78,-293.5 350.34,-289.05 368,-285 378.47,-282.6 389.62,-280.02 400.39,-277.53"/>
+<polygon fill="#00c4ff" stroke="#00c4ff" points="401.18,-280.94 410.13,-275.27 399.6,-274.12 401.18,-280.94"/>
+</g>
+<!-- proc~scale_vector_int -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node27" class="node">
+<title>proc~scale_vector_int</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node27"><a xlink:href="../proc/scale_vector_int.html" xlink:title="scale_vector_int">
+<polygon fill="#d9534f" stroke="#d9534f" points="508.5,-318 410.5,-318 410.5,-294 508.5,-294 508.5,-318"/>
+<text text-anchor="middle" x="459.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">scale_vector_int</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_scale&#45;&gt;proc~scale_vector_int -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge26" class="edge">
+<title>interface~vector_scale&#45;&gt;proc~scale_vector_int</title>
+<path fill="none" stroke="#00c4ff" stroke-dasharray="5,2" d="M314.31,-306C339.26,-306 372.14,-306 400.2,-306"/>
+<polygon fill="#00c4ff" stroke="#00c4ff" points="400.29,-309.5 410.29,-306 400.29,-302.5 400.29,-309.5"/>
+</g>
+<!-- interface~get_data_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node30" class="node">
+<title>interface~get_data_vector_dp</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node30"><a xlink:href="../interface/get_data_vector_dp.html" xlink:title="type_vector_dp%get_data_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="759,-276 551,-276 551,-252 759,-252 759,-276"/>
+<text text-anchor="middle" x="655" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~axpy_vector_dp&#45;&gt;interface~get_data_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge27" class="edge">
+<title>proc~axpy_vector_dp&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M502.48,-377.92C507.05,-375.46 511.35,-372.52 515,-369 544.25,-340.82 519.51,-310.65 551,-285 552.59,-283.7 554.24,-282.48 555.94,-281.33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="557.98,-284.19 564.84,-276.12 554.44,-278.15 557.98,-284.19"/>
+</g>
+<!-- interface~get_data_vector_int -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node31" class="node">
+<title>interface~get_data_vector_int</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node31"><a xlink:href="../interface/get_data_vector_int.html" xlink:title="type_vector_int%get_data_vector_int">
+<polygon fill="#a7506f" stroke="#a7506f" points="759,-318 551,-318 551,-294 759,-294 759,-318"/>
+<text text-anchor="middle" x="655" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_int%get_data_vector_int</text>
+</a>
+</g>
+</g>
+<!-- proc~axpy_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge28" class="edge">
+<title>proc~axpy_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#ff7500" d="M503.73,-461.9C507.91,-459.45 511.78,-456.52 515,-453 554.3,-410.02 508.26,-366.56 551,-327 552.29,-325.81 553.63,-324.67 555.01,-323.6"/>
+<polygon fill="#ff7500" stroke="#ff7500" points="556.97,-326.5 563.35,-318.04 553.09,-320.67 556.97,-326.5"/>
+</g>
+<!-- proc~axpyz_vector_dp&#45;&gt;interface~get_data_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge29" class="edge">
+<title>proc~axpyz_vector_dp&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#ffeb00" d="M498.97,-335.96C504.58,-333.43 510.11,-330.45 515,-327 535.08,-312.82 529.81,-297.46 551,-285 554.22,-283.11 557.58,-281.38 561.04,-279.81"/>
+<polygon fill="#ffeb00" stroke="#ffeb00" points="562.46,-283.01 570.4,-276 559.82,-276.53 562.46,-283.01"/>
+</g>
+<!-- proc~axpyz_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge30" class="edge">
+<title>proc~axpyz_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#9cff00" d="M502.48,-419.92C507.05,-417.46 511.35,-414.52 515,-411 544.25,-382.82 519.51,-352.65 551,-327 552.59,-325.7 554.24,-324.48 555.94,-323.33"/>
+<polygon fill="#9cff00" stroke="#9cff00" points="557.98,-326.19 564.84,-318.12 554.44,-320.15 557.98,-326.19"/>
+</g>
+<!-- interface~destroy_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node29" class="node">
+<title>interface~destroy_vector_dp</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node29"><a xlink:href="../interface/destroy_vector_dp.html" xlink:title="type_vector_dp%destroy_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="755,-864 555,-864 555,-840 755,-840 755,-864"/>
+<text text-anchor="middle" x="655" y="-849.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%destroy_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~copy_vector_dp&#45;&gt;interface~destroy_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge31" class="edge">
+<title>proc~copy_vector_dp&#45;&gt;interface~destroy_vector_dp</title>
+<path fill="none" stroke="#27ff00" d="M507.88,-821.25C521.76,-824.47 536.97,-827.94 551,-831 561.51,-833.29 572.64,-835.64 583.56,-837.9"/>
+<polygon fill="#27ff00" stroke="#27ff00" points="582.99,-841.36 593.49,-839.95 584.4,-834.5 582.99,-841.36"/>
+</g>
+<!-- interface~initialize_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node32" class="node">
+<title>interface~initialize_vector_dp</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node32"><a xlink:href="../interface/initialize_vector_dp.html" xlink:title="type_vector_dp%initialize_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="757.5,-822 552.5,-822 552.5,-798 757.5,-798 757.5,-822"/>
+<text text-anchor="middle" x="655" y="-807.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%initialize_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~copy_vector_dp&#45;&gt;interface~initialize_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge32" class="edge">
+<title>proc~copy_vector_dp&#45;&gt;interface~initialize_vector_dp</title>
+<path fill="none" stroke="#27ff00" d="M507.84,-810C518.41,-810 530.07,-810 542.04,-810"/>
+<polygon fill="#27ff00" stroke="#27ff00" points="542.15,-813.5 552.15,-810 542.15,-806.5 542.15,-813.5"/>
+</g>
+<!-- proc~dot_vector_dp&#45;&gt;proc~dot_native~2 -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge35" class="edge">
+<title>proc~dot_vector_dp&#45;&gt;proc~dot_native~2</title>
+<path fill="none" stroke="#00ffc4" d="M503.72,-211.72C518.67,-208.23 535.56,-204.37 551,-201 570.56,-196.74 592.27,-192.27 610.69,-188.56"/>
+<polygon fill="#00ffc4" stroke="#00ffc4" points="611.44,-191.98 620.55,-186.58 610.06,-185.12 611.44,-191.98"/>
+</g>
+<!-- check_match_length -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node28" class="node">
+<title>check_match_length</title>
+<polygon fill="#777777" stroke="#777777" points="716,-234 594,-234 594,-210 716,-210 716,-234"/>
+<text text-anchor="middle" x="655" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">check_match_length</text>
+</g>
+<!-- proc~dot_vector_dp&#45;&gt;check_match_length -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge33" class="edge">
+<title>proc~dot_vector_dp&#45;&gt;check_match_length</title>
+<path fill="none" stroke="#00ffc4" d="M503.93,-222C527.44,-222 557.07,-222 583.77,-222"/>
+<polygon fill="#00ffc4" stroke="#00ffc4" points="583.85,-225.5 593.85,-222 583.85,-218.5 583.85,-225.5"/>
+</g>
+<!-- proc~dot_vector_dp&#45;&gt;interface~get_data_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge34" class="edge">
+<title>proc~dot_vector_dp&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#00ffc4" d="M503.72,-232.28C518.67,-235.77 535.56,-239.63 551,-243 561.51,-245.29 572.64,-247.64 583.56,-249.9"/>
+<polygon fill="#00ffc4" stroke="#00ffc4" points="582.99,-253.36 593.49,-251.95 584.4,-246.5 582.99,-253.36"/>
+</g>
+<!-- proc~matvec_matrix&#45;&gt;interface~get_data_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge36" class="edge">
+<title>proc~matvec_matrix&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#00c4ff" d="M504.65,-503.91C508.55,-501.47 512.11,-498.53 515,-495 575.01,-421.75 485.1,-353 551,-285 551.93,-284.04 552.89,-283.12 553.88,-282.24"/>
+<polygon fill="#00c4ff" stroke="#00c4ff" points="556.09,-284.95 561.97,-276.14 551.87,-279.36 556.09,-284.95"/>
+</g>
+<!-- proc~gemv_matrix_bsr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node33" class="node">
+<title>proc~gemv_matrix_bsr</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node33"><a xlink:href="../proc/gemv_matrix_bsr.html" xlink:title="gemv_matrix_bsr">
+<polygon fill="#d9534f" stroke="#d9534f" points="707,-528 603,-528 603,-504 707,-504 707,-528"/>
+<text text-anchor="middle" x="655" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gemv_matrix_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~matvec_matrix&#45;&gt;proc~gemv_matrix_bsr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge37" class="edge">
+<title>proc~matvec_matrix&#45;&gt;proc~gemv_matrix_bsr</title>
+<path fill="none" stroke="#00c4ff" d="M505.87,-516C531.73,-516 564.5,-516 592.64,-516"/>
+<polygon fill="#00c4ff" stroke="#00c4ff" points="592.78,-519.5 602.78,-516 592.78,-512.5 592.78,-519.5"/>
+</g>
+<!-- proc~gemv_matrix_coo -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node34" class="node">
+<title>proc~gemv_matrix_coo</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node34"><a xlink:href="../proc/gemv_matrix_coo.html" xlink:title="gemv_matrix_coo">
+<polygon fill="#d9534f" stroke="#d9534f" points="708.5,-360 601.5,-360 601.5,-336 708.5,-336 708.5,-360"/>
+<text text-anchor="middle" x="655" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gemv_matrix_coo</text>
+</a>
+</g>
+</g>
+<!-- proc~matvec_matrix&#45;&gt;proc~gemv_matrix_coo -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge38" class="edge">
+<title>proc~matvec_matrix&#45;&gt;proc~gemv_matrix_coo</title>
+<path fill="none" stroke="#00c4ff" d="M498.54,-503.88C504.27,-501.34 509.95,-498.39 515,-495 568.11,-459.4 615.97,-400.1 639.19,-368.81"/>
+<polygon fill="#00c4ff" stroke="#00c4ff" points="642.26,-370.55 645.33,-360.41 636.61,-366.42 642.26,-370.55"/>
+</g>
+<!-- proc~gemv_matrix_csr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node35" class="node">
+<title>proc~gemv_matrix_csr</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node35"><a xlink:href="../proc/gemv_matrix_csr.html" xlink:title="gemv_matrix_csr">
+<polygon fill="#d9534f" stroke="#d9534f" points="706.5,-675 603.5,-675 603.5,-651 706.5,-651 706.5,-675"/>
+<text text-anchor="middle" x="655" y="-660.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gemv_matrix_csr</text>
+</a>
+</g>
+</g>
+<!-- proc~matvec_matrix&#45;&gt;proc~gemv_matrix_csr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge39" class="edge">
+<title>proc~matvec_matrix&#45;&gt;proc~gemv_matrix_csr</title>
+<path fill="none" stroke="#00c4ff" d="M472.12,-528.22C488.72,-545.34 520.59,-576.95 551,-600 573.85,-617.32 601.68,-634.11 622.65,-646"/>
+<polygon fill="#00c4ff" stroke="#00c4ff" points="621.03,-649.11 631.47,-650.94 624.46,-643 621.03,-649.11"/>
+</g>
+<!-- proc~gemv_matrix_dense -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node36" class="node">
+<title>proc~gemv_matrix_dense</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node36"><a xlink:href="../proc/gemv_matrix_dense.html" xlink:title="gemv_matrix_dense">
+<polygon fill="#d9534f" stroke="#d9534f" points="715,-591 595,-591 595,-567 715,-567 715,-591"/>
+<text text-anchor="middle" x="655" y="-576.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gemv_matrix_dense</text>
+</a>
+</g>
+</g>
+<!-- proc~matvec_matrix&#45;&gt;proc~gemv_matrix_dense -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge40" class="edge">
+<title>proc~matvec_matrix&#45;&gt;proc~gemv_matrix_dense</title>
+<path fill="none" stroke="#00c4ff" d="M497.81,-528.15C529.09,-538.33 573.92,-552.93 607.53,-563.87"/>
+<polygon fill="#00c4ff" stroke="#00c4ff" points="606.54,-567.23 617.13,-567 608.71,-560.57 606.54,-567.23"/>
+</g>
+<!-- proc~gemv_matrix_real64 -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node37" class="node">
+<title>proc~gemv_matrix_real64</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node37"><a xlink:href="../proc/gemv_matrix_real64.html" xlink:title="gemv_matrix_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="715.5,-717 594.5,-717 594.5,-693 715.5,-693 715.5,-717"/>
+<text text-anchor="middle" x="655" y="-702.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gemv_matrix_real64</text>
+</a>
+</g>
+</g>
+<!-- proc~matvec_real64&#45;&gt;proc~gemv_matrix_real64 -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge41" class="edge">
+<title>proc~matvec_real64&#45;&gt;proc~gemv_matrix_real64</title>
+<path fill="none" stroke="#004eff" d="M477.69,-644.13C495.31,-656 523.88,-673.75 551,-684 561.56,-687.99 573.04,-691.28 584.36,-693.97"/>
+<polygon fill="#004eff" stroke="#004eff" points="583.73,-697.42 594.25,-696.19 585.26,-690.59 583.73,-697.42"/>
+</g>
+<!-- proc~norm_2_vector_dp&#45;&gt;proc~norm_2_native~2 -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge43" class="edge">
+<title>proc~norm_2_vector_dp&#45;&gt;proc~norm_2_native~2</title>
+<path fill="none" stroke="#9c00ff" d="M515.17,-135.78C541.42,-132.8 572.79,-129.23 599.07,-126.25"/>
+<polygon fill="#9c00ff" stroke="#9c00ff" points="599.7,-129.7 609.24,-125.09 598.91,-122.74 599.7,-129.7"/>
+</g>
+<!-- proc~norm_2_vector_dp&#45;&gt;interface~get_data_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge42" class="edge">
+<title>proc~norm_2_vector_dp&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#9c00ff" d="M471.91,-154.08C483.03,-165.92 500.35,-184.54 515,-201 531.34,-219.37 529.81,-230.54 551,-243 554.22,-244.89 557.58,-246.62 561.04,-248.19"/>
+<polygon fill="#9c00ff" stroke="#9c00ff" points="559.82,-251.47 570.4,-252 562.46,-244.99 559.82,-251.47"/>
+</g>
+<!-- proc~scale_vector_dp&#45;&gt;interface~get_data_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge44" class="edge">
+<title>proc~scale_vector_dp&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#ff00eb" d="M508.83,-264C518.69,-264 529.44,-264 540.5,-264"/>
+<polygon fill="#ff00eb" stroke="#ff00eb" points="540.73,-267.5 550.73,-264 540.73,-260.5 540.73,-267.5"/>
+</g>
+<!-- proc~scale_vector_int&#45;&gt;interface~get_data_vector_int -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge45" class="edge">
+<title>proc~scale_vector_int&#45;&gt;interface~get_data_vector_int</title>
+<path fill="none" stroke="#ff0075" d="M508.83,-306C518.69,-306 529.44,-306 540.5,-306"/>
+<polygon fill="#ff0075" stroke="#ff0075" points="540.73,-309.5 550.73,-306 540.73,-302.5 540.73,-309.5"/>
+</g>
+<!-- proc~destroy_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node51" class="node">
+<title>proc~destroy_vector_dp</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node51"><a xlink:href="../proc/destroy_vector_dp.html" xlink:title="destroy_vector_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="951,-864 842,-864 842,-840 951,-840 951,-864"/>
+<text text-anchor="middle" x="896.5" y="-849.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">destroy_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~destroy_vector_dp&#45;&gt;proc~destroy_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge46" class="edge">
+<title>interface~destroy_vector_dp&#45;&gt;proc~destroy_vector_dp</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M755.14,-852C781.04,-852 808.26,-852 831.76,-852"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="831.94,-855.5 841.94,-852 831.94,-848.5 831.94,-855.5"/>
+</g>
+<!-- proc~get_data_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node52" class="node">
+<title>proc~get_data_vector_dp</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node52"><a xlink:href="../proc/get_data_vector_dp.html" xlink:title="get_data_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="955,-192 838,-192 838,-168 955,-168 955,-192"/>
+<text text-anchor="middle" x="896.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge47" class="edge">
+<title>interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M739.6,-252C746.38,-249.53 752.94,-246.56 759,-243 780.19,-230.54 773.84,-213.52 795,-201 804.97,-195.1 816.35,-190.85 827.78,-187.78"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="828.9,-191.11 837.81,-185.38 827.27,-184.3 828.9,-191.11"/>
+</g>
+<!-- proc~get_data_vector_int -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node53" class="node">
+<title>proc~get_data_vector_int</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node53"><a xlink:href="../proc/get_data_vector_int.html" xlink:title="get_data_vector_int">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="955,-234 838,-234 838,-210 955,-210 955,-234"/>
+<text text-anchor="middle" x="896.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_data_vector_int</text>
+</a>
+</g>
+</g>
+<!-- interface~get_data_vector_int&#45;&gt;proc~get_data_vector_int -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge48" class="edge">
+<title>interface~get_data_vector_int&#45;&gt;proc~get_data_vector_int</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M739.6,-294C746.38,-291.53 752.94,-288.56 759,-285 780.19,-272.54 773.84,-255.52 795,-243 804.97,-237.1 816.35,-232.85 827.78,-229.78"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="828.9,-233.11 837.81,-227.38 827.27,-226.3 828.9,-233.11"/>
+</g>
+<!-- proc~initialize_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node54" class="node">
+<title>proc~initialize_vector_dp</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node54"><a xlink:href="../proc/initialize_vector_dp.html" xlink:title="initialize_vector_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="954,-822 839,-822 839,-798 954,-798 954,-822"/>
+<text text-anchor="middle" x="896.5" y="-807.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_vector_dp&#45;&gt;proc~initialize_vector_dp -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge49" class="edge">
+<title>interface~initialize_vector_dp&#45;&gt;proc~initialize_vector_dp</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M757.57,-810C781.56,-810 806.55,-810 828.57,-810"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="828.78,-813.5 838.78,-810 828.78,-806.5 828.78,-813.5"/>
+</g>
+<!-- interface~get_ind_bsr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node39" class="node">
+<title>interface~get_ind_bsr</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node39"><a xlink:href="../interface/get_ind_bsr.html" xlink:title="type_matrix_bsr%get_ind_bsr">
+<polygon fill="#a7506f" stroke="#a7506f" points="980.5,-486 812.5,-486 812.5,-462 980.5,-462 980.5,-486"/>
+<text text-anchor="middle" x="896.5" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_bsr%get_ind_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_bsr&#45;&gt;interface~get_ind_bsr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge50" class="edge">
+<title>proc~gemv_matrix_bsr&#45;&gt;interface~get_ind_bsr</title>
+<path fill="none" stroke="#00ffff" d="M707.08,-507.04C738.98,-501.45 780.69,-494.13 816.76,-487.81"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="817.52,-491.23 826.77,-486.05 816.32,-484.33 817.52,-491.23"/>
+</g>
+<!-- interface~get_info_bsr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node41" class="node">
+<title>interface~get_info_bsr</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node41"><a xlink:href="../interface/get_info_bsr.html" xlink:title="type_matrix_bsr%get_info_bsr">
+<polygon fill="#a7506f" stroke="#a7506f" points="982.5,-444 810.5,-444 810.5,-420 982.5,-420 982.5,-444"/>
+<text text-anchor="middle" x="896.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_bsr%get_info_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_bsr&#45;&gt;interface~get_info_bsr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge51" class="edge">
+<title>proc~gemv_matrix_bsr&#45;&gt;interface~get_info_bsr</title>
+<path fill="none" stroke="#00ffff" d="M678.5,-503.94C705.49,-489.91 752.44,-466.91 795,-453 802.33,-450.61 810.05,-448.42 817.82,-446.45"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="818.77,-449.82 827.66,-444.05 817.11,-443.01 818.77,-449.82"/>
+</g>
+<!-- interface~get_ptr_bsr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node45" class="node">
+<title>interface~get_ptr_bsr</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node45"><a xlink:href="../interface/get_ptr_bsr.html" xlink:title="type_matrix_bsr%get_ptr_bsr">
+<polygon fill="#a7506f" stroke="#a7506f" points="979.5,-570 813.5,-570 813.5,-546 979.5,-546 979.5,-570"/>
+<text text-anchor="middle" x="896.5" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_bsr%get_ptr_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_bsr&#45;&gt;interface~get_ptr_bsr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge52" class="edge">
+<title>proc~gemv_matrix_bsr&#45;&gt;interface~get_ptr_bsr</title>
+<path fill="none" stroke="#00ffff" d="M707.08,-524.96C738.98,-530.55 780.69,-537.87 816.76,-544.19"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="816.32,-547.67 826.77,-545.95 817.52,-540.77 816.32,-547.67"/>
+</g>
+<!-- interface~get_val_bsr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node48" class="node">
+<title>interface~get_val_bsr</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node48"><a xlink:href="../interface/get_val_bsr.html" xlink:title="type_matrix_bsr%get_val_bsr">
+<polygon fill="#a7506f" stroke="#a7506f" points="980,-528 813,-528 813,-504 980,-504 980,-528"/>
+<text text-anchor="middle" x="896.5" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_bsr%get_val_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_bsr&#45;&gt;interface~get_val_bsr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge53" class="edge">
+<title>proc~gemv_matrix_bsr&#45;&gt;interface~get_val_bsr</title>
+<path fill="none" stroke="#00ffff" d="M707.08,-516C734.97,-516 770.37,-516 802.93,-516"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="802.93,-519.5 812.93,-516 802.93,-512.5 802.93,-519.5"/>
+</g>
+<!-- interface~get_col_coo -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node38" class="node">
+<title>interface~get_col_coo</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node38"><a xlink:href="../interface/get_col_coo.html" xlink:title="type_matrix_coo%get_col_coo">
+<polygon fill="#a7506f" stroke="#a7506f" points="983,-318 810,-318 810,-294 983,-294 983,-318"/>
+<text text-anchor="middle" x="896.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_coo%get_col_coo</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_coo&#45;&gt;interface~get_col_coo -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge54" class="edge">
+<title>proc~gemv_matrix_coo&#45;&gt;interface~get_col_coo</title>
+<path fill="none" stroke="#0066ff" d="M708.56,-338.78C740.28,-333.22 781.29,-326.03 816.82,-319.8"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="817.44,-323.24 826.68,-318.07 816.23,-316.35 817.44,-323.24"/>
+</g>
+<!-- interface~get_info_coo -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node42" class="node">
+<title>interface~get_info_coo</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node42"><a xlink:href="../interface/get_info_coo.html" xlink:title="type_matrix_coo%get_info_coo">
+<polygon fill="#a7506f" stroke="#a7506f" points="985.5,-276 807.5,-276 807.5,-252 985.5,-252 985.5,-276"/>
+<text text-anchor="middle" x="896.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_coo%get_info_coo</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_coo&#45;&gt;interface~get_info_coo -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge55" class="edge">
+<title>proc~gemv_matrix_coo&#45;&gt;interface~get_info_coo</title>
+<path fill="none" stroke="#0066ff" d="M708.71,-344.05C725.64,-341.06 743.9,-335.88 759,-327 780.19,-314.54 773.84,-297.52 795,-285 798.18,-283.12 801.5,-281.41 804.92,-279.85"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="806.25,-283.08 814.18,-276.06 803.6,-276.6 806.25,-283.08"/>
+</g>
+<!-- interface~get_row_coo -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node47" class="node">
+<title>interface~get_row_coo</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node47"><a xlink:href="../interface/get_row_coo.html" xlink:title="type_matrix_coo%get_row_coo">
+<polygon fill="#a7506f" stroke="#a7506f" points="984.5,-402 808.5,-402 808.5,-378 984.5,-378 984.5,-402"/>
+<text text-anchor="middle" x="896.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_coo%get_row_coo</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_coo&#45;&gt;interface~get_row_coo -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge56" class="edge">
+<title>proc~gemv_matrix_coo&#45;&gt;interface~get_row_coo</title>
+<path fill="none" stroke="#0066ff" d="M708.56,-357.22C740.28,-362.78 781.29,-369.97 816.82,-376.2"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="816.23,-379.65 826.68,-377.93 817.44,-372.76 816.23,-379.65"/>
+</g>
+<!-- interface~get_val_coo -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node49" class="node">
+<title>interface~get_val_coo</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node49"><a xlink:href="../interface/get_val_coo.html" xlink:title="type_matrix_coo%get_val_coo">
+<polygon fill="#a7506f" stroke="#a7506f" points="983,-360 810,-360 810,-336 983,-336 983,-360"/>
+<text text-anchor="middle" x="896.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_coo%get_val_coo</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_coo&#45;&gt;interface~get_val_coo -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge57" class="edge">
+<title>proc~gemv_matrix_coo&#45;&gt;interface~get_val_coo</title>
+<path fill="none" stroke="#0066ff" d="M708.56,-348C735.16,-348 768.29,-348 799.25,-348"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="799.65,-351.5 809.65,-348 799.65,-344.5 799.65,-351.5"/>
+</g>
+<!-- interface~get_ind_csr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node40" class="node">
+<title>interface~get_ind_csr</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node40"><a xlink:href="../interface/get_ind_csr.html" xlink:title="type_matrix_csr%get_ind_csr">
+<polygon fill="#a7506f" stroke="#a7506f" points="979.5,-654 813.5,-654 813.5,-630 979.5,-630 979.5,-654"/>
+<text text-anchor="middle" x="896.5" y="-639.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_csr%get_ind_csr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_csr&#45;&gt;interface~get_ind_csr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge58" class="edge">
+<title>proc~gemv_matrix_csr&#45;&gt;interface~get_ind_csr</title>
+<path fill="none" stroke="#3200ff" d="M706.79,-658.55C734.79,-656.09 770.42,-652.97 803.16,-650.1"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="803.56,-653.58 813.21,-649.22 802.95,-646.6 803.56,-653.58"/>
+</g>
+<!-- interface~get_info_csr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node43" class="node">
+<title>interface~get_info_csr</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node43"><a xlink:href="../interface/get_info_csr.html" xlink:title="type_matrix_csr%get_info_csr">
+<polygon fill="#a7506f" stroke="#a7506f" points="981.5,-780 811.5,-780 811.5,-756 981.5,-756 981.5,-780"/>
+<text text-anchor="middle" x="896.5" y="-765.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_csr%get_info_csr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_csr&#45;&gt;interface~get_info_csr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge59" class="edge">
+<title>proc~gemv_matrix_csr&#45;&gt;interface~get_info_csr</title>
+<path fill="none" stroke="#3200ff" d="M706.6,-664.81C724.5,-667.54 743.92,-673.09 759,-684 785.13,-702.91 768.92,-728.03 795,-747 797.37,-748.72 799.84,-750.31 802.4,-751.77"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="800.89,-754.93 811.4,-756.27 804.03,-748.67 800.89,-754.93"/>
+</g>
+<!-- interface~get_ptr_csr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node46" class="node">
+<title>interface~get_ptr_csr</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node46"><a xlink:href="../interface/get_ptr_csr.html" xlink:title="type_matrix_csr%get_ptr_csr">
+<polygon fill="#a7506f" stroke="#a7506f" points="979,-738 814,-738 814,-714 979,-714 979,-738"/>
+<text text-anchor="middle" x="896.5" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_csr%get_ptr_csr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_csr&#45;&gt;interface~get_ptr_csr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge60" class="edge">
+<title>proc~gemv_matrix_csr&#45;&gt;interface~get_ptr_csr</title>
+<path fill="none" stroke="#3200ff" d="M706.7,-669.93C723.67,-673.14 742.46,-677.69 759,-684 776.31,-690.6 777.71,-698.35 795,-705 801.15,-707.36 807.62,-709.48 814.18,-711.38"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="813.28,-714.76 823.85,-714 815.11,-708 813.28,-714.76"/>
+</g>
+<!-- interface~get_val_csr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node50" class="node">
+<title>interface~get_val_csr</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node50"><a xlink:href="../interface/get_val_csr.html" xlink:title="type_matrix_csr%get_val_csr">
+<polygon fill="#a7506f" stroke="#a7506f" points="979.5,-696 813.5,-696 813.5,-672 979.5,-672 979.5,-696"/>
+<text text-anchor="middle" x="896.5" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_csr%get_val_csr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_csr&#45;&gt;interface~get_val_csr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge61" class="edge">
+<title>proc~gemv_matrix_csr&#45;&gt;interface~get_val_csr</title>
+<path fill="none" stroke="#3200ff" d="M706.79,-667.45C734.79,-669.91 770.42,-673.03 803.16,-675.9"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="802.95,-679.4 813.21,-676.78 803.56,-672.42 802.95,-679.4"/>
+</g>
+<!-- interface~get_info_dense -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node44" class="node">
+<title>interface~get_info_dense</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node44"><a xlink:href="../interface/get_info_dense.html" xlink:title="type_matrix_dense%get_info_dense">
+<polygon fill="#a7506f" stroke="#a7506f" points="998,-612 795,-612 795,-588 998,-588 998,-612"/>
+<text text-anchor="middle" x="896.5" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dense%get_info_dense</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_dense&#45;&gt;interface~get_info_dense -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge62" class="edge">
+<title>proc~gemv_matrix_dense&#45;&gt;interface~get_info_dense</title>
+<path fill="none" stroke="#cc00ff" d="M715.2,-584.19C736.17,-586.03 760.5,-588.16 784.37,-590.26"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="784.29,-593.76 794.56,-591.15 784.91,-586.79 784.29,-593.76"/>
+</g>
+<!-- proc~get_col_coo -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node57" class="node">
+<title>proc~get_col_coo</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node57"><a xlink:href="../proc/get_col_coo.html" xlink:title="get_col_coo">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1123.5,-318 1047.5,-318 1047.5,-294 1123.5,-294 1123.5,-318"/>
+<text text-anchor="middle" x="1085.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_col_coo</text>
+</a>
+</g>
+</g>
+<!-- interface~get_col_coo&#45;&gt;proc~get_col_coo -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge63" class="edge">
+<title>interface~get_col_coo&#45;&gt;proc~get_col_coo</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M983.06,-306C1001.52,-306 1020.4,-306 1036.79,-306"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1037.16,-309.5 1047.16,-306 1037.16,-302.5 1037.16,-309.5"/>
+</g>
+<!-- proc~get_ind_bsr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node58" class="node">
+<title>proc~get_ind_bsr</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node58"><a xlink:href="../proc/get_ind_bsr.html" xlink:title="get_ind_bsr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1122,-486 1049,-486 1049,-462 1122,-462 1122,-486"/>
+<text text-anchor="middle" x="1085.5" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_ind_bsr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_ind_bsr&#45;&gt;proc~get_ind_bsr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge64" class="edge">
+<title>interface~get_ind_bsr&#45;&gt;proc~get_ind_bsr</title>
+<path fill="none" stroke="#ff5900" stroke-dasharray="5,2" d="M980.61,-474C1000.48,-474 1020.99,-474 1038.48,-474"/>
+<polygon fill="#ff5900" stroke="#ff5900" points="1038.94,-477.5 1048.94,-474 1038.94,-470.5 1038.94,-477.5"/>
+</g>
+<!-- proc~get_ind_csr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node59" class="node">
+<title>proc~get_ind_csr</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node59"><a xlink:href="../proc/get_ind_csr.html" xlink:title="get_ind_csr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1122,-654 1049,-654 1049,-630 1122,-630 1122,-654"/>
+<text text-anchor="middle" x="1085.5" y="-639.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_ind_csr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_ind_csr&#45;&gt;proc~get_ind_csr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge65" class="edge">
+<title>interface~get_ind_csr&#45;&gt;proc~get_ind_csr</title>
+<path fill="none" stroke="#ffb300" stroke-dasharray="5,2" d="M979.52,-642C999.87,-642 1020.95,-642 1038.83,-642"/>
+<polygon fill="#ffb300" stroke="#ffb300" points="1038.96,-645.5 1048.96,-642 1038.96,-638.5 1038.96,-645.5"/>
+</g>
+<!-- proc~get_info_bsr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node60" class="node">
+<title>proc~get_info_bsr</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node60"><a xlink:href="../proc/get_info_bsr.html" xlink:title="get_info_bsr">
+<polygon fill="#d9534f" stroke="#d9534f" points="1124,-444 1047,-444 1047,-420 1124,-420 1124,-444"/>
+<text text-anchor="middle" x="1085.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_info_bsr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_info_bsr&#45;&gt;proc~get_info_bsr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge66" class="edge">
+<title>interface~get_info_bsr&#45;&gt;proc~get_info_bsr</title>
+<path fill="none" stroke="#f0ff00" stroke-dasharray="5,2" d="M982.52,-432C1001.04,-432 1020.01,-432 1036.48,-432"/>
+<polygon fill="#f0ff00" stroke="#f0ff00" points="1036.92,-435.5 1046.92,-432 1036.92,-428.5 1036.92,-435.5"/>
+</g>
+<!-- proc~get_info_coo -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node61" class="node">
+<title>proc~get_info_coo</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node61"><a xlink:href="../proc/get_info_coo.html" xlink:title="get_info_coo">
+<polygon fill="#d9534f" stroke="#d9534f" points="1125.5,-276 1045.5,-276 1045.5,-252 1125.5,-252 1125.5,-276"/>
+<text text-anchor="middle" x="1085.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_info_coo</text>
+</a>
+</g>
+</g>
+<!-- interface~get_info_coo&#45;&gt;proc~get_info_coo -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge67" class="edge">
+<title>interface~get_info_coo&#45;&gt;proc~get_info_coo</title>
+<path fill="none" stroke="#96ff00" stroke-dasharray="5,2" d="M985.52,-264C1002.61,-264 1019.94,-264 1035.23,-264"/>
+<polygon fill="#96ff00" stroke="#96ff00" points="1035.45,-267.5 1045.45,-264 1035.45,-260.5 1035.45,-267.5"/>
+</g>
+<!-- proc~get_info_csr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node62" class="node">
+<title>proc~get_info_csr</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node62"><a xlink:href="../proc/get_info_csr.html" xlink:title="get_info_csr">
+<polygon fill="#d9534f" stroke="#d9534f" points="1123.5,-780 1047.5,-780 1047.5,-756 1123.5,-756 1123.5,-780"/>
+<text text-anchor="middle" x="1085.5" y="-765.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_info_csr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_info_csr&#45;&gt;proc~get_info_csr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge68" class="edge">
+<title>interface~get_info_csr&#45;&gt;proc~get_info_csr</title>
+<path fill="none" stroke="#3cff00" stroke-dasharray="5,2" d="M981.7,-768C1000.65,-768 1020.11,-768 1036.93,-768"/>
+<polygon fill="#3cff00" stroke="#3cff00" points="1037.03,-771.5 1047.03,-768 1037.03,-764.5 1037.03,-771.5"/>
+</g>
+<!-- proc~get_info_dense -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node63" class="node">
+<title>proc~get_info_dense</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node63"><a xlink:href="../proc/get_info_dense.html" xlink:title="get_info_dense">
+<polygon fill="#d9534f" stroke="#d9534f" points="1132,-612 1039,-612 1039,-588 1132,-588 1132,-612"/>
+<text text-anchor="middle" x="1085.5" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_info_dense</text>
+</a>
+</g>
+</g>
+<!-- interface~get_info_dense&#45;&gt;proc~get_info_dense -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge69" class="edge">
+<title>interface~get_info_dense&#45;&gt;proc~get_info_dense</title>
+<path fill="none" stroke="#00ff1e" stroke-dasharray="5,2" d="M998.12,-600C1008.53,-600 1018.82,-600 1028.48,-600"/>
+<polygon fill="#00ff1e" stroke="#00ff1e" points="1028.68,-603.5 1038.68,-600 1028.68,-596.5 1028.68,-603.5"/>
+</g>
+<!-- proc~get_ptr_bsr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node64" class="node">
+<title>proc~get_ptr_bsr</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node64"><a xlink:href="../proc/get_ptr_bsr.html" xlink:title="get_ptr_bsr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1121.5,-570 1049.5,-570 1049.5,-546 1121.5,-546 1121.5,-570"/>
+<text text-anchor="middle" x="1085.5" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_ptr_bsr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_ptr_bsr&#45;&gt;proc~get_ptr_bsr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge70" class="edge">
+<title>interface~get_ptr_bsr&#45;&gt;proc~get_ptr_bsr</title>
+<path fill="none" stroke="#00ff78" stroke-dasharray="5,2" d="M979.52,-558C1000.03,-558 1021.29,-558 1039.26,-558"/>
+<polygon fill="#00ff78" stroke="#00ff78" points="1039.44,-561.5 1049.44,-558 1039.44,-554.5 1039.44,-561.5"/>
+</g>
+<!-- proc~get_ptr_csr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node65" class="node">
+<title>proc~get_ptr_csr</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node65"><a xlink:href="../proc/get_ptr_csr.html" xlink:title="get_ptr_csr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1121,-738 1050,-738 1050,-714 1121,-714 1121,-738"/>
+<text text-anchor="middle" x="1085.5" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_ptr_csr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_ptr_csr&#45;&gt;proc~get_ptr_csr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge71" class="edge">
+<title>interface~get_ptr_csr&#45;&gt;proc~get_ptr_csr</title>
+<path fill="none" stroke="#00ffd1" stroke-dasharray="5,2" d="M979.25,-726C999.95,-726 1021.44,-726 1039.55,-726"/>
+<polygon fill="#00ffd1" stroke="#00ffd1" points="1039.8,-729.5 1049.8,-726 1039.8,-722.5 1039.8,-729.5"/>
+</g>
+<!-- proc~get_row_coo -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node66" class="node">
+<title>proc~get_row_coo</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node66"><a xlink:href="../proc/get_row_coo.html" xlink:title="get_row_coo">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1125,-402 1046,-402 1046,-378 1125,-378 1125,-402"/>
+<text text-anchor="middle" x="1085.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_row_coo</text>
+</a>
+</g>
+</g>
+<!-- interface~get_row_coo&#45;&gt;proc~get_row_coo -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge72" class="edge">
+<title>interface~get_row_coo&#45;&gt;proc~get_row_coo</title>
+<path fill="none" stroke="#00d1ff" stroke-dasharray="5,2" d="M984.7,-390C1002.03,-390 1019.65,-390 1035.17,-390"/>
+<polygon fill="#00d1ff" stroke="#00d1ff" points="1035.54,-393.5 1045.54,-390 1035.54,-386.5 1035.54,-393.5"/>
+</g>
+<!-- proc~get_val_bsr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node67" class="node">
+<title>proc~get_val_bsr</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node67"><a xlink:href="../proc/get_val_bsr.html" xlink:title="get_val_bsr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1122,-528 1049,-528 1049,-504 1122,-504 1122,-528"/>
+<text text-anchor="middle" x="1085.5" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_val_bsr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_val_bsr&#45;&gt;proc~get_val_bsr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge73" class="edge">
+<title>interface~get_val_bsr&#45;&gt;proc~get_val_bsr</title>
+<path fill="none" stroke="#0078ff" stroke-dasharray="5,2" d="M980.07,-516C1000.19,-516 1020.99,-516 1038.68,-516"/>
+<polygon fill="#0078ff" stroke="#0078ff" points="1038.71,-519.5 1048.71,-516 1038.71,-512.5 1038.71,-519.5"/>
+</g>
+<!-- proc~get_val_coo -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node68" class="node">
+<title>proc~get_val_coo</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node68"><a xlink:href="../proc/get_val_coo.html" xlink:title="get_val_coo">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1123.5,-360 1047.5,-360 1047.5,-336 1123.5,-336 1123.5,-360"/>
+<text text-anchor="middle" x="1085.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_val_coo</text>
+</a>
+</g>
+</g>
+<!-- interface~get_val_coo&#45;&gt;proc~get_val_coo -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge74" class="edge">
+<title>interface~get_val_coo&#45;&gt;proc~get_val_coo</title>
+<path fill="none" stroke="#001dff" stroke-dasharray="5,2" d="M983.06,-348C1001.52,-348 1020.4,-348 1036.79,-348"/>
+<polygon fill="#001dff" stroke="#001dff" points="1037.16,-351.5 1047.16,-348 1037.16,-344.5 1037.16,-351.5"/>
+</g>
+<!-- proc~get_val_csr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node69" class="node">
+<title>proc~get_val_csr</title>
+<g id="a_proc~~solve_type_solver_gmres~~CallsGraph_node69"><a xlink:href="../proc/get_val_csr.html" xlink:title="get_val_csr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1121.5,-696 1049.5,-696 1049.5,-672 1121.5,-672 1121.5,-696"/>
+<text text-anchor="middle" x="1085.5" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_val_csr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_val_csr&#45;&gt;proc~get_val_csr -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge75" class="edge">
+<title>interface~get_val_csr&#45;&gt;proc~get_val_csr</title>
+<path fill="none" stroke="#3c00ff" stroke-dasharray="5,2" d="M979.52,-684C1000.03,-684 1021.29,-684 1039.26,-684"/>
+<polygon fill="#3c00ff" stroke="#3c00ff" points="1039.44,-687.5 1049.44,-684 1039.44,-680.5 1039.44,-687.5"/>
+</g>
+<!-- deallocate_array -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node56" class="node">
+<title>deallocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="1137,-864 1034,-864 1034,-840 1137,-840 1137,-864"/>
+<text text-anchor="middle" x="1085.5" y="-849.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_array</text>
+</g>
+<!-- proc~destroy_vector_dp&#45;&gt;deallocate_array -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge76" class="edge">
+<title>proc~destroy_vector_dp&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#9500ff" d="M951.09,-852C973.74,-852 1000.25,-852 1023.64,-852"/>
+<polygon fill="#9500ff" stroke="#9500ff" points="1023.8,-855.5 1033.8,-852 1023.8,-848.5 1023.8,-855.5"/>
+</g>
+<!-- allocate_array -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_node55" class="node">
+<title>allocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="1130,-822 1041,-822 1041,-798 1130,-798 1130,-822"/>
+<text text-anchor="middle" x="1085.5" y="-807.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</g>
+<!-- proc~initialize_vector_dp&#45;&gt;allocate_array -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge77" class="edge">
+<title>proc~initialize_vector_dp&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#ff005a" d="M954.11,-810C978.48,-810 1006.82,-810 1030.84,-810"/>
+<polygon fill="#ff005a" stroke="#ff005a" points="1030.85,-813.5 1040.85,-810 1030.85,-806.5 1030.85,-813.5"/>
+</g>
+<!-- proc~initialize_vector_dp&#45;&gt;deallocate_array -->
+<g id="proc~~solve_type_solver_gmres~~CallsGraph_edge78" class="edge">
+<title>proc~initialize_vector_dp&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#ff005a" d="M954.18,-821.51C968.5,-824.51 983.83,-827.8 998,-831 1007.17,-833.07 1016.87,-835.34 1026.33,-837.61"/>
+<polygon fill="#ff005a" stroke="#ff005a" points="1025.53,-841.01 1036.07,-839.95 1027.17,-834.21 1025.53,-841.01"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocsolve_type_solver_gmresCallsGraph = svgPanZoom('#procsolve_type_solver_gmresCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~solve_type_solver_gmres~~CalledByGraph Pages: 1 -->
+<svg id="procsolve_type_solver_gmresCalledByGraph" width="442pt" height="32pt"
+ viewBox="0.00 0.00 442.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~solve_type_solver_gmres~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~solve_type_solver_gmres~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 438,-28 438,4 -4,4"/>
+<!-- proc~solve_type_solver_gmres -->
+<g id="proc~~solve_type_solver_gmres~~CalledByGraph_node1" class="node">
+<title>proc~solve_type_solver_gmres</title>
+<polygon fill="none" stroke="black" points="434,-24 289,-24 289,0 434,0 434,-24"/>
+<text text-anchor="middle" x="361.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">solve_type_solver_gmres</text>
+</g>
+<!-- interface~solve_type_solver_gmres -->
+<g id="proc~~solve_type_solver_gmres~~CalledByGraph_node2" class="node">
+<title>interface~solve_type_solver_gmres</title>
+<g id="a_proc~~solve_type_solver_gmres~~CalledByGraph_node2"><a xlink:href="../interface/solve_type_solver_gmres.html" xlink:title="type_solver_gmres%solve_type_solver_gmres">
+<polygon fill="#a7506f" stroke="#a7506f" points="253,-24 0,-24 0,0 253,0 253,-24"/>
+<text text-anchor="middle" x="126.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_solver_gmres%solve_type_solver_gmres</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_type_solver_gmres&#45;&gt;proc~solve_type_solver_gmres -->
+<g id="proc~~solve_type_solver_gmres~~CalledByGraph_edge1" class="edge">
+<title>interface~solve_type_solver_gmres&#45;&gt;proc~solve_type_solver_gmres</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M253.21,-12C261.75,-12 270.22,-12 278.44,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="278.7,-15.5 288.7,-12 278.7,-8.5 278.7,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">solve_type_solver_gmres</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="w">        </span><span class="c">!&gt; Solver instance</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">type_solver_gmres</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="c">!&gt; System matrix \( A \)</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">abst_matrix</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">A</span>
+<span class="w">        </span><span class="c">!&gt; Right-hand side vector \( b \)</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_vector_dp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">b</span>
+<span class="w">        </span><span class="c">!&gt; Solution vector (initial guess on input, result on output)</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_vector_dp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">x</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">beta</span><span class="p">,</span><span class="w"> </span><span class="n">w_norm</span><span class="p">,</span><span class="w"> </span><span class="n">temp_val</span><span class="p">,</span><span class="w"> </span><span class="n">resid</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">ierr</span><span class="p">,</span><span class="w"> </span><span class="n">iter_global</span><span class="p">,</span><span class="w"> </span><span class="n">iter</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">converged</span>
+
+<span class="w">        </span><span class="c">! Initialize</span>
+<span class="w">        </span><span class="n">iter_global</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">current_iteration</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="n">converged</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+
+<span class="w">        </span><span class="c">! Clear history</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">residual_history</span><span class="p">%</span><span class="n">zero</span><span class="p">()</span>
+
+<span class="w">        </span><span class="c">! Setup Preconditioner</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">pc</span><span class="p">%</span><span class="n">setup</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! ==========================================================</span>
+<span class="w">        </span><span class="c">! Restart Loop (Outer Loop)</span>
+<span class="w">        </span><span class="c">! ==========================================================</span>
+<span class="w">        </span><span class="n">restart_loop</span><span class="p">:</span><span class="w"> </span><span class="k">do</span>
+
+<span class="w">            </span><span class="c">! ------------------------------------------------------</span>
+<span class="w">            </span><span class="c">! 1. Compute initial residual: r0 = b - Ax</span>
+<span class="w">            </span><span class="c">! ------------------------------------------------------</span>
+<span class="w">            </span><span class="c">! Note: Recompute true residual from current x at every restart</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">r</span><span class="p">%</span><span class="n">zero</span><span class="p">()</span>
+<span class="w">            </span><span class="k">call </span><span class="n">matvec</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">ierr</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">vector_axpyz</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">r</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c">! beta = ||r0||_2</span>
+<span class="w">            </span><span class="n">beta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vector_norm2</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">r</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c">! Save history (first iteration or every restart)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">iter_global</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">residual_history</span><span class="p">%</span><span class="n">set</span><span class="p">(</span><span class="n">OP_INS</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">beta</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c">! Convergence check (Initial)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">beta</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">tolerance</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SOLVER_STATUS_SUCCESS</span>
+<span class="w">                </span><span class="k">exit </span><span class="n">restart_loop</span>
+<span class="w">            </span><span class="k">end if</span>
+
+<span class="w">            </span><span class="c">! ------------------------------------------------------</span>
+<span class="w">            </span><span class="c">! 2. Initialize basis: v1 = r0 / beta</span>
+<span class="w">            </span><span class="c">! ------------------------------------------------------</span>
+<span class="w">            </span><span class="c">! Reset arrays</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">h</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">g</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">cs</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">sn</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">y</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+
+<span class="w">            </span><span class="c">! Initialize RHS vector g: g = [beta, 0, ..., 0]^T</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">g</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">beta</span>
+
+<span class="w">            </span><span class="c">! Set v1</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">v</span><span class="p">(</span><span class="mi">1</span><span class="p">)%</span><span class="n">copy</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">r</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">vector_scale</span><span class="p">(</span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">beta</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">v</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="w">            </span><span class="c">! ======================================================</span>
+<span class="w">            </span><span class="c">! Arnoldi Loop (Inner Loop)</span>
+<span class="w">            </span><span class="c">! ======================================================</span>
+<span class="w">            </span><span class="n">arnoldi_loop</span><span class="p">:</span><span class="w"> </span><span class="k">do </span><span class="n">iter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">m_restart</span>
+<span class="w">                </span><span class="n">iter_global</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">iter_global</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">current_iteration</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">iter_global</span>
+<span class="w">                </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">iter</span>
+
+<span class="w">                </span><span class="c">! --------------------------------------------------</span>
+<span class="w">                </span><span class="c">! Step 5: w = A * M^-1 * v_i (Right Preconditioning)</span>
+<span class="w">                </span><span class="c">! --------------------------------------------------</span>
+<span class="w">                </span><span class="c">! 1. Preconditioning: z = M^-1 * v(iter)</span>
+<span class="w">                </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">pc</span><span class="p">%</span><span class="n">apply</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">v</span><span class="p">(</span><span class="n">iter</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">z</span><span class="p">)</span>
+
+<span class="w">                </span><span class="c">! 2. Matrix-Vector Product: w = A * z</span>
+<span class="w">                </span><span class="k">call </span><span class="n">matvec</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">w</span><span class="p">,</span><span class="w"> </span><span class="n">ierr</span><span class="p">)</span>
+
+<span class="w">                </span><span class="c">! --------------------------------------------------</span>
+<span class="w">                </span><span class="c">! Step 6-9: Modified Gram-Schmidt (MGS)</span>
+<span class="w">                </span><span class="c">! --------------------------------------------------</span>
+<span class="w">                </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">iter</span>
+<span class="w">                    </span><span class="c">! Dot product h(i, iter) = (w, v(i))</span>
+<span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">iter</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vector_dot</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">w</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">v</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<span class="w">                    </span><span class="c">! Orthogonalization w = w - h(i, iter) * v(i)</span>
+<span class="w">                    </span><span class="k">call </span><span class="n">vector_axpy</span><span class="p">(</span><span class="o">-</span><span class="n">self</span><span class="p">%</span><span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">iter</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">v</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">w</span><span class="p">)</span>
+<span class="w">                </span><span class="k">end do</span>
+
+<span class="w">                </span><span class="c">! --------------------------------------------------</span>
+<span class="w">                </span><span class="c">! Step 10-11: Normalize &amp; Breakdown Check</span>
+<span class="w">                </span><span class="c">! --------------------------------------------------</span>
+<span class="w">                </span><span class="n">w_norm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vector_norm2</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">w</span><span class="p">)</span>
+
+<span class="w">                </span><span class="c">! Happy Breakdown check</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">w_norm</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">1.0d-20</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    </span><span class="n">self</span><span class="p">%</span><span class="n">h</span><span class="p">(</span><span class="n">iter</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">iter</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">                    </span><span class="c">! Cannot extend basis further; break loop (residual should be small)</span>
+<span class="w">                    </span><span class="k">exit </span><span class="n">arnoldi_loop</span>
+<span class="w">                </span><span class="k">else</span>
+<span class="k">                    </span><span class="n">self</span><span class="p">%</span><span class="n">h</span><span class="p">(</span><span class="n">iter</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">iter</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">w_norm</span>
+<span class="w">                    </span><span class="c">! v(iter+1) = w / w_norm</span>
+<span class="w">                    </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">v</span><span class="p">(</span><span class="n">iter</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)%</span><span class="n">copy</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">w</span><span class="p">)</span>
+<span class="w">                    </span><span class="k">call </span><span class="n">vector_scale</span><span class="p">(</span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">w_norm</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">v</span><span class="p">(</span><span class="n">iter</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span>
+<span class="w">                </span><span class="k">end if</span>
+
+<span class="w">                </span><span class="c">! --------------------------------------------------</span>
+<span class="w">                </span><span class="c">! Givens Rotations</span>
+<span class="w">                </span><span class="c">! --------------------------------------------------</span>
+<span class="w">                </span><span class="c">! Apply previous rotations</span>
+<span class="w">                </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">iter</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">                    </span><span class="n">temp_val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">cs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">iter</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">sn</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">iter</span><span class="p">)</span>
+<span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">iter</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">self</span><span class="p">%</span><span class="n">sn</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">iter</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">cs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">iter</span><span class="p">)</span>
+<span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">iter</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">temp_val</span>
+<span class="w">                </span><span class="k">end do</span>
+
+<span class="w">                </span><span class="c">! Generate new rotation</span>
+<span class="w">                </span><span class="k">call </span><span class="n">generate_givens_rotation</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">h</span><span class="p">(</span><span class="n">iter</span><span class="p">,</span><span class="w"> </span><span class="n">iter</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">h</span><span class="p">(</span><span class="n">iter</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">iter</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">cs</span><span class="p">(</span><span class="n">iter</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">sn</span><span class="p">(</span><span class="n">iter</span><span class="p">))</span>
+
+<span class="w">                </span><span class="c">! Apply rotation to current column (Diagonalize)</span>
+<span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">h</span><span class="p">(</span><span class="n">iter</span><span class="p">,</span><span class="w"> </span><span class="n">iter</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">cs</span><span class="p">(</span><span class="n">iter</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">h</span><span class="p">(</span><span class="n">iter</span><span class="p">,</span><span class="w"> </span><span class="n">iter</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">sn</span><span class="p">(</span><span class="n">iter</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">h</span><span class="p">(</span><span class="n">iter</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">iter</span><span class="p">)</span>
+<span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">h</span><span class="p">(</span><span class="n">iter</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">iter</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+
+<span class="w">                </span><span class="c">! Apply rotation to RHS vector g</span>
+<span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">g</span><span class="p">(</span><span class="n">iter</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">self</span><span class="p">%</span><span class="n">sn</span><span class="p">(</span><span class="n">iter</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">g</span><span class="p">(</span><span class="n">iter</span><span class="p">)</span>
+<span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">g</span><span class="p">(</span><span class="n">iter</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">cs</span><span class="p">(</span><span class="n">iter</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">g</span><span class="p">(</span><span class="n">iter</span><span class="p">)</span>
+
+<span class="w">                </span><span class="c">! --------------------------------------------------</span>
+<span class="w">                </span><span class="c">! Convergence Check</span>
+<span class="w">                </span><span class="c">! --------------------------------------------------</span>
+<span class="w">                </span><span class="n">resid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">abs</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">g</span><span class="p">(</span><span class="n">iter</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span>
+<span class="w">                </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">residual_history</span><span class="p">%</span><span class="n">set</span><span class="p">(</span><span class="n">OP_INS</span><span class="p">,</span><span class="w"> </span><span class="n">iter_global</span><span class="p">,</span><span class="w"> </span><span class="n">resid</span><span class="p">)</span>
+
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">resid</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">tolerance</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    </span><span class="n">converged</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">                    </span><span class="k">exit </span><span class="n">arnoldi_loop</span>
+<span class="w">                </span><span class="k">end if</span>
+
+<span class="k">                if</span><span class="w"> </span><span class="p">(</span><span class="n">iter_global</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">max_iterations</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SOLVER_STATUS_MAXITER</span>
+<span class="w">                    </span><span class="k">exit </span><span class="n">arnoldi_loop</span>
+<span class="w">                </span><span class="k">end if</span>
+
+<span class="k">            end do </span><span class="n">arnoldi_loop</span>
+
+<span class="w">            </span><span class="c">! ======================================================</span>
+<span class="w">            </span><span class="c">! Update Solution</span>
+<span class="w">            </span><span class="c">! ======================================================</span>
+
+<span class="w">            </span><span class="c">! 1. Calculate Least Squares solution y (Solve upper triangular Hy = g)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">backward_substitution</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">h</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">g</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">y</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c">! 2. x_update = V * y (Update vector in non-preconditioned space)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">x_update</span><span class="p">%</span><span class="n">zero</span><span class="p">()</span>
+<span class="w">            </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">k</span>
+<span class="w">                </span><span class="k">call </span><span class="n">vector_axpy</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">y</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">v</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">x_update</span><span class="p">)</span>
+<span class="w">            </span><span class="k">end do</span>
+
+<span class="w">            </span><span class="c">! 3. Map to preconditioned space: z = M^-1 * x_update</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">pc</span><span class="p">%</span><span class="n">apply</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">x_update</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">z</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c">! 4. Update true solution: x = x + z</span>
+<span class="w">            </span><span class="k">call </span><span class="n">vector_axpy</span><span class="p">(</span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c">! ======================================================</span>
+<span class="w">            </span><span class="c">! Restart Check</span>
+<span class="w">            </span><span class="c">! ======================================================</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">converged</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SOLVER_STATUS_SUCCESS</span>
+<span class="w">                </span><span class="k">exit </span><span class="n">restart_loop</span>
+<span class="w">            </span><span class="k">end if</span>
+
+<span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">SOLVER_STATUS_MAXITER</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                exit </span><span class="n">restart_loop</span>
+<span class="w">            </span><span class="k">end if</span>
+
+<span class="k">        end do </span><span class="n">restart_loop</span>
+
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">solve_type_solver_gmres</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

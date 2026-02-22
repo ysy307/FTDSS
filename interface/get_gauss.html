@@ -1,0 +1,962 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>get_gauss &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>get_gauss
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">60 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/fe_interface.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/fe_interface.f90.html'>fe_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/domain_base_fe.html'>domain_base_fe</a></li>
+            <li class="breadcrumb-item active" aria-current="page">get_gauss</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+    <em>None</em>
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>interface</h2>
+      
+      <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~get_gauss~~CallsGraph Pages: 1 -->
+<svg id="interfaceget_gaussCallsGraph" width="224pt" height="32pt"
+ viewBox="0.00 0.00 224.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~get_gauss~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>interface~~get_gauss~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 220,-28 220,4 -4,4"/>
+<!-- interface~get_gauss -->
+<g id="interface~~get_gauss~~CallsGraph_node1" class="node">
+<title>interface~get_gauss</title>
+<polygon fill="none" stroke="black" points="114,-24 0,-24 0,0 114,0 114,-24"/>
+<text text-anchor="middle" x="57" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">abst_fe%get_gauss</text>
+</g>
+<!-- proc~get_gauss -->
+<g id="interface~~get_gauss~~CallsGraph_node2" class="node">
+<title>proc~get_gauss</title>
+<g id="a_interface~~get_gauss~~CallsGraph_node2"><a xlink:href="../proc/get_gauss.html" xlink:title="get_gauss">
+<polygon fill="#d9534f" stroke="#d9534f" points="216,-24 150,-24 150,0 216,0 216,-24"/>
+<text text-anchor="middle" x="183" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_gauss</text>
+</a>
+</g>
+</g>
+<!-- interface~get_gauss&#45;&gt;proc~get_gauss -->
+<g id="interface~~get_gauss~~CallsGraph_edge1" class="edge">
+<title>interface~get_gauss&#45;&gt;proc~get_gauss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M114.2,-12C122.76,-12 131.47,-12 139.66,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="139.72,-15.5 149.72,-12 139.72,-8.5 139.72,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~get_gauss~~CalledByGraph Pages: 1 -->
+<svg id="interfaceget_gaussCalledByGraph" width="641pt" height="78pt"
+ viewBox="0.00 0.00 641.00 77.85" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~get_gauss~~CalledByGraph" class="graph" transform="scale(0.28 0.28) rotate(0) translate(4 276.2)">
+<title>interface~~get_gauss~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-276.2 2303,-276.2 2303,4 -4,4"/>
+<!-- interface~get_gauss -->
+<g id="interface~~get_gauss~~CalledByGraph_node1" class="node">
+<title>interface~get_gauss</title>
+<polygon fill="none" stroke="black" points="2299,-150 2185,-150 2185,-126 2299,-126 2299,-150"/>
+<text text-anchor="middle" x="2242" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50">abst_fe%get_gauss</text>
+</g>
+<!-- proc~apply_natural_bc_generic -->
+<g id="interface~~get_gauss~~CalledByGraph_node2" class="node">
+<title>proc~apply_natural_bc_generic</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node2"><a xlink:href="../proc/apply_natural_bc_generic.html" xlink:title="apply_natural_bc_generic">
+<polygon fill="#d9534f" stroke="#d9534f" points="1559,-241 1410,-241 1410,-217 1559,-217 1559,-241"/>
+<text text-anchor="middle" x="1484.5" y="-226.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">apply_natural_bc_generic</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_natural_bc_generic&#45;&gt;interface~get_gauss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge1" class="edge">
+<title>proc~apply_natural_bc_generic&#45;&gt;interface~get_gauss</title>
+<path fill="none" stroke="#ff0000" d="M1540,-241.05C1656.64,-264.17 1937.05,-305.49 2149,-222 2181.75,-209.1 2210.04,-178.65 2226.31,-158.18"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2229.2,-160.16 2232.52,-150.1 2223.65,-155.89 2229.2,-160.16"/>
+</g>
+<!-- proc~calc_area_square_first -->
+<g id="interface~~get_gauss~~CalledByGraph_node3" class="node">
+<title>proc~calc_area_square_first</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node3"><a xlink:href="../proc/calc_area_square_first.html" xlink:title="calc_area_square_first">
+<polygon fill="#d9534f" stroke="#d9534f" points="2103,-213 1973,-213 1973,-189 2103,-189 2103,-213"/>
+<text text-anchor="middle" x="2038" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_area_square_first</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_area_square_first&#45;&gt;interface~get_gauss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge2" class="edge">
+<title>proc~calc_area_square_first&#45;&gt;interface~get_gauss</title>
+<path fill="none" stroke="#ff0000" d="M2103.05,-191.45C2118.29,-188.45 2134.37,-184.66 2149,-180 2169.75,-173.39 2191.99,-163.32 2209.4,-154.71"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2211.19,-157.73 2218.54,-150.1 2208.04,-151.47 2211.19,-157.73"/>
+</g>
+<!-- proc~calc_area_square_second -->
+<g id="interface~~get_gauss~~CalledByGraph_node4" class="node">
+<title>proc~calc_area_square_second</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node4"><a xlink:href="../proc/calc_area_square_second.html" xlink:title="calc_area_square_second">
+<polygon fill="#d9534f" stroke="#d9534f" points="2112,-171 1964,-171 1964,-147 2112,-147 2112,-171"/>
+<text text-anchor="middle" x="2038" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_area_square_second</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_area_square_second&#45;&gt;interface~get_gauss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge3" class="edge">
+<title>proc~calc_area_square_second&#45;&gt;interface~get_gauss</title>
+<path fill="none" stroke="#ff0000" d="M2112.21,-151.39C2132.69,-149.26 2154.82,-146.96 2174.86,-144.88"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2175.24,-148.36 2184.82,-143.84 2174.51,-141.39 2175.24,-148.36"/>
+</g>
+<!-- proc~calc_area_triangle_second -->
+<g id="interface~~get_gauss~~CalledByGraph_node5" class="node">
+<title>proc~calc_area_triangle_second</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node5"><a xlink:href="../proc/calc_area_triangle_second.html" xlink:title="calc_area_triangle_second">
+<polygon fill="#d9534f" stroke="#d9534f" points="2115,-129 1961,-129 1961,-105 2115,-105 2115,-129"/>
+<text text-anchor="middle" x="2038" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_area_triangle_second</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_area_triangle_second&#45;&gt;interface~get_gauss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge4" class="edge">
+<title>proc~calc_area_triangle_second&#45;&gt;interface~get_gauss</title>
+<path fill="none" stroke="#ff0000" d="M2115.08,-124.91C2134.7,-126.95 2155.67,-129.13 2174.74,-131.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2174.52,-134.61 2184.83,-132.16 2175.25,-127.65 2174.52,-134.61"/>
+</g>
+<!-- proc~calc_gradient_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node6" class="node">
+<title>proc~calc_gradient_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node6"><a xlink:href="../proc/calc_gradient_ftdss.html" xlink:title="calc_gradient_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="2095.5,-45 1980.5,-45 1980.5,-21 2095.5,-21 2095.5,-45"/>
+<text text-anchor="middle" x="2038" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_gradient_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_ftdss&#45;&gt;interface~get_gauss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge5" class="edge">
+<title>proc~calc_gradient_ftdss&#45;&gt;interface~get_gauss</title>
+<path fill="none" stroke="#ff0000" d="M2095.77,-37.75C2113.49,-40.81 2132.66,-45.82 2149,-54 2179.97,-69.51 2208.19,-98.48 2224.98,-118.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2222.35,-120.31 2231.46,-125.73 2227.72,-115.82 2222.35,-120.31"/>
+</g>
+<!-- proc~lerp_states -->
+<g id="interface~~get_gauss~~CalledByGraph_node7" class="node">
+<title>proc~lerp_states</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node7"><a xlink:href="../proc/lerp_states.html" xlink:title="type_assemble_workspace%lerp_states">
+<polygon fill="#d9534f" stroke="#d9534f" points="2149,-87 1927,-87 1927,-63 2149,-63 2149,-87"/>
+<text text-anchor="middle" x="2038" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assemble_workspace%lerp_states</text>
+</a>
+</g>
+</g>
+<!-- proc~lerp_states&#45;&gt;interface~get_gauss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge6" class="edge">
+<title>proc~lerp_states&#45;&gt;interface~get_gauss</title>
+<path fill="none" stroke="#ff0000" d="M2115.04,-87.05C2126.53,-89.58 2138.16,-92.55 2149,-96 2169.75,-102.61 2191.99,-112.68 2209.4,-121.29"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2208.04,-124.53 2218.54,-125.9 2211.19,-118.27 2208.04,-124.53"/>
+</g>
+<!-- interface~apply_natural_bc_generic -->
+<g id="interface~~get_gauss~~CalledByGraph_node8" class="node">
+<title>interface~apply_natural_bc_generic</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node8"><a xlink:href="../interface/apply_natural_bc_generic.html" xlink:title="type_ftdss%apply_natural_bc_generic">
+<polygon fill="#a7506f" stroke="#a7506f" points="1336,-229 1124,-229 1124,-205 1336,-205 1336,-229"/>
+<text text-anchor="middle" x="1230" y="-214.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%apply_natural_bc_generic</text>
+</a>
+</g>
+</g>
+<!-- interface~apply_natural_bc_generic&#45;&gt;proc~apply_natural_bc_generic -->
+<g id="interface~~get_gauss~~CalledByGraph_edge7" class="edge">
+<title>interface~apply_natural_bc_generic&#45;&gt;proc~apply_natural_bc_generic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1336.25,-222C1357.44,-223.01 1379.43,-224.05 1399.76,-225.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1399.76,-228.52 1409.91,-225.5 1400.09,-221.53 1399.76,-228.52"/>
+</g>
+<!-- interface~calc_area_square_first -->
+<g id="interface~~get_gauss~~CalledByGraph_node9" class="node">
+<title>interface~calc_area_square_first</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node9"><a xlink:href="../interface/calc_area_square_first.html" xlink:title="type_square_first%calc_area_square_first">
+<polygon fill="#a7506f" stroke="#a7506f" points="1867.5,-213 1637.5,-213 1637.5,-189 1867.5,-189 1867.5,-213"/>
+<text text-anchor="middle" x="1752.5" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_square_first%calc_area_square_first</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_area_square_first&#45;&gt;proc~calc_area_square_first -->
+<g id="interface~~get_gauss~~CalledByGraph_edge8" class="edge">
+<title>interface~calc_area_square_first&#45;&gt;proc~calc_area_square_first</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M1867.58,-201C1899.65,-201 1933.69,-201 1962.77,-201"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="1962.84,-204.5 1972.84,-201 1962.84,-197.5 1962.84,-204.5"/>
+</g>
+<!-- interface~calc_area_square_second -->
+<g id="interface~~get_gauss~~CalledByGraph_node10" class="node">
+<title>interface~calc_area_square_second</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node10"><a xlink:href="../interface/calc_area_square_second.html" xlink:title="type_square_second%calc_area_square_second">
+<polygon fill="#a7506f" stroke="#a7506f" points="1885.5,-171 1619.5,-171 1619.5,-147 1885.5,-147 1885.5,-171"/>
+<text text-anchor="middle" x="1752.5" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_square_second%calc_area_square_second</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_area_square_second&#45;&gt;proc~calc_area_square_second -->
+<g id="interface~~get_gauss~~CalledByGraph_edge9" class="edge">
+<title>interface~calc_area_square_second&#45;&gt;proc~calc_area_square_second</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1885.7,-159C1908.78,-159 1932.19,-159 1953.48,-159"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1953.75,-162.5 1963.75,-159 1953.75,-155.5 1953.75,-162.5"/>
+</g>
+<!-- interface~calc_area_triangle_second -->
+<g id="interface~~get_gauss~~CalledByGraph_node11" class="node">
+<title>interface~calc_area_triangle_second</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node11"><a xlink:href="../interface/calc_area_triangle_second.html" xlink:title="type_triangle_second%calc_area_triangle_second">
+<polygon fill="#a7506f" stroke="#a7506f" points="1891,-129 1614,-129 1614,-105 1891,-105 1891,-129"/>
+<text text-anchor="middle" x="1752.5" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_triangle_second%calc_area_triangle_second</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_area_triangle_second&#45;&gt;proc~calc_area_triangle_second -->
+<g id="interface~~get_gauss~~CalledByGraph_edge10" class="edge">
+<title>interface~calc_area_triangle_second&#45;&gt;proc~calc_area_triangle_second</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1891.1,-117C1911.43,-117 1931.87,-117 1950.75,-117"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1950.77,-120.5 1960.77,-117 1950.77,-113.5 1950.77,-120.5"/>
+</g>
+<!-- interface~calc_gradient_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node12" class="node">
+<title>interface~calc_gradient_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node12"><a xlink:href="../interface/calc_gradient_ftdss.html" xlink:title="type_ftdss%calc_gradient_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1841.5,-45 1663.5,-45 1663.5,-21 1841.5,-21 1841.5,-45"/>
+<text text-anchor="middle" x="1752.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%calc_gradient_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_gradient_ftdss&#45;&gt;proc~calc_gradient_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge11" class="edge">
+<title>interface~calc_gradient_ftdss&#45;&gt;proc~calc_gradient_ftdss</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M1841.65,-33C1883.13,-33 1931.79,-33 1970.17,-33"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1970.2,-36.5 1980.2,-33 1970.2,-29.5 1970.2,-36.5"/>
+</g>
+<!-- proc~assemble_initialize_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node13" class="node">
+<title>proc~assemble_initialize_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node13"><a xlink:href="../proc/assemble_initialize_ftdss.html" xlink:title="assemble_initialize_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1556,-108 1413,-108 1413,-84 1556,-84 1556,-108"/>
+<text text-anchor="middle" x="1484.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_initialize_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_initialize_ftdss&#45;&gt;proc~lerp_states -->
+<g id="interface~~get_gauss~~CalledByGraph_edge12" class="edge">
+<title>proc~assemble_initialize_ftdss&#45;&gt;proc~lerp_states</title>
+<path fill="none" stroke="#ff00ff" d="M1556.19,-93.31C1647.16,-89.84 1806.58,-83.77 1916.77,-79.58"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="1917.08,-83.07 1926.94,-79.19 1916.81,-76.07 1917.08,-83.07"/>
+</g>
+<!-- interface~assemble_initialize_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node14" class="node">
+<title>interface~assemble_initialize_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node14"><a xlink:href="../interface/assemble_initialize_ftdss.html" xlink:title="type_ftdss%assemble_initialize_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1333,-108 1127,-108 1127,-84 1333,-84 1333,-108"/>
+<text text-anchor="middle" x="1230" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_initialize_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_initialize_ftdss&#45;&gt;proc~assemble_initialize_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge16" class="edge">
+<title>interface~assemble_initialize_ftdss&#45;&gt;proc~assemble_initialize_ftdss</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M1333.34,-96C1356.35,-96 1380.46,-96 1402.47,-96"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="1402.75,-99.5 1412.75,-96 1402.75,-92.5 1402.75,-99.5"/>
+</g>
+<!-- proc~apply_bc_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node15" class="node">
+<title>proc~apply_bc_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node15"><a xlink:href="../proc/apply_bc_ftdss.html" xlink:title="apply_bc_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1033,-206 943,-206 943,-182 1033,-182 1033,-206"/>
+<text text-anchor="middle" x="988" y="-191.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">apply_bc_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_bc_ftdss&#45;&gt;interface~apply_natural_bc_generic -->
+<g id="interface~~get_gauss~~CalledByGraph_edge13" class="edge">
+<title>proc~apply_bc_ftdss&#45;&gt;interface~apply_natural_bc_generic</title>
+<path fill="none" stroke="#ff0000" d="M1033.02,-198.22C1055.9,-200.41 1085.04,-203.2 1113.81,-205.96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1113.67,-209.46 1123.96,-206.93 1114.34,-202.5 1113.67,-209.46"/>
+</g>
+<!-- proc~calc_gradient_pressure_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node16" class="node">
+<title>proc~calc_gradient_pressure_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node16"><a xlink:href="../proc/calc_gradient_pressure_ftdss.html" xlink:title="calc_gradient_pressure_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1567,-24 1402,-24 1402,0 1567,0 1567,-24"/>
+<text text-anchor="middle" x="1484.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_gradient_pressure_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_pressure_ftdss&#45;&gt;interface~calc_gradient_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge14" class="edge">
+<title>proc~calc_gradient_pressure_ftdss&#45;&gt;interface~calc_gradient_ftdss</title>
+<path fill="none" stroke="#0000ff" d="M1567.12,-18.44C1594.18,-20.58 1624.61,-22.98 1652.82,-25.21"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1652.86,-28.72 1663.1,-26.02 1653.41,-21.74 1652.86,-28.72"/>
+</g>
+<!-- proc~calc_gradient_temperature_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node17" class="node">
+<title>proc~calc_gradient_temperature_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node17"><a xlink:href="../proc/calc_gradient_temperature_ftdss.html" xlink:title="calc_gradient_temperature_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1578,-66 1391,-66 1391,-42 1578,-42 1578,-66"/>
+<text text-anchor="middle" x="1484.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_gradient_temperature_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_temperature_ftdss&#45;&gt;interface~calc_gradient_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge15" class="edge">
+<title>proc~calc_gradient_temperature_ftdss&#45;&gt;interface~calc_gradient_ftdss</title>
+<path fill="none" stroke="#0000ff" d="M1578.16,-46.68C1602.41,-44.77 1628.63,-42.7 1653.16,-40.76"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1653.5,-44.25 1663.2,-39.97 1652.95,-37.27 1653.5,-44.25"/>
+</g>
+<!-- interface~apply_bc_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node18" class="node">
+<title>interface~apply_bc_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node18"><a xlink:href="../interface/apply_bc_ftdss.html" xlink:title="type_ftdss%apply_bc_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="835,-160 682,-160 682,-136 835,-136 835,-160"/>
+<text text-anchor="middle" x="758.5" y="-145.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%apply_bc_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~apply_bc_ftdss&#45;&gt;proc~apply_bc_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge18" class="edge">
+<title>interface~apply_bc_ftdss&#45;&gt;proc~apply_bc_ftdss</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M818.98,-160.03C854.32,-167.17 898.81,-176.17 933.12,-183.11"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="932.47,-186.55 942.97,-185.1 933.86,-179.68 932.47,-186.55"/>
+</g>
+<!-- interface~calc_gradient_pressure_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node19" class="node">
+<title>interface~calc_gradient_pressure_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node19"><a xlink:href="../interface/calc_gradient_pressure_ftdss.html" xlink:title="type_ftdss%calc_gradient_pressure_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1344,-24 1116,-24 1116,0 1344,0 1344,-24"/>
+<text text-anchor="middle" x="1230" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%calc_gradient_pressure_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_gradient_pressure_ftdss&#45;&gt;proc~calc_gradient_pressure_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge19" class="edge">
+<title>interface~calc_gradient_pressure_ftdss&#45;&gt;proc~calc_gradient_pressure_ftdss</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1344.32,-12C1360.24,-12 1376.44,-12 1391.88,-12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1391.91,-15.5 1401.91,-12 1391.91,-8.5 1391.91,-15.5"/>
+</g>
+<!-- interface~calc_gradient_temperature_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node20" class="node">
+<title>interface~calc_gradient_temperature_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node20"><a xlink:href="../interface/calc_gradient_temperature_ftdss.html" xlink:title="type_ftdss%calc_gradient_temperature_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1355,-66 1105,-66 1105,-42 1355,-42 1355,-66"/>
+<text text-anchor="middle" x="1230" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%calc_gradient_temperature_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_gradient_temperature_ftdss&#45;&gt;proc~calc_gradient_temperature_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge20" class="edge">
+<title>interface~calc_gradient_temperature_ftdss&#45;&gt;proc~calc_gradient_temperature_ftdss</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1355.03,-54C1363.63,-54 1372.25,-54 1380.71,-54"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1380.96,-57.5 1390.96,-54 1380.96,-50.5 1380.96,-57.5"/>
+</g>
+<!-- proc~assemble_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node21" class="node">
+<title>proc~assemble_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node21"><a xlink:href="../proc/assemble_ftdss.html" xlink:title="assemble_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1035,-108 941,-108 941,-84 1035,-84 1035,-108"/>
+<text text-anchor="middle" x="988" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_ftdss&#45;&gt;interface~assemble_initialize_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge17" class="edge">
+<title>proc~assemble_ftdss&#45;&gt;interface~assemble_initialize_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M1035.27,-96C1058.61,-96 1088.01,-96 1116.82,-96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1116.97,-99.5 1126.97,-96 1116.97,-92.5 1116.97,-99.5"/>
+</g>
+<!-- interface~assemble_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node22" class="node">
+<title>interface~assemble_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node22"><a xlink:href="../interface/assemble_ftdss.html" xlink:title="type_ftdss%assemble_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="837,-108 680,-108 680,-84 837,-84 837,-108"/>
+<text text-anchor="middle" x="758.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge27" class="edge">
+<title>interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M837.16,-96C867.88,-96 902.52,-96 930.75,-96"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="930.85,-99.5 940.85,-96 930.85,-92.5 930.85,-99.5"/>
+</g>
+<!-- proc~initialize_type_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node23" class="node">
+<title>proc~initialize_type_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node23"><a xlink:href="../proc/initialize_type_ftdss.html" xlink:title="initialize_type_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="604,-160 489,-160 489,-136 604,-136 604,-160"/>
+<text text-anchor="middle" x="546.5" y="-145.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_type_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_ftdss&#45;&gt;interface~apply_bc_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge21" class="edge">
+<title>proc~initialize_type_ftdss&#45;&gt;interface~apply_bc_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M604.05,-148C624.9,-148 649.01,-148 671.85,-148"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="671.9,-151.5 681.9,-148 671.9,-144.5 671.9,-151.5"/>
+</g>
+<!-- proc~reflect_variables_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node24" class="node">
+<title>proc~reflect_variables_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node24"><a xlink:href="../proc/reflect_variables_ftdss.html" xlink:title="reflect_variables_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1053,-66 923,-66 923,-42 1053,-42 1053,-66"/>
+<text text-anchor="middle" x="988" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">reflect_variables_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;interface~calc_gradient_pressure_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge23" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;interface~calc_gradient_pressure_ftdss</title>
+<path fill="none" stroke="#7fff00" d="M1053.1,-42.26C1069.97,-39.21 1088.17,-35.95 1105,-33 1118.59,-30.62 1133.02,-28.14 1147.05,-25.74"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1147.91,-29.15 1157.18,-24.02 1146.73,-22.25 1147.91,-29.15"/>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;interface~calc_gradient_temperature_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge25" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;interface~calc_gradient_temperature_ftdss</title>
+<path fill="none" stroke="#00ffff" d="M1053,-54C1066.09,-54 1080.32,-54 1094.83,-54"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1094.92,-57.5 1104.92,-54 1094.92,-50.5 1094.92,-57.5"/>
+</g>
+<!-- proc~solve_time_step_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node25" class="node">
+<title>proc~solve_time_step_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node25"><a xlink:href="../proc/solve_time_step_ftdss.html" xlink:title="solve_time_step_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="610,-97 483,-97 483,-73 610,-73 610,-97"/>
+<text text-anchor="middle" x="546.5" y="-82.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~apply_bc_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge22" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~apply_bc_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M583.41,-97.07C602.02,-103.23 625.17,-110.72 646,-117 664.42,-122.55 684.67,-128.29 702.79,-133.29"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="702.04,-136.72 712.61,-135.99 703.9,-129.97 702.04,-136.72"/>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge28" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M610.22,-88.29C628.94,-89.27 649.8,-90.36 669.8,-91.41"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="669.68,-94.9 679.85,-91.93 670.05,-87.91 669.68,-94.9"/>
+</g>
+<!-- interface~reflect_variables_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node28" class="node">
+<title>interface~reflect_variables_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node28"><a xlink:href="../interface/reflect_variables_ftdss.html" xlink:title="type_ftdss%reflect_variables_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="855,-66 662,-66 662,-42 855,-42 855,-66"/>
+<text text-anchor="middle" x="758.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%reflect_variables_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~reflect_variables_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge33" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~reflect_variables_ftdss</title>
+<path fill="none" stroke="#7fff00" d="M610.22,-75.74C627.74,-73.15 647.14,-70.29 665.96,-67.51"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="666.65,-70.95 676.04,-66.03 665.63,-64.02 666.65,-70.95"/>
+</g>
+<!-- interface~solve_time_step_setup_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node30" class="node">
+<title>interface~solve_time_step_setup_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node30"><a xlink:href="../interface/solve_time_step_setup_ftdss.html" xlink:title="type_ftdss%solve_time_step_setup_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="871,-24 646,-24 646,0 871,0 871,-24"/>
+<text text-anchor="middle" x="758.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_setup_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~solve_time_step_setup_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge35" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~solve_time_step_setup_ftdss</title>
+<path fill="none" stroke="#7f00ff" d="M566.34,-72.85C585.62,-60.96 616.79,-43.2 646,-33 652.98,-30.56 660.32,-28.39 667.75,-26.45"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="668.67,-29.83 677.55,-24.04 667,-23.03 668.67,-29.83"/>
+</g>
+<!-- proc~solve_time_step_setup_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node26" class="node">
+<title>proc~solve_time_step_setup_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node26"><a xlink:href="../proc/solve_time_step_setup_ftdss.html" xlink:title="solve_time_step_setup_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1069,-24 907,-24 907,0 1069,0 1069,-24"/>
+<text text-anchor="middle" x="988" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_setup_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_setup_ftdss&#45;&gt;interface~calc_gradient_pressure_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge24" class="edge">
+<title>proc~solve_time_step_setup_ftdss&#45;&gt;interface~calc_gradient_pressure_ftdss</title>
+<path fill="none" stroke="#7fff00" d="M1069.25,-12C1080.96,-12 1093.24,-12 1105.57,-12"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1105.92,-15.5 1115.92,-12 1105.92,-8.5 1105.92,-15.5"/>
+</g>
+<!-- proc~solve_time_step_setup_ftdss&#45;&gt;interface~calc_gradient_temperature_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge26" class="edge">
+<title>proc~solve_time_step_setup_ftdss&#45;&gt;interface~calc_gradient_temperature_ftdss</title>
+<path fill="none" stroke="#00ffff" d="M1054.62,-24.01C1071.06,-26.99 1088.67,-30.14 1105,-33 1118.59,-35.38 1133.02,-37.86 1147.05,-40.26"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1146.73,-43.75 1157.18,-41.98 1147.91,-36.85 1146.73,-43.75"/>
+</g>
+<!-- interface~initialize_type_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node27" class="node">
+<title>interface~initialize_type_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node27"><a xlink:href="../interface/initialize_type_ftdss.html" xlink:title="type_ftdss%initialize_type_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="441,-160 263,-160 263,-136 441,-136 441,-160"/>
+<text text-anchor="middle" x="352" y="-145.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%initialize_type_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_ftdss&#45;&gt;proc~initialize_type_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge29" class="edge">
+<title>interface~initialize_type_ftdss&#45;&gt;proc~initialize_type_ftdss</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M441.08,-148C453.77,-148 466.64,-148 478.82,-148"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="478.86,-151.5 488.86,-148 478.86,-144.5 478.86,-151.5"/>
+</g>
+<!-- interface~reflect_variables_ftdss&#45;&gt;proc~reflect_variables_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge30" class="edge">
+<title>interface~reflect_variables_ftdss&#45;&gt;proc~reflect_variables_ftdss</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M855.32,-54C874.58,-54 894.55,-54 912.93,-54"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="912.97,-57.5 922.97,-54 912.97,-50.5 912.97,-57.5"/>
+</g>
+<!-- interface~solve_time_step_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node29" class="node">
+<title>interface~solve_time_step_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node29"><a xlink:href="../interface/solve_time_step_ftdss.html" xlink:title="type_ftdss%solve_time_step_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="447,-97 257,-97 257,-73 447,-73 447,-97"/>
+<text text-anchor="middle" x="352" y="-82.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge31" class="edge">
+<title>interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M447.28,-85C455.88,-85 464.5,-85 472.87,-85"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="472.93,-88.5 482.93,-85 472.93,-81.5 472.93,-88.5"/>
+</g>
+<!-- interface~solve_time_step_setup_ftdss&#45;&gt;proc~solve_time_step_setup_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge32" class="edge">
+<title>interface~solve_time_step_setup_ftdss&#45;&gt;proc~solve_time_step_setup_ftdss</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M871.25,-12C879.8,-12 888.36,-12 896.75,-12"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="896.87,-15.5 906.87,-12 896.87,-8.5 896.87,-15.5"/>
+</g>
+<!-- proc~run_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node31" class="node">
+<title>proc~run_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node31"><a xlink:href="../proc/run_ftdss.html" xlink:title="run_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-97 160,-97 160,-73 221,-73 221,-97"/>
+<text text-anchor="middle" x="190.5" y="-82.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge34" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss</title>
+<path fill="none" stroke="#00ffff" d="M221.13,-85C228.8,-85 237.52,-85 246.72,-85"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="246.86,-88.5 256.86,-85 246.86,-81.5 246.86,-88.5"/>
+</g>
+<!-- interface~run_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_node32" class="node">
+<title>interface~run_ftdss</title>
+<g id="a_interface~~get_gauss~~CalledByGraph_node32"><a xlink:href="../interface/run_ftdss.html" xlink:title="type_ftdss%run_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="124,-97 0,-97 0,-73 124,-73 124,-97"/>
+<text text-anchor="middle" x="62" y="-82.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftdss&#45;&gt;proc~run_ftdss -->
+<g id="interface~~get_gauss~~CalledByGraph_edge36" class="edge">
+<title>interface~run_ftdss&#45;&gt;proc~run_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M124.03,-85C132.82,-85 141.68,-85 149.91,-85"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="149.94,-88.5 159.94,-85 149.94,-81.5 149.94,-88.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfaceget_gaussCalledByGraph = svgPanZoom('#interfaceget_gaussCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+      <h2>private module subroutine get_gauss(self, gauss)  
+    <a href="../proc/get_gauss.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h2>
+
+    
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~1181"></span>
+              class(<a href='../type/abst_fe.html'>abst_fe</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-gauss~3"></span>
+              type(<a href='../type/type_coordinate_dp.html'>type_coordinate_dp</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              pointer, contiguous, dimension(:)
+            </td>
+            <td>::</td>
+            <td><strong>gauss</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+
+ </div>
+</div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

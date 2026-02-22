@@ -1,0 +1,853 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>initialize_type_hydraulic &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>initialize_type_hydraulic
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">38 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/hydraulic_base.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/hydraulic_base.f90.html'>hydraulic_base.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/hydraulic_base.html'>hydraulic_base</a></li>
+            <li class="breadcrumb-item active" aria-current="page">initialize_type_hydraulic</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/initialize_type_hydraulic.html#src">initialize_type_hydraulic</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine initialize_type_hydraulic(self, input, active_region_ids)  
+    <a href="../interface/initialize_type_hydraulic.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~453"></span>
+              class(<a href='../type/type_hydraulic.html'>type_hydraulic</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-input~22"></span>
+              type(<a href='../type/type_input.html'>type_input</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>input</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-active_region_ids~3"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>active_region_ids</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~initialize_type_hydraulic~~CallsGraph Pages: 1 -->
+<svg id="procinitialize_type_hydraulicCallsGraph" width="641pt" height="124pt"
+ viewBox="0.00 0.00 641.00 123.61" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~initialize_type_hydraulic~~CallsGraph" class="graph" transform="scale(0.44 0.44) rotate(0) translate(4 276)">
+<title>proc~~initialize_type_hydraulic~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-276 1448,-276 1448,4 -4,4"/>
+<!-- proc~initialize_type_hydraulic -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node1" class="node">
+<title>proc~initialize_type_hydraulic</title>
+<polygon fill="none" stroke="black" points="140,-168 0,-168 0,-144 140,-144 140,-168"/>
+<text text-anchor="middle" x="70" y="-153.6" font-family="Helvetica,sans-Serif" font-size="10.50">initialize_type_hydraulic</text>
+</g>
+<!-- proc~get_density_info_input -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node2" class="node">
+<title>proc~get_density_info_input</title>
+<g id="a_proc~~initialize_type_hydraulic~~CallsGraph_node2"><a xlink:href="../proc/get_density_info_input.html" xlink:title="type_input%get_density_info_input">
+<polygon fill="#d9534f" stroke="#d9534f" points="417,-188 221,-188 221,-164 417,-164 417,-188"/>
+<text text-anchor="middle" x="319" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input%get_density_info_input</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_hydraulic&#45;&gt;proc~get_density_info_input -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge1" class="edge">
+<title>proc~initialize_type_hydraulic&#45;&gt;proc~get_density_info_input</title>
+<path fill="none" stroke="#ff0000" d="M140.13,-161.6C161.99,-163.37 186.68,-165.37 210.55,-167.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="210.48,-170.8 220.73,-168.12 211.04,-163.83 210.48,-170.8"/>
+</g>
+<!-- proc~get_gcc_info_input -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node3" class="node">
+<title>proc~get_gcc_info_input</title>
+<g id="a_proc~~initialize_type_hydraulic~~CallsGraph_node3"><a xlink:href="../proc/get_gcc_info_input.html" xlink:title="type_input%get_gcc_info_input">
+<polygon fill="#d9534f" stroke="#d9534f" points="407.5,-230 230.5,-230 230.5,-206 407.5,-206 407.5,-230"/>
+<text text-anchor="middle" x="319" y="-215.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input%get_gcc_info_input</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_hydraulic&#45;&gt;proc~get_gcc_info_input -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge2" class="edge">
+<title>proc~initialize_type_hydraulic&#45;&gt;proc~get_gcc_info_input</title>
+<path fill="none" stroke="#ff0000" d="M97.2,-168.14C118.12,-177.36 148.39,-189.67 176,-197 190.09,-200.74 205.16,-203.87 220.02,-206.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="219.81,-209.98 230.26,-208.19 220.97,-203.08 219.81,-209.98"/>
+</g>
+<!-- proc~get_hcf_info_input -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node4" class="node">
+<title>proc~get_hcf_info_input</title>
+<g id="a_proc~~initialize_type_hydraulic~~CallsGraph_node4"><a xlink:href="../proc/get_hcf_info_input.html" xlink:title="type_input%get_hcf_info_input">
+<polygon fill="#d9534f" stroke="#d9534f" points="406.5,-272 231.5,-272 231.5,-248 406.5,-248 406.5,-272"/>
+<text text-anchor="middle" x="319" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input%get_hcf_info_input</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_hydraulic&#45;&gt;proc~get_hcf_info_input -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge3" class="edge">
+<title>proc~initialize_type_hydraulic&#45;&gt;proc~get_hcf_info_input</title>
+<path fill="none" stroke="#ff0000" d="M82.22,-168.28C100.08,-186.97 136.97,-222.13 176,-239 190.07,-245.08 205.59,-249.45 221.03,-252.58"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="220.68,-256.08 231.15,-254.47 221.96,-249.2 220.68,-256.08"/>
+</g>
+<!-- proc~get_wrf_info_input -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node5" class="node">
+<title>proc~get_wrf_info_input</title>
+<g id="a_proc~~initialize_type_hydraulic~~CallsGraph_node5"><a xlink:href="../proc/get_wrf_info_input.html" xlink:title="type_input%get_wrf_info_input">
+<polygon fill="#d9534f" stroke="#d9534f" points="406.5,-45 231.5,-45 231.5,-21 406.5,-21 406.5,-45"/>
+<text text-anchor="middle" x="319" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input%get_wrf_info_input</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_hydraulic&#45;&gt;proc~get_wrf_info_input -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge4" class="edge">
+<title>proc~initialize_type_hydraulic&#45;&gt;proc~get_wrf_info_input</title>
+<path fill="none" stroke="#ff0000" d="M83.51,-143.81C102.18,-126.24 139.1,-93.85 176,-75 199.04,-63.23 225.91,-54.22 250.04,-47.63"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="251.06,-50.97 259.83,-45.04 249.27,-44.21 251.06,-50.97"/>
+</g>
+<!-- proc~initialize_physics_manager -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node6" class="node">
+<title>proc~initialize_physics_manager</title>
+<g id="a_proc~~initialize_type_hydraulic~~CallsGraph_node6"><a xlink:href="../proc/initialize_physics_manager.html" xlink:title="type_physics_manager%initialize_physics_manager">
+<polygon fill="#d9534f" stroke="#d9534f" points="462,-108 176,-108 176,-84 462,-84 462,-108"/>
+<text text-anchor="middle" x="319" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%initialize_physics_manager</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_hydraulic&#45;&gt;proc~initialize_physics_manager -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge5" class="edge">
+<title>proc~initialize_type_hydraulic&#45;&gt;proc~initialize_physics_manager</title>
+<path fill="none" stroke="#ff0000" d="M104.25,-143.99C124.74,-136.9 151.66,-128.14 176,-122 193.92,-117.48 213.3,-113.4 231.81,-109.9"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="232.5,-113.33 241.69,-108.06 231.22,-106.45 232.5,-113.33"/>
+</g>
+<!-- proc~reset_physics_info -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node7" class="node">
+<title>proc~reset_physics_info</title>
+<g id="a_proc~~initialize_type_hydraulic~~CallsGraph_node7"><a xlink:href="../proc/reset_physics_info.html" xlink:title="type_physics_info%reset_physics_info">
+<polygon fill="#d9534f" stroke="#d9534f" points="1302,-168 1091,-168 1091,-144 1302,-144 1302,-168"/>
+<text text-anchor="middle" x="1196.5" y="-153.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_info%reset_physics_info</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_hydraulic&#45;&gt;proc~reset_physics_info -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge6" class="edge">
+<title>proc~initialize_type_hydraulic&#45;&gt;proc~reset_physics_info</title>
+<path fill="none" stroke="#ff0000" d="M140.19,-155.25C152.13,-155.14 164.42,-155.06 176,-155 566.66,-153.14 664.34,-153.61 1055,-155 1063.33,-155.03 1071.93,-155.07 1080.59,-155.12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1080.75,-158.62 1090.77,-155.17 1080.79,-151.62 1080.75,-158.62"/>
+</g>
+<!-- interface~get_density_info_material_settings -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node10" class="node">
+<title>interface~get_density_info_material_settings</title>
+<g id="a_proc~~initialize_type_hydraulic~~CallsGraph_node10"><a xlink:href="../interface/get_density_info_material_settings.html" xlink:title="type_material_settings%get_density_info_material_settings">
+<polygon fill="#a7506f" stroke="#a7506f" points="823,-188 498,-188 498,-164 823,-164 823,-188"/>
+<text text-anchor="middle" x="660.5" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_material_settings%get_density_info_material_settings</text>
+</a>
+</g>
+</g>
+<!-- proc~get_density_info_input&#45;&gt;interface~get_density_info_material_settings -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge7" class="edge">
+<title>proc~get_density_info_input&#45;&gt;interface~get_density_info_material_settings</title>
+<path fill="none" stroke="#ff0000" d="M417.29,-176C439.42,-176 463.57,-176 487.77,-176"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="487.78,-179.5 497.78,-176 487.78,-172.5 487.78,-179.5"/>
+</g>
+<!-- interface~get_gcc_info_material_settings -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node11" class="node">
+<title>interface~get_gcc_info_material_settings</title>
+<g id="a_proc~~initialize_type_hydraulic~~CallsGraph_node11"><a xlink:href="../interface/get_gcc_info_material_settings.html" xlink:title="type_material_settings%get_gcc_info_material_settings">
+<polygon fill="#a7506f" stroke="#a7506f" points="813.5,-230 507.5,-230 507.5,-206 813.5,-206 813.5,-230"/>
+<text text-anchor="middle" x="660.5" y="-215.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_material_settings%get_gcc_info_material_settings</text>
+</a>
+</g>
+</g>
+<!-- proc~get_gcc_info_input&#45;&gt;interface~get_gcc_info_material_settings -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge8" class="edge">
+<title>proc~get_gcc_info_input&#45;&gt;interface~get_gcc_info_material_settings</title>
+<path fill="none" stroke="#ffff00" d="M407.87,-218C435.14,-218 466.12,-218 496.79,-218"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="497.18,-221.5 507.18,-218 497.18,-214.5 497.18,-221.5"/>
+</g>
+<!-- interface~get_hcf_info_material_settings -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node12" class="node">
+<title>interface~get_hcf_info_material_settings</title>
+<g id="a_proc~~initialize_type_hydraulic~~CallsGraph_node12"><a xlink:href="../interface/get_hcf_info_material_settings.html" xlink:title="type_material_settings%get_hcf_info_material_settings">
+<polygon fill="#a7506f" stroke="#a7506f" points="812.5,-272 508.5,-272 508.5,-248 812.5,-248 812.5,-272"/>
+<text text-anchor="middle" x="660.5" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_material_settings%get_hcf_info_material_settings</text>
+</a>
+</g>
+</g>
+<!-- proc~get_hcf_info_input&#45;&gt;interface~get_hcf_info_material_settings -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge9" class="edge">
+<title>proc~get_hcf_info_input&#45;&gt;interface~get_hcf_info_material_settings</title>
+<path fill="none" stroke="#00ff00" d="M406.55,-260C434.56,-260 466.58,-260 498.21,-260"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="498.46,-263.5 508.46,-260 498.46,-256.5 498.46,-263.5"/>
+</g>
+<!-- interface~get_wrf_info_material_settings -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node13" class="node">
+<title>interface~get_wrf_info_material_settings</title>
+<g id="a_proc~~initialize_type_hydraulic~~CallsGraph_node13"><a xlink:href="../interface/get_wrf_info_material_settings.html" xlink:title="type_material_settings%get_wrf_info_material_settings">
+<polygon fill="#a7506f" stroke="#a7506f" points="812.5,-24 508.5,-24 508.5,0 812.5,0 812.5,-24"/>
+<text text-anchor="middle" x="660.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_material_settings%get_wrf_info_material_settings</text>
+</a>
+</g>
+</g>
+<!-- proc~get_wrf_info_input&#45;&gt;interface~get_wrf_info_material_settings -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge10" class="edge">
+<title>proc~get_wrf_info_input&#45;&gt;interface~get_wrf_info_material_settings</title>
+<path fill="none" stroke="#00ffff" d="M406.55,-27.65C434.56,-25.91 466.58,-23.93 498.21,-21.98"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="498.7,-25.45 508.46,-21.34 498.27,-18.47 498.7,-25.45"/>
+</g>
+<!-- initialize -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node9" class="node">
+<title>initialize</title>
+<polygon fill="#777777" stroke="#777777" points="689,-66 632,-66 632,-42 689,-42 689,-66"/>
+<text text-anchor="middle" x="660.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize</text>
+</g>
+<!-- proc~initialize_physics_manager&#45;&gt;initialize -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge11" class="edge">
+<title>proc~initialize_physics_manager&#45;&gt;initialize</title>
+<path fill="none" stroke="#0000ff" d="M417.29,-83.96C485.38,-75.54 572.62,-64.75 621.64,-58.68"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="622.3,-62.13 631.8,-57.43 621.44,-55.18 622.3,-62.13"/>
+</g>
+<!-- proc~set_map_materials -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node14" class="node">
+<title>proc~set_map_materials</title>
+<g id="a_proc~~initialize_type_hydraulic~~CallsGraph_node14"><a xlink:href="../proc/set_map_materials.html" xlink:title="type_physics_manager%set_map_materials">
+<polygon fill="#d9534f" stroke="#d9534f" points="782.5,-108 538.5,-108 538.5,-84 782.5,-84 782.5,-108"/>
+<text text-anchor="middle" x="660.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager%set_map_materials</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_physics_manager&#45;&gt;proc~set_map_materials -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge12" class="edge">
+<title>proc~initialize_physics_manager&#45;&gt;proc~set_map_materials</title>
+<path fill="none" stroke="#0000ff" d="M462.01,-96C483.89,-96 506.41,-96 528.05,-96"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="528.25,-99.5 538.25,-96 528.25,-92.5 528.25,-99.5"/>
+</g>
+<!-- deallocate_array -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node8" class="node">
+<title>deallocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="1442.5,-168 1339.5,-168 1339.5,-144 1442.5,-144 1442.5,-168"/>
+<text text-anchor="middle" x="1391" y="-153.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_array</text>
+</g>
+<!-- proc~reset_physics_info&#45;&gt;deallocate_array -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge13" class="edge">
+<title>proc~reset_physics_info&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#ff00ff" d="M1302.2,-156C1311.35,-156 1320.4,-156 1329.02,-156"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="1329.28,-159.5 1339.28,-156 1329.28,-152.5 1329.28,-159.5"/>
+</g>
+<!-- proc~get_density_info_material_settings -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node15" class="node">
+<title>proc~get_density_info_material_settings</title>
+<g id="a_proc~~initialize_type_hydraulic~~CallsGraph_node15"><a xlink:href="../proc/get_density_info_material_settings.html" xlink:title="get_density_info_material_settings">
+<polygon fill="#d9534f" stroke="#d9534f" points="1055,-188 859,-188 859,-164 1055,-164 1055,-188"/>
+<text text-anchor="middle" x="957" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_density_info_material_settings</text>
+</a>
+</g>
+</g>
+<!-- interface~get_density_info_material_settings&#45;&gt;proc~get_density_info_material_settings -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge14" class="edge">
+<title>interface~get_density_info_material_settings&#45;&gt;proc~get_density_info_material_settings</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M823.4,-176C831.95,-176 840.43,-176 848.74,-176"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="848.76,-179.5 858.76,-176 848.76,-172.5 848.76,-179.5"/>
+</g>
+<!-- proc~get_gcc_info_material_settings -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node16" class="node">
+<title>proc~get_gcc_info_material_settings</title>
+<g id="a_proc~~initialize_type_hydraulic~~CallsGraph_node16"><a xlink:href="../proc/get_gcc_info_material_settings.html" xlink:title="get_gcc_info_material_settings">
+<polygon fill="#d9534f" stroke="#d9534f" points="1045,-230 869,-230 869,-206 1045,-206 1045,-230"/>
+<text text-anchor="middle" x="957" y="-215.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_gcc_info_material_settings</text>
+</a>
+</g>
+</g>
+<!-- interface~get_gcc_info_material_settings&#45;&gt;proc~get_gcc_info_material_settings -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge15" class="edge">
+<title>interface~get_gcc_info_material_settings&#45;&gt;proc~get_gcc_info_material_settings</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M813.93,-218C829.06,-218 844.12,-218 858.47,-218"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="858.78,-221.5 868.78,-218 858.78,-214.5 858.78,-221.5"/>
+</g>
+<!-- proc~get_hcf_info_material_settings -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node17" class="node">
+<title>proc~get_hcf_info_material_settings</title>
+<g id="a_proc~~initialize_type_hydraulic~~CallsGraph_node17"><a xlink:href="../proc/get_hcf_info_material_settings.html" xlink:title="get_hcf_info_material_settings">
+<polygon fill="#d9534f" stroke="#d9534f" points="1044,-272 870,-272 870,-248 1044,-248 1044,-272"/>
+<text text-anchor="middle" x="957" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_hcf_info_material_settings</text>
+</a>
+</g>
+</g>
+<!-- interface~get_hcf_info_material_settings&#45;&gt;proc~get_hcf_info_material_settings -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge16" class="edge">
+<title>interface~get_hcf_info_material_settings&#45;&gt;proc~get_hcf_info_material_settings</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M812.63,-260C828.58,-260 844.47,-260 859.55,-260"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="859.85,-263.5 869.85,-260 859.85,-256.5 859.85,-263.5"/>
+</g>
+<!-- proc~get_wrf_info_material_settings -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node18" class="node">
+<title>proc~get_wrf_info_material_settings</title>
+<g id="a_proc~~initialize_type_hydraulic~~CallsGraph_node18"><a xlink:href="../proc/get_wrf_info_material_settings.html" xlink:title="get_wrf_info_material_settings">
+<polygon fill="#d9534f" stroke="#d9534f" points="1044,-24 870,-24 870,0 1044,0 1044,-24"/>
+<text text-anchor="middle" x="957" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_wrf_info_material_settings</text>
+</a>
+</g>
+</g>
+<!-- interface~get_wrf_info_material_settings&#45;&gt;proc~get_wrf_info_material_settings -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge17" class="edge">
+<title>interface~get_wrf_info_material_settings&#45;&gt;proc~get_wrf_info_material_settings</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M812.63,-12C828.58,-12 844.47,-12 859.55,-12"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="859.85,-15.5 869.85,-12 859.85,-8.5 859.85,-15.5"/>
+</g>
+<!-- proc~get_density_info_material_settings&#45;&gt;proc~reset_physics_info -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge18" class="edge">
+<title>proc~get_density_info_material_settings&#45;&gt;proc~reset_physics_info</title>
+<path fill="none" stroke="#ff0000" d="M1055.29,-167.81C1063.57,-167.11 1072.01,-166.4 1080.41,-165.69"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1080.97,-169.16 1090.64,-164.83 1080.39,-162.18 1080.97,-169.16"/>
+</g>
+<!-- interface~reset_params_hcf -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node19" class="node">
+<title>interface~reset_params_hcf</title>
+<g id="a_proc~~initialize_type_hydraulic~~CallsGraph_node19"><a xlink:href="../interface/reset_params_hcf.html" xlink:title="type_hcf_params%reset_params_hcf">
+<polygon fill="#a7506f" stroke="#a7506f" points="1300,-272 1093,-272 1093,-248 1300,-248 1300,-272"/>
+<text text-anchor="middle" x="1196.5" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_params%reset_params_hcf</text>
+</a>
+</g>
+</g>
+<!-- proc~get_hcf_info_material_settings&#45;&gt;interface~reset_params_hcf -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge19" class="edge">
+<title>proc~get_hcf_info_material_settings&#45;&gt;interface~reset_params_hcf</title>
+<path fill="none" stroke="#00ffff" d="M1044.08,-260C1056.54,-260 1069.53,-260 1082.43,-260"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1082.74,-263.5 1092.74,-260 1082.74,-256.5 1082.74,-263.5"/>
+</g>
+<!-- reset -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node20" class="node">
+<title>reset</title>
+<polygon fill="#777777" stroke="#777777" points="1223.5,-24 1169.5,-24 1169.5,0 1223.5,0 1223.5,-24"/>
+<text text-anchor="middle" x="1196.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">reset</text>
+</g>
+<!-- proc~get_wrf_info_material_settings&#45;&gt;reset -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge20" class="edge">
+<title>proc~get_wrf_info_material_settings&#45;&gt;reset</title>
+<path fill="none" stroke="#7f00ff" d="M1044.08,-12C1083.74,-12 1128.68,-12 1159.22,-12"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1159.4,-15.5 1169.4,-12 1159.4,-8.5 1159.4,-15.5"/>
+</g>
+<!-- proc~reset_params_hcf -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_node21" class="node">
+<title>proc~reset_params_hcf</title>
+<g id="a_proc~~initialize_type_hydraulic~~CallsGraph_node21"><a xlink:href="../proc/reset_params_hcf.html" xlink:title="reset_params_hcf">
+<polygon fill="#d9534f" stroke="#d9534f" points="1444,-272 1338,-272 1338,-248 1444,-248 1444,-272"/>
+<text text-anchor="middle" x="1391" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">reset_params_hcf</text>
+</a>
+</g>
+</g>
+<!-- interface~reset_params_hcf&#45;&gt;proc~reset_params_hcf -->
+<g id="proc~~initialize_type_hydraulic~~CallsGraph_edge21" class="edge">
+<title>interface~reset_params_hcf&#45;&gt;proc~reset_params_hcf</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1300.23,-260C1309.5,-260 1318.7,-260 1327.46,-260"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1327.53,-263.5 1337.53,-260 1327.53,-256.5 1327.53,-263.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocinitialize_type_hydraulicCallsGraph = svgPanZoom('#procinitialize_type_hydraulicCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~initialize_type_hydraulic~~CalledByGraph Pages: 1 -->
+<svg id="procinitialize_type_hydraulicCalledByGraph" width="412pt" height="32pt"
+ viewBox="0.00 0.00 412.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~initialize_type_hydraulic~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~initialize_type_hydraulic~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 408,-28 408,4 -4,4"/>
+<!-- proc~initialize_type_hydraulic -->
+<g id="proc~~initialize_type_hydraulic~~CalledByGraph_node1" class="node">
+<title>proc~initialize_type_hydraulic</title>
+<polygon fill="none" stroke="black" points="404,-24 264,-24 264,0 404,0 404,-24"/>
+<text text-anchor="middle" x="334" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">initialize_type_hydraulic</text>
+</g>
+<!-- interface~initialize_type_hydraulic -->
+<g id="proc~~initialize_type_hydraulic~~CalledByGraph_node2" class="node">
+<title>interface~initialize_type_hydraulic</title>
+<g id="a_proc~~initialize_type_hydraulic~~CalledByGraph_node2"><a xlink:href="../interface/initialize_type_hydraulic.html" xlink:title="type_hydraulic%initialize_type_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="228,-24 0,-24 0,0 228,0 228,-24"/>
+<text text-anchor="middle" x="114" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%initialize_type_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_hydraulic&#45;&gt;proc~initialize_type_hydraulic -->
+<g id="proc~~initialize_type_hydraulic~~CalledByGraph_edge1" class="edge">
+<title>interface~initialize_type_hydraulic&#45;&gt;proc~initialize_type_hydraulic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M228.15,-12C236.77,-12 245.36,-12 253.7,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="253.73,-15.5 263.73,-12 253.73,-8.5 253.73,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">initialize_type_hydraulic</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="n">active_region_ids</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_hydraulic</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_input</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">input</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">active_region_ids</span><span class="p">(:)</span>
+
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_physics_info</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">density_info</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">wrf_ids</span><span class="p">(:)</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_wrf_params</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">wrf_model_info</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">hcf_ids</span><span class="p">(:)</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_hcf_params</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">hcf_model_info</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">gcc_model_info</span><span class="p">(:)</span>
+
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_materials</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_phases</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span>
+
+<span class="w">        </span><span class="n">num_materials</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">num_materials</span>
+
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">density_info</span><span class="p">(</span><span class="n">num_materials</span><span class="p">))</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">wrf_ids</span><span class="p">(</span><span class="n">num_materials</span><span class="p">))</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">wrf_model_info</span><span class="p">(</span><span class="n">num_materials</span><span class="p">))</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">hcf_ids</span><span class="p">(</span><span class="n">num_materials</span><span class="p">))</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">hcf_model_info</span><span class="p">(</span><span class="n">num_materials</span><span class="p">))</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">gcc_model_info</span><span class="p">(</span><span class="n">num_materials</span><span class="p">))</span>
+
+<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_materials</span>
+<span class="w">            </span><span class="k">do </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">active_region_ids</span><span class="p">)</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">input</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">active_region_ids</span><span class="p">(</span><span class="n">j</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    call </span><span class="n">density_info</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">reset</span><span class="p">()</span>
+
+<span class="w">                    </span><span class="k">call </span><span class="n">input</span><span class="p">%</span><span class="n">get_density_info</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">density_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<span class="w">                    </span><span class="k">call </span><span class="n">input</span><span class="p">%</span><span class="n">get_wrf_info</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">wrf_model_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<span class="w">                    </span><span class="k">call </span><span class="n">input</span><span class="p">%</span><span class="n">get_gcc_info</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">gcc_model_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<span class="w">                    </span><span class="k">call </span><span class="n">input</span><span class="p">%</span><span class="n">get_hcf_info</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">hcf_model_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+<span class="w">                    </span><span class="n">wrf_ids</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span>
+<span class="w">                    </span><span class="n">hcf_ids</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span>
+
+<span class="w">                </span><span class="k">end if</span>
+<span class="k">            end do</span>
+<span class="k">        end do</span>
+
+<span class="k">        call </span><span class="n">self</span><span class="p">%</span><span class="n">physics</span><span class="p">%</span><span class="n">initialize</span><span class="p">(</span><span class="n">active_region_ids</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                     </span><span class="n">density_info</span><span class="o">=</span><span class="n">density_info</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                     </span><span class="n">wrf_ids</span><span class="o">=</span><span class="n">wrf_ids</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                     </span><span class="n">wrf_model_info</span><span class="o">=</span><span class="n">wrf_model_info</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                     </span><span class="n">hcf_ids</span><span class="o">=</span><span class="n">hcf_ids</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                     </span><span class="n">hcf_model_info</span><span class="o">=</span><span class="n">hcf_model_info</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                     </span><span class="n">gcc_model_ids</span><span class="o">=</span><span class="n">gcc_model_info</span><span class="p">)</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">computation_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">simulation_settings</span><span class="p">%</span><span class="n">calculate_type</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">computation_dimension</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">simulation_settings</span><span class="p">%</span><span class="n">calculate_dimension</span>
+
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">initialize_type_hydraulic</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

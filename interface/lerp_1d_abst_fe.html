@@ -1,0 +1,749 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>lerp_1d_abst_fe &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>lerp_1d_abst_fe
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">32 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/fe_interface.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/fe_interface.f90.html'>fe_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/domain_base_fe.html'>domain_base_fe</a></li>
+            <li class="breadcrumb-item active" aria-current="page">lerp_1d_abst_fe</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+    <em>None</em>
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>interface</h2>
+      
+      <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~lerp_1d_abst_fe~~CallsGraph Pages: 1 -->
+<svg id="interfacelerp_1d_abst_feCallsGraph" width="375pt" height="32pt"
+ viewBox="0.00 0.00 375.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~lerp_1d_abst_fe~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>interface~~lerp_1d_abst_fe~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 371,-28 371,4 -4,4"/>
+<!-- interface~lerp_1d_abst_fe -->
+<g id="interface~~lerp_1d_abst_fe~~CallsGraph_node1" class="node">
+<title>interface~lerp_1d_abst_fe</title>
+<polygon fill="none" stroke="black" points="144,-24 0,-24 0,0 144,0 144,-24"/>
+<text text-anchor="middle" x="72" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">abst_fe%lerp_1d_abst_fe</text>
+</g>
+<!-- proc~lerp_1d_abst_fe -->
+<g id="interface~~lerp_1d_abst_fe~~CallsGraph_node2" class="node">
+<title>proc~lerp_1d_abst_fe</title>
+<g id="a_interface~~lerp_1d_abst_fe~~CallsGraph_node2"><a xlink:href="../proc/lerp_1d_abst_fe.html" xlink:title="lerp_1d_abst_fe">
+<polygon fill="#d9534f" stroke="#d9534f" points="276,-24 180,-24 180,0 276,0 276,-24"/>
+<text text-anchor="middle" x="228" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">lerp_1d_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- interface~lerp_1d_abst_fe&#45;&gt;proc~lerp_1d_abst_fe -->
+<g id="interface~~lerp_1d_abst_fe~~CallsGraph_edge1" class="edge">
+<title>interface~lerp_1d_abst_fe&#45;&gt;proc~lerp_1d_abst_fe</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M144.14,-12C152.77,-12 161.5,-12 169.88,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="169.92,-15.5 179.92,-12 169.92,-8.5 169.92,-15.5"/>
+</g>
+<!-- calc_psi -->
+<g id="interface~~lerp_1d_abst_fe~~CallsGraph_node3" class="node">
+<title>calc_psi</title>
+<polygon fill="#777777" stroke="#777777" points="367,-24 312,-24 312,0 367,0 367,-24"/>
+<text text-anchor="middle" x="339.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_psi</text>
+</g>
+<!-- proc~lerp_1d_abst_fe&#45;&gt;calc_psi -->
+<g id="interface~~lerp_1d_abst_fe~~CallsGraph_edge2" class="edge">
+<title>proc~lerp_1d_abst_fe&#45;&gt;calc_psi</title>
+<path fill="none" stroke="#ff0000" d="M276.07,-12C284.71,-12 293.61,-12 301.89,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="301.98,-15.5 311.98,-12 301.98,-8.5 301.98,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~lerp_1d_abst_fe~~CalledByGraph Pages: 1 -->
+<svg id="interfacelerp_1d_abst_feCalledByGraph" width="641pt" height="95pt"
+ viewBox="0.00 0.00 641.00 94.91" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph" class="graph" transform="scale(0.33 0.33) rotate(0) translate(4 280)">
+<title>interface~~lerp_1d_abst_fe~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-280 1914,-280 1914,4 -4,4"/>
+<!-- interface~lerp_1d_abst_fe -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_node1" class="node">
+<title>interface~lerp_1d_abst_fe</title>
+<polygon fill="none" stroke="black" points="1910,-150 1766,-150 1766,-126 1910,-126 1910,-150"/>
+<text text-anchor="middle" x="1838" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50">abst_fe%lerp_1d_abst_fe</text>
+</g>
+<!-- none~lerp~3 -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_node2" class="node">
+<title>none~lerp~3</title>
+<g id="a_interface~~lerp_1d_abst_fe~~CalledByGraph_node2"><a xlink:href="../type/abst_fe.html#boundprocedure-lerp~3" xlink:title="abst_fe%lerp">
+<polygon fill="#a7506f" stroke="#a7506f" points="1730,-150 1648,-150 1648,-126 1730,-126 1730,-150"/>
+<text text-anchor="middle" x="1689" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%lerp</text>
+</a>
+</g>
+</g>
+<!-- none~lerp~3&#45;&gt;interface~lerp_1d_abst_fe -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_edge1" class="edge">
+<title>none~lerp~3&#45;&gt;interface~lerp_1d_abst_fe</title>
+<path fill="none" stroke="#ff0000" d="M1730.17,-138C1738.2,-138 1746.9,-138 1755.75,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1755.79,-141.5 1765.79,-138 1755.79,-134.5 1755.79,-141.5"/>
+</g>
+<!-- proc~interpolate_observations_pw -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_node3" class="node">
+<title>proc~interpolate_observations_pw</title>
+<g id="a_interface~~lerp_1d_abst_fe~~CalledByGraph_node3"><a xlink:href="../proc/interpolate_observations_pw.html" xlink:title="interpolate_observations_pw">
+<polygon fill="#d9534f" stroke="#d9534f" points="1583.5,-276 1418.5,-276 1418.5,-252 1583.5,-252 1583.5,-276"/>
+<text text-anchor="middle" x="1501" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpolate_observations_pw</text>
+</a>
+</g>
+</g>
+<!-- proc~interpolate_observations_pw&#45;&gt;none~lerp~3 -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_edge2" class="edge">
+<title>proc~interpolate_observations_pw&#45;&gt;none~lerp~3</title>
+<path fill="none" stroke="#ff0000" d="M1583.69,-255.67C1593.68,-252.59 1603.39,-248.48 1612,-243 1644.04,-222.62 1666.87,-183.48 1678.7,-159.17"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1681.9,-160.6 1682.96,-150.06 1675.56,-157.64 1681.9,-160.6"/>
+</g>
+<!-- proc~interpolate_observations_si -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_node4" class="node">
+<title>proc~interpolate_observations_si</title>
+<g id="a_interface~~lerp_1d_abst_fe~~CalledByGraph_node4"><a xlink:href="../proc/interpolate_observations_si.html" xlink:title="interpolate_observations_si">
+<polygon fill="#d9534f" stroke="#d9534f" points="1580,-234 1422,-234 1422,-210 1580,-210 1580,-234"/>
+<text text-anchor="middle" x="1501" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpolate_observations_si</text>
+</a>
+</g>
+</g>
+<!-- proc~interpolate_observations_si&#45;&gt;none~lerp~3 -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_edge3" class="edge">
+<title>proc~interpolate_observations_si&#45;&gt;none~lerp~3</title>
+<path fill="none" stroke="#ff0000" d="M1580.19,-212.15C1591.15,-209.32 1602.06,-205.68 1612,-201 1634.37,-190.46 1655.66,-171.79 1669.99,-157.5"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1672.73,-159.7 1677.2,-150.09 1667.71,-154.82 1672.73,-159.7"/>
+</g>
+<!-- proc~interpolate_observations_temperature -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_node5" class="node">
+<title>proc~interpolate_observations_temperature</title>
+<g id="a_interface~~lerp_1d_abst_fe~~CalledByGraph_node5"><a xlink:href="../proc/interpolate_observations_temperature.html" xlink:title="interpolate_observations_temperature">
+<polygon fill="#d9534f" stroke="#d9534f" points="1609.5,-192 1392.5,-192 1392.5,-168 1609.5,-168 1609.5,-192"/>
+<text text-anchor="middle" x="1501" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpolate_observations_temperature</text>
+</a>
+</g>
+</g>
+<!-- proc~interpolate_observations_temperature&#45;&gt;none~lerp~3 -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_edge4" class="edge">
+<title>proc~interpolate_observations_temperature&#45;&gt;none~lerp~3</title>
+<path fill="none" stroke="#ff0000" d="M1569.66,-167.98C1583.7,-165.23 1598.37,-162.18 1612,-159 1620.52,-157.01 1629.53,-154.71 1638.25,-152.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1639.2,-155.74 1647.92,-149.73 1637.36,-148.98 1639.2,-155.74"/>
+</g>
+<!-- proc~lerp_1d_domain -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_node6" class="node">
+<title>proc~lerp_1d_domain</title>
+<g id="a_interface~~lerp_1d_abst_fe~~CalledByGraph_node6"><a xlink:href="../proc/lerp_1d_domain.html" xlink:title="type_domain%lerp_1d_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="1589.5,-150 1412.5,-150 1412.5,-126 1589.5,-126 1589.5,-150"/>
+<text text-anchor="middle" x="1501" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%lerp_1d_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~lerp_1d_domain&#45;&gt;none~lerp~3 -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_edge5" class="edge">
+<title>proc~lerp_1d_domain&#45;&gt;none~lerp~3</title>
+<path fill="none" stroke="#ff0000" d="M1589.55,-138C1605.93,-138 1622.53,-138 1637.32,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1637.74,-141.5 1647.74,-138 1637.74,-134.5 1637.74,-141.5"/>
+</g>
+<!-- proc~lerp_2d_domain -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_node7" class="node">
+<title>proc~lerp_2d_domain</title>
+<g id="a_interface~~lerp_1d_abst_fe~~CalledByGraph_node7"><a xlink:href="../proc/lerp_2d_domain.html" xlink:title="type_domain%lerp_2d_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="1589.5,-108 1412.5,-108 1412.5,-84 1589.5,-84 1589.5,-108"/>
+<text text-anchor="middle" x="1501" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%lerp_2d_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~lerp_2d_domain&#45;&gt;none~lerp~3 -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_edge6" class="edge">
+<title>proc~lerp_2d_domain&#45;&gt;none~lerp~3</title>
+<path fill="none" stroke="#ff0000" d="M1569.66,-108.02C1583.7,-110.77 1598.37,-113.82 1612,-117 1620.52,-118.99 1629.53,-121.29 1638.25,-123.63"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1637.36,-127.02 1647.92,-126.27 1639.2,-120.26 1637.36,-127.02"/>
+</g>
+<!-- proc~lerp_3d_domain -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_node8" class="node">
+<title>proc~lerp_3d_domain</title>
+<g id="a_interface~~lerp_1d_abst_fe~~CalledByGraph_node8"><a xlink:href="../proc/lerp_3d_domain.html" xlink:title="type_domain%lerp_3d_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="1589.5,-66 1412.5,-66 1412.5,-42 1589.5,-42 1589.5,-66"/>
+<text text-anchor="middle" x="1501" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%lerp_3d_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~lerp_3d_domain&#45;&gt;none~lerp~3 -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_edge7" class="edge">
+<title>proc~lerp_3d_domain&#45;&gt;none~lerp~3</title>
+<path fill="none" stroke="#ff0000" d="M1588.03,-66.02C1596.31,-68.48 1604.44,-71.44 1612,-75 1634.37,-85.54 1655.66,-104.21 1669.99,-118.5"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1667.71,-121.18 1677.2,-125.91 1672.73,-116.3 1667.71,-121.18"/>
+</g>
+<!-- proc~lerp_states -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_node9" class="node">
+<title>proc~lerp_states</title>
+<g id="a_interface~~lerp_1d_abst_fe~~CalledByGraph_node9"><a xlink:href="../proc/lerp_states.html" xlink:title="type_assemble_workspace%lerp_states">
+<polygon fill="#d9534f" stroke="#d9534f" points="1612,-24 1390,-24 1390,0 1612,0 1612,-24"/>
+<text text-anchor="middle" x="1501" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assemble_workspace%lerp_states</text>
+</a>
+</g>
+</g>
+<!-- proc~lerp_states&#45;&gt;none~lerp~3 -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_edge8" class="edge">
+<title>proc~lerp_states&#45;&gt;none~lerp~3</title>
+<path fill="none" stroke="#ff0000" d="M1594.39,-24.09C1600.56,-26.56 1606.5,-29.5 1612,-33 1644.04,-53.38 1666.87,-92.52 1678.7,-116.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1675.56,-118.36 1682.96,-125.94 1681.9,-115.4 1675.56,-118.36"/>
+</g>
+<!-- proc~assemble_initialize_ftdss -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_node10" class="node">
+<title>proc~assemble_initialize_ftdss</title>
+<g id="a_interface~~lerp_1d_abst_fe~~CalledByGraph_node10"><a xlink:href="../proc/assemble_initialize_ftdss.html" xlink:title="assemble_initialize_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1354,-24 1211,-24 1211,0 1354,0 1354,-24"/>
+<text text-anchor="middle" x="1282.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_initialize_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_initialize_ftdss&#45;&gt;proc~lerp_states -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_edge9" class="edge">
+<title>proc~assemble_initialize_ftdss&#45;&gt;proc~lerp_states</title>
+<path fill="none" stroke="#ff00da" d="M1354.09,-12C1362.34,-12 1370.92,-12 1379.61,-12"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="1379.84,-15.5 1389.84,-12 1379.84,-8.5 1379.84,-15.5"/>
+</g>
+<!-- interface~assemble_initialize_ftdss -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_node11" class="node">
+<title>interface~assemble_initialize_ftdss</title>
+<g id="a_interface~~lerp_1d_abst_fe~~CalledByGraph_node11"><a xlink:href="../interface/assemble_initialize_ftdss.html" xlink:title="type_ftdss%assemble_initialize_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1175,-24 969,-24 969,0 1175,0 1175,-24"/>
+<text text-anchor="middle" x="1072" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_initialize_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_initialize_ftdss&#45;&gt;proc~assemble_initialize_ftdss -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_edge10" class="edge">
+<title>interface~assemble_initialize_ftdss&#45;&gt;proc~assemble_initialize_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1175.11,-12C1183.69,-12 1192.3,-12 1200.68,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1200.79,-15.5 1210.79,-12 1200.79,-8.5 1200.79,-15.5"/>
+</g>
+<!-- proc~assemble_ftdss -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_node12" class="node">
+<title>proc~assemble_ftdss</title>
+<g id="a_interface~~lerp_1d_abst_fe~~CalledByGraph_node12"><a xlink:href="../proc/assemble_ftdss.html" xlink:title="assemble_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="933,-24 839,-24 839,0 933,0 933,-24"/>
+<text text-anchor="middle" x="886" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_ftdss&#45;&gt;interface~assemble_initialize_ftdss -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_edge11" class="edge">
+<title>proc~assemble_ftdss&#45;&gt;interface~assemble_initialize_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M933.43,-12C941.4,-12 949.98,-12 958.81,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="958.89,-15.5 968.89,-12 958.89,-8.5 958.89,-15.5"/>
+</g>
+<!-- interface~assemble_ftdss -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_node13" class="node">
+<title>interface~assemble_ftdss</title>
+<g id="a_interface~~lerp_1d_abst_fe~~CalledByGraph_node13"><a xlink:href="../interface/assemble_ftdss.html" xlink:title="type_ftdss%assemble_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="803,-24 646,-24 646,0 803,0 803,-24"/>
+<text text-anchor="middle" x="724.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_edge12" class="edge">
+<title>interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M803.38,-12C811.94,-12 820.54,-12 828.76,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="828.95,-15.5 838.95,-12 828.95,-8.5 828.95,-15.5"/>
+</g>
+<!-- proc~solve_time_step_ftdss -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_node14" class="node">
+<title>proc~solve_time_step_ftdss</title>
+<g id="a_interface~~lerp_1d_abst_fe~~CalledByGraph_node14"><a xlink:href="../proc/solve_time_step_ftdss.html" xlink:title="solve_time_step_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="610,-24 483,-24 483,0 610,0 610,-24"/>
+<text text-anchor="middle" x="546.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_edge13" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M610.05,-12C618.36,-12 627,-12 635.63,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="635.75,-15.5 645.75,-12 635.75,-8.5 635.75,-15.5"/>
+</g>
+<!-- interface~solve_time_step_ftdss -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_node15" class="node">
+<title>interface~solve_time_step_ftdss</title>
+<g id="a_interface~~lerp_1d_abst_fe~~CalledByGraph_node15"><a xlink:href="../interface/solve_time_step_ftdss.html" xlink:title="type_ftdss%solve_time_step_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="447,-24 257,-24 257,0 447,0 447,-24"/>
+<text text-anchor="middle" x="352" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_edge14" class="edge">
+<title>interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M447.28,-12C455.88,-12 464.5,-12 472.87,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="472.93,-15.5 482.93,-12 472.93,-8.5 472.93,-15.5"/>
+</g>
+<!-- proc~run_ftdss -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_node16" class="node">
+<title>proc~run_ftdss</title>
+<g id="a_interface~~lerp_1d_abst_fe~~CalledByGraph_node16"><a xlink:href="../proc/run_ftdss.html" xlink:title="run_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-24 160,-24 160,0 221,0 221,-24"/>
+<text text-anchor="middle" x="190.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_edge15" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M221.13,-12C228.8,-12 237.52,-12 246.72,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="246.86,-15.5 256.86,-12 246.86,-8.5 246.86,-15.5"/>
+</g>
+<!-- interface~run_ftdss -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_node17" class="node">
+<title>interface~run_ftdss</title>
+<g id="a_interface~~lerp_1d_abst_fe~~CalledByGraph_node17"><a xlink:href="../interface/run_ftdss.html" xlink:title="type_ftdss%run_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="124,-24 0,-24 0,0 124,0 124,-24"/>
+<text text-anchor="middle" x="62" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftdss&#45;&gt;proc~run_ftdss -->
+<g id="interface~~lerp_1d_abst_fe~~CalledByGraph_edge16" class="edge">
+<title>interface~run_ftdss&#45;&gt;proc~run_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M124.03,-12C132.82,-12 141.68,-12 149.91,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="149.94,-15.5 159.94,-12 149.94,-8.5 149.94,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacelerp_1d_abst_feCalledByGraph = svgPanZoom('#interfacelerp_1d_abst_feCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+      <h2>private module subroutine lerp_1d_abst_fe(self, r, values, lerped_value)  
+    <a href="../proc/lerp_1d_abst_fe.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h2>
+
+    
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~1184"></span>
+              class(<a href='../type/abst_fe.html'>abst_fe</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-r~72"></span>
+              type(<a href='../type/type_coordinate_dp.html'>type_coordinate_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>r</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-values~17"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>values</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-lerped_value~5"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>lerped_value</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+
+ </div>
+</div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

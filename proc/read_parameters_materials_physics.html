@@ -1,0 +1,1124 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>read_parameters_materials_physics &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>read_parameters_materials_physics
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">42 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/basic_materials.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/basic_materials.f90.html'>basic_materials.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/inout_input_basic_materials.html'>inout_input_basic_materials</a></li>
+            <li class="breadcrumb-item active" aria-current="page">read_parameters_materials_physics</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/read_parameters_materials_physics.html#src">read_parameters_materials_physics</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2> subroutine read_parameters_materials_physics(self, json, i_material)  
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~648"></span>
+              class(<a href='../type/type_input_basic.html'>type_input_basic</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json~25"></span>
+              type(json_file),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>json</strong></td>
+            <td>
+                <p>JSON parser</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-i_material~2"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>i_material</strong></td>
+            <td>
+                <p>Material index</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~read_parameters_materials_physics~~CallsGraph Pages: 1 -->
+<svg id="procread_parameters_materials_physicsCallsGraph" width="641pt" height="304pt"
+ viewBox="0.00 0.00 641.00 303.53" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~read_parameters_materials_physics~~CallsGraph" class="graph" transform="scale(0.51 0.51) rotate(0) translate(4 589.8)">
+<title>proc~~read_parameters_materials_physics~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-589.8 1250,-589.8 1250,4 -4,4"/>
+<!-- proc~read_parameters_materials_physics -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node1" class="node">
+<title>proc~read_parameters_materials_physics</title>
+<polygon fill="none" stroke="black" points="204,-284 0,-284 0,-260 204,-260 204,-284"/>
+<text text-anchor="middle" x="102" y="-269.6" font-family="Helvetica,sans-Serif" font-size="10.50">read_parameters_materials_physics</text>
+</g>
+<!-- interface~get_json_value -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node2" class="node">
+<title>interface~get_json_value</title>
+<g id="a_proc~~read_parameters_materials_physics~~CallsGraph_node2"><a xlink:href="../interface/get_json_value.html" xlink:title="get_json_value">
+<polygon fill="#a7506f" stroke="#a7506f" points="638.5,-284 547.5,-284 547.5,-260 638.5,-260 638.5,-284"/>
+<text text-anchor="middle" x="593" y="-269.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_value</text>
+</a>
+</g>
+</g>
+<!-- proc~read_parameters_materials_physics&#45;&gt;interface~get_json_value -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge1" class="edge">
+<title>proc~read_parameters_materials_physics&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M167.93,-259.98C190.64,-256.32 216.37,-252.8 240,-251 352.12,-242.46 381.17,-239.27 493,-251 507.62,-252.53 523.27,-255.31 537.7,-258.35"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="536.95,-261.77 547.47,-260.49 538.45,-254.93 536.95,-261.77"/>
+</g>
+<!-- proc~join -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node3" class="node">
+<title>proc~join</title>
+<g id="a_proc~~read_parameters_materials_physics~~CallsGraph_node3"><a xlink:href="../proc/join.html" xlink:title="join">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="620,-345 566,-345 566,-321 620,-321 620,-345"/>
+<text text-anchor="middle" x="593" y="-330.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">join</text>
+</a>
+</g>
+</g>
+<!-- proc~read_parameters_materials_physics&#45;&gt;proc~join -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge2" class="edge">
+<title>proc~read_parameters_materials_physics&#45;&gt;proc~join</title>
+<path fill="none" stroke="#ff0000" d="M177.94,-284.03C198.07,-287.11 219.85,-290.31 240,-293 355.21,-308.37 492.14,-322.85 555.94,-329.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="555.6,-332.85 565.9,-330.39 556.31,-325.89 555.6,-332.85"/>
+</g>
+<!-- proc~read_parameters_materials_hydraulic_model -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node4" class="node">
+<title>proc~read_parameters_materials_hydraulic_model</title>
+<g id="a_proc~~read_parameters_materials_physics~~CallsGraph_node4"><a xlink:href="../proc/read_parameters_materials_hydraulic_model.html" xlink:title="read_parameters_materials_hydraulic_model">
+<polygon fill="#d9534f" stroke="#d9534f" points="493,-284 240,-284 240,-260 493,-260 493,-284"/>
+<text text-anchor="middle" x="366.5" y="-269.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_materials_hydraulic_model</text>
+</a>
+</g>
+</g>
+<!-- proc~read_parameters_materials_physics&#45;&gt;proc~read_parameters_materials_hydraulic_model -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge3" class="edge">
+<title>proc~read_parameters_materials_physics&#45;&gt;proc~read_parameters_materials_hydraulic_model</title>
+<path fill="none" stroke="#ff0000" d="M204.11,-272C212.52,-272 221.11,-272 229.71,-272"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="229.82,-275.5 239.82,-272 229.82,-268.5 229.82,-275.5"/>
+</g>
+<!-- proc~read_parameters_materials_swcc -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node5" class="node">
+<title>proc~read_parameters_materials_swcc</title>
+<g id="a_proc~~read_parameters_materials_physics~~CallsGraph_node5"><a xlink:href="../proc/read_parameters_materials_swcc.html" xlink:title="read_parameters_materials_swcc">
+<polygon fill="#d9534f" stroke="#d9534f" points="461.5,-364 271.5,-364 271.5,-340 461.5,-340 461.5,-364"/>
+<text text-anchor="middle" x="366.5" y="-349.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_materials_swcc</text>
+</a>
+</g>
+</g>
+<!-- proc~read_parameters_materials_physics&#45;&gt;proc~read_parameters_materials_swcc -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge4" class="edge">
+<title>proc~read_parameters_materials_physics&#45;&gt;proc~read_parameters_materials_swcc</title>
+<path fill="none" stroke="#ff0000" d="M129.56,-284.04C156.81,-296.02 200.68,-314.27 240,-326 254.95,-330.46 271.14,-334.43 286.75,-337.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="286.4,-341.34 296.91,-340 287.85,-334.5 286.4,-341.34"/>
+</g>
+<!-- to_string -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node6" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="1124.5,-68 1066.5,-68 1066.5,-44 1124.5,-44 1124.5,-68"/>
+<text text-anchor="middle" x="1095.5" y="-53.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~read_parameters_materials_physics&#45;&gt;to_string -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge5" class="edge">
+<title>proc~read_parameters_materials_physics&#45;&gt;to_string</title>
+<path fill="none" stroke="#ff0000" d="M114.14,-259.96C164.15,-207.32 374.88,0 592,0 592,0 592,0 768,0 873.74,0 996.01,-28.89 1056.52,-45.17"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1055.82,-48.6 1066.39,-47.86 1057.66,-41.85 1055.82,-48.6"/>
+</g>
+<!-- proc~get_json_integer32 -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node7" class="node">
+<title>proc~get_json_integer32</title>
+<g id="a_proc~~read_parameters_materials_physics~~CallsGraph_node7"><a xlink:href="../proc/get_json_integer32.html" xlink:title="get_json_integer32">
+<polygon fill="#d9534f" stroke="#d9534f" points="824,-284 710,-284 710,-260 824,-260 824,-284"/>
+<text text-anchor="middle" x="767" y="-269.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_integer32</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_integer32 -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge6" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_integer32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M638.74,-272C657.3,-272 679.23,-272 699.6,-272"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="699.77,-275.5 709.77,-272 699.77,-268.5 699.77,-275.5"/>
+</g>
+<!-- proc~get_json_integer32_array -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node8" class="node">
+<title>proc~get_json_integer32_array</title>
+<g id="a_proc~~read_parameters_materials_physics~~CallsGraph_node8"><a xlink:href="../proc/get_json_integer32_array.html" xlink:title="get_json_integer32_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="841,-242 693,-242 693,-218 841,-218 841,-242"/>
+<text text-anchor="middle" x="767" y="-227.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_integer32_array</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_integer32_array -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge7" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_integer32_array</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M638.74,-261.07C659.55,-255.99 684.58,-249.88 706.92,-244.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="707.76,-247.83 716.64,-242.05 706.09,-241.03 707.76,-247.83"/>
+</g>
+<!-- proc~get_json_logical -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node9" class="node">
+<title>proc~get_json_logical</title>
+<g id="a_proc~~read_parameters_materials_physics~~CallsGraph_node9"><a xlink:href="../proc/get_json_logical.html" xlink:title="get_json_logical">
+<polygon fill="#d9534f" stroke="#d9534f" points="815.5,-368 718.5,-368 718.5,-344 815.5,-344 815.5,-368"/>
+<text text-anchor="middle" x="767" y="-353.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_logical</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_logical -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge8" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_logical</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M613.03,-284.06C625.53,-291.99 642.25,-302.6 657,-312 673.01,-322.2 675.7,-327.18 693,-335 697.96,-337.24 703.21,-339.3 708.54,-341.19"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="707.57,-344.55 718.16,-344.39 709.78,-337.91 707.57,-344.55"/>
+</g>
+<!-- proc~get_json_real64 -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node10" class="node">
+<title>proc~get_json_real64</title>
+<g id="a_proc~~read_parameters_materials_physics~~CallsGraph_node10"><a xlink:href="../proc/get_json_real64.html" xlink:title="get_json_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="815,-158 719,-158 719,-134 815,-134 815,-158"/>
+<text text-anchor="middle" x="767" y="-143.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_real64 -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge9" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M602,-259.95C617.14,-238.1 652.14,-191.91 693,-167 698.05,-163.92 703.57,-161.28 709.24,-159.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="710.65,-162.22 718.87,-155.54 708.28,-155.64 710.65,-162.22"/>
+</g>
+<!-- proc~get_json_real64_array -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node11" class="node">
+<title>proc~get_json_real64_array</title>
+<g id="a_proc~~read_parameters_materials_physics~~CallsGraph_node11"><a xlink:href="../proc/get_json_real64_array.html" xlink:title="get_json_real64_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="832,-326 702,-326 702,-302 832,-302 832,-326"/>
+<text text-anchor="middle" x="767" y="-311.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_real64_array</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_real64_array -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge10" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_real64_array</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M638.74,-282.93C659.55,-288.01 684.58,-294.12 706.92,-299.57"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="706.09,-302.97 716.64,-301.95 707.76,-296.17 706.09,-302.97"/>
+</g>
+<!-- proc~get_json_string -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node12" class="node">
+<title>proc~get_json_string</title>
+<g id="a_proc~~read_parameters_materials_physics~~CallsGraph_node12"><a xlink:href="../proc/get_json_string.html" xlink:title="get_json_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="813,-200 721,-200 721,-176 813,-176 813,-200"/>
+<text text-anchor="middle" x="767" y="-185.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_string</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_string -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge11" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_string</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M609.99,-259.77C628.91,-245.8 661.8,-223.06 693,-209 698.76,-206.4 704.92,-204.04 711.13,-201.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="712.43,-205.18 720.88,-198.79 710.29,-198.52 712.43,-205.18"/>
+</g>
+<!-- proc~get_json_string_array -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node13" class="node">
+<title>proc~get_json_string_array</title>
+<g id="a_proc~~read_parameters_materials_physics~~CallsGraph_node13"><a xlink:href="../proc/get_json_string_array.html" xlink:title="get_json_string_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="830,-410 704,-410 704,-386 830,-386 830,-410"/>
+<text text-anchor="middle" x="767" y="-395.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_string_array</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_string_array -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge12" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_string_array</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M619.11,-284.12C631.59,-291.03 646.25,-300.59 657,-312 679.64,-336.04 667.17,-356.43 693,-377 694.8,-378.44 696.7,-379.77 698.67,-381.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="697.24,-384.23 707.7,-385.92 700.58,-378.07 697.24,-384.23"/>
+</g>
+<!-- strip -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node16" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="1246,-366 1192,-366 1192,-342 1246,-342 1246,-366"/>
+<text text-anchor="middle" x="1219" y="-351.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~join&#45;&gt;strip -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge13" class="edge">
+<title>proc~join&#45;&gt;strip</title>
+<path fill="none" stroke="#cbff00" d="M603.34,-345.23C619.25,-364.97 653.71,-403.21 693,-419 883.94,-495.72 969.1,-503.1 1156,-417 1175.97,-407.8 1193,-389.17 1204.14,-374.54"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1207.24,-376.22 1210.28,-366.07 1201.57,-372.11 1207.24,-376.22"/>
+</g>
+<!-- proc~read_parameters_materials_hydraulic_model&#45;&gt;interface~get_json_value -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge14" class="edge">
+<title>proc~read_parameters_materials_hydraulic_model&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#00ff66" d="M493.2,-272C508.38,-272 523.23,-272 536.61,-272"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="537.01,-275.5 547.01,-272 537.01,-268.5 537.01,-275.5"/>
+</g>
+<!-- proc~read_parameters_materials_hydraulic_model&#45;&gt;proc~join -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge15" class="edge">
+<title>proc~read_parameters_materials_hydraulic_model&#45;&gt;proc~join</title>
+<path fill="none" stroke="#00ff66" d="M434.01,-284.03C453.18,-287.97 474.03,-292.71 493,-298 514.28,-303.94 537.61,-312.1 556.27,-319.05"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="555.25,-322.4 565.84,-322.66 557.72,-315.85 555.25,-322.4"/>
+</g>
+<!-- proc~read_parameters_materials_hydraulic_model&#45;&gt;to_string -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge16" class="edge">
+<title>proc~read_parameters_materials_hydraulic_model&#45;&gt;to_string</title>
+<path fill="none" stroke="#00ff66" d="M372.22,-259.92C387.75,-222.07 441.35,-105.75 529,-62 621.55,-15.81 944.84,-41.59 1056.34,-52.16"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1056.17,-55.66 1066.46,-53.13 1056.84,-48.69 1056.17,-55.66"/>
+</g>
+<!-- proc~read_parameters_materials_swcc&#45;&gt;interface~get_json_value -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge17" class="edge">
+<title>proc~read_parameters_materials_swcc&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#0066ff" d="M401.6,-339.85C440.97,-325.82 505.81,-302.71 548.71,-287.42"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="550.07,-290.66 558.32,-284 547.72,-284.06 550.07,-290.66"/>
+</g>
+<!-- proc~read_parameters_materials_swcc&#45;&gt;proc~join -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge20" class="edge">
+<title>proc~read_parameters_materials_swcc&#45;&gt;proc~join</title>
+<path fill="none" stroke="#0066ff" d="M461.73,-344.02C494.7,-341.23 529.8,-338.26 555.25,-336.11"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="555.86,-339.57 565.53,-335.24 555.27,-332.6 555.86,-339.57"/>
+</g>
+<!-- proc~read_parameters_materials_swcc&#45;&gt;to_string -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge21" class="edge">
+<title>proc~read_parameters_materials_swcc&#45;&gt;to_string</title>
+<path fill="none" stroke="#0066ff" d="M402.98,-339.96C429.41,-329.93 465.51,-313.93 493,-293 512.56,-278.11 511.16,-267.91 529,-251 595.71,-187.77 608.8,-161.86 693,-125 818.05,-70.26 982.76,-58.84 1056.25,-56.53"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1056.51,-60.03 1066.41,-56.26 1056.32,-53.03 1056.51,-60.03"/>
+</g>
+<!-- proc~get_physics_unit -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node14" class="node">
+<title>proc~get_physics_unit</title>
+<g id="a_proc~~read_parameters_materials_physics~~CallsGraph_node14"><a xlink:href="../proc/get_physics_unit.html" xlink:title="get_physics_unit">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="643,-559 543,-559 543,-535 643,-535 643,-559"/>
+<text text-anchor="middle" x="593" y="-544.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_physics_unit</text>
+</a>
+</g>
+</g>
+<!-- proc~read_parameters_materials_swcc&#45;&gt;proc~get_physics_unit -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge18" class="edge">
+<title>proc~read_parameters_materials_swcc&#45;&gt;proc~get_physics_unit</title>
+<path fill="none" stroke="#0066ff" d="M375.41,-364.06C396.54,-395.37 457.62,-480.03 529,-526 531.63,-527.69 534.41,-529.26 537.28,-530.72"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="536.11,-534.03 546.66,-534.98 539,-527.66 536.11,-534.03"/>
+</g>
+<!-- proc~get_swcc_model_type -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node15" class="node">
+<title>proc~get_swcc_model_type</title>
+<g id="a_proc~~read_parameters_materials_physics~~CallsGraph_node15"><a xlink:href="../proc/get_swcc_model_type.html" xlink:title="get_swcc_model_type">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="657,-517 529,-517 529,-493 657,-493 657,-517"/>
+<text text-anchor="middle" x="593" y="-502.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_swcc_model_type</text>
+</a>
+</g>
+</g>
+<!-- proc~read_parameters_materials_swcc&#45;&gt;proc~get_swcc_model_type -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge19" class="edge">
+<title>proc~read_parameters_materials_swcc&#45;&gt;proc~get_swcc_model_type</title>
+<path fill="none" stroke="#0066ff" d="M385.12,-364.01C424.44,-390.81 519.57,-455.64 565.84,-487.17"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="563.92,-490.1 574.16,-492.84 567.86,-484.31 563.92,-490.1"/>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;strip -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge25" class="edge">
+<title>proc~get_json_integer32&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M823.34,-284.13C829.53,-286.58 835.56,-289.51 841,-293 861.68,-306.29 854.96,-324.11 877,-335 929.67,-361.03 1105.15,-358.14 1181.73,-355.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1181.99,-359.01 1191.86,-355.15 1181.74,-352.01 1181.99,-359.01"/>
+</g>
+<!-- get -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node17" class="node">
+<title>get</title>
+<polygon fill="#777777" stroke="#777777" points="965,-284 911,-284 911,-260 965,-260 965,-284"/>
+<text text-anchor="middle" x="938" y="-269.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get</text>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;get -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge22" class="edge">
+<title>proc~get_json_integer32&#45;&gt;get</title>
+<path fill="none" stroke="#ff0000" d="M824.27,-272C849.47,-272 878.46,-272 900.72,-272"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="900.76,-275.5 910.76,-272 900.76,-268.5 900.76,-275.5"/>
+</g>
+<!-- print_error_message -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node18" class="node">
+<title>print_error_message</title>
+<polygon fill="#777777" stroke="#777777" points="999,-326 877,-326 877,-302 999,-302 999,-326"/>
+<text text-anchor="middle" x="938" y="-311.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">print_error_message</text>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;print_error_message -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge23" class="edge">
+<title>proc~get_json_integer32&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#ff0000" d="M816.43,-284.04C835.88,-288.87 858.46,-294.48 878.79,-299.53"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="878.02,-302.95 888.56,-301.96 879.7,-296.15 878.02,-302.95"/>
+</g>
+<!-- proc~raise_error -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node19" class="node">
+<title>proc~raise_error</title>
+<g id="a_proc~~read_parameters_materials_physics~~CallsGraph_node19"><a xlink:href="../proc/raise_error.html" xlink:title="raise_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="973,-242 903,-242 903,-218 973,-218 973,-242"/>
+<text text-anchor="middle" x="938" y="-227.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">raise_error</text>
+</a>
+</g>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;proc~raise_error -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge24" class="edge">
+<title>proc~get_json_integer32&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff0000" d="M816.43,-259.96C840.58,-253.96 869.57,-246.76 893.08,-240.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="893.92,-244.31 902.78,-238.5 892.23,-237.52 893.92,-244.31"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;strip -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge29" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;strip</title>
+<path fill="none" stroke="#ff9900" d="M819.55,-217.98C837.61,-214.33 858.1,-210.8 877,-209 1000.53,-197.21 1053.84,-149.55 1156,-220 1193.59,-245.92 1208.89,-300.64 1214.71,-331.54"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="1211.32,-332.48 1216.46,-341.75 1218.22,-331.3 1211.32,-332.48"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;get -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge26" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;get</title>
+<path fill="none" stroke="#ff9900" d="M816.43,-242.04C843.23,-248.7 875.98,-256.84 900.59,-262.95"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="900.04,-266.42 910.59,-265.44 901.73,-259.63 900.04,-266.42"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;print_error_message -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge27" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#ff9900" d="M823.34,-242.13C829.53,-244.58 835.56,-247.51 841,-251 861.68,-264.29 856.7,-279.13 877,-293 879.39,-294.63 881.92,-296.15 884.54,-297.57"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="883.17,-300.79 893.7,-301.96 886.2,-294.48 883.17,-300.79"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;proc~raise_error -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge28" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff9900" d="M841.14,-230C858.54,-230 876.59,-230 892.27,-230"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="892.71,-233.5 902.71,-230 892.71,-226.5 892.71,-233.5"/>
+</g>
+<!-- proc~get_json_logical&#45;&gt;get -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge30" class="edge">
+<title>proc~get_json_logical&#45;&gt;get</title>
+<path fill="none" stroke="#cbff00" d="M815.69,-346.63C824.51,-343.71 833.34,-339.92 841,-335 861.68,-321.71 856.7,-306.87 877,-293 884.27,-288.03 892.84,-284.12 901.18,-281.09"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="902.39,-284.38 910.79,-277.93 900.2,-277.73 902.39,-284.38"/>
+</g>
+<!-- proc~get_json_logical&#45;&gt;print_error_message -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge31" class="edge">
+<title>proc~get_json_logical&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#cbff00" d="M815.53,-344.19C835.16,-339.31 858.11,-333.61 878.74,-328.48"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="879.8,-331.82 888.66,-326.01 878.11,-325.03 879.8,-331.82"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;strip -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge35" class="edge">
+<title>proc~get_json_real64&#45;&gt;strip</title>
+<path fill="none" stroke="#33ff00" d="M805.14,-133.98C880,-112.27 1050.82,-75.7 1156,-155 1211.97,-197.19 1218.74,-289.46 1218.72,-331.87"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1215.21,-331.93 1218.58,-341.98 1222.21,-332.02 1215.21,-331.93"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;get -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge32" class="edge">
+<title>proc~get_json_real64&#45;&gt;get</title>
+<path fill="none" stroke="#33ff00" d="M815.13,-152.96C824.5,-156.06 833.68,-160.54 841,-167 871.46,-193.87 847.32,-223.28 877,-251 883.74,-257.29 892.47,-261.72 901.18,-264.82"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="900.3,-268.21 910.89,-267.79 902.35,-261.52 900.3,-268.21"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;print_error_message -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge33" class="edge">
+<title>proc~get_json_real64&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#33ff00" d="M815.02,-152.03C824.61,-155.17 833.92,-159.91 841,-167 882.15,-208.22 837.04,-250.63 877,-293 878.04,-294.1 879.14,-295.15 880.3,-296.14"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="878.36,-299.06 888.56,-301.92 882.37,-293.32 878.36,-299.06"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;proc~raise_error -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge34" class="edge">
+<title>proc~get_json_real64&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#33ff00" d="M815.1,-157.29C823.88,-160.02 832.85,-163.26 841,-167 867.43,-179.14 894.92,-197.9 913.67,-211.8"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="911.79,-214.76 921.88,-217.99 916,-209.17 911.79,-214.76"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;strip -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge39" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;strip</title>
+<path fill="none" stroke="#00ff66" d="M821.02,-326.09C827.95,-328.57 834.79,-331.52 841,-335 859.93,-345.62 856.77,-360.13 877,-368 981.36,-408.59 1117.47,-381.63 1181.58,-364.72"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1182.86,-368 1191.6,-362.01 1181.03,-361.24 1182.86,-368"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;get -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge36" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;get</title>
+<path fill="none" stroke="#00ff66" d="M816.43,-301.96C843.23,-295.3 875.98,-287.16 900.59,-281.05"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="901.73,-284.37 910.59,-278.56 900.04,-277.58 901.73,-284.37"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;print_error_message -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge37" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#00ff66" d="M832.37,-314C843.59,-314 855.3,-314 866.66,-314"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="866.98,-317.5 876.98,-314 866.98,-310.5 866.98,-317.5"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;proc~raise_error -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge38" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ff66" d="M823.34,-301.87C829.53,-299.42 835.56,-296.49 841,-293 861.68,-279.71 856.7,-264.87 877,-251 881.96,-247.61 887.53,-244.71 893.22,-242.25"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="894.77,-245.4 902.82,-238.51 892.23,-238.88 894.77,-245.4"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;strip -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge43" class="edge">
+<title>proc~get_json_string&#45;&gt;strip</title>
+<path fill="none" stroke="#00ffff" d="M813.06,-180.47C903.28,-166.41 1102.07,-140.89 1156,-179 1205.83,-214.21 1215.87,-293.05 1217.72,-331.73"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1214.22,-332.05 1218.05,-341.93 1221.22,-331.82 1214.22,-332.05"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;get -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge40" class="edge">
+<title>proc~get_json_string&#45;&gt;get</title>
+<path fill="none" stroke="#00ffff" d="M813.01,-196.51C822.71,-199.53 832.57,-203.58 841,-209 861.68,-222.29 856.7,-237.13 877,-251 884.27,-255.97 892.84,-259.88 901.18,-262.91"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="900.2,-266.27 910.79,-266.07 902.39,-259.62 900.2,-266.27"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;print_error_message -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge41" class="edge">
+<title>proc~get_json_string&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#00ffff" d="M813.23,-194.35C823.25,-197.47 833.19,-202.11 841,-209 871.46,-235.87 847.32,-265.28 877,-293 878.3,-294.22 879.68,-295.36 881.12,-296.45"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="879.57,-299.61 889.9,-301.94 883.28,-293.67 879.57,-299.61"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;proc~raise_error -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge42" class="edge">
+<title>proc~get_json_string&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ffff" d="M813.29,-199.26C838.04,-205.41 868.55,-212.99 893.08,-219.09"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="892.3,-222.5 902.85,-221.51 893.99,-215.7 892.3,-222.5"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;strip -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge47" class="edge">
+<title>proc~get_json_string_array&#45;&gt;strip</title>
+<path fill="none" stroke="#0066ff" d="M830.02,-407.34C907.92,-416.8 1044.87,-425.82 1156,-393 1170.24,-388.79 1184.39,-380.31 1195.57,-372.32"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1197.94,-374.92 1203.84,-366.12 1193.74,-369.32 1197.94,-374.92"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;get -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge44" class="edge">
+<title>proc~get_json_string_array&#45;&gt;get</title>
+<path fill="none" stroke="#0066ff" d="M827.76,-385.83C832.54,-383.4 837.04,-380.49 841,-377 871.46,-350.13 847.32,-320.72 877,-293 883.74,-286.71 892.47,-282.28 901.18,-279.18"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="902.35,-282.48 910.89,-276.21 900.3,-275.79 902.35,-282.48"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;print_error_message -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge45" class="edge">
+<title>proc~get_json_string_array&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#0066ff" d="M817.43,-385.98C825.46,-383.4 833.57,-380.41 841,-377 867.43,-364.86 894.92,-346.1 913.67,-332.2"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="916,-334.83 921.88,-326.01 911.79,-329.24 916,-334.83"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;proc~raise_error -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge46" class="edge">
+<title>proc~get_json_string_array&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#0066ff" d="M828.95,-385.97C833.36,-383.5 837.46,-380.55 841,-377 882.15,-335.78 837.04,-293.37 877,-251 881.52,-246.21 887.2,-242.51 893.25,-239.65"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="894.93,-242.75 902.94,-235.82 892.36,-236.24 894.93,-242.75"/>
+</g>
+<!-- proc~get_physics_unit&#45;&gt;strip -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge48" class="edge">
+<title>proc~get_physics_unit&#45;&gt;strip</title>
+<path fill="none" stroke="#3200ff" d="M643.06,-558.92C658.89,-562.23 676.6,-565.36 693,-567 900.94,-587.79 995.05,-618.3 1156,-485 1190.02,-456.82 1206.54,-405.68 1213.56,-376.32"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="1217.05,-376.75 1215.8,-366.23 1210.22,-375.23 1217.05,-376.75"/>
+</g>
+<!-- to_lower -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node20" class="node">
+<title>to_lower</title>
+<polygon fill="#777777" stroke="#777777" points="796,-558 738,-558 738,-534 796,-534 796,-558"/>
+<text text-anchor="middle" x="767" y="-543.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_lower</text>
+</g>
+<!-- proc~get_physics_unit&#45;&gt;to_lower -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge49" class="edge">
+<title>proc~get_physics_unit&#45;&gt;to_lower</title>
+<path fill="none" stroke="#3200ff" d="M643.29,-546.71C670.04,-546.56 702.63,-546.37 727.5,-546.22"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="727.66,-549.72 737.64,-546.16 727.62,-542.72 727.66,-549.72"/>
+</g>
+<!-- proc~get_swcc_model_type&#45;&gt;strip -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge50" class="edge">
+<title>proc~get_swcc_model_type&#45;&gt;strip</title>
+<path fill="none" stroke="#cc00ff" d="M657.26,-506.9C786.95,-509.58 1077.35,-508.95 1156,-453 1183.08,-433.73 1200.9,-398.56 1210.22,-375.74"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1213.55,-376.82 1213.9,-366.23 1207.02,-374.29 1213.55,-376.82"/>
+</g>
+<!-- proc~get_swcc_model_type&#45;&gt;to_lower -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge51" class="edge">
+<title>proc~get_swcc_model_type&#45;&gt;to_lower</title>
+<path fill="none" stroke="#cc00ff" d="M644.68,-517.08C671.21,-523.4 703.17,-531.02 727.63,-536.85"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="727.07,-540.32 737.61,-539.23 728.69,-533.51 727.07,-540.32"/>
+</g>
+<!-- proc~raise_error&#45;&gt;to_string -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge54" class="edge">
+<title>proc~raise_error&#45;&gt;to_string</title>
+<path fill="none" stroke="#00ffff" d="M949.93,-217.76C976.41,-188.14 1044.18,-112.3 1076.64,-75.98"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1079.32,-78.24 1083.37,-68.45 1074.1,-73.58 1079.32,-78.24"/>
+</g>
+<!-- proc~raise_error&#45;&gt;strip -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge53" class="edge">
+<title>proc~raise_error&#45;&gt;strip</title>
+<path fill="none" stroke="#00ffff" d="M973.18,-241.28C981.68,-244.27 990.73,-247.62 999,-251 1066.43,-278.57 1142.98,-316.04 1185.37,-337.36"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1183.87,-340.52 1194.38,-341.91 1187.03,-334.28 1183.87,-340.52"/>
+</g>
+<!-- proc~replace_placeholder -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_node21" class="node">
+<title>proc~replace_placeholder</title>
+<g id="a_proc~~read_parameters_materials_physics~~CallsGraph_node21"><a xlink:href="../proc/replace_placeholder.html" xlink:title="replace_placeholder">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1156,-253 1035,-253 1035,-229 1156,-229 1156,-253"/>
+<text text-anchor="middle" x="1095.5" y="-238.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">replace_placeholder</text>
+</a>
+</g>
+</g>
+<!-- proc~raise_error&#45;&gt;proc~replace_placeholder -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge52" class="edge">
+<title>proc~raise_error&#45;&gt;proc~replace_placeholder</title>
+<path fill="none" stroke="#00ffff" d="M973.13,-232.41C988.22,-233.48 1006.56,-234.78 1024.37,-236.04"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1024.53,-239.56 1034.76,-236.77 1025.03,-232.58 1024.53,-239.56"/>
+</g>
+<!-- proc~replace_placeholder&#45;&gt;strip -->
+<g id="proc~~read_parameters_materials_physics~~CallsGraph_edge55" class="edge">
+<title>proc~replace_placeholder&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M1112.06,-253.03C1124.31,-262.68 1141.64,-276.75 1156,-290 1171.44,-304.25 1187.95,-321.39 1200.05,-334.35"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1197.6,-336.85 1206.96,-341.81 1202.73,-332.09 1197.6,-336.85"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocread_parameters_materials_physicsCallsGraph = svgPanZoom('#procread_parameters_materials_physicsCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~read_parameters_materials_physics~~CalledByGraph Pages: 1 -->
+<svg id="procread_parameters_materials_physicsCalledByGraph" width="641pt" height="16pt"
+ viewBox="0.00 0.00 641.00 15.84" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~read_parameters_materials_physics~~CalledByGraph" class="graph" transform="scale(0.49 0.49) rotate(0) translate(4 28)">
+<title>proc~~read_parameters_materials_physics~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 1291,-28 1291,4 -4,4"/>
+<!-- proc~read_parameters_materials_physics -->
+<g id="proc~~read_parameters_materials_physics~~CalledByGraph_node1" class="node">
+<title>proc~read_parameters_materials_physics</title>
+<polygon fill="none" stroke="black" points="1287,-24 1083,-24 1083,0 1287,0 1287,-24"/>
+<text text-anchor="middle" x="1185" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">read_parameters_materials_physics</text>
+</g>
+<!-- proc~read_parameters_materials -->
+<g id="proc~~read_parameters_materials_physics~~CalledByGraph_node2" class="node">
+<title>proc~read_parameters_materials</title>
+<g id="a_proc~~read_parameters_materials_physics~~CalledByGraph_node2"><a xlink:href="../proc/read_parameters_materials.html" xlink:title="read_parameters_materials">
+<polygon fill="#d9534f" stroke="#d9534f" points="1047,-24 887,-24 887,0 1047,0 1047,-24"/>
+<text text-anchor="middle" x="967" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_materials</text>
+</a>
+</g>
+</g>
+<!-- proc~read_parameters_materials&#45;&gt;proc~read_parameters_materials_physics -->
+<g id="proc~~read_parameters_materials_physics~~CalledByGraph_edge1" class="edge">
+<title>proc~read_parameters_materials&#45;&gt;proc~read_parameters_materials_physics</title>
+<path fill="none" stroke="#ff0000" d="M1047.2,-12C1055.51,-12 1064.06,-12 1072.65,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1072.72,-15.5 1082.72,-12 1072.72,-8.5 1072.72,-15.5"/>
+</g>
+<!-- interface~read_parameters_materials -->
+<g id="proc~~read_parameters_materials_physics~~CalledByGraph_node3" class="node">
+<title>interface~read_parameters_materials</title>
+<g id="a_proc~~read_parameters_materials_physics~~CalledByGraph_node3"><a xlink:href="../interface/read_parameters_materials.html" xlink:title="read_parameters_materials">
+<polygon fill="#a7506f" stroke="#a7506f" points="851,-24 691,-24 691,0 851,0 851,-24"/>
+<text text-anchor="middle" x="771" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_parameters_materials</text>
+</a>
+</g>
+</g>
+<!-- interface~read_parameters_materials&#45;&gt;proc~read_parameters_materials -->
+<g id="proc~~read_parameters_materials_physics~~CalledByGraph_edge2" class="edge">
+<title>interface~read_parameters_materials&#45;&gt;proc~read_parameters_materials</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M851.19,-12C859.53,-12 868.05,-12 876.5,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="876.75,-15.5 886.75,-12 876.75,-8.5 876.75,-15.5"/>
+</g>
+<!-- proc~initialize_type_input_basic -->
+<g id="proc~~read_parameters_materials_physics~~CalledByGraph_node4" class="node">
+<title>proc~initialize_type_input_basic</title>
+<g id="a_proc~~read_parameters_materials_physics~~CalledByGraph_node4"><a xlink:href="../proc/initialize_type_input_basic.html" xlink:title="initialize_type_input_basic">
+<polygon fill="#d9534f" stroke="#d9534f" points="655,-24 504,-24 504,0 655,0 655,-24"/>
+<text text-anchor="middle" x="579.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_type_input_basic</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_input_basic&#45;&gt;interface~read_parameters_materials -->
+<g id="proc~~read_parameters_materials_physics~~CalledByGraph_edge3" class="edge">
+<title>proc~initialize_type_input_basic&#45;&gt;interface~read_parameters_materials</title>
+<path fill="none" stroke="#ff0000" d="M655.12,-12C663.54,-12 672.17,-12 680.74,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="680.76,-15.5 690.76,-12 680.76,-8.5 680.76,-15.5"/>
+</g>
+<!-- interface~initialize_type_input_basic -->
+<g id="proc~~read_parameters_materials_physics~~CalledByGraph_node5" class="node">
+<title>interface~initialize_type_input_basic</title>
+<g id="a_proc~~read_parameters_materials_physics~~CalledByGraph_node5"><a xlink:href="../interface/initialize_type_input_basic.html" xlink:title="type_input_basic%initialize_type_input_basic">
+<polygon fill="#a7506f" stroke="#a7506f" points="468,-24 219,-24 219,0 468,0 468,-24"/>
+<text text-anchor="middle" x="343.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input_basic%initialize_type_input_basic</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_input_basic&#45;&gt;proc~initialize_type_input_basic -->
+<g id="proc~~read_parameters_materials_physics~~CalledByGraph_edge4" class="edge">
+<title>interface~initialize_type_input_basic&#45;&gt;proc~initialize_type_input_basic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M468.01,-12C476.68,-12 485.3,-12 493.69,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="493.78,-15.5 503.78,-12 493.78,-8.5 493.78,-15.5"/>
+</g>
+<!-- proc~initialize_type_input -->
+<g id="proc~~read_parameters_materials_physics~~CalledByGraph_node6" class="node">
+<title>proc~initialize_type_input</title>
+<g id="a_proc~~read_parameters_materials_physics~~CalledByGraph_node6"><a xlink:href="../proc/initialize_type_input.html" xlink:title="type_input%initialize_type_input">
+<polygon fill="#d9534f" stroke="#d9534f" points="183,-24 0,-24 0,0 183,0 183,-24"/>
+<text text-anchor="middle" x="91.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input%initialize_type_input</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_input&#45;&gt;interface~initialize_type_input_basic -->
+<g id="proc~~read_parameters_materials_physics~~CalledByGraph_edge5" class="edge">
+<title>proc~initialize_type_input&#45;&gt;interface~initialize_type_input_basic</title>
+<path fill="none" stroke="#ff0000" d="M183.11,-12C191.45,-12 200,-12 208.62,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="208.75,-15.5 218.75,-12 208.75,-8.5 208.75,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocread_parameters_materials_physicsCalledByGraph = svgPanZoom('#procread_parameters_materials_physicsCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">read_parameters_materials_physics</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">i_material</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_input_basic</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">json_file</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="c">!! JSON parser</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i_material</span><span class="w"> </span><span class="c">!! Material index</span>
+
+<span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">buffer</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="kt">character</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+
+<span class="w">        </span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">materials</span><span class="o">//</span><span class="s2">&quot;(&quot;</span><span class="o">//</span><span class="n">to_string</span><span class="p">(</span><span class="n">i_material</span><span class="p">)</span><span class="o">//</span><span class="s2">&quot;)&quot;</span>
+
+<span class="w">        </span><span class="n">buffer</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">density</span>
+<span class="w">        </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">value</span>
+<span class="k">        call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">)),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">density</span><span class="p">%</span><span class="k">value</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                            </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="n">valid_range</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="nb">huge</span><span class="p">(</span><span class="mf">0.0d0</span><span class="p">)],</span><span class="w"> </span><span class="n">array_size</span><span class="o">=</span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">phase</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">buffer</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">specific_heat</span>
+<span class="w">        </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">value</span>
+<span class="k">        call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">)),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">specific_heat</span><span class="p">%</span><span class="k">value</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                            </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="n">valid_range</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="nb">huge</span><span class="p">(</span><span class="mf">0.0d0</span><span class="p">)],</span><span class="w"> </span><span class="n">array_size</span><span class="o">=</span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">phase</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">buffer</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">volumetric_heat_capacity</span>
+<span class="w">        </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">value</span>
+<span class="k">        call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">)),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">volumetric_heat_capacity</span><span class="p">%</span><span class="k">value</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                            </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="n">valid_range</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="nb">huge</span><span class="p">(</span><span class="mf">0.0d0</span><span class="p">)],</span><span class="w"> </span><span class="n">array_size</span><span class="o">=</span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">phase</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">phase</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">params</span>
+<span class="w">            </span><span class="k">call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">)),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">volumetric_heat_capacity</span><span class="p">%</span><span class="k">value</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="n">valid_range</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="nb">huge</span><span class="p">(</span><span class="mf">0.0d0</span><span class="p">)],</span><span class="w"> </span><span class="n">array_size</span><span class="o">=</span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">phase</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        </span><span class="n">buffer</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thermal_conductivity</span>
+<span class="w">        </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">value</span>
+<span class="k">        call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">)),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">thermal_conductivity</span><span class="p">%</span><span class="k">value</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                            </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="n">valid_range</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="nb">huge</span><span class="p">(</span><span class="mf">0.0d0</span><span class="p">)],</span><span class="w"> </span><span class="n">array_size</span><span class="o">=</span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">phase</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">is_dispersed</span>
+<span class="w">        </span><span class="k">call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">)),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">thermal_conductivity</span><span class="p">%</span><span class="n">is_dispersed</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                            </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">false</span><span class="p">.,</span><span class="w"> </span><span class="n">default_value</span><span class="o">=</span><span class="p">.</span><span class="n">false</span><span class="p">.)</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">thermal_conductivity</span><span class="p">%</span><span class="n">is_dispersed</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dispersivity</span>
+<span class="w">            </span><span class="k">call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">)),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">thermal_conductivity</span><span class="p">%</span><span class="n">dispersivity</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="n">valid_range</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="nb">huge</span><span class="p">(</span><span class="mf">0.0d0</span><span class="p">)],</span><span class="w"> </span><span class="n">array_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">phase</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">params</span>
+<span class="w">            </span><span class="k">call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">)),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">thermal_conductivity</span><span class="p">%</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="n">valid_range</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="nb">huge</span><span class="p">(</span><span class="mf">0.0d0</span><span class="p">)],</span><span class="w"> </span><span class="n">array_size</span><span class="o">=</span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">phase</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">phase</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">buffer</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">phase_change</span>
+<span class="w">            </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">equilibrium_model</span>
+<span class="w">            </span><span class="n">buffer</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">segregation</span>
+<span class="w">            </span><span class="k">call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">phase_change</span><span class="p">%</span><span class="n">equilibrium_model</span><span class="p">%</span><span class="n">segregation</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="n">default_value</span><span class="o">=</span><span class="p">.</span><span class="n">false</span><span class="p">.)</span>
+
+<span class="w">            </span><span class="k">call </span><span class="n">read_parameters_materials_swcc</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">i_material</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">read_parameters_materials_hydraulic_model</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">i_material</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">    end subroutine </span><span class="n">read_parameters_materials_physics</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

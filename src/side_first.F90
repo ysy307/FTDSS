@@ -1,160 +1,184 @@
-submodule(domain_mesh_side) domain_mesh_side_first
+!>
+!> Implements the procedures for the first-order side (line) finite element.
+!> Refactored to use subroutines for all interface methods and strict variable declarations.
+!>
+submodule(domain_fe_side) domain_fe_side_first
     implicit none
 contains
 
-    module function construct_side_first(id, global_coordinate, input) result(side)
+    !>
+    !> Creates and initializes a first-order side (2-node line) element object.
+    !>
+    module function construct_side_first(integration_order) result(fe)
         implicit none
-        integer(int32), intent(in) :: id
-        type(type_dp_3d), pointer, intent(in) :: global_coordinate
-        type(type_input), intent(in) :: input
-        class(abst_side), allocatable :: side
+        !> The integration order for the element.
+        integer(int32), intent(in) :: integration_order
+        !> The newly created and allocated first-order side element object.
+        class(abst_fe), allocatable :: fe
 
-        integer(int32) :: num_nodes, num_gauss
-        real(real64), allocatable :: weight(:)
-        real(real64), allocatable :: gauss(:, :)
+        character(len=*), parameter :: cell_name = "Line"
+        integer(int32) :: vtk_type
+        integer(int32) :: num_nodes
+        integer(int32) :: dimension
+        integer(int32) :: order
+        integer(int32) :: num_gauss
 
-        allocate (type_side_first :: side)
+        allocate (type_side_first :: fe)
 
-        num_nodes = input%geometry%vtk%cells(id)%num_nodes_in_cell
+        call vtk_constants%get_cell_info_from_cell_name(cell_name, vtk_type, num_nodes, dimension, order)
 
-        select case (input%basic%geometry_settings%integration_type)
-        case ("full")
-            num_gauss = 1_int32
-            call allocate_array(weight, num_gauss)
-            call allocate_array(gauss, 3_int32, num_gauss)
-
-            weight(:) = [0.0d0]
-            gauss(:, 1) = [2.0d0, 0.0d0, 0.0d0]
-        case ("reduced")
-            call global_logger%log_warning(message="Reduced-type integration is not implemented for first order sides.")
-            num_gauss = 1_int32
-            call allocate_array(weight, num_gauss)
-            call allocate_array(gauss, num_gauss, 3_int32)
-
-            weight(:) = [0.0d0]
-            gauss(:, 1) = [2.0d0, 0.0d0, 0.0d0]
-        case ("free")
-            call global_logger%log_warning(message="Free-type integration is not implemented for first order sides.")
-            num_gauss = 1_int32
-            call allocate_array(weight, num_gauss)
-            call allocate_array(gauss, num_gauss, 3_int32)
-
-            weight(:) = [0.0d0]
-            gauss(:, 1) = [2.0d0, 0.0d0, 0.0d0]
-        end select
-
-        call side%initialize(id=id, &
-                             type=input%geometry%vtk%cells(id)%cell_type, &
-                             group=input%geometry%vtk%cells(id)%cell_entity_id, &
-                             dimension=input%geometry%vtk%cells(id)%get_dimension(), &
-                             order=input%geometry%vtk%cells(id)%get_order(), &
-                             num_nodes=num_nodes, &
-                             connectivity=input%geometry%vtk%cells(id)%connectivity(1:num_nodes), &
-                             num_gauss=num_gauss, &
-                             weight=weight, &
-                             gauss=gauss, &
-                             global_coordinate=global_coordinate)
+        call fe%initialize(type=vtk_type, dimension=dimension, order=order, num_nodes=num_nodes, &
+                           integration_order=integration_order)
 
     end function construct_side_first
 
-    module pure function get_length_side_first(self) result(length)
+    !>
+    !> Calculates the straight-line length of the element.
+    !>
+    module subroutine calc_length_side_first(self, node_coords, measure)
         implicit none
         class(type_side_first), intent(in) :: self
-        real(real64) :: length
+        real(real64), intent(in) :: node_coords(:, :)
+        real(real64), intent(inout) :: measure
+        integer(int32) :: node1_id
+        integer(int32) :: node2_id
+        real(real64) :: dx
+        real(real64) :: dy
+        real(real64) :: dz
 
-        type(type_dp_vector_3d) :: coord1
-        type(type_dp_vector_3d) :: coord2
-        type(type_dp_vector_3d) :: delta
+        dx = node_coords(1, 2) - node_coords(1, 1)
+        dy = node_coords(2, 2) - node_coords(2, 1)
+        dz = node_coords(3, 2) - node_coords(3, 1)
 
-        ! オブジェクト自身が持つ get_coordinate メソッドを使用して節点座標を取得
-        coord1 = self%get_coordinate(1)
-        coord2 = self%get_coordinate(2)
+        measure = sqrt(dx**2 + dy**2 + dz**2)
+    end subroutine calc_length_side_first
 
-        ! 2点間のベクトルを計算
-        delta = coord2 - coord1
-
-        ! ユークリッド距離（ベクトルの大きさ）を計算
-        length = sqrt(delta%x**2 + delta%y**2 + delta%z**2)
-
-    end function get_length_side_first
-    module pure elemental function psi_side_first(self, i, r) result(psi)
+    !>
+    !> Evaluates the shape function psi.
+    !>
+    pure elemental module subroutine calc_psi_side_first(self, i, r, psi_val)
         implicit none
         class(type_side_first), intent(in) :: self
         integer(int32), intent(in) :: i
-        type(type_dp_vector_3d), intent(in) :: r
-        real(real64) :: psi
+        type(type_coordinate_dp), intent(in) :: r
+        real(real64), intent(inout) :: psi_val
 
         select case (i)
         case (1)
-            psi = 0.5d0 * (1.0d0 - r%x)
+            psi_val = 0.5d0 * (1.0d0 - r%x)
         case (2)
-            psi = 0.5d0 * (1.0d0 + r%x)
+            psi_val = 0.5d0 * (1.0d0 + r%x)
         case default
-            psi = 0.0d0
+            psi_val = 0.0d0
         end select
-    end function psi_side_first
+    end subroutine calc_psi_side_first
 
-    module pure elemental function dpsi_side_first(self, i, j, r) result(dpsi)
+    !>
+    !> Evaluates the derivative of the shape function dpsi.
+    !>
+    pure elemental module subroutine calc_dpsi_side_first(self, i, j, r, dpsi_val)
         implicit none
         class(type_side_first), intent(in) :: self
-        type(type_dp_vector_3d), intent(in) :: r
         integer(int32), intent(in) :: i
         integer(int32), intent(in) :: j
-        real(real64) :: dpsi
+        type(type_coordinate_dp), intent(in) :: r
+        real(real64), intent(inout) :: dpsi_val
 
-        select case (j)
-        case (1)
+        dpsi_val = 0.0d0
+        if (j == 1) then
             select case (i)
             case (1)
-                dpsi = -0.5d0
+                dpsi_val = -0.5d0
             case (2)
-                dpsi = 0.5d0
-            case default
-                dpsi = 0.0d0
+                dpsi_val = 0.5d0
             end select
-        end select
-    end function dpsi_side_first
+        end if
+    end subroutine calc_dpsi_side_first
 
-    pure elemental module function jacobian_side_first(self, i, j, r) result(jacobian)
+    !>
+    !> Computes the tangent vector at a specified local coordinate.
+    !>
+    pure module subroutine compute_tangent_vector_side_first(self, r, node_coords, tangent_vec)
         implicit none
         class(type_side_first), intent(in) :: self
-        integer(int32), intent(in) :: i
-        integer(int32), intent(in) :: j
-        type(type_dp_vector_3d), intent(in) :: r
-        real(real64) :: jacobian
+        type(type_coordinate_dp), intent(in) :: r
+        real(real64), intent(in) :: node_coords(:, :)
+        real(real64), intent(inout) :: tangent_vec(:)
 
-        type(type_dp_vector_3d) :: coord1
-        type(type_dp_vector_3d) :: coord2
-        type(type_dp_vector_3d) :: delta
+        integer(int32) :: i
+        integer(int32) :: node_id
+        integer(int32) :: nn
+        real(real64) :: dpsi_val
 
-        jacobian = 0.0d0
-        select case (j)
-        case (1)
-            coord1 = self%get_coordinate(1)
-            coord2 = self%get_coordinate(2)
-            delta = coord2 - coord1
+        tangent_vec = 0.0d0
+        call self%get_num_nodes(nn)
 
-            ! J = 0.5 * (x2 - x1)
-            select case (i)
-            case (1) ! x-component
-                jacobian = 0.5d0 * delta%x
-            case (2) ! y-component
-                jacobian = 0.5d0 * delta%y
-            case (3) ! z-component
-                jacobian = 0.5d0 * delta%z
-            end select
-        end select
+        do i = 1, nn
+            call self%calc_dpsi(i, 1, r, dpsi_val)
+            tangent_vec(1) = tangent_vec(1) + dpsi_val * node_coords(1, i)
+            tangent_vec(2) = tangent_vec(2) + dpsi_val * node_coords(2, i)
+            tangent_vec(3) = tangent_vec(3) + dpsi_val * node_coords(3, i)
+        end do
+    end subroutine compute_tangent_vector_side_first
 
-    end function jacobian_side_first
-
-    pure elemental module function jacobian_det_side_first(self, r) result(jacobian_det)
+    !>
+    !> Calculates the Jacobian matrix.
+    !>
+    pure module subroutine calc_jacobian_side_first(self, r, node_coords, jac)
         implicit none
         class(type_side_first), intent(in) :: self
-        type(type_dp_vector_3d), intent(in) :: r
-        real(real64) :: jacobian_det
+        type(type_coordinate_dp), intent(in) :: r
+        real(real64), intent(in) :: node_coords(:, :)
+        real(real64), intent(inout) :: jac(:, :)
 
-        jacobian_det = self%get_geometry() / 2.0d0
+        real(real64) :: tangent_vec(3)
 
-    end function jacobian_det_side_first
+        call self%compute_tangent_vector(r, node_coords, tangent_vec)
+        jac(1, 1) = sqrt(sum(tangent_vec**2))
+    end subroutine calc_jacobian_side_first
 
-end submodule domain_mesh_side_First
+    !>
+    !> Checks if a point is on the element.
+    !>
+    module subroutine is_in_side_first(self, cartesian, normalized, node_coords, is_in)
+        implicit none
+        class(type_side_first), intent(in) :: self
+        type(type_coordinate_dp), intent(in) :: cartesian
+        type(type_coordinate_dp), intent(inout) :: normalized
+        real(real64), intent(in) :: node_coords(:, :)
+        logical, intent(inout) :: is_in
+
+        real(real64) :: v(3)
+        real(real64) :: w(3)
+        real(real64) :: t
+        real(real64) :: v_dot_v
+        integer(int32) :: node1_id
+        integer(int32) :: node2_id
+        real(real64), parameter :: tol = 1.0e-9
+
+        ! Vector from node 1 to node 2
+        v(1) = node_coords(1, 2) - node_coords(1, 1)
+        v(2) = node_coords(2, 2) - node_coords(2, 1)
+        v(3) = node_coords(3, 2) - node_coords(3, 1)
+
+        ! Vector from node 1 to the point to check
+        w(1) = cartesian%x - node_coords(1, 1)
+        w(2) = cartesian%y - node_coords(2, 1)
+        w(3) = cartesian%z - node_coords(3, 1)
+
+        v_dot_v = v(1)**2 + v(2)**2 + v(3)**2
+
+        if (v_dot_v < tol**2) then
+            is_in = (abs(w(1)) < tol .and. abs(w(2)) < tol .and. abs(w(3)) < tol)
+        else
+            t = (w(1) * v(1) + w(2) * v(2) + w(3) * v(3)) / v_dot_v
+            is_in = (t >= 0.0d0 - tol .and. t <= 1.0d0 + tol)
+        end if
+
+        if (is_in) then
+            call normalized%set(2.0d0 * t - 1.0d0, 0.0d0, 0.0d0)
+        end if
+    end subroutine is_in_side_first
+
+end submodule domain_fe_side_first
+

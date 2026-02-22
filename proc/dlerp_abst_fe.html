@@ -1,0 +1,1475 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>dlerp_abst_fe &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>dlerp_abst_fe
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">35 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/fe_interpolation.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/fe_interpolation.f90.html'>fe_interpolation.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/domain_base_fe_interpolation.html'>domain_base_fe_interpolation</a></li>
+            <li class="breadcrumb-item active" aria-current="page">dlerp_abst_fe</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/dlerp_abst_fe.html#src">dlerp_abst_fe</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine dlerp_abst_fe(self, r, values, node_coords, plane_axis, dlerped_value)  
+    <a href="../interface/dlerp_abst_fe.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+    <p>物理座標系における値の勾配(nabla u)を計算する
+内部で dpsi_dx (形状関数の物理勾配) を呼び出して線形結合をとる</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~85"></span>
+              class(<a href='../type/abst_fe.html'>abst_fe</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                <p>要素オブジェクト</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-r~17"></span>
+              type(<a href='../type/type_coordinate_dp.html'>type_coordinate_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>r</strong></td>
+            <td>
+                <p>局所座標 (xi, eta, zeta)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-values~6"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>values</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-node_coords~8"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>node_coords</strong>(:,:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-plane_axis"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>plane_axis</strong></td>
+            <td>
+                <p>2次元の場合の軸指定 (1:XY面, 2:XZ面). 3次元は無視.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dlerped_value~2"></span>
+              type(<a href='../type/type_coordinate_dp.html'>type_coordinate_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>dlerped_value</strong></td>
+            <td>
+                <p>計算された勾配ベクトル (du/dx, du/dy, du/dz)</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~dlerp_abst_fe~~CallsGraph Pages: 1 -->
+<svg id="procdlerp_abst_feCallsGraph" width="641pt" height="415pt"
+ viewBox="0.00 0.00 641.00 414.89" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~dlerp_abst_fe~~CallsGraph" class="graph" transform="scale(0.54 0.54) rotate(0) translate(4 763)">
+<title>proc~~dlerp_abst_fe~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-763 1181,-763 1181,4 -4,4"/>
+<!-- proc~dlerp_abst_fe -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node1" class="node">
+<title>proc~dlerp_abst_fe</title>
+<polygon fill="none" stroke="black" points="84,-549 0,-549 0,-525 84,-525 84,-549"/>
+<text text-anchor="middle" x="42" y="-534.6" font-family="Helvetica,sans-Serif" font-size="10.50">dlerp_abst_fe</text>
+</g>
+<!-- interface~calc_shape_function_abst_fe -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node2" class="node">
+<title>interface~calc_shape_function_abst_fe</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node2"><a xlink:href="../interface/calc_shape_function_abst_fe.html" xlink:title="abst_fe%calc_shape_function_abst_fe">
+<polygon fill="#a7506f" stroke="#a7506f" points="343.5,-633 131.5,-633 131.5,-609 343.5,-609 343.5,-633"/>
+<text text-anchor="middle" x="237.5" y="-618.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%calc_shape_function_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- proc~dlerp_abst_fe&#45;&gt;interface~calc_shape_function_abst_fe -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge1" class="edge">
+<title>proc~dlerp_abst_fe&#45;&gt;interface~calc_shape_function_abst_fe</title>
+<path fill="none" stroke="#ff0000" d="M70.72,-549.04C104.49,-563.69 161.66,-588.51 199.25,-604.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="198.26,-608.22 208.83,-608.99 201.05,-601.79 198.26,-608.22"/>
+</g>
+<!-- interface~matvec -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node3" class="node">
+<title>interface~matvec</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node3"><a xlink:href="../interface/matvec.html" xlink:title="matvec">
+<polygon fill="#a7506f" stroke="#a7506f" points="264.5,-549 210.5,-549 210.5,-525 264.5,-525 264.5,-549"/>
+<text text-anchor="middle" x="237.5" y="-534.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matvec</text>
+</a>
+</g>
+</g>
+<!-- proc~dlerp_abst_fe&#45;&gt;interface~matvec -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge2" class="edge">
+<title>proc~dlerp_abst_fe&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M84.04,-537C118.47,-537 167.19,-537 200.22,-537"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="200.35,-540.5 210.35,-537 200.35,-533.5 200.35,-540.5"/>
+</g>
+<!-- proc~reset_coordinate_dp -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node4" class="node">
+<title>proc~reset_coordinate_dp</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node4"><a xlink:href="../proc/reset_coordinate_dp.html" xlink:title="type_coordinate_dp%reset_coordinate_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="355,-507 120,-507 120,-483 355,-483 355,-507"/>
+<text text-anchor="middle" x="237.5" y="-492.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_coordinate_dp%reset_coordinate_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~dlerp_abst_fe&#45;&gt;proc~reset_coordinate_dp -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge3" class="edge">
+<title>proc~dlerp_abst_fe&#45;&gt;proc~reset_coordinate_dp</title>
+<path fill="none" stroke="#ff0000" d="M84.39,-524.99C95.87,-521.86 108.38,-518.63 120,-516 131.01,-513.51 142.65,-511.12 154.16,-508.91"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="155.03,-512.31 164.21,-507.01 153.73,-505.43 155.03,-512.31"/>
+</g>
+<!-- proc~calc_shape_function_abst_fe -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node5" class="node">
+<title>proc~calc_shape_function_abst_fe</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node5"><a xlink:href="../proc/calc_shape_function_abst_fe.html" xlink:title="calc_shape_function_abst_fe">
+<polygon fill="#d9534f" stroke="#d9534f" points="555,-654 391,-654 391,-630 555,-630 555,-654"/>
+<text text-anchor="middle" x="473" y="-639.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_shape_function_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_shape_function_abst_fe&#45;&gt;proc~calc_shape_function_abst_fe -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge4" class="edge">
+<title>interface~calc_shape_function_abst_fe&#45;&gt;proc~calc_shape_function_abst_fe</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M343.64,-630.46C356.03,-631.57 368.59,-632.7 380.77,-633.79"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="380.62,-637.3 390.89,-634.71 381.24,-630.32 380.62,-637.3"/>
+</g>
+<!-- proc~matvec_matrix -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node6" class="node">
+<title>proc~matvec_matrix</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node6"><a xlink:href="../proc/matvec_matrix.html" xlink:title="matvec_matrix">
+<polygon fill="#d9534f" stroke="#d9534f" points="519,-444 427,-444 427,-420 519,-420 519,-444"/>
+<text text-anchor="middle" x="473" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matvec_matrix</text>
+</a>
+</g>
+</g>
+<!-- interface~matvec&#45;&gt;proc~matvec_matrix -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge5" class="edge">
+<title>interface~matvec&#45;&gt;proc~matvec_matrix</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M264.89,-535.57C289.15,-533.5 325.67,-528.42 355,-516 392.37,-500.18 429.37,-470.67 451.46,-451.17"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="454.07,-453.53 459.16,-444.24 449.39,-448.33 454.07,-453.53"/>
+</g>
+<!-- proc~matvec_real64 -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node7" class="node">
+<title>proc~matvec_real64</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node7"><a xlink:href="../proc/matvec_real64.html" xlink:title="matvec_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="518.5,-549 427.5,-549 427.5,-525 518.5,-525 518.5,-549"/>
+<text text-anchor="middle" x="473" y="-534.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matvec_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~matvec&#45;&gt;proc~matvec_real64 -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge6" class="edge">
+<title>interface~matvec&#45;&gt;proc~matvec_real64</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M264.83,-537C301.61,-537 369.24,-537 417.21,-537"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="417.44,-540.5 427.44,-537 417.44,-533.5 417.44,-540.5"/>
+</g>
+<!-- calc_dpsi -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node8" class="node">
+<title>calc_dpsi</title>
+<polygon fill="#777777" stroke="#777777" points="725.5,-633 664.5,-633 664.5,-609 725.5,-609 725.5,-633"/>
+<text text-anchor="middle" x="695" y="-618.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_dpsi</text>
+</g>
+<!-- proc~calc_shape_function_abst_fe&#45;&gt;calc_dpsi -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge7" class="edge">
+<title>proc~calc_shape_function_abst_fe&#45;&gt;calc_dpsi</title>
+<path fill="none" stroke="#ff0000" d="M555.29,-634.24C589.05,-631.02 626.68,-627.43 654.22,-624.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="654.63,-628.27 664.25,-623.84 653.97,-621.31 654.63,-628.27"/>
+</g>
+<!-- calc_jacobian -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node9" class="node">
+<title>calc_jacobian</title>
+<polygon fill="#777777" stroke="#777777" points="737.5,-591 652.5,-591 652.5,-567 737.5,-567 737.5,-591"/>
+<text text-anchor="middle" x="695" y="-576.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_jacobian</text>
+</g>
+<!-- proc~calc_shape_function_abst_fe&#45;&gt;calc_jacobian -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge8" class="edge">
+<title>proc~calc_shape_function_abst_fe&#45;&gt;calc_jacobian</title>
+<path fill="none" stroke="#ff0000" d="M503.92,-629.92C527.33,-620.79 560.86,-608.43 591,-600 607.45,-595.4 625.63,-591.35 642.09,-588.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="642.93,-591.48 652.08,-586.13 641.59,-584.61 642.93,-591.48"/>
+</g>
+<!-- calc_psi -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node10" class="node">
+<title>calc_psi</title>
+<polygon fill="#777777" stroke="#777777" points="722.5,-759 667.5,-759 667.5,-735 722.5,-735 722.5,-759"/>
+<text text-anchor="middle" x="695" y="-744.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_psi</text>
+</g>
+<!-- proc~calc_shape_function_abst_fe&#45;&gt;calc_psi -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge9" class="edge">
+<title>proc~calc_shape_function_abst_fe&#45;&gt;calc_psi</title>
+<path fill="none" stroke="#ff0000" d="M486.89,-654.13C507.3,-672.63 549.07,-707.68 591,-726 611.93,-735.15 637.02,-740.37 657.2,-743.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="656.88,-746.81 667.25,-744.66 657.8,-739.87 656.88,-746.81"/>
+</g>
+<!-- interface~matrix_determinant -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node12" class="node">
+<title>interface~matrix_determinant</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node12"><a xlink:href="../interface/matrix_determinant.html" xlink:title="matrix_determinant">
+<polygon fill="#a7506f" stroke="#a7506f" points="754,-717 636,-717 636,-693 754,-693 754,-717"/>
+<text text-anchor="middle" x="695" y="-702.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_determinant</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_shape_function_abst_fe&#45;&gt;interface~matrix_determinant -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge10" class="edge">
+<title>proc~calc_shape_function_abst_fe&#45;&gt;interface~matrix_determinant</title>
+<path fill="none" stroke="#ff0000" d="M503.92,-654.08C527.33,-663.21 560.86,-675.57 591,-684 602.26,-687.15 614.33,-690.04 626.11,-692.6"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="625.4,-696.03 635.91,-694.67 626.85,-689.18 625.4,-696.03"/>
+</g>
+<!-- interface~matrix_inverse -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node13" class="node">
+<title>interface~matrix_inverse</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node13"><a xlink:href="../interface/matrix_inverse.html" xlink:title="matrix_inverse">
+<polygon fill="#a7506f" stroke="#a7506f" points="740.5,-675 649.5,-675 649.5,-651 740.5,-651 740.5,-675"/>
+<text text-anchor="middle" x="695" y="-660.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_inverse</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_shape_function_abst_fe&#45;&gt;interface~matrix_inverse -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge11" class="edge">
+<title>proc~calc_shape_function_abst_fe&#45;&gt;interface~matrix_inverse</title>
+<path fill="none" stroke="#ff0000" d="M555.29,-649.76C583.27,-652.43 613.9,-655.35 639.25,-657.77"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="639.11,-661.28 649.4,-658.74 639.78,-654.31 639.11,-661.28"/>
+</g>
+<!-- interface~get_data_vector_dp -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node11" class="node">
+<title>interface~get_data_vector_dp</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node11"><a xlink:href="../interface/get_data_vector_dp.html" xlink:title="type_vector_dp%get_data_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="799,-465 591,-465 591,-441 799,-441 799,-465"/>
+<text text-anchor="middle" x="695" y="-450.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~matvec_matrix&#45;&gt;interface~get_data_vector_dp -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge12" class="edge">
+<title>proc~matvec_matrix&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#00ff00" d="M519.05,-436.3C537.15,-438.03 558.9,-440.1 580.82,-442.2"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="580.6,-445.69 590.89,-443.16 581.26,-438.72 580.6,-445.69"/>
+</g>
+<!-- proc~gemv_matrix_bsr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node14" class="node">
+<title>proc~gemv_matrix_bsr</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node14"><a xlink:href="../proc/gemv_matrix_bsr.html" xlink:title="gemv_matrix_bsr">
+<polygon fill="#d9534f" stroke="#d9534f" points="747,-423 643,-423 643,-399 747,-399 747,-423"/>
+<text text-anchor="middle" x="695" y="-408.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gemv_matrix_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~matvec_matrix&#45;&gt;proc~gemv_matrix_bsr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge13" class="edge">
+<title>proc~matvec_matrix&#45;&gt;proc~gemv_matrix_bsr</title>
+<path fill="none" stroke="#00ff00" d="M519.05,-427.7C551.77,-424.58 596.44,-420.31 632.46,-416.87"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="633.22,-420.32 642.85,-415.88 632.56,-413.35 633.22,-420.32"/>
+</g>
+<!-- proc~gemv_matrix_coo -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node15" class="node">
+<title>proc~gemv_matrix_coo</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node15"><a xlink:href="../proc/gemv_matrix_coo.html" xlink:title="gemv_matrix_coo">
+<polygon fill="#d9534f" stroke="#d9534f" points="748.5,-276 641.5,-276 641.5,-252 748.5,-252 748.5,-276"/>
+<text text-anchor="middle" x="695" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gemv_matrix_coo</text>
+</a>
+</g>
+</g>
+<!-- proc~matvec_matrix&#45;&gt;proc~gemv_matrix_coo -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge14" class="edge">
+<title>proc~matvec_matrix&#45;&gt;proc~gemv_matrix_coo</title>
+<path fill="none" stroke="#00ff00" d="M489.82,-419.92C527.86,-390.87 624.65,-316.96 669.94,-282.37"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="672.2,-285.05 678.03,-276.2 667.95,-279.49 672.2,-285.05"/>
+</g>
+<!-- proc~gemv_matrix_csr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node16" class="node">
+<title>proc~gemv_matrix_csr</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node16"><a xlink:href="../proc/gemv_matrix_csr.html" xlink:title="gemv_matrix_csr">
+<polygon fill="#d9534f" stroke="#d9534f" points="746.5,-108 643.5,-108 643.5,-84 746.5,-84 746.5,-108"/>
+<text text-anchor="middle" x="695" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gemv_matrix_csr</text>
+</a>
+</g>
+</g>
+<!-- proc~matvec_matrix&#45;&gt;proc~gemv_matrix_csr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge15" class="edge">
+<title>proc~matvec_matrix&#45;&gt;proc~gemv_matrix_csr</title>
+<path fill="none" stroke="#00ff00" d="M481.16,-419.91C499.1,-389.72 547.68,-308.73 591,-243 621.33,-196.98 658.91,-144.39 679.25,-116.27"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="682.18,-118.19 685.22,-108.04 676.51,-114.08 682.18,-118.19"/>
+</g>
+<!-- proc~gemv_matrix_dense -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node17" class="node">
+<title>proc~gemv_matrix_dense</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node17"><a xlink:href="../proc/gemv_matrix_dense.html" xlink:title="gemv_matrix_dense">
+<polygon fill="#d9534f" stroke="#d9534f" points="755,-507 635,-507 635,-483 755,-483 755,-507"/>
+<text text-anchor="middle" x="695" y="-492.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gemv_matrix_dense</text>
+</a>
+</g>
+</g>
+<!-- proc~matvec_matrix&#45;&gt;proc~gemv_matrix_dense -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge16" class="edge">
+<title>proc~matvec_matrix&#45;&gt;proc~gemv_matrix_dense</title>
+<path fill="none" stroke="#00ff00" d="M503.92,-444.08C527.33,-453.21 560.86,-465.57 591,-474 601.87,-477.04 613.51,-479.84 624.9,-482.34"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="624.32,-485.79 634.83,-484.45 625.77,-478.94 624.32,-485.79"/>
+</g>
+<!-- proc~gemv_matrix_real64 -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node18" class="node">
+<title>proc~gemv_matrix_real64</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node18"><a xlink:href="../proc/gemv_matrix_real64.html" xlink:title="gemv_matrix_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="755.5,-549 634.5,-549 634.5,-525 755.5,-525 755.5,-549"/>
+<text text-anchor="middle" x="695" y="-534.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gemv_matrix_real64</text>
+</a>
+</g>
+</g>
+<!-- proc~matvec_real64&#45;&gt;proc~gemv_matrix_real64 -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge17" class="edge">
+<title>proc~matvec_real64&#45;&gt;proc~gemv_matrix_real64</title>
+<path fill="none" stroke="#0000ff" d="M518.52,-537C548.8,-537 589.5,-537 624.07,-537"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="624.12,-540.5 634.12,-537 624.12,-533.5 624.12,-540.5"/>
+</g>
+<!-- proc~get_data_vector_dp -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node32" class="node">
+<title>proc~get_data_vector_dp</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node32"><a xlink:href="../proc/get_data_vector_dp.html" xlink:title="get_data_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="995,-528 878,-528 878,-504 995,-504 995,-528"/>
+<text text-anchor="middle" x="936.5" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge18" class="edge">
+<title>interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp</title>
+<path fill="none" stroke="#5cff00" stroke-dasharray="5,2" d="M769.99,-465.03C779.89,-467.52 789.79,-470.49 799,-474 816.31,-480.6 817.71,-488.35 835,-495 845.49,-499.03 856.9,-502.35 868.16,-505.07"/>
+<polygon fill="#5cff00" stroke="#5cff00" points="867.45,-508.49 877.97,-507.3 869,-501.67 867.45,-508.49"/>
+</g>
+<!-- proc~matrix_determinant_real64 -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node33" class="node">
+<title>proc~matrix_determinant_real64</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node33"><a xlink:href="../proc/matrix_determinant_real64.html" xlink:title="matrix_determinant_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1015,-717 858,-717 858,-693 1015,-693 1015,-717"/>
+<text text-anchor="middle" x="936.5" y="-702.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_determinant_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~matrix_determinant&#45;&gt;proc~matrix_determinant_real64 -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge19" class="edge">
+<title>interface~matrix_determinant&#45;&gt;proc~matrix_determinant_real64</title>
+<path fill="none" stroke="#00ff2e" stroke-dasharray="5,2" d="M754.28,-705C782.27,-705 816.41,-705 847.48,-705"/>
+<polygon fill="#00ff2e" stroke="#00ff2e" points="847.88,-708.5 857.88,-705 847.88,-701.5 847.88,-708.5"/>
+</g>
+<!-- proc~matrix_inverse_real64 -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node34" class="node">
+<title>proc~matrix_inverse_real64</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node34"><a xlink:href="../proc/matrix_inverse_real64.html" xlink:title="matrix_inverse_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1001.5,-675 871.5,-675 871.5,-651 1001.5,-651 1001.5,-675"/>
+<text text-anchor="middle" x="936.5" y="-660.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_inverse_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~matrix_inverse&#45;&gt;proc~matrix_inverse_real64 -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge20" class="edge">
+<title>interface~matrix_inverse&#45;&gt;proc~matrix_inverse_real64</title>
+<path fill="none" stroke="#00ffb9" stroke-dasharray="5,2" d="M740.77,-663C774.52,-663 821.57,-663 860.97,-663"/>
+<polygon fill="#00ffb9" stroke="#00ffb9" points="861.07,-666.5 871.07,-663 861.07,-659.5 861.07,-666.5"/>
+</g>
+<!-- interface~get_ind_bsr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node20" class="node">
+<title>interface~get_ind_bsr</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node20"><a xlink:href="../interface/get_ind_bsr.html" xlink:title="type_matrix_bsr%get_ind_bsr">
+<polygon fill="#a7506f" stroke="#a7506f" points="1020.5,-360 852.5,-360 852.5,-336 1020.5,-336 1020.5,-360"/>
+<text text-anchor="middle" x="936.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_bsr%get_ind_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_bsr&#45;&gt;interface~get_ind_bsr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge21" class="edge">
+<title>proc~gemv_matrix_bsr&#45;&gt;interface~get_ind_bsr</title>
+<path fill="none" stroke="#00b9ff" d="M732.63,-398.98C760.52,-390.05 799.95,-377.94 835,-369 844.23,-366.65 853.99,-364.36 863.64,-362.22"/>
+<polygon fill="#00b9ff" stroke="#00b9ff" points="864.62,-365.58 873.65,-360.04 863.13,-358.74 864.62,-365.58"/>
+</g>
+<!-- interface~get_info_bsr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node22" class="node">
+<title>interface~get_info_bsr</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node22"><a xlink:href="../interface/get_info_bsr.html" xlink:title="type_matrix_bsr%get_info_bsr">
+<polygon fill="#a7506f" stroke="#a7506f" points="1022.5,-486 850.5,-486 850.5,-462 1022.5,-462 1022.5,-486"/>
+<text text-anchor="middle" x="936.5" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_bsr%get_info_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_bsr&#45;&gt;interface~get_info_bsr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge22" class="edge">
+<title>proc~gemv_matrix_bsr&#45;&gt;interface~get_info_bsr</title>
+<path fill="none" stroke="#00b9ff" d="M747.23,-418.03C764.06,-421.24 782.63,-425.75 799,-432 816.31,-438.6 817.71,-446.35 835,-453 841.15,-455.36 847.62,-457.48 854.18,-459.38"/>
+<polygon fill="#00b9ff" stroke="#00b9ff" points="853.28,-462.76 863.85,-462 855.11,-456 853.28,-462.76"/>
+</g>
+<!-- interface~get_ptr_bsr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node26" class="node">
+<title>interface~get_ptr_bsr</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node26"><a xlink:href="../interface/get_ptr_bsr.html" xlink:title="type_matrix_bsr%get_ptr_bsr">
+<polygon fill="#a7506f" stroke="#a7506f" points="1019.5,-444 853.5,-444 853.5,-420 1019.5,-420 1019.5,-444"/>
+<text text-anchor="middle" x="936.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_bsr%get_ptr_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_bsr&#45;&gt;interface~get_ptr_bsr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge23" class="edge">
+<title>proc~gemv_matrix_bsr&#45;&gt;interface~get_ptr_bsr</title>
+<path fill="none" stroke="#00b9ff" d="M747.08,-415.48C775.1,-417.94 810.68,-421.06 843.36,-423.92"/>
+<polygon fill="#00b9ff" stroke="#00b9ff" points="843.13,-427.41 853.4,-424.8 843.75,-420.44 843.13,-427.41"/>
+</g>
+<!-- interface~get_val_bsr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node29" class="node">
+<title>interface~get_val_bsr</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node29"><a xlink:href="../interface/get_val_bsr.html" xlink:title="type_matrix_bsr%get_val_bsr">
+<polygon fill="#a7506f" stroke="#a7506f" points="1020,-402 853,-402 853,-378 1020,-378 1020,-402"/>
+<text text-anchor="middle" x="936.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_bsr%get_val_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_bsr&#45;&gt;interface~get_val_bsr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge24" class="edge">
+<title>proc~gemv_matrix_bsr&#45;&gt;interface~get_val_bsr</title>
+<path fill="none" stroke="#00b9ff" d="M747.08,-406.52C774.97,-404.08 810.37,-400.97 842.93,-398.12"/>
+<polygon fill="#00b9ff" stroke="#00b9ff" points="843.27,-401.6 852.93,-397.24 842.66,-394.63 843.27,-401.6"/>
+</g>
+<!-- interface~get_col_coo -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node19" class="node">
+<title>interface~get_col_coo</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node19"><a xlink:href="../interface/get_col_coo.html" xlink:title="type_matrix_coo%get_col_coo">
+<polygon fill="#a7506f" stroke="#a7506f" points="1023,-192 850,-192 850,-168 1023,-168 1023,-192"/>
+<text text-anchor="middle" x="936.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_coo%get_col_coo</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_coo&#45;&gt;interface~get_col_coo -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge25" class="edge">
+<title>proc~gemv_matrix_coo&#45;&gt;interface~get_col_coo</title>
+<path fill="none" stroke="#002eff" d="M718.5,-251.94C745.49,-237.91 792.44,-214.91 835,-201 842.33,-198.61 850.05,-196.42 857.82,-194.45"/>
+<polygon fill="#002eff" stroke="#002eff" points="858.77,-197.82 867.66,-192.05 857.11,-191.01 858.77,-197.82"/>
+</g>
+<!-- interface~get_info_coo -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node23" class="node">
+<title>interface~get_info_coo</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node23"><a xlink:href="../interface/get_info_coo.html" xlink:title="type_matrix_coo%get_info_coo">
+<polygon fill="#a7506f" stroke="#a7506f" points="1025.5,-318 847.5,-318 847.5,-294 1025.5,-294 1025.5,-318"/>
+<text text-anchor="middle" x="936.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_coo%get_info_coo</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_coo&#45;&gt;interface~get_info_coo -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge26" class="edge">
+<title>proc~gemv_matrix_coo&#45;&gt;interface~get_info_coo</title>
+<path fill="none" stroke="#002eff" d="M748.56,-273.22C780.28,-278.78 821.29,-285.97 856.82,-292.2"/>
+<polygon fill="#002eff" stroke="#002eff" points="856.23,-295.65 866.68,-293.93 857.44,-288.76 856.23,-295.65"/>
+</g>
+<!-- interface~get_row_coo -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node28" class="node">
+<title>interface~get_row_coo</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node28"><a xlink:href="../interface/get_row_coo.html" xlink:title="type_matrix_coo%get_row_coo">
+<polygon fill="#a7506f" stroke="#a7506f" points="1024.5,-276 848.5,-276 848.5,-252 1024.5,-252 1024.5,-276"/>
+<text text-anchor="middle" x="936.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_coo%get_row_coo</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_coo&#45;&gt;interface~get_row_coo -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge27" class="edge">
+<title>proc~gemv_matrix_coo&#45;&gt;interface~get_row_coo</title>
+<path fill="none" stroke="#002eff" d="M748.56,-264C774.79,-264 807.37,-264 837.95,-264"/>
+<polygon fill="#002eff" stroke="#002eff" points="838.24,-267.5 848.24,-264 838.24,-260.5 838.24,-267.5"/>
+</g>
+<!-- interface~get_val_coo -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node30" class="node">
+<title>interface~get_val_coo</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node30"><a xlink:href="../interface/get_val_coo.html" xlink:title="type_matrix_coo%get_val_coo">
+<polygon fill="#a7506f" stroke="#a7506f" points="1023,-234 850,-234 850,-210 1023,-210 1023,-234"/>
+<text text-anchor="middle" x="936.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_coo%get_val_coo</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_coo&#45;&gt;interface~get_val_coo -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge28" class="edge">
+<title>proc~gemv_matrix_coo&#45;&gt;interface~get_val_coo</title>
+<path fill="none" stroke="#002eff" d="M748.56,-254.78C780.28,-249.22 821.29,-242.03 856.82,-235.8"/>
+<polygon fill="#002eff" stroke="#002eff" points="857.44,-239.24 866.68,-234.07 856.23,-232.35 857.44,-239.24"/>
+</g>
+<!-- interface~get_ind_csr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node21" class="node">
+<title>interface~get_ind_csr</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node21"><a xlink:href="../interface/get_ind_csr.html" xlink:title="type_matrix_csr%get_ind_csr">
+<polygon fill="#a7506f" stroke="#a7506f" points="1019.5,-24 853.5,-24 853.5,0 1019.5,0 1019.5,-24"/>
+<text text-anchor="middle" x="936.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_csr%get_ind_csr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_csr&#45;&gt;interface~get_ind_csr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge29" class="edge">
+<title>proc~gemv_matrix_csr&#45;&gt;interface~get_ind_csr</title>
+<path fill="none" stroke="#5c00ff" d="M718.5,-83.94C745.49,-69.91 792.44,-46.91 835,-33 842.33,-30.61 850.05,-28.42 857.82,-26.45"/>
+<polygon fill="#5c00ff" stroke="#5c00ff" points="858.77,-29.82 867.66,-24.05 857.11,-23.01 858.77,-29.82"/>
+</g>
+<!-- interface~get_info_csr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node24" class="node">
+<title>interface~get_info_csr</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node24"><a xlink:href="../interface/get_info_csr.html" xlink:title="type_matrix_csr%get_info_csr">
+<polygon fill="#a7506f" stroke="#a7506f" points="1021.5,-150 851.5,-150 851.5,-126 1021.5,-126 1021.5,-150"/>
+<text text-anchor="middle" x="936.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_csr%get_info_csr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_csr&#45;&gt;interface~get_info_csr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge30" class="edge">
+<title>proc~gemv_matrix_csr&#45;&gt;interface~get_info_csr</title>
+<path fill="none" stroke="#5c00ff" d="M746.79,-104.91C778.8,-110.52 820.77,-117.88 857,-124.23"/>
+<polygon fill="#5c00ff" stroke="#5c00ff" points="856.6,-127.72 867.06,-126 857.81,-120.82 856.6,-127.72"/>
+</g>
+<!-- interface~get_ptr_csr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node27" class="node">
+<title>interface~get_ptr_csr</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node27"><a xlink:href="../interface/get_ptr_csr.html" xlink:title="type_matrix_csr%get_ptr_csr">
+<polygon fill="#a7506f" stroke="#a7506f" points="1019,-108 854,-108 854,-84 1019,-84 1019,-108"/>
+<text text-anchor="middle" x="936.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_csr%get_ptr_csr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_csr&#45;&gt;interface~get_ptr_csr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge31" class="edge">
+<title>proc~gemv_matrix_csr&#45;&gt;interface~get_ptr_csr</title>
+<path fill="none" stroke="#5c00ff" d="M746.79,-96C774.91,-96 810.73,-96 843.59,-96"/>
+<polygon fill="#5c00ff" stroke="#5c00ff" points="843.68,-99.5 853.68,-96 843.68,-92.5 843.68,-99.5"/>
+</g>
+<!-- interface~get_val_csr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node31" class="node">
+<title>interface~get_val_csr</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node31"><a xlink:href="../interface/get_val_csr.html" xlink:title="type_matrix_csr%get_val_csr">
+<polygon fill="#a7506f" stroke="#a7506f" points="1019.5,-66 853.5,-66 853.5,-42 1019.5,-42 1019.5,-66"/>
+<text text-anchor="middle" x="936.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_csr%get_val_csr</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_csr&#45;&gt;interface~get_val_csr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge32" class="edge">
+<title>proc~gemv_matrix_csr&#45;&gt;interface~get_val_csr</title>
+<path fill="none" stroke="#5c00ff" d="M746.79,-87.09C778.8,-81.48 820.77,-74.12 857,-67.77"/>
+<polygon fill="#5c00ff" stroke="#5c00ff" points="857.81,-71.18 867.06,-66 856.6,-64.28 857.81,-71.18"/>
+</g>
+<!-- interface~get_info_dense -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node25" class="node">
+<title>interface~get_info_dense</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node25"><a xlink:href="../interface/get_info_dense.html" xlink:title="type_matrix_dense%get_info_dense">
+<polygon fill="#a7506f" stroke="#a7506f" points="1038,-570 835,-570 835,-546 1038,-546 1038,-570"/>
+<text text-anchor="middle" x="936.5" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dense%get_info_dense</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_dense&#45;&gt;interface~get_info_dense -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge33" class="edge">
+<title>proc~gemv_matrix_dense&#45;&gt;interface~get_info_dense</title>
+<path fill="none" stroke="#e700ff" d="M755.23,-503.63C769.81,-506.69 785.19,-510.73 799,-516 816.31,-522.6 817.71,-530.35 835,-537 841.15,-539.36 847.62,-541.48 854.18,-543.38"/>
+<polygon fill="#e700ff" stroke="#e700ff" points="853.28,-546.76 863.85,-546 855.11,-540 853.28,-546.76"/>
+</g>
+<!-- proc~get_col_coo -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node37" class="node">
+<title>proc~get_col_coo</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node37"><a xlink:href="../proc/get_col_coo.html" xlink:title="get_col_coo">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1163.5,-192 1087.5,-192 1087.5,-168 1163.5,-168 1163.5,-192"/>
+<text text-anchor="middle" x="1125.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_col_coo</text>
+</a>
+</g>
+</g>
+<!-- interface~get_col_coo&#45;&gt;proc~get_col_coo -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge34" class="edge">
+<title>interface~get_col_coo&#45;&gt;proc~get_col_coo</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1023.06,-180C1041.52,-180 1060.4,-180 1076.79,-180"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1077.16,-183.5 1087.16,-180 1077.16,-176.5 1077.16,-183.5"/>
+</g>
+<!-- proc~get_ind_bsr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node38" class="node">
+<title>proc~get_ind_bsr</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node38"><a xlink:href="../proc/get_ind_bsr.html" xlink:title="get_ind_bsr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1162,-360 1089,-360 1089,-336 1162,-336 1162,-360"/>
+<text text-anchor="middle" x="1125.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_ind_bsr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_ind_bsr&#45;&gt;proc~get_ind_bsr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge35" class="edge">
+<title>interface~get_ind_bsr&#45;&gt;proc~get_ind_bsr</title>
+<path fill="none" stroke="#ff5f00" stroke-dasharray="5,2" d="M1020.61,-348C1040.48,-348 1060.99,-348 1078.48,-348"/>
+<polygon fill="#ff5f00" stroke="#ff5f00" points="1078.94,-351.5 1088.94,-348 1078.94,-344.5 1078.94,-351.5"/>
+</g>
+<!-- proc~get_ind_csr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node39" class="node">
+<title>proc~get_ind_csr</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node39"><a xlink:href="../proc/get_ind_csr.html" xlink:title="get_ind_csr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1162,-24 1089,-24 1089,0 1162,0 1162,-24"/>
+<text text-anchor="middle" x="1125.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_ind_csr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_ind_csr&#45;&gt;proc~get_ind_csr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge36" class="edge">
+<title>interface~get_ind_csr&#45;&gt;proc~get_ind_csr</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1019.52,-12C1039.87,-12 1060.95,-12 1078.83,-12"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1078.96,-15.5 1088.96,-12 1078.96,-8.5 1078.96,-15.5"/>
+</g>
+<!-- proc~get_info_bsr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node40" class="node">
+<title>proc~get_info_bsr</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node40"><a xlink:href="../proc/get_info_bsr.html" xlink:title="get_info_bsr">
+<polygon fill="#d9534f" stroke="#d9534f" points="1164,-486 1087,-486 1087,-462 1164,-462 1164,-486"/>
+<text text-anchor="middle" x="1125.5" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_info_bsr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_info_bsr&#45;&gt;proc~get_info_bsr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge37" class="edge">
+<title>interface~get_info_bsr&#45;&gt;proc~get_info_bsr</title>
+<path fill="none" stroke="#dfff00" stroke-dasharray="5,2" d="M1022.52,-474C1041.04,-474 1060.01,-474 1076.48,-474"/>
+<polygon fill="#dfff00" stroke="#dfff00" points="1076.92,-477.5 1086.92,-474 1076.92,-470.5 1076.92,-477.5"/>
+</g>
+<!-- proc~get_info_coo -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node41" class="node">
+<title>proc~get_info_coo</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node41"><a xlink:href="../proc/get_info_coo.html" xlink:title="get_info_coo">
+<polygon fill="#d9534f" stroke="#d9534f" points="1165.5,-318 1085.5,-318 1085.5,-294 1165.5,-294 1165.5,-318"/>
+<text text-anchor="middle" x="1125.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_info_coo</text>
+</a>
+</g>
+</g>
+<!-- interface~get_info_coo&#45;&gt;proc~get_info_coo -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge38" class="edge">
+<title>interface~get_info_coo&#45;&gt;proc~get_info_coo</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M1025.52,-306C1042.61,-306 1059.94,-306 1075.23,-306"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1075.45,-309.5 1085.45,-306 1075.45,-302.5 1075.45,-309.5"/>
+</g>
+<!-- proc~get_info_csr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node42" class="node">
+<title>proc~get_info_csr</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node42"><a xlink:href="../proc/get_info_csr.html" xlink:title="get_info_csr">
+<polygon fill="#d9534f" stroke="#d9534f" points="1163.5,-150 1087.5,-150 1087.5,-126 1163.5,-126 1163.5,-150"/>
+<text text-anchor="middle" x="1125.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_info_csr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_info_csr&#45;&gt;proc~get_info_csr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge39" class="edge">
+<title>interface~get_info_csr&#45;&gt;proc~get_info_csr</title>
+<path fill="none" stroke="#1fff00" stroke-dasharray="5,2" d="M1021.7,-138C1040.65,-138 1060.11,-138 1076.93,-138"/>
+<polygon fill="#1fff00" stroke="#1fff00" points="1077.03,-141.5 1087.03,-138 1077.03,-134.5 1077.03,-141.5"/>
+</g>
+<!-- proc~get_info_dense -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node43" class="node">
+<title>proc~get_info_dense</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node43"><a xlink:href="../proc/get_info_dense.html" xlink:title="get_info_dense">
+<polygon fill="#d9534f" stroke="#d9534f" points="1172,-570 1079,-570 1079,-546 1172,-546 1172,-570"/>
+<text text-anchor="middle" x="1125.5" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_info_dense</text>
+</a>
+</g>
+</g>
+<!-- interface~get_info_dense&#45;&gt;proc~get_info_dense -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge40" class="edge">
+<title>interface~get_info_dense&#45;&gt;proc~get_info_dense</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1038.12,-558C1048.53,-558 1058.82,-558 1068.48,-558"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="1068.68,-561.5 1078.68,-558 1068.68,-554.5 1068.68,-561.5"/>
+</g>
+<!-- proc~get_ptr_bsr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node44" class="node">
+<title>proc~get_ptr_bsr</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node44"><a xlink:href="../proc/get_ptr_bsr.html" xlink:title="get_ptr_bsr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1161.5,-444 1089.5,-444 1089.5,-420 1161.5,-420 1161.5,-444"/>
+<text text-anchor="middle" x="1125.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_ptr_bsr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_ptr_bsr&#45;&gt;proc~get_ptr_bsr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge41" class="edge">
+<title>interface~get_ptr_bsr&#45;&gt;proc~get_ptr_bsr</title>
+<path fill="none" stroke="#00ff9f" stroke-dasharray="5,2" d="M1019.52,-432C1040.03,-432 1061.29,-432 1079.26,-432"/>
+<polygon fill="#00ff9f" stroke="#00ff9f" points="1079.44,-435.5 1089.44,-432 1079.44,-428.5 1079.44,-435.5"/>
+</g>
+<!-- proc~get_ptr_csr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node45" class="node">
+<title>proc~get_ptr_csr</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node45"><a xlink:href="../proc/get_ptr_csr.html" xlink:title="get_ptr_csr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1161,-108 1090,-108 1090,-84 1161,-84 1161,-108"/>
+<text text-anchor="middle" x="1125.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_ptr_csr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_ptr_csr&#45;&gt;proc~get_ptr_csr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge42" class="edge">
+<title>interface~get_ptr_csr&#45;&gt;proc~get_ptr_csr</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1019.25,-96C1039.95,-96 1061.44,-96 1079.55,-96"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1079.8,-99.5 1089.8,-96 1079.8,-92.5 1079.8,-99.5"/>
+</g>
+<!-- proc~get_row_coo -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node46" class="node">
+<title>proc~get_row_coo</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node46"><a xlink:href="../proc/get_row_coo.html" xlink:title="get_row_coo">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1165,-276 1086,-276 1086,-252 1165,-252 1165,-276"/>
+<text text-anchor="middle" x="1125.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_row_coo</text>
+</a>
+</g>
+</g>
+<!-- interface~get_row_coo&#45;&gt;proc~get_row_coo -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge43" class="edge">
+<title>interface~get_row_coo&#45;&gt;proc~get_row_coo</title>
+<path fill="none" stroke="#009fff" stroke-dasharray="5,2" d="M1024.7,-264C1042.03,-264 1059.65,-264 1075.17,-264"/>
+<polygon fill="#009fff" stroke="#009fff" points="1075.54,-267.5 1085.54,-264 1075.54,-260.5 1075.54,-267.5"/>
+</g>
+<!-- proc~get_val_bsr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node47" class="node">
+<title>proc~get_val_bsr</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node47"><a xlink:href="../proc/get_val_bsr.html" xlink:title="get_val_bsr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1162,-402 1089,-402 1089,-378 1162,-378 1162,-402"/>
+<text text-anchor="middle" x="1125.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_val_bsr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_val_bsr&#45;&gt;proc~get_val_bsr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge44" class="edge">
+<title>interface~get_val_bsr&#45;&gt;proc~get_val_bsr</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M1020.07,-390C1040.19,-390 1060.99,-390 1078.68,-390"/>
+<polygon fill="#003fff" stroke="#003fff" points="1078.71,-393.5 1088.71,-390 1078.71,-386.5 1078.71,-393.5"/>
+</g>
+<!-- proc~get_val_coo -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node48" class="node">
+<title>proc~get_val_coo</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node48"><a xlink:href="../proc/get_val_coo.html" xlink:title="get_val_coo">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1163.5,-234 1087.5,-234 1087.5,-210 1163.5,-210 1163.5,-234"/>
+<text text-anchor="middle" x="1125.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_val_coo</text>
+</a>
+</g>
+</g>
+<!-- interface~get_val_coo&#45;&gt;proc~get_val_coo -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge45" class="edge">
+<title>interface~get_val_coo&#45;&gt;proc~get_val_coo</title>
+<path fill="none" stroke="#1f00ff" stroke-dasharray="5,2" d="M1023.06,-222C1041.52,-222 1060.4,-222 1076.79,-222"/>
+<polygon fill="#1f00ff" stroke="#1f00ff" points="1077.16,-225.5 1087.16,-222 1077.16,-218.5 1077.16,-225.5"/>
+</g>
+<!-- proc~get_val_csr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node49" class="node">
+<title>proc~get_val_csr</title>
+<g id="a_proc~~dlerp_abst_fe~~CallsGraph_node49"><a xlink:href="../proc/get_val_csr.html" xlink:title="get_val_csr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1161.5,-66 1089.5,-66 1089.5,-42 1161.5,-42 1161.5,-66"/>
+<text text-anchor="middle" x="1125.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_val_csr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_val_csr&#45;&gt;proc~get_val_csr -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge46" class="edge">
+<title>interface~get_val_csr&#45;&gt;proc~get_val_csr</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1019.52,-54C1040.03,-54 1061.29,-54 1079.26,-54"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1079.44,-57.5 1089.44,-54 1079.44,-50.5 1079.44,-57.5"/>
+</g>
+<!-- allocate_array -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node35" class="node">
+<title>allocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="1170,-675 1081,-675 1081,-651 1170,-651 1170,-675"/>
+<text text-anchor="middle" x="1125.5" y="-660.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</g>
+<!-- proc~matrix_determinant_real64&#45;&gt;allocate_array -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge47" class="edge">
+<title>proc~matrix_determinant_real64&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#ff00bf" d="M996.56,-692.99C1010.19,-690.13 1024.61,-687.02 1038,-684 1048.62,-681.6 1059.94,-678.93 1070.78,-676.33"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="1071.66,-679.71 1080.56,-673.96 1070.02,-672.91 1071.66,-679.71"/>
+</g>
+<!-- deallocate_array -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_node36" class="node">
+<title>deallocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="1177,-717 1074,-717 1074,-693 1177,-693 1177,-717"/>
+<text text-anchor="middle" x="1125.5" y="-702.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_array</text>
+</g>
+<!-- proc~matrix_determinant_real64&#45;&gt;deallocate_array -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge48" class="edge">
+<title>proc~matrix_determinant_real64&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#ff00bf" d="M1015.18,-705C1031.24,-705 1047.95,-705 1063.32,-705"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="1063.73,-708.5 1073.73,-705 1063.73,-701.5 1063.73,-708.5"/>
+</g>
+<!-- proc~matrix_inverse_real64&#45;&gt;allocate_array -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge49" class="edge">
+<title>proc~matrix_inverse_real64&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#ff005f" d="M1001.59,-663C1024.04,-663 1048.99,-663 1070.53,-663"/>
+<polygon fill="#ff005f" stroke="#ff005f" points="1070.79,-666.5 1080.79,-663 1070.79,-659.5 1070.79,-666.5"/>
+</g>
+<!-- proc~matrix_inverse_real64&#45;&gt;deallocate_array -->
+<g id="proc~~dlerp_abst_fe~~CallsGraph_edge50" class="edge">
+<title>proc~matrix_inverse_real64&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#ff005f" d="M996.56,-675.01C1010.19,-677.87 1024.61,-680.98 1038,-684 1047.17,-686.07 1056.87,-688.34 1066.33,-690.61"/>
+<polygon fill="#ff005f" stroke="#ff005f" points="1065.53,-694.01 1076.07,-692.95 1067.17,-687.21 1065.53,-694.01"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocdlerp_abst_feCallsGraph = svgPanZoom('#procdlerp_abst_feCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~dlerp_abst_fe~~CalledByGraph Pages: 1 -->
+<svg id="procdlerp_abst_feCalledByGraph" width="641pt" height="25pt"
+ viewBox="0.00 0.00 641.00 24.86" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~dlerp_abst_fe~~CalledByGraph" class="graph" transform="scale(0.34 0.34) rotate(0) translate(4 70)">
+<title>proc~~dlerp_abst_fe~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 1904,-70 1904,4 -4,4"/>
+<!-- proc~dlerp_abst_fe -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_node1" class="node">
+<title>proc~dlerp_abst_fe</title>
+<polygon fill="none" stroke="black" points="1900,-45 1816,-45 1816,-21 1900,-21 1900,-45"/>
+<text text-anchor="middle" x="1858" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">dlerp_abst_fe</text>
+</g>
+<!-- interface~dlerp_abst_fe -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_node2" class="node">
+<title>interface~dlerp_abst_fe</title>
+<g id="a_proc~~dlerp_abst_fe~~CalledByGraph_node2"><a xlink:href="../interface/dlerp_abst_fe.html" xlink:title="abst_fe%dlerp_abst_fe">
+<polygon fill="#a7506f" stroke="#a7506f" points="1780,-45 1648,-45 1648,-21 1780,-21 1780,-45"/>
+<text text-anchor="middle" x="1714" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%dlerp_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- interface~dlerp_abst_fe&#45;&gt;proc~dlerp_abst_fe -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_edge1" class="edge">
+<title>interface~dlerp_abst_fe&#45;&gt;proc~dlerp_abst_fe</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1780.18,-33C1788.69,-33 1797.31,-33 1805.55,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1805.75,-36.5 1815.75,-33 1805.75,-29.5 1805.75,-36.5"/>
+</g>
+<!-- proc~dlerp_domain -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_node3" class="node">
+<title>proc~dlerp_domain</title>
+<g id="a_proc~~dlerp_abst_fe~~CalledByGraph_node3"><a xlink:href="../proc/dlerp_domain.html" xlink:title="type_domain%dlerp_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="1583.5,-66 1418.5,-66 1418.5,-42 1583.5,-42 1583.5,-66"/>
+<text text-anchor="middle" x="1501" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%dlerp_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~dlerp_domain&#45;&gt;interface~dlerp_abst_fe -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_edge2" class="edge">
+<title>proc~dlerp_domain&#45;&gt;interface~dlerp_abst_fe</title>
+<path fill="none" stroke="#ff0000" d="M1583.58,-45.88C1601.42,-44.11 1620.22,-42.23 1637.79,-40.49"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1638.38,-43.94 1647.98,-39.47 1637.68,-36.98 1638.38,-43.94"/>
+</g>
+<!-- proc~lerp_states -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_node4" class="node">
+<title>proc~lerp_states</title>
+<g id="a_proc~~dlerp_abst_fe~~CalledByGraph_node4"><a xlink:href="../proc/lerp_states.html" xlink:title="type_assemble_workspace%lerp_states">
+<polygon fill="#d9534f" stroke="#d9534f" points="1612,-24 1390,-24 1390,0 1612,0 1612,-24"/>
+<text text-anchor="middle" x="1501" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assemble_workspace%lerp_states</text>
+</a>
+</g>
+</g>
+<!-- proc~lerp_states&#45;&gt;interface~dlerp_abst_fe -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_edge3" class="edge">
+<title>proc~lerp_states&#45;&gt;interface~dlerp_abst_fe</title>
+<path fill="none" stroke="#ff0000" d="M1612.13,-22.96C1620.8,-23.82 1629.43,-24.68 1637.78,-25.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1637.51,-29 1647.81,-26.51 1638.2,-22.04 1637.51,-29"/>
+</g>
+<!-- proc~assemble_initialize_ftdss -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_node5" class="node">
+<title>proc~assemble_initialize_ftdss</title>
+<g id="a_proc~~dlerp_abst_fe~~CalledByGraph_node5"><a xlink:href="../proc/assemble_initialize_ftdss.html" xlink:title="assemble_initialize_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1354,-24 1211,-24 1211,0 1354,0 1354,-24"/>
+<text text-anchor="middle" x="1282.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_initialize_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_initialize_ftdss&#45;&gt;proc~lerp_states -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_edge4" class="edge">
+<title>proc~assemble_initialize_ftdss&#45;&gt;proc~lerp_states</title>
+<path fill="none" stroke="#00ffff" d="M1354.09,-12C1362.34,-12 1370.92,-12 1379.61,-12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1379.84,-15.5 1389.84,-12 1379.84,-8.5 1379.84,-15.5"/>
+</g>
+<!-- interface~assemble_initialize_ftdss -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_node6" class="node">
+<title>interface~assemble_initialize_ftdss</title>
+<g id="a_proc~~dlerp_abst_fe~~CalledByGraph_node6"><a xlink:href="../interface/assemble_initialize_ftdss.html" xlink:title="type_ftdss%assemble_initialize_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1175,-24 969,-24 969,0 1175,0 1175,-24"/>
+<text text-anchor="middle" x="1072" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_initialize_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_initialize_ftdss&#45;&gt;proc~assemble_initialize_ftdss -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_edge5" class="edge">
+<title>interface~assemble_initialize_ftdss&#45;&gt;proc~assemble_initialize_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1175.11,-12C1183.69,-12 1192.3,-12 1200.68,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1200.79,-15.5 1210.79,-12 1200.79,-8.5 1200.79,-15.5"/>
+</g>
+<!-- proc~assemble_ftdss -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_node7" class="node">
+<title>proc~assemble_ftdss</title>
+<g id="a_proc~~dlerp_abst_fe~~CalledByGraph_node7"><a xlink:href="../proc/assemble_ftdss.html" xlink:title="assemble_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="933,-24 839,-24 839,0 933,0 933,-24"/>
+<text text-anchor="middle" x="886" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_ftdss&#45;&gt;interface~assemble_initialize_ftdss -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_edge6" class="edge">
+<title>proc~assemble_ftdss&#45;&gt;interface~assemble_initialize_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M933.43,-12C941.4,-12 949.98,-12 958.81,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="958.89,-15.5 968.89,-12 958.89,-8.5 958.89,-15.5"/>
+</g>
+<!-- interface~assemble_ftdss -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_node8" class="node">
+<title>interface~assemble_ftdss</title>
+<g id="a_proc~~dlerp_abst_fe~~CalledByGraph_node8"><a xlink:href="../interface/assemble_ftdss.html" xlink:title="type_ftdss%assemble_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="803,-24 646,-24 646,0 803,0 803,-24"/>
+<text text-anchor="middle" x="724.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_edge7" class="edge">
+<title>interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M803.38,-12C811.94,-12 820.54,-12 828.76,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="828.95,-15.5 838.95,-12 828.95,-8.5 828.95,-15.5"/>
+</g>
+<!-- proc~solve_time_step_ftdss -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_node9" class="node">
+<title>proc~solve_time_step_ftdss</title>
+<g id="a_proc~~dlerp_abst_fe~~CalledByGraph_node9"><a xlink:href="../proc/solve_time_step_ftdss.html" xlink:title="solve_time_step_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="610,-24 483,-24 483,0 610,0 610,-24"/>
+<text text-anchor="middle" x="546.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_edge8" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M610.05,-12C618.36,-12 627,-12 635.63,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="635.75,-15.5 645.75,-12 635.75,-8.5 635.75,-15.5"/>
+</g>
+<!-- interface~solve_time_step_ftdss -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_node10" class="node">
+<title>interface~solve_time_step_ftdss</title>
+<g id="a_proc~~dlerp_abst_fe~~CalledByGraph_node10"><a xlink:href="../interface/solve_time_step_ftdss.html" xlink:title="type_ftdss%solve_time_step_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="447,-24 257,-24 257,0 447,0 447,-24"/>
+<text text-anchor="middle" x="352" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_edge9" class="edge">
+<title>interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M447.28,-12C455.88,-12 464.5,-12 472.87,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="472.93,-15.5 482.93,-12 472.93,-8.5 472.93,-15.5"/>
+</g>
+<!-- proc~run_ftdss -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_node11" class="node">
+<title>proc~run_ftdss</title>
+<g id="a_proc~~dlerp_abst_fe~~CalledByGraph_node11"><a xlink:href="../proc/run_ftdss.html" xlink:title="run_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-24 160,-24 160,0 221,0 221,-24"/>
+<text text-anchor="middle" x="190.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_edge10" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M221.13,-12C228.8,-12 237.52,-12 246.72,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="246.86,-15.5 256.86,-12 246.86,-8.5 246.86,-15.5"/>
+</g>
+<!-- interface~run_ftdss -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_node12" class="node">
+<title>interface~run_ftdss</title>
+<g id="a_proc~~dlerp_abst_fe~~CalledByGraph_node12"><a xlink:href="../interface/run_ftdss.html" xlink:title="type_ftdss%run_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="124,-24 0,-24 0,0 124,0 124,-24"/>
+<text text-anchor="middle" x="62" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftdss&#45;&gt;proc~run_ftdss -->
+<g id="proc~~dlerp_abst_fe~~CalledByGraph_edge11" class="edge">
+<title>interface~run_ftdss&#45;&gt;proc~run_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M124.03,-12C132.82,-12 141.68,-12 149.91,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="149.94,-15.5 159.94,-12 149.94,-8.5 149.94,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocdlerp_abst_feCalledByGraph = svgPanZoom('#procdlerp_abst_feCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">dlerp_abst_fe</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="p">,</span><span class="w"> </span><span class="n">node_coords</span><span class="p">,</span><span class="w"> </span><span class="n">plane_axis</span><span class="p">,</span><span class="w"> </span><span class="n">dlerped_value</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">abst_fe</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_coordinate_dp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">r</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">values</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">node_coords</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">plane_axis</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_coordinate_dp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dlerped_value</span>
+
+<span class="w">        </span><span class="c">! 形状関数の物理勾配を格納する一時配列 (3 x num_nodes)</span>
+<span class="w">        </span><span class="c">! calc_dpsi_dx は dim=2 の場合 (1:2, :) に値を埋めることに注意</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">shape_grads</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="k">dimension</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_nodes</span><span class="p">)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dlerp_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="k">dimension</span><span class="p">)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ierr</span>
+
+<span class="w">        </span><span class="c">! 1. 初期化</span>
+<span class="w">        </span><span class="k">call </span><span class="n">dlerped_value</span><span class="p">%</span><span class="n">reset</span><span class="p">()</span>
+<span class="w">        </span><span class="n">shape_grads</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="n">dlerp_array</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+
+<span class="w">        </span><span class="c">! 2. 形状関数の物理勾配 (dN_i/dx, dN_i/dy, dN_i/dz) を取得</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">calc_shape_function</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">node_coords</span><span class="p">,</span><span class="w"> </span><span class="n">dpsi_dx</span><span class="o">=</span><span class="n">shape_grads</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">matvec</span><span class="p">(</span><span class="n">shape_grads</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="p">,</span><span class="w"> </span><span class="n">dlerp_array</span><span class="p">,</span><span class="w"> </span><span class="n">ierr</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! 3. 勾配の計算: grad u = sum( u_i * grad N_i )</span>
+<span class="w">        </span><span class="c">! shape_grads の第1次元は常に 1〜dim に詰められていることを考慮してマッピングする</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="k">dimension</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="w">            </span><span class="c">! --- 3次元 (XYZ) ---</span>
+<span class="w">            </span><span class="c">! shape_grads(1:3, :) に順に x, y, z 成分が入っている</span>
+<span class="w">            </span><span class="n">dlerped_value</span><span class="p">%</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dlerp_array</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">            </span><span class="n">dlerped_value</span><span class="p">%</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dlerp_array</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">            </span><span class="n">dlerped_value</span><span class="p">%</span><span class="n">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dlerp_array</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="w">        </span><span class="k">else if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="k">dimension</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="w">            </span><span class="c">! --- 2次元 (XY or XZ) ---</span>
+<span class="w">            </span><span class="c">! shape_grads(1, :) -&gt; 第1成分 (x)</span>
+<span class="w">            </span><span class="c">! shape_grads(2, :) -&gt; 第2成分 (y or z)</span>
+
+<span class="w">            </span><span class="c">! 第1成分は常に x</span>
+<span class="w">            </span><span class="n">dlerped_value</span><span class="p">%</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dlerp_array</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">plane_axis</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">dlerped_value</span><span class="p">%</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">                </span><span class="n">dlerped_value</span><span class="p">%</span><span class="n">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dlerp_array</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">            </span><span class="k">else</span>
+<span class="k">                </span><span class="n">dlerped_value</span><span class="p">%</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dlerp_array</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">                </span><span class="n">dlerped_value</span><span class="p">%</span><span class="n">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        else if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="k">dimension</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">dlerped_value</span><span class="p">%</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dlerp_array</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">            </span><span class="n">dlerped_value</span><span class="p">%</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">            </span><span class="n">dlerped_value</span><span class="p">%</span><span class="n">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">    end subroutine </span><span class="n">dlerp_abst_fe</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

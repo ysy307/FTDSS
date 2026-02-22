@@ -1,9 +1,8 @@
 module module_thermal
-    use :: main_thermal, only:abst_thermal, type_thermal_crs
+    use :: main_thermal, only:type_thermal
     implicit none
     private
 
-    public :: abst_thermal
-    public :: type_thermal_crs
+    public :: type_thermal
 
 end module module_thermal

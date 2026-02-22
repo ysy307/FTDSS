@@ -1,0 +1,1281 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>solve_time_step_check_convergence_ftdss &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>solve_time_step_check_convergence_ftdss
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.4% of total for procedures.">181 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/ftdss_interface.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/ftdss_interface.f90.html'>ftdss_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/main_ftdss.html'>main_ftdss</a></li>
+            <li class="breadcrumb-item active" aria-current="page">solve_time_step_check_convergence_ftdss</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+    <em>None</em>
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>interface</h2>
+      
+      <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~solve_time_step_check_convergence_ftdss~~CallsGraph Pages: 1 -->
+<svg id="interfacesolve_time_step_check_convergence_ftdssCallsGraph" width="641pt" height="224pt"
+ viewBox="0.00 0.00 641.00 223.59" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph" class="graph" transform="scale(0.29 0.29) rotate(0) translate(4 766.18)">
+<title>interface~~solve_time_step_check_convergence_ftdss~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-766.18 2204,-766.18 2204,4 -4,4"/>
+<!-- interface~solve_time_step_check_convergence_ftdss -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node1" class="node">
+<title>interface~solve_time_step_check_convergence_ftdss</title>
+<polygon fill="none" stroke="black" points="302,-318 0,-318 0,-294 302,-294 302,-318"/>
+<text text-anchor="middle" x="151" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_ftdss%solve_time_step_check_convergence_ftdss</text>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftdss -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node2" class="node">
+<title>proc~solve_time_step_check_convergence_ftdss</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node2"><a xlink:href="../proc/solve_time_step_check_convergence_ftdss.html" xlink:title="solve_time_step_check_convergence_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="577,-318 338,-318 338,-294 577,-294 577,-318"/>
+<text text-anchor="middle" x="457.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_check_convergence_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_check_convergence_ftdss&#45;&gt;proc~solve_time_step_check_convergence_ftdss -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge1" class="edge">
+<title>interface~solve_time_step_check_convergence_ftdss&#45;&gt;proc~solve_time_step_check_convergence_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M302.02,-306C310.56,-306 319.11,-306 327.55,-306"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="327.81,-309.5 337.81,-306 327.8,-302.5 327.81,-309.5"/>
+</g>
+<!-- deallocate_array -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node3" class="node">
+<title>deallocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="1567,-717 1464,-717 1464,-693 1567,-693 1567,-717"/>
+<text text-anchor="middle" x="1515.5" y="-702.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_array</text>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftdss&#45;&gt;deallocate_array -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge2" class="edge">
+<title>proc~solve_time_step_check_convergence_ftdss&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#ff0000" d="M459.86,-318.1C466.18,-367.86 497.41,-557.96 613,-639 878.5,-825.16 1302.71,-753.8 1456.46,-719.35"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1457.65,-722.67 1466.63,-717.04 1456.1,-715.85 1457.65,-722.67"/>
+</g>
+<!-- has_nan -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node4" class="node">
+<title>has_nan</title>
+<polygon fill="#777777" stroke="#777777" points="790.5,-276 733.5,-276 733.5,-252 790.5,-252 790.5,-276"/>
+<text text-anchor="middle" x="762" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">has_nan</text>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftdss&#45;&gt;has_nan -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge3" class="edge">
+<title>proc~solve_time_step_check_convergence_ftdss&#45;&gt;has_nan</title>
+<path fill="none" stroke="#ff0000" d="M545.18,-293.96C604.02,-285.8 678.9,-275.4 723.21,-269.25"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="723.83,-272.69 733.26,-267.85 722.87,-265.76 723.83,-272.69"/>
+</g>
+<!-- interface~get_variable_increment_ftdss -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node5" class="node">
+<title>interface~get_variable_increment_ftdss</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node5"><a xlink:href="../interface/get_variable_increment_ftdss.html" xlink:title="type_ftdss%get_variable_increment_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="877.5,-596 646.5,-596 646.5,-572 877.5,-572 877.5,-596"/>
+<text text-anchor="middle" x="762" y="-581.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%get_variable_increment_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftdss&#45;&gt;interface~get_variable_increment_ftdss -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge4" class="edge">
+<title>proc~solve_time_step_check_convergence_ftdss&#45;&gt;interface~get_variable_increment_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M462.9,-318.23C477.57,-357.3 528.75,-480.08 613,-542 629.74,-554.3 649.97,-563.01 670.02,-569.16"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="669.25,-572.58 679.83,-571.98 671.19,-565.86 669.25,-572.58"/>
+</g>
+<!-- interface~get_variable_residual_ftdss -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node6" class="node">
+<title>interface~get_variable_residual_ftdss</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node6"><a xlink:href="../interface/get_variable_residual_ftdss.html" xlink:title="type_ftdss%get_variable_residual_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="871.5,-533 652.5,-533 652.5,-509 871.5,-509 871.5,-533"/>
+<text text-anchor="middle" x="762" y="-518.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%get_variable_residual_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftdss&#45;&gt;interface~get_variable_residual_ftdss -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge5" class="edge">
+<title>proc~solve_time_step_check_convergence_ftdss&#45;&gt;interface~get_variable_residual_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M465.38,-318.2C484.35,-350.66 540.81,-439.69 613,-484 628.98,-493.81 647.43,-501.02 665.78,-506.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="665.07,-509.76 675.64,-509 666.91,-503 665.07,-509.76"/>
+</g>
+<!-- proc~check_convergence -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node7" class="node">
+<title>proc~check_convergence</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node7"><a xlink:href="../proc/check_convergence.html" xlink:title="type_iteration%check_convergence">
+<polygon fill="#d9534f" stroke="#d9534f" points="863,-402 661,-402 661,-378 863,-378 863,-402"/>
+<text text-anchor="middle" x="762" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%check_convergence</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~check_convergence -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge6" class="edge">
+<title>proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~check_convergence</title>
+<path fill="none" stroke="#ff0000" d="M482.74,-318.07C512.62,-332.44 565.32,-356.11 613,-369 625.06,-372.26 637.81,-375.04 650.58,-377.4"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="650.35,-380.91 660.81,-379.2 651.57,-374.02 650.35,-380.91"/>
+</g>
+<!-- proc~get_current_residual_norm_iteration -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node8" class="node">
+<title>proc~get_current_residual_norm_iteration</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node8"><a xlink:href="../proc/get_current_residual_norm_iteration.html" xlink:title="type_iteration%get_current_residual_norm_iteration">
+<polygon fill="#d9534f" stroke="#d9534f" points="1290.5,-522 1002.5,-522 1002.5,-498 1290.5,-498 1290.5,-522"/>
+<text text-anchor="middle" x="1146.5" y="-507.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%get_current_residual_norm_iteration</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~get_current_residual_norm_iteration -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge7" class="edge">
+<title>proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~get_current_residual_norm_iteration</title>
+<path fill="none" stroke="#ff0000" d="M472.28,-318.23C497.99,-340.38 555.88,-387.02 613,-411 734.7,-462.09 883.04,-486.92 992.21,-498.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="992,-502.42 1002.32,-500.01 992.75,-495.46 992,-502.42"/>
+</g>
+<!-- proc~get_nonlinear_iter -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node9" class="node">
+<title>proc~get_nonlinear_iter</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node9"><a xlink:href="../proc/get_nonlinear_iter.html" xlink:title="type_iteration%get_nonlinear_iter">
+<polygon fill="#d9534f" stroke="#d9534f" points="858.5,-234 665.5,-234 665.5,-210 858.5,-210 858.5,-234"/>
+<text text-anchor="middle" x="762" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%get_nonlinear_iter</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~get_nonlinear_iter -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge8" class="edge">
+<title>proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~get_nonlinear_iter</title>
+<path fill="none" stroke="#ff0000" d="M482.74,-293.93C512.62,-279.56 565.32,-255.89 613,-243 626.54,-239.34 640.95,-236.29 655.27,-233.75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="655.88,-237.2 665.16,-232.08 654.71,-230.3 655.88,-237.2"/>
+</g>
+<!-- proc~has_diverged_iteration -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node10" class="node">
+<title>proc~has_diverged_iteration</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node10"><a xlink:href="../proc/has_diverged_iteration.html" xlink:title="type_iteration%has_diverged_iteration">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="870.5,-192 653.5,-192 653.5,-168 870.5,-168 870.5,-192"/>
+<text text-anchor="middle" x="762" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%has_diverged_iteration</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~has_diverged_iteration -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge9" class="edge">
+<title>proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~has_diverged_iteration</title>
+<path fill="none" stroke="#ff0000" d="M471.75,-293.8C497.05,-271.29 554.92,-223.45 613,-201 622.63,-197.28 632.84,-194.2 643.22,-191.67"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="644.23,-195.03 653.21,-189.4 642.68,-188.2 644.23,-195.03"/>
+</g>
+<!-- proc~is_compute_newton_method_iteration -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node11" class="node">
+<title>proc~is_compute_newton_method_iteration</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node11"><a xlink:href="../proc/is_compute_newton_method_iteration.html" xlink:title="type_iteration%is_compute_newton_method_iteration">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="911,-150 613,-150 613,-126 911,-126 911,-150"/>
+<text text-anchor="middle" x="762" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%is_compute_newton_method_iteration</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~is_compute_newton_method_iteration -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge10" class="edge">
+<title>proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~is_compute_newton_method_iteration</title>
+<path fill="none" stroke="#ff0000" d="M466.93,-293.92C487.84,-264.99 545.35,-191.74 613,-159 617.3,-156.92 621.75,-155.03 626.3,-153.31"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="627.47,-156.61 635.77,-150.03 625.17,-150 627.47,-156.61"/>
+</g>
+<!-- proc~is_compute_picard_method_iteration -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node12" class="node">
+<title>proc~is_compute_picard_method_iteration</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node12"><a xlink:href="../proc/is_compute_picard_method_iteration.html" xlink:title="type_iteration%is_compute_picard_method_iteration">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="908,-108 616,-108 616,-84 908,-84 908,-108"/>
+<text text-anchor="middle" x="762" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%is_compute_picard_method_iteration</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~is_compute_picard_method_iteration -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge11" class="edge">
+<title>proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~is_compute_picard_method_iteration</title>
+<path fill="none" stroke="#ff0000" d="M464.41,-293.63C481.69,-258.94 535.84,-160.49 613,-117 616.15,-115.23 619.39,-113.58 622.71,-112.06"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="624.36,-115.17 632.25,-108.09 621.67,-108.7 624.36,-115.17"/>
+</g>
+<!-- proc~is_none_method_iteration -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node13" class="node">
+<title>proc~is_none_method_iteration</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node13"><a xlink:href="../proc/is_none_method_iteration.html" xlink:title="type_iteration%is_none_method_iteration">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="878.5,-66 645.5,-66 645.5,-42 878.5,-42 878.5,-66"/>
+<text text-anchor="middle" x="762" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%is_none_method_iteration</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~is_none_method_iteration -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge12" class="edge">
+<title>proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~is_none_method_iteration</title>
+<path fill="none" stroke="#ff0000" d="M462.55,-293.82C476.35,-254.45 525.58,-129.94 613,-75 620.11,-70.53 627.78,-66.86 635.76,-63.85"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="636.92,-67.15 645.26,-60.62 634.67,-60.53 636.92,-67.15"/>
+</g>
+<!-- proc~is_physics_active_control -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node14" class="node">
+<title>proc~is_physics_active_control</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node14"><a xlink:href="../proc/is_physics_active_control.html" xlink:title="type_controls%is_physics_active_control">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1628,-675 1403,-675 1403,-651 1628,-651 1628,-675"/>
+<text text-anchor="middle" x="1515.5" y="-660.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_controls%is_physics_active_control</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~is_physics_active_control -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge13" class="edge">
+<title>proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~is_physics_active_control</title>
+<path fill="none" stroke="#ff0000" d="M460.48,-318.22C468.81,-365.17 505.65,-534.82 613,-605 676.66,-646.62 1161.51,-658.47 1392.65,-661.77"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1392.74,-665.27 1402.79,-661.91 1392.84,-658.27 1392.74,-665.27"/>
+</g>
+<!-- proc~reach_min_relaxation_aitken -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node15" class="node">
+<title>proc~reach_min_relaxation_aitken</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node15"><a xlink:href="../proc/reach_min_relaxation_aitken.html" xlink:title="type_aitken_params%reach_min_relaxation_aitken">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="903,-318 621,-318 621,-294 903,-294 903,-318"/>
+<text text-anchor="middle" x="762" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_aitken_params%reach_min_relaxation_aitken</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~reach_min_relaxation_aitken -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge14" class="edge">
+<title>proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~reach_min_relaxation_aitken</title>
+<path fill="none" stroke="#ff0000" d="M577.19,-306C588.15,-306 599.35,-306 610.55,-306"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="610.82,-309.5 620.82,-306 610.82,-302.5 610.82,-309.5"/>
+</g>
+<!-- proc~set_diverged -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node16" class="node">
+<title>proc~set_diverged</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node16"><a xlink:href="../proc/set_diverged.html" xlink:title="type_iteration%set_diverged">
+<polygon fill="#d9534f" stroke="#d9534f" points="844,-360 680,-360 680,-336 844,-336 844,-360"/>
+<text text-anchor="middle" x="762" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%set_diverged</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~set_diverged -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge15" class="edge">
+<title>proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~set_diverged</title>
+<path fill="none" stroke="#ff0000" d="M545.18,-318.04C584.13,-323.44 630.11,-329.83 669.6,-335.31"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="669.37,-338.81 679.75,-336.72 670.33,-331.88 669.37,-338.81"/>
+</g>
+<!-- proc~set_nonlinear_type_iteration -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node17" class="node">
+<title>proc~set_nonlinear_type_iteration</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node17"><a xlink:href="../proc/set_nonlinear_type_iteration.html" xlink:title="type_iteration%set_nonlinear_type_iteration">
+<polygon fill="#d9534f" stroke="#d9534f" points="885.5,-24 638.5,-24 638.5,0 885.5,0 885.5,-24"/>
+<text text-anchor="middle" x="762" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%set_nonlinear_type_iteration</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~set_nonlinear_type_iteration -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge16" class="edge">
+<title>proc~solve_time_step_check_convergence_ftdss&#45;&gt;proc~set_nonlinear_type_iteration</title>
+<path fill="none" stroke="#ff0000" d="M461.29,-293.86C472.04,-250.13 515.13,-99.72 613,-33 618.01,-29.58 623.35,-26.61 628.9,-24.04"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="630.54,-27.15 638.43,-20.07 627.85,-20.68 630.54,-27.15"/>
+</g>
+<!-- proc~get_variable_increment_ftdss -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node21" class="node">
+<title>proc~get_variable_increment_ftdss</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node21"><a xlink:href="../proc/get_variable_increment_ftdss.html" xlink:title="get_variable_increment_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1230.5,-606 1062.5,-606 1062.5,-582 1230.5,-582 1230.5,-606"/>
+<text text-anchor="middle" x="1146.5" y="-591.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_variable_increment_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~get_variable_increment_ftdss&#45;&gt;proc~get_variable_increment_ftdss -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge17" class="edge">
+<title>interface~get_variable_increment_ftdss&#45;&gt;proc~get_variable_increment_ftdss</title>
+<path fill="none" stroke="#ffcc00" stroke-dasharray="5,2" d="M877.5,-586.99C933.33,-588.45 999.62,-590.19 1052.3,-591.56"/>
+<polygon fill="#ffcc00" stroke="#ffcc00" points="1052.22,-595.06 1062.31,-591.83 1052.41,-588.06 1052.22,-595.06"/>
+</g>
+<!-- proc~get_variable_residual_ftdss -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node22" class="node">
+<title>proc~get_variable_residual_ftdss</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node22"><a xlink:href="../proc/get_variable_residual_ftdss.html" xlink:title="get_variable_residual_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1224.5,-564 1068.5,-564 1068.5,-540 1224.5,-540 1224.5,-564"/>
+<text text-anchor="middle" x="1146.5" y="-549.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_variable_residual_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~get_variable_residual_ftdss&#45;&gt;proc~get_variable_residual_ftdss -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge18" class="edge">
+<title>interface~get_variable_residual_ftdss&#45;&gt;proc~get_variable_residual_ftdss</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M871.59,-529.8C930.64,-534.59 1002.71,-540.43 1058.1,-544.92"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1057.99,-548.42 1068.24,-545.74 1058.55,-541.44 1057.99,-548.42"/>
+</g>
+<!-- is_valid -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node19" class="node">
+<title>is_valid</title>
+<polygon fill="#777777" stroke="#777777" points="1542.5,-423 1488.5,-423 1488.5,-399 1542.5,-399 1542.5,-423"/>
+<text text-anchor="middle" x="1515.5" y="-408.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">is_valid</text>
+</g>
+<!-- proc~check_convergence&#45;&gt;is_valid -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge19" class="edge">
+<title>proc~check_convergence&#45;&gt;is_valid</title>
+<path fill="none" stroke="#65ff00" d="M790.05,-402.02C825.33,-416.98 889.36,-441.69 947,-451 1122.07,-479.26 1173.87,-493.64 1346,-451 1363.56,-446.65 1364.83,-437.72 1382,-432 1413.51,-421.51 1451.02,-416.19 1478.07,-413.54"/>
+<polygon fill="#65ff00" stroke="#65ff00" points="1478.61,-417 1488.25,-412.61 1477.98,-410.03 1478.61,-417"/>
+</g>
+<!-- proc~check_convergence_criterion -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node20" class="node">
+<title>proc~check_convergence_criterion</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node20"><a xlink:href="../proc/check_convergence_criterion.html" xlink:title="type_convergence_criterion%check_convergence_criterion">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1310.5,-282 982.5,-282 982.5,-258 1310.5,-258 1310.5,-282"/>
+<text text-anchor="middle" x="1146.5" y="-267.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_convergence_criterion%check_convergence_criterion</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence&#45;&gt;proc~check_convergence_criterion -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge20" class="edge">
+<title>proc~check_convergence&#45;&gt;proc~check_convergence_criterion</title>
+<path fill="none" stroke="#65ff00" d="M863.24,-379.36C879.36,-376.63 895.74,-373.23 911,-369 986.19,-348.17 1069.2,-308.99 1113.48,-286.67"/>
+<polygon fill="#65ff00" stroke="#65ff00" points="1115.26,-289.7 1122.59,-282.05 1112.09,-283.46 1115.26,-289.7"/>
+</g>
+<!-- proc~raise_error -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node23" class="node">
+<title>proc~raise_error</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node23"><a xlink:href="../proc/raise_error.html" xlink:title="raise_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="1181.5,-164 1111.5,-164 1111.5,-140 1181.5,-140 1181.5,-164"/>
+<text text-anchor="middle" x="1146.5" y="-149.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">raise_error</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence&#45;&gt;proc~raise_error -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge21" class="edge">
+<title>proc~check_convergence&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#65ff00" d="M863.38,-392.09C880.94,-388.17 897.78,-381.08 911,-369 962.57,-321.88 899.64,-267.35 947,-216 986.86,-172.79 1056,-158.64 1101.25,-154.08"/>
+<polygon fill="#65ff00" stroke="#65ff00" points="1101.71,-157.55 1111.36,-153.18 1101.09,-150.58 1101.71,-157.55"/>
+</g>
+<!-- proc~should_check_residual_convergence_control -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node24" class="node">
+<title>proc~should_check_residual_convergence_control</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node24"><a xlink:href="../proc/should_check_residual_convergence_control.html" xlink:title="type_convergence_control%should_check_residual_convergence_control">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1346,-400 947,-400 947,-376 1346,-376 1346,-400"/>
+<text text-anchor="middle" x="1146.5" y="-385.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_convergence_control%should_check_residual_convergence_control</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence&#45;&gt;proc~should_check_residual_convergence_control -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge22" class="edge">
+<title>proc~check_convergence&#45;&gt;proc~should_check_residual_convergence_control</title>
+<path fill="none" stroke="#65ff00" d="M863.5,-389.47C886.26,-389.36 911.26,-389.22 936.68,-389.09"/>
+<polygon fill="#65ff00" stroke="#65ff00" points="936.83,-392.59 946.81,-389.04 936.8,-385.59 936.83,-392.59"/>
+</g>
+<!-- proc~should_check_update_convergence_control -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node25" class="node">
+<title>proc~should_check_update_convergence_control</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node25"><a xlink:href="../proc/should_check_update_convergence_control.html" xlink:title="type_convergence_control%should_check_update_convergence_control">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1343.5,-442 949.5,-442 949.5,-418 1343.5,-418 1343.5,-442"/>
+<text text-anchor="middle" x="1146.5" y="-427.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_convergence_control%should_check_update_convergence_control</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence&#45;&gt;proc~should_check_update_convergence_control -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge23" class="edge">
+<title>proc~check_convergence&#45;&gt;proc~should_check_update_convergence_control</title>
+<path fill="none" stroke="#65ff00" d="M863.5,-400.51C911.54,-405.53 969.52,-411.6 1020.38,-416.92"/>
+<polygon fill="#65ff00" stroke="#65ff00" points="1020.15,-420.41 1030.46,-417.97 1020.88,-413.45 1020.15,-420.41"/>
+</g>
+<!-- strip -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node26" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="1771,-122 1717,-122 1717,-98 1771,-98 1771,-122"/>
+<text text-anchor="middle" x="1744" y="-107.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~check_convergence&#45;&gt;strip -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge24" class="edge">
+<title>proc~check_convergence&#45;&gt;strip</title>
+<path fill="none" stroke="#65ff00" d="M863.19,-391.36C880.66,-387.48 897.52,-380.59 911,-369 953.22,-332.7 903.66,-283.96 947,-249 1007.9,-199.88 1577.05,-224.74 1649,-194 1681.58,-180.08 1710.54,-150.18 1727.44,-130.07"/>
+<polygon fill="#65ff00" stroke="#65ff00" points="1730.3,-132.09 1733.91,-122.13 1724.88,-127.67 1730.3,-132.09"/>
+</g>
+<!-- proc~get_current_residual_norm_iteration&#45;&gt;is_valid -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge25" class="edge">
+<title>proc~get_current_residual_norm_iteration&#45;&gt;is_valid</title>
+<path fill="none" stroke="#00ff00" d="M1290.72,-505.87C1310.2,-501.21 1329.24,-494.23 1346,-484 1370,-469.36 1358.2,-446.96 1382,-432 1410.76,-413.92 1449.76,-409.62 1478,-409.28"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1478.24,-412.78 1488.25,-409.32 1478.26,-405.78 1478.24,-412.78"/>
+</g>
+<!-- in_group -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node18" class="node">
+<title>in_group</title>
+<polygon fill="#777777" stroke="#777777" points="1773,-675 1715,-675 1715,-651 1773,-651 1773,-675"/>
+<text text-anchor="middle" x="1744" y="-660.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_group</text>
+</g>
+<!-- proc~is_physics_active_control&#45;&gt;in_group -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge26" class="edge">
+<title>proc~is_physics_active_control&#45;&gt;in_group</title>
+<path fill="none" stroke="#6500ff" d="M1628.09,-663C1655.6,-663 1683.24,-663 1704.52,-663"/>
+<polygon fill="#6500ff" stroke="#6500ff" points="1704.73,-666.5 1714.73,-663 1704.73,-659.5 1704.73,-666.5"/>
+</g>
+<!-- proc~reach_min_relaxation_aitken&#45;&gt;is_valid -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge27" class="edge">
+<title>proc~reach_min_relaxation_aitken&#45;&gt;is_valid</title>
+<path fill="none" stroke="#cc00ff" d="M903.06,-303.11C1063.55,-300.92 1309.28,-301.43 1346,-324 1374.47,-341.5 1354.7,-370.74 1382,-390 1410.05,-409.79 1449.73,-413.75 1478.34,-413.55"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1478.43,-417.05 1488.34,-413.31 1478.26,-410.05 1478.43,-417.05"/>
+</g>
+<!-- proc~reach_min_relaxation_aitken&#45;&gt;proc~raise_error -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge28" class="edge">
+<title>proc~reach_min_relaxation_aitken&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#cc00ff" d="M898.26,-293.82C902.74,-291.25 907.01,-288.32 911,-285 949.58,-252.92 908.25,-209.87 947,-178 990.12,-142.54 1057.27,-141.34 1101.33,-145.37"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1101.14,-148.87 1111.45,-146.43 1101.87,-141.91 1101.14,-148.87"/>
+</g>
+<!-- proc~reach_min_relaxation_aitken&#45;&gt;strip -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge29" class="edge">
+<title>proc~reach_min_relaxation_aitken&#45;&gt;strip</title>
+<path fill="none" stroke="#cc00ff" d="M899.32,-293.89C903.45,-291.28 907.36,-288.33 911,-285 962.86,-237.55 894.84,-178.11 947,-131 1091.66,-0.34 1187.47,-87.47 1382,-75 1500.42,-67.41 1532.21,-53.96 1649,-75 1669.53,-78.7 1691.44,-86.6 1708.93,-93.96"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1707.59,-97.2 1718.16,-97.97 1710.38,-90.78 1707.59,-97.2"/>
+</g>
+<!-- proc~set_diverged&#45;&gt;is_valid -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge30" class="edge">
+<title>proc~set_diverged&#45;&gt;is_valid</title>
+<path fill="none" stroke="#ff00cb" d="M844.43,-337.35C959.22,-325.29 1173.82,-313.63 1346,-367 1364.14,-372.62 1364.25,-383.26 1382,-390 1413.14,-401.82 1450.84,-406.99 1478.05,-409.25"/>
+<polygon fill="#ff00cb" stroke="#ff00cb" points="1478.06,-412.76 1488.29,-410 1478.58,-405.78 1478.06,-412.76"/>
+</g>
+<!-- proc~set_diverged&#45;&gt;proc~raise_error -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge31" class="edge">
+<title>proc~set_diverged&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff00cb" d="M844.1,-353.12C868.19,-350.59 892.94,-343.4 911,-327 961.43,-281.2 896.32,-223.53 947,-178 988.73,-140.5 1056.76,-139.96 1101.33,-144.67"/>
+<polygon fill="#ff00cb" stroke="#ff00cb" points="1100.95,-148.15 1111.3,-145.85 1101.78,-141.2 1100.95,-148.15"/>
+</g>
+<!-- proc~set_diverged&#45;&gt;strip -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge32" class="edge">
+<title>proc~set_diverged&#45;&gt;strip</title>
+<path fill="none" stroke="#ff00cb" d="M844.13,-352.19C867.94,-349.55 892.53,-342.53 911,-327 950.7,-293.63 906,-247.76 947,-216 1070.55,-120.28 1500.93,-223.03 1649,-173 1676.67,-163.65 1703.91,-143.91 1721.88,-129.01"/>
+<polygon fill="#ff00cb" stroke="#ff00cb" points="1724.58,-131.3 1729.92,-122.14 1720.04,-125.97 1724.58,-131.3"/>
+</g>
+<!-- interface~vector_norm1 -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node28" class="node">
+<title>interface~vector_norm1</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node28"><a xlink:href="../interface/vector_norm1.html" xlink:title="vector_norm1">
+<polygon fill="#a7506f" stroke="#a7506f" points="1559,-381 1472,-381 1472,-357 1559,-357 1559,-381"/>
+<text text-anchor="middle" x="1515.5" y="-366.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_norm1</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence_criterion&#45;&gt;interface~vector_norm1 -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge33" class="edge">
+<title>proc~check_convergence_criterion&#45;&gt;interface~vector_norm1</title>
+<path fill="none" stroke="#aaff00" d="M1310.03,-282.03C1322.52,-285.72 1334.66,-290.32 1346,-296 1366.51,-306.28 1362.23,-321.36 1382,-333 1406.39,-347.36 1436.66,-356.15 1462.11,-361.44"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="1461.48,-364.88 1471.96,-363.36 1462.82,-358.01 1461.48,-364.88"/>
+</g>
+<!-- interface~vector_norm2 -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node29" class="node">
+<title>interface~vector_norm2</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node29"><a xlink:href="../interface/vector_norm2.html" xlink:title="vector_norm2">
+<polygon fill="#a7506f" stroke="#a7506f" points="1559,-282 1472,-282 1472,-258 1559,-258 1559,-282"/>
+<text text-anchor="middle" x="1515.5" y="-267.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_norm2</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence_criterion&#45;&gt;interface~vector_norm2 -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge34" class="edge">
+<title>proc~check_convergence_criterion&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M1310.61,-270C1364.91,-270 1421.62,-270 1461.41,-270"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="1461.66,-273.5 1471.66,-270 1461.66,-266.5 1461.66,-273.5"/>
+</g>
+<!-- interface~vector_norminf -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node30" class="node">
+<title>interface~vector_norminf</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node30"><a xlink:href="../interface/vector_norminf.html" xlink:title="vector_norminf">
+<polygon fill="#a7506f" stroke="#a7506f" points="1562.5,-324 1468.5,-324 1468.5,-300 1562.5,-300 1562.5,-324"/>
+<text text-anchor="middle" x="1515.5" y="-309.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_norminf</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence_criterion&#45;&gt;interface~vector_norminf -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge35" class="edge">
+<title>proc~check_convergence_criterion&#45;&gt;interface~vector_norminf</title>
+<path fill="none" stroke="#aaff00" d="M1252.67,-282.04C1319.53,-289.69 1403.47,-299.29 1458.01,-305.54"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="1457.85,-309.04 1468.18,-306.7 1458.64,-302.08 1457.85,-309.04"/>
+</g>
+<!-- proc~get_variable_increment_ftdss&#45;&gt;deallocate_array -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge37" class="edge">
+<title>proc~get_variable_increment_ftdss&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#00ff00" d="M1173.63,-606.11C1216.31,-625.42 1304.08,-663.12 1382,-684 1405.12,-690.2 1431.03,-694.8 1453.76,-698.09"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1453.57,-701.6 1463.96,-699.52 1454.54,-694.67 1453.57,-701.6"/>
+</g>
+<!-- proc~get_variable_increment_ftdss&#45;&gt;proc~is_physics_active_control -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge43" class="edge">
+<title>proc~get_variable_increment_ftdss&#45;&gt;proc~is_physics_active_control</title>
+<path fill="none" stroke="#00ff00" d="M1230.91,-597.17C1267.09,-600.5 1309.46,-607.1 1346,-620 1363.68,-626.24 1364.4,-635.52 1382,-642 1388.46,-644.38 1395.2,-646.49 1402.06,-648.36"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1401.63,-651.86 1412.18,-650.93 1403.35,-645.08 1401.63,-651.86"/>
+</g>
+<!-- proc~get_variable_increment_ftdss&#45;&gt;is_valid -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge38" class="edge">
+<title>proc~get_variable_increment_ftdss&#45;&gt;is_valid</title>
+<path fill="none" stroke="#00ff00" d="M1230.9,-605.58C1270.1,-606.36 1314.94,-599.86 1346,-573 1394.92,-530.69 1334.19,-475.56 1382,-432 1407.68,-408.6 1448.43,-405.34 1477.96,-406.69"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1478.07,-410.21 1488.28,-407.37 1478.53,-403.22 1478.07,-410.21"/>
+</g>
+<!-- allocate_array -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node27" class="node">
+<title>allocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="1560,-633 1471,-633 1471,-609 1560,-609 1560,-633"/>
+<text text-anchor="middle" x="1515.5" y="-618.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</g>
+<!-- proc~get_variable_increment_ftdss&#45;&gt;allocate_array -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge36" class="edge">
+<title>proc~get_variable_increment_ftdss&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#00ff00" d="M1230.78,-600.13C1301.25,-605.31 1400.17,-612.59 1460.66,-617.04"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1460.53,-620.54 1470.76,-617.78 1461.04,-613.56 1460.53,-620.54"/>
+</g>
+<!-- proc~get_data_vector -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node31" class="node">
+<title>proc~get_data_vector</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node31"><a xlink:href="../proc/get_data_vector.html" xlink:title="type_residual_vector%get_data_vector">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1624,-507 1407,-507 1407,-483 1624,-483 1624,-507"/>
+<text text-anchor="middle" x="1515.5" y="-492.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_residual_vector%get_data_vector</text>
+</a>
+</g>
+</g>
+<!-- proc~get_variable_increment_ftdss&#45;&gt;proc~get_data_vector -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge39" class="edge">
+<title>proc~get_variable_increment_ftdss&#45;&gt;proc~get_data_vector</title>
+<path fill="none" stroke="#00ff00" d="M1230.53,-601.07C1268.29,-600.48 1312.01,-594.14 1346,-573 1371.44,-557.17 1356.98,-532.48 1382,-516 1386.92,-512.76 1392.17,-509.95 1397.62,-507.53"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1398.98,-510.75 1406.98,-503.8 1396.39,-504.25 1398.98,-510.75"/>
+</g>
+<!-- proc~get_num_dofs_per_node_domain -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node32" class="node">
+<title>proc~get_num_dofs_per_node_domain</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node32"><a xlink:href="../proc/get_num_dofs_per_node_domain.html" xlink:title="type_domain%get_num_dofs_per_node_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="1649,-591 1382,-591 1382,-567 1649,-567 1649,-591"/>
+<text text-anchor="middle" x="1515.5" y="-576.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_num_dofs_per_node_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~get_variable_increment_ftdss&#45;&gt;proc~get_num_dofs_per_node_domain -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge40" class="edge">
+<title>proc~get_variable_increment_ftdss&#45;&gt;proc~get_num_dofs_per_node_domain</title>
+<path fill="none" stroke="#00ff00" d="M1230.78,-590.6C1272.44,-588.89 1324.04,-586.78 1371.77,-584.83"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1372.04,-588.33 1381.89,-584.42 1371.75,-581.33 1372.04,-588.33"/>
+</g>
+<!-- proc~get_num_nodes_domain -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node33" class="node">
+<title>proc~get_num_nodes_domain</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node33"><a xlink:href="../proc/get_num_nodes_domain.html" xlink:title="type_domain%get_num_nodes_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="1626,-549 1405,-549 1405,-525 1626,-525 1626,-549"/>
+<text text-anchor="middle" x="1515.5" y="-534.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_num_nodes_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~get_variable_increment_ftdss&#45;&gt;proc~get_num_nodes_domain -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge41" class="edge">
+<title>proc~get_variable_increment_ftdss&#45;&gt;proc~get_num_nodes_domain</title>
+<path fill="none" stroke="#00ff00" d="M1230.54,-590.58C1266.46,-587.73 1308.73,-582.52 1346,-573 1362.79,-568.71 1365.32,-562.72 1382,-558 1391.15,-555.41 1400.75,-553.11 1410.42,-551.08"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1411.4,-554.45 1420.51,-549.05 1410.02,-547.59 1411.4,-554.45"/>
+</g>
+<!-- proc~get_target_dof_domain -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node34" class="node">
+<title>proc~get_target_dof_domain</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node34"><a xlink:href="../proc/get_target_dof_domain.html" xlink:title="type_domain%get_target_dof_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="1622.5,-465 1408.5,-465 1408.5,-441 1622.5,-441 1622.5,-465"/>
+<text text-anchor="middle" x="1515.5" y="-450.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_target_dof_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~get_variable_increment_ftdss&#45;&gt;proc~get_target_dof_domain -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge42" class="edge">
+<title>proc~get_variable_increment_ftdss&#45;&gt;proc~get_target_dof_domain</title>
+<path fill="none" stroke="#00ff00" d="M1230.77,-604.24C1269.48,-604.57 1313.93,-598.08 1346,-573 1382.88,-544.16 1345.88,-503.79 1382,-474 1387.25,-469.67 1393.03,-466.05 1399.15,-463.05"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1400.55,-466.25 1408.33,-459.06 1397.77,-459.83 1400.55,-466.25"/>
+</g>
+<!-- proc~get_variable_residual_ftdss&#45;&gt;deallocate_array -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge45" class="edge">
+<title>proc~get_variable_residual_ftdss&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#00ffa9" d="M1224.78,-541.41C1265.01,-540.16 1312.62,-545.94 1346,-573 1386.29,-605.66 1342.57,-650.3 1382,-684 1401.61,-700.76 1429.05,-706.95 1453.87,-708.57"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="1453.82,-712.08 1463.96,-709 1454.11,-705.08 1453.82,-712.08"/>
+</g>
+<!-- proc~get_variable_residual_ftdss&#45;&gt;proc~is_physics_active_control -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge51" class="edge">
+<title>proc~get_variable_residual_ftdss&#45;&gt;proc~is_physics_active_control</title>
+<path fill="none" stroke="#00ffa9" d="M1224.51,-543.69C1263.95,-543.28 1310.91,-549.11 1346,-573 1374.59,-592.46 1353.92,-621.8 1382,-642 1385.72,-644.67 1389.64,-647.06 1393.73,-649.19"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="1392.35,-652.41 1402.89,-653.44 1395.3,-646.06 1392.35,-652.41"/>
+</g>
+<!-- proc~get_variable_residual_ftdss&#45;&gt;is_valid -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge46" class="edge">
+<title>proc~get_variable_residual_ftdss&#45;&gt;is_valid</title>
+<path fill="none" stroke="#00ffa9" d="M1224.89,-562.14C1264.91,-563.18 1312.29,-557.37 1346,-531 1382.88,-502.16 1345.88,-461.79 1382,-432 1408.73,-409.96 1449.12,-406.44 1478.28,-407.36"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="1478.31,-410.87 1488.47,-407.88 1478.66,-403.88 1478.31,-410.87"/>
+</g>
+<!-- proc~get_variable_residual_ftdss&#45;&gt;allocate_array -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge44" class="edge">
+<title>proc~get_variable_residual_ftdss&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#00ffa9" d="M1224.7,-550.67C1262.41,-552.37 1307.78,-557.98 1346,-573 1364.61,-580.32 1363.58,-592.21 1382,-600 1406.79,-610.49 1436.2,-615.79 1461.01,-618.45"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="1460.69,-621.93 1470.98,-619.4 1461.36,-614.96 1460.69,-621.93"/>
+</g>
+<!-- proc~get_variable_residual_ftdss&#45;&gt;proc~get_data_vector -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge47" class="edge">
+<title>proc~get_variable_residual_ftdss&#45;&gt;proc~get_data_vector</title>
+<path fill="none" stroke="#00ffa9" d="M1224.77,-549.03C1261.88,-546.28 1306.72,-541.03 1346,-531 1362.79,-526.71 1365.32,-520.72 1382,-516 1391.15,-513.41 1400.75,-511.11 1410.42,-509.08"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="1411.4,-512.45 1420.51,-507.05 1410.02,-505.59 1411.4,-512.45"/>
+</g>
+<!-- proc~get_variable_residual_ftdss&#45;&gt;proc~get_num_dofs_per_node_domain -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge48" class="edge">
+<title>proc~get_variable_residual_ftdss&#45;&gt;proc~get_num_dofs_per_node_domain</title>
+<path fill="none" stroke="#00ffa9" d="M1224.88,-557.69C1267.48,-560.83 1321.7,-564.82 1371.68,-568.49"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="1371.71,-572 1381.94,-569.25 1372.22,-565.02 1371.71,-572"/>
+</g>
+<!-- proc~get_variable_residual_ftdss&#45;&gt;proc~get_num_nodes_domain -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge49" class="edge">
+<title>proc~get_variable_residual_ftdss&#45;&gt;proc~get_num_nodes_domain</title>
+<path fill="none" stroke="#00ffa9" d="M1224.88,-548.84C1274.08,-546.83 1338.78,-544.18 1394.55,-541.9"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="1395.01,-545.39 1404.85,-541.48 1394.72,-538.39 1395.01,-545.39"/>
+</g>
+<!-- proc~get_variable_residual_ftdss&#45;&gt;proc~get_target_dof_domain -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge50" class="edge">
+<title>proc~get_variable_residual_ftdss&#45;&gt;proc~get_target_dof_domain</title>
+<path fill="none" stroke="#00ffa9" d="M1224.7,-559.12C1263.72,-559.1 1310.25,-553.24 1346,-531 1371.44,-515.17 1356.98,-490.48 1382,-474 1387.3,-470.51 1392.97,-467.53 1398.87,-464.98"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="1400.25,-468.2 1408.32,-461.33 1397.73,-461.67 1400.25,-468.2"/>
+</g>
+<!-- proc~raise_error&#45;&gt;strip -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge53" class="edge">
+<title>proc~raise_error&#45;&gt;strip</title>
+<path fill="none" stroke="#00a9ff" d="M1181.11,-139.97C1226.14,-124.55 1308.86,-98.65 1382,-89 1499.65,-73.47 1531.05,-75.99 1649,-89 1668.45,-91.15 1689.76,-95.72 1707.17,-100.05"/>
+<polygon fill="#00a9ff" stroke="#00a9ff" points="1706.37,-103.46 1716.92,-102.55 1708.11,-96.68 1706.37,-103.46"/>
+</g>
+<!-- proc~replace_placeholder -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node35" class="node">
+<title>proc~replace_placeholder</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node35"><a xlink:href="../proc/replace_placeholder.html" xlink:title="replace_placeholder">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1576,-122 1455,-122 1455,-98 1576,-98 1576,-122"/>
+<text text-anchor="middle" x="1515.5" y="-107.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">replace_placeholder</text>
+</a>
+</g>
+</g>
+<!-- proc~raise_error&#45;&gt;proc~replace_placeholder -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge52" class="edge">
+<title>proc~raise_error&#45;&gt;proc~replace_placeholder</title>
+<path fill="none" stroke="#00a9ff" d="M1181.7,-148.09C1241.39,-141.26 1365.71,-127.03 1444.36,-118.03"/>
+<polygon fill="#00a9ff" stroke="#00a9ff" points="1445.13,-121.46 1454.67,-116.85 1444.34,-114.51 1445.13,-121.46"/>
+</g>
+<!-- to_string -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node36" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="1544.5,-164 1486.5,-164 1486.5,-140 1544.5,-140 1544.5,-164"/>
+<text text-anchor="middle" x="1515.5" y="-149.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~raise_error&#45;&gt;to_string -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge54" class="edge">
+<title>proc~raise_error&#45;&gt;to_string</title>
+<path fill="none" stroke="#00a9ff" d="M1181.7,-152C1250.25,-152 1404.04,-152 1476,-152"/>
+<polygon fill="#00a9ff" stroke="#00a9ff" points="1476.41,-155.5 1486.41,-152 1476.41,-148.5 1476.41,-155.5"/>
+</g>
+<!-- proc~norm_1_native~2 -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node38" class="node">
+<title>proc~norm_1_native~2</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node38"><a xlink:href="../proc/norm_1_native~2.html" xlink:title="norm_1_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1988.5,-459 1897.5,-459 1897.5,-435 1988.5,-435 1988.5,-459"/>
+<text text-anchor="middle" x="1943" y="-444.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_1_native</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norm1&#45;&gt;proc~norm_1_native~2 -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge55" class="edge">
+<title>interface~vector_norm1&#45;&gt;proc~norm_1_native~2</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1559.11,-371.3C1585.67,-373.81 1620.15,-379.05 1649,-390 1666.75,-396.74 1667.16,-406.49 1685,-413 1751.79,-437.38 1834.01,-444.62 1887.18,-446.59"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="1887.31,-450.09 1897.42,-446.91 1887.54,-443.1 1887.31,-450.09"/>
+</g>
+<!-- proc~norm_1_vector_dp -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node39" class="node">
+<title>proc~norm_1_vector_dp</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node39"><a xlink:href="../proc/norm_1_vector_dp.html" xlink:title="norm_1_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1799.5,-404 1688.5,-404 1688.5,-380 1799.5,-380 1799.5,-404"/>
+<text text-anchor="middle" x="1744" y="-389.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_1_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norm1&#45;&gt;proc~norm_1_vector_dp -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge56" class="edge">
+<title>interface~vector_norm1&#45;&gt;proc~norm_1_vector_dp</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1559.1,-373.33C1592.63,-376.73 1639.91,-381.53 1678.13,-385.41"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="1677.84,-388.9 1688.15,-386.43 1678.55,-381.94 1677.84,-388.9"/>
+</g>
+<!-- proc~norm_2_native~2 -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node40" class="node">
+<title>proc~norm_2_native~2</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node40"><a xlink:href="../proc/norm_2_native~2.html" xlink:title="norm_2_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1988.5,-262 1897.5,-262 1897.5,-238 1988.5,-238 1988.5,-262"/>
+<text text-anchor="middle" x="1943" y="-247.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_2_native</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norm2&#45;&gt;proc~norm_2_native~2 -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge57" class="edge">
+<title>interface~vector_norm2&#45;&gt;proc~norm_2_native~2</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M1559.3,-263.18C1593.28,-258.12 1642.04,-251.67 1685,-249 1737.34,-245.75 1750.56,-248.81 1803,-249 1830.68,-249.1 1861.46,-249.31 1887,-249.51"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1887.21,-253.02 1897.24,-249.6 1887.27,-246.02 1887.21,-253.02"/>
+</g>
+<!-- proc~norm_2_vector_dp -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node41" class="node">
+<title>proc~norm_2_vector_dp</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node41"><a xlink:href="../proc/norm_2_vector_dp.html" xlink:title="norm_2_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1799.5,-282 1688.5,-282 1688.5,-258 1799.5,-258 1799.5,-282"/>
+<text text-anchor="middle" x="1744" y="-267.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_2_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norm2&#45;&gt;proc~norm_2_vector_dp -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge58" class="edge">
+<title>interface~vector_norm2&#45;&gt;proc~norm_2_vector_dp</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M1559.1,-270C1592.63,-270 1639.91,-270 1678.13,-270"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1678.15,-273.5 1688.15,-270 1678.15,-266.5 1678.15,-273.5"/>
+</g>
+<!-- proc~norm_inf_native~2 -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node42" class="node">
+<title>proc~norm_inf_native~2</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node42"><a xlink:href="../proc/norm_inf_native~2.html" xlink:title="norm_inf_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1992,-342 1894,-342 1894,-318 1992,-318 1992,-342"/>
+<text text-anchor="middle" x="1943" y="-327.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_inf_native</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norminf&#45;&gt;proc~norm_inf_native~2 -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge59" class="edge">
+<title>interface~vector_norminf&#45;&gt;proc~norm_inf_native~2</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1562.85,-313.96C1640.88,-317.26 1798.31,-323.92 1883.71,-327.53"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1883.62,-331.03 1893.76,-327.96 1883.91,-324.04 1883.62,-331.03"/>
+</g>
+<!-- proc~norm_inf_vector_dp -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node43" class="node">
+<title>proc~norm_inf_vector_dp</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node43"><a xlink:href="../proc/norm_inf_vector_dp.html" xlink:title="norm_inf_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1803,-362 1685,-362 1685,-338 1803,-338 1803,-362"/>
+<text text-anchor="middle" x="1744" y="-347.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_inf_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norminf&#45;&gt;proc~norm_inf_vector_dp -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge60" class="edge">
+<title>interface~vector_norminf&#45;&gt;proc~norm_inf_vector_dp</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1562.61,-319.74C1594.89,-325.15 1638.55,-332.48 1674.84,-338.56"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1674.42,-342.04 1684.86,-340.25 1675.58,-335.14 1674.42,-342.04"/>
+</g>
+<!-- interface~get_data_vector_dp -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node37" class="node">
+<title>interface~get_data_vector_dp</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node37"><a xlink:href="../interface/get_data_vector_dp.html" xlink:title="type_vector_dp%get_data_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="2047,-394 1839,-394 1839,-370 2047,-370 2047,-394"/>
+<text text-anchor="middle" x="1943" y="-379.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~get_data_vector&#45;&gt;interface~get_data_vector_dp -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge61" class="edge">
+<title>proc~get_data_vector&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#00ff66" d="M1604.16,-482.97C1619.19,-480.38 1634.6,-477.38 1649,-474 1739.58,-452.72 1842.83,-417.7 1899.38,-397.56"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1900.81,-400.76 1909.05,-394.1 1898.45,-394.17 1900.81,-400.76"/>
+</g>
+<!-- proc~replace_placeholder&#45;&gt;strip -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge62" class="edge">
+<title>proc~replace_placeholder&#45;&gt;strip</title>
+<path fill="none" stroke="#cc00ff" d="M1576.01,-110C1617.47,-110 1671.43,-110 1706.62,-110"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1706.91,-113.5 1716.91,-110 1706.91,-106.5 1706.91,-113.5"/>
+</g>
+<!-- proc~get_data_vector_dp -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node44" class="node">
+<title>proc~get_data_vector_dp</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_node44"><a xlink:href="../proc/get_data_vector_dp.html" xlink:title="get_data_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="2200,-394 2083,-394 2083,-370 2200,-370 2200,-394"/>
+<text text-anchor="middle" x="2141.5" y="-379.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge63" class="edge">
+<title>interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2047.14,-382C2055.74,-382 2064.29,-382 2072.53,-382"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2072.77,-385.5 2082.77,-382 2072.77,-378.5 2072.77,-385.5"/>
+</g>
+<!-- proc~norm_1_vector_dp&#45;&gt;interface~get_data_vector_dp -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge64" class="edge">
+<title>proc~norm_1_vector_dp&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#48ff00" d="M1799.61,-389.23C1808.84,-388.76 1818.71,-388.26 1828.79,-387.75"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="1829.11,-391.24 1838.92,-387.23 1828.75,-384.24 1829.11,-391.24"/>
+</g>
+<!-- proc~norm_1_vector_dp&#45;&gt;proc~norm_1_native~2 -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge65" class="edge">
+<title>proc~norm_1_vector_dp&#45;&gt;proc~norm_1_native~2</title>
+<path fill="none" stroke="#48ff00" d="M1788.23,-404.07C1817.87,-412.34 1857.38,-423.38 1888.93,-432.18"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="1888.3,-435.64 1898.87,-434.96 1890.18,-428.9 1888.3,-435.64"/>
+</g>
+<!-- proc~norm_2_vector_dp&#45;&gt;interface~get_data_vector_dp -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge66" class="edge">
+<title>proc~norm_2_vector_dp&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#0091ff" d="M1755.95,-282.25C1772.34,-299.88 1805,-332.35 1839,-351 1850.74,-357.44 1863.99,-362.71 1876.98,-366.95"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="1876.24,-370.39 1886.83,-370 1878.31,-363.7 1876.24,-370.39"/>
+</g>
+<!-- proc~norm_2_vector_dp&#45;&gt;proc~norm_2_native~2 -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge67" class="edge">
+<title>proc~norm_2_vector_dp&#45;&gt;proc~norm_2_native~2</title>
+<path fill="none" stroke="#0091ff" d="M1799.61,-264.46C1826.88,-261.69 1859.78,-258.35 1887.08,-255.58"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="1887.65,-259.04 1897.25,-254.54 1886.94,-252.07 1887.65,-259.04"/>
+</g>
+<!-- proc~norm_inf_vector_dp&#45;&gt;interface~get_data_vector_dp -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge68" class="edge">
+<title>proc~norm_inf_vector_dp&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#ff00da" d="M1803.04,-359.43C1820.26,-362.23 1839.48,-365.35 1858,-368.36"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="1857.47,-371.81 1867.9,-369.96 1858.59,-364.91 1857.47,-371.81"/>
+</g>
+<!-- proc~norm_inf_vector_dp&#45;&gt;proc~norm_inf_native~2 -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CallsGraph_edge69" class="edge">
+<title>proc~norm_inf_vector_dp&#45;&gt;proc~norm_inf_native~2</title>
+<path fill="none" stroke="#ff00da" d="M1803.04,-344.11C1828.48,-341.53 1858.27,-338.5 1883.73,-335.92"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="1884.39,-339.37 1893.99,-334.87 1883.69,-332.4 1884.39,-339.37"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacesolve_time_step_check_convergence_ftdssCallsGraph = svgPanZoom('#interfacesolve_time_step_check_convergence_ftdssCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~solve_time_step_check_convergence_ftdss~~CalledByGraph Pages: 1 -->
+<svg id="interfacesolve_time_step_check_convergence_ftdssCalledByGraph" width="641pt" height="21pt"
+ viewBox="0.00 0.00 641.00 21.46" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CalledByGraph" class="graph" transform="scale(0.67 0.67) rotate(0) translate(4 28)">
+<title>interface~~solve_time_step_check_convergence_ftdss~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 952,-28 952,4 -4,4"/>
+<!-- interface~solve_time_step_check_convergence_ftdss -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CalledByGraph_node1" class="node">
+<title>interface~solve_time_step_check_convergence_ftdss</title>
+<polygon fill="none" stroke="black" points="948,-24 646,-24 646,0 948,0 948,-24"/>
+<text text-anchor="middle" x="797" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_ftdss%solve_time_step_check_convergence_ftdss</text>
+</g>
+<!-- proc~solve_time_step_ftdss -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CalledByGraph_node2" class="node">
+<title>proc~solve_time_step_ftdss</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CalledByGraph_node2"><a xlink:href="../proc/solve_time_step_ftdss.html" xlink:title="solve_time_step_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="610,-24 483,-24 483,0 610,0 610,-24"/>
+<text text-anchor="middle" x="546.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~solve_time_step_check_convergence_ftdss -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CalledByGraph_edge1" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~solve_time_step_check_convergence_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M610.21,-12C618.25,-12 626.76,-12 635.52,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="635.52,-15.5 645.52,-12 635.52,-8.5 635.52,-15.5"/>
+</g>
+<!-- interface~solve_time_step_ftdss -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CalledByGraph_node3" class="node">
+<title>interface~solve_time_step_ftdss</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CalledByGraph_node3"><a xlink:href="../interface/solve_time_step_ftdss.html" xlink:title="type_ftdss%solve_time_step_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="447,-24 257,-24 257,0 447,0 447,-24"/>
+<text text-anchor="middle" x="352" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CalledByGraph_edge2" class="edge">
+<title>interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M447.28,-12C455.88,-12 464.5,-12 472.87,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="472.93,-15.5 482.93,-12 472.93,-8.5 472.93,-15.5"/>
+</g>
+<!-- proc~run_ftdss -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CalledByGraph_node4" class="node">
+<title>proc~run_ftdss</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CalledByGraph_node4"><a xlink:href="../proc/run_ftdss.html" xlink:title="run_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-24 160,-24 160,0 221,0 221,-24"/>
+<text text-anchor="middle" x="190.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CalledByGraph_edge3" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M221.13,-12C228.8,-12 237.52,-12 246.72,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="246.86,-15.5 256.86,-12 246.86,-8.5 246.86,-15.5"/>
+</g>
+<!-- interface~run_ftdss -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CalledByGraph_node5" class="node">
+<title>interface~run_ftdss</title>
+<g id="a_interface~~solve_time_step_check_convergence_ftdss~~CalledByGraph_node5"><a xlink:href="../interface/run_ftdss.html" xlink:title="type_ftdss%run_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="124,-24 0,-24 0,0 124,0 124,-24"/>
+<text text-anchor="middle" x="62" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftdss&#45;&gt;proc~run_ftdss -->
+<g id="interface~~solve_time_step_check_convergence_ftdss~~CalledByGraph_edge4" class="edge">
+<title>interface~run_ftdss&#45;&gt;proc~run_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M124.03,-12C132.82,-12 141.68,-12 149.91,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="149.94,-15.5 159.94,-12 149.94,-8.5 149.94,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacesolve_time_step_check_convergence_ftdssCalledByGraph = svgPanZoom('#interfacesolve_time_step_check_convergence_ftdssCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+      <h2>public module subroutine solve_time_step_check_convergence_ftdss(self)  
+    <a href="../proc/solve_time_step_check_convergence_ftdss.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h2>
+
+    
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~427"></span>
+              class(<a href='../type/type_ftdss.html'>type_ftdss</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+
+ </div>
+</div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

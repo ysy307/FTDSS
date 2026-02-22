@@ -92,20 +92,20 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.6% of total for derived types.</p>Including implementation: 7 statements,  0.1% of total for derived types.">7 statements</a>
+                 title="<p> 0.4% of total for derived types.</p>Including implementation: 9 statements,  0.1% of total for derived types.">9 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/input_interface.F90"> Source File</a>
+              <a href="../src/output_interface.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/input_interface.f90.html'>input_interface.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/inout_input.html'>inout_input</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/output_interface.f90~2.html'>output_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/inout_input_output_conditions.html'>inout_input_output_conditions</a></li>
             <li class="breadcrumb-item active" aria-current="page">type_field_output</li>
           </ol>
         </nav>
@@ -134,11 +134,11 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_field_output.html#variable-coloring~4">coloring</a>
-            <a class="list-group-item" href="../type/type_field_output.html#variable-file_format~2">file_format</a>
+            <a class="list-group-item" href="../type/type_field_output.html#variable-file_format~3">file_format</a>
             <a class="list-group-item" href="../type/type_field_output.html#variable-output_interval_step">output_interval_step</a>
             <a class="list-group-item" href="../type/type_field_output.html#variable-output_interval_unit">output_interval_unit</a>
-            <a class="list-group-item" href="../type/type_field_output.html#variable-variable_names">variable_names</a>
+            <a class="list-group-item" href="../type/type_field_output.html#variable-output_time_unit~4">output_time_unit</a>
+            <a class="list-group-item" href="../type/type_field_output.html#variable-variable_names~2">variable_names</a>
         </div>
       </div>
     </div>
@@ -158,7 +158,18 @@
   
   
   
-  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#boundprocs-0"
+         aria-expanded="false" aria-controls="boundprocs-0">
+         <h4 class="card-header bg-primary text-white">Type-Bound Procedures</h4>
+      </a>
+      <div id="boundprocs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/type_field_output.html#boundprocedure-display~36">display</a>
+        </div>
+      </div>
+    </div>
+
   
   
     <div class="card card-primary">
@@ -175,7 +186,7 @@
     
     <div class="col-md-9" id='text'>
       <h2 id="type-def-statement">
-        type, public :: type_field_output</h2>
+        type, private :: type_field_output</h2>
     
 <br>      <div class="card">
         <div class="card-header">
@@ -300,24 +311,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-coloring~4"></span>
-              logical,
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>coloring</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-file_format~2"></span>
+              <span class="anchor" id="variable-file_format~3"></span>
               character(len=:),
             </td>
               <td>public,</td>
@@ -352,11 +346,11 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" id="variable-output_interval_unit"></span>
-              character(len=:),
+              integer(kind=int32),
             </td>
-              <td>public,</td>
+              <td>public</td>
             <td>
-              allocatable
+              
             </td>
             <td>::</td>
             <td><strong>output_interval_unit</strong></td>
@@ -368,7 +362,24 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-variable_names"></span>
+              <span class="anchor" id="variable-output_time_unit~4"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>output_time_unit</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-variable_names~2"></span>
               character(len=:),
             </td>
               <td>public,</td>
@@ -391,15 +402,75 @@ large graphs.</div>
     
 
 
+      <section>
+        <h2>Type-Bound Procedures</h2>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-display~36"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>display</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/display_output_settings_fields.html'>display_output_settings_fields</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine display_output_settings_fields(self)  
+    <a href="../proc/display_output_settings_fields.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_field_output.html'>type_field_output</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+      </section>
 
     <section>
     <h3><span class="anchor" id="src"></span>Source Code</h3>
     <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_field_output</span>
 <span class="w">        </span><span class="kt">character</span><span class="p">(:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">file_format</span>
-<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">coloring</span>
-<span class="w">        </span><span class="kt">character</span><span class="p">(:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">output_interval_unit</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">output_time_unit</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">output_interval_unit</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">output_interval_step</span>
 <span class="w">        </span><span class="kt">character</span><span class="p">(:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">variable_names</span><span class="p">(:)</span>
+<span class="w">    </span><span class="k">contains</span>
+<span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">display</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">display_output_settings_fields</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_field_output</span>
 </pre></div>
 
@@ -416,14 +487,14 @@ large graphs.</div>
           <div class="col">
             <p>
               FTDSS
- was developed by Kikuchi Shun<br>              &copy; 2025 
+ was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
           <div class="col">
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-08-26 10:37 +0000             </p>
+ on 2026-02-22 12:12 +0000             </p>
           </div>
         </div>
         <br>

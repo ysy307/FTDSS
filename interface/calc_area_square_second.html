@@ -1,0 +1,565 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>calc_area_square_second &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>calc_area_square_second
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.4% of total for procedures.">166 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/element_interface.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/element_interface.f90.html'>element_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/domain_fe_element.html'>domain_fe_element</a></li>
+            <li class="breadcrumb-item active" aria-current="page">calc_area_square_second</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+    <em>None</em>
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>interface</h2>
+      
+      <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~calc_area_square_second~~CallsGraph Pages: 1 -->
+<svg id="interfacecalc_area_square_secondCallsGraph" width="641pt" height="78pt"
+ viewBox="0.00 0.00 641.00 78.37" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~calc_area_square_second~~CallsGraph" class="graph" transform="scale(0.44 0.44) rotate(0) translate(4 175)">
+<title>interface~~calc_area_square_second~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-175 1460,-175 1460,4 -4,4"/>
+<!-- interface~calc_area_square_second -->
+<g id="interface~~calc_area_square_second~~CallsGraph_node1" class="node">
+<title>interface~calc_area_square_second</title>
+<polygon fill="none" stroke="black" points="266,-87 0,-87 0,-63 266,-63 266,-87"/>
+<text text-anchor="middle" x="133" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_square_second%calc_area_square_second</text>
+</g>
+<!-- proc~calc_area_square_second -->
+<g id="interface~~calc_area_square_second~~CallsGraph_node2" class="node">
+<title>proc~calc_area_square_second</title>
+<g id="a_interface~~calc_area_square_second~~CallsGraph_node2"><a xlink:href="../proc/calc_area_square_second.html" xlink:title="calc_area_square_second">
+<polygon fill="#d9534f" stroke="#d9534f" points="450,-87 302,-87 302,-63 450,-63 450,-87"/>
+<text text-anchor="middle" x="376" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_area_square_second</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_area_square_second&#45;&gt;proc~calc_area_square_second -->
+<g id="interface~~calc_area_square_second~~CallsGraph_edge1" class="edge">
+<title>interface~calc_area_square_second&#45;&gt;proc~calc_area_square_second</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M266.13,-75C274.86,-75 283.51,-75 291.89,-75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="291.97,-78.5 301.97,-75 291.97,-71.5 291.97,-78.5"/>
+</g>
+<!-- interface~calc_jacobian_determinant_abst_fe -->
+<g id="interface~~calc_area_square_second~~CallsGraph_node3" class="node">
+<title>interface~calc_jacobian_determinant_abst_fe</title>
+<g id="a_interface~~calc_area_square_second~~CallsGraph_node3"><a xlink:href="../interface/calc_jacobian_determinant_abst_fe.html" xlink:title="abst_fe%calc_jacobian_determinant_abst_fe">
+<polygon fill="#a7506f" stroke="#a7506f" points="734,-150 486,-150 486,-126 734,-126 734,-150"/>
+<text text-anchor="middle" x="610" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%calc_jacobian_determinant_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_area_square_second&#45;&gt;interface~calc_jacobian_determinant_abst_fe -->
+<g id="interface~~calc_area_square_second~~CallsGraph_edge2" class="edge">
+<title>proc~calc_area_square_second&#45;&gt;interface~calc_jacobian_determinant_abst_fe</title>
+<path fill="none" stroke="#ff0000" d="M403.82,-87.06C425.58,-96.42 457.26,-109.09 486,-117 495.4,-119.59 505.29,-121.91 515.22,-123.99"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="514.65,-127.44 525.14,-125.98 516.03,-120.58 514.65,-127.44"/>
+</g>
+<!-- interface~get_gauss -->
+<g id="interface~~calc_area_square_second~~CallsGraph_node4" class="node">
+<title>interface~get_gauss</title>
+<g id="a_interface~~calc_area_square_second~~CallsGraph_node4"><a xlink:href="../interface/get_gauss.html" xlink:title="abst_fe%get_gauss">
+<polygon fill="#a7506f" stroke="#a7506f" points="667,-108 553,-108 553,-84 667,-84 667,-108"/>
+<text text-anchor="middle" x="610" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%get_gauss</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_area_square_second&#45;&gt;interface~get_gauss -->
+<g id="interface~~calc_area_square_second~~CallsGraph_edge3" class="edge">
+<title>proc~calc_area_square_second&#45;&gt;interface~get_gauss</title>
+<path fill="none" stroke="#ff0000" d="M450.09,-81.62C479.79,-84.3 513.86,-87.39 542.82,-90.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="542.56,-93.5 552.84,-90.92 543.19,-86.53 542.56,-93.5"/>
+</g>
+<!-- interface~get_num_gauss -->
+<g id="interface~~calc_area_square_second~~CallsGraph_node5" class="node">
+<title>interface~get_num_gauss</title>
+<g id="a_interface~~calc_area_square_second~~CallsGraph_node5"><a xlink:href="../interface/get_num_gauss.html" xlink:title="abst_fe%get_num_gauss">
+<polygon fill="#a7506f" stroke="#a7506f" points="681.5,-66 538.5,-66 538.5,-42 681.5,-42 681.5,-66"/>
+<text text-anchor="middle" x="610" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%get_num_gauss</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_area_square_second&#45;&gt;interface~get_num_gauss -->
+<g id="interface~~calc_area_square_second~~CallsGraph_edge4" class="edge">
+<title>proc~calc_area_square_second&#45;&gt;interface~get_num_gauss</title>
+<path fill="none" stroke="#ff0000" d="M450.09,-68.38C474.95,-66.13 502.86,-63.61 528.28,-61.31"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="528.62,-64.79 538.26,-60.4 527.99,-57.82 528.62,-64.79"/>
+</g>
+<!-- interface~get_weight -->
+<g id="interface~~calc_area_square_second~~CallsGraph_node6" class="node">
+<title>interface~get_weight</title>
+<g id="a_interface~~calc_area_square_second~~CallsGraph_node6"><a xlink:href="../interface/get_weight.html" xlink:title="abst_fe%get_weight">
+<polygon fill="#a7506f" stroke="#a7506f" points="669,-24 551,-24 551,0 669,0 669,-24"/>
+<text text-anchor="middle" x="610" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%get_weight</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_area_square_second&#45;&gt;interface~get_weight -->
+<g id="interface~~calc_area_square_second~~CallsGraph_edge5" class="edge">
+<title>proc~calc_area_square_second&#45;&gt;interface~get_weight</title>
+<path fill="none" stroke="#ff0000" d="M403.82,-62.94C425.58,-53.58 457.26,-40.91 486,-33 503.62,-28.15 522.99,-24.22 541.04,-21.12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="541.62,-24.58 550.91,-19.49 540.47,-17.67 541.62,-24.58"/>
+</g>
+<!-- proc~calc_jacobian_determinant_abst_fe -->
+<g id="interface~~calc_area_square_second~~CallsGraph_node7" class="node">
+<title>proc~calc_jacobian_determinant_abst_fe</title>
+<g id="a_interface~~calc_area_square_second~~CallsGraph_node7"><a xlink:href="../proc/calc_jacobian_determinant_abst_fe.html" xlink:title="calc_jacobian_determinant_abst_fe">
+<polygon fill="#d9534f" stroke="#d9534f" points="970,-150 770,-150 770,-126 970,-126 970,-150"/>
+<text text-anchor="middle" x="870" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_jacobian_determinant_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_jacobian_determinant_abst_fe&#45;&gt;proc~calc_jacobian_determinant_abst_fe -->
+<g id="interface~~calc_area_square_second~~CallsGraph_edge6" class="edge">
+<title>interface~calc_jacobian_determinant_abst_fe&#45;&gt;proc~calc_jacobian_determinant_abst_fe</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M734.33,-138C742.81,-138 751.31,-138 759.71,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="759.88,-141.5 769.88,-138 759.88,-134.5 759.88,-141.5"/>
+</g>
+<!-- proc~get_gauss -->
+<g id="interface~~calc_area_square_second~~CallsGraph_node8" class="node">
+<title>proc~get_gauss</title>
+<g id="a_interface~~calc_area_square_second~~CallsGraph_node8"><a xlink:href="../proc/get_gauss.html" xlink:title="get_gauss">
+<polygon fill="#d9534f" stroke="#d9534f" points="903,-108 837,-108 837,-84 903,-84 903,-108"/>
+<text text-anchor="middle" x="870" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_gauss</text>
+</a>
+</g>
+</g>
+<!-- interface~get_gauss&#45;&gt;proc~get_gauss -->
+<g id="interface~~calc_area_square_second~~CallsGraph_edge7" class="edge">
+<title>interface~get_gauss&#45;&gt;proc~get_gauss</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M667.3,-96C715.24,-96 783.07,-96 826.55,-96"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="826.79,-99.5 836.79,-96 826.79,-92.5 826.79,-99.5"/>
+</g>
+<!-- proc~get_num_gauss -->
+<g id="interface~~calc_area_square_second~~CallsGraph_node9" class="node">
+<title>proc~get_num_gauss</title>
+<g id="a_interface~~calc_area_square_second~~CallsGraph_node9"><a xlink:href="../proc/get_num_gauss.html" xlink:title="get_num_gauss">
+<polygon fill="#d9534f" stroke="#d9534f" points="917.5,-66 822.5,-66 822.5,-42 917.5,-42 917.5,-66"/>
+<text text-anchor="middle" x="870" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_num_gauss</text>
+</a>
+</g>
+</g>
+<!-- interface~get_num_gauss&#45;&gt;proc~get_num_gauss -->
+<g id="interface~~calc_area_square_second~~CallsGraph_edge8" class="edge">
+<title>interface~get_num_gauss&#45;&gt;proc~get_num_gauss</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M681.84,-54C722.75,-54 773.52,-54 811.86,-54"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="812.33,-57.5 822.33,-54 812.33,-50.5 812.33,-57.5"/>
+</g>
+<!-- proc~get_weight -->
+<g id="interface~~calc_area_square_second~~CallsGraph_node10" class="node">
+<title>proc~get_weight</title>
+<g id="a_interface~~calc_area_square_second~~CallsGraph_node10"><a xlink:href="../proc/get_weight.html" xlink:title="get_weight">
+<polygon fill="#d9534f" stroke="#d9534f" points="905,-24 835,-24 835,0 905,0 905,-24"/>
+<text text-anchor="middle" x="870" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_weight</text>
+</a>
+</g>
+</g>
+<!-- interface~get_weight&#45;&gt;proc~get_weight -->
+<g id="interface~~calc_area_square_second~~CallsGraph_edge9" class="edge">
+<title>interface~get_weight&#45;&gt;proc~get_weight</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M669.22,-12C716.32,-12 781.64,-12 824.59,-12"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="824.73,-15.5 834.73,-12 824.73,-8.5 824.73,-15.5"/>
+</g>
+<!-- calc_jacobian -->
+<g id="interface~~calc_area_square_second~~CallsGraph_node11" class="node">
+<title>calc_jacobian</title>
+<polygon fill="#777777" stroke="#777777" points="1107.5,-171 1022.5,-171 1022.5,-147 1107.5,-147 1107.5,-171"/>
+<text text-anchor="middle" x="1065" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_jacobian</text>
+</g>
+<!-- proc~calc_jacobian_determinant_abst_fe&#45;&gt;calc_jacobian -->
+<g id="interface~~calc_area_square_second~~CallsGraph_edge10" class="edge">
+<title>proc~calc_jacobian_determinant_abst_fe&#45;&gt;calc_jacobian</title>
+<path fill="none" stroke="#ff0000" d="M970.04,-148.78C984.65,-150.37 999.18,-151.95 1012.29,-153.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1012.15,-156.88 1022.47,-154.48 1012.91,-149.92 1012.15,-156.88"/>
+</g>
+<!-- interface~matrix_determinant -->
+<g id="interface~~calc_area_square_second~~CallsGraph_node12" class="node">
+<title>interface~matrix_determinant</title>
+<g id="a_interface~~calc_area_square_second~~CallsGraph_node12"><a xlink:href="../interface/matrix_determinant.html" xlink:title="matrix_determinant">
+<polygon fill="#a7506f" stroke="#a7506f" points="1124,-129 1006,-129 1006,-105 1124,-105 1124,-129"/>
+<text text-anchor="middle" x="1065" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_determinant</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_jacobian_determinant_abst_fe&#45;&gt;interface~matrix_determinant -->
+<g id="interface~~calc_area_square_second~~CallsGraph_edge11" class="edge">
+<title>proc~calc_jacobian_determinant_abst_fe&#45;&gt;interface~matrix_determinant</title>
+<path fill="none" stroke="#ff0000" d="M970.04,-127.22C978.73,-126.28 987.39,-125.34 995.74,-124.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="996.19,-127.9 1005.75,-123.34 995.43,-120.94 996.19,-127.9"/>
+</g>
+<!-- proc~matrix_determinant_real64 -->
+<g id="interface~~calc_area_square_second~~CallsGraph_node13" class="node">
+<title>proc~matrix_determinant_real64</title>
+<g id="a_interface~~calc_area_square_second~~CallsGraph_node13"><a xlink:href="../proc/matrix_determinant_real64.html" xlink:title="matrix_determinant_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1317,-129 1160,-129 1160,-105 1317,-105 1317,-129"/>
+<text text-anchor="middle" x="1238.5" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_determinant_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~matrix_determinant&#45;&gt;proc~matrix_determinant_real64 -->
+<g id="interface~~calc_area_square_second~~CallsGraph_edge12" class="edge">
+<title>interface~matrix_determinant&#45;&gt;proc~matrix_determinant_real64</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1124.06,-117C1132.3,-117 1140.93,-117 1149.58,-117"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1149.73,-120.5 1159.73,-117 1149.73,-113.5 1149.73,-120.5"/>
+</g>
+<!-- allocate_array -->
+<g id="interface~~calc_area_square_second~~CallsGraph_node14" class="node">
+<title>allocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="1449,-150 1360,-150 1360,-126 1449,-126 1449,-150"/>
+<text text-anchor="middle" x="1404.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</g>
+<!-- proc~matrix_determinant_real64&#45;&gt;allocate_array -->
+<g id="interface~~calc_area_square_second~~CallsGraph_edge13" class="edge">
+<title>proc~matrix_determinant_real64&#45;&gt;allocate_array</title>
+<path fill="none" stroke="#ff0000" d="M1317.18,-126.95C1328.11,-128.35 1339.14,-129.76 1349.49,-131.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1349.23,-134.58 1359.59,-132.38 1350.12,-127.64 1349.23,-134.58"/>
+</g>
+<!-- deallocate_array -->
+<g id="interface~~calc_area_square_second~~CallsGraph_node15" class="node">
+<title>deallocate_array</title>
+<polygon fill="#777777" stroke="#777777" points="1456,-108 1353,-108 1353,-84 1456,-84 1456,-108"/>
+<text text-anchor="middle" x="1404.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_array</text>
+</g>
+<!-- proc~matrix_determinant_real64&#45;&gt;deallocate_array -->
+<g id="interface~~calc_area_square_second~~CallsGraph_edge14" class="edge">
+<title>proc~matrix_determinant_real64&#45;&gt;deallocate_array</title>
+<path fill="none" stroke="#ff0000" d="M1317.18,-107.05C1325.77,-105.95 1334.43,-104.84 1342.77,-103.78"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1343.29,-107.24 1352.76,-102.5 1342.4,-100.3 1343.29,-107.24"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacecalc_area_square_secondCallsGraph = svgPanZoom('#interfacecalc_area_square_secondCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+      <h2>private module subroutine calc_area_square_second(self, node_coords, measure)  
+    <a href="../proc/calc_area_square_second.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h2>
+
+    
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~117"></span>
+              class(<a href='../type/type_square_second.html'>type_square_second</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                <p>The element instance.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-node_coords~18"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>node_coords</strong>(:,:)</td>
+            <td>
+                <p>Global coordinates of the nodes.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-measure~7"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>measure</strong></td>
+            <td>
+                <p>Output area.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h3>Description</h3>
+    <p>Calculates the area of a second-order square element.</p>
+    <br>
+
+ </div>
+</div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

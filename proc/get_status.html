@@ -97,15 +97,15 @@
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/iteration.F90"> Source File</a>
+              <a href="../src/matrix_interface.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/iteration.f90.html'>iteration.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/control_iteration.html'>control_iteration</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/matrix_interface.f90.html'>matrix_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_types_matrix.html'>core_types_matrix</a></li>
             <li class="breadcrumb-item active" aria-current="page">get_status</li>
           </ol>
         </nav>
@@ -159,13 +159,13 @@
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>private pure function get_status(self) result(is_converged)  
+    <h2>private pure function get_status(self) result(status)  
 </h2>
     
 
 
     <h3>Type Bound</h3>
-    <p><a href='../type/type_iteration.html'>type_iteration</a></p>
+    <p><a href='../type/abst_matrix.html'>abst_matrix</a></p>
 
     <h3>Arguments</h3>
         <table class="table table-striped varlist">
@@ -180,8 +180,8 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~182"></span>
-              class(<a href='../type/type_iteration.html'>type_iteration</a>),
+              <span class="anchor" id="variable-self~1073"></span>
+              class(<a href='../type/abst_matrix.html'>abst_matrix</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -198,8 +198,8 @@
 
       <h3>Return Value
         <small>
-          <span class="anchor" id="variable-is_converged~2"></span>
-          logical
+          <span class="anchor" id="variable-status~17"></span>
+          integer(kind=int32)
         </small>
       </h3>
       
@@ -217,12 +217,12 @@
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">pure function </span><span class="n">get_status</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">is_converged</span><span class="p">)</span>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">pure function </span><span class="n">get_status</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
 <span class="w">        </span><span class="k">implicit none</span>
-<span class="k">        class</span><span class="p">(</span><span class="n">type_iteration</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
-<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_converged</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">abst_matrix</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">status</span>
 
-<span class="w">        </span><span class="n">is_converged</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">is_converged</span>
+<span class="w">        </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">status</span>
 <span class="w">    </span><span class="k">end function </span><span class="n">get_status</span>
 </pre></div>
 
@@ -240,14 +240,14 @@
           <div class="col">
             <p>
               FTDSS
- was developed by Kikuchi Shun<br>              &copy; 2025 
+ was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
           <div class="col">
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-08-26 10:37 +0000             </p>
+ on 2026-02-22 12:12 +0000             </p>
           </div>
         </div>
         <br>

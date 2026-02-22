@@ -1,0 +1,522 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>type_boundary_local_time_dependent &ndash; FTDSS </title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>type_boundary_local_time_dependent
+      <small>Derived Type</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title="<p> 0.2% of total for derived types.</p>Including implementation: 5 statements,  0.0% of total for derived types.">5 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/conditions_interface.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/conditions_interface.f90.html'>conditions_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/inout_input_conditions.html'>inout_input_conditions</a></li>
+            <li class="breadcrumb-item active" aria-current="page">type_boundary_local_time_dependent</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#vars-0"
+         aria-expanded="false" aria-controls="vars-0">
+         <h4 class="card-header bg-primary text-white">Variables</h4>
+      </a>
+      <div id="vars-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/type_boundary_local_time_dependent.html#variable-time">time</a>
+            <a class="list-group-item" href="../type/type_boundary_local_time_dependent.html#variable-time_iso">time_iso</a>
+            <a class="list-group-item" href="../type/type_boundary_local_time_dependent.html#variable-value~14">value</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../type/type_boundary_local_time_dependent.html#src">type_boundary_local_time_dependent</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2 id="type-def-statement">
+        type, private :: type_boundary_local_time_dependent</h2>
+    
+<br>      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Inherited by</h3>
+        </div>
+        <div class="card-body">
+          <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: type~~type_boundary_local_time_dependent~~InheritedByGraph Pages: 1 -->
+<svg id="typetype_boundary_local_time_dependentInheritedByGraph" width="641pt" height="65pt"
+ viewBox="0.00 0.00 641.00 65.39" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph" class="graph" transform="scale(0.43 0.43) rotate(0) translate(4 148.71)">
+<title>type~~type_boundary_local_time_dependent~~InheritedByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-148.71 1493,-148.71 1493,4 -4,4"/>
+<!-- type~type_boundary_local_time_dependent -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_node1" class="node">
+<title>type~type_boundary_local_time_dependent</title>
+<polygon fill="none" stroke="black" points="215,-144.71 0,-144.71 0,-120.71 215,-120.71 215,-144.71"/>
+<text text-anchor="middle" x="107.5" y="-130.31" font-family="Helvetica,sans-Serif" font-size="10.50">type_boundary_local_time_dependent</text>
+</g>
+<!-- type~type_boundary_local -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_node2" class="node">
+<title>type~type_boundary_local</title>
+<g id="a_type~~type_boundary_local_time_dependent~~InheritedByGraph_node2"><a xlink:href="../type/type_boundary_local.html" xlink:title="type_boundary_local">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="406,-144.71 283,-144.71 283,-120.71 406,-120.71 406,-144.71"/>
+<text text-anchor="middle" x="344.5" y="-130.31" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_boundary_local</text>
+</a>
+</g>
+</g>
+<!-- type~type_boundary_local&#45;&gt;type~type_boundary_local_time_dependent -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_edge1" class="edge">
+<title>type~type_boundary_local&#45;&gt;type~type_boundary_local_time_dependent</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M282.98,-132.71C265.3,-132.71 245.34,-132.71 225.41,-132.71"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="225.32,-129.21 215.32,-132.71 225.32,-136.21 225.32,-129.21"/>
+<text text-anchor="middle" x="249" y="-135.11" font-family="Helvetica,sans-Serif" font-size="9.50">values</text>
+</g>
+<!-- type~type_boundary_conditions -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_node3" class="node">
+<title>type~type_boundary_conditions</title>
+<g id="a_type~~type_boundary_local_time_dependent~~InheritedByGraph_node3"><a xlink:href="../type/type_boundary_conditions.html" xlink:title="type_boundary_conditions">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1489,-119.71 1337,-119.71 1337,-95.71 1489,-95.71 1489,-119.71"/>
+<text text-anchor="middle" x="1413" y="-105.31" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_boundary_conditions</text>
+</a>
+</g>
+</g>
+<!-- type~type_boundary_conditions&#45;&gt;type~type_boundary_local -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_edge2" class="edge">
+<title>type~type_boundary_conditions&#45;&gt;type~type_boundary_local</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1336.83,-118.86C1285.46,-125.53 1215.76,-132.71 1154,-132.71 1154,-132.71 1154,-132.71 640,-132.71 544.44,-132.71 520.06,-123.02 425,-132.71"/>
+<text text-anchor="middle" x="819.5" y="-135.11" font-family="Helvetica,sans-Serif" font-size="9.50">physics</text>
+</g>
+<!-- type~type_conditions -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_node5" class="node">
+<title>type~type_conditions</title>
+<g id="a_type~~type_boundary_local_time_dependent~~InheritedByGraph_node5"><a xlink:href="../type/type_conditions.html" xlink:title="type_conditions">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1201,-86.71 1105,-86.71 1105,-62.71 1201,-62.71 1201,-86.71"/>
+<text text-anchor="middle" x="1153" y="-72.31" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_conditions</text>
+</a>
+</g>
+</g>
+<!-- type~type_boundary_conditions&#45;&gt;type~type_conditions -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_edge8" class="edge">
+<title>type~type_boundary_conditions&#45;&gt;type~type_conditions</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1336.72,-100.09C1300.99,-96.23 1257.73,-91.2 1219,-85.71 1216.47,-85.36 1213.89,-84.98 1211.28,-84.58"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1211.59,-81.09 1201.17,-83.01 1210.51,-88.01 1211.59,-81.09"/>
+<text text-anchor="middle" x="1269" y="-100.11" font-family="Helvetica,sans-Serif" font-size="9.50">parent</text>
+</g>
+<!-- type~type_boundary_local_initial -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_node4" class="node">
+<title>type~type_boundary_local_initial</title>
+<g id="a_type~~type_boundary_local_time_dependent~~InheritedByGraph_node4"><a xlink:href="../type/type_boundary_local_initial.html" xlink:title="type_boundary_local_initial">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="600,-104.71 443,-104.71 443,-80.71 600,-80.71 600,-104.71"/>
+<text text-anchor="middle" x="521.5" y="-90.31" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_boundary_local_initial</text>
+</a>
+</g>
+</g>
+<!-- type~type_boundary_local_initial&#45;&gt;type~type_boundary_local -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_edge3" class="edge">
+<title>type~type_boundary_local_initial&#45;&gt;type~type_boundary_local</title>
+<path fill="none" stroke="#ff0000" d="M475.97,-104.8C464.89,-108.57 453.26,-113.21 443,-118.71 434.07,-123.5 435.08,-131.69 425,-132.71"/>
+<path fill="none" stroke="#ff0000" d="M424,-132.71C421.51,-132.97 418.97,-133.19 416.41,-133.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="416.2,-129.88 406.42,-133.93 416.6,-136.87 416.2,-129.88"/>
+</g>
+<!-- type~type_conditions&#45;&gt;type~type_boundary_conditions -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_edge4" class="edge">
+<title>type~type_conditions&#45;&gt;type~type_boundary_conditions</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1201.29,-70.96C1234.48,-69.31 1279.75,-69.03 1319,-75.71 1338,-78.95 1358.32,-85.55 1375.1,-91.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1373.95,-95.23 1384.54,-95.62 1376.51,-88.71 1373.95,-95.23"/>
+<text text-anchor="middle" x="1269" y="-78.11" font-family="Helvetica,sans-Serif" font-size="9.50">boundary_conditions</text>
+</g>
+<!-- type~type_initial_conditions -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_node7" class="node">
+<title>type~type_initial_conditions</title>
+<g id="a_type~~type_boundary_local_time_dependent~~InheritedByGraph_node7"><a xlink:href="../type/type_initial_conditions.html" xlink:title="type_initial_conditions">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="986,-104.71 856,-104.71 856,-80.71 986,-80.71 986,-104.71"/>
+<text text-anchor="middle" x="921" y="-90.31" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_initial_conditions</text>
+</a>
+</g>
+</g>
+<!-- type~type_conditions&#45;&gt;type~type_initial_conditions -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_edge11" class="edge">
+<title>type~type_conditions&#45;&gt;type~type_initial_conditions</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1104.88,-83.4C1098.88,-84.3 1092.8,-85.1 1087,-85.71 1057.54,-88.82 1024.99,-90.56 996.63,-91.53"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="996.28,-88.04 986.39,-91.85 996.5,-95.03 996.28,-88.04"/>
+<text text-anchor="middle" x="1045.5" y="-93.11" font-family="Helvetica,sans-Serif" font-size="9.50">initial_conditions</text>
+</g>
+<!-- type~type_time_controls -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_node9" class="node">
+<title>type~type_time_controls</title>
+<g id="a_type~~type_boundary_local_time_dependent~~InheritedByGraph_node9"><a xlink:href="../type/type_time_controls.html" xlink:title="type_time_controls">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="977,-37.71 865,-37.71 865,-13.71 977,-13.71 977,-37.71"/>
+<text text-anchor="middle" x="921" y="-23.31" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time_controls</text>
+</a>
+</g>
+</g>
+<!-- type~type_conditions&#45;&gt;type~type_time_controls -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_edge12" class="edge">
+<title>type~type_conditions&#45;&gt;type~type_time_controls</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M1104.84,-62.85C1098.84,-61.41 1092.78,-60 1087,-58.71 1054.21,-51.4 1017.58,-44 987.18,-38.07"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="987.61,-34.58 977.13,-36.11 986.28,-41.45 987.61,-34.58"/>
+<text text-anchor="middle" x="1045.5" y="-61.11" font-family="Helvetica,sans-Serif" font-size="9.50">time_control</text>
+</g>
+<!-- type~type_initial_local -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_node6" class="node">
+<title>type~type_initial_local</title>
+<g id="a_type~~type_boundary_local_time_dependent~~InheritedByGraph_node6"><a xlink:href="../type/type_initial_local.html" xlink:title="type_initial_local">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="783,-104.71 682,-104.71 682,-80.71 783,-80.71 783,-104.71"/>
+<text text-anchor="middle" x="732.5" y="-90.31" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_initial_local</text>
+</a>
+</g>
+</g>
+<!-- type~type_initial_local&#45;&gt;type~type_boundary_local_initial -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_edge5" class="edge">
+<title>type~type_initial_local&#45;&gt;type~type_boundary_local_initial</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M681.97,-92.71C660.54,-92.71 634.8,-92.71 610.31,-92.71"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="610.27,-89.21 600.27,-92.71 610.27,-96.21 610.27,-89.21"/>
+<text text-anchor="middle" x="641" y="-95.11" font-family="Helvetica,sans-Serif" font-size="9.50">boundary</text>
+</g>
+<!-- type~type_initial_conditions&#45;&gt;type~type_conditions -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_edge7" class="edge">
+<title>type~type_initial_conditions&#45;&gt;type~type_conditions</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M972.06,-80.7C982.55,-78.64 993.59,-76.82 1004,-75.71 1033.79,-72.56 1067.15,-72.07 1094.65,-72.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1094.81,-75.98 1104.88,-72.67 1094.94,-68.98 1094.81,-75.98"/>
+<text text-anchor="middle" x="1045.5" y="-78.11" font-family="Helvetica,sans-Serif" font-size="9.50">parent</text>
+</g>
+<!-- type~type_initial_conditions&#45;&gt;type~type_initial_local -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_edge10" class="edge">
+<title>type~type_initial_conditions&#45;&gt;type~type_initial_local</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M855.82,-92.71C835.54,-92.71 813.22,-92.71 793.27,-92.71"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="793.07,-89.21 783.07,-92.71 793.07,-96.21 793.07,-89.21"/>
+<text text-anchor="middle" x="819.5" y="-95.11" font-family="Helvetica,sans-Serif" font-size="9.50">physics</text>
+</g>
+<!-- type~type_input -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_node8" class="node">
+<title>type~type_input</title>
+<g id="a_type~~type_boundary_local_time_dependent~~InheritedByGraph_node8"><a xlink:href="../type/type_input.html" xlink:title="type_input">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1447,-53.71 1379,-53.71 1379,-29.71 1447,-29.71 1447,-53.71"/>
+<text text-anchor="middle" x="1413" y="-39.31" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input</text>
+</a>
+</g>
+</g>
+<!-- type~type_input&#45;&gt;type~type_conditions -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_edge9" class="edge">
+<title>type~type_input&#45;&gt;type~type_conditions</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1378.98,-42.35C1340.35,-43.54 1274.61,-46.95 1219,-56.71 1213.67,-57.65 1208.14,-58.84 1202.66,-60.15"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1201.74,-56.77 1192.91,-62.63 1203.46,-63.56 1201.74,-56.77"/>
+<text text-anchor="middle" x="1269" y="-59.11" font-family="Helvetica,sans-Serif" font-size="9.50">conditions</text>
+</g>
+<!-- type~type_time_controls&#45;&gt;type~type_conditions -->
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_edge6" class="edge">
+<title>type~type_time_controls&#45;&gt;type~type_conditions</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M954.66,-13.71C988.96,-3.09 1043.79,8.18 1087,-9.71 1108.57,-18.65 1126.71,-38.6 1138.3,-54.05"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1135.69,-56.41 1144.35,-62.52 1141.38,-52.35 1135.69,-56.41"/>
+<text text-anchor="middle" x="1045.5" y="-12.11" font-family="Helvetica,sans-Serif" font-size="9.50">parent</text>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var pantypetype_boundary_local_time_dependentInheritedByGraph = svgPanZoom('#typetype_boundary_local_time_dependentInheritedByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#InheritedByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="InheritedByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="186pt" height="32pt"
+ viewBox="0.00 0.00 185.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 181.5,-28 181.5,4 -4,4"/>
+<!-- Type -->
+<g id="node1" class="node">
+<title>Type</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="177.5,-24 72.5,-24 72.5,0 177.5,0 177.5,-24"/>
+<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a derived type to the parent type which it
+extends. Dashed arrows point from a derived type to the other
+types it contains as a components, with a label listing the name(s) of
+said component(s).
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    <br>
+
+    <section>
+    <h2>Components</h2>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-time"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>time</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-time_iso"></span>
+              character(len=:),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>time_iso</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~14"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    </section>
+    <br>
+    
+
+
+
+    <section>
+    <h3><span class="anchor" id="src"></span>Source Code</h3>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_boundary_local_time_dependent</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="nb">time</span>
+<span class="nb">        </span><span class="kt">character</span><span class="p">(:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">time_iso</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="k">value</span>
+<span class="k">    end type </span><span class="n">type_boundary_local_time_dependent</span>
+</pre></div>
+
+    </section>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

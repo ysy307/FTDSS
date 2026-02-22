@@ -1,0 +1,698 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>finalize_type_ftdss &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>finalize_type_ftdss
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.4% of total for procedures.">181 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/ftdss_interface.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/ftdss_interface.f90.html'>ftdss_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/main_ftdss.html'>main_ftdss</a></li>
+            <li class="breadcrumb-item active" aria-current="page">finalize_type_ftdss</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+    <em>None</em>
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>interface</h2>
+      
+      <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~finalize_type_ftdss~~CallsGraph Pages: 1 -->
+<svg id="interfacefinalize_type_ftdssCallsGraph" width="641pt" height="265pt"
+ viewBox="0.00 0.00 641.00 265.27" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~finalize_type_ftdss~~CallsGraph" class="graph" transform="scale(0.54 0.54) rotate(0) translate(4 488.05)">
+<title>interface~~finalize_type_ftdss~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-488.05 1185,-488.05 1185,4 -4,4"/>
+<!-- interface~finalize_type_ftdss -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node1" class="node">
+<title>interface~finalize_type_ftdss</title>
+<polygon fill="none" stroke="black" points="172,-127.82 0,-127.82 0,-103.82 172,-103.82 172,-127.82"/>
+<text text-anchor="middle" x="86" y="-113.42" font-family="Helvetica,sans-Serif" font-size="10.50">type_ftdss%finalize_type_ftdss</text>
+</g>
+<!-- proc~finalize_type_ftdss -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node2" class="node">
+<title>proc~finalize_type_ftdss</title>
+<g id="a_interface~~finalize_type_ftdss~~CallsGraph_node2"><a xlink:href="../proc/finalize_type_ftdss.html" xlink:title="finalize_type_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="317,-127.82 208,-127.82 208,-103.82 317,-103.82 317,-127.82"/>
+<text text-anchor="middle" x="262.5" y="-113.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">finalize_type_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~finalize_type_ftdss&#45;&gt;proc~finalize_type_ftdss -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge1" class="edge">
+<title>interface~finalize_type_ftdss&#45;&gt;proc~finalize_type_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M172.21,-115.82C180.72,-115.82 189.26,-115.82 197.51,-115.82"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="197.77,-119.32 207.77,-115.82 197.76,-112.32 197.77,-119.32"/>
+</g>
+<!-- interface~output_system_log -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node3" class="node">
+<title>interface~output_system_log</title>
+<g id="a_interface~~finalize_type_ftdss~~CallsGraph_node3"><a xlink:href="../interface/output_system_log.html" xlink:title="type_output%output_system_log">
+<polygon fill="#a7506f" stroke="#a7506f" points="537,-168.82 353,-168.82 353,-144.82 537,-144.82 537,-168.82"/>
+<text text-anchor="middle" x="445" y="-154.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output%output_system_log</text>
+</a>
+</g>
+</g>
+<!-- proc~finalize_type_ftdss&#45;&gt;interface~output_system_log -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge2" class="edge">
+<title>proc~finalize_type_ftdss&#45;&gt;interface~output_system_log</title>
+<path fill="none" stroke="#ff0000" d="M316.68,-127.9C336.88,-132.49 360.08,-137.75 381.09,-142.53"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="380.36,-145.95 390.89,-144.75 381.91,-139.13 380.36,-145.95"/>
+</g>
+<!-- proc~get_profiling_data -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node4" class="node">
+<title>proc~get_profiling_data</title>
+<g id="a_interface~~finalize_type_ftdss~~CallsGraph_node4"><a xlink:href="../proc/get_profiling_data.html" xlink:title="type_profiler%get_profiling_data">
+<polygon fill="#d9534f" stroke="#d9534f" points="757,-127.82 573,-127.82 573,-103.82 757,-103.82 757,-127.82"/>
+<text text-anchor="middle" x="665" y="-113.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_profiler%get_profiling_data</text>
+</a>
+</g>
+</g>
+<!-- proc~finalize_type_ftdss&#45;&gt;proc~get_profiling_data -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge3" class="edge">
+<title>proc~finalize_type_ftdss&#45;&gt;proc~get_profiling_data</title>
+<path fill="none" stroke="#ff0000" d="M317.1,-115.82C379.62,-115.82 484.37,-115.82 562.43,-115.82"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="562.78,-119.32 572.78,-115.82 562.78,-112.32 562.78,-119.32"/>
+</g>
+<!-- proc~record_profiler -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node5" class="node">
+<title>proc~record_profiler</title>
+<g id="a_interface~~finalize_type_ftdss~~CallsGraph_node5"><a xlink:href="../proc/record_profiler.html" xlink:title="type_profiler%record_profiler">
+<polygon fill="#d9534f" stroke="#d9534f" points="528.5,-86.82 361.5,-86.82 361.5,-62.82 528.5,-62.82 528.5,-86.82"/>
+<text text-anchor="middle" x="445" y="-72.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_profiler%record_profiler</text>
+</a>
+</g>
+</g>
+<!-- proc~finalize_type_ftdss&#45;&gt;proc~record_profiler -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge4" class="edge">
+<title>proc~finalize_type_ftdss&#45;&gt;proc~record_profiler</title>
+<path fill="none" stroke="#ff0000" d="M316.68,-103.74C336.88,-99.15 360.08,-93.88 381.09,-89.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="381.91,-92.51 390.89,-86.88 380.36,-85.68 381.91,-92.51"/>
+</g>
+<!-- proc~output_system_log -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node7" class="node">
+<title>proc~output_system_log</title>
+<g id="a_interface~~finalize_type_ftdss~~CallsGraph_node7"><a xlink:href="../proc/output_system_log.html" xlink:title="output_system_log">
+<polygon fill="#d9534f" stroke="#d9534f" points="721,-231.82 609,-231.82 609,-207.82 721,-207.82 721,-231.82"/>
+<text text-anchor="middle" x="665" y="-217.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">output_system_log</text>
+</a>
+</g>
+</g>
+<!-- interface~output_system_log&#45;&gt;proc~output_system_log -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge5" class="edge">
+<title>interface~output_system_log&#45;&gt;proc~output_system_log</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M487.77,-168.89C523.3,-179.16 574.45,-193.94 612.5,-204.93"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="611.79,-208.37 622.37,-207.79 613.73,-201.65 611.79,-208.37"/>
+</g>
+<!-- strip -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node8" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="1181,-286.82 1127,-286.82 1127,-262.82 1181,-262.82 1181,-286.82"/>
+<text text-anchor="middle" x="1154" y="-272.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~get_profiling_data&#45;&gt;strip -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge6" class="edge">
+<title>proc~get_profiling_data&#45;&gt;strip</title>
+<path fill="none" stroke="#00ff00" d="M738.29,-103.79C744.85,-101.34 751.2,-98.38 757,-94.82 778.25,-81.78 770.42,-62.36 793,-51.82 913,4.22 985.55,28.32 1091,-51.82 1123.34,-76.39 1143.27,-201.23 1150.22,-252.64"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1146.77,-253.25 1151.54,-262.71 1153.71,-252.33 1146.77,-253.25"/>
+</g>
+<!-- proc~get_time_record_string -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node6" class="node">
+<title>proc~get_time_record_string</title>
+<g id="a_interface~~finalize_type_ftdss~~CallsGraph_node6"><a xlink:href="../proc/get_time_record_string.html" xlink:title="get_time_record_string">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="732,-85.82 598,-85.82 598,-61.82 732,-61.82 732,-85.82"/>
+<text text-anchor="middle" x="665" y="-71.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_time_record_string</text>
+</a>
+</g>
+</g>
+<!-- proc~record_profiler&#45;&gt;proc~get_time_record_string -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge7" class="edge">
+<title>proc~record_profiler&#45;&gt;proc~get_time_record_string</title>
+<path fill="none" stroke="#0000ff" d="M528.73,-74.44C548.13,-74.35 568.71,-74.26 587.8,-74.17"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="587.96,-77.67 597.94,-74.12 587.93,-70.67 587.96,-77.67"/>
+</g>
+<!-- proc~output_system_log&#45;&gt;strip -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge16" class="edge">
+<title>proc~output_system_log&#45;&gt;strip</title>
+<path fill="none" stroke="#00ff00" d="M673.33,-231.87C690.36,-258.56 735.56,-322.16 793,-345.82 822.41,-357.93 1084.23,-340.84 1091,-337.82 1111.07,-328.85 1128.1,-310.19 1139.2,-295.49"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1142.32,-297.14 1145.32,-286.98 1136.64,-293.05 1142.32,-297.14"/>
+</g>
+<!-- proc~get_compiler_name -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node9" class="node">
+<title>proc~get_compiler_name</title>
+<g id="a_interface~~finalize_type_ftdss~~CallsGraph_node9"><a xlink:href="../proc/get_compiler_name.html" xlink:title="get_compiler_name">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="915.5,-336.82 797.5,-336.82 797.5,-312.82 915.5,-312.82 915.5,-336.82"/>
+<text text-anchor="middle" x="856.5" y="-322.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_compiler_name</text>
+</a>
+</g>
+</g>
+<!-- proc~output_system_log&#45;&gt;proc~get_compiler_name -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge8" class="edge">
+<title>proc~output_system_log&#45;&gt;proc~get_compiler_name</title>
+<path fill="none" stroke="#00ff00" d="M681.63,-232.11C704.83,-249.89 750.24,-282.94 793,-303.82 796.82,-305.68 800.84,-307.45 804.94,-309.1"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="803.95,-312.47 814.54,-312.76 806.44,-305.93 803.95,-312.47"/>
+</g>
+<!-- proc~get_compiler_version -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node10" class="node">
+<title>proc~get_compiler_version</title>
+<g id="a_interface~~finalize_type_ftdss~~CallsGraph_node10"><a xlink:href="../proc/get_compiler_version.html" xlink:title="get_compiler_version">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="920,-294.82 793,-294.82 793,-270.82 920,-270.82 920,-294.82"/>
+<text text-anchor="middle" x="856.5" y="-280.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_compiler_version</text>
+</a>
+</g>
+</g>
+<!-- proc~output_system_log&#45;&gt;proc~get_compiler_version -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge9" class="edge">
+<title>proc~output_system_log&#45;&gt;proc~get_compiler_version</title>
+<path fill="none" stroke="#00ff00" d="M702.54,-231.97C733.05,-242.11 776.7,-256.62 809.57,-267.55"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="808.8,-270.98 819.4,-270.82 811.01,-264.34 808.8,-270.98"/>
+</g>
+<!-- proc~get_cpu_architecture -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node11" class="node">
+<title>proc~get_cpu_architecture</title>
+<g id="a_interface~~finalize_type_ftdss~~CallsGraph_node11"><a xlink:href="../proc/get_cpu_architecture.html" xlink:title="get_cpu_architecture">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="918.5,-252.82 794.5,-252.82 794.5,-228.82 918.5,-228.82 918.5,-252.82"/>
+<text text-anchor="middle" x="856.5" y="-238.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_cpu_architecture</text>
+</a>
+</g>
+</g>
+<!-- proc~output_system_log&#45;&gt;proc~get_cpu_architecture -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge10" class="edge">
+<title>proc~output_system_log&#45;&gt;proc~get_cpu_architecture</title>
+<path fill="none" stroke="#00ff00" d="M721.07,-225.92C740.79,-228.11 763.31,-230.6 784.2,-232.92"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="783.99,-236.41 794.31,-234.04 784.76,-229.46 783.99,-236.41"/>
+</g>
+<!-- proc~get_hostname -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node12" class="node">
+<title>proc~get_hostname</title>
+<g id="a_interface~~finalize_type_ftdss~~CallsGraph_node12"><a xlink:href="../proc/get_hostname.html" xlink:title="get_hostname">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="900.5,-168.82 812.5,-168.82 812.5,-144.82 900.5,-144.82 900.5,-168.82"/>
+<text text-anchor="middle" x="856.5" y="-154.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_hostname</text>
+</a>
+</g>
+</g>
+<!-- proc~output_system_log&#45;&gt;proc~get_hostname -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge11" class="edge">
+<title>proc~output_system_log&#45;&gt;proc~get_hostname</title>
+<path fill="none" stroke="#00ff00" d="M702.54,-207.67C733.05,-197.53 776.7,-183.02 809.57,-172.09"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="811.01,-175.3 819.4,-168.82 808.8,-168.65 811.01,-175.3"/>
+</g>
+<!-- proc~get_memory_usage -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node13" class="node">
+<title>proc~get_memory_usage</title>
+<g id="a_interface~~finalize_type_ftdss~~CallsGraph_node13"><a xlink:href="../proc/get_memory_usage.html" xlink:title="get_memory_usage">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="915.5,-84.82 797.5,-84.82 797.5,-60.82 915.5,-60.82 915.5,-84.82"/>
+<text text-anchor="middle" x="856.5" y="-70.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_memory_usage</text>
+</a>
+</g>
+</g>
+<!-- proc~output_system_log&#45;&gt;proc~get_memory_usage -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge12" class="edge">
+<title>proc~output_system_log&#45;&gt;proc~get_memory_usage</title>
+<path fill="none" stroke="#00ff00" d="M680.42,-207.72C698.84,-192.04 731.4,-163.52 757,-136.82 774.25,-118.82 772.41,-107.87 793,-93.82 795.39,-92.18 797.92,-90.67 800.54,-89.26"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="802.18,-92.36 809.71,-84.9 799.17,-86.04 802.18,-92.36"/>
+</g>
+<!-- proc~get_os -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node14" class="node">
+<title>proc~get_os</title>
+<g id="a_interface~~finalize_type_ftdss~~CallsGraph_node14"><a xlink:href="../proc/get_os.html" xlink:title="get_os">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="883.5,-210.82 829.5,-210.82 829.5,-186.82 883.5,-186.82 883.5,-210.82"/>
+<text text-anchor="middle" x="856.5" y="-196.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_os</text>
+</a>
+</g>
+</g>
+<!-- proc~output_system_log&#45;&gt;proc~get_os -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge13" class="edge">
+<title>proc~output_system_log&#45;&gt;proc~get_os</title>
+<path fill="none" stroke="#00ff00" d="M721.07,-213.72C752.65,-210.22 791.43,-205.92 819.2,-202.84"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="819.72,-206.3 829.27,-201.72 818.95,-199.35 819.72,-206.3"/>
+</g>
+<!-- proc~get_username -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node15" class="node">
+<title>proc~get_username</title>
+<g id="a_interface~~finalize_type_ftdss~~CallsGraph_node15"><a xlink:href="../proc/get_username.html" xlink:title="get_username">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="901,-126.82 812,-126.82 812,-102.82 901,-102.82 901,-126.82"/>
+<text text-anchor="middle" x="856.5" y="-112.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_username</text>
+</a>
+</g>
+</g>
+<!-- proc~output_system_log&#45;&gt;proc~get_username -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge14" class="edge">
+<title>proc~output_system_log&#45;&gt;proc~get_username</title>
+<path fill="none" stroke="#00ff00" d="M681.63,-207.52C704.83,-189.74 750.24,-156.7 793,-135.82 796.82,-133.95 800.84,-132.19 804.94,-130.53"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="806.44,-133.7 814.54,-126.87 803.95,-127.16 806.44,-133.7"/>
+</g>
+<!-- proc~raise_error -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node16" class="node">
+<title>proc~raise_error</title>
+<g id="a_interface~~finalize_type_ftdss~~CallsGraph_node16"><a xlink:href="../proc/raise_error.html" xlink:title="raise_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="891.5,-435.82 821.5,-435.82 821.5,-411.82 891.5,-411.82 891.5,-435.82"/>
+<text text-anchor="middle" x="856.5" y="-421.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">raise_error</text>
+</a>
+</g>
+</g>
+<!-- proc~output_system_log&#45;&gt;proc~raise_error -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge15" class="edge">
+<title>proc~output_system_log&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ff00" d="M673.94,-231.9C692.6,-259.77 741.55,-329.88 793,-378.82 803.4,-388.71 816.06,-398.21 827.26,-405.92"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="825.61,-409.02 835.86,-411.69 829.5,-403.21 825.61,-409.02"/>
+</g>
+<!-- interface~c_get_cpu_architecture -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node17" class="node">
+<title>interface~c_get_cpu_architecture</title>
+<g id="a_interface~~finalize_type_ftdss~~CallsGraph_node17"><a xlink:href="../interface/c_get_cpu_architecture.html" xlink:title="c_get_cpu_architecture">
+<polygon fill="#a7506f" stroke="#a7506f" points="1091,-328.82 956,-328.82 956,-304.82 1091,-304.82 1091,-328.82"/>
+<text text-anchor="middle" x="1023.5" y="-314.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">c_get_cpu_architecture</text>
+</a>
+</g>
+</g>
+<!-- proc~get_cpu_architecture&#45;&gt;interface~c_get_cpu_architecture -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge17" class="edge">
+<title>proc~get_cpu_architecture&#45;&gt;interface~c_get_cpu_architecture</title>
+<path fill="none" stroke="#7fff00" d="M901.61,-252.94C907.99,-255.46 914.31,-258.4 920,-261.82 938.87,-273.14 937.03,-284.67 956,-295.82 959.16,-297.68 962.5,-299.39 965.94,-300.96"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="964.63,-304.21 975.21,-304.82 967.32,-297.74 964.63,-304.21"/>
+</g>
+<!-- proc~c_ptr_to_string -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node20" class="node">
+<title>proc~c_ptr_to_string</title>
+<g id="a_interface~~finalize_type_ftdss~~CallsGraph_node20"><a xlink:href="../proc/c_ptr_to_string.html" xlink:title="c_ptr_to_string">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1068.5,-286.82 978.5,-286.82 978.5,-262.82 1068.5,-262.82 1068.5,-286.82"/>
+<text text-anchor="middle" x="1023.5" y="-272.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">c_ptr_to_string</text>
+</a>
+</g>
+</g>
+<!-- proc~get_cpu_architecture&#45;&gt;proc~c_ptr_to_string -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge18" class="edge">
+<title>proc~get_cpu_architecture&#45;&gt;proc~c_ptr_to_string</title>
+<path fill="none" stroke="#7fff00" d="M916.14,-252.9C933.09,-256.39 951.51,-260.19 968.19,-263.63"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="967.82,-267.12 978.32,-265.71 969.23,-260.27 967.82,-267.12"/>
+</g>
+<!-- proc~get_hostname&#45;&gt;strip -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge20" class="edge">
+<title>proc~get_hostname&#45;&gt;strip</title>
+<path fill="none" stroke="#00ff3f" d="M900.81,-164.05C958.99,-174.26 1058.78,-193.7 1091,-211.82 1109.83,-222.41 1126.7,-240.4 1138.07,-254.46"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="1135.5,-256.86 1144.41,-262.6 1141.03,-252.56 1135.5,-256.86"/>
+</g>
+<!-- proc~get_env_string -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node21" class="node">
+<title>proc~get_env_string</title>
+<g id="a_interface~~finalize_type_ftdss~~CallsGraph_node21"><a xlink:href="../proc/get_env_string.html" xlink:title="get_env_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="1068.5,-164.82 978.5,-164.82 978.5,-140.82 1068.5,-140.82 1068.5,-164.82"/>
+<text text-anchor="middle" x="1023.5" y="-150.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_env_string</text>
+</a>
+</g>
+</g>
+<!-- proc~get_hostname&#45;&gt;proc~get_env_string -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge19" class="edge">
+<title>proc~get_hostname&#45;&gt;proc~get_env_string</title>
+<path fill="none" stroke="#00ff3f" d="M900.85,-155.77C921.46,-155.27 946.31,-154.67 968.16,-154.14"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="968.38,-157.63 978.29,-153.89 968.21,-150.63 968.38,-157.63"/>
+</g>
+<!-- interface~c_get_rss_kb -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node19" class="node">
+<title>interface~c_get_rss_kb</title>
+<g id="a_interface~~finalize_type_ftdss~~CallsGraph_node19"><a xlink:href="../interface/c_get_rss_kb.html" xlink:title="c_get_rss_kb">
+<polygon fill="#a7506f" stroke="#a7506f" points="1063,-84.82 984,-84.82 984,-60.82 1063,-60.82 1063,-84.82"/>
+<text text-anchor="middle" x="1023.5" y="-70.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">c_get_rss_kb</text>
+</a>
+</g>
+</g>
+<!-- proc~get_memory_usage&#45;&gt;interface~c_get_rss_kb -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge21" class="edge">
+<title>proc~get_memory_usage&#45;&gt;interface~c_get_rss_kb</title>
+<path fill="none" stroke="#00ffff" d="M915.67,-72.82C934.69,-72.82 955.59,-72.82 973.83,-72.82"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="973.94,-76.32 983.94,-72.82 973.94,-69.32 973.94,-76.32"/>
+</g>
+<!-- interface~c_get_os -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node18" class="node">
+<title>interface~c_get_os</title>
+<g id="a_interface~~finalize_type_ftdss~~CallsGraph_node18"><a xlink:href="../interface/c_get_os.html" xlink:title="c_get_os">
+<polygon fill="#a7506f" stroke="#a7506f" points="1052.5,-244.82 994.5,-244.82 994.5,-220.82 1052.5,-220.82 1052.5,-244.82"/>
+<text text-anchor="middle" x="1023.5" y="-230.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">c_get_os</text>
+</a>
+</g>
+</g>
+<!-- proc~get_os&#45;&gt;interface~c_get_os -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge22" class="edge">
+<title>proc~get_os&#45;&gt;interface~c_get_os</title>
+<path fill="none" stroke="#003fff" d="M883.64,-204.21C910.75,-209.79 953.4,-218.58 984.28,-224.94"/>
+<polygon fill="#003fff" stroke="#003fff" points="983.77,-228.41 994.27,-227 985.18,-221.55 983.77,-228.41"/>
+</g>
+<!-- proc~get_os&#45;&gt;proc~c_ptr_to_string -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge23" class="edge">
+<title>proc~get_os&#45;&gt;proc~c_ptr_to_string</title>
+<path fill="none" stroke="#003fff" d="M883.53,-204.84C895.19,-208.2 908.81,-213.1 920,-219.82 938.87,-231.14 937.03,-242.67 956,-253.82 960.09,-256.22 964.49,-258.38 969,-260.32"/>
+<polygon fill="#003fff" stroke="#003fff" points="967.78,-263.6 978.37,-263.98 970.33,-257.08 967.78,-263.6"/>
+</g>
+<!-- proc~get_username&#45;&gt;strip -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge25" class="edge">
+<title>proc~get_username&#45;&gt;strip</title>
+<path fill="none" stroke="#7f00ff" d="M901.11,-105.53C951.66,-97.36 1035.15,-92.18 1091,-131.82 1130.87,-160.12 1145.35,-219.71 1150.41,-252.32"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1147,-253.21 1151.84,-262.64 1153.94,-252.25 1147,-253.21"/>
+</g>
+<!-- proc~get_username&#45;&gt;proc~get_env_string -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge24" class="edge">
+<title>proc~get_username&#45;&gt;proc~get_env_string</title>
+<path fill="none" stroke="#7f00ff" d="M901.28,-124.9C921.9,-129.65 946.69,-135.36 968.46,-140.37"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="967.69,-143.79 978.22,-142.62 969.27,-136.97 967.69,-143.79"/>
+</g>
+<!-- proc~raise_error&#45;&gt;strip -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge27" class="edge">
+<title>proc~raise_error&#45;&gt;strip</title>
+<path fill="none" stroke="#ff00bf" d="M876.89,-435.84C919.86,-460.77 1024.55,-511.95 1091,-463.82 1144.54,-425.03 1152.68,-338.56 1153.37,-297.41"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="1156.87,-297.32 1153.41,-287.31 1149.87,-297.3 1156.87,-297.32"/>
+</g>
+<!-- proc~replace_placeholder -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node22" class="node">
+<title>proc~replace_placeholder</title>
+<g id="a_interface~~finalize_type_ftdss~~CallsGraph_node22"><a xlink:href="../proc/replace_placeholder.html" xlink:title="replace_placeholder">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1084,-454.82 963,-454.82 963,-430.82 1084,-430.82 1084,-454.82"/>
+<text text-anchor="middle" x="1023.5" y="-440.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">replace_placeholder</text>
+</a>
+</g>
+</g>
+<!-- proc~raise_error&#45;&gt;proc~replace_placeholder -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge26" class="edge">
+<title>proc~raise_error&#45;&gt;proc~replace_placeholder</title>
+<path fill="none" stroke="#ff00bf" d="M891.69,-427.75C909.45,-429.8 931.83,-432.38 953.03,-434.82"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="952.66,-438.3 962.99,-435.97 953.46,-431.34 952.66,-438.3"/>
+</g>
+<!-- to_string -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_node23" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="1052.5,-412.82 994.5,-412.82 994.5,-388.82 1052.5,-388.82 1052.5,-412.82"/>
+<text text-anchor="middle" x="1023.5" y="-398.42" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~raise_error&#45;&gt;to_string -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge28" class="edge">
+<title>proc~raise_error&#45;&gt;to_string</title>
+<path fill="none" stroke="#ff00bf" d="M891.69,-419.05C918.64,-415.3 956.21,-410.06 984.18,-406.16"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="984.96,-409.58 994.38,-404.74 984,-402.65 984.96,-409.58"/>
+</g>
+<!-- proc~replace_placeholder&#45;&gt;strip -->
+<g id="interface~~finalize_type_ftdss~~CallsGraph_edge29" class="edge">
+<title>proc~replace_placeholder&#45;&gt;strip</title>
+<path fill="none" stroke="#4800ff" d="M1078.01,-430.68C1082.72,-428.24 1087.15,-425.32 1091,-421.82 1127.82,-388.28 1143.5,-329.34 1149.58,-297.22"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="1153.08,-297.52 1151.34,-287.07 1146.18,-296.32 1153.08,-297.52"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacefinalize_type_ftdssCallsGraph = svgPanZoom('#interfacefinalize_type_ftdssCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+      <h2>public module subroutine finalize_type_ftdss(self)  
+    <a href="../proc/finalize_type_ftdss.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h2>
+
+    
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~432"></span>
+              class(<a href='../type/type_ftdss.html'>type_ftdss</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+
+ </div>
+</div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

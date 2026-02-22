@@ -1,0 +1,789 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>calc_den_gp_4phase &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>calc_den_gp_4phase
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">13 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/density_multiphase.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/density_multiphase.f90.html'>density_multiphase.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/density_multiphase.html'>density_multiphase</a></li>
+            <li class="breadcrumb-item active" aria-current="page">calc_den_gp_4phase</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/calc_den_gp_4phase.html#src">calc_den_gp_4phase</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine calc_den_gp_4phase(self, state, density)  
+    <a href="../interface/calc_den_gp_4phase.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~730"></span>
+              class(<a href='../type/type_den_4phase.html'>type_den_4phase</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-state~125"></span>
+              type(<a href='../type/type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-density~8"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>density</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~calc_den_gp_4phase~~CallsGraph Pages: 1 -->
+<svg id="proccalc_den_gp_4phaseCallsGraph" width="641pt" height="121pt"
+ viewBox="0.00 0.00 641.00 120.92" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~calc_den_gp_4phase~~CallsGraph" class="graph" transform="scale(0.49 0.49) rotate(0) translate(4 240.86)">
+<title>proc~~calc_den_gp_4phase~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-240.86 1294,-240.86 1294,4 -4,4"/>
+<!-- proc~calc_den_gp_4phase -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_node1" class="node">
+<title>proc~calc_den_gp_4phase</title>
+<polygon fill="none" stroke="black" points="123,-152.86 0,-152.86 0,-128.86 123,-128.86 123,-152.86"/>
+<text text-anchor="middle" x="61.5" y="-138.46" font-family="Helvetica,sans-Serif" font-size="10.50">calc_den_gp_4phase</text>
+</g>
+<!-- interface~calc_den_4 -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_node2" class="node">
+<title>interface~calc_den_4</title>
+<g id="a_proc~~calc_den_gp_4phase~~CallsGraph_node2"><a xlink:href="../interface/calc_den_4.html" xlink:title="calc_den_4">
+<polygon fill="#a7506f" stroke="#a7506f" points="332,-236.86 260,-236.86 260,-212.86 332,-212.86 332,-236.86"/>
+<text text-anchor="middle" x="296" y="-222.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_den_4</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_den_gp_4phase&#45;&gt;interface~calc_den_4 -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge1" class="edge">
+<title>proc~calc_den_gp_4phase&#45;&gt;interface~calc_den_4</title>
+<path fill="none" stroke="#ff0000" d="M76.78,-153.04C94.73,-167.62 127.05,-191.62 159,-203.86 188.08,-215 222.81,-220.24 249.89,-222.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="249.61,-226.19 259.87,-223.51 250.18,-219.21 249.61,-226.19"/>
+</g>
+<!-- proc~calc_ice_density_abst_material -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_node3" class="node">
+<title>proc~calc_ice_density_abst_material</title>
+<g id="a_proc~~calc_den_gp_4phase~~CallsGraph_node3"><a xlink:href="../proc/calc_ice_density_abst_material.html" xlink:title="abst_material%calc_ice_density_abst_material">
+<polygon fill="#d9534f" stroke="#d9534f" points="425.5,-152.86 166.5,-152.86 166.5,-128.86 425.5,-128.86 425.5,-152.86"/>
+<text text-anchor="middle" x="296" y="-138.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_material%calc_ice_density_abst_material</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_den_gp_4phase&#45;&gt;proc~calc_ice_density_abst_material -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge2" class="edge">
+<title>proc~calc_den_gp_4phase&#45;&gt;proc~calc_ice_density_abst_material</title>
+<path fill="none" stroke="#ff0000" d="M123.28,-140.86C133.59,-140.86 144.65,-140.86 156.01,-140.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="156.06,-144.36 166.06,-140.86 156.06,-137.36 156.06,-144.36"/>
+</g>
+<!-- proc~calc_vapor_density_abst_material -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_node4" class="node">
+<title>proc~calc_vapor_density_abst_material</title>
+<g id="a_proc~~calc_den_gp_4phase~~CallsGraph_node4"><a xlink:href="../proc/calc_vapor_density_abst_material.html" xlink:title="abst_material%calc_vapor_density_abst_material">
+<polygon fill="#d9534f" stroke="#d9534f" points="433,-105.86 159,-105.86 159,-81.86 433,-81.86 433,-105.86"/>
+<text text-anchor="middle" x="296" y="-91.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_material%calc_vapor_density_abst_material</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_den_gp_4phase&#45;&gt;proc~calc_vapor_density_abst_material -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge3" class="edge">
+<title>proc~calc_den_gp_4phase&#45;&gt;proc~calc_vapor_density_abst_material</title>
+<path fill="none" stroke="#ff0000" d="M116.55,-128.84C130.37,-125.84 145.23,-122.67 159,-119.86 178.85,-115.8 200.36,-111.6 220.3,-107.79"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="221.08,-111.2 230.25,-105.89 219.77,-104.32 221.08,-111.2"/>
+</g>
+<!-- proc~calc_water_density_abst_material -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_node5" class="node">
+<title>proc~calc_water_density_abst_material</title>
+<g id="a_proc~~calc_den_gp_4phase~~CallsGraph_node5"><a xlink:href="../proc/calc_water_density_abst_material.html" xlink:title="abst_material%calc_water_density_abst_material">
+<polygon fill="#d9534f" stroke="#d9534f" points="433,-194.86 159,-194.86 159,-170.86 433,-170.86 433,-194.86"/>
+<text text-anchor="middle" x="296" y="-180.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_material%calc_water_density_abst_material</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_den_gp_4phase&#45;&gt;proc~calc_water_density_abst_material -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge4" class="edge">
+<title>proc~calc_den_gp_4phase&#45;&gt;proc~calc_water_density_abst_material</title>
+<path fill="none" stroke="#ff0000" d="M114.97,-152.89C129.22,-155.99 144.67,-159.2 159,-161.86 172.84,-164.43 187.51,-166.93 201.89,-169.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="201.37,-172.72 211.79,-170.84 202.47,-165.8 201.37,-172.72"/>
+</g>
+<!-- proc~get_material_phi -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_node6" class="node">
+<title>proc~get_material_phi</title>
+<g id="a_proc~~calc_den_gp_4phase~~CallsGraph_node6"><a xlink:href="../proc/get_material_phi.html" xlink:title="abst_material%get_material_phi">
+<polygon fill="#d9534f" stroke="#d9534f" points="682,-39.86 498,-39.86 498,-15.86 682,-15.86 682,-39.86"/>
+<text text-anchor="middle" x="590" y="-25.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_material%get_material_phi</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_den_gp_4phase&#45;&gt;proc~get_material_phi -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge5" class="edge">
+<title>proc~calc_den_gp_4phase&#45;&gt;proc~get_material_phi</title>
+<path fill="none" stroke="#ff0000" d="M74.99,-128.8C92.28,-112.92 125.23,-85.53 159,-72.86 266.25,-32.6 398.45,-24.35 487.73,-24.25"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="487.85,-27.75 497.86,-24.28 487.87,-20.75 487.85,-27.75"/>
+</g>
+<!-- proc~calc_den_4 -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_node7" class="node">
+<title>proc~calc_den_4</title>
+<g id="a_proc~~calc_den_gp_4phase~~CallsGraph_node7"><a xlink:href="../proc/calc_den_4.html" xlink:title="calc_den_4">
+<polygon fill="#d9534f" stroke="#d9534f" points="626,-236.86 554,-236.86 554,-212.86 626,-212.86 626,-236.86"/>
+<text text-anchor="middle" x="590" y="-222.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_den_4</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_den_4&#45;&gt;proc~calc_den_4 -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge6" class="edge">
+<title>interface~calc_den_4&#45;&gt;proc~calc_den_4</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M332.22,-224.86C385.17,-224.86 485.26,-224.86 543.61,-224.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="543.65,-228.36 553.65,-224.86 543.65,-221.36 543.65,-228.36"/>
+</g>
+<!-- proc~calc_rho_ice_abst_physics -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_node8" class="node">
+<title>proc~calc_rho_ice_abst_physics</title>
+<g id="a_proc~~calc_den_gp_4phase~~CallsGraph_node8"><a xlink:href="../proc/calc_rho_ice_abst_physics.html" xlink:title="abst_physics%calc_rho_ice_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="703.5,-152.86 476.5,-152.86 476.5,-128.86 703.5,-128.86 703.5,-152.86"/>
+<text text-anchor="middle" x="590" y="-138.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_rho_ice_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_ice_density_abst_material&#45;&gt;proc~calc_rho_ice_abst_physics -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge7" class="edge">
+<title>proc~calc_ice_density_abst_material&#45;&gt;proc~calc_rho_ice_abst_physics</title>
+<path fill="none" stroke="#cbff00" d="M425.5,-140.86C439.03,-140.86 452.77,-140.86 466.24,-140.86"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="466.48,-144.36 476.48,-140.86 466.48,-137.36 466.48,-144.36"/>
+</g>
+<!-- proc~calc_rho_vapor_abst_physics -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_node9" class="node">
+<title>proc~calc_rho_vapor_abst_physics</title>
+<g id="a_proc~~calc_den_gp_4phase~~CallsGraph_node9"><a xlink:href="../proc/calc_rho_vapor_abst_physics.html" xlink:title="abst_physics%calc_rho_vapor_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="711,-100.86 469,-100.86 469,-76.86 711,-76.86 711,-100.86"/>
+<text text-anchor="middle" x="590" y="-86.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_rho_vapor_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_vapor_density_abst_material&#45;&gt;proc~calc_rho_vapor_abst_physics -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge8" class="edge">
+<title>proc~calc_vapor_density_abst_material&#45;&gt;proc~calc_rho_vapor_abst_physics</title>
+<path fill="none" stroke="#00ff66" d="M433.17,-91.53C441.63,-91.38 450.13,-91.24 458.56,-91.09"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="458.86,-94.59 468.8,-90.92 458.74,-87.59 458.86,-94.59"/>
+</g>
+<!-- proc~calc_rho_water_abst_physics -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_node10" class="node">
+<title>proc~calc_rho_water_abst_physics</title>
+<g id="a_proc~~calc_den_gp_4phase~~CallsGraph_node10"><a xlink:href="../proc/calc_rho_water_abst_physics.html" xlink:title="abst_physics%calc_rho_water_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="710.5,-194.86 469.5,-194.86 469.5,-170.86 710.5,-170.86 710.5,-194.86"/>
+<text text-anchor="middle" x="590" y="-180.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%calc_rho_water_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_water_density_abst_material&#45;&gt;proc~calc_rho_water_abst_physics -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge9" class="edge">
+<title>proc~calc_water_density_abst_material&#45;&gt;proc~calc_rho_water_abst_physics</title>
+<path fill="none" stroke="#0066ff" d="M433.17,-182.86C441.82,-182.86 450.53,-182.86 459.15,-182.86"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="459.24,-186.36 469.24,-182.86 459.24,-179.36 459.24,-186.36"/>
+</g>
+<!-- proc~get_field_dp -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_node11" class="node">
+<title>proc~get_field_dp</title>
+<g id="a_proc~~calc_den_gp_4phase~~CallsGraph_node11"><a xlink:href="../proc/get_field_dp.html" xlink:title="type_field_dp%get_field_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="1215,-80.86 1058,-80.86 1058,-56.86 1215,-56.86 1215,-80.86"/>
+<text text-anchor="middle" x="1136.5" y="-66.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_field_dp%get_field_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~get_material_phi&#45;&gt;proc~get_field_dp -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge10" class="edge">
+<title>proc~get_material_phi&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#cc00ff" d="M657.03,-15.84C728.82,-4.7 846.72,7.96 947,-7.86 1001.11,-16.4 1060.85,-37.92 1098.28,-52.97"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1097.17,-56.3 1107.75,-56.83 1099.82,-49.82 1097.17,-56.3"/>
+</g>
+<!-- calc_rho -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_node12" class="node">
+<title>calc_rho</title>
+<polygon fill="#777777" stroke="#777777" points="876,-204.86 818,-204.86 818,-180.86 876,-180.86 876,-204.86"/>
+<text text-anchor="middle" x="847" y="-190.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_rho</text>
+</g>
+<!-- proc~calc_rho_ice_abst_physics&#45;&gt;calc_rho -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge11" class="edge">
+<title>proc~calc_rho_ice_abst_physics&#45;&gt;calc_rho</title>
+<path fill="none" stroke="#cbff00" d="M666.44,-152.9C681.26,-155.59 696.66,-158.62 711,-161.86 727.2,-165.52 730.87,-167.91 747,-171.86 767.02,-176.76 789.47,-181.57 807.93,-185.36"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="807.23,-188.79 817.73,-187.35 808.63,-181.93 807.23,-188.79"/>
+</g>
+<!-- proc~get_thermo_state_tp -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_node15" class="node">
+<title>proc~get_thermo_state_tp</title>
+<g id="a_proc~~calc_den_gp_4phase~~CallsGraph_node15"><a xlink:href="../proc/get_thermo_state_tp.html" xlink:title="abst_physics%get_thermo_state_TP">
+<polygon fill="#d9534f" stroke="#d9534f" points="947,-162.86 747,-162.86 747,-138.86 947,-138.86 947,-162.86"/>
+<text text-anchor="middle" x="847" y="-148.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%get_thermo_state_TP</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_rho_ice_abst_physics&#45;&gt;proc~get_thermo_state_tp -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge12" class="edge">
+<title>proc~calc_rho_ice_abst_physics&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#cbff00" d="M703.59,-145.27C714.62,-145.71 725.8,-146.15 736.8,-146.58"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="736.71,-150.08 746.84,-146.97 736.98,-143.08 736.71,-150.08"/>
+</g>
+<!-- proc~calc_rho_vapor_abst_physics&#45;&gt;proc~get_field_dp -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge14" class="edge">
+<title>proc~calc_rho_vapor_abst_physics&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#00ff66" d="M711.17,-84.45C812.9,-80.71 956.34,-75.44 1047.62,-72.09"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1047.79,-75.58 1057.66,-71.72 1047.54,-68.59 1047.79,-75.58"/>
+</g>
+<!-- calc_saturation_density -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_node13" class="node">
+<title>calc_saturation_density</title>
+<polygon fill="#777777" stroke="#777777" points="915.5,-40.86 778.5,-40.86 778.5,-16.86 915.5,-16.86 915.5,-40.86"/>
+<text text-anchor="middle" x="847" y="-26.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_saturation_density</text>
+</g>
+<!-- proc~calc_rho_vapor_abst_physics&#45;&gt;calc_saturation_density -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge13" class="edge">
+<title>proc~calc_rho_vapor_abst_physics&#45;&gt;calc_saturation_density</title>
+<path fill="none" stroke="#00ff66" d="M642.3,-76.79C683.45,-67.11 741.33,-53.49 784.88,-43.24"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="785.85,-46.61 794.79,-40.91 784.25,-39.79 785.85,-46.61"/>
+</g>
+<!-- proc~get_thermo_state_t -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_node14" class="node">
+<title>proc~get_thermo_state_t</title>
+<g id="a_proc~~calc_den_gp_4phase~~CallsGraph_node14"><a xlink:href="../proc/get_thermo_state_t.html" xlink:title="abst_physics%get_thermo_state_T">
+<polygon fill="#d9534f" stroke="#d9534f" points="944,-120.86 750,-120.86 750,-96.86 944,-96.86 944,-120.86"/>
+<text text-anchor="middle" x="847" y="-106.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%get_thermo_state_T</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_rho_vapor_abst_physics&#45;&gt;proc~get_thermo_state_t -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge15" class="edge">
+<title>proc~calc_rho_vapor_abst_physics&#45;&gt;proc~get_thermo_state_t</title>
+<path fill="none" stroke="#00ff66" d="M711.03,-98.27C720.61,-99.03 730.25,-99.78 739.73,-100.52"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="739.7,-104.03 749.94,-101.33 740.24,-97.05 739.7,-104.03"/>
+</g>
+<!-- proc~calc_rho_water_abst_physics&#45;&gt;calc_rho -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge16" class="edge">
+<title>proc~calc_rho_water_abst_physics&#45;&gt;calc_rho</title>
+<path fill="none" stroke="#0066ff" d="M710.66,-187.55C745.8,-188.93 781.74,-190.34 807.75,-191.36"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="807.77,-194.86 817.9,-191.76 808.05,-187.87 807.77,-194.86"/>
+</g>
+<!-- proc~calc_rho_water_abst_physics&#45;&gt;proc~get_thermo_state_tp -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge17" class="edge">
+<title>proc~calc_rho_water_abst_physics&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#0066ff" d="M686.68,-170.85C704.04,-168.67 722.25,-166.39 739.9,-164.17"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="740.72,-167.6 750.21,-162.88 739.85,-160.65 740.72,-167.6"/>
+</g>
+<!-- proc~get_thermo_state_t&#45;&gt;proc~get_field_dp -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge18" class="edge">
+<title>proc~get_thermo_state_t&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#00ffff" d="M933.33,-96.81C949.81,-94.49 966.94,-92.09 983,-89.86 1004.02,-86.93 1026.68,-83.8 1047.93,-80.87"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1048.48,-84.33 1057.91,-79.5 1047.53,-77.39 1048.48,-84.33"/>
+</g>
+<!-- proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_node17" class="node">
+<title>proc~shift_temperature_absolute_abst_physics</title>
+<g id="a_proc~~calc_den_gp_4phase~~CallsGraph_node17"><a xlink:href="../proc/shift_temperature_absolute_abst_physics.html" xlink:title="abst_physics%shift_temperature_absolute_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="1290,-122.86 983,-122.86 983,-98.86 1290,-98.86 1290,-122.86"/>
+<text text-anchor="middle" x="1136.5" y="-108.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%shift_temperature_absolute_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_t&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge19" class="edge">
+<title>proc~get_thermo_state_t&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#00ffff" d="M944.13,-109.53C953.4,-109.59 962.97,-109.66 972.65,-109.73"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="972.75,-113.23 982.78,-109.8 972.8,-106.23 972.75,-113.23"/>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge20" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#7f00ff" d="M927.25,-138.83C934.15,-136.37 940.84,-133.42 947,-129.86 967.71,-117.9 961.87,-101.06 983,-89.86 1002.66,-79.44 1025.66,-73.58 1047.75,-70.41"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1048.33,-73.86 1057.82,-69.13 1047.46,-66.92 1048.33,-73.86"/>
+</g>
+<!-- proc~shift_pressure_absolute_abst_physics -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_node16" class="node">
+<title>proc~shift_pressure_absolute_abst_physics</title>
+<g id="a_proc~~calc_den_gp_4phase~~CallsGraph_node16"><a xlink:href="../proc/shift_pressure_absolute_abst_physics.html" xlink:title="abst_physics%shift_pressure_absolute_abst_physics">
+<polygon fill="#d9534f" stroke="#d9534f" points="1279,-164.86 994,-164.86 994,-140.86 1279,-140.86 1279,-164.86"/>
+<text text-anchor="middle" x="1136.5" y="-150.46" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics%shift_pressure_absolute_abst_physics</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_physics -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge21" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_physics</title>
+<path fill="none" stroke="#7f00ff" d="M947.34,-151.55C959.07,-151.63 971.24,-151.72 983.49,-151.8"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="983.76,-155.3 993.78,-151.87 983.81,-148.3 983.76,-155.3"/>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_physics -->
+<g id="proc~~calc_den_gp_4phase~~CallsGraph_edge22" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_physics</title>
+<path fill="none" stroke="#7f00ff" d="M933.33,-138.81C949.81,-136.49 966.94,-134.09 983,-131.86 1000.76,-129.39 1019.68,-126.77 1037.93,-124.25"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1038.57,-127.7 1048,-122.86 1037.61,-120.76 1038.57,-127.7"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccalc_den_gp_4phaseCallsGraph = svgPanZoom('#proccalc_den_gp_4phaseCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~calc_den_gp_4phase~~CalledByGraph Pages: 1 -->
+<svg id="proccalc_den_gp_4phaseCalledByGraph" width="393pt" height="32pt"
+ viewBox="0.00 0.00 393.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~calc_den_gp_4phase~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~calc_den_gp_4phase~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 389,-28 389,4 -4,4"/>
+<!-- proc~calc_den_gp_4phase -->
+<g id="proc~~calc_den_gp_4phase~~CalledByGraph_node1" class="node">
+<title>proc~calc_den_gp_4phase</title>
+<polygon fill="none" stroke="black" points="385,-24 262,-24 262,0 385,0 385,-24"/>
+<text text-anchor="middle" x="323.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">calc_den_gp_4phase</text>
+</g>
+<!-- interface~calc_den_gp_4phase -->
+<g id="proc~~calc_den_gp_4phase~~CalledByGraph_node2" class="node">
+<title>interface~calc_den_gp_4phase</title>
+<g id="a_proc~~calc_den_gp_4phase~~CalledByGraph_node2"><a xlink:href="../interface/calc_den_gp_4phase.html" xlink:title="type_den_4phase%calc_den_gp_4phase">
+<polygon fill="#a7506f" stroke="#a7506f" points="226,-24 0,-24 0,0 226,0 226,-24"/>
+<text text-anchor="middle" x="113" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_den_4phase%calc_den_gp_4phase</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_den_gp_4phase&#45;&gt;proc~calc_den_gp_4phase -->
+<g id="proc~~calc_den_gp_4phase~~CalledByGraph_edge1" class="edge">
+<title>interface~calc_den_gp_4phase&#45;&gt;proc~calc_den_gp_4phase</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M226.18,-12C234.79,-12 243.33,-12 251.55,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="251.79,-15.5 261.79,-12 251.79,-8.5 251.79,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">calc_den_gp_4phase</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">density</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_den_4phase</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_state</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">state</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">density</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">phi1</span><span class="p">,</span><span class="w"> </span><span class="n">phi2</span><span class="p">,</span><span class="w"> </span><span class="n">phi3</span><span class="p">,</span><span class="w"> </span><span class="n">phi4</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">density_water</span><span class="p">,</span><span class="w"> </span><span class="n">density_ice</span><span class="p">,</span><span class="w"> </span><span class="n">density_vapor</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">get_phi</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">phi1</span><span class="p">,</span><span class="w"> </span><span class="n">phi2</span><span class="p">,</span><span class="w"> </span><span class="n">phi3</span><span class="p">,</span><span class="w"> </span><span class="n">phi4</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">calc_water_density</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">density_water</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">calc_ice_density</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">density_ice</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">calc_vapor_density</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">density_vapor</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">calc_den_4</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">material1</span><span class="p">,</span><span class="w"> </span><span class="n">phi1</span><span class="p">,</span><span class="w"> </span><span class="n">density_water</span><span class="p">,</span><span class="w"> </span><span class="n">phi2</span><span class="p">,</span><span class="w"> </span><span class="n">density_ice</span><span class="p">,</span><span class="w"> </span><span class="n">phi3</span><span class="p">,</span><span class="w"> </span><span class="n">density_vapor</span><span class="p">,</span><span class="w"> </span><span class="n">phi4</span><span class="p">,</span><span class="w"> </span><span class="n">density</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">calc_den_gp_4phase</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

@@ -1,4 +1,6 @@
-submodule(input_output) input_output_overall_vtk
+submodule(inout_output) inout_output_overall_vtk
+    use :: iso_fortran_env, only:int32, real64
+    use :: stdlib_strings, only:to_string
     implicit none
 
     interface write_field
@@ -15,11 +17,10 @@ submodule(input_output) input_output_overall_vtk
 
 contains
 
-    module subroutine initialize_output_overall_vtk(self, input, coordinate, domain)
+    module subroutine initialize_output_overall_vtk(self, input, domain)
         implicit none
         class(type_output_overall), intent(inout) :: self
         type(type_input), intent(in) :: input
-        type(type_dp_3d), intent(in) :: coordinate
         type(type_domain), intent(inout) :: domain
 
         integer(int32) :: i, j, idx, total
@@ -64,19 +65,17 @@ contains
         real(real64), intent(in), optional :: temperature(:)
         real(real64), intent(in), optional :: si(:)
         real(real64), intent(in), optional :: pressure(:)
-        type(type_dp_3d), intent(in), optional :: water_flux
+        type(type_coordinate_array_dp), intent(in), optional :: water_flux
 
         integer(int32) :: status
         integer(int32) :: unit_num
         integer(int32) :: iN, iE, idx, i
 
         character(256) :: output_name
-        real(real64), allocatable :: original(:), original_vector(:, :)
 
-        ! Initialize VTK file
         write (output_name, self%format_output) trim(self%dir_output_field), "Out_", file_counts, self%file_extension
         open (newunit=unit_num, file=output_name, status='replace', action='write', iostat=status)
-        if (status /= 0) call error_message(931)
+        if (status /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, opt=output_name)
 
         write (unit_num, '(a)') "# vtk DataFile Version 2.0"
         write (unit_num, '(a)') "Analysis ASCII VTK file"
@@ -106,43 +105,23 @@ contains
             if (i == 1) write (unit_num, '(a, i0)') "POINT_DATA ", self%vtk%num_points
             select case (self%variable_names(i))
             case ("temperature")
-                if (present(temperature)) then
-                    call allocate_array(original, self%vtk%num_points)
-                    call domain%reordering%to_original_value(temperature, original)
-                    call write_field(unit_num, "Temperature", original)
-                    call deallocate_array(original)
-                end if
+                if (present(temperature)) call write_field(unit_num, "Temperature", temperature)
             case ("ice_saturation")
-                if (present(si)) then
-                    call allocate_array(original, self%vtk%num_points)
-                    call domain%reordering%to_original_value(si, original)
-                    call write_field(unit_num, "Si", original)
-                    call deallocate_array(original)
-                end if
+                if (present(si)) call write_field(unit_num, "Si", si)
             case ("thermal_conductivity")
                 print *, "Warning: 'thermal_conductivity' is not implemented in VTK output."
             case ("volumetric_heat_capacity")
                 print *, "Warning: 'volumetric_heat_capacity' is not implemented in VTK output."
             case ("pressure")
-                if (present(pressure)) then
-                    call allocate_array(original, self%vtk%num_points)
-                    call domain%reordering%to_original_value(pressure, original)
-                    call write_field(unit_num, "Pressure", original)
-                    call deallocate_array(original)
-                end if
+                if (present(pressure)) call write_field(unit_num, "Pressure", pressure)
             case ("water_flux")
-                if (present(water_flux)) then
-                    call allocate_array(original_vector, 3_int32, self%vtk%num_points)
-                    call domain%reordering%to_original_value(water_flux%x, original_vector(:, 1))
-                    call domain%reordering%to_original_value(water_flux%y, original_vector(:, 2))
-                    call domain%reordering%to_original_value(water_flux%z, original_vector(:, 3))
-                    call write_field(unit_num, "waterFlux", original_vector(:, 1), original_vector(:, 2), original_vector(:, 3))
-                    call deallocate_array(original_vector)
-                end if
+                if (present(water_flux)) call write_field(unit_num, "waterFlux", water_flux%x, water_flux%y, water_flux%z)
             case ("hydraulic_conductivity")
                 print *, "Warning: 'hydraulic_conductivity' is not implemented in VTK output."
             end select
         end do
+
+        close (unit_num)
 
     end subroutine output_overall_vtk_fields
 
@@ -159,7 +138,8 @@ contains
 
         open (newunit=unit_num, file=trim(self%dir_output_field)//trim(file_name)//trim(self%file_extension), &
               status='replace', action='write', iostat=status)
-        if (status /= 0) call error_message(931)
+        if (status /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, &
+                                          opt=trim(self%dir_output_field)//trim(file_name)//trim(self%file_extension))
 
         write (unit_num, '(a)') "# vtk DataFile Version 2.0"
         write (unit_num, '(a)') "Analysis ASCII VTK file"
@@ -187,6 +167,8 @@ contains
 
         write (unit_num, '(a,i0)') "CELL_DATA ", self%vtk%num_cells
         call write_cell(unit_num, variable_name, variable)
+
+        close (unit_num)
 
     end subroutine output_overall_vtk_cell
 
@@ -274,4 +256,4 @@ contains
 
     end subroutine output_vtk_cell_int32
 
-end submodule input_output_overall_vtk
+end submodule inout_output_overall_vtk

@@ -92,20 +92,20 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 1.0% of total for derived types.</p>Including implementation: 12 statements,  0.2% of total for derived types.">12 statements</a>
+                 title="<p> 1.0% of total for derived types.</p>Including implementation: 22 statements,  0.1% of total for derived types.">22 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/input_interface.F90"> Source File</a>
+              <a href="../src/basic_interface.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/input_interface.f90.html'>input_interface.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/inout_input.html'>inout_input</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/basic_interface.f90.html'>basic_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/inout_input_basic.html'>inout_input_basic</a></li>
             <li class="breadcrumb-item active" aria-current="page">type_material_settings</li>
           </ol>
         </nav>
@@ -134,16 +134,17 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_material_settings.html#variable-calculate_hydraulic~3">calculate_hydraulic</a>
-            <a class="list-group-item" href="../type/type_material_settings.html#variable-calculate_mechanical~3">calculate_mechanical</a>
-            <a class="list-group-item" href="../type/type_material_settings.html#variable-calculate_thermal~3">calculate_thermal</a>
-            <a class="list-group-item" href="../type/type_material_settings.html#variable-hydraulic~3">hydraulic</a>
-            <a class="list-group-item" href="../type/type_material_settings.html#variable-id~16">id</a>
-            <a class="list-group-item" href="../type/type_material_settings.html#variable-is_dispersed~2">is_dispersed</a>
-            <a class="list-group-item" href="../type/type_material_settings.html#variable-is_frozen~2">is_frozen</a>
-            <a class="list-group-item" href="../type/type_material_settings.html#variable-name~4">name</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#variable-density~27">density</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#variable-hydraulic_conductivity_model~2">hydraulic_conductivity_model</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#variable-id~18">id</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#variable-is_active~20">is_active</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#variable-name~6">name</a>
             <a class="list-group-item" href="../type/type_material_settings.html#variable-phase~2">phase</a>
-            <a class="list-group-item" href="../type/type_material_settings.html#variable-thermal~3">thermal</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#variable-phase_change~3">phase_change</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#variable-specific_heat~20">specific_heat</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#variable-thermal_conductivity~5">thermal_conductivity</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#variable-volumetric_heat_capacity~2">volumetric_heat_capacity</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#variable-water_characteristic_curve~2">water_characteristic_curve</a>
         </div>
       </div>
     </div>
@@ -163,7 +164,25 @@
   
   
   
-  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#boundprocs-0"
+         aria-expanded="false" aria-controls="boundprocs-0">
+         <h4 class="card-header bg-primary text-white">Type-Bound Procedures</h4>
+      </a>
+      <div id="boundprocs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/type_material_settings.html#boundprocedure-display~32">display</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#boundprocedure-get_density_info~2">get_density_info</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#boundprocedure-get_gcc_info~2">get_gcc_info</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#boundprocedure-get_hcf_info~2">get_hcf_info</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#boundprocedure-get_specific_heat_info~2">get_specific_heat_info</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#boundprocedure-get_thermal_conductivity_info~2">get_thermal_conductivity_info</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#boundprocedure-get_volumetric_heat_capacity_info~2">get_volumetric_heat_capacity_info</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#boundprocedure-get_wrf_info~2">get_wrf_info</a>
+        </div>
+      </div>
+    </div>
+
   
   
     <div class="card card-primary">
@@ -180,7 +199,7 @@
     
     <div class="col-md-9" id='text'>
       <h2 id="type-def-statement">
-        type, public :: type_material_settings</h2>
+        type, private :: type_material_settings</h2>
     
 <br>      <div class="card">
         <div class="card-header">
@@ -193,118 +212,144 @@
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: type~~type_material_settings~~InheritsGraph Pages: 1 -->
-<svg id="typetype_material_settingsInheritsGraph" width="641pt" height="71pt"
- viewBox="0.00 0.00 641.00 70.70" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="type~~type_material_settings~~InheritsGraph" class="graph" transform="scale(0.79 0.79) rotate(0) translate(4 86)">
+<svg id="typetype_material_settingsInheritsGraph" width="641pt" height="220pt"
+ viewBox="0.00 0.00 641.00 220.39" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_material_settings~~InheritsGraph" class="graph" transform="scale(0.78 0.78) rotate(0) translate(4 280)">
 <title>type~~type_material_settings~~InheritsGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-86 812,-86 812,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-280 822,-280 822,4 -4,4"/>
 <!-- type~type_material_settings -->
 <g id="type~~type_material_settings~~InheritsGraph_node1" class="node">
 <title>type~type_material_settings</title>
-<polygon fill="none" stroke="black" points="808,-60 675,-60 675,-36 808,-36 808,-60"/>
-<text text-anchor="middle" x="741.5" y="-45.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_material_settings</text>
+<polygon fill="none" stroke="black" points="818,-150 685,-150 685,-126 818,-126 818,-150"/>
+<text text-anchor="middle" x="751.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_material_settings</text>
 </g>
-<!-- type~type_materials_hydraulic -->
+<!-- type~type_hydraulic_conductivity_model -->
 <g id="type~~type_material_settings~~InheritsGraph_node2" class="node">
-<title>type~type_materials_hydraulic</title>
-<g id="a_type~~type_material_settings~~InheritsGraph_node2"><a xlink:href="../type/type_materials_hydraulic.html" xlink:title="type_materials_hydraulic">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="594,-82 448,-82 448,-58 594,-58 594,-82"/>
-<text text-anchor="middle" x="521" y="-67.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_materials_hydraulic</text>
+<title>type~type_hydraulic_conductivity_model</title>
+<g id="a_type~~type_material_settings~~InheritsGraph_node2"><a xlink:href="../type/type_hydraulic_conductivity_model.html" xlink:title="type_hydraulic_conductivity_model">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="486.5,-276 287.5,-276 287.5,-252 486.5,-252 486.5,-276"/>
+<text text-anchor="middle" x="387" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic_conductivity_model</text>
 </a>
 </g>
 </g>
-<!-- type~type_material_settings&#45;&gt;type~type_materials_hydraulic -->
-<g id="type~~type_material_settings~~InheritsGraph_edge2" class="edge">
-<title>type~type_material_settings&#45;&gt;type~type_materials_hydraulic</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M674.94,-54.6C652.82,-56.83 627.84,-59.34 604.58,-61.69"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="603.98,-58.23 594.38,-62.71 604.68,-65.19 603.98,-58.23"/>
-<text text-anchor="middle" x="634.5" y="-62.4" font-family="Helvetica,sans-Serif" font-size="9.50">hydraulic</text>
-</g>
-<!-- type~type_materials_thermal -->
-<g id="type~~type_material_settings~~InheritsGraph_node3" class="node">
-<title>type~type_materials_thermal</title>
-<g id="a_type~~type_material_settings~~InheritsGraph_node3"><a xlink:href="../type/type_materials_thermal.html" xlink:title="type_materials_thermal">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="590.5,-40 451.5,-40 451.5,-16 590.5,-16 590.5,-40"/>
-<text text-anchor="middle" x="521" y="-25.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_materials_thermal</text>
-</a>
-</g>
-</g>
-<!-- type~type_material_settings&#45;&gt;type~type_materials_thermal -->
-<g id="type~~type_material_settings~~InheritsGraph_edge1" class="edge">
-<title>type~type_material_settings&#45;&gt;type~type_materials_thermal</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M674.95,-37.14C668.89,-36.34 662.84,-35.6 657,-35 638.88,-33.12 619.33,-31.74 600.9,-30.73"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="600.95,-27.23 590.78,-30.2 600.59,-34.22 600.95,-27.23"/>
-<text text-anchor="middle" x="634.5" y="-37.4" font-family="Helvetica,sans-Serif" font-size="9.50">thermal</text>
-</g>
-<!-- type~type_materials_hcf -->
-<g id="type~~type_material_settings~~InheritsGraph_node4" class="node">
-<title>type~type_materials_hcf</title>
-<g id="a_type~~type_material_settings~~InheritsGraph_node4"><a xlink:href="../type/type_materials_hcf.html" xlink:title="type_materials_hcf">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="311.5,-82 198.5,-82 198.5,-58 311.5,-58 311.5,-82"/>
-<text text-anchor="middle" x="255" y="-67.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_materials_hcf</text>
-</a>
-</g>
-</g>
-<!-- type~type_materials_hydraulic&#45;&gt;type~type_materials_hcf -->
-<g id="type~~type_material_settings~~InheritsGraph_edge3" class="edge">
-<title>type~type_materials_hydraulic&#45;&gt;type~type_materials_hcf</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M447.86,-70C408.48,-70 360.08,-70 321.75,-70"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="321.73,-66.5 311.73,-70 321.73,-73.5 321.73,-66.5"/>
-<text text-anchor="middle" x="395" y="-72.4" font-family="Helvetica,sans-Serif" font-size="9.50">hcf</text>
-</g>
-<!-- type~type_materials_phase_change -->
-<g id="type~~type_material_settings~~InheritsGraph_node5" class="node">
-<title>type~type_materials_phase_change</title>
-<g id="a_type~~type_material_settings~~InheritsGraph_node5"><a xlink:href="../type/type_materials_phase_change.html" xlink:title="type_materials_phase_change">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="342,-40 168,-40 168,-16 342,-16 342,-40"/>
-<text text-anchor="middle" x="255" y="-25.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_materials_phase_change</text>
-</a>
-</g>
-</g>
-<!-- type~type_materials_thermal&#45;&gt;type~type_materials_phase_change -->
-<g id="type~~type_material_settings~~InheritsGraph_edge4" class="edge">
-<title>type~type_materials_thermal&#45;&gt;type~type_materials_phase_change</title>
-<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M451.33,-28C421.14,-28 385.17,-28 352.37,-28"/>
-<polygon fill="#00ffff" stroke="#00ffff" points="352.3,-24.5 342.3,-28 352.3,-31.5 352.3,-24.5"/>
-<text text-anchor="middle" x="395" y="-30.4" font-family="Helvetica,sans-Serif" font-size="9.50">phase_change</text>
-</g>
-<!-- type~type_materials_wrf -->
-<g id="type~~type_material_settings~~InheritsGraph_node7" class="node">
-<title>type~type_materials_wrf</title>
-<g id="a_type~~type_material_settings~~InheritsGraph_node7"><a xlink:href="../type/type_materials_wrf.html" xlink:title="type_materials_wrf">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="114,-74 1,-74 1,-50 114,-50 114,-74"/>
-<text text-anchor="middle" x="57.5" y="-59.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_materials_wrf</text>
-</a>
-</g>
-</g>
-<!-- type~type_materials_hcf&#45;&gt;type~type_materials_wrf -->
-<g id="type~~type_material_settings~~InheritsGraph_edge5" class="edge">
-<title>type~type_materials_hcf&#45;&gt;type~type_materials_wrf</title>
-<path fill="none" stroke="#ff0000" d="M198.24,-67.72C175.23,-66.78 148.39,-65.68 124.41,-64.7"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="124.47,-61.2 114.33,-64.28 124.18,-68.19 124.47,-61.2"/>
-</g>
-<!-- type~type_materials_gcc -->
-<g id="type~~type_material_settings~~InheritsGraph_node6" class="node">
-<title>type~type_materials_gcc</title>
-<g id="a_type~~type_material_settings~~InheritsGraph_node6"><a xlink:href="../type/type_materials_gcc.html" xlink:title="type_materials_gcc">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="115,-24 0,-24 0,0 115,0 115,-24"/>
-<text text-anchor="middle" x="57.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_materials_gcc</text>
-</a>
-</g>
-</g>
-<!-- type~type_materials_phase_change&#45;&gt;type~type_materials_gcc -->
+<!-- type~type_material_settings&#45;&gt;type~type_hydraulic_conductivity_model -->
 <g id="type~~type_material_settings~~InheritsGraph_edge7" class="edge">
-<title>type~type_materials_phase_change&#45;&gt;type~type_materials_gcc</title>
-<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M179.15,-16C169.36,-14.78 159.46,-13.73 150,-13 142,-12.38 133.61,-11.97 125.27,-11.7"/>
-<polygon fill="#00ffff" stroke="#00ffff" points="125.26,-8.2 115.17,-11.45 125.08,-15.2 125.26,-8.2"/>
-<text text-anchor="middle" x="141.5" y="-15.4" font-family="Helvetica,sans-Serif" font-size="9.50">gcc</text>
+<title>type~type_material_settings&#45;&gt;type~type_hydraulic_conductivity_model</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M742.71,-150.14C729.63,-169.39 701.3,-206.52 667,-224 614.88,-250.56 550.6,-261.04 496.88,-264.66"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="496.4,-261.18 486.63,-265.28 496.82,-268.17 496.4,-261.18"/>
+<text text-anchor="middle" x="596" y="-263.4" font-family="Helvetica,sans-Serif" font-size="9.50">hydraulic_conductivity_model</text>
 </g>
-<!-- type~type_materials_phase_change&#45;&gt;type~type_materials_wrf -->
+<!-- type~type_materials_density -->
+<g id="type~~type_material_settings~~InheritsGraph_node3" class="node">
+<title>type~type_materials_density</title>
+<g id="a_type~~type_material_settings~~InheritsGraph_node3"><a xlink:href="../type/type_materials_density.html" xlink:title="type_materials_density">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="454.5,-234 319.5,-234 319.5,-210 454.5,-210 454.5,-234"/>
+<text text-anchor="middle" x="387" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_materials_density</text>
+</a>
+</g>
+</g>
+<!-- type~type_material_settings&#45;&gt;type~type_materials_density -->
+<g id="type~~type_material_settings~~InheritsGraph_edge1" class="edge">
+<title>type~type_material_settings&#45;&gt;type~type_materials_density</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M731.39,-150.17C714.95,-160.04 690.29,-173.52 667,-181 600.6,-202.32 521.71,-212.61 464.79,-217.54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="464.46,-214.06 454.78,-218.37 465.04,-221.03 464.46,-214.06"/>
+<text text-anchor="middle" x="596" y="-212.4" font-family="Helvetica,sans-Serif" font-size="9.50">density</text>
+</g>
+<!-- type~type_materials_specific_heat -->
+<g id="type~~type_material_settings~~InheritsGraph_node4" class="node">
+<title>type~type_materials_specific_heat</title>
+<g id="a_type~~type_material_settings~~InheritsGraph_node4"><a xlink:href="../type/type_materials_specific_heat.html" xlink:title="type_materials_specific_heat">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="470,-192 304,-192 304,-168 470,-168 470,-192"/>
+<text text-anchor="middle" x="387" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_materials_specific_heat</text>
+</a>
+</g>
+</g>
+<!-- type~type_material_settings&#45;&gt;type~type_materials_specific_heat -->
+<g id="type~~type_material_settings~~InheritsGraph_edge2" class="edge">
+<title>type~type_material_settings&#45;&gt;type~type_materials_specific_heat</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M684.92,-149.42C678.87,-150.34 672.83,-151.22 667,-152 604.88,-160.32 534.69,-167.35 480.24,-172.29"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="479.91,-168.8 470.27,-173.18 480.54,-175.77 479.91,-168.8"/>
+<text text-anchor="middle" x="596" y="-169.4" font-family="Helvetica,sans-Serif" font-size="9.50">specific_heat</text>
+</g>
+<!-- type~type_materials_thermal_conductivity -->
+<g id="type~~type_material_settings~~InheritsGraph_node5" class="node">
+<title>type~type_materials_thermal_conductivity</title>
+<g id="a_type~~type_material_settings~~InheritsGraph_node5"><a xlink:href="../type/type_materials_thermal_conductivity.html" xlink:title="type_materials_thermal_conductivity">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="491,-150 283,-150 283,-126 491,-126 491,-150"/>
+<text text-anchor="middle" x="387" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_materials_thermal_conductivity</text>
+</a>
+</g>
+</g>
+<!-- type~type_material_settings&#45;&gt;type~type_materials_thermal_conductivity -->
+<g id="type~~type_material_settings~~InheritsGraph_edge4" class="edge">
+<title>type~type_material_settings&#45;&gt;type~type_materials_thermal_conductivity</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M684.85,-138C633.84,-138 561.86,-138 501.55,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="501.21,-134.5 491.21,-138 501.21,-141.5 501.21,-134.5"/>
+<text text-anchor="middle" x="596" y="-140.4" font-family="Helvetica,sans-Serif" font-size="9.50">thermal_conductivity</text>
+</g>
+<!-- type~type_materials_volumetric_heat_capacity -->
+<g id="type~~type_material_settings~~InheritsGraph_node6" class="node">
+<title>type~type_materials_volumetric_heat_capacity</title>
+<g id="a_type~~type_material_settings~~InheritsGraph_node6"><a xlink:href="../type/type_materials_volumetric_heat_capacity.html" xlink:title="type_materials_volumetric_heat_capacity">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="503.5,-108 270.5,-108 270.5,-84 503.5,-84 503.5,-108"/>
+<text text-anchor="middle" x="387" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_materials_volumetric_heat_capacity</text>
+</a>
+</g>
+</g>
+<!-- type~type_material_settings&#45;&gt;type~type_materials_volumetric_heat_capacity -->
+<g id="type~~type_material_settings~~InheritsGraph_edge3" class="edge">
+<title>type~type_material_settings&#45;&gt;type~type_materials_volumetric_heat_capacity</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M684.92,-126.58C678.87,-125.66 672.83,-124.78 667,-124 617,-117.31 561.76,-111.44 513.72,-106.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="513.87,-103.33 503.58,-105.87 513.2,-110.3 513.87,-103.33"/>
+<text text-anchor="middle" x="596" y="-126.4" font-family="Helvetica,sans-Serif" font-size="9.50">volumetric_heat_capacity</text>
+</g>
+<!-- type~type_materials_water_characteristic_curve -->
+<g id="type~~type_material_settings~~InheritsGraph_node7" class="node">
+<title>type~type_materials_water_characteristic_curve</title>
+<g id="a_type~~type_material_settings~~InheritsGraph_node7"><a xlink:href="../type/type_materials_water_characteristic_curve.html" xlink:title="type_materials_water_characteristic_curve">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="507,-66 267,-66 267,-42 507,-42 507,-66"/>
+<text text-anchor="middle" x="387" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_materials_water_characteristic_curve</text>
+</a>
+</g>
+</g>
+<!-- type~type_material_settings&#45;&gt;type~type_materials_water_characteristic_curve -->
+<g id="type~~type_material_settings~~InheritsGraph_edge5" class="edge">
+<title>type~type_material_settings&#45;&gt;type~type_materials_water_characteristic_curve</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M732.08,-125.92C715.69,-115.76 690.69,-101.69 667,-94 619.31,-78.53 565.1,-69.03 517.23,-63.21"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="517.46,-59.71 507.12,-62.02 516.64,-66.67 517.46,-59.71"/>
+<text text-anchor="middle" x="596" y="-96.4" font-family="Helvetica,sans-Serif" font-size="9.50">water_characteristic_curve</text>
+</g>
+<!-- type~type_phase_change -->
+<g id="type~~type_material_settings~~InheritsGraph_node8" class="node">
+<title>type~type_phase_change</title>
+<g id="a_type~~type_material_settings~~InheritsGraph_node8"><a xlink:href="../type/type_phase_change.html" xlink:title="type_phase_change">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="446,-24 328,-24 328,0 446,0 446,-24"/>
+<text text-anchor="middle" x="387" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_phase_change</text>
+</a>
+</g>
+</g>
+<!-- type~type_material_settings&#45;&gt;type~type_phase_change -->
 <g id="type~~type_material_settings~~InheritsGraph_edge6" class="edge">
-<title>type~type_materials_phase_change&#45;&gt;type~type_materials_wrf</title>
-<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M184.8,-40.03C165.06,-43.47 143.62,-47.2 124.11,-50.59"/>
-<polygon fill="#00ffff" stroke="#00ffff" points="123.35,-47.17 114.1,-52.33 124.55,-54.07 123.35,-47.17"/>
-<text text-anchor="middle" x="141.5" y="-50.4" font-family="Helvetica,sans-Serif" font-size="9.50">wrf</text>
+<title>type~type_material_settings&#45;&gt;type~type_phase_change</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M742.75,-125.7C729.74,-106.21 701.49,-68.62 667,-51 600.96,-17.25 515.26,-9.8 456.36,-9.33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="456.06,-5.83 446.05,-9.32 456.05,-12.83 456.06,-5.83"/>
+<text text-anchor="middle" x="596" y="-53.4" font-family="Helvetica,sans-Serif" font-size="9.50">phase_change</text>
+</g>
+<!-- type~type_equilibrium_model -->
+<g id="type~~type_material_settings~~InheritsGraph_node9" class="node">
+<title>type~type_equilibrium_model</title>
+<g id="a_type~~type_material_settings~~InheritsGraph_node9"><a xlink:href="../type/type_equilibrium_model.html" xlink:title="type_equilibrium_model">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="141,-24 0,-24 0,0 141,0 141,-24"/>
+<text text-anchor="middle" x="70.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_equilibrium_model</text>
+</a>
+</g>
+</g>
+<!-- type~type_phase_change&#45;&gt;type~type_equilibrium_model -->
+<g id="type~~type_material_settings~~InheritsGraph_edge8" class="edge">
+<title>type~type_phase_change&#45;&gt;type~type_equilibrium_model</title>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M327.95,-12C278.24,-12 206.18,-12 151.09,-12"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="151.02,-8.5 141.02,-12 151.02,-15.5 151.02,-8.5"/>
+<text text-anchor="middle" x="204" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">equilibrium_model</text>
 </g>
 </g>
 </svg>
@@ -374,48 +419,48 @@ large graphs.</div>
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: type~~type_material_settings~~InheritedByGraph Pages: 1 -->
-<svg id="typetype_material_settingsInheritedByGraph" width="426pt" height="32pt"
- viewBox="0.00 0.00 426.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg id="typetype_material_settingsInheritedByGraph" width="454pt" height="32pt"
+ viewBox="0.00 0.00 454.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="type~~type_material_settings~~InheritedByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>type~~type_material_settings~~InheritedByGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 422,-28 422,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 450,-28 450,4 -4,4"/>
 <!-- type~type_material_settings -->
 <g id="type~~type_material_settings~~InheritedByGraph_node1" class="node">
 <title>type~type_material_settings</title>
 <polygon fill="none" stroke="black" points="133,-24 0,-24 0,0 133,0 133,-24"/>
 <text text-anchor="middle" x="66.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_material_settings</text>
 </g>
-<!-- type~input_basic -->
+<!-- type~type_input_basic -->
 <g id="type~~type_material_settings~~InheritedByGraph_node2" class="node">
-<title>type~input_basic</title>
-<g id="a_type~~type_material_settings~~InheritedByGraph_node2"><a xlink:href="../type/input_basic.html" xlink:title="input_basic">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="288,-24 215,-24 215,0 288,0 288,-24"/>
-<text text-anchor="middle" x="251.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">input_basic</text>
+<title>type~type_input_basic</title>
+<g id="a_type~~type_material_settings~~InheritedByGraph_node2"><a xlink:href="../type/type_input_basic.html" xlink:title="type_input_basic">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="316,-24 215,-24 215,0 316,0 316,-24"/>
+<text text-anchor="middle" x="265.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input_basic</text>
 </a>
 </g>
 </g>
-<!-- type~input_basic&#45;&gt;type~type_material_settings -->
+<!-- type~type_input_basic&#45;&gt;type~type_material_settings -->
 <g id="type~~type_material_settings~~InheritedByGraph_edge1" class="edge">
-<title>type~input_basic&#45;&gt;type~type_material_settings</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M214.78,-12C194.39,-12 168.03,-12 143.26,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="143.13,-8.5 133.13,-12 143.13,-15.5 143.13,-8.5"/>
+<title>type~type_input_basic&#45;&gt;type~type_material_settings</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M214.79,-12C193.15,-12 167.3,-12 143.34,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="143.21,-8.5 133.21,-12 143.21,-15.5 143.21,-8.5"/>
 <text text-anchor="middle" x="174" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">materials</text>
 </g>
 <!-- type~type_input -->
 <g id="type~~type_material_settings~~InheritedByGraph_node3" class="node">
 <title>type~type_input</title>
 <g id="a_type~~type_material_settings~~InheritedByGraph_node3"><a xlink:href="../type/type_input.html" xlink:title="type_input">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="418,-24 350,-24 350,0 418,0 418,-24"/>
-<text text-anchor="middle" x="384" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input</text>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="446,-24 378,-24 378,0 446,0 446,-24"/>
+<text text-anchor="middle" x="412" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input</text>
 </a>
 </g>
 </g>
-<!-- type~type_input&#45;&gt;type~input_basic -->
+<!-- type~type_input&#45;&gt;type~type_input_basic -->
 <g id="type~~type_material_settings~~InheritedByGraph_edge2" class="edge">
-<title>type~type_input&#45;&gt;type~input_basic</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M349.73,-12C334.22,-12 315.51,-12 298.66,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="298.46,-8.5 288.46,-12 298.46,-15.5 298.46,-8.5"/>
-<text text-anchor="middle" x="319" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">basic</text>
+<title>type~type_input&#45;&gt;type~type_input_basic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M377.85,-12C362.59,-12 344.01,-12 326.43,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="326.23,-8.5 316.23,-12 326.23,-15.5 326.23,-8.5"/>
+<text text-anchor="middle" x="347" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">basic</text>
 </g>
 </g>
 </svg>
@@ -486,15 +531,15 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-calculate_hydraulic~3"></span>
-              logical,
+              <span class="anchor" id="variable-density~27"></span>
+              type(<a href='type_materials_density.html'>type_materials_density</a>),
             </td>
               <td>public</td>
             <td>
               
             </td>
             <td>::</td>
-            <td><strong>calculate_hydraulic</strong></td>
+            <td><strong>density</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -503,15 +548,15 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-calculate_mechanical~3"></span>
-              logical,
+              <span class="anchor" id="variable-hydraulic_conductivity_model~2"></span>
+              type(<a href='type_hydraulic_conductivity_model.html'>type_hydraulic_conductivity_model</a>),
             </td>
               <td>public</td>
             <td>
               
             </td>
             <td>::</td>
-            <td><strong>calculate_mechanical</strong></td>
+            <td><strong>hydraulic_conductivity_model</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -520,41 +565,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-calculate_thermal~3"></span>
-              logical,
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>calculate_thermal</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-hydraulic~3"></span>
-              type(<a href='type_materials_hydraulic.html'>type_materials_hydraulic</a>),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>hydraulic</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-id~16"></span>
+              <span class="anchor" id="variable-id~18"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -571,7 +582,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-is_dispersed~2"></span>
+              <span class="anchor" id="variable-is_active~20"></span>
               logical,
             </td>
               <td>public</td>
@@ -579,7 +590,7 @@ large graphs.</div>
               
             </td>
             <td>::</td>
-            <td><strong>is_dispersed</strong></td>
+            <td><strong>is_active</strong>(NUM_PHYSICS_TYPES)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -588,24 +599,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-is_frozen~2"></span>
-              logical,
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>is_frozen</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-name~4"></span>
+              <span class="anchor" id="variable-name~6"></span>
               character(len=:),
             </td>
               <td>public,</td>
@@ -639,15 +633,83 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-thermal~3"></span>
-              type(<a href='type_materials_thermal.html'>type_materials_thermal</a>),
+              <span class="anchor" id="variable-phase_change~3"></span>
+              type(<a href='type_phase_change.html'>type_phase_change</a>),
             </td>
               <td>public</td>
             <td>
               
             </td>
             <td>::</td>
-            <td><strong>thermal</strong></td>
+            <td><strong>phase_change</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-specific_heat~20"></span>
+              type(<a href='type_materials_specific_heat.html'>type_materials_specific_heat</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>specific_heat</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-thermal_conductivity~5"></span>
+              type(<a href='type_materials_thermal_conductivity.html'>type_materials_thermal_conductivity</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>thermal_conductivity</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-volumetric_heat_capacity~2"></span>
+              type(<a href='type_materials_volumetric_heat_capacity.html'>type_materials_volumetric_heat_capacity</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>volumetric_heat_capacity</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-water_characteristic_curve~2"></span>
+              type(<a href='type_materials_water_characteristic_curve.html'>type_materials_water_characteristic_curve</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>water_characteristic_curve</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -662,20 +724,579 @@ large graphs.</div>
     
 
 
+      <section>
+        <h2>Type-Bound Procedures</h2>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-display~32"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>display</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/display_material_settings.html'>display_material_settings</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine display_material_settings(self)  
+    <a href="../proc/display_material_settings.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_material_settings.html'>type_material_settings</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_density_info~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_density_info</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/get_density_info_material_settings.html'>get_density_info_material_settings</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine get_density_info_material_settings(self, density_info)  
+    <a href="../proc/get_density_info_material_settings.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_material_settings.html'>type_material_settings</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_physics_info.html'>type_physics_info</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>density_info</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_gcc_info~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_gcc_info</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/get_gcc_info_material_settings.html'>get_gcc_info_material_settings</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine get_gcc_info_material_settings(self, gcc_info)  
+    <a href="../proc/get_gcc_info_material_settings.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_material_settings.html'>type_material_settings</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>gcc_info</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_hcf_info~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_hcf_info</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/get_hcf_info_material_settings.html'>get_hcf_info_material_settings</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine get_hcf_info_material_settings(self, hcf_info)  
+    <a href="../proc/get_hcf_info_material_settings.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_material_settings.html'>type_material_settings</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_hcf_params.html'>type_hcf_params</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>hcf_info</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_specific_heat_info~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_specific_heat_info</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/get_specific_heat_info_material_settings.html'>get_specific_heat_info_material_settings</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine get_specific_heat_info_material_settings(self, specific_heat_info)  
+    <a href="../proc/get_specific_heat_info_material_settings.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_material_settings.html'>type_material_settings</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_physics_info.html'>type_physics_info</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>specific_heat_info</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_thermal_conductivity_info~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_thermal_conductivity_info</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/get_thermal_conductivity_info_material_settings.html'>get_thermal_conductivity_info_material_settings</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine get_thermal_conductivity_info_material_settings(self, thermal_conductivity_info)  
+    <a href="../proc/get_thermal_conductivity_info_material_settings.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_material_settings.html'>type_material_settings</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_physics_info.html'>type_physics_info</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>thermal_conductivity_info</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_volumetric_heat_capacity_info~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_volumetric_heat_capacity_info</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/get_volumetric_heat_capacity_info_material_settings.html'>get_volumetric_heat_capacity_info_material_settings</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine get_volumetric_heat_capacity_info_material_settings(self, volumetric_heat_capacity_info)  
+    <a href="../proc/get_volumetric_heat_capacity_info_material_settings.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_material_settings.html'>type_material_settings</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_physics_info.html'>type_physics_info</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>volumetric_heat_capacity_info</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_wrf_info~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_wrf_info</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/get_wrf_info_material_settings.html'>get_wrf_info_material_settings</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine get_wrf_info_material_settings(self, wrf_info)  
+    <a href="../proc/get_wrf_info_material_settings.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_material_settings.html'>type_material_settings</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(type_wrf_params),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>wrf_info</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+      </section>
 
     <section>
     <h3><span class="anchor" id="src"></span>Source Code</h3>
     <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_material_settings</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">id</span>
 <span class="w">        </span><span class="kt">character</span><span class="p">(:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">name</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_active</span><span class="p">(</span><span class="n">NUM_PHYSICS_TYPES</span><span class="p">)</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">phase</span>
-<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_frozen</span>
-<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_dispersed</span>
-<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calculate_thermal</span>
-<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calculate_hydraulic</span>
-<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calculate_mechanical</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_materials_thermal</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">thermal</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_materials_hydraulic</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">hydraulic</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_materials_density</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">density</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_materials_specific_heat</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">specific_heat</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_materials_volumetric_heat_capacity</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">volumetric_heat_capacity</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_materials_thermal_conductivity</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">thermal_conductivity</span>
+
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_materials_water_characteristic_curve</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">water_characteristic_curve</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_phase_change</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">phase_change</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_hydraulic_conductivity_model</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">hydraulic_conductivity_model</span>
+<span class="w">    </span><span class="k">contains</span>
+<span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">display</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">display_material_settings</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_density_info</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_density_info_material_settings</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_specific_heat_info</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_specific_heat_info_material_settings</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_volumetric_heat_capacity_info</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_volumetric_heat_capacity_info_material_settings</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_thermal_conductivity_info</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_thermal_conductivity_info_material_settings</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_wrf_info</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_wrf_info_material_settings</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_gcc_info</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_gcc_info_material_settings</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_hcf_info</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_hcf_info_material_settings</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_material_settings</span>
 </pre></div>
 
@@ -692,14 +1313,14 @@ large graphs.</div>
           <div class="col">
             <p>
               FTDSS
- was developed by Kikuchi Shun<br>              &copy; 2025 
+ was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
           <div class="col">
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-08-26 10:37 +0000             </p>
+ on 2026-02-22 12:12 +0000             </p>
           </div>
         </div>
         <br>

@@ -1,6 +1,6 @@
 module core_fortran_utils_memory_stats_wrapper
     use, intrinsic :: iso_fortran_env, only: real64, int64
-    use :: core_c_utils, only:c_get_rss_kb
+    use :: core_c_utils_memory_stats, only:c_get_rss_kb
     implicit none
     private
 

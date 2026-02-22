@@ -11,8 +11,12 @@ module core_vtk_vtk_wrapper
     public :: vtk_get_num_cells
     public :: vtk_get_total_connectivity_size
     public :: vtk_get_cell_info
-    public :: vtk_get_cell_ids
-    public :: vtk_get_point_data
+    public :: vtk_get_num_cell_data_components
+    public :: vtk_get_num_point_data_components
+    public :: vtk_get_cell_data_int32
+    public :: vtk_get_cell_data_float64
+    public :: vtk_get_point_data_int32
+    public :: vtk_get_point_data_float64
     public :: vtk_finalize
 
     !----------------------------------------------------------------!
@@ -74,20 +78,49 @@ module core_vtk_vtk_wrapper
             integer(c_int), intent(out) :: types(*)
         end subroutine vtk_get_cell_info
 
-        subroutine vtk_get_cell_ids(handle, array_name, ids) bind(C, name='c_vtk_get_cell_ids')
+        subroutine vtk_get_num_cell_data_components(handle, array_name, num_components) &
+            bind(C, name='c_vtk_get_num_cell_data_components')
+            import :: c_ptr, c_char, c_int
+            type(c_ptr), value, intent(in) :: handle
+            character(kind=c_char), intent(in) :: array_name(*)
+            integer(c_int), intent(out) :: num_components
+        end subroutine vtk_get_num_cell_data_components
+
+        subroutine vtk_get_num_point_data_components(handle, array_name, num_components) &
+            bind(C, name='c_vtk_get_num_point_data_components')
+            import :: c_ptr, c_char, c_int
+            type(c_ptr), value, intent(in) :: handle
+            character(kind=c_char), intent(in) :: array_name(*)
+            integer(c_int), intent(out) :: num_components
+        end subroutine vtk_get_num_point_data_components
+
+        subroutine vtk_get_cell_data_int32(handle, array_name, ids) bind(C, name='c_vtk_get_cell_data_int32')
             import :: c_ptr, c_int, c_char
             type(c_ptr), value, intent(in) :: handle
             character(kind=c_char), intent(in) :: array_name(*)
             integer(c_int), intent(out) :: ids(*)
-        end subroutine vtk_get_cell_ids
+        end subroutine vtk_get_cell_data_int32
 
-        subroutine vtk_get_point_data(handle, array_name, point_data) bind(C, name='c_vtk_get_point_data')
+        subroutine vtk_get_cell_data_float64(handle, array_name, data) bind(C, name='c_vtk_get_cell_data_float64')
+            import :: c_ptr, c_double, c_char
+            type(c_ptr), value, intent(in) :: handle
+            character(kind=c_char), intent(in) :: array_name(*)
+            real(c_double), intent(out) :: data(*)
+        end subroutine vtk_get_cell_data_float64
+
+        subroutine vtk_get_point_data_int32(handle, array_name, point_data) bind(C, name='c_vtk_get_point_data_int32')
+            import :: c_ptr, c_int, c_char
+            type(c_ptr), value, intent(in) :: handle
+            character(kind=c_char), intent(in) :: array_name(*)
+            integer(c_int), intent(out) :: point_data(*)
+        end subroutine vtk_get_point_data_int32
+
+        subroutine vtk_get_point_data_float64(handle, array_name, point_data) bind(C, name='c_vtk_get_point_data_float64')
             import :: c_ptr, c_double, c_char
             type(c_ptr), value, intent(in) :: handle
             character(kind=c_char), intent(in) :: array_name(*)
             real(c_double), intent(out) :: point_data(*)
-        end subroutine vtk_get_point_data
+        end subroutine vtk_get_point_data_float64
 
     end interface
-
 end module core_vtk_vtk_wrapper

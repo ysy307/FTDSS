@@ -1,0 +1,977 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>read_conditions_time_controls_time_stepping &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>read_conditions_time_controls_time_stepping
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">25 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/conditions_time_controls.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/conditions_time_controls.f90.html'>conditions_time_controls.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/inout_input_conditions_time_controlss.html'>inout_input_conditions_time_controlss</a></li>
+            <li class="breadcrumb-item active" aria-current="page">read_conditions_time_controls_time_stepping</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/read_conditions_time_controls_time_stepping.html#src">read_conditions_time_controls_time_stepping</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2> subroutine read_conditions_time_controls_time_stepping(self, json)  
+</h2>
+    
+
+    <p>Load the time stepping parameters from the JSON file</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~199"></span>
+              class(<a href='../type/type_conditions.html'>type_conditions</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json~12"></span>
+              type(json_file),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>json</strong></td>
+            <td>
+                <p>JSON parser</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~read_conditions_time_controls_time_stepping~~CallsGraph Pages: 1 -->
+<svg id="procread_conditions_time_controls_time_steppingCallsGraph" width="641pt" height="313pt"
+ viewBox="0.00 0.00 641.00 312.93" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph" class="graph" transform="scale(0.66 0.66) rotate(0) translate(4 472.96)">
+<title>proc~~read_conditions_time_controls_time_stepping~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-472.96 973,-472.96 973,4 -4,4"/>
+<!-- proc~read_conditions_time_controls_time_stepping -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node1" class="node">
+<title>proc~read_conditions_time_controls_time_stepping</title>
+<polygon fill="none" stroke="black" points="253,-311.96 0,-311.96 0,-287.96 253,-287.96 253,-311.96"/>
+<text text-anchor="middle" x="126.5" y="-297.56" font-family="Helvetica,sans-Serif" font-size="10.50">read_conditions_time_controls_time_stepping</text>
+</g>
+<!-- interface~get_json_value -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node2" class="node">
+<title>interface~get_json_value</title>
+<g id="a_proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node2"><a xlink:href="../interface/get_json_value.html" xlink:title="get_json_value">
+<polygon fill="#a7506f" stroke="#a7506f" points="380,-215.96 289,-215.96 289,-191.96 380,-191.96 380,-215.96"/>
+<text text-anchor="middle" x="334.5" y="-201.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_value</text>
+</a>
+</g>
+</g>
+<!-- proc~read_conditions_time_controls_time_stepping&#45;&gt;interface~get_json_value -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge1" class="edge">
+<title>proc~read_conditions_time_controls_time_stepping&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M153.59,-287.8C190.35,-270.67 257.48,-239.39 298.53,-220.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="300.04,-223.42 307.62,-216.02 297.08,-217.07 300.04,-223.42"/>
+</g>
+<!-- proc~get_time_unit -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node3" class="node">
+<title>proc~get_time_unit</title>
+<g id="a_proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node3"><a xlink:href="../proc/get_time_unit.html" xlink:title="get_time_unit">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="377,-428.96 292,-428.96 292,-404.96 377,-404.96 377,-428.96"/>
+<text text-anchor="middle" x="334.5" y="-414.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_time_unit</text>
+</a>
+</g>
+</g>
+<!-- proc~read_conditions_time_controls_time_stepping&#45;&gt;proc~get_time_unit -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge2" class="edge">
+<title>proc~read_conditions_time_controls_time_stepping&#45;&gt;proc~get_time_unit</title>
+<path fill="none" stroke="#ff0000" d="M148.77,-312.04C185.64,-332.98 261.51,-376.07 303.65,-400"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="301.92,-403.05 312.35,-404.94 305.38,-396.96 301.92,-403.05"/>
+</g>
+<!-- proc~join -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node4" class="node">
+<title>proc~join</title>
+<g id="a_proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node4"><a xlink:href="../proc/join.html" xlink:title="join">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="845.5,-388.96 791.5,-388.96 791.5,-364.96 845.5,-364.96 845.5,-388.96"/>
+<text text-anchor="middle" x="818.5" y="-374.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">join</text>
+</a>
+</g>
+</g>
+<!-- proc~read_conditions_time_controls_time_stepping&#45;&gt;proc~join -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge3" class="edge">
+<title>proc~read_conditions_time_controls_time_stepping&#45;&gt;proc~join</title>
+<path fill="none" stroke="#ff0000" d="M235.31,-311.99C393.46,-329.64 680.47,-361.67 781.3,-372.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="780.97,-376.4 791.29,-374.03 781.74,-369.45 780.97,-376.4"/>
+</g>
+<!-- proc~raise_error -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node5" class="node">
+<title>proc~raise_error</title>
+<g id="a_proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node5"><a xlink:href="../proc/raise_error.html" xlink:title="raise_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="696,-110.96 626,-110.96 626,-86.96 696,-86.96 696,-110.96"/>
+<text text-anchor="middle" x="661" y="-96.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">raise_error</text>
+</a>
+</g>
+</g>
+<!-- proc~read_conditions_time_controls_time_stepping&#45;&gt;proc~raise_error -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge4" class="edge">
+<title>proc~read_conditions_time_controls_time_stepping&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff0000" d="M135.56,-287.78C165.83,-243.31 278.04,-89.56 416,-35.96 477.31,-12.14 500.98,-17.13 564,-35.96 592.82,-44.57 621.02,-64.92 639.31,-80.17"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="637.12,-82.91 646.99,-86.77 641.68,-77.6 637.12,-82.91"/>
+</g>
+<!-- proc~get_json_integer32 -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node6" class="node">
+<title>proc~get_json_integer32</title>
+<g id="a_proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node6"><a xlink:href="../proc/get_json_integer32.html" xlink:title="get_json_integer32">
+<polygon fill="#d9534f" stroke="#d9534f" points="547,-194.96 433,-194.96 433,-170.96 547,-170.96 547,-194.96"/>
+<text text-anchor="middle" x="490" y="-180.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_integer32</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_integer32 -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge5" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_integer32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M380.31,-197.83C393.56,-196.02 408.35,-193.99 422.64,-192.04"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="423.51,-195.45 432.94,-190.63 422.56,-188.52 423.51,-195.45"/>
+</g>
+<!-- proc~get_json_integer32_array -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node7" class="node">
+<title>proc~get_json_integer32_array</title>
+<g id="a_proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node7"><a xlink:href="../proc/get_json_integer32_array.html" xlink:title="get_json_integer32_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="564,-152.96 416,-152.96 416,-128.96 564,-128.96 564,-152.96"/>
+<text text-anchor="middle" x="490" y="-138.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_integer32_array</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_integer32_array -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge6" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_integer32_array</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M355.81,-191.91C371.77,-182.8 394.78,-170.45 416,-161.96 421.13,-159.91 426.53,-157.97 431.98,-156.15"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="433.33,-159.4 441.8,-153.03 431.21,-152.73 433.33,-159.4"/>
+</g>
+<!-- proc~get_json_logical -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node8" class="node">
+<title>proc~get_json_logical</title>
+<g id="a_proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node8"><a xlink:href="../proc/get_json_logical.html" xlink:title="get_json_logical">
+<polygon fill="#d9534f" stroke="#d9534f" points="538.5,-278.96 441.5,-278.96 441.5,-254.96 538.5,-254.96 538.5,-278.96"/>
+<text text-anchor="middle" x="490" y="-264.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_logical</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_logical -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge7" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_logical</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M355.81,-216.01C371.77,-225.12 394.78,-237.47 416,-245.96 421.13,-248.01 426.53,-249.95 431.98,-251.77"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="431.21,-255.19 441.8,-254.89 433.33,-248.52 431.21,-255.19"/>
+</g>
+<!-- proc~get_json_real64 -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node9" class="node">
+<title>proc~get_json_real64</title>
+<g id="a_proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node9"><a xlink:href="../proc/get_json_real64.html" xlink:title="get_json_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="538,-236.96 442,-236.96 442,-212.96 538,-212.96 538,-236.96"/>
+<text text-anchor="middle" x="490" y="-222.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_real64 -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge8" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M380.31,-210.09C396.36,-212.29 414.68,-214.79 431.64,-217.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="431.61,-220.64 442,-218.53 432.56,-213.71 431.61,-220.64"/>
+</g>
+<!-- proc~get_json_real64_array -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node10" class="node">
+<title>proc~get_json_real64_array</title>
+<g id="a_proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node10"><a xlink:href="../proc/get_json_real64_array.html" xlink:title="get_json_real64_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="555,-110.96 425,-110.96 425,-86.96 555,-86.96 555,-110.96"/>
+<text text-anchor="middle" x="490" y="-96.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_real64_array</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_real64_array -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge9" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_real64_array</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M343.9,-191.73C357.12,-173.4 384.53,-138.97 416,-119.96 418.97,-118.17 422.1,-116.52 425.32,-115.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="426.75,-118.21 434.61,-111.1 424.04,-111.75 426.75,-118.21"/>
+</g>
+<!-- proc~get_json_string -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node11" class="node">
+<title>proc~get_json_string</title>
+<g id="a_proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node11"><a xlink:href="../proc/get_json_string.html" xlink:title="get_json_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="536,-68.96 444,-68.96 444,-44.96 536,-44.96 536,-68.96"/>
+<text text-anchor="middle" x="490" y="-54.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_string</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_string -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge10" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_string</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M339.83,-191.84C349.44,-166.67 375.02,-108.55 416,-77.96 421.47,-73.88 427.71,-70.59 434.18,-67.94"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="435.55,-71.17 443.78,-64.49 433.18,-64.58 435.55,-71.17"/>
+</g>
+<!-- proc~get_json_string_array -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node12" class="node">
+<title>proc~get_json_string_array</title>
+<g id="a_proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node12"><a xlink:href="../proc/get_json_string_array.html" xlink:title="get_json_string_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="553,-320.96 427,-320.96 427,-296.96 553,-296.96 553,-320.96"/>
+<text text-anchor="middle" x="490" y="-306.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_string_array</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_string_array -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge11" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_string_array</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M343.9,-216.19C357.12,-234.51 384.53,-268.95 416,-287.96 418.97,-289.75 422.1,-291.4 425.32,-292.91"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="424.04,-296.17 434.61,-296.82 426.75,-289.71 424.04,-296.17"/>
+</g>
+<!-- strip -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node14" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="969,-251.96 915,-251.96 915,-227.96 969,-227.96 969,-251.96"/>
+<text text-anchor="middle" x="942" y="-237.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~get_time_unit&#45;&gt;strip -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge12" class="edge">
+<title>proc~get_time_unit&#45;&gt;strip</title>
+<path fill="none" stroke="#7fff00" d="M377.2,-421.19C490.15,-431.77 798.85,-454.68 879,-397.96 923.49,-366.47 936.06,-297.99 939.61,-262.42"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="943.12,-262.38 940.47,-252.12 936.15,-261.79 943.12,-262.38"/>
+</g>
+<!-- to_lower -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node15" class="node">
+<title>to_lower</title>
+<polygon fill="#777777" stroke="#777777" points="519,-468.96 461,-468.96 461,-444.96 519,-444.96 519,-468.96"/>
+<text text-anchor="middle" x="490" y="-454.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_lower</text>
+</g>
+<!-- proc~get_time_unit&#45;&gt;to_lower -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge13" class="edge">
+<title>proc~get_time_unit&#45;&gt;to_lower</title>
+<path fill="none" stroke="#7fff00" d="M377.04,-427.78C399.98,-433.76 428.29,-441.14 450.7,-446.98"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="449.98,-450.41 460.54,-449.54 451.75,-443.63 449.98,-450.41"/>
+</g>
+<!-- proc~join&#45;&gt;strip -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge14" class="edge">
+<title>proc~join&#45;&gt;strip</title>
+<path fill="none" stroke="#00ffff" d="M845.62,-369.7C856.87,-365.59 869.56,-359.52 879,-350.96 906.47,-326.05 924.58,-286.03 933.8,-261.46"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="937.12,-262.56 937.2,-251.96 930.53,-260.2 937.12,-262.56"/>
+</g>
+<!-- proc~replace_placeholder -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node13" class="node">
+<title>proc~replace_placeholder</title>
+<g id="a_proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node13"><a xlink:href="../proc/replace_placeholder.html" xlink:title="replace_placeholder">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="879,-148.96 758,-148.96 758,-124.96 879,-124.96 879,-148.96"/>
+<text text-anchor="middle" x="818.5" y="-134.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">replace_placeholder</text>
+</a>
+</g>
+</g>
+<!-- proc~raise_error&#45;&gt;proc~replace_placeholder -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge15" class="edge">
+<title>proc~raise_error&#45;&gt;proc~replace_placeholder</title>
+<path fill="none" stroke="#7f00ff" d="M696.13,-107.3C714.34,-111.75 737.28,-117.35 758.29,-122.49"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="757.56,-125.92 768.11,-124.89 759.23,-119.12 757.56,-125.92"/>
+</g>
+<!-- proc~raise_error&#45;&gt;strip -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge16" class="edge">
+<title>proc~raise_error&#45;&gt;strip</title>
+<path fill="none" stroke="#7f00ff" d="M696.17,-92.02C741.95,-84.71 823.83,-78.81 879,-115.96 914.05,-139.56 930.19,-189.11 936.87,-217.92"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="933.47,-218.8 938.98,-227.85 940.32,-217.34 933.47,-218.8"/>
+</g>
+<!-- to_string -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node16" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="847.5,-190.96 789.5,-190.96 789.5,-166.96 847.5,-166.96 847.5,-190.96"/>
+<text text-anchor="middle" x="818.5" y="-176.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~raise_error&#45;&gt;to_string -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge17" class="edge">
+<title>proc~raise_error&#45;&gt;to_string</title>
+<path fill="none" stroke="#7f00ff" d="M695.09,-110.96C704.13,-114.86 713.71,-119.58 722,-124.96 740.21,-136.77 739.39,-146.79 758,-157.96 764.59,-161.91 772.03,-165.28 779.36,-168.08"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="778.62,-171.52 789.21,-171.55 780.94,-164.92 778.62,-171.52"/>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;proc~raise_error -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge20" class="edge">
+<title>proc~get_json_integer32&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff0000" d="M540.43,-170.94C548.46,-168.36 556.57,-165.37 564,-161.96 590.43,-149.82 617.92,-131.06 636.67,-117.16"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="639,-119.79 644.88,-110.97 634.79,-114.2 639,-119.79"/>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;strip -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge21" class="edge">
+<title>proc~get_json_integer32&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M545.41,-195.07C551.9,-197.53 558.25,-200.47 564,-203.96 583.88,-216.05 578.63,-232.77 600,-241.96 703.03,-286.28 840.32,-263.9 904.74,-249.28"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="905.86,-252.61 914.8,-246.92 904.27,-245.79 905.86,-252.61"/>
+</g>
+<!-- get -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node17" class="node">
+<title>get</title>
+<polygon fill="#777777" stroke="#777777" points="688,-190.96 634,-190.96 634,-166.96 688,-166.96 688,-190.96"/>
+<text text-anchor="middle" x="661" y="-176.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get</text>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;get -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge18" class="edge">
+<title>proc~get_json_integer32&#45;&gt;get</title>
+<path fill="none" stroke="#ff0000" d="M547.27,-181.63C572.47,-181.03 601.46,-180.35 623.72,-179.82"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="623.84,-183.32 633.76,-179.58 623.68,-176.32 623.84,-183.32"/>
+</g>
+<!-- print_error_message -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_node18" class="node">
+<title>print_error_message</title>
+<polygon fill="#777777" stroke="#777777" points="722,-232.96 600,-232.96 600,-208.96 722,-208.96 722,-232.96"/>
+<text text-anchor="middle" x="661" y="-218.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">print_error_message</text>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;print_error_message -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge19" class="edge">
+<title>proc~get_json_integer32&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#ff0000" d="M544.47,-194.98C561.04,-198.71 579.46,-202.85 596.64,-206.71"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="596.06,-210.17 606.59,-208.95 597.6,-203.34 596.06,-210.17"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;proc~raise_error -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge24" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff8b00" d="M539.43,-128.92C563.58,-122.92 592.57,-115.72 616.08,-109.88"/>
+<polygon fill="#ff8b00" stroke="#ff8b00" points="616.92,-113.27 625.78,-107.46 615.23,-106.48 616.92,-113.27"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;strip -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge25" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;strip</title>
+<path fill="none" stroke="#ff8b00" d="M564.03,-132.38C611.5,-130.07 673.37,-133.39 722,-157.96 743.94,-169.05 736.9,-187.35 758,-199.96 803.67,-227.26 865.72,-236 904.55,-238.76"/>
+<polygon fill="#ff8b00" stroke="#ff8b00" points="904.66,-242.27 914.85,-239.39 905.09,-235.28 904.66,-242.27"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;get -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge22" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;get</title>
+<path fill="none" stroke="#ff8b00" d="M544.47,-152.98C570.3,-158.79 600.62,-165.61 623.72,-170.8"/>
+<polygon fill="#ff8b00" stroke="#ff8b00" points="623.25,-174.28 633.78,-173.06 624.79,-167.46 623.25,-174.28"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;print_error_message -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge23" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#ff8b00" d="M545.41,-153.07C551.9,-155.53 558.25,-158.47 564,-161.96 583.88,-174.05 580.47,-187.32 600,-199.96 602.6,-201.64 605.36,-203.21 608.2,-204.67"/>
+<polygon fill="#ff8b00" stroke="#ff8b00" points="606.94,-207.94 617.49,-208.95 609.87,-201.59 606.94,-207.94"/>
+</g>
+<!-- proc~get_json_logical&#45;&gt;get -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge26" class="edge">
+<title>proc~get_json_logical&#45;&gt;get</title>
+<path fill="none" stroke="#e7ff00" d="M538.87,-257.86C547.68,-254.92 556.46,-251.05 564,-245.96 585.52,-231.44 578.9,-215.08 600,-199.96 607.22,-194.79 615.83,-190.79 624.25,-187.74"/>
+<polygon fill="#e7ff00" stroke="#e7ff00" points="625.52,-191.01 633.94,-184.58 623.35,-184.35 625.52,-191.01"/>
+</g>
+<!-- proc~get_json_logical&#45;&gt;print_error_message -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge27" class="edge">
+<title>proc~get_json_logical&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#e7ff00" d="M535.4,-254.87C557.04,-248.98 583.25,-241.85 606.03,-235.65"/>
+<polygon fill="#e7ff00" stroke="#e7ff00" points="607.16,-238.97 615.89,-232.96 605.33,-232.21 607.16,-238.97"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;proc~raise_error -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge30" class="edge">
+<title>proc~get_json_real64&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#5cff00" d="M538.11,-216.11C547.17,-213.14 556.24,-209.2 564,-203.96 585.52,-189.44 582.71,-177.32 600,-157.96 612.45,-144.01 627.45,-129.27 639.33,-118.01"/>
+<polygon fill="#5cff00" stroke="#5cff00" points="641.74,-120.55 646.64,-111.15 636.95,-115.44 641.74,-120.55"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;strip -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge31" class="edge">
+<title>proc~get_json_real64&#45;&gt;strip</title>
+<path fill="none" stroke="#5cff00" d="M538.02,-235.49C546.9,-238.31 555.93,-241.76 564,-245.96 582.23,-255.43 580.62,-268.13 600,-274.96 716.94,-316.2 759.07,-306.47 879,-274.96 892.17,-271.5 905.48,-264.54 916.38,-257.73"/>
+<polygon fill="#5cff00" stroke="#5cff00" points="918.48,-260.54 924.91,-252.12 914.63,-254.69 918.48,-260.54"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;get -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge28" class="edge">
+<title>proc~get_json_real64&#45;&gt;get</title>
+<path fill="none" stroke="#5cff00" d="M535.4,-212.87C563.03,-205.35 598.1,-195.81 623.99,-188.76"/>
+<polygon fill="#5cff00" stroke="#5cff00" points="625.05,-192.1 633.78,-186.1 623.21,-185.35 625.05,-192.1"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;print_error_message -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge29" class="edge">
+<title>proc~get_json_real64&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#5cff00" d="M538.08,-223.85C554.08,-223.47 572.32,-223.03 589.74,-222.62"/>
+<polygon fill="#5cff00" stroke="#5cff00" points="589.96,-226.12 599.87,-222.38 589.79,-219.12 589.96,-226.12"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;proc~raise_error -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge34" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ff2e" d="M555.37,-98.96C575.43,-98.96 597.09,-98.96 615.47,-98.96"/>
+<polygon fill="#00ff2e" stroke="#00ff2e" points="615.6,-102.46 625.6,-98.96 615.6,-95.46 615.6,-102.46"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;strip -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge35" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;strip</title>
+<path fill="none" stroke="#00ff2e" d="M542.55,-86.94C560.61,-83.29 581.1,-79.76 600,-77.96 723.45,-66.18 777.44,-10.8 879,-81.96 923.64,-113.24 936.14,-181.81 939.64,-217.45"/>
+<polygon fill="#00ff2e" stroke="#00ff2e" points="936.18,-218.09 940.49,-227.77 943.16,-217.52 936.18,-218.09"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;get -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge32" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;get</title>
+<path fill="none" stroke="#00ff2e" d="M539.95,-111.05C548.12,-113.63 556.4,-116.61 564,-119.96 589.49,-131.21 616.34,-148.21 635.14,-161.07"/>
+<polygon fill="#00ff2e" stroke="#00ff2e" points="633.22,-164 643.43,-166.83 637.21,-158.25 633.22,-164"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;print_error_message -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge33" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#00ff2e" d="M550.34,-111.02C555.26,-113.47 559.91,-116.42 564,-119.96 593.47,-145.49 571.27,-173.6 600,-199.96 601.31,-201.16 602.7,-202.3 604.15,-203.37"/>
+<polygon fill="#00ff2e" stroke="#00ff2e" points="602.62,-206.55 612.97,-208.83 606.31,-200.59 602.62,-206.55"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;proc~raise_error -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge38" class="edge">
+<title>proc~get_json_string&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ffb9" d="M536.29,-68.21C561.04,-74.37 591.55,-81.95 616.08,-88.05"/>
+<polygon fill="#00ffb9" stroke="#00ffb9" points="615.3,-91.46 625.85,-90.47 616.99,-84.66 615.3,-91.46"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;strip -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge39" class="edge">
+<title>proc~get_json_string&#45;&gt;strip</title>
+<path fill="none" stroke="#00ffb9" d="M519.83,-44.88C589.36,-17.84 768.72,39.07 879,-41.96 935.22,-83.27 941.86,-175.41 941.76,-217.82"/>
+<polygon fill="#00ffb9" stroke="#00ffb9" points="938.26,-217.87 941.6,-227.93 945.26,-217.98 938.26,-217.87"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;get -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge36" class="edge">
+<title>proc~get_json_string&#45;&gt;get</title>
+<path fill="none" stroke="#00ffb9" d="M536.01,-65.47C545.71,-68.49 555.57,-72.54 564,-77.96 584.68,-91.25 583.22,-101.99 600,-119.96 612.76,-133.62 627.76,-148.37 639.56,-159.7"/>
+<polygon fill="#00ffb9" stroke="#00ffb9" points="637.16,-162.24 646.81,-166.61 641.99,-157.18 637.16,-162.24"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;print_error_message -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge37" class="edge">
+<title>proc~get_json_string&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#00ffb9" d="M536.07,-62.43C546.33,-65.57 556.42,-70.43 564,-77.96 604.11,-117.8 561.03,-159 600,-199.96 601.05,-201.06 602.15,-202.1 603.31,-203.09"/>
+<polygon fill="#00ffb9" stroke="#00ffb9" points="601.39,-206.01 611.59,-208.85 605.38,-200.26 601.39,-206.01"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;proc~raise_error -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge42" class="edge">
+<title>proc~get_json_string_array&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00b9ff" d="M551.98,-296.96C556.39,-294.49 560.47,-291.52 564,-287.96 606.18,-245.36 569.59,-209.63 600,-157.96 609.18,-142.36 623.52,-128.05 635.88,-117.42"/>
+<polygon fill="#00b9ff" stroke="#00b9ff" points="638.17,-120.07 643.65,-111 633.71,-114.68 638.17,-120.07"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;strip -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge43" class="edge">
+<title>proc~get_json_string_array&#45;&gt;strip</title>
+<path fill="none" stroke="#00b9ff" d="M551.33,-320.98C630.15,-333.79 770.82,-346.56 879,-300.96 898.82,-292.6 915.78,-274.66 926.92,-260.39"/>
+<polygon fill="#00b9ff" stroke="#00b9ff" points="929.93,-262.21 933.09,-252.09 924.31,-258.03 929.93,-262.21"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;get -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge40" class="edge">
+<title>proc~get_json_string_array&#45;&gt;get</title>
+<path fill="none" stroke="#00b9ff" d="M550.82,-296.86C555.59,-294.42 560.07,-291.48 564,-287.96 595.45,-259.74 569.36,-229.06 600,-199.96 606.69,-193.61 615.4,-189.17 624.1,-186.06"/>
+<polygon fill="#00b9ff" stroke="#00b9ff" points="625.28,-189.37 633.82,-183.1 623.23,-182.67 625.28,-189.37"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;print_error_message -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge41" class="edge">
+<title>proc~get_json_string_array&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#00b9ff" d="M541.29,-296.87C549.05,-294.33 556.86,-291.36 564,-287.96 591.37,-274.92 619.43,-254.33 638.09,-239.41"/>
+<polygon fill="#00b9ff" stroke="#00b9ff" points="640.42,-242.03 645.97,-233.01 636,-236.6 640.42,-242.03"/>
+</g>
+<!-- proc~replace_placeholder&#45;&gt;strip -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CallsGraph_edge44" class="edge">
+<title>proc~replace_placeholder&#45;&gt;strip</title>
+<path fill="none" stroke="#002eff" d="M863.26,-149.03C868.82,-151.52 874.22,-154.47 879,-157.96 901.21,-174.2 919.15,-200.61 929.91,-219.05"/>
+<polygon fill="#002eff" stroke="#002eff" points="926.92,-220.87 934.87,-227.88 933.02,-217.45 926.92,-220.87"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocread_conditions_time_controls_time_steppingCallsGraph = svgPanZoom('#procread_conditions_time_controls_time_steppingCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~read_conditions_time_controls_time_stepping~~CalledByGraph Pages: 1 -->
+<svg id="procread_conditions_time_controls_time_steppingCalledByGraph" width="641pt" height="17pt"
+ viewBox="0.00 0.00 641.00 16.72" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~read_conditions_time_controls_time_stepping~~CalledByGraph" class="graph" transform="scale(0.52 0.52) rotate(0) translate(4 28)">
+<title>proc~~read_conditions_time_controls_time_stepping~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 1223,-28 1223,4 -4,4"/>
+<!-- proc~read_conditions_time_controls_time_stepping -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CalledByGraph_node1" class="node">
+<title>proc~read_conditions_time_controls_time_stepping</title>
+<polygon fill="none" stroke="black" points="1219,-24 966,-24 966,0 1219,0 1219,-24"/>
+<text text-anchor="middle" x="1092.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">read_conditions_time_controls_time_stepping</text>
+</g>
+<!-- proc~read_conditions_time_controls -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CalledByGraph_node2" class="node">
+<title>proc~read_conditions_time_controls</title>
+<g id="a_proc~~read_conditions_time_controls_time_stepping~~CalledByGraph_node2"><a xlink:href="../proc/read_conditions_time_controls.html" xlink:title="read_conditions_time_controls">
+<polygon fill="#d9534f" stroke="#d9534f" points="930,-24 757,-24 757,0 930,0 930,-24"/>
+<text text-anchor="middle" x="843.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_conditions_time_controls</text>
+</a>
+</g>
+</g>
+<!-- proc~read_conditions_time_controls&#45;&gt;proc~read_conditions_time_controls_time_stepping -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CalledByGraph_edge1" class="edge">
+<title>proc~read_conditions_time_controls&#45;&gt;proc~read_conditions_time_controls_time_stepping</title>
+<path fill="none" stroke="#ff0000" d="M930.2,-12C938.51,-12 947.07,-12 955.72,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="955.9,-15.5 965.9,-12 955.9,-8.5 955.9,-15.5"/>
+</g>
+<!-- interface~read_conditions_time_controls -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CalledByGraph_node3" class="node">
+<title>interface~read_conditions_time_controls</title>
+<g id="a_proc~~read_conditions_time_controls_time_stepping~~CalledByGraph_node3"><a xlink:href="../interface/read_conditions_time_controls.html" xlink:title="type_conditions%read_conditions_time_controls">
+<polygon fill="#a7506f" stroke="#a7506f" points="721,-24 455,-24 455,0 721,0 721,-24"/>
+<text text-anchor="middle" x="588" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_conditions%read_conditions_time_controls</text>
+</a>
+</g>
+</g>
+<!-- interface~read_conditions_time_controls&#45;&gt;proc~read_conditions_time_controls -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CalledByGraph_edge2" class="edge">
+<title>interface~read_conditions_time_controls&#45;&gt;proc~read_conditions_time_controls</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M721.32,-12C729.85,-12 738.35,-12 746.67,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="746.7,-15.5 756.7,-12 746.7,-8.5 746.7,-15.5"/>
+</g>
+<!-- proc~initialize_type_conditions -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CalledByGraph_node4" class="node">
+<title>proc~initialize_type_conditions</title>
+<g id="a_proc~~read_conditions_time_controls_time_stepping~~CalledByGraph_node4"><a xlink:href="../proc/initialize_type_conditions.html" xlink:title="initialize_type_conditions">
+<polygon fill="#d9534f" stroke="#d9534f" points="419,-24 274,-24 274,0 419,0 419,-24"/>
+<text text-anchor="middle" x="346.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_type_conditions</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_conditions&#45;&gt;interface~read_conditions_time_controls -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CalledByGraph_edge3" class="edge">
+<title>proc~initialize_type_conditions&#45;&gt;interface~read_conditions_time_controls</title>
+<path fill="none" stroke="#ff0000" d="M419.03,-12C427.35,-12 436.03,-12 444.88,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="444.94,-15.5 454.94,-12 444.94,-8.5 444.94,-15.5"/>
+</g>
+<!-- interface~initialize_type_conditions -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CalledByGraph_node5" class="node">
+<title>interface~initialize_type_conditions</title>
+<g id="a_proc~~read_conditions_time_controls_time_stepping~~CalledByGraph_node5"><a xlink:href="../interface/initialize_type_conditions.html" xlink:title="type_conditions%initialize_type_conditions">
+<polygon fill="#a7506f" stroke="#a7506f" points="238,-24 0,-24 0,0 238,0 238,-24"/>
+<text text-anchor="middle" x="119" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_conditions%initialize_type_conditions</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_conditions&#45;&gt;proc~initialize_type_conditions -->
+<g id="proc~~read_conditions_time_controls_time_stepping~~CalledByGraph_edge4" class="edge">
+<title>interface~initialize_type_conditions&#45;&gt;proc~initialize_type_conditions</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M238.03,-12C246.75,-12 255.42,-12 263.84,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="263.97,-15.5 273.97,-12 263.97,-8.5 263.97,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocread_conditions_time_controls_time_steppingCalledByGraph = svgPanZoom('#procread_conditions_time_controls_time_steppingCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">read_conditions_time_controls_time_stepping</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">json</span><span class="p">)</span>
+<span class="w">        </span><span class="c">!&gt; Load the time stepping parameters from the JSON file</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_conditions</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">json_file</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="c">!! JSON parser</span>
+<span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="w">        </span><span class="kt">character</span><span class="p">(:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">tmp_string</span>
+
+<span class="w">        </span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">time_controls</span>
+<span class="w">        </span><span class="n">buffer</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">time_stepping</span>
+
+<span class="w">        </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unit</span>
+<span class="w">        </span><span class="k">call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">),</span><span class="w"> </span><span class="n">tmp_string</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                            </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="n">valid_list</span><span class="o">=</span><span class="n">valid_units</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">time_control</span><span class="p">%</span><span class="n">time_stepping</span><span class="p">%</span><span class="n">unit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_time_unit</span><span class="p">(</span><span class="n">tmp_string</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">tmp_string</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">tmp_string</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">initial_step</span>
+<span class="w">        </span><span class="k">call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">time_control</span><span class="p">%</span><span class="n">time_stepping</span><span class="p">%</span><span class="n">initial_step</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                            </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="n">valid_range</span><span class="o">=</span><span class="p">[</span><span class="nb">epsilon</span><span class="p">(</span><span class="mf">0.0d0</span><span class="p">),</span><span class="w"> </span><span class="nb">huge</span><span class="p">(</span><span class="mf">0.0d0</span><span class="p">)])</span>
+
+<span class="w">        </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">min_step</span>
+<span class="w">        </span><span class="k">call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">time_control</span><span class="p">%</span><span class="n">time_stepping</span><span class="p">%</span><span class="n">min_step</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                            </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="n">valid_range</span><span class="o">=</span><span class="p">[</span><span class="nb">epsilon</span><span class="p">(</span><span class="mf">0.0d0</span><span class="p">),</span><span class="w"> </span><span class="nb">huge</span><span class="p">(</span><span class="mf">0.0d0</span><span class="p">)])</span>
+
+<span class="w">        </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max_step</span>
+<span class="w">        </span><span class="k">call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">time_control</span><span class="p">%</span><span class="n">time_stepping</span><span class="p">%</span><span class="n">max_step</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                            </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="n">valid_range</span><span class="o">=</span><span class="p">[</span><span class="nb">epsilon</span><span class="p">(</span><span class="mf">0.0d0</span><span class="p">),</span><span class="w"> </span><span class="nb">huge</span><span class="p">(</span><span class="mf">0.0d0</span><span class="p">)])</span>
+
+<span class="w">        </span><span class="c">! Custom validation for time step consistency</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">time_control</span><span class="p">%</span><span class="n">time_stepping</span><span class="p">%</span><span class="n">min_step</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">time_control</span><span class="p">%</span><span class="n">time_stepping</span><span class="p">%</span><span class="n">max_step</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">raise_error</span><span class="p">(</span><span class="n">ERROR_CODES</span><span class="p">%</span><span class="n">VAR_INVALID</span><span class="p">,</span><span class="w"> </span><span class="n">opt</span><span class="o">=</span><span class="s2">&quot;In &quot;</span><span class="o">//</span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">))</span><span class="o">//</span><span class="s2">&quot;, &#39;min_step&#39; cannot be greater than &#39;max_step&#39;.&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">time_control</span><span class="p">%</span><span class="n">time_stepping</span><span class="p">%</span><span class="n">initial_step</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">time_control</span><span class="p">%</span><span class="n">time_stepping</span><span class="p">%</span><span class="n">min_step</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">time_control</span><span class="p">%</span><span class="n">time_stepping</span><span class="p">%</span><span class="n">initial_step</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">time_control</span><span class="p">%</span><span class="n">time_stepping</span><span class="p">%</span><span class="n">max_step</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">raise_error</span><span class="p">(</span><span class="n">ERROR_CODES</span><span class="p">%</span><span class="n">VAR_INVALID</span><span class="p">,</span><span class="w"> </span><span class="n">opt</span><span class="o">=</span><span class="s2">&quot;In &quot;</span><span class="o">//</span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">))</span><span class="o">//</span><span class="s2">&quot;, &#39;initial_step&#39; must be between &#39;min_step&#39; and &#39;max_step&#39;.&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+<span class="k">    end subroutine </span><span class="n">read_conditions_time_controls_time_stepping</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 12:12 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>
