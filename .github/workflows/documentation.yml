@@ -60,9 +60,8 @@ jobs:
       - name: Upgrade pip & Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
-          # Install Ford for documentation generation
           python -m pip install --upgrade ford
-          # Pin the Markdown version for consistent output
+          python -m pip install --upgrade fypp
           python -m pip install markdown==3.3.4
 
       # Step 6: Verify the installed Ford version for debugging purposes
