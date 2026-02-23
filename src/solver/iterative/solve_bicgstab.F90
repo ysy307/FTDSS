@@ -15,7 +15,7 @@ contains
 
         integer(int32) :: ierr
 
-        self%id = solver_settings%id
+        self%ID = solver_settings%ID
         self%name = "BiCGSTAB"
 
         self%num_nodes = solver_settings%num_nodes
@@ -34,7 +34,7 @@ contains
         call self%residual_history%initialize(self%max_iterations)
         self%current_iteration = 0
 
-        self%status = SOLVER_STATUS%SUCCESS%id
+        self%status = SOLVER_STATUS%SUCCESS%ID
 
         ! Setup preconditioner
         call create_preconditioner(self%pc, preconditioner_settings, ierr)
@@ -107,7 +107,7 @@ contains
                 self%current_iteration = iter
                 call self%residual_history%set(MATRIX_OPS%INS, iter, vector_norm2(self%r))
                 call x%copy(self%x)
-                self%status = SOLVER_STATUS%SUCCESS%id
+                self%status = SOLVER_STATUS%SUCCESS%ID
                 return
             end if
 
@@ -141,7 +141,7 @@ contains
 
             ! 22: omega breakdown check
             if (omega == 0.0d0) then
-                self%status = SOLVER_STATUS%BREAKDOWN%id
+                self%status = SOLVER_STATUS%BREAKDOWN%ID
                 return
             end if
 
@@ -156,7 +156,7 @@ contains
             call self%residual_history%set(MATRIX_OPS%INS, iter, resid)
             if (resid < self%tolerance) then
                 self%current_iteration = iter
-                self%status = SOLVER_STATUS%SUCCESS%id
+                self%status = SOLVER_STATUS%SUCCESS%ID
                 call x%copy(self%x)
                 return
             end if
@@ -166,7 +166,7 @@ contains
             if (was_interrupted()) stop
         end do
         self%current_iteration = iter
-        self%status = SOLVER_STATUS%MAXITER%id
+        self%status = SOLVER_STATUS%MAXITER%ID
         call x%copy(self%x)
 
     end subroutine solve_type_solver_bicgstab
@@ -177,7 +177,7 @@ contains
         !> Solver instance to be destroyed
         class(type_solver_bicgstab), intent(inout) :: self
 
-        self%id = -1
+        self%ID = -1
         if (allocated(self%name)) deallocate (self%name)
         self%num_nodes = -1
         self%tolerance = 0.0d0
@@ -198,6 +198,6 @@ contains
             deallocate (self%pc)
         end if
 
-        self%status = SOLVER_STATUS%SUCCESS%id
+        self%status = SOLVER_STATUS%SUCCESS%ID
     end subroutine destroy_type_solver_bicgstab
 end submodule solve_type_solver_bicgstab

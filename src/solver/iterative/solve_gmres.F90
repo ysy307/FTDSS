@@ -15,7 +15,7 @@ contains
 
         integer(int32) :: i, ierr
 
-        self%id = solver_settings%id
+        self%ID = solver_settings%ID
         self%name = "GMRES"
 
         self%num_nodes = solver_settings%num_nodes
@@ -120,7 +120,7 @@ contains
 
             ! Convergence check (Initial)
             if (beta < self%tolerance) then
-                self%status = SOLVER_STATUS%SUCCESS%id
+                self%status = SOLVER_STATUS%SUCCESS%ID
                 exit restart_loop
             end if
 
@@ -218,7 +218,7 @@ contains
                 end if
 
                 if (iter_global >= self%max_iterations) then
-                    self%status = SOLVER_STATUS%MAXITER%id
+                    self%status = SOLVER_STATUS%MAXITER%ID
                     exit arnoldi_loop
                 end if
 
@@ -247,11 +247,11 @@ contains
             ! Restart Check
             ! ======================================================
             if (converged) then
-                self%status = SOLVER_STATUS%SUCCESS%id
+                self%status = SOLVER_STATUS%SUCCESS%ID
                 exit restart_loop
             end if
 
-            if (self%status == SOLVER_STATUS%MAXITER%id) then
+            if (self%status == SOLVER_STATUS%MAXITER%ID) then
                 exit restart_loop
             end if
 
@@ -266,7 +266,7 @@ contains
         class(type_solver_gmres), intent(inout) :: self
         integer(int32) :: i
 
-        self%id = -1
+        self%ID = -1
         if (allocated(self%name)) deallocate (self%name)
 
         ! Release vector arrays
@@ -292,7 +292,7 @@ contains
             deallocate (self%pc)
         end if
 
-        self%status = SOLVER_STATUS%SUCCESS%id
+        self%status = SOLVER_STATUS%SUCCESS%ID
     end subroutine destroy_type_solver_gmres
 
     !> Generate Givens rotation coefficients \( c \) (cosine) and \( s \) (sine).

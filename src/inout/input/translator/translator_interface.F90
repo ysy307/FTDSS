@@ -5,11 +5,11 @@ module inout_input_translator
     implicit none
     private
 
-
     type :: type_input_translator
     contains
         procedure, private, pass(self) :: execute_condition_boundary
-        generic :: execute => execute_condition_boundary
+        procedure, private, pass(self) :: execute_basic_swcc
+        generic :: execute => execute_condition_boundary, execute_basic_swcc
     end type type_input_translator
 
     type(type_input_translator), parameter, public :: input_translator = type_input_translator()
@@ -21,8 +21,16 @@ module inout_input_translator
             class(type_input), intent(in) :: input
             integer(int32), intent(in) :: index
             type(type_constant_id), intent(in) :: target_physics
-            type(type_config_bc), intent(inout) :: config
+            class(abst_config), intent(inout) :: config
         end subroutine execute_condition_boundary
+
+        module subroutine execute_basic_swcc(self, input, material_id, config)
+            implicit none
+            class(type_input_translator), intent(in) :: self
+            class(type_input), intent(in) :: input
+            integer(int32), intent(in) :: material_id
+            class(abst_config), intent(inout) :: config
+        end subroutine execute_basic_swcc
     end interface
 
 ! contains

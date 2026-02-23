@@ -24,16 +24,16 @@ contains
             do i = 1, IC_TARGETS%NUM_ID
 
                 select case (i)
-                case (IC_TARGETS%THERMAL%id)
+                case (IC_TARGETS%THERMAL%ID)
                     if (.not. p%basic%analysis_controls%is_active(i)) cycle
                     buffer(2) = thermal
-                case (IC_TARGETS%HYDRAULIC%id)
+                case (IC_TARGETS%HYDRAULIC%ID)
                     if (.not. p%basic%analysis_controls%is_active(i)) cycle
                     buffer(2) = hydraulic
-                case (IC_TARGETS%MECHANICAL%id)
+                case (IC_TARGETS%MECHANICAL%ID)
                     if (.not. p%basic%analysis_controls%is_active(i)) cycle
                     buffer(2) = mechanical
-                case (IC_TARGETS%POROSITY%id)
+                case (IC_TARGETS%POROSITY%ID)
                     buffer(2) = porosity
                 end select
                 buffer(3) = type
@@ -43,13 +43,13 @@ contains
                 self%initial_conditions%physics(i)%type = IC_METHODS%to_id(tmp_string)
 
                 select case (self%initial_conditions%physics(i)%type)
-                case (IC_METHODS%UNIFORM%id)
+                case (IC_METHODS%UNIFORM%ID)
                     buffer(3) = value
                     call get_json_value(json, join(buffer), self%initial_conditions%physics(i)%value, &
                                         is_required=.true.)
-                case (IC_METHODS%LAPLACE%id)
+                case (IC_METHODS%LAPLACE%ID)
                     ! No additional parameters needed for laplace
-                case (IC_METHODS%FROM_FILE%id)
+                case (IC_METHODS%FROM_FILE%ID)
                     buffer(3) = field_name
                     call get_json_value(json, join(buffer), self%initial_conditions%physics(i)%field_name, &
                                         is_required=.true.)
@@ -68,14 +68,14 @@ contains
         select type (p => self%parent%parent)
         type is (type_input)
 
-            if (p%basic%analysis_controls%is_active(PHYSICS_TYPES%THERMAL%id)) then
-                call display_initial_local(self%physics, "Thermal", IC_TARGETS%THERMAL%id)
+            if (p%basic%analysis_controls%is_active(PHYSICS_TYPES%THERMAL%ID)) then
+                call display_initial_local(self%physics, "Thermal", IC_TARGETS%THERMAL%ID)
             end if
-            if (p%basic%analysis_controls%is_active(PHYSICS_TYPES%HYDRAULIC%id)) then
-                call display_initial_local(self%physics, "Hydraulic", IC_TARGETS%HYDRAULIC%id)
+            if (p%basic%analysis_controls%is_active(PHYSICS_TYPES%HYDRAULIC%ID)) then
+                call display_initial_local(self%physics, "Hydraulic", IC_TARGETS%HYDRAULIC%ID)
             end if
 
-            call display_initial_local(self%physics, "Porosity", IC_TARGETS%POROSITY%id)
+            call display_initial_local(self%physics, "Porosity", IC_TARGETS%POROSITY%ID)
 
         end select
 
@@ -91,11 +91,11 @@ contains
         write (*, '(A, A)') "      Type: ", trim(IC_METHODS%to_name(fields(target_ic_id)%type))
 
         select case (fields(target_ic_id)%type)
-        case (IC_METHODS%UNIFORM%id)
+        case (IC_METHODS%UNIFORM%ID)
             write (*, '(A, F8.3)') "      Value: ", fields(target_ic_id)%value
-        case (IC_METHODS%LAPLACE%id)
+        case (IC_METHODS%LAPLACE%ID)
             write (*, '(A)') "      Value: Laplace equation will be solved"
-        case (IC_METHODS%FROM_FILE%id)
+        case (IC_METHODS%FROM_FILE%ID)
             write (*, '(A, A)') "      Field Name: ", trim(fields(target_ic_id)%field_name)
         case default
             write (*, '(A)') "      Unknown type"

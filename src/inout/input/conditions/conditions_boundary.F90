@@ -45,34 +45,34 @@ contains
                 buffer(1) = boundary_conditions//"("//to_string(i)//")"
                 ! 必須のIDを読み込む
                 buffer(2) = id
-                call get_json_value(json, join(buffer(1:2)), self%boundary_conditions(i)%id, is_required=.true.)
+                call get_json_value(json, join(buffer(1:2)), self%boundary_conditions(i)%ID, is_required=.true.)
 
                 do j = 1, PHYSICS_TYPES%NUM_ID
                     ! do j = 1, NUM_PHYSICS_TYPES
                     if (p%basic%analysis_controls%is_active(j)) then
                         select case (j)
-                        case (PHYSICS_TYPES%THERMAL%id)
+                        case (PHYSICS_TYPES%THERMAL%ID)
                             buffer(2) = calculate_thermal
-                        case (PHYSICS_TYPES%HYDRAULIC%id)
+                        case (PHYSICS_TYPES%HYDRAULIC%ID)
                             buffer(2) = calculate_hydraulic
-                        case (PHYSICS_TYPES%MECHANICAL%id)
+                        case (PHYSICS_TYPES%MECHANICAL%ID)
                             buffer(2) = calculate_mechanical
                         end select
                         call get_json_value(json, join(buffer(1:2)), self%boundary_conditions(i)%physics(j)%is_active, &
                                             is_required=.true.)
                         if (self%boundary_conditions(i)%physics(j)%is_active) then
                             select case (j)
-                            case (PHYSICS_TYPES%THERMAL%id)
+                            case (PHYSICS_TYPES%THERMAL%ID)
                                 physics_type = PHYSICS_TYPES%THERMAL
                                 ! self%boundary_conditions(i)%physics(j)%state%physics_type = PHYSICS_TYPES%THERMAL
                                 buffer(2) = thermal
                                 valid_list => valid_thermal_boundary_types
-                            case (PHYSICS_TYPES%HYDRAULIC%id)
+                            case (PHYSICS_TYPES%HYDRAULIC%ID)
                                 physics_type = PHYSICS_TYPES%HYDRAULIC
                                 ! self%boundary_conditions(i)%physics(j)%state%physics_type = PHYSICS_TYPES%HYDRAULIC
                                 buffer(2) = hydraulic
                                 valid_list => valid_hydraulic_boundary_types
-                            case (PHYSICS_TYPES%MECHANICAL%id)
+                            case (PHYSICS_TYPES%MECHANICAL%ID)
                                 physics_type = PHYSICS_TYPES%MECHANICAL
                                 ! self%boundary_conditions(i)%physics(j)%state%physics_type = PHYSICS_TYPES%MECHANICAL
                                 buffer(2) = mechanical
@@ -183,7 +183,7 @@ contains
         implicit none
         class(type_boundary_conditions), intent(in) :: self
 
-        ! write (*, '(a, i0, a)') "  ■ Boundary Condition (ID: ", self%id, ") -------------------"
+        ! write (*, '(a, i0, a)') "  ■ Boundary Condition (ID: ", self%ID, ") -------------------"
         ! if (associated(self%parent)) then
         !     ! 次に、祖父母ポインタが有効かチェックする
         !     if (associated(self%parent%parent)) then

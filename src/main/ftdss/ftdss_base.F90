@@ -23,7 +23,7 @@ contains
 
         profiler_labels = [character(len=10) :: "IO", "Setup", "Assemble", "Solve", "Total"]
         call self%controls%profiler%initialize(profiler_labels)
-        call self%controls%profiler%record(TIME_RECORDS%START%id)
+        call self%controls%profiler%record(TIME_RECORDS%START%ID)
         call self%controls%profiler%start("Total")
 
         ! call setup_handler()
@@ -54,16 +54,16 @@ contains
 
         max_bdf_order = input%basic%solver_settings%bdf_order
         call self%porosity%initialize(num_nodes, max_bdf_order)
-        call ic%apply(IC_TARGETS%POROSITY%id, self%porosity)
+        call ic%apply(IC_TARGETS%POROSITY%ID, self%porosity)
 
         if (self%is_active_thermal()) then
             call self%temperature%initialize(num_nodes, max_bdf_order)
-            call ic%apply(IC_TARGETS%THERMAL%id, self%temperature)
+            call ic%apply(IC_TARGETS%THERMAL%ID, self%temperature)
         end if
 
         if (self%is_active_hydraulic()) then
             call self%pressure%initialize(num_nodes, max_bdf_order)
-            call ic%apply(IC_TARGETS%HYDRAULIC%id, self%pressure)
+            call ic%apply(IC_TARGETS%HYDRAULIC%ID, self%pressure)
         end if
 
         call self%Qw%initialize(num_nodes, max_bdf_order)
@@ -210,7 +210,7 @@ contains
         if (self%controls%is_physics_active(variable_id)) then
             call self%domain%get_num_nodes(num_nodes)
             call self%domain%get_num_dofs_per_node(num_dofs_per_node)
-            call self%domain%get_target_dof(variable_id%id, target_dof)
+            call self%domain%get_target_dof(variable_id%ID, target_dof)
 
             call allocate_array(variable, num_nodes)
 
@@ -255,7 +255,7 @@ contains
         if (self%controls%is_physics_active(variable_id)) then
             call self%domain%get_num_nodes(num_nodes)
             call self%domain%get_num_dofs_per_node(num_dofs_per_node)
-            call self%domain%get_target_dof(variable_id%id, target_dof)
+            call self%domain%get_target_dof(variable_id%ID, target_dof)
 
             call allocate_array(variable, num_nodes)
 
@@ -498,7 +498,7 @@ contains
 
         ! --- Stop and Record Profiler ---
         call self%controls%profiler%stop("Total")
-        call self%controls%profiler%record(TIME_RECORDS%END%id)
+        call self%controls%profiler%record(TIME_RECORDS%END%ID)
 
         ! --- Extract Profiling Data ---
         ! Get primitive data from the profiler to avoid dependency in the logger

@@ -54,7 +54,7 @@ contains
         real(real64), intent(in) :: h
         real(real64), intent(inout) :: kr
 
-        associate (params => self%parent%params)
+        associate (params => self%parent%config)
             call calc_kr_mvg(params%theta_s, params%theta_r, params%alpha1, params%n1, params%m1, params%l, params%h_crit, h, kr)
         end associate
 

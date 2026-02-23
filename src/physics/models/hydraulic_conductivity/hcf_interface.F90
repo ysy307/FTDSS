@@ -9,7 +9,7 @@ module physics_models_hcf
     private
 
     public :: abst_hcf
-    public :: type_hcf_params
+    ! public :: type_config_hcf
     public :: holder_hcfs
     public :: type_hcf_base
     public :: type_hcf_impedance
@@ -19,54 +19,54 @@ module physics_models_hcf
     public :: type_hcf_impedance_viscosity
     public :: type_hcf_base_impedance_viscosity
 
-    type :: type_hcf_params
-        integer(int32) :: unit_id
-        integer(int32) :: model_number
-        integer(int32) :: hcf_model_number
-        integer(int32) :: water_viscosity_model
-        real(real64) :: k_s
-        real(real64) :: theta_r
-        real(real64) :: theta_s
-        real(real64) :: alpha1
-        real(real64) :: n1
-        real(real64) :: m1
-        real(real64) :: h_crit
-        real(real64) :: alpha2
-        real(real64) :: n2
-        real(real64) :: m2
-        real(real64) :: w1
-        real(real64) :: w2
-        real(real64) :: l
-        real(real64) :: omega
-        real(real64) :: gain_factor
-    contains
-        procedure, pass(self), public :: reset => reset_params_hcf
-        procedure, pass(self), public :: copy => copy_params_hcf
-        procedure, pass(self), public :: convert => convert_params_hcf
-    end type type_hcf_params
+    ! type :: type_config_hcf
+    !     integer(int32) :: unit_id
+    !     integer(int32) :: model_number
+    !     integer(int32) :: hcf_model_number
+    !     integer(int32) :: water_viscosity_model
+    !     real(real64) :: k_s
+    !     real(real64) :: theta_r
+    !     real(real64) :: theta_s
+    !     real(real64) :: alpha1
+    !     real(real64) :: n1
+    !     real(real64) :: m1
+    !     real(real64) :: h_crit
+    !     real(real64) :: alpha2
+    !     real(real64) :: n2
+    !     real(real64) :: m2
+    !     real(real64) :: w1
+    !     real(real64) :: w2
+    !     real(real64) :: l
+    !     real(real64) :: omega
+    !     real(real64) :: gain_factor
+    ! contains
+    !     procedure, pass(self), public :: reset => reset_config_hcf
+    !     procedure, pass(self), public :: copy => copy_config_hcf
+    !     procedure, pass(self), public :: convert => convert_config_hcf
+    ! end type type_config_hcf
 
-    interface
-        module subroutine reset_params_hcf(self)
-            implicit none
-            class(type_hcf_params), intent(inout) :: self
+    ! interface
+    !     module subroutine reset_config_hcf(self)
+    !         implicit none
+    !         class(type_config_hcf), intent(inout) :: self
 
-        end subroutine reset_params_hcf
+    !     end subroutine reset_config_hcf
 
-        module subroutine copy_params_hcf(self, source)
-            implicit none
-            class(type_hcf_params), intent(inout) :: self
-            type(type_hcf_params), intent(in) :: source
+    !     module subroutine copy_config_hcf(self, source)
+    !         implicit none
+    !         class(type_config_hcf), intent(inout) :: self
+    !         type(type_config_hcf), intent(in) :: source
 
-        end subroutine copy_params_hcf
+    !     end subroutine copy_config_hcf
 
-        module subroutine convert_params_hcf(self, unit_id, factor)
-            implicit none
-            class(type_hcf_params), intent(inout) :: self
-            integer(int32), intent(in) :: unit_id
-            real(real64), intent(in), optional :: factor
+    !     module subroutine convert_config_hcf(self, unit_id, factor)
+    !         implicit none
+    !         class(type_config_hcf), intent(inout) :: self
+    !         integer(int32), intent(in) :: unit_id
+    !         real(real64), intent(in), optional :: factor
 
-        end subroutine convert_params_hcf
-    end interface
+    !     end subroutine convert_config_hcf
+    ! end interface
 
     type :: holder_hcfs
         class(abst_hcf), allocatable :: p
@@ -75,11 +75,11 @@ module physics_models_hcf
     end type holder_hcfs
 
     interface
-        module subroutine initialize_holder_hcfs(self, material_id, params, water, ice)
+        module subroutine initialize_holder_hcfs(self, material_id, config, water, ice)
             implicit none
             class(holder_hcfs), intent(inout) :: self
             integer(int32), intent(in) :: material_id
-            type(type_hcf_params), intent(in) :: params
+            type(type_config_hcf), intent(in) :: config
             type(type_iapws97), intent(in), target :: water
             type(type_iapws06), intent(in), target :: ice
 
@@ -144,7 +144,7 @@ module physics_models_hcf
 
     type, extends(abst_physics), abstract :: abst_hcf
         private
-        type(type_hcf_params) :: params
+        type(type_config_hcf) :: config
         class(abst_hcf_base), allocatable :: base
         class(abst_hcf_impedance), allocatable :: impedance
         class(abst_hcf_viscosity), allocatable :: viscosity
@@ -159,11 +159,10 @@ module physics_models_hcf
     end type abst_hcf
 
     interface
-        module subroutine initialize_abst_hcf(self, material_id, params, water, ice)
+        module subroutine initialize_abst_hcf(self, material_id, water, ice)
             implicit none
             class(abst_hcf), intent(inout), target :: self
             integer(int32), intent(in) :: material_id
-            type(type_hcf_params), intent(in) :: params
             type(type_iapws97), intent(in), target :: water
             type(type_iapws06), intent(in), target :: ice
 
@@ -315,7 +314,7 @@ module physics_models_hcf
 
     abstract interface
         subroutine abst_calc_base_kr(self, h, kr)
-            import :: abst_hcf_base, type_hcf_params, real64
+            import :: abst_hcf_base, real64
             implicit none
             class(abst_hcf_base), intent(in) :: self
             real(real64), intent(in) :: h

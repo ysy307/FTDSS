@@ -34,7 +34,7 @@ contains
         real(real64), intent(in) :: h
         real(real64), intent(inout) :: kr
 
-        associate (params => self%parent%params)
+        associate (params => self%parent%config)
             call calc_kr_durner(params%alpha1, params%n1, params%m1, params%w1, &
                                 params%alpha2, params%n2, params%m2, params%w2, params%l, h, kr)
         end associate

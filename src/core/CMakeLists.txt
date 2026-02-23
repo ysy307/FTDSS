@@ -80,7 +80,7 @@ list(APPEND CORE_SOURCES
     types/physics/meteorology.F90
     types/config/config_base.F90
     types/config/config_bc.F90
-    types/config/config_wrf.F90
+    types/config/config_swcc.F90
     types/math/gauss.F90
     types/matrix/matrix_interface.F90
     types/matrix/matrix_dense.F90

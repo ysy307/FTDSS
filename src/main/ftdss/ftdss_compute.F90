@@ -324,15 +324,15 @@ contains
 
         ! --- 流束の計算 (Darcy則: q = -K_wT*grad_T - K_wP*grad_P - K*grad_z) ---
         select case (computation_type)
-        case (COMP_TYPES%XY_2D%id)
+        case (COMP_TYPES%XY_2D%ID)
             water_flux%x = -K_wT * grad_T%x - K_wP * grad_P%x
             water_flux%y = -K_wT * grad_T%y - K_wP * grad_P%y
             water_flux%z = 0.0d0
-        case (COMP_TYPES%XZ_2D%id)
+        case (COMP_TYPES%XZ_2D%ID)
             water_flux%x = -K_wT * grad_T%x - K_wP * grad_P%x
             water_flux%y = 0.0d0
             water_flux%z = -K_wT * grad_T%z - K_wP * grad_P%z - gravity_term ! Zを鋴直と仮定
-        case (COMP_TYPES%XYZ_3D%id)
+        case (COMP_TYPES%XYZ_3D%ID)
             water_flux%x = -K_wT * grad_T%x - K_wP * grad_P%x
             water_flux%y = -K_wT * grad_T%y - K_wP * grad_P%y
             water_flux%z = -K_wT * grad_T%z - K_wP * grad_P%z - gravity_term ! Zを鉛直と仮定
@@ -358,15 +358,15 @@ contains
         call self%hydraulic%calc_K_vP(material_id, state, K_vP)
 
         select case (computation_type)
-        case (COMP_TYPES%XY_2D%id)
+        case (COMP_TYPES%XY_2D%ID)
             water_flux%x = -K_vT * grad_T%x - K_vP * grad_P%x
             water_flux%y = -K_vT * grad_T%y - K_vP * grad_P%y
             water_flux%z = 0.0d0
-        case (COMP_TYPES%XZ_2D%id)
+        case (COMP_TYPES%XZ_2D%ID)
             water_flux%x = -K_vT * grad_T%x - K_vP * grad_P%x
             water_flux%y = 0.0d0
             water_flux%z = -K_vT * grad_T%z - K_vP * grad_P%z
-        case (COMP_TYPES%XYZ_3D%id)
+        case (COMP_TYPES%XYZ_3D%ID)
             water_flux%x = -K_vT * grad_T%x - K_vP * grad_P%x
             water_flux%y = -K_vT * grad_T%y - K_vP * grad_P%y
             water_flux%z = -K_vT * grad_T%z - K_vP * grad_P%z

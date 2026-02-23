@@ -35,7 +35,7 @@ contains
         real(real64), intent(in) :: h
         real(real64), intent(inout) :: kr
 
-        associate (params => self%parent%params)
+        associate (params => self%parent%config)
             call calc_kr_vg(params%alpha1, params%n1, params%m1, params%l, h, kr)
         end associate
     end subroutine calc_kr_base_vg

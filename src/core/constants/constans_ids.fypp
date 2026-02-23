@@ -54,7 +54,7 @@ contains
 
         #:for i, item in enumerate(group['items'])
         ${'if' if i == 0 else 'else if'}$ (lname == strip(to_lower(self%${item[0]}$%name))) then
-            id = self%${item[0]}$%id
+            id = self%${item[0]}$%ID
         #:endfor
         else
             id = -1
@@ -73,7 +73,7 @@ contains
         character(len=:), allocatable :: name
 
         #:for i, item in enumerate(group['items'])
-        ${'if' if i == 0 else 'else if'}$ (id == self%${item[0]}$%id) then
+        ${'if' if i == 0 else 'else if'}$ (id == self%${item[0]}$%ID) then
             name = self%${item[0]}$%name
         #:endfor
         else
@@ -93,7 +93,7 @@ contains
         type(type_constant_id) :: object
 
         #:for i, item in enumerate(group['items'])
-        ${'if' if i == 0 else 'else if'}$ (id == self%${item[0]}$%id) then
+        ${'if' if i == 0 else 'else if'}$ (id == self%${item[0]}$%ID) then
             object = self%${item[0]}$
         #:endfor
         else
@@ -159,7 +159,7 @@ contains
 
         if (.not. is_valid) return
 
-        if (object%id < ${group['id_range'][0]}$ .or. object%id > ${group['id_range'][1]}$) then
+        if (object%ID < ${group['id_range'][0]}$ .or. object%ID > ${group['id_range'][1]}$) then
             is_valid = .false.
         else
             is_valid = .true.

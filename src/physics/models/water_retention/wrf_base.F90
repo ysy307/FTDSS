@@ -101,20 +101,20 @@ contains
             deallocate (self%p)
         end if
 
-        if (config%model == SWCC_MODELS%BC) then
+        if (config%swcc_model == SWCC_MODELS%BC) then
             allocate (type_wrf_bc :: self%p)
-        else if (config%model == SWCC_MODELS%VG) then
+        else if (config%swcc_model == SWCC_MODELS%VG) then
             allocate (type_wrf_vg :: self%p)
-        else if (config%model == SWCC_MODELS%KO) then
+        else if (config%swcc_model == SWCC_MODELS%KO) then
             allocate (type_wrf_ko :: self%p)
-        else if (config%model == SWCC_MODELS%MVG) then
+        else if (config%swcc_model == SWCC_MODELS%MVG) then
             allocate (type_wrf_mvg :: self%p)
-        else if (config%model == SWCC_MODELS%DURNER) then
+        else if (config%swcc_model == SWCC_MODELS%DURNER) then
             allocate (type_wrf_durner :: self%p)
-        else if (config%model == SWCC_MODELS%DVGCH) then
+        else if (config%swcc_model == SWCC_MODELS%DVGCH) then
             allocate (type_wrf_dvgch :: self%p)
         else
-            write (*, *) 'Error: Unknown WRF model ', config%model
+            write (*, *) 'Error: Unknown WRF model ', config%swcc_model
             stop
         end if
         call self%p%initialize(config)

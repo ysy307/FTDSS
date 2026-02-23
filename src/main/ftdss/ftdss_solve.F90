@@ -156,7 +156,7 @@ contains
                     current_norm = 0.0d0
                     call self%controls%iteration%get_current_residual_norm(PHYSICS_TYPES%THERMAL, NORM_TYPES%LINF, current_norm)
                     ! [Debug output skipped]
-                    if (current_norm > switch_norm(PHYSICS_TYPES%THERMAL%id)) then
+                    if (current_norm > switch_norm(PHYSICS_TYPES%THERMAL%ID)) then
                         should_switch = .false.
                     end if
                 end if
@@ -165,7 +165,7 @@ contains
                 if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
                     current_norm = 0.0d0
                     call self%controls%iteration%get_current_residual_norm(PHYSICS_TYPES%HYDRAULIC, NORM_TYPES%LINF, current_norm)
-                    if (current_norm > switch_norm(PHYSICS_TYPES%HYDRAULIC%id)) then
+                    if (current_norm > switch_norm(PHYSICS_TYPES%HYDRAULIC%ID)) then
                         should_switch = .false.
                     end if
                 end if

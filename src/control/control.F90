@@ -90,20 +90,20 @@ contains
         num_unique_regions = size(unique_material_ids)
         max_region_id = maxval(unique_material_ids)
 
-        self%is_active(PHYSICS_TYPES%THERMAL%id) = input%basic%analysis_controls%is_active(PHYSICS_TYPES%THERMAL%id)
-        if (self%is_active(PHYSICS_TYPES%THERMAL%id)) then
+        self%is_active(PHYSICS_TYPES%THERMAL%ID) = input%basic%analysis_controls%is_active(PHYSICS_TYPES%THERMAL%ID)
+        if (self%is_active(PHYSICS_TYPES%THERMAL%ID)) then
             allocate (self%thermal(max_region_id))
             self%thermal = .false.
         end if
 
-        self%is_active(PHYSICS_TYPES%HYDRAULIC%id) = input%basic%analysis_controls%is_active(PHYSICS_TYPES%HYDRAULIC%id)
-        if (self%is_active(PHYSICS_TYPES%HYDRAULIC%id)) then
+        self%is_active(PHYSICS_TYPES%HYDRAULIC%ID) = input%basic%analysis_controls%is_active(PHYSICS_TYPES%HYDRAULIC%ID)
+        if (self%is_active(PHYSICS_TYPES%HYDRAULIC%ID)) then
             allocate (self%hydraulic(max_region_id))
             self%hydraulic = .false.
         end if
 
-        self%is_active(PHYSICS_TYPES%MECHANICAL%id) = input%basic%analysis_controls%is_active(PHYSICS_TYPES%MECHANICAL%id)
-        if (self%is_active(PHYSICS_TYPES%MECHANICAL%id)) then
+        self%is_active(PHYSICS_TYPES%MECHANICAL%ID) = input%basic%analysis_controls%is_active(PHYSICS_TYPES%MECHANICAL%ID)
+        if (self%is_active(PHYSICS_TYPES%MECHANICAL%ID)) then
             allocate (self%mechanical(max_region_id))
             self%mechanical = .false.
         end if
@@ -112,19 +112,19 @@ contains
             current_material_id = unique_material_ids(i)
             if (current_material_id > size(input%basic%materials)) cycle
 
-            if (self%is_active(PHYSICS_TYPES%THERMAL%id)) then
+            if (self%is_active(PHYSICS_TYPES%THERMAL%ID)) then
                 self%thermal(current_material_id) = &
-                    input%basic%materials(current_material_id)%is_active(PHYSICS_TYPES%THERMAL%id)
+                    input%basic%materials(current_material_id)%is_active(PHYSICS_TYPES%THERMAL%ID)
             end if
 
-            if (self%is_active(PHYSICS_TYPES%HYDRAULIC%id)) then
+            if (self%is_active(PHYSICS_TYPES%HYDRAULIC%ID)) then
                 self%hydraulic(current_material_id) = &
-                    input%basic%materials(current_material_id)%is_active(PHYSICS_TYPES%HYDRAULIC%id)
+                    input%basic%materials(current_material_id)%is_active(PHYSICS_TYPES%HYDRAULIC%ID)
             end if
 
-            if (self%is_active(PHYSICS_TYPES%MECHANICAL%id)) then
+            if (self%is_active(PHYSICS_TYPES%MECHANICAL%ID)) then
                 self%mechanical(current_material_id) = &
-                    input%basic%materials(current_material_id)%is_active(PHYSICS_TYPES%MECHANICAL%id)
+                    input%basic%materials(current_material_id)%is_active(PHYSICS_TYPES%MECHANICAL%ID)
             end if
         end do
 
@@ -166,7 +166,7 @@ contains
         integer(int32), intent(in) :: material_id
         logical :: is_active
 
-        if (.not. self%is_active(target_physics%id)) then
+        if (.not. self%is_active(target_physics%ID)) then
             is_active = .false.
             return
         end if
@@ -206,10 +206,10 @@ contains
         logical :: is_active
 
         if (PHYSICS_TYPES%in_group(physics_type)) then
-            if (physics_type%id < 1 .or. physics_type%id > PHYSICS_TYPES%NUM_ID) then
+            if (physics_type%ID < 1 .or. physics_type%ID > PHYSICS_TYPES%NUM_ID) then
                 is_active = .false.
             end if
-            is_active = self%is_active(physics_type%id)
+            is_active = self%is_active(physics_type%ID)
         else
             is_active = .false.
         end if
@@ -257,13 +257,13 @@ contains
 
         write (*, '(a)') "# Control Settings"
         write (*, '(a)') "## Active Physics Types:"
-        if (self%is_active(PHYSICS_TYPES%THERMAL%id)) then
+        if (self%is_active(PHYSICS_TYPES%THERMAL%ID)) then
             write (*, '(a)') "- Thermal"
         end if
-        if (self%is_active(PHYSICS_TYPES%HYDRAULIC%id)) then
+        if (self%is_active(PHYSICS_TYPES%HYDRAULIC%ID)) then
             write (*, '(a)') "- Hydraulic"
         end if
-        if (self%is_active(PHYSICS_TYPES%MECHANICAL%id)) then
+        if (self%is_active(PHYSICS_TYPES%MECHANICAL%ID)) then
             write (*, '(a)') "- Mechanical"
         end if
 
@@ -343,7 +343,7 @@ contains
             call raise_error(ERROR_CODES%INVALID_TYPE, opt=strip(physics_type%name))
         end if
 
-        pid = physics_type%id
+        pid = physics_type%ID
         du_old => self%du_raw(:, pid)
 
         numerator = vector_dot((du_new - du_old), du_old)
@@ -375,7 +375,7 @@ contains
             call raise_error(ERROR_CODES%INVALID_TYPE, opt=strip(physics_type%name))
         end if
 
-        relaxation_factor = self%relaxation_factor(physics_type%id)
+        relaxation_factor = self%relaxation_factor(physics_type%ID)
 
     end subroutine get_aitken_relaxation
 
@@ -389,7 +389,7 @@ contains
             call raise_error(ERROR_CODES%INVALID_TYPE, opt=strip(physics_type%name))
         end if
 
-        self%du_raw(:, physics_type%id) = du(:)
+        self%du_raw(:, physics_type%ID) = du(:)
 
     end subroutine set_du_raw_aitken
 
@@ -403,7 +403,7 @@ contains
             call raise_error(ERROR_CODES%INVALID_TYPE, opt=strip(physics_type%name))
         end if
 
-        is_min_exceeded = self%relaxation_factor(physics_type%id) <= self%min_relaxation
+        is_min_exceeded = self%relaxation_factor(physics_type%ID) <= self%min_relaxation
 
     end function reach_min_relaxation_aitken
 

@@ -204,14 +204,14 @@ contains
         is_ok = .false.
 
         if (iter >= 1 .and. iter <= size(self%norms_history, 2)) then
-            self%norms_history(NORM_TYPES%L1%id, iter) = vector_norm1(vector)
-            self%norms_history(NORM_TYPES%L2%id, iter) = vector_norm2(vector)
-            self%norms_history(NORM_TYPES%LINF%id, iter) = vector_norminf(vector)
+            self%norms_history(NORM_TYPES%L1%ID, iter) = vector_norm1(vector)
+            self%norms_history(NORM_TYPES%L2%ID, iter) = vector_norm2(vector)
+            self%norms_history(NORM_TYPES%LINF%ID, iter) = vector_norminf(vector)
 
             write (*, '(A, I6, A, F12.6, A, F12.6, A, F12.6)') '    [Debug] Iteration:', iter, ' Norms - L1:', &
-                self%norms_history(NORM_TYPES%L1%id, iter), &
-                ' L2:', self%norms_history(NORM_TYPES%L2%id, iter), &
-                ' LInf:', self%norms_history(NORM_TYPES%LINF%id, iter)
+                self%norms_history(NORM_TYPES%L1%ID, iter), &
+                ' L2:', self%norms_history(NORM_TYPES%L2%ID, iter), &
+                ' LInf:', self%norms_history(NORM_TYPES%LINF%ID, iter)
         end if
 
         if (.not. self%should_check) then
@@ -224,7 +224,7 @@ contains
             return
         end if
 
-        current_norm = self%norms_history(norm_type%id, iter)
+        current_norm = self%norms_history(norm_type%ID, iter)
 
         abs_ok = (current_norm < self%absolute_tolerance)
         rel_ok = (current_norm / self%reference_value < self%relative_tolerance)
@@ -392,7 +392,7 @@ contains
         ! 設定がソルバーなし(NONE)の場合は，収束判定をスキップして常にTrueとする．
         ! これにより，1回のループ(線形ステップ)後にループを抜けることができる．
         if (self%nonlinear_solver_type == NONLINEAR_SOLVER%NONE) then
-            self%is_converged(physics_type%id) = .true.
+            self%is_converged(physics_type%ID) = .true.
             return
         end if
 
@@ -409,8 +409,8 @@ contains
         associate (control => self%config%convergence_control)
             ! --- Residual vector check ---
             if (present(residual_vector)) then
-                write (*, '(A, i0)') '    [Debug] Checking residual convergence for physics type ID: ', physics_type%id
-                is_residual_ok = control%residual(physics_type%id)%check( &
+                write (*, '(A, i0)') '    [Debug] Checking residual convergence for physics type ID: ', physics_type%ID
+                is_residual_ok = control%residual(physics_type%ID)%check( &
                                  residual_vector, self%nonlinear_iter, control%norm_type)
                 if (.not. check_residual) is_residual_ok = .true.
             else
@@ -419,8 +419,8 @@ contains
 
             ! --- Update vector check ---
             if (present(update_vector)) then
-                write (*, '(A, i0)') '    [Debug] Checking update convergence for physics type ID: ', physics_type%id
-                is_update_ok = control%update(physics_type%id)%check( &
+                write (*, '(A, i0)') '    [Debug] Checking update convergence for physics type ID: ', physics_type%ID
+                is_update_ok = control%update(physics_type%ID)%check( &
                                update_vector, self%nonlinear_iter, control%norm_type)
                 if (.not. check_update) is_update_ok = .true.
             else
@@ -429,9 +429,9 @@ contains
 
             ! --- Combine Logic (AND / OR) ---
             if (control%combination_logic == NONLINEAR_LOGIC%OR) then
-                self%is_converged(physics_type%id) = is_residual_ok .or. is_update_ok
+                self%is_converged(physics_type%ID) = is_residual_ok .or. is_update_ok
             else ! Default AND
-                self%is_converged(physics_type%id) = is_residual_ok .and. is_update_ok
+                self%is_converged(physics_type%ID) = is_residual_ok .and. is_update_ok
             end if
 
         end associate
@@ -477,7 +477,7 @@ contains
             call raise_error(ERROR_CODES%INVALID_TYPE, opt=strip(physics_type%name))
         end if
 
-        self%is_converged(physics_type%id) = converged
+        self%is_converged(physics_type%ID) = converged
     end subroutine set_converged
 
     subroutine set_diverged(self, physics_type, diverged)
@@ -490,7 +490,7 @@ contains
             call raise_error(ERROR_CODES%INVALID_TYPE, opt=strip(physics_type%name))
         end if
 
-        self%is_diverged(physics_type%id) = diverged
+        self%is_diverged(physics_type%ID) = diverged
     end subroutine set_diverged
 
     ! --- Getters ---
@@ -537,10 +537,10 @@ contains
         if (.not. PHYSICS_TYPES%is_valid(physics_type)) return
         if (.not. NORM_TYPES%is_valid(norm_type)) return
 
-        associate (criterion => self%config%convergence_control%residual(physics_type%id))
+        associate (criterion => self%config%convergence_control%residual(physics_type%ID))
             if (allocated(criterion%norms_history)) then
                 if (self%nonlinear_iter >= 1 .and. self%nonlinear_iter <= size(criterion%norms_history, 2)) then
-                    current_norm = criterion%norms_history(norm_type%id, self%nonlinear_iter)
+                    current_norm = criterion%norms_history(norm_type%ID, self%nonlinear_iter)
                 end if
             end if
         end associate
@@ -559,7 +559,7 @@ contains
 
         if (self%nonlinear_iter >= 1 .and. self%nonlinear_iter <= self%config%max_iterations) then
             current_norm = &
-                self%config%convergence_control%update(physics_type%id)%norms_history(norm_type%id, self%nonlinear_iter)
+                self%config%convergence_control%update(physics_type%ID)%norms_history(norm_type%ID, self%nonlinear_iter)
         end if
     end subroutine get_current_update_norm_iteration
 
@@ -576,10 +576,10 @@ contains
 
         if (criteria_type == NONLINEAR_NORM_CRITERIA%UPDATE) then
             absolute_tolerance = &
-                self%config%convergence_control%update(physics_type%id)%absolute_tolerance
+                self%config%convergence_control%update(physics_type%ID)%absolute_tolerance
         elseif (criteria_type == NONLINEAR_NORM_CRITERIA%RESIDUAL) then
             absolute_tolerance = &
-                self%config%convergence_control%residual(physics_type%id)%absolute_tolerance
+                self%config%convergence_control%residual(physics_type%ID)%absolute_tolerance
         end if
     end subroutine get_absolute_tolerance_iteration
 
@@ -596,10 +596,10 @@ contains
 
         if (criteria_type == NONLINEAR_NORM_CRITERIA%UPDATE) then
             relative_tolerance = &
-                self%config%convergence_control%update(physics_type%id)%relative_tolerance
+                self%config%convergence_control%update(physics_type%ID)%relative_tolerance
         elseif (criteria_type == NONLINEAR_NORM_CRITERIA%RESIDUAL) then
             relative_tolerance = &
-                self%config%convergence_control%residual(physics_type%id)%relative_tolerance
+                self%config%convergence_control%residual(physics_type%ID)%relative_tolerance
         end if
     end subroutine get_relative_tolerance_iteration
 

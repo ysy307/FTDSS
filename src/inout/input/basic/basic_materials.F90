@@ -93,7 +93,7 @@ contains
 
         buffer(1) = join([materials//"("//to_string(i_material)//")"])
         buffer(2) = id
-        call get_json_value(json, join(buffer), self%materials(i_material)%id, &
+        call get_json_value(json, join(buffer), self%materials(i_material)%ID, &
                             is_required=.true.)
 
         buffer(2) = name
@@ -102,19 +102,19 @@ contains
 
         ! if (self%analysis_controls%is_active(get_physics_type(thermal))) then
         buffer(2) = calculate_thermal
-        call get_json_value(json, join(buffer), self%materials(i_material)%is_active(PHYSICS_TYPES%THERMAL%id), &
+        call get_json_value(json, join(buffer), self%materials(i_material)%is_active(PHYSICS_TYPES%THERMAL%ID), &
                             is_required=.false., default_value=.false.)
         ! end if
 
-        ! if (self%analysis_controls%is_active(PHYSICS_TYPES%HYDRAULIC%id)) then
+        ! if (self%analysis_controls%is_active(PHYSICS_TYPES%HYDRAULIC%ID)) then
         buffer(2) = calculate_hydraulic
-        call get_json_value(json, join(buffer), self%materials(i_material)%is_active(PHYSICS_TYPES%HYDRAULIC%id), &
+        call get_json_value(json, join(buffer), self%materials(i_material)%is_active(PHYSICS_TYPES%HYDRAULIC%ID), &
                             is_required=.false., default_value=.false.)
         ! end if
 
-        ! if (self%analysis_controls%is_active(PHYSICS_TYPES%MECHANICAL%id)) then
+        ! if (self%analysis_controls%is_active(PHYSICS_TYPES%MECHANICAL%ID)) then
         buffer(2) = calculate_mechanical
-        call get_json_value(json, join(buffer), self%materials(i_material)%is_active(PHYSICS_TYPES%MECHANICAL%id), &
+        call get_json_value(json, join(buffer), self%materials(i_material)%is_active(PHYSICS_TYPES%MECHANICAL%ID), &
                             is_required=.false., default_value=.false.)
         ! end if
 
@@ -216,7 +216,7 @@ contains
 
             buffer(3) = water_viscosity_model
             call get_json_value(json, join(buffer(1:3)), hydraulic_conductivity%water_viscosity_model, &
-                                is_required=.false., default_value=HCF_VISCOSITY_TYPES%EXPONENTIAL%id, valid_range=[1, 2])
+                                is_required=.false., default_value=HCF_VISCOSITY_TYPES%EXPONENTIAL%ID, valid_range=[1, 2])
 
             buffer(3) = gain_factor
             call get_json_value(json, join(buffer(1:3)), hydraulic_conductivity%gain_factor, &
@@ -424,9 +424,9 @@ contains
 
     !     if (self%phase > 2) then
     !         if (self%phase_change%equilibrium_model%segregation) then
-    !             gcc_info = GCC_TYPES%SEGREGATION%id
+    !             gcc_info = GCC_TYPES%SEGREGATION%ID
     !         else
-    !             gcc_info = GCC_TYPES%NON_SEGREGATION%id
+    !             gcc_info = GCC_TYPES%NON_SEGREGATION%ID
     !         end if
     !     else
     !         gcc_info = -1
@@ -476,17 +476,17 @@ contains
 
         ! --- 2. Thermal Properties ---
         !     構造体はフラットですが，表示は見やすく物理現象ごとにまとめます
-        if (self%is_active(PHYSICS_TYPES%THERMAL%id)) then
+        if (self%is_active(PHYSICS_TYPES%THERMAL%ID)) then
             call display_material_thermal(self)
         end if
 
         ! --- 3. Hydraulic Properties ---
-        if (self%is_active(PHYSICS_TYPES%HYDRAULIC%id)) then
+        if (self%is_active(PHYSICS_TYPES%HYDRAULIC%ID)) then
             call display_material_hydraulic(self)
         end if
 
         ! --- 4. Mechanical Properties ---
-        if (self%is_active(PHYSICS_TYPES%MECHANICAL%id)) then
+        if (self%is_active(PHYSICS_TYPES%MECHANICAL%ID)) then
             write (*, '(a)') "  Mechanical Properties: (Not implemented)"
         end if
 
@@ -496,7 +496,7 @@ contains
         implicit none
         class(type_material_settings), intent(in) :: material
 
-        write (*, '(a, i0)') "  ID                  : ", material%id
+        write (*, '(a, i0)') "  ID                  : ", material%ID
         if (allocated(material%name)) then
             write (*, '(a, a)') "  Name                : ", trim(material%name)
         end if

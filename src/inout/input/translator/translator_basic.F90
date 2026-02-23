@@ -2,88 +2,126 @@ submodule(inout_input_translator) input_translator_basic
     implicit none
 contains
 
-    module subroutine execute_basic_wrf(self, input, material_id, config)
+    module subroutine execute_basic_swcc(self, input, material_id, config)
         implicit none
         class(type_input_translator), intent(in) :: self
         class(type_input), intent(in) :: input
         integer(int32), intent(in) :: material_id
-        type(type_config_wrf), intent(inout) :: config
+        class(abst_config), intent(inout) :: config
 
         type(type_constant_id) :: L_unit
-
         real(real64) :: scale_pressure
 
         if (material_id < 1 .or. material_id > self%basic%num_materials) then
-            error stop "Input Error: material_id is out of range in get_wrf_info."
+            error stop "Input Error: material_id is out of range."
         end if
 
-        associate (material => input%basic%materials(material_id)%water_characteristic_curve)
-            call config%reset()
+        select type (config)
 
-            config%model = SWCC_MODELS%to_object(material%model_number)
-            L_unit = PHYSICS_UNITS%to_object(material%unit)
-            config%theta_s = material%theta_s
-            config%theta_r = material%theta_r
-            config%alpha1 = material%alpha1
-            if (config%model == SWCC_MODELS%WRF_VG) then
-                config%n1 = material%n1
-                config%m1 = 1.0d0 - 1.0d0 / material%n1
-            else if (config%model == SWCC_MODELS%WRF_MVG) then
-                config%n1 = material%n1
-                config%m1 = 1.0d0 - 1.0d0 / material%n1
-                config%h_crit = material%h_crit
-            else if (config%model == SWCC_MODELS%WRF_DURNER) then
-                config%n1 = material%n1
-                config%m1 = 1.0d0 - 1.0d0 / material%n1
-                config%alpha2 = material%alpha2
-                config%n2 = material%n2
-                config%m2 = 1.0d0 - 1.0d0 / material%n2
-                config%w1 = material%w1
-                config%w2 = 1.0d0 - material%w1
-            else if (config%model == SWCC_MODELS%WRF_DVGCH) then
-                config%n1 = material%n1
-                config%m1 = 1.0d0 - 1.0d0 / material%n1
-                config%n2 = material%n2
-                config%m2 = 1.0d0 - 1.0d0 / material%n2
-                config%w1 = material%w1
-                config%w2 = 1.0d0 - material%w1
-            end if
+            !==================================================
+            ! WRF 共通処理（HCFもここを通る）
+            !==================================================
+        class is (type_config_wrf)
 
-            ! --- 変換係数の決定 ---
-            if (L_unit%id == PHYSICS_UNIT_M) then
-                ! m -> Pa (圧力の単位変換: 1 mH2O = 1000 kg/m3 * 9.80655 m/s2 = 9806.55 Pa)
-                scale_pressure = 1000.0d0 * 9.80655d0
-            else if (L_unit%id == PHYSICS_UNIT_CM) then
-                ! cm -> m -> Pa (圧力の単位変換: 1 cmH2O = 0.01 mH2O = 98.0655 Pa)
-                scale_pressure = 1000.0d0 * 9.80655d0 * 1.0d-2
-            else if (L_unit%id == PHYSICS_UNIT_PA) then
-                ! Pa -> Pa (圧力の単位変換: 1 Pa = 1 Pa)
-                scale_pressure = 1.0d0
-            else
-                scale_pressure = 1.0d0
-            end if
+            associate (material => input%basic%materials(material_id)%water_characteristic_curve)
 
-            ! --- モデルごとのパラメータ変換 ---
-            if (config%model == SWCC_MODELS%WRF_BC .or. &
-                config%model == SWCC_MODELS%WRF_KO) then
-                config%alpha1 = config%alpha1 * scale_pressure
-                config%h_crit = config%h_crit * scale_pressure
-                config%alpha2 = config%alpha2 * scale_pressure
+                call config%reset()
 
-            else if (config%model == SWCC_MODELS%WRF_VG .or. &
-                     config%model == SWCC_MODELS%WRF_DVGCH) then
-                config%alpha1 = config%alpha1 / scale_pressure
-            else if (config%model == SWCC_MODELS%WRF_VG .or. &
-                     config%model == SWCC_MODELS%WRF_MVG) then
-                config%alpha1 = config%alpha1 / scale_pressure
-                config%h_crit = config%h_crit * scale_pressure
-            else if (config%model == SWCC_MODELS%WRF_DURNER) then
-                config%alpha1 = config%alpha1 / scale_pressure
-                config%alpha2 = config%alpha2 / scale_pressure
-            end if
+                config%model = SWCC_MODELS%to_object(material%model_number)
+                L_unit = PHYSICS_UNITS%to_object(material%unit)
 
-        end associate
+                config%theta_s = material%theta_s
+                config%theta_r = material%theta_r
+                config%alpha1 = material%alpha1
 
-    end subroutine execute_basic_wrf
+                ! ---- モデル別基本設定 ----
+                select case (config%model%ID)
+
+                case (SWCC_MODELS%WRF_VG%ID)
+                    config%n1 = material%n1
+                    config%m1 = 1.0d0 - 1.0d0 / material%n1
+
+                case (SWCC_MODELS%WRF_MVG%ID)
+                    config%n1 = material%n1
+                    config%m1 = 1.0d0 - 1.0d0 / material%n1
+                    config%h_crit = material%h_crit
+
+                case (SWCC_MODELS%WRF_DURNER%ID)
+                    config%n1 = material%n1
+                    config%m1 = 1.0d0 - 1.0d0 / material%n1
+                    config%alpha2 = material%alpha2
+                    config%n2 = material%n2
+                    config%m2 = 1.0d0 - 1.0d0 / material%n2
+                    config%w1 = material%w1
+                    config%w2 = 1.0d0 - material%w1
+
+                case (SWCC_MODELS%WRF_DVGCH%ID)
+                    config%n1 = material%n1
+                    config%m1 = 1.0d0 - 1.0d0 / material%n1
+                    config%n2 = material%n2
+                    config%m2 = 1.0d0 - 1.0d0 / material%n2
+                    config%w1 = material%w1
+                    config%w2 = 1.0d0 - material%w1
+
+                end select
+
+                ! ---- 単位変換係数 ----
+                select case (L_unit%ID)
+                case (PHYSICS_UNIT_M)
+                    scale_pressure = 1000.0d0 * 9.80655d0
+                case (PHYSICS_UNIT_CM)
+                    scale_pressure = 1000.0d0 * 9.80655d0 * 1.0d-2
+                case (PHYSICS_UNIT_PA)
+                    scale_pressure = 1.0d0
+                case default
+                    scale_pressure = 1.0d0
+                end select
+
+                ! ---- モデル別スケーリング ----
+                select case (config%model%ID)
+
+                case (SWCC_MODELS%WRF_BC%ID, SWCC_MODELS%WRF_KO%ID)
+                    config%alpha1 = config%alpha1 * scale_pressure
+                    config%h_crit = config%h_crit * scale_pressure
+                    config%alpha2 = config%alpha2 * scale_pressure
+
+                case (SWCC_MODELS%WRF_VG%ID, SWCC_MODELS%WRF_DVGCH%ID)
+                    config%alpha1 = config%alpha1 / scale_pressure
+
+                case (SWCC_MODELS%WRF_MVG%ID)
+                    config%alpha1 = config%alpha1 / scale_pressure
+                    config%h_crit = config%h_crit * scale_pressure
+
+                case (SWCC_MODELS%WRF_DURNER%ID)
+                    config%alpha1 = config%alpha1 / scale_pressure
+                    config%alpha2 = config%alpha2 / scale_pressure
+
+                end select
+
+            end associate
+
+            !==================================================
+            ! HCF 追加処理（WRF処理の後に上乗せ）
+            !==================================================
+        type is (type_config_hcf)
+
+            associate (material => input%basic%materials(material_id)%water_characteristic_curve)
+
+                config%hcf_model = HCF_MODELS%to_object(material%hcf_model_number)
+                config%water_viscosity_model = VISCOSITY_MODELS%to_object(material%viscosity_model)
+
+                config%k_sat = material%k_sat
+                config%l = material%l
+                config%omega = material%omega
+                config%gain_factor = material%gain_factor
+
+            end associate
+
+        class default
+            error stop "execute_basic_swcc: unsupported config type."
+
+        end select
+
+    end subroutine execute_basic_swcc
 
 end submodule input_translator_basic

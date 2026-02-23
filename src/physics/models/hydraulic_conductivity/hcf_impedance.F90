@@ -18,7 +18,7 @@ contains
         real(real64), intent(in) :: Qice
         real(real64), intent(inout) :: kr
 
-        associate (params => self%parent%params)
+        associate (params => self%parent%config)
             call calc_impedance_exponential(params%omega, Qice, kr)
         end associate
 

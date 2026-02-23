@@ -63,7 +63,7 @@ module core_constants_error
         type(type_constant_error) :: obj
 
         obj = self%to_object(name)
-        id = obj%id
+        id = obj%ID
     end function to_id_${ERROR_CODES['suffix']}$
 
     !> Get Name from ID (Pure)
@@ -122,7 +122,7 @@ module core_constants_error
         type(type_constant_error) :: obj
 
         obj = self%to_object(id)
-        res = (obj%id /= -1)
+        res = (obj%ID /= -1)
     end function is_valid_${ERROR_CODES['suffix']}$
 
 end module core_constants_error

@@ -8,55 +8,59 @@ contains
         class(type_input), intent(in) :: input
         integer(int32), intent(in) :: index
         type(type_constant_id), intent(in) :: target_physics
-        type(type_config), intent(inout) :: config
+        class(abst_config), intent(inout) :: config
 
         integer(int32) :: i
 
-        config%boundary_id = input%conditions%boundary_conditions(index)%id
+        select type (config)
+        type is (type_config_bc)
 
-        associate (physics_data => input%conditions%boundary_conditions(index)%physics(target_physics%id))
+            config%boundary_id = input%conditions%boundary_conditions(index)%ID
 
-            if (.not. physics_data%is_active) return
+            associate (physics_data => input%conditions%boundary_conditions(index)%physics(target_physics%ID))
 
-            config%physics_type = target_physics
-            config%num_time_points = physics_data%num_time_points
+                if (.not. physics_data%is_active) return
 
-            if (target_physics == PHYSICS_TYPES%THERMAL) then
-                config%bc_kind = THERMAL_BC_TYPES%to_object(physics_data%bc_type)
-            else if (target_physics == PHYSICS_TYPES%HYDRAULIC) then
-                config%bc_kind = HYDRAULIC_BC_TYPES%to_object(physics_data%bc_type)
-            end if
+                config%physics_type = target_physics
+                config%num_time_points = physics_data%num_time_points
 
-            if (config%bc_kind == THERMAL_BC_TYPES%DIRICHLET .or. &
-                config%bc_kind == THERMAL_BC_TYPES%NEUMANN .or. &
-                config%bc_kind == THERMAL_BC_TYPES%FLUX .or. &
-                config%bc_kind == HYDRAULIC_BC_TYPES%DIRICHLET .or. &
-                config%bc_kind == HYDRAULIC_BC_TYPES%NEUMANN .or. &
-                config%bc_kind == HYDRAULIC_BC_TYPES%FLUX) then
+                if (target_physics == PHYSICS_TYPES%THERMAL) then
+                    config%bc_kind = THERMAL_BC_TYPES%to_object(physics_data%bc_type)
+                else if (target_physics == PHYSICS_TYPES%HYDRAULIC) then
+                    config%bc_kind = HYDRAULIC_BC_TYPES%to_object(physics_data%bc_type)
+                end if
 
-                config%num_variables = 1
-                call allocate_array(config%time_points, config%num_time_points)
-                call allocate_array(config%values, config%num_variables, config%num_time_points)
+                if (config%bc_kind == THERMAL_BC_TYPES%DIRICHLET .or. &
+                    config%bc_kind == THERMAL_BC_TYPES%NEUMANN .or. &
+                    config%bc_kind == THERMAL_BC_TYPES%FLUX .or. &
+                    config%bc_kind == HYDRAULIC_BC_TYPES%DIRICHLET .or. &
+                    config%bc_kind == HYDRAULIC_BC_TYPES%NEUMANN .or. &
+                    config%bc_kind == HYDRAULIC_BC_TYPES%FLUX) then
 
-                do i = 1, config%num_time_points
-                    config%time_points(i) = physics_data%values(i)%time
-                    config%values(1, i) = physics_data%values(i)%value
-                end do
+                    config%num_variables = 1
+                    call allocate_array(config%time_points, config%num_time_points)
+                    call allocate_array(config%values, config%num_variables, config%num_time_points)
 
-            else if (config%bc_kind == THERMAL_BC_TYPES%ROBIN .or. &
-                     config%bc_kind == THERMAL_BC_TYPES%CONVECTIVE .or. &
-                     config%bc_kind == THERMAL_BC_TYPES%RADIATION) then
+                    do i = 1, config%num_time_points
+                        config%time_points(i) = physics_data%values(i)%time
+                        config%values(1, i) = physics_data%values(i)%value
+                    end do
 
-                config%num_variables = 2
-                call allocate_array(config%time_points, config%num_time_points)
-                call allocate_array(config%values, config%num_variables, config%num_time_points)
+                else if (config%bc_kind == THERMAL_BC_TYPES%ROBIN .or. &
+                         config%bc_kind == THERMAL_BC_TYPES%CONVECTIVE .or. &
+                         config%bc_kind == THERMAL_BC_TYPES%RADIATION) then
 
-                ! Assign values for 2 variables here
-            else
-                config%num_variables = 0
-            end if
+                    config%num_variables = 2
+                    call allocate_array(config%time_points, config%num_time_points)
+                    call allocate_array(config%values, config%num_variables, config%num_time_points)
 
-        end associate
+                    ! Assign values for 2 variables here
+                else
+                    config%num_variables = 0
+                end if
+
+            end associate
+        end select
 
     end subroutine execute_condition_boundary
 end submodule input_translator_conditions

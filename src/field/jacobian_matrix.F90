@@ -68,7 +68,7 @@ contains
         call domain%get_num_dofs_per_node(self%num_dofs_per_node)
         call domain%get_node_adjacency(MATRIX_TYPES%CSR, row, col)
 
-        self%matrix_type = MATRIX_TYPES%BSR%id
+        self%matrix_type = MATRIX_TYPES%BSR%ID
 
         ! 行列ファクトリを使用してBSR行列を生成
         self%matrix = create_matrix(MATRIX_TYPES%BSR, self%num_nodes, row, col, self%num_dofs_per_node)

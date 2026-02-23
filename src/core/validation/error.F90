@@ -43,7 +43,7 @@ contains
 
         ! 2. Start constructing the full message
         ! Format: "# 901(INPUT_DIR_MISSING): Message body"
-        full_msg = "# "//trim(to_string(err%id))// &
+        full_msg = "# "//trim(to_string(err%ID))// &
                    "("//trim(strip(err%name))//"): "//msg_body
 
         ! 3. Add Scope and Line info

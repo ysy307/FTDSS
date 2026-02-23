@@ -322,9 +322,9 @@ contains
         !> ILU fill-in level (optional, default 0)
         integer(int32), intent(in), optional :: ilu_fillin_level
 
-        self%id = id
-        select case (self%id)
-        case (PRECONDITIONER_TYPES%JACOBI%id)
+        self%ID = id
+        select case (self%ID)
+        case (PRECONDITIONER_TYPES%JACOBI%ID)
             if (present(num_nodes)) then
                 self%num_nodes = num_nodes
             else
@@ -335,7 +335,7 @@ contains
             else
                 self%block_size = 1
             end if
-        case (PRECONDITIONER_TYPES%ILU%id)
+        case (PRECONDITIONER_TYPES%ILU%ID)
             if (present(num_nodes)) then
                 self%num_nodes = num_nodes
             else
@@ -369,33 +369,33 @@ contains
             deallocate (pc)
         end if
 
-        select case (info%id)
-        case (PRECONDITIONER_TYPES%NONE%id)
+        select case (info%ID)
+        case (PRECONDITIONER_TYPES%NONE%ID)
             allocate (type_preconditioner_none :: pc)
             call pc%initialize(info)
             ierr = pc%status
-        case (PRECONDITIONER_TYPES%JACOBI%id)
+        case (PRECONDITIONER_TYPES%JACOBI%ID)
             allocate (type_preconditioner_jacobi :: pc)
             call pc%initialize(info)
             ierr = pc%status
-        case (PRECONDITIONER_TYPES%ILU%id)
+        case (PRECONDITIONER_TYPES%ILU%ID)
             allocate (type_preconditioner_iluk :: pc)
             call pc%initialize(info)
             ierr = pc%status
-        case (PRECONDITIONER_TYPES%SSOR%id)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%id
-        case (PRECONDITIONER_TYPES%HYBRID%id)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%id
-        case (PRECONDITIONER_TYPES%IS%id)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%id
-        case (PRECONDITIONER_TYPES%SAINV%id)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%id
-        case (PRECONDITIONER_TYPES%SAAMG%id)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%id
-        case (PRECONDITIONER_TYPES%ILUC%id)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%id
-        case (PRECONDITIONER_TYPES%ILUT%id)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%id
+        case (PRECONDITIONER_TYPES%SSOR%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (PRECONDITIONER_TYPES%HYBRID%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (PRECONDITIONER_TYPES%IS%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (PRECONDITIONER_TYPES%SAINV%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (PRECONDITIONER_TYPES%SAAMG%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (PRECONDITIONER_TYPES%ILUC%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (PRECONDITIONER_TYPES%ILUT%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
         end select
 
     end subroutine create_preconditioner

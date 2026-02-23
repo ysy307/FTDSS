@@ -233,8 +233,8 @@ contains
 
         self%log_file_name = trim(adjustl(self%dir_output))//"run.log"
 
-        self%is_thermal = input%basic%analysis_controls%is_active(PHYSICS_TYPES%THERMAL%id)
-        self%is_hydraulic = input%basic%analysis_controls%is_active(PHYSICS_TYPES%HYDRAULIC%id)
+        self%is_thermal = input%basic%analysis_controls%is_active(PHYSICS_TYPES%THERMAL%ID)
+        self%is_hydraulic = input%basic%analysis_controls%is_active(PHYSICS_TYPES%HYDRAULIC%ID)
 
         if (allocated(self%observations)) deallocate (self%observations)
         allocate (self%observations(size(input%output_settings%history_output%variable_names)))
