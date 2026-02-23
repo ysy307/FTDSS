@@ -8,10 +8,10 @@ contains
         real(real64), intent(inout) :: Qw
 
         if (h < 0.0d0) then
-            Qw = self%params%theta_r + (self%params%theta_s - self%params%theta_r) &
-                 * 0.5d0 * erfc(log(h / self%params%alpha1) / (self%params%n1 * sqrt(2.0d0)))
+            Qw = self%config%theta_r + (self%config%theta_s - self%config%theta_r) &
+                 * 0.5d0 * erfc(log(h / self%config%alpha1) / (self%config%n1 * sqrt(2.0d0)))
         else
-            Qw = self%params%theta_s
+            Qw = self%config%theta_s
         end if
 
     end subroutine calculate_wrf_ko
@@ -23,9 +23,9 @@ contains
         real(real64), intent(inout) :: dQw_dh
 
         if (h < 0.0d0) then
-            dqw_dh = -(self%params%theta_s - self%params%theta_r) * &
-                     exp(-(log(h / self%params%alpha1))**2.0d0 / (2.0d0 * self%params%n1**2.0d0)) / &
-                     (sqrt(2.0d0 * pi) * h * self%params%n1)
+            dqw_dh = -(self%config%theta_s - self%config%theta_r) * &
+                     exp(-(log(h / self%config%alpha1))**2.0d0 / (2.0d0 * self%config%n1**2.0d0)) / &
+                     (sqrt(2.0d0 * pi) * h * self%config%n1)
         else
             dqw_dh = 0.0d0
         end if

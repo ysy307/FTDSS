@@ -7,7 +7,7 @@
 !> @endnote
 module physics_models_wrf
     use, intrinsic :: iso_fortran_env
-    use :: module_core, only:type_config_wrf
+    use :: module_core, only:type_config_wrf, SWCC_MODELS
     ! use :: module_core, only:WRF_BC, WRF_VG, WRF_KO, WRF_MVG, WRF_DURNER, WRF_DVGCH, &
     !     PHYSICS_UNIT_M, PHYSICS_UNIT_CM, PHYSICS_UNIT_PA
     use :: physics_constants, only:pi => circle_ratio, g => gravity_acceleration, rho_std => reference_water_density
@@ -38,15 +38,15 @@ module physics_models_wrf
     !     real(real64) :: theta_r
     !     !> Saturated water content, \(\theta_\mathrm{s}\) [-]
     !     real(real64) :: theta_s
-    !     !> Inverse of the air-entry value or scaling parameter, \(\alpha_1\) [1/m]
+    !     !> Inverse of the air-entry value or scaling parameter, \(\alpha_1\) [1/L]
     !     real(real64) :: alpha1
     !     !> Pore-size distribution index, \(n_1\) [-]
     !     real(real64) :: n1
     !     !> Asymmetry parameter, \(m_1\) [-]
     !     real(real64) :: m1
-    !     !> Critical pressure head for modified models, \(h_\mathrm{crit}\) [m]
+    !     !> Critical pressure head for modified models, \(h_\mathrm{crit}\) [L]
     !     real(real64) :: h_crit
-    !     !> Scaling parameter for secondary porosity, \(\alpha_2\) [1/m]
+    !     !> Scaling parameter for secondary porosity, \(\alpha_2\) [1/L]
     !     real(real64) :: alpha2
     !     !> Pore-size distribution index for secondary porosity, \(n_2\) [-]
     !     real(real64) :: n2
@@ -119,7 +119,7 @@ module physics_models_wrf
             import :: abst_wrf, real64
             implicit none
             class(abst_wrf), intent(in) :: self
-            !> Pressure head, \(h\) [m]
+            !> Pressure head, \(h\) [L]
             real(real64), intent(in) :: h
             !> Water content, \(\theta_\mathrm{w}\) [-]
             real(real64), intent(inout) :: Qw
@@ -130,9 +130,9 @@ module physics_models_wrf
             import :: abst_wrf, real64
             implicit none
             class(abst_wrf), intent(in) :: self
-            !> Pressure head, \(h\) [m]
+            !> Pressure head, \(h\) [L]
             real(real64), intent(in) :: h
-            !> Water capacity, \(C(h) = \mathrm{d}\theta_\mathrm{w}/\mathrm{d}h\) [1/m]
+            !> Water capacity, \(C(h) = \mathrm{d}\theta_\mathrm{w}/\mathrm{d}h\) [1/L]
             real(real64), intent(inout) :: dQw_dh
         end subroutine abst_calc_wrf_derivative
     end interface
@@ -197,14 +197,14 @@ module physics_models_wrf
         !> Calculate water content using the Brooks-Corey model.
         !>
         !> \[
-        !> \theta_\mathrm{w}(h) = \theta_\mathrm{r} + (\theta_\mathrm{s} - \theta_\mathrm{r}) (\alpha |h|)^{-n}
+        !> \theta_\mathrm{w}(h) = \theta_\mathrm{r} + (\theta_\mathrm{s} - \theta_\mathrm{r}) (\frac{\alpha}{h})^{-n}
         !> \]
         !>
-        !> \(\theta_\mathrm{w}\) : water content [-]
+        !> \(\theta_\mathrm{w}\) : water content [-] <br>
         !> \(\theta_\mathrm{r}\) : residual water content [-]
         !> \(\theta_\mathrm{s}\) : saturated water content [-]
-        !> \(\alpha\) : scaling parameter [1/m]
-        !> \(h\) : pressure head [m]
+        !> \(\alpha\) : scaling parameter [1/L]
+        !> \(h\) : pressure head [L]
         !> \(n\) : pore-size distribution index [-]
         !>
         !> @note
@@ -221,7 +221,8 @@ module physics_models_wrf
         !> Calculate Water capacity for the Brooks-Corey model.
         !>
         !> \[
-        !> \frac{\mathrm{d}\theta_\mathrm{w}}{\mathrm{d}h} = (\theta_\mathrm{s} - \theta_\mathrm{r}) \alpha n (\alpha |h|)^{-n-1}
+        !> \frac{\mathrm{d}\theta_\mathrm{w}}{\mathrm{d}h} = (\theta_\mathrm{s} - \theta_\mathrm{r})
+        !> n \frac{\alpha}{h}^{n+1} \frac{1}{\alpha}
         !> \]
         !>
         !> @note
@@ -244,8 +245,8 @@ module physics_models_wrf
         !> \(\theta_\mathrm{w}\) : water content [-]
         !> \(\theta_\mathrm{r}\) : residual water content [-]
         !> \(\theta_\mathrm{s}\) : saturated water content [-]
-        !> \(\alpha\) : scaling parameter [1/m]
-        !> \(h\) : pressure head [m]
+        !> \(\alpha\) : scaling parameter [1/L]
+        !> \(h\) : pressure head [L]
         !> \(n\) : pore-size distribution index [-]
         !> \(m\) : asymmetry parameter [-]
         !>
@@ -286,8 +287,8 @@ module physics_models_wrf
         !> \(\Phi\) : standard normal cumulative distribution function
         !> \(\theta_\mathrm{r}\) : residual water content [-]
         !> \(\theta_\mathrm{s}\) : saturated water content [-]
-        !> \(\alpha\) : scaling parameter [m]
-        !> \(h\) : pressure head [m]
+        !> \(\alpha\) : scaling parameter [L]
+        !> \(h\) : pressure head [L]
         !> \(\sigma\) : log-pore radius standard deviation [-]
         !>
         !> @note

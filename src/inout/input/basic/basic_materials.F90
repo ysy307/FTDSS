@@ -257,7 +257,7 @@ contains
             buffer(3) = n1
             call get_json_value(json, join(buffer(1:3)), swcc%n1, is_required=.true.)
 
-            swcc%m1 = 1.0d0 - 1.0d0 / swcc%n1
+            ! swcc%m1 = 1.0d0 - 1.0d0 / swcc%n1
 
             select case (swcc%model_number)
             case (4)
@@ -269,21 +269,21 @@ contains
                 call get_json_value(json, join(buffer(1:3)), swcc%alpha2, is_required=.true.)
                 buffer(3) = n2
                 call get_json_value(json, join(buffer(1:3)), swcc%n2, is_required=.true.)
-                swcc%m2 = 1.0d0 - 1.0d0 / swcc%n2
+                ! swcc%m2 = 1.0d0 - 1.0d0 / swcc%n2
 
                 buffer(3) = w1
                 call get_json_value(json, join(buffer(1:3)), swcc%w1, is_required=.true., valid_range=[0.0d0, 1.0d0])
-                swcc%w2 = 1.0d0 - swcc%w1
+                ! swcc%w2 = 1.0d0 - swcc%w1
             case (6)
                 buffer(3) = alpha2
                 call get_json_value(json, join(buffer(1:3)), swcc%alpha2, is_required=.true.)
                 buffer(3) = n2
                 call get_json_value(json, join(buffer(1:3)), swcc%n2, is_required=.true.)
-                swcc%m2 = 1.0d0 - 1.0d0 / swcc%n2
+                ! swcc%m2 = 1.0d0 - 1.0d0 / swcc%n2
 
                 buffer(3) = w1
                 call get_json_value(json, join(buffer(1:3)), swcc%w1, is_required=.true., valid_range=[0.0d0, 1.0d0])
-                swcc%w2 = 1.0d0 - swcc%w1
+                ! swcc%w2 = 1.0d0 - swcc%w1
             end select
 
             buffer(3) = l
@@ -293,176 +293,176 @@ contains
 
     end subroutine read_parameters_materials_swcc
 
-    !---
-    ! getter
-    ! ---
-    module subroutine get_density_info_material_settings(self, density_info)
-        implicit none
-        class(type_material_settings), intent(in) :: self
-        type(type_physics_info), intent(inout) :: density_info
+    ! !---
+    ! ! getter
+    ! ! ---
+    ! module subroutine get_density_info_material_settings(self, density_info)
+    !     implicit none
+    !     class(type_material_settings), intent(in) :: self
+    !     type(type_physics_info), intent(inout) :: density_info
 
-        call density_info%reset()
+    !     call density_info%reset()
 
-        density_info%num_phases = self%phase
-        if (allocated(self%density%value)) then
-            density_info%solid = self%density%value(1)
-            if (self%phase >= 2 .and. size(self%density%value) >= 2) then
-                density_info%water = self%density%value(2)
-            end if
-            if (self%phase >= 3 .and. size(self%density%value) >= 3) then
-                density_info%ice = self%density%value(3)
-            end if
-            if (self%phase >= 4 .and. size(self%density%value) >= 4) then
-                density_info%vapor = self%density%value(4)
-            end if
-        end if
-    end subroutine get_density_info_material_settings
+    !     density_info%num_phases = self%phase
+    !     if (allocated(self%density%value)) then
+    !         density_info%solid = self%density%value(1)
+    !         if (self%phase >= 2 .and. size(self%density%value) >= 2) then
+    !             density_info%water = self%density%value(2)
+    !         end if
+    !         if (self%phase >= 3 .and. size(self%density%value) >= 3) then
+    !             density_info%ice = self%density%value(3)
+    !         end if
+    !         if (self%phase >= 4 .and. size(self%density%value) >= 4) then
+    !             density_info%vapor = self%density%value(4)
+    !         end if
+    !     end if
+    ! end subroutine get_density_info_material_settings
 
-    module subroutine get_specific_heat_info_material_settings(self, specific_heat_info)
-        implicit none
-        class(type_material_settings), intent(in) :: self
-        type(type_physics_info), intent(inout) :: specific_heat_info
+    ! module subroutine get_specific_heat_info_material_settings(self, specific_heat_info)
+    !     implicit none
+    !     class(type_material_settings), intent(in) :: self
+    !     type(type_physics_info), intent(inout) :: specific_heat_info
 
-        call specific_heat_info%reset()
+    !     call specific_heat_info%reset()
 
-        specific_heat_info%num_phases = self%phase
-        if (allocated(self%specific_heat%value)) then
-            specific_heat_info%solid = self%specific_heat%value(1)
-            if (self%phase >= 2 .and. size(self%specific_heat%value) >= 2) then
-                specific_heat_info%water = self%specific_heat%value(2)
-            end if
-            if (self%phase >= 3 .and. size(self%specific_heat%value) >= 3) then
-                specific_heat_info%ice = self%specific_heat%value(3)
-            end if
-            if (self%phase >= 4 .and. size(self%specific_heat%value) >= 4) then
-                specific_heat_info%vapor = self%specific_heat%value(4)
-            end if
-        end if
-    end subroutine get_specific_heat_info_material_settings
+    !     specific_heat_info%num_phases = self%phase
+    !     if (allocated(self%specific_heat%value)) then
+    !         specific_heat_info%solid = self%specific_heat%value(1)
+    !         if (self%phase >= 2 .and. size(self%specific_heat%value) >= 2) then
+    !             specific_heat_info%water = self%specific_heat%value(2)
+    !         end if
+    !         if (self%phase >= 3 .and. size(self%specific_heat%value) >= 3) then
+    !             specific_heat_info%ice = self%specific_heat%value(3)
+    !         end if
+    !         if (self%phase >= 4 .and. size(self%specific_heat%value) >= 4) then
+    !             specific_heat_info%vapor = self%specific_heat%value(4)
+    !         end if
+    !     end if
+    ! end subroutine get_specific_heat_info_material_settings
 
-    module subroutine get_volumetric_heat_capacity_info_material_settings(self, volumetric_heat_capacity_info)
-        implicit none
-        class(type_material_settings), intent(in) :: self
-        type(type_physics_info), intent(inout) :: volumetric_heat_capacity_info
+    ! module subroutine get_volumetric_heat_capacity_info_material_settings(self, volumetric_heat_capacity_info)
+    !     implicit none
+    !     class(type_material_settings), intent(in) :: self
+    !     type(type_physics_info), intent(inout) :: volumetric_heat_capacity_info
 
-        call volumetric_heat_capacity_info%reset()
+    !     call volumetric_heat_capacity_info%reset()
 
-        volumetric_heat_capacity_info%num_phases = self%phase
-        if (allocated(self%volumetric_heat_capacity%value)) then
-            volumetric_heat_capacity_info%solid = self%volumetric_heat_capacity%value(1)
-            if (self%phase >= 2 .and. size(self%volumetric_heat_capacity%value) >= 2) then
-                volumetric_heat_capacity_info%water = self%volumetric_heat_capacity%value(2)
-            end if
-            if (self%phase >= 3 .and. size(self%volumetric_heat_capacity%value) >= 3) then
-                volumetric_heat_capacity_info%ice = self%volumetric_heat_capacity%value(3)
-            end if
-            if (self%phase >= 4 .and. size(self%volumetric_heat_capacity%value) >= 4) then
-                volumetric_heat_capacity_info%vapor = self%volumetric_heat_capacity%value(4)
-                if (allocated(self%volumetric_heat_capacity%params)) then
-                    call allocate_array(volumetric_heat_capacity_info%params, source=self%volumetric_heat_capacity%params)
-                end if
-            end if
-        end if
-    end subroutine get_volumetric_heat_capacity_info_material_settings
+    !     volumetric_heat_capacity_info%num_phases = self%phase
+    !     if (allocated(self%volumetric_heat_capacity%value)) then
+    !         volumetric_heat_capacity_info%solid = self%volumetric_heat_capacity%value(1)
+    !         if (self%phase >= 2 .and. size(self%volumetric_heat_capacity%value) >= 2) then
+    !             volumetric_heat_capacity_info%water = self%volumetric_heat_capacity%value(2)
+    !         end if
+    !         if (self%phase >= 3 .and. size(self%volumetric_heat_capacity%value) >= 3) then
+    !             volumetric_heat_capacity_info%ice = self%volumetric_heat_capacity%value(3)
+    !         end if
+    !         if (self%phase >= 4 .and. size(self%volumetric_heat_capacity%value) >= 4) then
+    !             volumetric_heat_capacity_info%vapor = self%volumetric_heat_capacity%value(4)
+    !             if (allocated(self%volumetric_heat_capacity%params)) then
+    !                 call allocate_array(volumetric_heat_capacity_info%params, source=self%volumetric_heat_capacity%params)
+    !             end if
+    !         end if
+    !     end if
+    ! end subroutine get_volumetric_heat_capacity_info_material_settings
 
-    module subroutine get_thermal_conductivity_info_material_settings(self, thermal_conductivity_info)
-        implicit none
-        class(type_material_settings), intent(in) :: self
-        type(type_physics_info), intent(inout) :: thermal_conductivity_info
+    ! module subroutine get_thermal_conductivity_info_material_settings(self, thermal_conductivity_info)
+    !     implicit none
+    !     class(type_material_settings), intent(in) :: self
+    !     type(type_physics_info), intent(inout) :: thermal_conductivity_info
 
-        call thermal_conductivity_info%reset()
+    !     call thermal_conductivity_info%reset()
 
-        thermal_conductivity_info%num_phases = self%phase
-        if (allocated(self%thermal_conductivity%value)) then
-            thermal_conductivity_info%solid = self%thermal_conductivity%value(1)
-            if (self%phase >= 2 .and. size(self%thermal_conductivity%value) >= 2) then
-                thermal_conductivity_info%water = self%thermal_conductivity%value(2)
-            end if
-            if (self%phase >= 3 .and. size(self%thermal_conductivity%value) >= 3) then
-                thermal_conductivity_info%ice = self%thermal_conductivity%value(3)
-            end if
-            if (self%phase >= 4 .and. size(self%thermal_conductivity%value) >= 4) then
-                thermal_conductivity_info%vapor = self%thermal_conductivity%value(4)
-                if (allocated(self%thermal_conductivity%params)) then
-                    call allocate_array(thermal_conductivity_info%params, source=self%thermal_conductivity%params)
-                end if
-            end if
-        end if
+    !     thermal_conductivity_info%num_phases = self%phase
+    !     if (allocated(self%thermal_conductivity%value)) then
+    !         thermal_conductivity_info%solid = self%thermal_conductivity%value(1)
+    !         if (self%phase >= 2 .and. size(self%thermal_conductivity%value) >= 2) then
+    !             thermal_conductivity_info%water = self%thermal_conductivity%value(2)
+    !         end if
+    !         if (self%phase >= 3 .and. size(self%thermal_conductivity%value) >= 3) then
+    !             thermal_conductivity_info%ice = self%thermal_conductivity%value(3)
+    !         end if
+    !         if (self%phase >= 4 .and. size(self%thermal_conductivity%value) >= 4) then
+    !             thermal_conductivity_info%vapor = self%thermal_conductivity%value(4)
+    !             if (allocated(self%thermal_conductivity%params)) then
+    !                 call allocate_array(thermal_conductivity_info%params, source=self%thermal_conductivity%params)
+    !             end if
+    !         end if
+    !     end if
 
-        if (self%thermal_conductivity%is_dispersed .and. allocated(self%thermal_conductivity%dispersivity)) then
-            call allocate_array(thermal_conductivity_info%dispersivity, source=self%thermal_conductivity%dispersivity)
-        end if
-    end subroutine get_thermal_conductivity_info_material_settings
+    !     if (self%thermal_conductivity%is_dispersed .and. allocated(self%thermal_conductivity%dispersivity)) then
+    !         call allocate_array(thermal_conductivity_info%dispersivity, source=self%thermal_conductivity%dispersivity)
+    !     end if
+    ! end subroutine get_thermal_conductivity_info_material_settings
 
-    module subroutine get_wrf_info_material_settings(self, wrf_info)
-        implicit none
-        class(type_material_settings), intent(in) :: self
-        type(type_wrf_params), intent(inout) :: wrf_info
+    ! module subroutine get_wrf_info_material_settings(self, wrf_info)
+    !     implicit none
+    !     class(type_material_settings), intent(in) :: self
+    !     type(type_wrf_params), intent(inout) :: wrf_info
 
-        call wrf_info%reset()
+    !     call wrf_info%reset()
 
-        wrf_info%model_number = self%water_characteristic_curve%model_number
-        wrf_info%unit_id = self%water_characteristic_curve%unit
-        wrf_info%theta_s = self%water_characteristic_curve%theta_s
-        wrf_info%theta_r = self%water_characteristic_curve%theta_r
-        wrf_info%alpha1 = self%water_characteristic_curve%alpha1
-        wrf_info%n1 = self%water_characteristic_curve%n1
-        wrf_info%m1 = self%water_characteristic_curve%m1
-        wrf_info%alpha2 = self%water_characteristic_curve%alpha2
-        wrf_info%n2 = self%water_characteristic_curve%n2
-        wrf_info%m2 = self%water_characteristic_curve%m2
-        wrf_info%w1 = self%water_characteristic_curve%w1
-        wrf_info%w2 = self%water_characteristic_curve%w2
-        wrf_info%h_crit = self%water_characteristic_curve%h_crit
+    !     wrf_info%model_number = self%water_characteristic_curve%model_number
+    !     wrf_info%unit_id = self%water_characteristic_curve%unit
+    !     wrf_info%theta_s = self%water_characteristic_curve%theta_s
+    !     wrf_info%theta_r = self%water_characteristic_curve%theta_r
+    !     wrf_info%alpha1 = self%water_characteristic_curve%alpha1
+    !     wrf_info%n1 = self%water_characteristic_curve%n1
+    !     wrf_info%m1 = self%water_characteristic_curve%m1
+    !     wrf_info%alpha2 = self%water_characteristic_curve%alpha2
+    !     wrf_info%n2 = self%water_characteristic_curve%n2
+    !     wrf_info%m2 = self%water_characteristic_curve%m2
+    !     wrf_info%w1 = self%water_characteristic_curve%w1
+    !     wrf_info%w2 = self%water_characteristic_curve%w2
+    !     wrf_info%h_crit = self%water_characteristic_curve%h_crit
 
-    end subroutine get_wrf_info_material_settings
+    ! end subroutine get_wrf_info_material_settings
 
-    module subroutine get_gcc_info_material_settings(self, gcc_info)
-        implicit none
-        class(type_material_settings), intent(in) :: self
-        integer(int32), intent(inout) :: gcc_info
+    ! module subroutine get_gcc_info_material_settings(self, gcc_info)
+    !     implicit none
+    !     class(type_material_settings), intent(in) :: self
+    !     integer(int32), intent(inout) :: gcc_info
 
-        if (self%phase > 2) then
-            if (self%phase_change%equilibrium_model%segregation) then
-                gcc_info = GCC_TYPES%SEGREGATION%id
-            else
-                gcc_info = GCC_TYPES%NON_SEGREGATION%id
-            end if
-        else
-            gcc_info = -1
-        end if
+    !     if (self%phase > 2) then
+    !         if (self%phase_change%equilibrium_model%segregation) then
+    !             gcc_info = GCC_TYPES%SEGREGATION%id
+    !         else
+    !             gcc_info = GCC_TYPES%NON_SEGREGATION%id
+    !         end if
+    !     else
+    !         gcc_info = -1
+    !     end if
 
-    end subroutine get_gcc_info_material_settings
+    ! end subroutine get_gcc_info_material_settings
 
-    module subroutine get_hcf_info_material_settings(self, hcf_info)
-        implicit none
-        class(type_material_settings), intent(in) :: self
-        type(type_hcf_params), intent(inout) :: hcf_info
+    ! module subroutine get_hcf_info_material_settings(self, hcf_info)
+    !     implicit none
+    !     class(type_material_settings), intent(in) :: self
+    !     type(type_hcf_params), intent(inout) :: hcf_info
 
-        call hcf_info%reset()
+    !     call hcf_info%reset()
 
-        hcf_info%model_number = self%hydraulic_conductivity_model%model_number
-        hcf_info%k_s = self%hydraulic_conductivity_model%saturated_conductivity
-        hcf_info%omega = self%hydraulic_conductivity_model%impedance_factor
-        hcf_info%water_viscosity_model = self%hydraulic_conductivity_model%water_viscosity_model
-        hcf_info%gain_factor = self%hydraulic_conductivity_model%gain_factor
+    !     hcf_info%model_number = self%hydraulic_conductivity_model%model_number
+    !     hcf_info%k_s = self%hydraulic_conductivity_model%saturated_conductivity
+    !     hcf_info%omega = self%hydraulic_conductivity_model%impedance_factor
+    !     hcf_info%water_viscosity_model = self%hydraulic_conductivity_model%water_viscosity_model
+    !     hcf_info%gain_factor = self%hydraulic_conductivity_model%gain_factor
 
-        hcf_info%unit_id = self%water_characteristic_curve%unit
-        hcf_info%hcf_model_number = self%water_characteristic_curve%model_number
-        hcf_info%theta_r = self%water_characteristic_curve%theta_r
-        hcf_info%theta_s = self%water_characteristic_curve%theta_s
-        hcf_info%alpha1 = self%water_characteristic_curve%alpha1
-        hcf_info%n1 = self%water_characteristic_curve%n1
-        hcf_info%m1 = self%water_characteristic_curve%m1
-        hcf_info%h_crit = self%water_characteristic_curve%h_crit
-        hcf_info%alpha2 = self%water_characteristic_curve%alpha2
-        hcf_info%n2 = self%water_characteristic_curve%n2
-        hcf_info%m2 = self%water_characteristic_curve%m2
-        hcf_info%w1 = self%water_characteristic_curve%w1
-        hcf_info%w2 = self%water_characteristic_curve%w2
-        hcf_info%l = self%water_characteristic_curve%l
+    !     hcf_info%unit_id = self%water_characteristic_curve%unit
+    !     hcf_info%hcf_model_number = self%water_characteristic_curve%model_number
+    !     hcf_info%theta_r = self%water_characteristic_curve%theta_r
+    !     hcf_info%theta_s = self%water_characteristic_curve%theta_s
+    !     hcf_info%alpha1 = self%water_characteristic_curve%alpha1
+    !     hcf_info%n1 = self%water_characteristic_curve%n1
+    !     hcf_info%m1 = self%water_characteristic_curve%m1
+    !     hcf_info%h_crit = self%water_characteristic_curve%h_crit
+    !     hcf_info%alpha2 = self%water_characteristic_curve%alpha2
+    !     hcf_info%n2 = self%water_characteristic_curve%n2
+    !     hcf_info%m2 = self%water_characteristic_curve%m2
+    !     hcf_info%w1 = self%water_characteristic_curve%w1
+    !     hcf_info%w2 = self%water_characteristic_curve%w2
+    !     hcf_info%l = self%water_characteristic_curve%l
 
-    end subroutine get_hcf_info_material_settings
+    ! end subroutine get_hcf_info_material_settings
 
 !---------------------------------------------------------------------------------------------------------------------------
     ! Display Subroutines

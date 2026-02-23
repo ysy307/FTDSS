@@ -8,10 +8,10 @@ contains
         real(real64), intent(in) :: h
         real(real64), intent(inout) :: Qw
 
-        if (h < self%params%alpha1) then
-            Qw = self%params%theta_r + (self%params%theta_s - self%params%theta_r) * (self%params%alpha1 / h)**self%params%n1
+        if (h < self%config%alpha1) then
+            Qw = self%config%theta_r + (self%config%theta_s - self%config%theta_r) * (self%config%alpha1 / h)**self%config%n1
         else
-            Qw = self%params%theta_s
+            Qw = self%config%theta_s
         end if
 
     end subroutine calculate_wrf_bc
@@ -23,9 +23,9 @@ contains
         real(real64), intent(inout) :: dQw_dh
 
         !@note alpha1 must be negative
-        if (h < self%params%alpha1) then
-            dQw_dh = -(self%params%theta_s - self%params%theta_r) * self%params%n1 &
-                     * (self%params%alpha1 / h)**(self%params%n1 + 1.0d0) / self%params%alpha1
+        if (h < self%config%alpha1) then
+            dQw_dh = -(self%config%theta_s - self%config%theta_r) * self%config%n1 &
+                     * (self%config%alpha1 / h)**(self%config%n1 + 1.0d0) / self%config%alpha1
         else
             dQw_dh = 0.0d0
         end if
