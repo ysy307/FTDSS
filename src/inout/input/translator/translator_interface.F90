@@ -25,14 +25,14 @@ module inout_input_translator
             class(abst_config), intent(inout) :: config
         end subroutine execute_condition_boundary
 
-            module subroutine execute_condition_initial(self, input, target_physics, config)
-        implicit none
-        class(type_input_translator), intent(in) :: self
-        class(type_input), intent(in) :: input
-        type(type_constant_id), intent(in) :: target_physics
-        class(abst_config), intent(inout) :: config
+        module subroutine execute_condition_initial(self, input, target_physics, config)
+            implicit none
+            class(type_input_translator), intent(in) :: self
+            class(type_input), intent(in) :: input
+            type(type_constant_id), intent(in) :: target_physics
+            class(abst_config), intent(inout) :: config
 
-    end subroutine execute_condition_initial
+        end subroutine execute_condition_initial
 
         module subroutine execute_basic_swcc(self, input, material_id, config)
             implicit none
