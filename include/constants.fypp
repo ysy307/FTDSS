@@ -369,16 +369,16 @@
         'id_range' : [0, 5] &
     }
 
-    #:set NODE_TYPES = { &
-        'type_name' : 'type_node_types', &
-        'obj_name'  : 'NODE_TYPES', &
-        'category'  : 'NODE_TYPE', &
-        'suffix'    : 'node_type', &
-        'description': 'Node types', &
+    #:set COMM_NODE_TYPES = { &
+        'type_name' : 'type_comm_node_types', &
+        'obj_name'  : 'COMM_NODE_TYPES', &
+        'category'  : 'COMM_NODE_TYPE', &
+        'suffix'    : 'comm_node_type', &
+        'description': 'Communication node types', &
         'items'     : [ &
-            ('NODE_INTERNAL', 1, 'internal'), &
-            ('NODE_BORDER',   2, 'border'), &
-            ('NODE_HALO',     3, 'halo') &
+            ('INTERNAL', 1, 'internal'), &
+            ('BORDER',   2, 'border'), &
+            ('HALO',     3, 'halo') &
         ], &
         'num' : 3, &
         'id_range' : [1, 3] &
@@ -391,9 +391,9 @@
         'suffix'    : 'comm_role', &
         'description': 'Communication roles', &
         'items'     : [ &
-            ('ROLE_OWNER',    0,  'owner'), &
-            ('ROLE_RECEIVER', 1,  'receiver'), &
-            ('ROLE_NONE',     2,  'none') &
+            ('OWNER',    0,  'owner'), &
+            ('RECEIVER', 1,  'receiver'), &
+            ('NONE',     2,  'none') &
         ], &
         'num' : 3, &
         'id_range' : [0, 2] &
@@ -406,8 +406,8 @@
         'suffix'    : 'comm_op', &
         'description': 'Communication operations', &
         'items'     : [ &
-            ('OP_UPDATE',   1, 'update'), &
-            ('OP_ASSEMBLE', 2, 'assemble') &
+            ('UPDATE',   1, 'update'), &
+            ('ASSEMBLE', 2, 'assemble') &
         ], &
         'num' : 2, &
         'id_range' : [1, 2] &
@@ -605,7 +605,7 @@
         VECTOR_OPS, &
         MATRIX_STATUS, &
         VECTOR_STATUS, &
-        NODE_TYPES, &
+        COMM_NODE_TYPES, &
         COMM_ROLES, &
         COMM_OPS, &
         FE_TYPES, &

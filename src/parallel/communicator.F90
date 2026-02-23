@@ -137,14 +137,14 @@ contains
     subroutine update_scalar(self, data_array)
         class(type_halo_communicator), intent(inout) :: self
         real(real64), intent(inout) :: data_array(:)
-        call self%exchange_and_operate_scalar_impl(data_array, OP_UPDATE)
+        call self%exchange_and_operate_scalar_impl(COMM_OPS%UPDATE, data_array)
     end subroutine update_scalar
 
     !> @brief スカラーデータを集計（加算）する．
     subroutine assemble_scalar(self, data_array)
         class(type_halo_communicator), intent(inout) :: self
         real(real64), intent(inout) :: data_array(:)
-        call self%exchange_and_operate_scalar_impl(data_array, OP_ASSEMBLE)
+        call self%exchange_and_operate_scalar_impl(COMM_OPS%ASSEMBLE, data_array)
     end subroutine assemble_scalar
 
     !> @brief ベクトルデータを更新（上書き）する．
@@ -152,7 +152,7 @@ contains
         class(type_halo_communicator), intent(inout) :: self
         real(real64), intent(inout) :: data_array(:, :)
         integer(int32), intent(in) :: num_components
-        call self%exchange_and_operate_vector_impl(data_array, num_components, OP_UPDATE)
+        call self%exchange_and_operate_vector_impl(COMM_OPS%UPDATE,data_array, num_components)
     end subroutine update_vector
 
     !> @brief ベクトルデータを集計（加算）する．
@@ -160,14 +160,14 @@ contains
         class(type_halo_communicator), intent(inout) :: self
         real(real64), intent(inout) :: data_array(:, :)
         integer(int32), intent(in) :: num_components
-        call self%exchange_and_operate_vector_impl(data_array, num_components, OP_ASSEMBLE)
+        call self%exchange_and_operate_vector_impl(COMM_OPS%ASSEMBLE, data_array, num_components)
     end subroutine assemble_vector
 
     !> @brief スカラーデータの送受信と操作を実行する内部実装．
-    subroutine exchange_and_operate_scalar_impl(self, data_array, operation)
+    subroutine exchange_and_operate_scalar_impl(self, op, data_array)
         class(type_halo_communicator), intent(inout) :: self
+        type(type_constant_id), intent(in) :: op
         real(real64), intent(inout) :: data_array(:)
-        type(type_constant_id), intent(in) :: operation
         integer(int32) :: i, ierr, total_send_nodes, total_recv_nodes
         type(MPI_Request), allocatable :: reqs(:)
         type(MPI_Status), allocatable :: statuses(:)
@@ -202,10 +202,10 @@ contains
         deallocate (reqs, statuses)
 
         if (total_recv_nodes > 0) then
-            select case (operation)
-            case (OP_UPDATE)
+            select case (op%ID)
+            case (COMM_OPS%UPDATE%ID)
                 data_array(self%recv_indices(1:total_recv_nodes)) = self%recv_buf(1:total_recv_nodes)
-            case (OP_ASSEMBLE)
+            case (COMM_OPS%ASSEMBLE%ID)
                 data_array(self%recv_indices(1:total_recv_nodes)) = data_array(self%recv_indices(1:total_recv_nodes)) + &
                                                                     self%recv_buf(1:total_recv_nodes)
             end select
@@ -213,11 +213,11 @@ contains
     end subroutine exchange_and_operate_scalar_impl
 
     !> @brief ベクトルデータの送受信と操作を実行する内部実装．
-    subroutine exchange_and_operate_vector_impl(self, data_array, num_components, operation)
+    subroutine exchange_and_operate_vector_impl(self, op, data_array, num_components)
         class(type_halo_communicator), intent(inout) :: self
+        type(type_constant_id), intent(in) :: op
         real(real64), intent(inout) :: data_array(:, :)
         integer(int32), intent(in) :: num_components
-        type(type_constant_id), intent(in) :: operation
         integer(int32) :: i, total_send_nodes, total_recv_nodes, total_send_values, total_recv_values, ierr
         type(MPI_Request), allocatable :: reqs(:)
         type(MPI_Status), allocatable :: statuses(:)
@@ -257,12 +257,12 @@ contains
         deallocate (reqs, statuses)
 
         if (total_recv_nodes > 0) then
-            select case (operation)
-            case (OP_UPDATE)
+            select case (op%ID)
+            case (COMM_OPS%UPDATE%ID)
                 do i = 1, total_recv_nodes
                     data_array(:, self%recv_indices(i)) = self%recv_buf((i - 1) * num_components + 1:i * num_components)
                 end do
-            case (OP_ASSEMBLE)
+            case (COMM_OPS%ASSEMBLE%ID)
                 do i = 1, total_recv_nodes
                     data_array(:, self%recv_indices(i)) = data_array(:, self%recv_indices(i)) + &
                                                           self%recv_buf((i - 1) * num_components + 1:i * num_components)
@@ -289,13 +289,13 @@ contains
             call self%setup_local_sorted_nodes(vtk)
 
             ! 2. ハローノードの情報を抽出する (owner, lid, gid)．
-            num_halo_nodes = count(vtk%node_type == NODE_HALO)
+            num_halo_nodes = count(vtk%node_type == COMM_NODE_TYPES%HALO%ID)
             allocate (halo_owners(num_halo_nodes), halo_lids(num_halo_nodes), halo_gids(num_halo_nodes))
             block
                 integer(int32) :: i, current_pos
                 current_pos = 0
                 do i = 1, vtk%num_points
-                    if (vtk%node_type(i) == NODE_HALO) then
+                    if (vtk%node_type(i) == COMM_NODE_TYPES%HALO%ID) then
                         current_pos = current_pos + 1
                         halo_owners(current_pos) = vtk%owner_rank(1, i)
                         halo_lids(current_pos) = i
@@ -318,18 +318,18 @@ contains
         end associate
     end subroutine build_communication_schedule
 
-    !> @brief 自領域の境界ノード(NODE_BORDER)を抽出し，GIDでソートして保持する．
+    !> @brief 自領域の境界ノード(COMM_NODE_TYPES%BORDER)を抽出し，GIDでソートして保持する．
     subroutine setup_local_sorted_nodes(self, vtk)
         class(type_halo_communicator), intent(inout) :: self
         class(type_vtk), intent(in) :: vtk
         integer(int32) :: num_border_nodes, i, current_pos
 
-        num_border_nodes = count(vtk%node_type == NODE_BORDER)
+        num_border_nodes = count(vtk%node_type == COMM_NODE_TYPES%BORDER%ID)
         allocate (self%sorted_local_gids(num_border_nodes), self%sorted_local_lids(num_border_nodes))
 
         current_pos = 0
         do i = 1, vtk%num_points
-            if (vtk%node_type(i) == NODE_BORDER) then
+            if (vtk%node_type(i) == COMM_NODE_TYPES%BORDER%ID) then
                 current_pos = current_pos + 1
                 self%sorted_local_gids(current_pos) = vtk%global_node_ids(i)
                 self%sorted_local_lids(current_pos) = i
