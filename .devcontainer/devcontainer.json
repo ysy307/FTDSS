@@ -7,9 +7,10 @@
         }
     },
     "mounts": [
-        // .gitconfigと.fortlsをdevuserのホームディレクトリにマウント
         "source=${localEnv:USERPROFILE}/.gitconfig,target=/home/devuser/.gitconfig,type=bind,consistency=cached",
-        "source=${localWorkspaceFolder}/.fortls,target=/home/devuser/.fortls,type=bind,consistency=cached"
+        "source=${localWorkspaceFolder}/.fortls,target=/home/devuser/.fortls,type=bind,consistency=cached",
+        "source=ftdss-build-vol,target=${containerWorkspaceFolder}/CMakeBuild,type=volume",
+        "source=ftdss-git-vol,target=${containerWorkspaceFolder}/.git,type=volume"
     ],
     "runArgs": [
         "--hostname=ftdss-dev",
