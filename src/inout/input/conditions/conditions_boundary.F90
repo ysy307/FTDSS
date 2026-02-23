@@ -219,37 +219,7 @@ contains
         character(*), intent(in) :: title
         integer(int32), intent(in) :: target_physics
         integer(int32) :: n_vals
-
-        ! procedure(get_string), pointer :: p_get_string => null()
-
-        ! select case (target_physics)
-        ! case (PHYSICS_TYPE_THERMAL)
-        !     p_get_string => get_thermal_bc_type_string
-        ! case (PHYSICS_TYPE_HYDRAULIC)
-        !     p_get_string => get_hydraulic_bc_type_string
-        ! end select
-
-        ! write (*, '(a, a, a)') "    --- ", trim(title), " ---"
-        ! write (*, '(a, a)') "      Type                : ", p_get_string(boundary(target_physics)%type)
-
-        ! select case (p_get_string(boundary(target_physics)%type))
-        ! case ("dirichlet", "neumann", "flux", "robin", "heat_transfer", "head_radiation")
-        !     if (allocated(boundary(target_physics)%values)) then
-        !         n_vals = size(boundary(target_physics)%values)
-        !         if (n_vals == 0) then
-        !             write (*, '(a)') "      Values              : (0 points defined)"
-        !         else if (n_vals <= 6) then
-        !             write (*, '(a, *(es12.4e2, :, " "))') "      Values              : ", boundary(target_physics)%values
-        !         else
-        !             write (*, '(a, 3(es12.4e2, :, " "), a, 3(es12.4e2, :, " "))') &
-        !                 "      Values (summary)    : ", boundary(target_physics)%values(1:3), " ... ", boundary(target_physics)%values(n_vals - 2:n_vals)
-        !         end if
-        !     else
-        !         write (*, '(a)') "      Values              : Not allocated"
-        !     end if
-        ! case default
-        !     ! "adiabatic"のようなタイプは追加フィールドなし
-        ! end select
+        
     end subroutine display_boundary_local
 
 end submodule inout_input_conditions_boundry

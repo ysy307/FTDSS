@@ -8,9 +8,13 @@ module inout_input_translator
     type :: type_input_translator
     contains
         procedure, private, pass(self) :: execute_condition_boundary
+        procedure, private, pass(self) :: execute_condition_initial
         procedure, private, pass(self) :: execute_basic_swcc
         procedure, private, pass(self) :: execute_basic_gcc
-        generic :: execute => execute_condition_boundary, execute_basic_swcc, execute_basic_gcc
+        generic, public :: execute => execute_condition_boundary, &
+            execute_condition_initial, &
+            execute_basic_swcc, &
+            execute_basic_gcc
     end type type_input_translator
 
     type(type_input_translator), parameter, public :: input_translator = type_input_translator()
