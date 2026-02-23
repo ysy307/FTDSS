@@ -22,6 +22,8 @@ set(INPUT_SOURCES
     geometry/geometry_interface.F90
     input_interface.F90
     translator/translator_interface.F90
+    translator/translator_basic.F90
+    # translator/translator_physics.F90
     translator/translator_conditions.F90
     input.F90
 )

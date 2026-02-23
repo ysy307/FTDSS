@@ -13,18 +13,18 @@ contains
     !>
     !> @brief Initialize the GCC holder object.
     !>
-    module subroutine initialize_holder_gccs(self, material_id, gcc_id, water, ice)
+    module subroutine initialize_holder_gccs(self, material_id, config, water, ice)
         implicit none
         class(holder_gccs), intent(inout) :: self
         integer(int32), intent(in) :: material_id
-        integer(int32), intent(in) :: gcc_id
+        class(type_config_gcc), intent(in) :: config
         type(type_iapws97), target, intent(in) :: water
         type(type_iapws06), target, intent(in) :: ice
 
-        select case (gcc_id)
-        case (GCC_NON_SEGREGATION)
+        select case (config%model%ID)
+        case (GCC_TYPES%NON_SEGREGATION%ID)
             allocate (type_gcc_non_segregation :: self%p)
-        case (GCC_SEGREGATION)
+        case (GCC_TYPES%SEGREGATION%ID)
             allocate (type_gcc_segregation :: self%p)
         end select
 

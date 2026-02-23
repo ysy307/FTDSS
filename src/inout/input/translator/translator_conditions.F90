@@ -15,7 +15,7 @@ contains
         select type (config)
         type is (type_config_bc)
 
-            config%boundary_id = input%conditions%boundary_conditions(index)%ID
+            config%boundary_id = input%conditions%boundary_conditions(index)%id
 
             associate (physics_data => input%conditions%boundary_conditions(index)%physics(target_physics%ID))
 

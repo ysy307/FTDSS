@@ -7,7 +7,7 @@ contains
         class(type_input_translator), intent(in) :: self
         class(type_input), intent(in) :: input
         integer(int32), intent(in) :: material_id
-        class(abst_config), intent(inout) :: config
+        class(type_config_wrf), intent(inout) :: config
 
         type(type_constant_id) :: L_unit
         real(real64) :: scale_pressure
@@ -22,11 +22,11 @@ contains
             ! WRF 共通処理（HCFもここを通る）
             !==================================================
         class is (type_config_wrf)
-
             associate (material => input%basic%materials(material_id)%water_characteristic_curve)
 
                 call config%reset()
 
+                config%material_id = material_id
                 config%model = SWCC_MODELS%to_object(material%model_number)
                 L_unit = PHYSICS_UNITS%to_object(material%unit)
 
@@ -123,5 +123,41 @@ contains
         end select
 
     end subroutine execute_basic_swcc
+
+    module subroutine execute_basic_gcc(self, input, material_id, config)
+        implicit none
+        class(type_input_translator), intent(in) :: self
+        class(type_input), intent(in) :: input
+        integer(int32), intent(in) :: material_id
+        class(type_config_gcc), intent(inout) :: config
+
+        if (material_id < 1 .or. material_id > self%basic%num_materials) then
+            error stop "Input Error: material_id is out of range."
+        end if
+
+        select type (config)
+
+            !==================================================
+            ! GCC モデルの処理
+            !==================================================
+        class is (type_config_gcc)
+            associate (material => input%basic%materials(material_id)%phase%gcc)
+
+                call config%reset()
+
+                config%material_id = material_id
+                if (material%is_segregation) then
+                    config%model = GCC_TYPES%SEGRGATION
+                else
+                    config%model = GCC_TYPES%NON_SEGREGATION
+                end if
+
+            end associate
+
+        class default
+            error stop "execute_basic_gcc: unsupported config type."
+        end select
+
+    end subroutine execute_basic_gcc
 
 end submodule input_translator_basic

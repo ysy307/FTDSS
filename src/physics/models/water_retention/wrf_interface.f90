@@ -264,7 +264,8 @@ module physics_models_wrf
         !> Calculate derivative for van Genuchten model.
         !>
         !> \[
-        !> \frac{\mathrm{d}\theta_\mathrm{w}}{\mathrm{d}h} = -\frac{(\theta_\mathrm{s} - \theta_\mathrm{r}) \alpha n m (\alpha |h|)^{n-1}}{[1 + (\alpha |h|)^n]^{m+1}}
+        !> \frac{\mathrm{d}\theta_\mathrm{w}}{\mathrm{d}h} = -\frac{(\theta_\mathrm{s} - \theta_\mathrm{r})
+        !> \alpha n m (\alpha |h|)^{n-1}}{[1 + (\alpha |h|)^n]^{m+1}}
         !> \]
         !>
         !> @note
@@ -281,7 +282,8 @@ module physics_models_wrf
         !> Calculate water content using the Kosugi log-normal model.
         !>
         !> \[
-        !> \theta_\mathrm{w}(h) = \theta_\mathrm{r} + (\theta_\mathrm{s} - \theta_\mathrm{r}) \Phi \left( \frac{\ln(-h/\alpha)}{\sigma} \right)
+        !> \theta_\mathrm{w}(h) = \theta_\mathrm{r} + (\theta_\mathrm{s} - \theta_\mathrm{r})
+        !> \Phi \left( \frac{\ln(-h/\alpha)}{\sigma} \right)
         !> \]
         !>
         !> \(\Phi\) : standard normal cumulative distribution function
@@ -305,7 +307,8 @@ module physics_models_wrf
         !> Calculate derivative for Kosugi model.
         !>
         !> \[
-        !> \frac{\mathrm{d}\theta_\mathrm{w}}{\mathrm{d}h} = -\frac{(\theta_\mathrm{s} - \theta_\mathrm{r})}{h \sigma \sqrt{2\pi}} \exp \left[ -\frac{1}{2} \left( \frac{\ln(-h/\alpha)}{\sigma} \right)^2 \right]
+        !> \frac{\mathrm{d}\theta_\mathrm{w}}{\mathrm{d}h} = -\frac{(\theta_\mathrm{s} - \theta_\mathrm{r})}{h \sigma \sqrt{2\pi}}
+        !> \exp \left[ -\frac{1}{2} \left( \frac{\ln(-h/\alpha)}{\sigma} \right)^2 \right]
         !> \]
         !>
         !> @note
@@ -339,7 +342,8 @@ module physics_models_wrf
         !> Derivative for Modified van Genuchten model
         !>
         !> \[
-        !> \frac{\mathrm{d}\theta_\mathrm{w}}{\mathrm{d}h} = -\frac{(\theta_\mathrm{s} - \theta_\mathrm{r}) \alpha n m (\alpha |h|)^{n-1}}{[1 + (\alpha |h|)^n]^{m+1}}
+        !> \frac{\mathrm{d}\theta_\mathrm{w}}{\mathrm{d}h} = -\frac{(\theta_\mathrm{s} - \theta_\mathrm{r})
+        !> \alpha n m (\alpha |h|)^{n-1}}{[1 + (\alpha |h|)^n]^{m+1}}
         !> \]
         !>
         !> @note
@@ -355,7 +359,8 @@ module physics_models_wrf
         !> Calculate water content using the Durner dual-porosity model
         !>
         !> \[
-        !> \theta_\mathrm{w}(h) = \theta_\mathrm{r} + (\theta_\mathrm{s} - \theta_\mathrm{r}) \sum_{i=1}^{2} w_i [1 + (\alpha_i |h|)^{n_i}]^{-m_i}
+        !> \theta_\mathrm{w}(h) = \theta_\mathrm{r} + (\theta_\mathrm{s} - \theta_\mathrm{r})
+        !> \sum_{i=1}^{2} w_i [1 + (\alpha_i |h|)^{n_i}]^{-m_i}
         !> \]
         !>
         !> @note
@@ -371,7 +376,8 @@ module physics_models_wrf
         !> Derivative for Durner dual-porosity model
         !>
         !> \[
-        !> \frac{\mathrm{d}\theta_\mathrm{w}}{\mathrm{d}h} = -(\theta_\mathrm{s} - \theta_\mathrm{r}) \sum_{i=1}^{2} w_i n_i \alpha_i (\alpha_i |h|)^{n_i-1} [1 + (\alpha_i |h|)^{n_i}]^{-m_i-1}
+        !> \frac{\mathrm{d}\theta_\mathrm{w}}{\mathrm{d}h} = -(\theta_\mathrm{s} - \theta_\mathrm{r})
+        !> \sum_{i=1}^{2} w_i n_i \alpha_i (\alpha_i |h|)^{n_i-1} [1 + (\alpha_i |h|)^{n_i}]^{-m_i-1}
         !> \]
         !>
         !> @note
@@ -387,7 +393,8 @@ module physics_models_wrf
         !> Calculate water content using the Dual van Genuchten with Common Head model (Seki, 2023)
         !>
         !> \[
-        !> \theta_\mathrm{w}(h) = \theta_\mathrm{r} + (\theta_\mathrm{s} - \theta_\mathrm{r}) \sum_{i=1}^{2} w_i [1 + (\alpha |h|)^{n_i}]^{-m_i}
+        !> \theta_\mathrm{w}(h) = \theta_\mathrm{r} + (\theta_\mathrm{s} - \theta_\mathrm{r})
+        !> \sum_{i=1}^{2} w_i [1 + (\alpha |h|)^{n_i}]^{-m_i}
         !> \]
         !>
         !> @note
@@ -403,7 +410,8 @@ module physics_models_wrf
         !> Derivative for Dual van Genuchten with Common Head model
         !>
         !> \[
-        !> \frac{\mathrm{d}\theta_\mathrm{w}}{\mathrm{d}h} = -(\theta_\mathrm{s} - \theta_\mathrm{r}) \alpha \sum_{i=1}^{2} w_i n_i (\alpha |h|)^{n_i-1} [1 + (\alpha |h|)^{n_i}]^{-m_i-1}
+        !> \frac{\mathrm{d}\theta_\mathrm{w}}{\mathrm{d}h} = -(\theta_\mathrm{s} - \theta_\mathrm{r})
+        !> \alpha \sum_{i=1}^{2} w_i n_i (\alpha |h|)^{n_i-1} [1 + (\alpha |h|)^{n_i}]^{-m_i-1}
         !> \]
         !>
         !> @note
