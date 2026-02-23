@@ -63,4 +63,32 @@ contains
         end select
 
     end subroutine execute_condition_boundary
+
+    module subroutine execute_condition_initial(self, input, target_physics, config)
+        implicit none
+        class(type_input_translator), intent(in) :: self
+        class(type_input), intent(in) :: input
+        type(type_constant_id), intent(in) :: target_physics
+        class(abst_config), intent(inout) :: config
+
+        select type (config)
+        type is (type_config_ic)
+            if (.not. PHYSICS_TYPES%is_valid(target_physics)) then
+                call config%reset()
+                return
+            end if
+
+            config%physics_type = target_physics
+            associate (condition_data => input%conditions%initial_conditions%physics(target_physics%ID))
+                config%ic_kind = IC_METHODS%to_object(condition_data%type)
+                if (config%ic_kind == IC_METHODS%UNIFORM) then
+                    config%value = condition_data%value
+                else
+                    ! Handle other IC methods if needed
+                end if
+            end associate
+
+        end select
+
+    end subroutine execute_condition_initial
 end submodule input_translator_conditions

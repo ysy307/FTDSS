@@ -38,18 +38,18 @@ contains
                 end select
                 buffer(3) = type
 
-                call get_json_value(json, join(buffer), tmp_string, &
+                call get_json_value(json, join(buffer), self%initial_conditions%physics(i)%type, &
                                     is_required=.true., valid_list=valid_initial_condition_types)
-                self%initial_conditions%physics(i)%type = IC_METHODS%to_id(tmp_string)
+                ! self%initial_conditions%physics(i)%type = IC_METHODS%to_id(tmp_string)
 
                 select case (self%initial_conditions%physics(i)%type)
-                case (IC_METHODS%UNIFORM%ID)
+                case (IC_METHODS%UNIFORM%NAME)
                     buffer(3) = value
                     call get_json_value(json, join(buffer), self%initial_conditions%physics(i)%value, &
                                         is_required=.true.)
-                case (IC_METHODS%LAPLACE%ID)
+                case (IC_METHODS%LAPLACE%NAME)
                     ! No additional parameters needed for laplace
-                case (IC_METHODS%FROM_FILE%ID)
+                case (IC_METHODS%FROM_FILE%NAME)
                     buffer(3) = field_name
                     call get_json_value(json, join(buffer), self%initial_conditions%physics(i)%field_name, &
                                         is_required=.true.)
@@ -88,14 +88,14 @@ contains
         integer(int32), intent(in), optional :: target_ic_id
 
         write (*, '(A, A)') "    ", trim(title), ":"
-        write (*, '(A, A)') "      Type: ", trim(IC_METHODS%to_name(fields(target_ic_id)%type))
+        write (*, '(A, A)') "      Type: ", trim(fields(target_ic_id)%type)
 
         select case (fields(target_ic_id)%type)
-        case (IC_METHODS%UNIFORM%ID)
+        case (IC_METHODS%UNIFORM%NAME)
             write (*, '(A, F8.3)') "      Value: ", fields(target_ic_id)%value
-        case (IC_METHODS%LAPLACE%ID)
+        case (IC_METHODS%LAPLACE%NAME)
             write (*, '(A)') "      Value: Laplace equation will be solved"
-        case (IC_METHODS%FROM_FILE%ID)
+        case (IC_METHODS%FROM_FILE%NAME)
             write (*, '(A, A)') "      Field Name: ", trim(fields(target_ic_id)%field_name)
         case default
             write (*, '(A)') "      Unknown type"

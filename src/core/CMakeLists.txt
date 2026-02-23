@@ -17,10 +17,6 @@ set(CORE_CONSTANTS_FYPP
 fypp_F90("" "${CORE_CONSTANTS_FYPP}" CORE_CONSTANTS_GENERATED)
 list(APPEND CORE_SOURCES
     constants/constants_base.F90
-    constants/constants_solver.F90
-    constants/constants_parallel.F90
-    constants/constants_utils.F90
-    constants/constants_physical.F90
     constants/constants.F90
     ${CORE_CONSTANTS_GENERATED}
 )
@@ -79,7 +75,9 @@ list(APPEND CORE_SOURCES
     types/physics/physics_info.F90
     types/physics/meteorology.F90
     types/config/config_base.F90
-    types/config/config_bc.F90
+    types/config/conditions/config_boundary.F90
+    types/config/conditions/config_initial.F90
+    types/config/conditions/config_conditions.F90
     types/config/physics/config_physics_base.F90
     types/config/physics/config_swcc.F90
     types/config/physics/config_gcc.F90

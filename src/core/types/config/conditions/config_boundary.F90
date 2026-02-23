@@ -1,4 +1,4 @@
-module core_types_config_bc
+module core_types_config_conditions_boundary
     use, intrinsic :: iso_fortran_env
     use :: core_memory, only:allocate_array, deallocate_array
     use :: core_constants, only:type_constant_id
@@ -13,10 +13,10 @@ module core_types_config_bc
         integer(int32) :: boundary_id = -1
         !> 対象とする現象の種類
         !> 熱移動，水分移動など
-        type(type_constant_id) :: physics_type = type_constant_id("none", "none", -1)
+        type(type_constant_id) :: physics_type = type_constant_id("", "", -1)
         !> 境界条件の種類
         !> ディリクレ，ノイマンなど
-        type(type_constant_id) :: bc_kind = type_constant_id("none", "none", -1)
+        type(type_constant_id) :: bc_kind = type_constant_id("", "", -1)
 
         real(real64), allocatable :: time_points(:)
         real(real64), allocatable :: values(:, :) ! (成分, 時間)
@@ -60,6 +60,8 @@ contains
         class(type_config_bc), intent(inout) :: self
 
         self%boundary_id = -1
+        self%physics_type = type_constant_id("", "", -1)
+        self%bc_kind = type_constant_id("", "", -1)
 
         if (allocated(self%time_points)) deallocate (self%time_points)
         if (allocated(self%values)) deallocate (self%values)
@@ -68,4 +70,4 @@ contains
         self%num_variables = 0
     end subroutine reset_config_bc
 
-end module core_types_config_bc
+end module core_types_config_conditions_boundary

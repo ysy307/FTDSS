@@ -17,8 +17,9 @@ module core_types
         type_state
     use :: core_types_config_base, only: &
         abst_config
-    use :: core_types_config_bc, only: &
-        type_config_bc
+    use :: core_types_config_conditions, only: &
+        type_config_bc, &
+        type_config_ic
     use :: core_types_config_physics, only: &
         abst_config_physics_model, &
         abst_config_physics_material, &

@@ -8,26 +8,17 @@ submodule(conditions_initial) conditions_initial_uniform
 
 contains
 
-    module subroutine initialize_type_ic_uniform(self, input, initial_target_id)
-        implicit none
-        class(type_ic_uniform), intent(inout) :: self
-        type(type_input), intent(in) :: input
-        integer(int32), intent(in) :: initial_target_id
-
-        if (initial_target_id > 0) then
-            self%target_id = initial_target_id
-            self%type = IC_METHOD_UNIFORM
-            self%value = input%conditions%initial_conditions%physics(initial_target_id)%value
-        end if
-    end subroutine initialize_type_ic_uniform
-
-    module subroutine apply_uniform(self, variable)
+    module subroutine apply_ic_uniform(self, variable)
         implicit none
         class(type_ic_uniform), intent(in) :: self
         type(type_variable), intent(inout) :: variable
 
-        call variable%set_current(self%value)
-        call variable%set_previous(self%value)
-    end subroutine
+        if (.not. self%initialized) then
+            error stop "Error: IC not initialized."
+        end if
+
+        call variable%set_current(self%config%value)
+        call variable%set_previous(self%config%value)
+    end subroutine apply_ic_uniform
 
 end submodule conditions_initial_uniform

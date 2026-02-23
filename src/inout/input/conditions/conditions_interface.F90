@@ -91,7 +91,7 @@ module inout_input_conditions
     end type
 
     type :: type_initial_local
-        integer(int32) :: type
+        character(:), allocatable :: type
         real(real64) :: value
         type(type_boundary_local_initial), allocatable :: boundary(:)
         character(:), allocatable :: field_name
