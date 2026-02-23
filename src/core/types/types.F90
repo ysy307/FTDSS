@@ -17,6 +17,8 @@ module core_types
         type_state
     use :: core_types_physics_config_bc, only: &
         type_config_bc
+    use :: core_types_physics_config_wrf, only: &
+        type_config_wrf
     use :: core_types_physics_info, only: &
         type_physics_info
     use :: core_types_physics_meteorology, only: &

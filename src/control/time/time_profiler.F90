@@ -18,7 +18,7 @@ module control_time_profiler
     end type type_profiler_section
 
     type :: type_time_record
-        character(20) :: label = ''
+        type(type_constant_id) :: label = type_constant_id("none", "none", -1)
         character(10) :: date = ''
         character(10) :: time = ''
         character(10) :: zone = ''
@@ -99,7 +99,7 @@ contains
         call self%format(time_stamp)
 
         ! Combine with label
-        log_string = strip(self%label)//" Time : "//time_stamp
+        log_string = strip(self%label%name)//" Time : "//time_stamp
     end subroutine get_log_formatted
 
     function match_profiler_section_label(self, label) result(is_match)
@@ -203,32 +203,42 @@ contains
     subroutine record_profiler(self, label)
         implicit none
         class(type_profiler), intent(inout) :: self
-        integer(int32), intent(in) :: label
+        type(type_constant_id), intent(in) :: label
 
-        select case (label)
-        case (TIME_RECORD_START)
+        if (.not. TIME_RECORDS%is_valid(label)) then
+            ! call raise_error(ERROR_CODES%INVALID_PROFILER_LABEL, opt=strip(get_time_record_string(label)))
+            return
+        end if
+
+        if (label == TIME_RECORDS%START) then
             call date_and_time(date=self%record_start%date, time=self%record_start%time, &
                                zone=self%record_start%zone)
-            self%record_start%label = get_time_record_string(label)
-        case (TIME_RECORD_END)
+
+            self%record_start%label = TIME_RECORDS%START
+        else if (label == TIME_RECORDS%END) then
             call date_and_time(date=self%record_end%date, time=self%record_end%time, &
                                zone=self%record_end%zone)
-            self%record_end%label = get_time_record_string(label)
-        end select
+            self%record_end%label = TIME_RECORDS%END
+        end if
+
     end subroutine record_profiler
 
     subroutine get_record_profiler(self, label, record)
         implicit none
         class(type_profiler), intent(in) :: self
-        integer(int32), intent(in) :: label
+        type(type_constant_id), intent(in) :: label
         character(:), allocatable, intent(inout) :: record
 
-        select case (label)
-        case (TIME_RECORD_START)
+        if (.not. TIME_RECORDS%is_valid(label) ) then
+            return
+        end if
+
+        if (label == TIME_RECORDS%START) then
             call self%record_start%get_log(record)
-        case (TIME_RECORD_END)
+        else if (label == TIME_RECORDS%END) then
             call self%record_end%get_log(record)
-        end select
+        end if
+
     end subroutine get_record_profiler
 
 !> Extracts all profiling data including percentage

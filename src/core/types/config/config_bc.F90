@@ -13,10 +13,10 @@ module core_types_physics_config_bc
         integer(int32) :: boundary_id = -1
         !> 対象とする現象の種類
         !> 熱移動，水分移動など
-        type(type_constant_id) :: physics_type = PHYSICS_TYPES%UNKNOWN
+        type(type_constant_id) :: physics_type = type_constant_id("none", "none", -1)
         !> 境界条件の種類
         !> ディリクレ，ノイマンなど
-        type(type_constant_id) :: bc_kind = type_constant_id(0, 'unknown')
+        type(type_constant_id) :: bc_kind = type_constant_id("none", "none", -1)
 
         real(real64), allocatable :: time_points(:)
         real(real64), allocatable :: values(:, :) ! (成分, 時間)
@@ -43,23 +43,13 @@ contains
             call self%set(self%boundary_id, source%boundary_id)
             call self%set(self%physics_type, source%physics_type)
             call self%set(self%bc_kind, source%bc_kind)
+            
 
-            self%num_time_points = source%num_time_points
-            self%num_variables = source%num_variables
+            call self%set(self%num_time_points, source%num_time_points)
+            call self%set(self%num_variables, source%num_variables)
 
-            if (allocated(source%time_points)) then
-                allocate (self%time_points(size(source%time_points)))
-                self%time_points = source%time_points
-            else
-                if (allocated(self%time_points)) deallocate (self%time_points)
-            end if
-
-            if (allocated(source%values)) then
-                allocate (self%values(size(source%values, 1), size(source%values, 2)))
-                self%values = source%values
-            else
-                if (allocated(self%values)) deallocate (self%values)
-            end if
+            call self%set(self%time_points, source%time_points)
+            call self%set(self%values, source%values)
         class default
             call self%reset()
         end select

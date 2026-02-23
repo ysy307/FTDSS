@@ -112,12 +112,12 @@ contains
                 A_data => A%get_val()
                 B_data => B%get_val()
                 B_data = alpha * A_data + B_data
-                ierr = MATRIX_STATUS_SUCCESS
+                ierr = MATRIX_STATUS%SUCCESS%id
             class default
-                ierr = MATRIX_STATUS_ILL_OPERATIONS
+                ierr = MATRIX_STATUS%ILL_OPERATIONS%id
             end select
         class default
-            ierr = MATRIX_STATUS_ILL_OPERATIONS
+            ierr = MATRIX_STATUS%ILL_OPERATIONS%id
         end select
 
     end subroutine matrix_axpy
@@ -145,12 +145,12 @@ contains
                 A_data => A%get_val()
                 B_data => B%get_val()
                 B_data = A_data + alpha * B_data
-                ierr = MATRIX_STATUS_SUCCESS
+                ierr = MATRIX_STATUS%SUCCESS%id
             class default
-                ierr = MATRIX_STATUS_ILL_OPERATIONS
+                ierr = MATRIX_STATUS%ILL_OPERATIONS%id
             end select
         class default
-            ierr = MATRIX_STATUS_ILL_OPERATIONS
+            ierr = MATRIX_STATUS%ILL_OPERATIONS%id
         end select
 
     end subroutine matrix_xpay
@@ -184,15 +184,15 @@ contains
                     B_data => B%get_val()
                     C_data => C%get_val()
                     C_data = alpha * A_data + B_data
-                    ierr = MATRIX_STATUS_SUCCESS
+                    ierr = MATRIX_STATUS%SUCCESS%id
                 class default
-                    ierr = MATRIX_STATUS_ILL_OPERATIONS
+                    ierr = MATRIX_STATUS%ILL_OPERATIONS%id
                 end select
             class default
-                ierr = MATRIX_STATUS_ILL_OPERATIONS
+                ierr = MATRIX_STATUS%ILL_OPERATIONS%id
             end select
         class default
-            ierr = MATRIX_STATUS_ILL_OPERATIONS
+            ierr = MATRIX_STATUS%ILL_OPERATIONS%id
         end select
 
     end subroutine matrix_axpyz
@@ -215,6 +215,11 @@ contains
         real(real64), dimension(:), pointer :: diag
         integer(int32) :: i
 
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            ierr = MATRIX_STATUS%ILL_OPERATIONS%id
+            return
+        end if
+
         call d%copy(b)
         call A%get_diagonal(d)
         diag => d%get_data()
@@ -227,15 +232,14 @@ contains
             end if
         end do
 
-        select case (op)
-        case (OP_SCALE_SYMM_DIAG)
+        if (op == MATRIX_OPS%SCALE_SYMM_DIAG) then
             diag = 1.0d0 / sqrt(abs(diag))
-        case (OP_SCALE_JACOBI)
+        else if (op == MATRIX_OPS%SCALE_JACOBI) then
             diag = 1.0d0 / diag
-        case default
-            ierr = MATRIX_STATUS_ILL_OPERATIONS
+        else
+            ierr = MATRIX_STATUS%ILL_OPERATIONS%id
             return
-        end select
+        end if
 
         call A%scale(op, d)
         call b%scale(op, d)
@@ -275,7 +279,7 @@ contains
         end do
         !$omp end parallel do
 #endif
-        ierr = MATRIX_STATUS_SUCCESS
+        ierr = MATRIX_STATUS%SUCCESS%id
 
     end subroutine gemv_matrix_real64
 
@@ -304,7 +308,7 @@ contains
 
         call A%get_info(info)
         if (info%num_rows /= size(x) .or. info%num_cols /= size(y)) then
-            ierr = MATRIX_STATUS_ILL_OPERATIONS
+            ierr = MATRIX_STATUS%ILL_OPERATIONS%id
             return
         end if
 
@@ -319,7 +323,7 @@ contains
         end do
         !$omp end parallel do
 #endif
-        ierr = MATRIX_STATUS_SUCCESS
+        ierr = MATRIX_STATUS%SUCCESS%id
 
     end subroutine gemv_matrix_dense
 
@@ -349,7 +353,7 @@ contains
 
         call A%get_info(info)
         if (info%num_nodes /= size(x) .or. info%num_nodes /= size(y)) then
-            ierr = MATRIX_STATUS_ILL_OPERATIONS
+            ierr = MATRIX_STATUS%ILL_OPERATIONS%id
             return
         end if
         ind => A%get_ind()
@@ -368,7 +372,7 @@ contains
         end do
         !$omp end parallel do
 
-        ierr = MATRIX_STATUS_SUCCESS
+        ierr = MATRIX_STATUS%SUCCESS%id
     end subroutine gemv_matrix_csr
 
     !> Perform general matrix-vector multiplication for COO matrices.
@@ -397,7 +401,7 @@ contains
 
         call A%get_info(info)
         if (info%num_nodes /= size(x) .or. info%num_nodes /= size(y)) then
-            ierr = MATRIX_STATUS_ILL_OPERATIONS
+            ierr = MATRIX_STATUS%ILL_OPERATIONS%id
             return
         end if
         col => A%get_col()
@@ -420,7 +424,7 @@ contains
         end do
         !$omp end parallel do
 
-        ierr = MATRIX_STATUS_SUCCESS
+        ierr = MATRIX_STATUS%SUCCESS%id
 
     end subroutine gemv_matrix_coo
 
@@ -458,7 +462,7 @@ contains
 
         ! Validate dimensions
         if (info%num_nodes * C /= size(x) .or. info%num_nodes * R /= size(y)) then
-            ierr = MATRIX_STATUS_ILL_OPERATIONS
+            ierr = MATRIX_STATUS%ILL_OPERATIONS%id
             return
         end if
 
@@ -486,7 +490,7 @@ contains
         end do
         !$omp end parallel do
 
-        ierr = MATRIX_STATUS_SUCCESS
+        ierr = MATRIX_STATUS%SUCCESS%id
 
     end subroutine gemv_matrix_bsr
 
@@ -509,7 +513,7 @@ contains
         k = size(A, 2)
         n = size(B, 2)
         call dgemm('N', 'N', m, n, k, 1.0d0, A, m, B, k, 0.0d0, C, m)
-        ierr = MATRIX_STATUS_SUCCESS
+        ierr = MATRIX_STATUS%SUCCESS%id
 #else
         integer(int32) :: i, j, l
         integer(int32) :: m, n, k
@@ -526,7 +530,7 @@ contains
             end do
         end do
         !$omp end parallel do
-        ierr = MATRIX_STATUS_SUCCESS
+        ierr = MATRIX_STATUS%SUCCESS%id
 #endif
     end subroutine matrix_gemm_real64
 
@@ -566,7 +570,7 @@ contains
 
         ! Validate square matrix
         if (n /= m) then
-            ierr = MATRIX_STATUS_ILL_OPERATIONS
+            ierr = MATRIX_STATUS%ILL_OPERATIONS%id
             return
         end if
 
@@ -574,13 +578,13 @@ contains
         ! 1. Analytical Solution for Small Matrices (N <= 3)
         ! -----------------------------------------------------------------------
         if (n <= 3) then
-            ierr = MATRIX_STATUS_SUCCESS
+            ierr = MATRIX_STATUS%SUCCESS%id
 
             select case (n)
             case (1)
                 det = A(1, 1)
                 if (abs(det) < epsilon(1.0_real64)) then
-                    ierr = MATRIX_STATUS_ILL_OPERATIONS
+                    ierr = MATRIX_STATUS%ILL_OPERATIONS%id
                     return
                 end if
                 A(1, 1) = 1.0d0 / det
@@ -588,7 +592,7 @@ contains
             case (2)
                 det = A(1, 1) * A(2, 2) - A(1, 2) * A(2, 1)
                 if (abs(det) < epsilon(1.0_real64)) then
-                    ierr = MATRIX_STATUS_ILL_OPERATIONS
+                    ierr = MATRIX_STATUS%ILL_OPERATIONS%id
                     return
                 end if
                 invDet = 1.0d0 / det
@@ -610,7 +614,7 @@ contains
                       + T(1, 3) * (T(2, 1) * T(3, 2) - T(2, 2) * T(3, 1))
 
                 if (abs(det) < epsilon(1.0_real64)) then
-                    ierr = MATRIX_STATUS_ILL_OPERATIONS
+                    ierr = MATRIX_STATUS%ILL_OPERATIONS%id
                     return
                 end if
                 invDet = 1.0d0 / det
@@ -643,7 +647,7 @@ contains
 
         if (info /= 0) then
             call deallocate_array(ipiv)
-            ierr = MATRIX_STATUS_ILL_OPERATIONS
+            ierr = MATRIX_STATUS%ILL_OPERATIONS%id
             return
         end if
 
@@ -658,9 +662,9 @@ contains
         call dgetri(n, A, n, ipiv, work, lwork, info)
 
         if (info /= 0) then
-            ierr = MATRIX_STATUS_ILL_OPERATIONS
+            ierr = MATRIX_STATUS%ILL_OPERATIONS%id
         else
-            ierr = MATRIX_STATUS_SUCCESS
+            ierr = MATRIX_STATUS%SUCCESS%id
         end if
 
         call deallocate_array(ipiv)
@@ -679,7 +683,7 @@ contains
 
         call allocate_array(temp_row_A, n)
         call allocate_array(temp_row_inv, n)
-        ierr = MATRIX_STATUS_SUCCESS
+        ierr = MATRIX_STATUS%SUCCESS%id
 
         do i = 1, n
             ! Find pivot
@@ -694,7 +698,7 @@ contains
 
             ! Check singularity
             if (pivot_val < epsilon(1.0_real64)) then
-                ierr = MATRIX_STATUS_ILL_OPERATIONS
+                ierr = MATRIX_STATUS%ILL_OPERATIONS%id
                 exit
             end if
 
@@ -725,7 +729,7 @@ contains
         end do
 
         ! If successful, copy result back
-        if (ierr == MATRIX_STATUS_SUCCESS) then
+        if (ierr == MATRIX_STATUS%SUCCESS%id) then
             A = invA
         end if
 
@@ -762,11 +766,11 @@ contains
         m = size(A, 2)
 
         if (n /= m) then
-            ierr = MATRIX_STATUS_ILL_OPERATIONS
+            ierr = MATRIX_STATUS%ILL_OPERATIONS%id
             det = 0.0d0
             return
         end if
-        ierr = MATRIX_STATUS_SUCCESS
+        ierr = MATRIX_STATUS%SUCCESS%id
 
         ! --- N <= 3: Analytical Solution ---
         if (n <= 3) then
@@ -794,7 +798,7 @@ contains
         call dgetrf(n, n, temp_A, n, ipiv, info)
 
         if (info < 0) then
-            ierr = MATRIX_STATUS_ILL_OPERATIONS
+            ierr = MATRIX_STATUS%ILL_OPERATIONS%id
             det = 0.0d0
         else if (info > 0) then
             ! Singular matrix
@@ -899,7 +903,7 @@ contains
         type is (type_matrix_bsr)
             call gemv_matrix_bsr(1.0d0, A, x_data, 0.0d0, y_data, ierr)
         class default
-            ierr = MATRIX_STATUS_ILL_OPERATIONS
+            ierr = MATRIX_STATUS%ILL_OPERATIONS%id
         end select
 
     end subroutine matvec_matrix

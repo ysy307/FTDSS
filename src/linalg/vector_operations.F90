@@ -1662,7 +1662,7 @@ contains
         end if
 
         ptr_rhs => rhs%get_data()
-        call lhs%set(OP_INS, ptr_rhs)
+        call lhs%set(VECTOR_OPS%INS, ptr_rhs)
     end subroutine assign_vector_dp
 
     !>
@@ -1682,7 +1682,7 @@ contains
         end if
         ptr_rhs => rhs%get_data()
 
-        call lhs%set(OP_INS, ptr_rhs)
+        call lhs%set(VECTOR_OPS%INS, ptr_rhs)
     end subroutine assign_vector_int
 
     subroutine axpy_vector_dp(alpha, x, y)
