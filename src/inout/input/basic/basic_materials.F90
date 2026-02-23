@@ -102,19 +102,19 @@ contains
 
         ! if (self%analysis_controls%is_active(get_physics_type(thermal))) then
         buffer(2) = calculate_thermal
-        call get_json_value(json, join(buffer), self%materials(i_material)%is_active(get_physics_type(thermal)), &
+        call get_json_value(json, join(buffer), self%materials(i_material)%is_active(PHYSICS_TYPES%THERMAL%id), &
                             is_required=.false., default_value=.false.)
         ! end if
 
-        ! if (self%analysis_controls%is_active(get_physics_type(hydraulic))) then
+        ! if (self%analysis_controls%is_active(PHYSICS_TYPES%HYDRAULIC%id)) then
         buffer(2) = calculate_hydraulic
-        call get_json_value(json, join(buffer), self%materials(i_material)%is_active(get_physics_type(hydraulic)), &
+        call get_json_value(json, join(buffer), self%materials(i_material)%is_active(PHYSICS_TYPES%HYDRAULIC%id), &
                             is_required=.false., default_value=.false.)
         ! end if
 
-        ! if (self%analysis_controls%is_active(get_physics_type(mechanical))) then
+        ! if (self%analysis_controls%is_active(PHYSICS_TYPES%MECHANICAL%id)) then
         buffer(2) = calculate_mechanical
-        call get_json_value(json, join(buffer), self%materials(i_material)%is_active(get_physics_type(mechanical)), &
+        call get_json_value(json, join(buffer), self%materials(i_material)%is_active(PHYSICS_TYPES%MECHANICAL%id), &
                             is_required=.false., default_value=.false.)
         ! end if
 
@@ -216,7 +216,7 @@ contains
 
             buffer(3) = water_viscosity_model
             call get_json_value(json, join(buffer(1:3)), hydraulic_conductivity%water_viscosity_model, &
-                                is_required=.false., default_value=HCF_VISCOSITY_EXPONENTIAL, valid_range=[1, 2])
+                                is_required=.false., default_value=HCF_VISCOSITY_TYPES%EXPONENTIAL%id, valid_range=[1, 2])
 
             buffer(3) = gain_factor
             call get_json_value(json, join(buffer(1:3)), hydraulic_conductivity%gain_factor, &
@@ -240,11 +240,11 @@ contains
         associate (swcc => self%materials(i_material)%water_characteristic_curve)
             buffer(3) = model
             call get_json_value(json, join(buffer(1:3)), tmp_strings, is_required=.true.)
-            swcc%model_number = get_swcc_model_type(tmp_strings)
+            swcc%model_number = SWCC_MODELS%to_id(tmp_strings)
 
             buffer(3) = unit
             call get_json_value(json, join(buffer(1:3)), tmp_strings, is_required=.true., valid_list=valid_units)
-            swcc%unit = get_physics_unit(tmp_strings)
+            swcc%unit = PHYSICS_UNITS%to_id(tmp_strings)
 
             buffer(3) = theta_s
             call get_json_value(json, join(buffer(1:3)), swcc%theta_s, is_required=.true., valid_range=[0.0d0, 1.0d0])
@@ -424,9 +424,9 @@ contains
 
         if (self%phase > 2) then
             if (self%phase_change%equilibrium_model%segregation) then
-                gcc_info = GCC_SEGREGATION
+                gcc_info = GCC_TYPES%SEGREGATION%id
             else
-                gcc_info = GCC_NON_SEGREGATION
+                gcc_info = GCC_TYPES%NON_SEGREGATION%id
             end if
         else
             gcc_info = -1
@@ -476,17 +476,17 @@ contains
 
         ! --- 2. Thermal Properties ---
         !     構造体はフラットですが，表示は見やすく物理現象ごとにまとめます
-        if (self%is_active(get_physics_type(thermal))) then
+        if (self%is_active(PHYSICS_TYPES%THERMAL%id)) then
             call display_material_thermal(self)
         end if
 
         ! --- 3. Hydraulic Properties ---
-        if (self%is_active(get_physics_type(hydraulic))) then
+        if (self%is_active(PHYSICS_TYPES%HYDRAULIC%id)) then
             call display_material_hydraulic(self)
         end if
 
         ! --- 4. Mechanical Properties ---
-        if (self%is_active(get_physics_type(mechanical))) then
+        if (self%is_active(PHYSICS_TYPES%MECHANICAL%id)) then
             write (*, '(a)') "  Mechanical Properties: (Not implemented)"
         end if
 

@@ -40,13 +40,13 @@ contains
         ! Step 1: Apply Natural BCs (Neumann, Robin, etc.)
         ! ----------------------------------------------------------------------
         if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
-            dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPE_THERMAL)
+            dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPES%THERMAL%id)
             call self%apply_natural_bc_generic(PHYSICS_TYPES%THERMAL, current_time, &
                                                self%temperature, dof_offset)
         end if
 
         if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
-            dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPE_HYDRAULIC)
+            dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPES%HYDRAULIC%id)
             call self%apply_natural_bc_generic(PHYSICS_TYPES%HYDRAULIC, current_time, &
                                                self%pressure, dof_offset)
         end if
@@ -55,13 +55,13 @@ contains
         ! Step 2: Apply Essential BCs (Dirichlet Constraints)
         ! ----------------------------------------------------------------------
         if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
-            dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPE_THERMAL)
+            dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPES%THERMAL%id)
             call self%apply_essential_bc_generic(PHYSICS_TYPES%THERMAL, current_time, &
                                                  self%temperature, dof_offset)
         end if
 
         if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
-            dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPE_HYDRAULIC)
+            dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPES%HYDRAULIC%id)
             call self%apply_essential_bc_generic(PHYSICS_TYPES%HYDRAULIC, current_time, &
                                                  self%pressure, dof_offset)
         end if

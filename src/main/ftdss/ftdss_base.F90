@@ -23,7 +23,7 @@ contains
 
         profiler_labels = [character(len=10) :: "IO", "Setup", "Assemble", "Solve", "Total"]
         call self%controls%profiler%initialize(profiler_labels)
-        call self%controls%profiler%record(TIME_RECORD_START)
+        call self%controls%profiler%record(TIME_RECORDS%START%id)
         call self%controls%profiler%start("Total")
 
         ! call setup_handler()
@@ -54,16 +54,16 @@ contains
 
         max_bdf_order = input%basic%solver_settings%bdf_order
         call self%porosity%initialize(num_nodes, max_bdf_order)
-        call ic%apply(IC_TARGET_POROSITY, self%porosity)
+        call ic%apply(IC_TARGETS%POROSITY%id, self%porosity)
 
         if (self%is_active_thermal()) then
             call self%temperature%initialize(num_nodes, max_bdf_order)
-            call ic%apply(IC_TARGET_THERMAL, self%temperature)
+            call ic%apply(IC_TARGETS%THERMAL%id, self%temperature)
         end if
 
         if (self%is_active_hydraulic()) then
             call self%pressure%initialize(num_nodes, max_bdf_order)
-            call ic%apply(IC_TARGET_HYDRAULIC, self%pressure)
+            call ic%apply(IC_TARGETS%HYDRAULIC%id, self%pressure)
         end if
 
         call self%Qw%initialize(num_nodes, max_bdf_order)
@@ -339,7 +339,7 @@ contains
 
         ! 2. 流束計算 (advectionやdiffusionで使用)
         !    Stateに入っている勾配(grad_T, grad_P)を使用
-        if (self%controls%is_target(PHYSICS_TYPE_HYDRAULIC, material_id)) then
+        if (self%controls%is_target(PHYSICS_TYPES%HYDRAULIC, material_id)) then
             call state%grad_T%get(grad_T)
             call state%grad_P%get(grad_P)
             call self%calc_water_flux(material_id, state, grad_T, grad_P, water_flux)
@@ -498,7 +498,7 @@ contains
 
         ! --- Stop and Record Profiler ---
         call self%controls%profiler%stop("Total")
-        call self%controls%profiler%record(TIME_RECORD_END)
+        call self%controls%profiler%record(TIME_RECORDS%END%id)
 
         ! --- Extract Profiling Data ---
         ! Get primitive data from the profiler to avoid dependency in the logger

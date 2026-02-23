@@ -34,7 +34,7 @@ contains
         call self%residual_history%initialize(self%max_iterations)
         self%current_iteration = 0
 
-        self%status = SOLVER_STATUS_SUCCESS
+        self%status = SOLVER_STATUS%SUCCESS%id
 
         ! Setup preconditioner
         call create_preconditioner(self%pc, preconditioner_settings, ierr)
@@ -105,9 +105,9 @@ contains
             ! 8: rho check
             if (rho == 0.0d0) then
                 self%current_iteration = iter
-                call self%residual_history%set(OP_INS, iter, vector_norm2(self%r))
+                call self%residual_history%set(MATRIX_OPS%INS, iter, vector_norm2(self%r))
                 call x%copy(self%x)
-                self%status = SOLVER_STATUS_SUCCESS
+                self%status = SOLVER_STATUS%SUCCESS%id
                 return
             end if
 
@@ -141,7 +141,7 @@ contains
 
             ! 22: omega breakdown check
             if (omega == 0.0d0) then
-                self%status = SOLVER_STATUS_BREAKDOWN
+                self%status = SOLVER_STATUS%BREAKDOWN%id
                 return
             end if
 
@@ -153,10 +153,10 @@ contains
 
             ! 25: ||r_k+1||_2
             resid = vector_norm2(self%r)
-            call self%residual_history%set(OP_INS, iter, resid)
+            call self%residual_history%set(MATRIX_OPS%INS, iter, resid)
             if (resid < self%tolerance) then
                 self%current_iteration = iter
-                self%status = SOLVER_STATUS_SUCCESS
+                self%status = SOLVER_STATUS%SUCCESS%id
                 call x%copy(self%x)
                 return
             end if
@@ -166,7 +166,7 @@ contains
             if (was_interrupted()) stop
         end do
         self%current_iteration = iter
-        self%status = SOLVER_STATUS_MAXITER
+        self%status = SOLVER_STATUS%MAXITER%id
         call x%copy(self%x)
 
     end subroutine solve_type_solver_bicgstab
@@ -198,6 +198,6 @@ contains
             deallocate (self%pc)
         end if
 
-        self%status = SOLVER_STATUS_SUCCESS
+        self%status = SOLVER_STATUS%SUCCESS%id
     end subroutine destroy_type_solver_bicgstab
 end submodule solve_type_solver_bicgstab

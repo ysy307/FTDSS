@@ -74,7 +74,7 @@ module inout_input_conditions
     type :: type_boundary_conditions
         class(type_conditions), pointer :: parent => null()
         integer(int32) :: id
-        type(type_boundary_local) :: physics(NUM_PHYSICS_TYPES)
+        type(type_boundary_local) :: physics(PHYSICS_TYPES%NUM_ID)
     contains
         procedure, pass(self) :: display => display_boundary_conditions
     end type type_boundary_conditions
@@ -99,7 +99,7 @@ module inout_input_conditions
 
     type :: type_initial_conditions
         class(type_conditions), pointer :: parent => null()
-        type(type_initial_local) :: physics(NUM_IC_TARGETS)
+        type(type_initial_local) :: physics(IC_TARGETS%NUM_ID)
     contains
         procedure, pass(self) :: display => display_initial_conditions
     end type type_initial_conditions

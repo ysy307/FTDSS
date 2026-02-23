@@ -98,11 +98,11 @@ contains
 
         ! Assuming z is the vertical coordinate acting against gravity
         select case (self%computation_type)
-        case (COMP_TYPE_2D_XZ)
+        case (COMP_TYPES%XZ_2D%id)
             V_H(2) = -grav_flux_mag ! z-direction
-        case (COMP_TYPE_3D)
+        case (COMP_TYPES%XYZ_3D%id)
             V_H(3) = -grav_flux_mag ! z-direction
-        case (COMP_TYPE_2D_XY)
+        case (COMP_TYPES%XY_2D%id)
             ! Usually gravity is perpendicular to XY plane or handled differently
             ! Assuming XY implies horizontal plane, gravity term might be zero or handled externally
             V_H(:) = 0.0d0

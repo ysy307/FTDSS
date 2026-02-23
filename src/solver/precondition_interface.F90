@@ -324,7 +324,7 @@ contains
 
         self%id = id
         select case (self%id)
-        case (SOLVER_PRECONDITION_JACOBI)
+        case (PRECONDITIONER_TYPES%JACOBI%id)
             if (present(num_nodes)) then
                 self%num_nodes = num_nodes
             else
@@ -335,7 +335,7 @@ contains
             else
                 self%block_size = 1
             end if
-        case (SOLVER_PRECONDITION_ILU)
+        case (PRECONDITIONER_TYPES%ILU%id)
             if (present(num_nodes)) then
                 self%num_nodes = num_nodes
             else
@@ -370,32 +370,32 @@ contains
         end if
 
         select case (info%id)
-        case (SOLVER_PRECONDITION_NONE)
+        case (PRECONDITIONER_TYPES%NONE%id)
             allocate (type_preconditioner_none :: pc)
             call pc%initialize(info)
             ierr = pc%status
-        case (SOLVER_PRECONDITION_JACOBI)
+        case (PRECONDITIONER_TYPES%JACOBI%id)
             allocate (type_preconditioner_jacobi :: pc)
             call pc%initialize(info)
             ierr = pc%status
-        case (SOLVER_PRECONDITION_ILU)
+        case (PRECONDITIONER_TYPES%ILU%id)
             allocate (type_preconditioner_iluk :: pc)
             call pc%initialize(info)
             ierr = pc%status
-        case (SOLVER_PRECONDITION_SSOR)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_PRECONDITION_HYBRID)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_PRECONDITION_IS)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_PRECONDITION_SAINV)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_PRECONDITION_SAAMG)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_PRECONDITION_ILUC)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_PRECONDITION_ILUT)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
+        case (PRECONDITIONER_TYPES%SSOR%id)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%id
+        case (PRECONDITIONER_TYPES%HYBRID%id)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%id
+        case (PRECONDITIONER_TYPES%IS%id)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%id
+        case (PRECONDITIONER_TYPES%SAINV%id)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%id
+        case (PRECONDITIONER_TYPES%SAAMG%id)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%id
+        case (PRECONDITIONER_TYPES%ILUC%id)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%id
+        case (PRECONDITIONER_TYPES%ILUT%id)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%id
         end select
 
     end subroutine create_preconditioner

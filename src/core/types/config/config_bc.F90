@@ -2,20 +2,21 @@ module core_types_physics_config_bc
     use, intrinsic :: iso_fortran_env
     use :: core_memory, only:allocate_array, deallocate_array
     use :: core_constants, only:type_constant_id
+    use :: core_types_physics_config_base, only:abst_config
     implicit none
     private
 
     public :: type_config_bc
 
-    type :: type_config_bc
+    type, extends(abst_config) :: type_config_bc
         !> 対象とする境界のID
         integer(int32) :: boundary_id = -1
         !> 対象とする現象の種類
         !> 熱移動，水分移動など
-        type(type_constant_id) :: physics_type
+        type(type_constant_id) :: physics_type = PHYSICS_TYPES%UNKNOWN
         !> 境界条件の種類
         !> ディリクレ，ノイマンなど
-        type(type_constant_id) :: bc_kind
+        type(type_constant_id) :: bc_kind = type_constant_id(0, 'unknown')
 
         real(real64), allocatable :: time_points(:)
         real(real64), allocatable :: values(:, :) ! (成分, 時間)
@@ -34,28 +35,34 @@ contains
     subroutine copy_config_bc(self, source)
         implicit none
         class(type_config_bc), intent(inout) :: self
-        class(type_config_bc), intent(in) :: source
+        class(abst_config), intent(in) :: source
 
-        self%boundary_id = source%boundary_id
-        self%physics_type = source%physics_type
-        self%bc_kind = source%bc_kind
+        select type (source)
+        type is (type_config_bc)
 
-        self%num_time_points = source%num_time_points
-        self%num_variables = source%num_variables
+            call self%set(self%boundary_id, source%boundary_id)
+            call self%set(self%physics_type, source%physics_type)
+            call self%set(self%bc_kind, source%bc_kind)
 
-        if (allocated(source%time_points)) then
-            allocate (self%time_points(size(source%time_points)))
-            self%time_points = source%time_points
-        else
-            if (allocated(self%time_points)) deallocate (self%time_points)
-        end if
+            self%num_time_points = source%num_time_points
+            self%num_variables = source%num_variables
 
-        if (allocated(source%values)) then
-            allocate (self%values(size(source%values, 1), size(source%values, 2)))
-            self%values = source%values
-        else
-            if (allocated(self%values)) deallocate (self%values)
-        end if
+            if (allocated(source%time_points)) then
+                allocate (self%time_points(size(source%time_points)))
+                self%time_points = source%time_points
+            else
+                if (allocated(self%time_points)) deallocate (self%time_points)
+            end if
+
+            if (allocated(source%values)) then
+                allocate (self%values(size(source%values, 1), size(source%values, 2)))
+                self%values = source%values
+            else
+                if (allocated(self%values)) deallocate (self%values)
+            end if
+        class default
+            call self%reset()
+        end select
     end subroutine copy_config_bc
 
     subroutine reset_config_bc(self)

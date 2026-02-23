@@ -116,11 +116,11 @@ contains
             beta = vector_norm2(self%r)
 
             ! Save history (first iteration or every restart)
-            if (iter_global == 0) call self%residual_history%set(OP_INS, 1, beta)
+            if (iter_global == 0) call self%residual_history%set(MATRIX_OPS%INS, 1, beta)
 
             ! Convergence check (Initial)
             if (beta < self%tolerance) then
-                self%status = SOLVER_STATUS_SUCCESS
+                self%status = SOLVER_STATUS%SUCCESS%id
                 exit restart_loop
             end if
 
@@ -210,7 +210,7 @@ contains
                 ! Convergence Check
                 ! --------------------------------------------------
                 resid = abs(self%g(iter + 1))
-                call self%residual_history%set(OP_INS, iter_global, resid)
+                call self%residual_history%set(MATRIX_OPS%INS, iter_global, resid)
 
                 if (resid < self%tolerance) then
                     converged = .true.
@@ -218,7 +218,7 @@ contains
                 end if
 
                 if (iter_global >= self%max_iterations) then
-                    self%status = SOLVER_STATUS_MAXITER
+                    self%status = SOLVER_STATUS%MAXITER%id
                     exit arnoldi_loop
                 end if
 
@@ -247,11 +247,11 @@ contains
             ! Restart Check
             ! ======================================================
             if (converged) then
-                self%status = SOLVER_STATUS_SUCCESS
+                self%status = SOLVER_STATUS%SUCCESS%id
                 exit restart_loop
             end if
 
-            if (self%status == SOLVER_STATUS_MAXITER) then
+            if (self%status == SOLVER_STATUS%MAXITER%id) then
                 exit restart_loop
             end if
 
@@ -292,7 +292,7 @@ contains
             deallocate (self%pc)
         end if
 
-        self%status = SOLVER_STATUS_SUCCESS
+        self%status = SOLVER_STATUS%SUCCESS%id
     end subroutine destroy_type_solver_gmres
 
     !> Generate Givens rotation coefficients \( c \) (cosine) and \( s \) (sine).

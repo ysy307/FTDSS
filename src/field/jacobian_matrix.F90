@@ -66,12 +66,12 @@ contains
         call domain%get_total_dofs(self%size)
         call domain%get_num_nodes(self%num_nodes)
         call domain%get_num_dofs_per_node(self%num_dofs_per_node)
-        call domain%get_node_adjacency(MATRIX_CSR, row, col)
+        call domain%get_node_adjacency(MATRIX_TYPES%CSR, row, col)
 
-        self%matrix_type = MATRIX_BSR
+        self%matrix_type = MATRIX_TYPES%BSR%id
 
         ! 行列ファクトリを使用してBSR行列を生成
-        self%matrix = create_matrix(MATRIX_BSR, self%num_nodes, row, col, self%num_dofs_per_node)
+        self%matrix = create_matrix(MATRIX_TYPES%BSR, self%num_nodes, row, col, self%num_dofs_per_node)
 
         deallocate (row, col)
     end subroutine initialize_jacobian_matrix
@@ -130,7 +130,7 @@ contains
         ! abst_matrix (BSR) の set_value_block を使用
         ! 引数順序: op, row(node), col(node), row_block(dof), col_block(dof), value
         if (allocated(self%matrix)) then
-            call self%matrix%set(OP_INS, row_node, col_node, row_dof, col_dof, value)
+            call self%matrix%set(MATRIX_OPS%INS, row_node, col_node, row_dof, col_dof, value)
         end if
     end subroutine set_value_jacobian_matrix
 
@@ -144,7 +144,7 @@ contains
         real(real64), intent(in) :: value
 
         if (allocated(self%matrix)) then
-            call self%matrix%set(OP_ADD, row_node, col_node, row_dof, col_dof, value)
+            call self%matrix%set(MATRIX_OPS%ADD, row_node, col_node, row_dof, col_dof, value)
         end if
     end subroutine add_value_jacobian_matrix
 
@@ -170,7 +170,7 @@ contains
         ! ここでは各ノードペアに対して set_value_block を呼び出す。
         do i = 1, num_local_nodes
             do j = 1, num_local_nodes
-                call self%matrix%set(OP_ADD, &
+                call self%matrix%set(MATRIX_OPS%ADD, &
                                      global_connectivity(i), global_connectivity(j), &
                                      row_dof, col_dof, dense_val(i, j))
             end do

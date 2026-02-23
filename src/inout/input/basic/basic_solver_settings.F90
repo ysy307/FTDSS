@@ -100,16 +100,16 @@ contains
         buffer(3) = method
         call get_json_value(json, join(buffer(1:3)), temp_string, &
                             is_required=.true., default_value="none", valid_list=valid_nonlinear_solver_methods_str)
-        self%solver_settings%nonlinear_solver%method = get_nonlinear_solver_type(temp_string)
+        self%solver_settings%nonlinear_solver%method = NONLINEAR_SOLVER%to_id(temp_string)
 
-        if (self%solver_settings%nonlinear_solver%method == NONLINEAR_SOLVER_MODIFIED_NEWTON) then
+        if (self%solver_settings%nonlinear_solver%method == NONLINEAR_SOLVER%MODIFIED_NEWTON%id) then
             buffer(3) = update_frequency
             call get_json_value(json, join(buffer(1:3)), self%solver_settings%nonlinear_solver%update_frequency, &
                                 is_required=.true., default_value=5, valid_range=[1, huge(1)])
         end if
 
         if (any(self%solver_settings%nonlinear_solver%method == [ &
-                NONLINEAR_SOLVER_NEWTON, NONLINEAR_SOLVER_MODIFIED_NEWTON, NONLINEAR_SOLVER_PICARD])) then
+                NONLINEAR_SOLVER%NEWTON%id, NONLINEAR_SOLVER%MODIFIED_NEWTON%id, NONLINEAR_SOLVER%PICARD%id])) then
             buffer(3) = max_iterations
             call get_json_value(json, join(buffer(1:3)), self%solver_settings%nonlinear_solver%max_iterations, &
                                 is_required=.true., default_value=1000, valid_range=[1, huge(1)])
@@ -118,28 +118,28 @@ contains
             buffer(4) = use_criteria
             call get_json_value(json, join(buffer), temp_string, &
                                 is_required=.true., default_value="both", valid_list=valid_criteria_types_str)
-            self%solver_settings%nonlinear_solver%convergence%use_criteria = get_nonlinear_norm_criteria(temp_string)
+            self%solver_settings%nonlinear_solver%convergence%use_criteria = NONLINEAR_NORM_CRITERIA%to_id(temp_string)
 
-            if (self%solver_settings%nonlinear_solver%convergence%use_criteria == NONLINEAR_NORM_CRITERIA_BOTH) then
+            if (self%solver_settings%nonlinear_solver%convergence%use_criteria == NONLINEAR_NORM_CRITERIA%BOTH%id) then
                 buffer(4) = logic_between_criteria
                 call get_json_value(json, join(buffer), temp_string, &
                                     is_required=.true., default_value="and", valid_list=valid_logic_types_str)
-                self%solver_settings%nonlinear_solver%convergence%use_logic = get_nonlinear_logic(temp_string)
+                self%solver_settings%nonlinear_solver%convergence%use_logic = NONLINEAR_LOGIC%to_id(temp_string)
             end if
 
             buffer(4) = norm_type
             call get_json_value(json, join(buffer), temp_string, &
                                 is_required=.true., default_value="l2", valid_list=valid_norm_types_str)
-            self%solver_settings%nonlinear_solver%convergence%norm_type = get_norm_type(temp_string)
+            self%solver_settings%nonlinear_solver%convergence%norm_type = NORM_TYPES%to_id(temp_string)
 
             if (any(self%solver_settings%nonlinear_solver%convergence%use_criteria == &
-                    [NONLINEAR_NORM_CRITERIA_RESIDUAL, NONLINEAR_NORM_CRITERIA_BOTH])) then
+                    [NONLINEAR_NORM_CRITERIA%RESIDUAL%id, NONLINEAR_NORM_CRITERIA%BOTH%id])) then
                 buffer(4) = residual
                 call read_parameters_solver_settings_nonlinear_convergence( &
                     self%solver_settings%nonlinear_solver%convergence%residual, json, buffer, 4)
             end if
             if (any(self%solver_settings%nonlinear_solver%convergence%use_criteria == &
-                    [NONLINEAR_NORM_CRITERIA_UPDATE, NONLINEAR_NORM_CRITERIA_BOTH])) then
+                    [NONLINEAR_NORM_CRITERIA%UPDATE%id, NONLINEAR_NORM_CRITERIA%BOTH%id])) then
                 buffer(4) = update
                 call read_parameters_solver_settings_nonlinear_convergence( &
                     self%solver_settings%nonlinear_solver%convergence%update, json, buffer, 4)
@@ -165,21 +165,21 @@ contains
         local_buffer(end_index + 1) = criteria
         call get_json_value(json, join(local_buffer), temp_string, &
                             is_required=.true., default_value="both", valid_list=valid_local_criteria_types_str)
-        convergence_obj%criteria = get_nonlinear_criteria(temp_string)
+        convergence_obj%criteria = NONLINEAR_CRITERIA%to_id(temp_string)
 
-        if (convergence_obj%criteria == NONLINEAR_CRITERIA_BOTH) then
+        if (convergence_obj%criteria == NONLINEAR_CRITERIA%BOTH%id) then
             local_buffer(end_index + 1) = logic
             call get_json_value(json, join(local_buffer), temp_string, &
                                 is_required=.true., default_value="and", valid_list=valid_logic_types_str)
-            convergence_obj%logic = get_nonlinear_logic(temp_string)
+            convergence_obj%logic = NONLINEAR_LOGIC%to_id(temp_string)
         end if
 
-        if (any(convergence_obj%criteria == [NONLINEAR_CRITERIA_ABSOLUTE, NONLINEAR_CRITERIA_BOTH])) then
+        if (any(convergence_obj%criteria == [NONLINEAR_CRITERIA%ABSOLUTE%id, NONLINEAR_CRITERIA%BOTH%id])) then
             local_buffer(end_index + 1) = absolute_tolerance
             call get_json_value(json, join(local_buffer), convergence_obj%absolute_tolerance, &
                                 is_required=.true., default_value=1.0d-6, valid_range=[0.0d0, huge(0.0d0)])
         end if
-        if (any(convergence_obj%criteria == [NONLINEAR_CRITERIA_RELATIVE, NONLINEAR_CRITERIA_BOTH])) then
+        if (any(convergence_obj%criteria == [NONLINEAR_CRITERIA%RELATIVE%id, NONLINEAR_CRITERIA%BOTH%id])) then
             local_buffer(end_index + 1) = relative_tolerance
             call get_json_value(json, join(local_buffer), convergence_obj%relative_tolerance, &
                                 is_required=.true., default_value=1.0d-6, valid_range=[0.0d0, huge(0.0d0)])
@@ -313,47 +313,29 @@ subroutine read_parameters_solver_parallel_settings(self, json)
     pure function nonlinear_solver_to_string(id) result(str)
         integer(int32), intent(in) :: id
         character(len=16) :: str
-        select case (id)
-        case (NONLINEAR_SOLVER_NONE); str = "none"
-        case (NONLINEAR_SOLVER_NEWTON); str = "newton"
-        case (NONLINEAR_SOLVER_MODIFIED_NEWTON); str = "modified_newton"
-        case (NONLINEAR_SOLVER_PICARD); str = "picard"
-        case default; str = "unknown"
-        end select
+        str = trim(NONLINEAR_SOLVER%to_name(id))
+        if (len_trim(str) == 0) str = "unknown"
     end function nonlinear_solver_to_string
 
     pure function norm_criteria_to_string(id) result(str)
         integer(int32), intent(in) :: id
         character(len=16) :: str
-        select case (id)
-        case (NONLINEAR_NORM_CRITERIA_NONE); str = "none"
-        case (NONLINEAR_NORM_CRITERIA_RESIDUAL); str = "residual"
-        case (NONLINEAR_NORM_CRITERIA_UPDATE); str = "update"
-        case (NONLINEAR_NORM_CRITERIA_BOTH); str = "both"
-        case default; str = "unknown"
-        end select
+        str = trim(NONLINEAR_NORM_CRITERIA%to_name(id))
+        if (len_trim(str) == 0) str = "unknown"
     end function norm_criteria_to_string
 
     pure function local_criteria_to_string(id) result(str)
         integer(int32), intent(in) :: id
         character(len=16) :: str
-        select case (id)
-        case (NONLINEAR_CRITERIA_NONE); str = "none"
-        case (NONLINEAR_CRITERIA_RELATIVE); str = "relative"
-        case (NONLINEAR_CRITERIA_ABSOLUTE); str = "absolute"
-        case (NONLINEAR_CRITERIA_BOTH); str = "both"
-        case default; str = "unknown"
-        end select
+        str = trim(NONLINEAR_CRITERIA%to_name(id))
+        if (len_trim(str) == 0) str = "unknown"
     end function local_criteria_to_string
 
     pure function logic_to_string(id) result(str)
         integer(int32), intent(in) :: id
         character(len=16) :: str
-        select case (id)
-        case (NONLINEAR_LOGIC_OR); str = "or"
-        case (NONLINEAR_LOGIC_AND); str = "and"
-        case default; str = "unknown"
-        end select
+        str = trim(NONLINEAR_LOGIC%to_name(id))
+        if (len_trim(str) == 0) str = "unknown"
     end function logic_to_string
 
     !======================================================================
@@ -386,22 +368,22 @@ subroutine read_parameters_solver_parallel_settings(self, json)
         write (*, '(/a)') "  --- Nonlinear Solver ---"
         write (*, '(a, a)') "    Method                : ", trim(nonlinear_solver_to_string(nonlinear%method))
 
-        if (nonlinear%method == NONLINEAR_SOLVER_MODIFIED_NEWTON) then
+        if (nonlinear%method == NONLINEAR_SOLVER%MODIFIED_NEWTON%id) then
             write (*, '(a, i0)') "    Update Frequency      : ", nonlinear%update_frequency
         end if
 
-        if (any(nonlinear%method == [NONLINEAR_SOLVER_NEWTON, NONLINEAR_SOLVER_MODIFIED_NEWTON, NONLINEAR_SOLVER_PICARD])) then
+        if (any(nonlinear%method == [NONLINEAR_SOLVER%NEWTON%id, NONLINEAR_SOLVER%MODIFIED_NEWTON%id, NONLINEAR_SOLVER%PICARD%id])) then
             write (*, '(a, i0)') "    Max Iterations        : ", nonlinear%max_iterations
             write (*, '(a)') "    --- Convergence ---"
             write (*, '(a, a)') "      Use Criteria          : ", trim(norm_criteria_to_string(nonlinear%convergence%use_criteria))
-            if (nonlinear%convergence%use_criteria == NONLINEAR_NORM_CRITERIA_BOTH) then
+            if (nonlinear%convergence%use_criteria == NONLINEAR_NORM_CRITERIA%BOTH%id) then
                 write (*, '(a, a)') "      Logic Between         : ", trim(logic_to_string(nonlinear%convergence%use_logic))
             end if
 
-            if (any(nonlinear%convergence%use_criteria == [NONLINEAR_NORM_CRITERIA_RESIDUAL, NONLINEAR_NORM_CRITERIA_BOTH])) then
+            if (any(nonlinear%convergence%use_criteria == [NONLINEAR_NORM_CRITERIA%RESIDUAL%id, NONLINEAR_NORM_CRITERIA%BOTH%id])) then
                 call display_solver_convergence_criteria(nonlinear%convergence%residual, "      Residual Criteria")
             end if
-            if (any(nonlinear%convergence%use_criteria == [NONLINEAR_NORM_CRITERIA_UPDATE, NONLINEAR_NORM_CRITERIA_BOTH])) then
+            if (any(nonlinear%convergence%use_criteria == [NONLINEAR_NORM_CRITERIA%UPDATE%id, NONLINEAR_NORM_CRITERIA%BOTH%id])) then
                 call display_solver_convergence_criteria(nonlinear%convergence%update, "      Update Criteria")
             end if
         end if
@@ -414,13 +396,13 @@ subroutine read_parameters_solver_parallel_settings(self, json)
         character(*), intent(in) :: title
 
         write (*, '(a, a)') trim(title)//'        : ', trim(local_criteria_to_string(criteria_obj%criteria))
-        if (criteria_obj%criteria == NONLINEAR_CRITERIA_BOTH) then
+        if (criteria_obj%criteria == NONLINEAR_CRITERIA%BOTH%id) then
             write (*, '(a, a)') "        Logic             : ", trim(logic_to_string(criteria_obj%logic))
         end if
-        if (any(criteria_obj%criteria == [NONLINEAR_CRITERIA_ABSOLUTE, NONLINEAR_CRITERIA_BOTH])) then
+        if (any(criteria_obj%criteria == [NONLINEAR_CRITERIA%ABSOLUTE%id, NONLINEAR_CRITERIA%BOTH%id])) then
             write (*, '(a, es12.4e2)') "        Absolute Tol.     : ", criteria_obj%absolute_tolerance
         end if
-        if (any(criteria_obj%criteria == [NONLINEAR_CRITERIA_RELATIVE, NONLINEAR_CRITERIA_BOTH])) then
+        if (any(criteria_obj%criteria == [NONLINEAR_CRITERIA%RELATIVE%id, NONLINEAR_CRITERIA%BOTH%id])) then
             write (*, '(a, es12.4e2)') "        Relative Tol.     : ", criteria_obj%relative_tolerance
         end if
     end subroutine display_solver_convergence_criteria

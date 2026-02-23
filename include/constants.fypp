@@ -10,7 +10,7 @@
             ('DENSE', 1, 'dense'), &
             ('CSR',   2, 'csr'), &
             ('COO',   3, 'coo'), &
-            ('BSR',   4, 'bsr') &
+            ('BSR',   4, 'bsr'), &
             ('DIA',   5, 'dia') &
         ], &
         'num' : 5, &
@@ -42,8 +42,8 @@
             ('HYDRAULIC',  2, 'hydraulic'), &
             ('MECHANICAL', 3, 'mechanical') &
         ], &
-        'num' : 3, &
-        'id_range' : [1, 3] &
+        'num' : 4, &
+        'id_range' : [0, 3] &
     }
 
     #:set DOF_TYPES = { &
@@ -488,6 +488,101 @@
         'id_range' : [0, 81] &
     }
 
+    #:set PHYSICS_UNITS = { &
+        'type_name'  : 'type_physics_units', &
+        'obj_name'   : 'PHYSICS_UNITS', &
+        'category'   : 'PHYSICS_UNIT', &
+        'suffix'     : 'physics_unit', &
+        'description': 'Physics unit systems', &
+        'items'      : [ &
+            ('M',  1, 'm'), &
+            ('CM', 2, 'cm'), &
+            ('PA', 3, 'pa') &
+        ], &
+        'num' : 3, &
+        'id_range' : [1, 3] &
+    }
+
+    #:set SWCC_MODELS = { &
+        'type_name'  : 'type_swcc_models', &
+        'obj_name'   : 'SWCC_MODELS', &
+        'category'   : 'SWCC_MODEL', &
+        'suffix'     : 'swcc_model', &
+        'description': 'Soil water characteristic curve models', &
+        'items'      : [ &
+            ('BC',     1, 'bc'), &
+            ('VG',     2, 'vg'), &
+            ('KO',     3, 'ko'), &
+            ('MVG',    4, 'mvg'), &
+            ('DURNER', 5, 'durner'), &
+            ('DVGCH',  6, 'dvgch') &
+        ], &
+        'num' : 6, &
+        'id_range' : [1, 6] &
+    }
+
+    #:set HCF_MODES = { &
+        'type_name'  : 'type_hcf_modes', &
+        'obj_name'   : 'HCF_MODES', &
+        'category'   : 'HCF_MODE', &
+        'suffix'     : 'hcf_mode', &
+        'description': 'Hydraulic conductivity function modes', &
+        'items'      : [ &
+            ('BASE',                    1, 'base'), &
+            ('IMPEDANCE',               2, 'impedance'), &
+            ('VISCOSITY',               3, 'viscosity'), &
+            ('BASE_IMPEDANCE',          4, 'base_impedance'), &
+            ('BASE_VISCOSITY',          5, 'base_viscosity'), &
+            ('IMPEDANCE_VISCOSITY',     6, 'impedance_viscosity'), &
+            ('BASE_IMPEDANCE_VISCOSITY', 7, 'base_impedance_viscosity') &
+        ], &
+        'num' : 7, &
+        'id_range' : [1, 7] &
+    }
+
+    #:set HCF_VISCOSITY_TYPES = { &
+        'type_name'  : 'type_hcf_viscosity_types', &
+        'obj_name'   : 'HCF_VISCOSITY_TYPES', &
+        'category'   : 'HCF_VISCOSITY', &
+        'suffix'     : 'hcf_viscosity_type', &
+        'description': 'Hydraulic conductivity viscosity models', &
+        'items'      : [ &
+            ('EXPONENTIAL',  1, 'exponential'), &
+            ('SUPERCOOLED',  2, 'supercooled') &
+        ], &
+        'num' : 2, &
+        'id_range' : [1, 2] &
+    }
+
+    #:set GCC_TYPES = { &
+        'type_name'  : 'type_gcc_types', &
+        'obj_name'   : 'GCC_TYPES', &
+        'category'   : 'GCC_TYPE', &
+        'suffix'     : 'gcc_type', &
+        'description': 'Ground cryogenic curve types', &
+        'items'      : [ &
+            ('NON_SEGREGATION', 1, 'non_segregation'), &
+            ('SEGREGATION',     2, 'segregation') &
+        ], &
+        'num' : 2, &
+        'id_range' : [1, 2] &
+    }
+
+    #:set TIME_RECORDS = { &
+        'type_name'  : 'type_time_records', &
+        'obj_name'   : 'TIME_RECORDS', &
+        'category'   : 'TIME_RECORD', &
+        'suffix'     : 'time_record', &
+        'description': 'Time recording points', &
+        'items'      : [ &
+            ('START', 1, 'start'), &
+            ('END',   2, 'end') &
+        ], &
+        'num' : 2, &
+        'id_range' : [1, 2] &
+    }
+ 
+
     #:set constant_id_groups = [ &
         MATRIX_TYPES, &
         COUPLING_MODES, &
@@ -513,7 +608,13 @@
         NODE_TYPES, &
         COMM_ROLES, &
         COMM_OPS, &
-        FE_TYPES &
+        FE_TYPES, &
+        PHYSICS_UNITS, &
+        SWCC_MODELS, &
+        HCF_MODES, &
+        HCF_VISCOSITY_TYPES, &
+        GCC_TYPES, &
+        TIME_RECORDS &
     ]
 
 

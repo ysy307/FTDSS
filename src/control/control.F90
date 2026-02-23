@@ -90,20 +90,20 @@ contains
         num_unique_regions = size(unique_material_ids)
         max_region_id = maxval(unique_material_ids)
 
-        self%is_active(PHYSICS_TYPE_THERMAL) = input%basic%analysis_controls%is_active(PHYSICS_TYPE_THERMAL)
-        if (self%is_active(PHYSICS_TYPE_THERMAL)) then
+        self%is_active(PHYSICS_TYPES%THERMAL%id) = input%basic%analysis_controls%is_active(PHYSICS_TYPES%THERMAL%id)
+        if (self%is_active(PHYSICS_TYPES%THERMAL%id)) then
             allocate (self%thermal(max_region_id))
             self%thermal = .false.
         end if
 
-        self%is_active(PHYSICS_TYPE_HYDRAULIC) = input%basic%analysis_controls%is_active(PHYSICS_TYPE_HYDRAULIC)
-        if (self%is_active(PHYSICS_TYPE_HYDRAULIC)) then
+        self%is_active(PHYSICS_TYPES%HYDRAULIC%id) = input%basic%analysis_controls%is_active(PHYSICS_TYPES%HYDRAULIC%id)
+        if (self%is_active(PHYSICS_TYPES%HYDRAULIC%id)) then
             allocate (self%hydraulic(max_region_id))
             self%hydraulic = .false.
         end if
 
-        self%is_active(PHYSICS_TYPE_MECHANICAL) = input%basic%analysis_controls%is_active(PHYSICS_TYPE_MECHANICAL)
-        if (self%is_active(PHYSICS_TYPE_MECHANICAL)) then
+        self%is_active(PHYSICS_TYPES%MECHANICAL%id) = input%basic%analysis_controls%is_active(PHYSICS_TYPES%MECHANICAL%id)
+        if (self%is_active(PHYSICS_TYPES%MECHANICAL%id)) then
             allocate (self%mechanical(max_region_id))
             self%mechanical = .false.
         end if
@@ -112,19 +112,19 @@ contains
             current_material_id = unique_material_ids(i)
             if (current_material_id > size(input%basic%materials)) cycle
 
-            if (self%is_active(PHYSICS_TYPE_THERMAL)) then
+            if (self%is_active(PHYSICS_TYPES%THERMAL%id)) then
                 self%thermal(current_material_id) = &
-                    input%basic%materials(current_material_id)%is_active(PHYSICS_TYPE_THERMAL)
+                    input%basic%materials(current_material_id)%is_active(PHYSICS_TYPES%THERMAL%id)
             end if
 
-            if (self%is_active(PHYSICS_TYPE_HYDRAULIC)) then
+            if (self%is_active(PHYSICS_TYPES%HYDRAULIC%id)) then
                 self%hydraulic(current_material_id) = &
-                    input%basic%materials(current_material_id)%is_active(PHYSICS_TYPE_HYDRAULIC)
+                    input%basic%materials(current_material_id)%is_active(PHYSICS_TYPES%HYDRAULIC%id)
             end if
 
-            if (self%is_active(PHYSICS_TYPE_MECHANICAL)) then
+            if (self%is_active(PHYSICS_TYPES%MECHANICAL%id)) then
                 self%mechanical(current_material_id) = &
-                    input%basic%materials(current_material_id)%is_active(PHYSICS_TYPE_MECHANICAL)
+                    input%basic%materials(current_material_id)%is_active(PHYSICS_TYPES%MECHANICAL%id)
             end if
         end do
 
@@ -162,39 +162,36 @@ contains
     pure function is_target_control(self, target_physics, material_id) result(is_active)
         implicit none
         class(type_controls), intent(in) :: self
-        integer, intent(in) :: target_physics
+        type(type_constant_id), intent(in) :: target_physics
         integer(int32), intent(in) :: material_id
         logical :: is_active
 
-        if (.not. self%is_active(target_physics)) then
+        if (.not. self%is_active(target_physics%id)) then
             is_active = .false.
             return
         end if
 
         is_active = .false.
 
-        select case (target_physics)
-        case (PHYSICS_TYPE_THERMAL)
+        if (target_physics == PHYSICS_TYPES%THERMAL) then
             if (allocated(self%thermal)) then
                 if (material_id <= ubound(self%thermal, 1)) then
                     is_active = self%thermal(material_id)
                 end if
             end if
-
-        case (PHYSICS_TYPE_HYDRAULIC)
+        else if (target_physics == PHYSICS_TYPES%HYDRAULIC) then
             if (allocated(self%hydraulic)) then
                 if (material_id <= ubound(self%hydraulic, 1)) then
                     is_active = self%hydraulic(material_id)
                 end if
             end if
-
-        case (PHYSICS_TYPE_MECHANICAL)
+        else if (target_physics == PHYSICS_TYPES%MECHANICAL) then
             if (allocated(self%mechanical)) then
                 if (material_id <= ubound(self%mechanical, 1)) then
                     is_active = self%mechanical(material_id)
                 end if
             end if
-        end select
+        end if
     end function is_target_control
 
     !>
@@ -260,13 +257,13 @@ contains
 
         write (*, '(a)') "# Control Settings"
         write (*, '(a)') "## Active Physics Types:"
-        if (self%is_active(PHYSICS_TYPE_THERMAL)) then
+        if (self%is_active(PHYSICS_TYPES%THERMAL%id)) then
             write (*, '(a)') "- Thermal"
         end if
-        if (self%is_active(PHYSICS_TYPE_HYDRAULIC)) then
+        if (self%is_active(PHYSICS_TYPES%HYDRAULIC%id)) then
             write (*, '(a)') "- Hydraulic"
         end if
-        if (self%is_active(PHYSICS_TYPE_MECHANICAL)) then
+        if (self%is_active(PHYSICS_TYPES%MECHANICAL%id)) then
             write (*, '(a)') "- Mechanical"
         end if
 

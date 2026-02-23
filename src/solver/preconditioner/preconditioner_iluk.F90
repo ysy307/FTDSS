@@ -12,8 +12,8 @@ contains
         class(type_preconditioner_iluk), intent(inout) :: self
         type(type_preconditioner_settings), intent(in) :: info
 
-        self%id = SOLVER_PRECONDITION_ILU
-        self%status = SOLVER_STATUS_SUCCESS
+        self%id = PRECONDITIONER_TYPES%ILU%id
+        self%status = SOLVER_STATUS%SUCCESS%id
 
         if (allocated(self%name)) deallocate (self%name)
         self%name = "ILU(0)"
@@ -48,7 +48,7 @@ contains
             self%num_rows = info%num_rows
         end if
 
-        self%status = SOLVER_STATUS_NOT_IMPLEMENTED
+        self%status = SOLVER_STATUS%NOT_IMPLEMENTED%id
 
         select type (A)
         type is (type_matrix_csr)
@@ -58,12 +58,12 @@ contains
             if (self%is_block) then
                 call self%setup_bsr_ilu0(A)
             else
-                self%status = SOLVER_STATUS_NOT_IMPLEMENTED
+                self%status = SOLVER_STATUS%NOT_IMPLEMENTED%id
             end if
 
         class default
             write (*, *) "Error: ILU(0) preconditioner does not support this matrix type."
-            self%status = SOLVER_STATUS_NOT_IMPLEMENTED
+            self%status = SOLVER_STATUS%NOT_IMPLEMENTED%id
         end select
 
     end subroutine setup_preconditioner_iluk
@@ -120,7 +120,7 @@ contains
                 end if
             end do
             if (self%diag_ptr(i) == -1) then
-                self%status = SOLVER_STATUS_DECOMPOSITION_FAILURE
+                self%status = SOLVER_STATUS%DECOMPOSITION_FAILURE%id
                 return
             end if
         end do
@@ -158,7 +158,7 @@ contains
             end do
         end do
 
-        self%status = SOLVER_STATUS_SUCCESS
+        self%status = SOLVER_STATUS%SUCCESS%id
     end subroutine setup_csr_ilu0
 
     !> BSR行列に対するブロック ILU(0) 分解を実行する
@@ -213,7 +213,7 @@ contains
                 end if
             end do
             if (self%diag_ptr(i) == -1) then
-                self%status = SOLVER_STATUS_DECOMPOSITION_FAILURE
+                self%status = SOLVER_STATUS%DECOMPOSITION_FAILURE%id
                 return
             end if
         end do
@@ -245,7 +245,7 @@ contains
                         self%diag_pivots(:, i), info_lapack)
 
             if (info_lapack /= 0) then
-                self%status = SOLVER_STATUS_DECOMPOSITION_FAILURE
+                self%status = SOLVER_STATUS%DECOMPOSITION_FAILURE%id
                 return
             end if
 
@@ -254,7 +254,7 @@ contains
             end do
         end do
 
-        self%status = SOLVER_STATUS_SUCCESS
+        self%status = SOLVER_STATUS%SUCCESS%id
     end subroutine setup_bsr_ilu0
 
     !> 前処理の適用

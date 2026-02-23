@@ -6,9 +6,9 @@ contains
         class(type_preconditioner_none), intent(inout) :: self
         type(type_preconditioner_settings), intent(in) :: info
 
-        self%id = SOLVER_PRECONDITION_NONE
+        self%id = PRECONDITIONER_TYPES%NONE%id
         self%name = "None"
-        self%status = SOLVER_STATUS_SUCCESS
+        self%status = SOLVER_STATUS%SUCCESS%id
     end subroutine initialize_preconditioner_none
 
     module subroutine setup_preconditioner_none(self, A)
@@ -16,7 +16,7 @@ contains
         class(type_preconditioner_none), intent(inout) :: self
         class(abst_matrix), intent(in) :: A
 
-        self%status = SOLVER_STATUS_SUCCESS
+        self%status = SOLVER_STATUS%SUCCESS%id
     end subroutine setup_preconditioner_none
 
     module subroutine apply_preconditioner_none(self, r, z)
@@ -28,7 +28,7 @@ contains
         ! z = I * r
         call z%copy(r)
 
-        self%status = SOLVER_STATUS_SUCCESS
+        self%status = SOLVER_STATUS%SUCCESS%id
     end subroutine apply_preconditioner_none
 
     module subroutine destroy_preconditioner_none(self)
@@ -37,7 +37,7 @@ contains
 
         self%id = -1
         if (allocated(self%name)) deallocate (self%name)
-        self%status = SOLVER_STATUS_SUCCESS
+        self%status = SOLVER_STATUS%SUCCESS%id
     end subroutine destroy_preconditioner_none
 
 end submodule solver_preconditioner_none

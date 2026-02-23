@@ -37,7 +37,7 @@ module inout_input_basic
     end interface
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_analysis_controls
-        logical :: is_active(NUM_IC_TARGETS)
+        logical :: is_active(IC_TARGETS%NUM_ID)
         integer(int32) :: coupling_mode
         logical :: partitioning
     contains
@@ -179,7 +179,7 @@ module inout_input_basic
     type :: type_material_settings
         integer(int32) :: id
         character(:), allocatable :: name
-        logical :: is_active(NUM_PHYSICS_TYPES)
+        logical :: is_active(PHYSICS_TYPES%NUM_ID)
         integer(int32) :: phase
         type(type_materials_density) :: density
         type(type_materials_specific_heat) :: specific_heat
