@@ -26,13 +26,13 @@ module inout_input
         type(type_input_geometry) :: geometry
     contains
         procedure, pass(self), public :: initialize => initialize_type_input
-        procedure, pass(self), public :: get_density_info => get_density_info_input
-        procedure, pass(self), public :: get_specific_heat_info => get_specific_heat_info_input
-        procedure, pass(self), public :: get_volumetric_heat_capacity_info => get_volumetric_heat_capacity_info_input
-        procedure, pass(self), public :: get_thermal_conductivity_info => get_thermal_conductivity_info_input
-        procedure, pass(self), public :: get_wrf_info => get_wrf_info_input
-        procedure, pass(self), public :: get_gcc_info => get_gcc_info_input
-        procedure, pass(self), public :: get_hcf_info => get_hcf_info_input
+        ! procedure, pass(self), public :: get_density_info => get_density_info_input
+        ! procedure, pass(self), public :: get_specific_heat_info => get_specific_heat_info_input
+        ! procedure, pass(self), public :: get_volumetric_heat_capacity_info => get_volumetric_heat_capacity_info_input
+        ! procedure, pass(self), public :: get_thermal_conductivity_info => get_thermal_conductivity_info_input
+        ! procedure, pass(self), public :: get_wrf_info => get_wrf_info_input
+        ! procedure, pass(self), public :: get_gcc_info => get_gcc_info_input
+        ! procedure, pass(self), public :: get_hcf_info => get_hcf_info_input
         procedure, pass(self), public :: display => display_input
     end type type_input
 
@@ -120,103 +120,103 @@ contains
 
     end subroutine display_input
 
-    subroutine get_density_info_input(self, material_id, density_info)
-        implicit none
-        class(type_input), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_physics_info), intent(inout) :: density_info
+    ! subroutine get_density_info_input(self, material_id, density_info)
+    !     implicit none
+    !     class(type_input), intent(in) :: self
+    !     integer(int32), intent(in) :: material_id
+    !     type(type_physics_info), intent(inout) :: density_info
 
-        if (material_id < 1 .or. material_id > self%basic%num_materials) then
-            error stop "Input Error: material_id is out of range in get_density_info."
-        end if
+    !     if (material_id < 1 .or. material_id > self%basic%num_materials) then
+    !         error stop "Input Error: material_id is out of range in get_density_info."
+    !     end if
 
-        call self%basic%materials(material_id)%get_density_info(density_info)
+    !     call self%basic%materials(material_id)%get_density_info(density_info)
 
-    end subroutine get_density_info_input
+    ! end subroutine get_density_info_input
 
-    subroutine get_specific_heat_info_input(self, material_id, specific_heat_info)
-        implicit none
-        class(type_input), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_physics_info), intent(inout) :: specific_heat_info
+    ! subroutine get_specific_heat_info_input(self, material_id, specific_heat_info)
+    !     implicit none
+    !     class(type_input), intent(in) :: self
+    !     integer(int32), intent(in) :: material_id
+    !     type(type_physics_info), intent(inout) :: specific_heat_info
 
-        if (material_id < 1 .or. material_id > self%basic%num_materials) then
-            error stop "Input Error: material_id is out of range in get_specific_heat_info."
-        end if
+    !     if (material_id < 1 .or. material_id > self%basic%num_materials) then
+    !         error stop "Input Error: material_id is out of range in get_specific_heat_info."
+    !     end if
 
-        call self%basic%materials(material_id)%get_specific_heat_info(specific_heat_info)
+    !     call self%basic%materials(material_id)%get_specific_heat_info(specific_heat_info)
 
-    end subroutine get_specific_heat_info_input
+    ! end subroutine get_specific_heat_info_input
 
-    subroutine get_volumetric_heat_capacity_info_input(self, material_id, volumetric_heat_capacity_info)
-        implicit none
-        class(type_input), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_physics_info), intent(inout) :: volumetric_heat_capacity_info
+    ! subroutine get_volumetric_heat_capacity_info_input(self, material_id, volumetric_heat_capacity_info)
+    !     implicit none
+    !     class(type_input), intent(in) :: self
+    !     integer(int32), intent(in) :: material_id
+    !     type(type_physics_info), intent(inout) :: volumetric_heat_capacity_info
 
-        if (material_id < 1 .or. material_id > self%basic%num_materials) then
-            error stop "Input Error: material_id is out of range in get_volumetric_heat_capacity_info."
-        end if
+    !     if (material_id < 1 .or. material_id > self%basic%num_materials) then
+    !         error stop "Input Error: material_id is out of range in get_volumetric_heat_capacity_info."
+    !     end if
 
-        call self%basic%materials(material_id)%get_volumetric_heat_capacity_info(volumetric_heat_capacity_info)
+    !     call self%basic%materials(material_id)%get_volumetric_heat_capacity_info(volumetric_heat_capacity_info)
 
-    end subroutine get_volumetric_heat_capacity_info_input
+    ! end subroutine get_volumetric_heat_capacity_info_input
 
-    subroutine get_thermal_conductivity_info_input(self, material_id, thermal_conductivity_info)
-        implicit none
-        class(type_input), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_physics_info), intent(inout) :: thermal_conductivity_info
+    ! subroutine get_thermal_conductivity_info_input(self, material_id, thermal_conductivity_info)
+    !     implicit none
+    !     class(type_input), intent(in) :: self
+    !     integer(int32), intent(in) :: material_id
+    !     type(type_physics_info), intent(inout) :: thermal_conductivity_info
 
-        if (material_id < 1 .or. material_id > self%basic%num_materials) then
-            error stop "Input Error: material_id is out of range in get_thermal_conductivity_info."
-        end if
+    !     if (material_id < 1 .or. material_id > self%basic%num_materials) then
+    !         error stop "Input Error: material_id is out of range in get_thermal_conductivity_info."
+    !     end if
 
-        call self%basic%materials(material_id)%get_thermal_conductivity_info(thermal_conductivity_info)
+    !     call self%basic%materials(material_id)%get_thermal_conductivity_info(thermal_conductivity_info)
 
-    end subroutine get_thermal_conductivity_info_input
+    ! end subroutine get_thermal_conductivity_info_input
 
-    subroutine get_wrf_info_input(self, material_id, wrf_info)
-        implicit none
-        class(type_input), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_wrf_params), intent(inout) :: wrf_info
+    ! subroutine get_wrf_info_input(self, material_id, wrf_info)
+    !     implicit none
+    !     class(type_input), intent(in) :: self
+    !     integer(int32), intent(in) :: material_id
+    !     type(type_wrf_params), intent(inout) :: wrf_info
 
-        if (material_id < 1 .or. material_id > self%basic%num_materials) then
-            error stop "Input Error: material_id is out of range in get_wrf_info."
-        end if
+    !     if (material_id < 1 .or. material_id > self%basic%num_materials) then
+    !         error stop "Input Error: material_id is out of range in get_wrf_info."
+    !     end if
 
-        call self%basic%materials(material_id)%get_wrf_info(wrf_info)
+    !     call self%basic%materials(material_id)%get_wrf_info(wrf_info)
 
-    end subroutine get_wrf_info_input
+    ! end subroutine get_wrf_info_input
 
-    subroutine get_gcc_info_input(self, material_id, gcc_info)
-        implicit none
-        class(type_input), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        integer(int32), intent(inout) :: gcc_info
+    ! subroutine get_gcc_info_input(self, material_id, gcc_info)
+    !     implicit none
+    !     class(type_input), intent(in) :: self
+    !     integer(int32), intent(in) :: material_id
+    !     integer(int32), intent(inout) :: gcc_info
 
-        if (material_id < 1 .or. material_id > self%basic%num_materials) then
-            error stop "Input Error: material_id is out of range in get_gcc_info."
-        end if
+    !     if (material_id < 1 .or. material_id > self%basic%num_materials) then
+    !         error stop "Input Error: material_id is out of range in get_gcc_info."
+    !     end if
 
-        call self%basic%materials(material_id)%get_gcc_info(gcc_info)
+    !     call self%basic%materials(material_id)%get_gcc_info(gcc_info)
 
-    end subroutine get_gcc_info_input
+    ! end subroutine get_gcc_info_input
 
-    subroutine get_hcf_info_input(self, material_id, hcf_info)
-        implicit none
-        class(type_input), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_hcf_params), intent(inout) :: hcf_info
+    ! subroutine get_hcf_info_input(self, material_id, hcf_info)
+    !     implicit none
+    !     class(type_input), intent(in) :: self
+    !     integer(int32), intent(in) :: material_id
+    !     type(type_hcf_params), intent(inout) :: hcf_info
 
-        if (material_id < 1 .or. material_id > self%basic%num_materials) then
-            error stop "Input Error: material_id is out of range in get_hcf_info."
-        end if
+    !     if (material_id < 1 .or. material_id > self%basic%num_materials) then
+    !         error stop "Input Error: material_id is out of range in get_hcf_info."
+    !     end if
 
-        call self%basic%materials(material_id)%get_hcf_info(hcf_info)
+    !     call self%basic%materials(material_id)%get_hcf_info(hcf_info)
 
-    end subroutine get_hcf_info_input
+    ! end subroutine get_hcf_info_input
 
     !>
     !> Checks if a file exists by attempting to open it.

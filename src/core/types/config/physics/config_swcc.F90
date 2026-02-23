@@ -118,7 +118,7 @@ contains
         select type (source)
         type is (type_config_hcf)
             ! まず親型の copy を呼ぶ
-            call self%type_config_wrf%copy(source)
+            call copy_config_wrf(self, source)
             ! 追加メンバーのみコピー
             call self%set(self%model, source%model)
             call self%set(self%water_viscosity_model, source%water_viscosity_model)
@@ -137,7 +137,7 @@ contains
         class(type_config_hcf), intent(inout) :: self
 
         ! まず親型の reset を呼ぶ
-        call self%type_config_wrf%reset()
+        call reset_config_wrf(self)
 
         ! 追加メンバーのみリセット
         self%model = type_constant_id("none", "none", -1)

@@ -4,7 +4,7 @@ module physics_service
     use :: module_core
     use :: physics_base, only:type_iapws_wrapper
     use :: module_physics_materials, only:type_material_manager, type_thc_dispersivity
-    use :: module_physics_models, only:type_models_manager, type_wrf_params, type_hcf_params
+    use :: module_physics_models, only:type_models_manager
     implicit none
     private
     public :: type_physics_manager
@@ -63,7 +63,7 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     subroutine initialize_physics_manager(self, unique_material_ids, density_info, &
                                           specific_heat_info, heat_capacity_info, thermal_conductivity_info, &
-                                          wrf_ids, wrf_model_info, hcf_ids, hcf_model_info, gcc_model_ids)
+                                          configs_wrf, configs_hcf, configs_gcc)
         implicit none
         class(type_physics_manager), intent(inout) :: self
         integer(int32), intent(in) :: unique_material_ids(:)
@@ -71,11 +71,9 @@ contains
         type(type_physics_info), intent(in), optional :: specific_heat_info(:)
         type(type_physics_info), intent(in), optional :: heat_capacity_info(:)
         type(type_physics_info), intent(in), optional :: thermal_conductivity_info(:)
-        integer(int32), intent(in), optional :: wrf_ids(:)
-        type(type_wrf_params), intent(in), optional :: wrf_model_info(:)
-        integer(int32), intent(in), optional :: hcf_ids(:)
-        type(type_hcf_params), intent(in), optional :: hcf_model_info(:)
-        integer(int32), intent(in), optional :: gcc_model_ids(:)
+        type(type_config_wrf), intent(in), optional :: configs_wrf(:)
+        type(type_config_hcf), intent(in), optional :: configs_hcf(:)
+        type(type_config_gcc), intent(in), optional :: configs_gcc(:)
 
         integer(int32) :: stat
         integer(int32) :: model_idx, current_material_id
@@ -135,31 +133,31 @@ contains
         end if
 
         ! WRF Model
-        if (present(wrf_ids) .and. present(wrf_model_info)) then
+        if (present(configs_wrf)) then
             do model_idx = 1, self%num_materials
                 current_material_id = unique_material_ids(model_idx)
                 call self%models(model_idx)%initialize(material_id=current_material_id, &
-                                                       wrf_id=wrf_ids(model_idx), wrf_params=wrf_model_info(model_idx), &
+                                                       config_wrf=configs_wrf(model_idx), &
                                                        water=self%water, ice=self%ice)
             end do
         end if
 
         ! HCF Model
-        if (present(hcf_ids) .and. present(hcf_model_info)) then
+        if ( present(configs_hcf)) then
             do model_idx = 1, self%num_materials
                 current_material_id = unique_material_ids(model_idx)
                 call self%models(model_idx)%initialize(material_id=current_material_id, &
-                                                       hcf_id=hcf_ids(model_idx), hcf_params=hcf_model_info(model_idx), &
+                                                       config_hcf=configs_hcf(model_idx), &
                                                        water=self%water, ice=self%ice)
             end do
         end if
 
         ! GCC Model
-        if (present(gcc_model_ids)) then
+        if (present(configs_gcc)) then
             do model_idx = 1, self%num_materials
                 current_material_id = unique_material_ids(model_idx)
                 call self%models(model_idx)%initialize(material_id=current_material_id, &
-                                                       gcc_id=gcc_model_ids(model_idx), &
+                                                       config_gcc=configs_gcc(model_idx), &
                                                        water=self%water, ice=self%ice)
             end do
         end if

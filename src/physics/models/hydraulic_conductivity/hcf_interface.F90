@@ -75,10 +75,9 @@ module physics_models_hcf
     end type holder_hcfs
 
     interface
-        module subroutine initialize_holder_hcfs(self, material_id, config, water, ice)
+        module subroutine initialize_holder_hcfs(self, config, water, ice)
             implicit none
             class(holder_hcfs), intent(inout) :: self
-            integer(int32), intent(in) :: material_id
             type(type_config_hcf), intent(in) :: config
             type(type_iapws97), intent(in), target :: water
             type(type_iapws06), intent(in), target :: ice
@@ -159,10 +158,10 @@ module physics_models_hcf
     end type abst_hcf
 
     interface
-        module subroutine initialize_abst_hcf(self, material_id, water, ice)
+        module subroutine initialize_abst_hcf(self, config, water, ice)
             implicit none
             class(abst_hcf), intent(inout), target :: self
-            integer(int32), intent(in) :: material_id
+            type(type_config_hcf), intent(in) :: config
             type(type_iapws97), intent(in), target :: water
             type(type_iapws06), intent(in), target :: ice
 

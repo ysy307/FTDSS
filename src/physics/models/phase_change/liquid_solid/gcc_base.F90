@@ -21,7 +21,7 @@ contains
         type(type_iapws97), target, intent(in) :: water
         type(type_iapws06), target, intent(in) :: ice
 
-        select case (config%model%ID)
+        select case (config%gcc_model%ID)
         case (GCC_TYPES%NON_SEGREGATION%ID)
             allocate (type_gcc_non_segregation :: self%p)
         case (GCC_TYPES%SEGREGATION%ID)

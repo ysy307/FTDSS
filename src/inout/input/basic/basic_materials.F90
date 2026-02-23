@@ -504,9 +504,9 @@ contains
         ! is_frozen 等のフラグが構造体にない場合は削除，ある場合は復活させてください
         ! write (*, '(a, g0)') "  Is Frozen           : ", material%is_frozen
 
-        write (*, '(a, L1)') "  Calculate Thermal   : ", material%is_active(get_physics_type(thermal))
-        write (*, '(a, L1)') "  Calculate Hydraulic : ", material%is_active(get_physics_type(hydraulic))
-        write (*, '(a, L1)') "  Calculate Mechanical: ", material%is_active(get_physics_type(mechanical))
+        write (*, '(a, L1)') "  Calculate Thermal   : ", material%is_active(PHYSICS_TYPES%THERMAL%ID)
+        write (*, '(a, L1)') "  Calculate Hydraulic : ", material%is_active(PHYSICS_TYPES%HYDRAULIC%ID)
+        write (*, '(a, L1)') "  Calculate Mechanical: ", material%is_active(PHYSICS_TYPES%MECHANICAL%ID)
     end subroutine display_material_basic
 
     subroutine display_material_thermal(material)
@@ -586,10 +586,13 @@ contains
         implicit none
         class(type_materials_water_characteristic_curve), intent(in) :: wcc
 
-        ! Model Name (String)
-        write (*, '(a, a)') "    [WCC] Model         : ", get_swcc_model_type_string(wcc%model_number)
+        type(type_constant_id) :: constant
 
-        write (*, '(a, a)') "      Unit              : ", get_physics_unit_string(wcc%unit)
+        ! Model Name (String)
+        constant = SWCC_MODELS%to_object(wcc%model_number)
+        write (*, '(a, a)') "    [WCC] Model         : ", strip(constant%NAME)
+        constant = PHYSICS_UNITS%to_object(wcc%unit)
+        write (*, '(a, a)') "      Unit              : ", strip(constant%NAME)
 
         write (*, '(a, es12.4e2)') "      theta_s           : ", wcc%theta_s
         write (*, '(a, es12.4e2)') "      theta_r           : ", wcc%theta_r

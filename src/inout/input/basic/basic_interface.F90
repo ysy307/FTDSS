@@ -38,7 +38,7 @@ module inout_input_basic
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_analysis_controls
         logical :: is_active(IC_TARGETS%NUM_ID)
-        integer(int32) :: coupling_mode
+        character(:), allocatable :: coupling_mode
         logical :: partitioning
     contains
         procedure, pass(self) :: display => display_analysis_controls
@@ -76,20 +76,6 @@ module inout_input_basic
         end subroutine display_geometry_settings
     end interface
     !!------------------------------------------------------------------------------------------------------------------------------
-    type :: type_materials_wrf
-        integer(int32) :: model_number
-        real(real64) :: theta_s
-        real(real64) :: theta_r
-        real(real64) :: alpha1
-        real(real64) :: n1
-        real(real64) :: m1
-        real(real64) :: w1
-        real(real64) :: h_crit
-        real(real64) :: alpha2
-        real(real64) :: n2
-        real(real64) :: m2
-        real(real64) :: w2
-    end type type_materials_wrf
 
     type :: type_materials_water_characteristic_curve
         integer(int32) :: model_number
@@ -128,33 +114,6 @@ module inout_input_basic
         logical :: is_segregation
         character(:), allocatable :: unit
     end type type_materials_gcc
-
-    type :: type_materials_phase_change
-        real(real64) :: latent_heat_fusion
-        real(real64) :: freezing_temperature
-        type(type_materials_wrf) :: wrf
-        type(type_materials_gcc) :: gcc
-    end type type_materials_phase_change
-
-    type :: type_materials_thermal
-        real(real64), allocatable :: density(:)
-        real(real64), allocatable :: specific_heat(:)
-        real(real64), allocatable :: thermal_conductivity(:)
-        real(real64), allocatable :: thermal_conductivity_dispersity(:)
-        type(type_materials_phase_change) :: phase_change
-    end type type_materials_thermal
-
-    type, extends(type_materials_wrf) :: type_materials_hcf
-        real(real64) :: l
-    end type type_materials_hcf
-
-    type :: type_materials_hydraulic
-        integer(int32) :: model_number
-        real(real64) :: impedance_factor
-        real(real64) :: hydraulic_conductivity
-        type(type_materials_hcf) :: hcf
-        integer(int32) :: water_viscosity_model
-    end type type_materials_hydraulic
 
     type :: type_materials_density
         real(real64), allocatable :: value(:)
@@ -284,18 +243,12 @@ module inout_input_basic
         real(real64) :: tolerance
     end type type_linear_solver_iterative
 
-    type :: type_linear_solver_settings
-        character(:), allocatable :: method
-        type(type_linear_solver_iterative) :: iterative_solver
-    end type type_linear_solver_settings
-
     type :: type_linear_solver
         integer(int32) :: solver_type
         integer(int32) :: preconditioner_type
         integer(int32) :: max_iterations
         real(real64) :: tolerance
         integer(int32) :: m_restarts
-        ! type(type_linear_solver_settings) :: physics(NUM_PHYSICS_TYPES)
     end type type_linear_solver
 
     type :: type_parallel_threads

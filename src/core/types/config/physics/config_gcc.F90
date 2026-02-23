@@ -10,7 +10,7 @@ module core_types_config_physics_gcc
 
     type, extends(abst_config_physics_model) :: type_config_gcc
         !> GCC model identification
-        type(type_constant_id) :: model = type_constant_id("none", "none", -1)
+        type(type_constant_id) :: gcc_model = type_constant_id("none", "none", -1)
     contains
         procedure, public, pass(self) :: copy => copy_config_gcc
         procedure, public, pass(self) :: reset => reset_config_gcc
@@ -26,7 +26,7 @@ contains
         call copy_config_physics_model(self, source)
         select type (source)
         type is (type_config_gcc)
-            call self%set(self%model, source%model)
+            call self%set(self%gcc_model, source%gcc_model)
         end select
     end subroutine copy_config_gcc
 
@@ -35,7 +35,7 @@ contains
         class(type_config_gcc), intent(inout) :: self
 
         call reset_config_physics_model(self)
-        self%model = type_constant_id("none", "none", -1)
+        self%gcc_model = type_constant_id("none", "none", -1)
     end subroutine reset_config_gcc
 
 end module core_types_config_physics_gcc

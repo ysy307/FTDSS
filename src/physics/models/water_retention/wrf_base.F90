@@ -91,10 +91,9 @@ contains
 
     ! end subroutine convert_config_wrf
 
-    module subroutine initialize_holder_wrfs(self, material_id, config)
+    module subroutine initialize_holder_wrfs(self, config)
         implicit none
         class(holder_wrfs), intent(inout) :: self
-        integer(int32), intent(in) :: material_id
         type(type_config_wrf), intent(in) :: config
 
         if (allocated(self%p)) then
