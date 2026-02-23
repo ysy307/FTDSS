@@ -26,9 +26,9 @@ module physics_models_phase_change_liquid_solid_gcc
     public :: type_gcc_non_segregation
     public :: type_gcc_segregation
 
-!>
-!> @brief Holder for GCC objects to handle polymorphism.
-!>
+    !>
+    !> @brief Holder for GCC objects to handle polymorphism.
+    !>
     type :: holder_gccs
         !> Polymorphic pointer to the specific GCC implementation
         class(abst_gcc), allocatable :: p

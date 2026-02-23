@@ -1,8 +1,8 @@
-module core_types_physics_config_swcc
+module core_types_config_physics_swcc
     use, intrinsic :: iso_fortran_env
-    use :: core_memory, only:allocate_array, deallocate_array
     use :: core_constants, only:type_constant_id
-    use :: core_types_physics_config_base, only:abst_config
+    use :: core_types_config_base, only:abst_config
+    use :: core_types_config_physics_base, only:abst_config_physics_model
     implicit none
     private
 
@@ -10,7 +10,7 @@ module core_types_physics_config_swcc
     public :: type_config_hcf
 
     !> Structure to hold common parameters for all WRF models.
-    type, extends(abst_config) :: type_config_wrf
+    type, extends(abst_config_physics_model) :: type_config_wrf
         !> Model identification number
         type(type_constant_id) :: swcc_model = type_constant_id("none", "none", -1)
         !> Residual water content, $\theta_\mathrm{r}$ [-]
@@ -66,6 +66,8 @@ contains
         class(type_config_wrf), intent(inout) :: self
         class(abst_config), intent(in) :: source
 
+        call copy_config_physics_model(self, source)
+
         select type (source)
         type is (type_config_wrf)
             ! 親型メンバーを self にコピー
@@ -90,6 +92,8 @@ contains
     subroutine reset_config_wrf(self)
         implicit none
         class(type_config_wrf), intent(inout) :: self
+
+        call reset_config_physics_model(self)
 
         self%swcc_model = type_constant_id("none", "none", -1)
         self%theta_s = 0.0d0
@@ -144,4 +148,4 @@ contains
         self%gain_factor = 0.0d0
     end subroutine reset_config_hcf
 
-end module core_types_physics_config_swcc
+end module core_types_config_physics_swcc

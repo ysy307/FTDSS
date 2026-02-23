@@ -18,13 +18,13 @@ module inout_input_conditions
     character(*), parameter :: porosity = "porosity"
 
     type :: type_time_controls_simulation_period
-        integer(int32) :: unit
+        character(:), allocatable :: unit
         real(real64) :: start
         real(real64) :: end
     end type type_time_controls_simulation_period
 
     type :: type_time_controls_time_stepping
-        integer(int32) :: unit
+        character(:), allocatable :: unit
         real(real64) :: initial_step
         real(real64) :: min_step
         real(real64) :: max_step
