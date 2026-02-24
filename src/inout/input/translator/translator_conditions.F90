@@ -91,4 +91,22 @@ contains
         end select
 
     end subroutine execute_condition_initial
+
+    module subroutine execute_condition_acceleration(self, input, config)
+        implicit none
+        class(type_input_translator), intent(in) :: self
+        class(type_input), intent(in) :: input
+        class(abst_config), intent(inout) :: config
+
+        select type (config)
+        type is (type_config_acceleration)
+
+            config%num_dofs = input%geometry%vtk%num_points
+            config%method = ACCELERATION_METHODS%AITKEN
+            config%min_relaxation = 0.1d0
+            config%max_relaxation = 1.0d0
+
+        end select
+
+    end subroutine execute_condition_acceleration
 end submodule input_translator_conditions
