@@ -18,13 +18,13 @@ module inout_input_conditions
     character(*), parameter :: porosity = "porosity"
 
     type :: type_time_controls_simulation_period
-        integer(int32) :: unit
+        character(:), allocatable :: unit
         real(real64) :: start
         real(real64) :: end
     end type type_time_controls_simulation_period
 
     type :: type_time_controls_time_stepping
-        integer(int32) :: unit
+        character(:), allocatable :: unit
         real(real64) :: initial_step
         real(real64) :: min_step
         real(real64) :: max_step
@@ -74,7 +74,7 @@ module inout_input_conditions
     type :: type_boundary_conditions
         class(type_conditions), pointer :: parent => null()
         integer(int32) :: id
-        type(type_boundary_local) :: physics(NUM_PHYSICS_TYPES)
+        type(type_boundary_local) :: physics(PHYSICS_TYPES%NUM_ID)
     contains
         procedure, pass(self) :: display => display_boundary_conditions
     end type type_boundary_conditions
@@ -91,7 +91,7 @@ module inout_input_conditions
     end type
 
     type :: type_initial_local
-        integer(int32) :: type
+        character(:), allocatable :: type
         real(real64) :: value
         type(type_boundary_local_initial), allocatable :: boundary(:)
         character(:), allocatable :: field_name
@@ -99,7 +99,7 @@ module inout_input_conditions
 
     type :: type_initial_conditions
         class(type_conditions), pointer :: parent => null()
-        type(type_initial_local) :: physics(NUM_IC_TARGETS)
+        type(type_initial_local) :: physics(IC_TARGETS%NUM_ID)
     contains
         procedure, pass(self) :: display => display_initial_conditions
     end type type_initial_conditions

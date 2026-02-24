@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.2% of total for procedures.">70 statements</a>
+                 title=" 0.1% of total for procedures.">68 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -159,7 +159,7 @@
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>private  subroutine initialize_physics_manager(self, unique_material_ids, density_info, specific_heat_info, heat_capacity_info, thermal_conductivity_info, wrf_ids, wrf_model_info, hcf_ids, hcf_model_info, gcc_model_ids)  
+    <h2>private  subroutine initialize_physics_manager(self, unique_material_ids, density_info, specific_heat_info, heat_capacity_info, thermal_conductivity_info, configs_wrf, configs_hcf, configs_gcc)  
 </h2>
     
 
@@ -180,7 +180,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~915"></span>
+              <span class="anchor" id="variable-self~1174"></span>
               class(<a href='../type/type_physics_manager.html'>type_physics_manager</a>),
             </td>
 <td>intent(inout)</td>
@@ -210,7 +210,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-density_info~4"></span>
+              <span class="anchor" id="variable-density_info~2"></span>
               type(<a href='../type/type_physics_info.html'>type_physics_info</a>),
             </td>
 <td>intent(in),</td>
@@ -225,7 +225,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-specific_heat_info~3"></span>
+              <span class="anchor" id="variable-specific_heat_info"></span>
               type(<a href='../type/type_physics_info.html'>type_physics_info</a>),
             </td>
 <td>intent(in),</td>
@@ -255,7 +255,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-thermal_conductivity_info~3"></span>
+              <span class="anchor" id="variable-thermal_conductivity_info"></span>
               type(<a href='../type/type_physics_info.html'>type_physics_info</a>),
             </td>
 <td>intent(in),</td>
@@ -270,75 +270,45 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-wrf_ids~2"></span>
-              integer(kind=int32),
+              <span class="anchor" id="variable-configs_wrf"></span>
+              type(<a href='../type/type_config_wrf.html'>type_config_wrf</a>),
             </td>
 <td>intent(in),</td>
               <td>optional</td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>wrf_ids</strong>(:)</td>
+            <td><strong>configs_wrf</strong>(:)</td>
             <td>
                 
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-wrf_model_info~2"></span>
-              type(type_wrf_params),
+              <span class="anchor" id="variable-configs_hcf"></span>
+              type(<a href='../type/type_config_hcf.html'>type_config_hcf</a>),
             </td>
 <td>intent(in),</td>
               <td>optional</td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>wrf_model_info</strong>(:)</td>
+            <td><strong>configs_hcf</strong>(:)</td>
             <td>
                 
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-hcf_ids~2"></span>
-              integer(kind=int32),
+              <span class="anchor" id="variable-configs_gcc"></span>
+              type(<a href='../type/type_config_gcc.html'>type_config_gcc</a>),
             </td>
 <td>intent(in),</td>
               <td>optional</td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>hcf_ids</strong>(:)</td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-hcf_model_info~2"></span>
-              type(<a href='../type/type_hcf_params.html'>type_hcf_params</a>),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>hcf_model_info</strong>(:)</td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-gcc_model_ids"></span>
-              integer(kind=int32),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>gcc_model_ids</strong>(:)</td>
+            <td><strong>configs_gcc</strong>(:)</td>
             <td>
                 
             </td>
@@ -664,7 +634,7 @@ large graphs.</div>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">initialize_physics_manager</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">unique_material_ids</span><span class="p">,</span><span class="w"> </span><span class="n">density_info</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
 <span class="w">                                          </span><span class="n">specific_heat_info</span><span class="p">,</span><span class="w"> </span><span class="n">heat_capacity_info</span><span class="p">,</span><span class="w"> </span><span class="n">thermal_conductivity_info</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
-<span class="w">                                          </span><span class="n">wrf_ids</span><span class="p">,</span><span class="w"> </span><span class="n">wrf_model_info</span><span class="p">,</span><span class="w"> </span><span class="n">hcf_ids</span><span class="p">,</span><span class="w"> </span><span class="n">hcf_model_info</span><span class="p">,</span><span class="w"> </span><span class="n">gcc_model_ids</span><span class="p">)</span>
+<span class="w">                                          </span><span class="n">configs_wrf</span><span class="p">,</span><span class="w"> </span><span class="n">configs_hcf</span><span class="p">,</span><span class="w"> </span><span class="n">configs_gcc</span><span class="p">)</span>
 <span class="w">        </span><span class="k">implicit none</span>
 <span class="k">        class</span><span class="p">(</span><span class="n">type_physics_manager</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">unique_material_ids</span><span class="p">(:)</span>
@@ -672,11 +642,9 @@ large graphs.</div>
 <span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_physics_info</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">specific_heat_info</span><span class="p">(:)</span>
 <span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_physics_info</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">heat_capacity_info</span><span class="p">(:)</span>
 <span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_physics_info</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">thermal_conductivity_info</span><span class="p">(:)</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">wrf_ids</span><span class="p">(:)</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_wrf_params</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">wrf_model_info</span><span class="p">(:)</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">hcf_ids</span><span class="p">(:)</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_hcf_params</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">hcf_model_info</span><span class="p">(:)</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">gcc_model_ids</span><span class="p">(:)</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_config_wrf</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">configs_wrf</span><span class="p">(:)</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_config_hcf</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">configs_hcf</span><span class="p">(:)</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_config_gcc</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">configs_gcc</span><span class="p">(:)</span>
 
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="nb">stat</span>
 <span class="nb">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">model_idx</span><span class="p">,</span><span class="w"> </span><span class="n">current_material_id</span>
@@ -736,31 +704,31 @@ large graphs.</div>
 <span class="k">        end if</span>
 
 <span class="w">        </span><span class="c">! WRF Model</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">wrf_ids</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="nb">present</span><span class="p">(</span><span class="n">wrf_model_info</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">configs_wrf</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
 <span class="k">            do </span><span class="n">model_idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_materials</span>
 <span class="w">                </span><span class="n">current_material_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unique_material_ids</span><span class="p">(</span><span class="n">model_idx</span><span class="p">)</span>
 <span class="w">                </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">models</span><span class="p">(</span><span class="n">model_idx</span><span class="p">)%</span><span class="n">initialize</span><span class="p">(</span><span class="n">material_id</span><span class="o">=</span><span class="n">current_material_id</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
-<span class="w">                                                       </span><span class="n">wrf_id</span><span class="o">=</span><span class="n">wrf_ids</span><span class="p">(</span><span class="n">model_idx</span><span class="p">),</span><span class="w"> </span><span class="n">wrf_params</span><span class="o">=</span><span class="n">wrf_model_info</span><span class="p">(</span><span class="n">model_idx</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                                       </span><span class="n">config_wrf</span><span class="o">=</span><span class="n">configs_wrf</span><span class="p">(</span><span class="n">model_idx</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span>
 <span class="w">                                                       </span><span class="n">water</span><span class="o">=</span><span class="n">self</span><span class="p">%</span><span class="n">water</span><span class="p">,</span><span class="w"> </span><span class="n">ice</span><span class="o">=</span><span class="n">self</span><span class="p">%</span><span class="n">ice</span><span class="p">)</span>
 <span class="w">            </span><span class="k">end do</span>
 <span class="k">        end if</span>
 
 <span class="w">        </span><span class="c">! HCF Model</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">hcf_ids</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="nb">present</span><span class="p">(</span><span class="n">hcf_model_info</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="nb">present</span><span class="p">(</span><span class="n">configs_hcf</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
 <span class="k">            do </span><span class="n">model_idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_materials</span>
 <span class="w">                </span><span class="n">current_material_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unique_material_ids</span><span class="p">(</span><span class="n">model_idx</span><span class="p">)</span>
 <span class="w">                </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">models</span><span class="p">(</span><span class="n">model_idx</span><span class="p">)%</span><span class="n">initialize</span><span class="p">(</span><span class="n">material_id</span><span class="o">=</span><span class="n">current_material_id</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
-<span class="w">                                                       </span><span class="n">hcf_id</span><span class="o">=</span><span class="n">hcf_ids</span><span class="p">(</span><span class="n">model_idx</span><span class="p">),</span><span class="w"> </span><span class="n">hcf_params</span><span class="o">=</span><span class="n">hcf_model_info</span><span class="p">(</span><span class="n">model_idx</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                                       </span><span class="n">config_hcf</span><span class="o">=</span><span class="n">configs_hcf</span><span class="p">(</span><span class="n">model_idx</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span>
 <span class="w">                                                       </span><span class="n">water</span><span class="o">=</span><span class="n">self</span><span class="p">%</span><span class="n">water</span><span class="p">,</span><span class="w"> </span><span class="n">ice</span><span class="o">=</span><span class="n">self</span><span class="p">%</span><span class="n">ice</span><span class="p">)</span>
 <span class="w">            </span><span class="k">end do</span>
 <span class="k">        end if</span>
 
 <span class="w">        </span><span class="c">! GCC Model</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">gcc_model_ids</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">configs_gcc</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
 <span class="k">            do </span><span class="n">model_idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_materials</span>
 <span class="w">                </span><span class="n">current_material_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unique_material_ids</span><span class="p">(</span><span class="n">model_idx</span><span class="p">)</span>
 <span class="w">                </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">models</span><span class="p">(</span><span class="n">model_idx</span><span class="p">)%</span><span class="n">initialize</span><span class="p">(</span><span class="n">material_id</span><span class="o">=</span><span class="n">current_material_id</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
-<span class="w">                                                       </span><span class="n">gcc_id</span><span class="o">=</span><span class="n">gcc_model_ids</span><span class="p">(</span><span class="n">model_idx</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                                       </span><span class="n">config_gcc</span><span class="o">=</span><span class="n">configs_gcc</span><span class="p">(</span><span class="n">model_idx</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span>
 <span class="w">                                                       </span><span class="n">water</span><span class="o">=</span><span class="n">self</span><span class="p">%</span><span class="n">water</span><span class="p">,</span><span class="w"> </span><span class="n">ice</span><span class="o">=</span><span class="n">self</span><span class="p">%</span><span class="n">ice</span><span class="p">)</span>
 <span class="w">            </span><span class="k">end do</span>
 <span class="k">        end if</span>
@@ -789,7 +757,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-22 12:12 +0000             </p>
+ on 2026-02-23 23:52 +0000             </p>
           </div>
         </div>
         <br>

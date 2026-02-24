@@ -29,7 +29,7 @@ contains
         call self%zero()
 
         self%is_initialized_matrix = .true.
-        self%status = MATRIX_STATUS_SUCCESS
+        self%status = MATRIX_STATUS%SUCCESS
     end subroutine initialize_dense
 
     !>
@@ -45,7 +45,7 @@ contains
         self%num_cols = 0
 
         self%is_initialized_matrix = .false.
-        self%status = MATRIX_STATUS_SUCCESS
+        self%status = MATRIX_STATUS%SUCCESS
     end subroutine destroy_dense
 
     !>
@@ -69,7 +69,7 @@ contains
 
         if (allocated(self%val)) then
             do i = 1, self%num_rows
-                call diagonal%set(OP_INS, i, self%val(i, i))
+                call diagonal%set(MATRIX_OPS%INS, i, self%val(i, i))
             end do
         end if
 
@@ -92,25 +92,29 @@ contains
     module subroutine set_value_dense(self, op, row, col, value)
         implicit none
         class(type_matrix_dense), intent(inout) :: self
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         integer(int32), intent(in) :: row, col
         real(real64), intent(in) :: value
+
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
 
         ! 範囲チェック
         if (.not. value_in_range(row, 1, self%num_rows) .or. &
             .not. value_in_range(col, 1, self%num_cols)) then
-            self%status = MATRIX_STATUS_OUT_OF_MEMORY
+            self%status = MATRIX_STATUS%OUT_OF_MEMORY
             return
         end if
 
-        select case (op)
-        case (OP_INS)
+        if (op == MATRIX_OPS%INS) then
             self%val(row, col) = value
-        case (OP_ADD)
+        else if (op == MATRIX_OPS%ADD) then
             self%val(row, col) = self%val(row, col) + value
-        case default
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
-        end select
+        else
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end if
     end subroutine set_value_dense
 
     !>
@@ -119,12 +123,12 @@ contains
     module subroutine set_value_block_dense(self, op, row, col, row_block, col_block, value)
         implicit none
         class(type_matrix_dense), intent(inout) :: self
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         integer(int32), intent(in) :: row, col
         integer(int32), intent(in) :: row_block, col_block
         real(real64), intent(in) :: value
 
-        self%status = MATRIX_STATUS_NOT_IMPLEMENTED
+        self%status = MATRIX_STATUS%NOT_IMPLEMENTED
     end subroutine set_value_block_dense
 
     !>
@@ -133,24 +137,29 @@ contains
     module subroutine set_row_dense(self, op, row, value, row_block)
         implicit none
         class(type_matrix_dense), intent(inout) :: self
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         integer(int32), intent(in) :: row
         real(real64), intent(in) :: value
         integer(int32), intent(in), optional :: row_block
 
-        if (.not. value_in_range(row, 1, self%num_rows)) then
-            self%status = MATRIX_STATUS_OUT_OF_MEMORY
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
             return
         end if
 
-        select case (op)
-        case (OP_INS)
+        if (.not. value_in_range(row, 1, self%num_rows)) then
+            self%status = MATRIX_STATUS%OUT_OF_MEMORY
+            return
+        end if
+
+        if (op == MATRIX_OPS%INS) then
             self%val(row, :) = value
-        case (OP_ADD)
+        else if (op == MATRIX_OPS%ADD) then
             self%val(row, :) = self%val(row, :) + value
-        case default
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
-        end select
+        else
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end if
+
     end subroutine set_row_dense
 
     !>
@@ -159,19 +168,24 @@ contains
     module subroutine set_all_dense(self, op, value)
         implicit none
         class(type_matrix_dense), intent(inout) :: self
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         real(real64), intent(in) :: value
+
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
 
         if (.not. allocated(self%val)) return
 
-        select case (op)
-        case (OP_INS)
-            self%val = value
-        case (OP_ADD)
-            self%val = self%val + value
-        case default
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
-        end select
+        if (op == MATRIX_OPS%INS) then
+            self%val(:, :) = value
+        else if (op == MATRIX_OPS%ADD) then
+            self%val(:, :) = self%val(:, :) + value
+        else
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end if
+
     end subroutine set_all_dense
 
 !>
@@ -180,12 +194,17 @@ contains
     module subroutine scale_dense(self, op, alpha)
         implicit none
         class(type_matrix_dense), intent(inout) :: self
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         type(type_vector_dp), intent(in) :: alpha
 
         real(real64), dimension(:), pointer :: alpha_data
         integer(int32) :: i, j
         integer(int32) :: nrows, ncols
+
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
 
         nrows = self%num_rows
         ncols = self%num_cols
@@ -194,17 +213,14 @@ contains
 
         ! alphaのサイズチェック (行数分必要)
         if (size(alpha_data) < nrows) then
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
             return
         end if
 
-        select case (op)
-
-            !-------------------------------------------------
-            ! Symmetric Scaling: A_ij <- A_ij * alpha(i) * alpha(j)
-            !-------------------------------------------------
-        case (OP_SCALE_SYMM_DIAG)
-
+        !-------------------------------------------------
+        ! Symmetric Scaling: A_ij <- A_ij * alpha(i) * alpha(j)
+        !-------------------------------------------------
+        if (op == MATRIX_OPS%SCALE_SYMM_DIAG) then
             ! Fortranは列優先(Column-Major)なので、j(列)を外側、i(行)を内側にするのが
             ! メモリアクセス的には最速ですが、alpha(j)へのアクセス頻度等を考慮し
             ! コンパイラの最適化に任せつつ、OpenMPは列(j)で切ります。
@@ -217,13 +233,13 @@ contains
             end do
             !$omp end parallel do
 
-            self%status = MATRIX_STATUS_SUCCESS
+            self%status = MATRIX_STATUS%SUCCESS
 
             !-------------------------------------------------
             ! Jacobi Scaling: A_ij <- A_ij * alpha(i)
             ! (左からのスケーリング: 行 i に alpha(i) を掛ける)
             !-------------------------------------------------
-        case (OP_SCALE_JACOBI)
+        else if (op == MATRIX_OPS%SCALE_JACOBI) then
 
             !$omp parallel do default(shared) private(i, j)
             do j = 1, ncols
@@ -235,11 +251,11 @@ contains
             end do
             !$omp end parallel do
 
-            self%status = MATRIX_STATUS_SUCCESS
+            self%status = MATRIX_STATUS%SUCCESS
 
-        case default
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
-        end select
+        else
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end if
 
     end subroutine scale_dense
 
@@ -250,7 +266,7 @@ contains
         implicit none
         class(type_matrix_dense), intent(inout) :: self
         if (allocated(self%val)) self%val = 0.0d0
-        self%status = MATRIX_STATUS_SUCCESS
+        self%status = MATRIX_STATUS%SUCCESS
     end subroutine zero_all_dense
 
     !> Sets all values in a specified row of the dense matrix to zero.
@@ -262,12 +278,12 @@ contains
         integer(int32), intent(in), optional :: row_block
 
         if (.not. value_in_range(row, 1, self%num_rows)) then
-            self%status = MATRIX_STATUS_OUT_OF_MEMORY
+            self%status = MATRIX_STATUS%OUT_OF_MEMORY
             return
         end if
 
         self%val(row, :) = 0.0d0
-        self%status = MATRIX_STATUS_SUCCESS
+        self%status = MATRIX_STATUS%SUCCESS
     end subroutine zero_row_dense
 
     !>

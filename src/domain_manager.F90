@@ -456,11 +456,11 @@ contains
 
         if (allocated(entity_map)) deallocate (entity_map)
 
-        max_id = maxval(input%conditions%boundary_conditions(:)%id)
+        max_id = maxval(input%conditions%boundary_conditions(:)%ID)
         call allocate_array(entity_map, max_id)
         entity_map = 0
         do i = 1, size(bc_idx_list)
-            bc_id = input%conditions%boundary_conditions(bc_idx_list(i))%id
+            bc_id = input%conditions%boundary_conditions(bc_idx_list(i))%ID
             entity_map(bc_id) = i
         end do
     end subroutine create_entity_id_to_group_map
@@ -571,7 +571,7 @@ contains
         do i = 1, size(bcs)
             original_input_idx = bc_idx_list(i)
 
-            ! bc_id = input%conditions%boundary_conditions(original_input_idx)%id
+            ! bc_id = input%conditions%boundary_conditions(original_input_idx)%ID
             bcs(i)%type_id = bc_type
 
             select case (physics_type_id)
@@ -603,12 +603,12 @@ contains
         select case (physics_type_id)
         case (PHYSICS_TYPE_THERMAL)
             if (input%conditions%boundary_conditions(idx)%physics(PHYSICS_TYPE_THERMAL)%is_active .and. &
-                any(active_region_id == input%conditions%boundary_conditions(idx)%id)) then
+                any(active_region_id == input%conditions%boundary_conditions(idx)%ID)) then
                 is_active = .true.
             end if
         case (PHYSICS_TYPE_HYDRAULIC)
             if (input%conditions%boundary_conditions(idx)%physics(PHYSICS_TYPE_HYDRAULIC)%is_active .and. &
-                any(active_region_id == input%conditions%boundary_conditions(idx)%id)) then
+                any(active_region_id == input%conditions%boundary_conditions(idx)%ID)) then
                 is_active = .true.
             end if
         case (PHYSICS_TYPE_MECHANICAL)

@@ -1,0 +1,2004 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>type_config_hcf &ndash; FTDSS </title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>type_config_hcf
+      <small>Derived Type</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title="<p> 0.4% of total for derived types.</p>Including implementation: 39 statements,  0.2% of total for derived types.">11 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/config_swcc.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/config_swcc.f90.html'>config_swcc.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_types_config_physics_swcc.html'>core_types_config_physics_swcc</a></li>
+            <li class="breadcrumb-item active" aria-current="page">type_config_hcf</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#vars-0"
+         aria-expanded="false" aria-controls="vars-0">
+         <h4 class="card-header bg-primary text-white">Variables</h4>
+      </a>
+      <div id="vars-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/type_config_hcf.html#variable-alpha1">alpha1</a>
+            <a class="list-group-item" href="../type/type_config_hcf.html#variable-alpha2">alpha2</a>
+            <a class="list-group-item" href="../type/type_config_hcf.html#variable-gain_factor">gain_factor</a>
+            <a class="list-group-item" href="../type/type_config_hcf.html#variable-h_crit">h_crit</a>
+            <a class="list-group-item" href="../type/type_config_hcf.html#variable-k_sat">k_sat</a>
+            <a class="list-group-item" href="../type/type_config_hcf.html#variable-l">l</a>
+            <a class="list-group-item" href="../type/type_config_hcf.html#variable-m1">m1</a>
+            <a class="list-group-item" href="../type/type_config_hcf.html#variable-m2">m2</a>
+            <a class="list-group-item" href="../type/type_config_hcf.html#variable-material_id~45">material_id</a>
+            <a class="list-group-item" href="../type/type_config_hcf.html#variable-model">model</a>
+            <a class="list-group-item" href="../type/type_config_hcf.html#variable-n1">n1</a>
+            <a class="list-group-item" href="../type/type_config_hcf.html#variable-n2">n2</a>
+            <a class="list-group-item" href="../type/type_config_hcf.html#variable-omega">omega</a>
+            <a class="list-group-item" href="../type/type_config_hcf.html#variable-swcc_model">swcc_model</a>
+            <a class="list-group-item" href="../type/type_config_hcf.html#variable-theta_r">theta_r</a>
+            <a class="list-group-item" href="../type/type_config_hcf.html#variable-theta_s">theta_s</a>
+            <a class="list-group-item" href="../type/type_config_hcf.html#variable-w1">w1</a>
+            <a class="list-group-item" href="../type/type_config_hcf.html#variable-w2">w2</a>
+            <a class="list-group-item" href="../type/type_config_hcf.html#variable-water_viscosity_model">water_viscosity_model</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#boundprocs-0"
+         aria-expanded="false" aria-controls="boundprocs-0">
+         <h4 class="card-header bg-primary text-white">Type-Bound Procedures</h4>
+      </a>
+      <div id="boundprocs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/type_config_hcf.html#boundprocedure-copy~2">copy</a>
+            <a class="list-group-item" href="../type/type_config_hcf.html#boundprocedure-reset~3">reset</a>
+            <a class="list-group-item" href="../type/type_config_hcf.html#boundprocedure-set~18">set</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2 id="type-def-statement">
+        type, public, extends(<a href='type_config_wrf.html'>type_config_wrf</a>) :: type_config_hcf</h2>
+    
+<br>      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Inherits</h3>
+        </div>
+        <div class="card-body">
+          <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: type~~type_config_hcf~~InheritsGraph Pages: 1 -->
+<svg id="typetype_config_hcfInheritsGraph" width="641pt" height="89pt"
+ viewBox="0.00 0.00 641.00 89.17" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_config_hcf~~InheritsGraph" class="graph" transform="scale(0.99 0.99) rotate(0) translate(4 86)">
+<title>type~~type_config_hcf~~InheritsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-86 643,-86 643,4 -4,4"/>
+<!-- type~type_config_hcf -->
+<g id="type~~type_config_hcf~~InheritsGraph_node1" class="node">
+<title>type~type_config_hcf</title>
+<polygon fill="none" stroke="black" points="639,-24 543,-24 543,0 639,0 639,-24"/>
+<text text-anchor="middle" x="591" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_config_hcf</text>
+</g>
+<!-- type~type_config_wrf -->
+<g id="type~~type_config_hcf~~InheritsGraph_node2" class="node">
+<title>type~type_config_wrf</title>
+<g id="a_type~~type_config_hcf~~InheritsGraph_node2"><a xlink:href="../type/type_config_wrf.html" xlink:title="type_config_wrf">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="481.5,-64 385.5,-64 385.5,-40 481.5,-40 481.5,-64"/>
+<text text-anchor="middle" x="433.5" y="-49.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_config_wrf</text>
+</a>
+</g>
+</g>
+<!-- type~type_config_hcf&#45;&gt;type~type_config_wrf -->
+<g id="type~~type_config_hcf~~InheritsGraph_edge2" class="edge">
+<title>type~type_config_hcf&#45;&gt;type~type_config_wrf</title>
+<path fill="none" stroke="#ff0000" d="M524,-12C513.92,-13.09 514.87,-21.1 506,-26 499.09,-29.82 491.51,-33.27 483.95,-36.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="482.52,-33.12 474.43,-39.97 485.02,-39.66 482.52,-33.12"/>
+</g>
+<!-- type~type_constant_id -->
+<g id="type~~type_config_hcf~~InheritsGraph_node3" class="node">
+<title>type~type_constant_id</title>
+<g id="a_type~~type_config_hcf~~InheritsGraph_node3"><a xlink:href="../type/type_constant_id.html" xlink:title="type_constant_id">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="239.5,-32 137.5,-32 137.5,-8 239.5,-8 239.5,-32"/>
+<text text-anchor="middle" x="188.5" y="-17.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_constant_id</text>
+</a>
+</g>
+</g>
+<!-- type~type_config_hcf&#45;&gt;type~type_constant_id -->
+<g id="type~~type_config_hcf~~InheritsGraph_edge1" class="edge">
+<title>type~type_config_hcf&#45;&gt;type~type_constant_id</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M542.72,-10.8C536.74,-11 530.72,-11.38 525,-12"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M524,-12C472.7,-17.57 331.52,-19.26 249.9,-19.78"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="249.75,-16.28 239.77,-19.84 249.79,-23.28 249.75,-16.28"/>
+<text text-anchor="middle" x="433.5" y="-21.4" font-family="Helvetica,sans-Serif" font-size="9.50">model, water_viscosity_model</text>
+</g>
+<!-- type~type_config_wrf&#45;&gt;type~type_constant_id -->
+<g id="type~~type_config_hcf~~InheritsGraph_edge3" class="edge">
+<title>type~type_config_wrf&#45;&gt;type~type_constant_id</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M385.36,-45.79C346.72,-40.7 291.79,-33.47 249.93,-27.96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="250.23,-24.47 239.86,-26.63 249.32,-31.41 250.23,-24.47"/>
+<text text-anchor="middle" x="314" y="-41.4" font-family="Helvetica,sans-Serif" font-size="9.50">swcc_model</text>
+</g>
+<!-- type~abst_config_physics_model -->
+<g id="type~~type_config_hcf~~InheritsGraph_node4" class="node">
+<title>type~abst_config_physics_model</title>
+<g id="a_type~~type_config_hcf~~InheritsGraph_node4"><a xlink:href="../type/abst_config_physics_model.html" xlink:title="abst_config_physics_model">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="267,-82 110,-82 110,-58 267,-58 267,-82"/>
+<text text-anchor="middle" x="188.5" y="-67.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config_physics_model</text>
+</a>
+</g>
+</g>
+<!-- type~type_config_wrf&#45;&gt;type~abst_config_physics_model -->
+<g id="type~~type_config_hcf~~InheritsGraph_edge4" class="edge">
+<title>type~type_config_wrf&#45;&gt;type~abst_config_physics_model</title>
+<path fill="none" stroke="#ff0000" d="M385.36,-55.49C354.7,-57.76 313.78,-60.79 277.28,-63.5"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="276.82,-60.02 267.11,-64.25 277.34,-67 276.82,-60.02"/>
+</g>
+<!-- type~abst_config -->
+<g id="type~~type_config_hcf~~InheritsGraph_node5" class="node">
+<title>type~abst_config</title>
+<g id="a_type~~type_config_hcf~~InheritsGraph_node5"><a xlink:href="../type/abst_config.html" xlink:title="abst_config">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="73,-82 0,-82 0,-58 73,-58 73,-82"/>
+<text text-anchor="middle" x="36.5" y="-67.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config</text>
+</a>
+</g>
+</g>
+<!-- type~abst_config_physics_model&#45;&gt;type~abst_config -->
+<g id="type~~type_config_hcf~~InheritsGraph_edge5" class="edge">
+<title>type~abst_config_physics_model&#45;&gt;type~abst_config</title>
+<path fill="none" stroke="#ff0000" d="M109.86,-70C100.72,-70 91.62,-70 83.12,-70"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="83.09,-66.5 73.09,-70 83.09,-73.5 83.09,-66.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var pantypetype_config_hcfInheritsGraph = svgPanZoom('#typetype_config_hcfInheritsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#InheritsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="InheritsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="186pt" height="32pt"
+ viewBox="0.00 0.00 185.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 181.5,-28 181.5,4 -4,4"/>
+<!-- Type -->
+<g id="node1" class="node">
+<title>Type</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="177.5,-24 72.5,-24 72.5,0 177.5,0 177.5,-24"/>
+<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a derived type to the parent type which it
+extends. Dashed arrows point from a derived type to the other
+types it contains as a components, with a label listing the name(s) of
+said component(s).
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Inherited by</h3>
+        </div>
+        <div class="card-body">
+          <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: type~~type_config_hcf~~InheritedByGraph Pages: 1 -->
+<svg id="typetype_config_hcfInheritedByGraph" width="641pt" height="247pt"
+ viewBox="0.00 0.00 641.00 246.50" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_config_hcf~~InheritedByGraph" class="graph" transform="scale(0.48 0.48) rotate(0) translate(4 509)">
+<title>type~~type_config_hcf~~InheritedByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-509 1330,-509 1330,4 -4,4"/>
+<!-- type~type_config_hcf -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node1" class="node">
+<title>type~type_config_hcf</title>
+<polygon fill="none" stroke="black" points="109,-322 13,-322 13,-298 109,-298 109,-322"/>
+<text text-anchor="middle" x="61" y="-307.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_config_hcf</text>
+</g>
+<!-- type~abst_hcf -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node2" class="node">
+<title>type~abst_hcf</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node2"><a xlink:href="../type/abst_hcf.html" xlink:title="abst_hcf">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="323,-253 266,-253 266,-229 323,-229 323,-253"/>
+<text text-anchor="middle" x="294.5" y="-238.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_hcf</text>
+</a>
+</g>
+</g>
+<!-- type~abst_hcf&#45;&gt;type~type_config_hcf -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge1" class="edge">
+<title>type~abst_hcf&#45;&gt;type~type_config_hcf</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M265.78,-246.3C249.75,-249.82 229.37,-255.07 212,-262 203.5,-265.39 202.45,-268.49 194,-272 170.01,-281.97 142.53,-290.33 118.88,-296.65"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="117.79,-293.32 109,-299.24 119.56,-300.09 117.79,-293.32"/>
+<text text-anchor="middle" x="167" y="-293.4" font-family="Helvetica,sans-Serif" font-size="9.50">config</text>
+</g>
+<!-- type~abst_hcf_base -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node3" class="node">
+<title>type~abst_hcf_base</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node3"><a xlink:href="../type/abst_hcf_base.html" xlink:title="abst_hcf_base">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="105,-388 17,-388 17,-364 105,-364 105,-388"/>
+<text text-anchor="middle" x="61" y="-373.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_hcf_base</text>
+</a>
+</g>
+</g>
+<!-- type~abst_hcf&#45;&gt;type~abst_hcf_base -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge14" class="edge">
+<title>type~abst_hcf&#45;&gt;type~abst_hcf_base</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M265.95,-240.96C248.12,-242.46 225.75,-247.45 212,-262 183.69,-291.97 223.48,-324.18 194,-353 173.5,-373.04 142.14,-379.12 115.13,-380.03"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="114.98,-376.53 105.02,-380.14 115.06,-383.53 114.98,-376.53"/>
+<text text-anchor="middle" x="167" y="-379.4" font-family="Helvetica,sans-Serif" font-size="9.50">base</text>
+</g>
+<!-- type~abst_hcf_impedance -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node4" class="node">
+<title>type~abst_hcf_impedance</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node4"><a xlink:href="../type/abst_hcf_impedance.html" xlink:title="abst_hcf_impedance">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="122,-190 0,-190 0,-166 122,-166 122,-190"/>
+<text text-anchor="middle" x="61" y="-175.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_hcf_impedance</text>
+</a>
+</g>
+</g>
+<!-- type~abst_hcf&#45;&gt;type~abst_hcf_impedance -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge21" class="edge">
+<title>type~abst_hcf&#45;&gt;type~abst_hcf_impedance</title>
+<path fill="none" stroke="#ff7f00" stroke-dasharray="5,2" d="M265.58,-233.4C228.64,-223.35 162.75,-205.42 115.95,-192.68"/>
+<polygon fill="#ff7f00" stroke="#ff7f00" points="116.83,-189.3 106.27,-190.05 115,-196.05 116.83,-189.3"/>
+<text text-anchor="middle" x="167" y="-216.4" font-family="Helvetica,sans-Serif" font-size="9.50">impedance</text>
+</g>
+<!-- type~abst_hcf_viscosity -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node5" class="node">
+<title>type~abst_hcf_viscosity</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node5"><a xlink:href="../type/abst_hcf_viscosity.html" xlink:title="abst_hcf_viscosity">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="114.5,-99 7.5,-99 7.5,-75 114.5,-75 114.5,-99"/>
+<text text-anchor="middle" x="61" y="-84.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_hcf_viscosity</text>
+</a>
+</g>
+</g>
+<!-- type~abst_hcf&#45;&gt;type~abst_hcf_viscosity -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge23" class="edge">
+<title>type~abst_hcf&#45;&gt;type~abst_hcf_viscosity</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M280.66,-228.82C262.32,-211.79 227.17,-180.42 194,-158 162.66,-136.82 124.35,-116.8 97.09,-103.45"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="98.47,-100.23 87.94,-99.02 95.42,-106.53 98.47,-100.23"/>
+<text text-anchor="middle" x="167" y="-160.4" font-family="Helvetica,sans-Serif" font-size="9.50">viscosity</text>
+</g>
+<!-- type~type_hcf_vapor -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node13" class="node">
+<title>type~type_hcf_vapor</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node13"><a xlink:href="../type/type_hcf_vapor.html" xlink:title="type_hcf_vapor">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="108,-268 14,-268 14,-244 108,-244 108,-268"/>
+<text text-anchor="middle" x="61" y="-253.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_vapor</text>
+</a>
+</g>
+</g>
+<!-- type~abst_hcf&#45;&gt;type~type_hcf_vapor -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge27" class="edge">
+<title>type~abst_hcf&#45;&gt;type~type_hcf_vapor</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M265.99,-240.44C235.23,-240.06 183.95,-240.21 140,-244 132.87,-244.62 125.4,-245.48 118.02,-246.47"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="117.48,-243.01 108.07,-247.87 118.46,-249.94 117.48,-243.01"/>
+<text text-anchor="middle" x="167" y="-246.4" font-family="Helvetica,sans-Serif" font-size="9.50">vapor</text>
+</g>
+<!-- type~abst_hcf_base&#45;&gt;type~abst_hcf -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge2" class="edge">
+<title>type~abst_hcf_base&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M89.27,-363.97C123.27,-348.54 178.79,-321.77 194,-305 207.92,-289.66 196.33,-275.56 212,-262 224.03,-251.59 240.57,-246.24 255.61,-243.52"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="256.32,-246.95 265.7,-242.03 255.3,-240.03 256.32,-246.95"/>
+<text text-anchor="middle" x="167" y="-341.4" font-family="Helvetica,sans-Serif" font-size="9.50">parent</text>
+</g>
+<!-- type~abst_hcf_impedance&#45;&gt;type~abst_hcf -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge3" class="edge">
+<title>type~abst_hcf_impedance&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M122.14,-171.61C145.03,-170.95 171.11,-172.36 194,-179 223.33,-187.51 252.45,-207.34 271.54,-222.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="269.59,-225.22 279.57,-228.77 273.98,-219.77 269.59,-225.22"/>
+<text text-anchor="middle" x="167" y="-181.4" font-family="Helvetica,sans-Serif" font-size="9.50">parent</text>
+</g>
+<!-- type~abst_hcf_viscosity&#45;&gt;type~abst_hcf -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge4" class="edge">
+<title>type~abst_hcf_viscosity&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M114.62,-88.84C140.15,-91.78 170.34,-98.42 194,-113 199.69,-116.51 251.69,-185.25 278.17,-220.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="275.5,-222.79 284.3,-228.69 281.1,-218.59 275.5,-222.79"/>
+<text text-anchor="middle" x="167" y="-115.4" font-family="Helvetica,sans-Serif" font-size="9.50">parent</text>
+</g>
+<!-- type~holder_hcfs -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node6" class="node">
+<title>type~holder_hcfs</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node6"><a xlink:href="../type/holder_hcfs.html" xlink:title="holder_hcfs">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="559,-371 485,-371 485,-347 559,-347 559,-371"/>
+<text text-anchor="middle" x="522" y="-356.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">holder_hcfs</text>
+</a>
+</g>
+</g>
+<!-- type~holder_hcfs&#45;&gt;type~abst_hcf -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge6" class="edge">
+<title>type~holder_hcfs&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M484.87,-358.68C464.16,-356.85 438.66,-351.62 420,-338 388.65,-315.12 407.8,-285.61 377,-262 364.47,-252.39 348,-247.16 333.14,-244.31"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="333.61,-240.84 323.18,-242.7 332.49,-247.75 333.61,-240.84"/>
+<text text-anchor="middle" x="398.5" y="-315.4" font-family="Helvetica,sans-Serif" font-size="9.50">p</text>
+</g>
+<!-- type~type_hcf_base -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node7" class="node">
+<title>type~type_hcf_base</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node7"><a xlink:href="../type/type_hcf_base.html" xlink:title="type_hcf_base">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="566,-329 478,-329 478,-305 566,-305 566,-329"/>
+<text text-anchor="middle" x="522" y="-314.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_base</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_base&#45;&gt;type~abst_hcf -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge11" class="edge">
+<title>type~type_hcf_base&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" d="M477.8,-318.4C457.66,-316.72 434.92,-311.1 420,-296 386.58,-262.17 445.86,-180.43 399.5,-191"/>
+</g>
+<!-- type~type_hcf_base_impedance -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node8" class="node">
+<title>type~type_hcf_base_impedance</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node8"><a xlink:href="../type/type_hcf_base_impedance.html" xlink:title="type_hcf_base_impedance">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="599,-287 445,-287 445,-263 599,-263 599,-287"/>
+<text text-anchor="middle" x="522" y="-272.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_base_impedance</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_base_impedance&#45;&gt;type~abst_hcf -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge7" class="edge">
+<title>type~type_hcf_base_impedance&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" d="M444.79,-268.37C435.7,-265.03 427.14,-260.39 420,-254 398.07,-234.35 428.21,-184.46 399.5,-191"/>
+</g>
+<!-- type~type_hcf_base_impedance_viscosity -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node9" class="node">
+<title>type~type_hcf_base_impedance_viscosity</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node9"><a xlink:href="../type/type_hcf_base_impedance_viscosity.html" xlink:title="type_hcf_base_impedance_viscosity">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="624,-245 420,-245 420,-221 624,-221 624,-245"/>
+<text text-anchor="middle" x="522" y="-230.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_base_impedance_viscosity</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_base_impedance_viscosity&#45;&gt;type~abst_hcf -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge12" class="edge">
+<title>type~type_hcf_base_impedance_viscosity&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" d="M440.83,-221C433.58,-218.54 426.52,-215.57 420,-212 408.56,-205.73 412.22,-188.1 399.5,-191"/>
+</g>
+<!-- type~type_hcf_base_viscosity -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node10" class="node">
+<title>type~type_hcf_base_viscosity</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node10"><a xlink:href="../type/type_hcf_base_viscosity.html" xlink:title="type_hcf_base_viscosity">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="591.5,-203 452.5,-203 452.5,-179 591.5,-179 591.5,-203"/>
+<text text-anchor="middle" x="522" y="-188.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_base_viscosity</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_base_viscosity&#45;&gt;type~abst_hcf -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge13" class="edge">
+<title>type~type_hcf_base_viscosity&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" d="M452.28,-185.67C434.89,-185.78 416.36,-187.16 399.5,-191"/>
+</g>
+<!-- type~type_hcf_impedance -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node11" class="node">
+<title>type~type_hcf_impedance</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node11"><a xlink:href="../type/type_hcf_impedance.html" xlink:title="type_hcf_impedance">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="583.5,-161 460.5,-161 460.5,-137 583.5,-137 583.5,-161"/>
+<text text-anchor="middle" x="522" y="-146.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_impedance</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_impedance&#45;&gt;type~abst_hcf -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge8" class="edge">
+<title>type~type_hcf_impedance&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" d="M460.45,-155.54C446.59,-158.66 432.33,-163.24 420,-170 408.56,-176.27 412.22,-188.1 399.5,-191"/>
+</g>
+<!-- type~type_hcf_impedance_viscosity -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node12" class="node">
+<title>type~type_hcf_impedance_viscosity</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node12"><a xlink:href="../type/type_hcf_impedance_viscosity.html" xlink:title="type_hcf_impedance_viscosity">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="608.5,-119 435.5,-119 435.5,-95 608.5,-95 608.5,-119"/>
+<text text-anchor="middle" x="522" y="-104.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_impedance_viscosity</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_impedance_viscosity&#45;&gt;type~abst_hcf -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge10" class="edge">
+<title>type~type_hcf_impedance_viscosity&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" d="M435.1,-117.82C429.65,-120.58 424.54,-123.94 420,-128 398.07,-147.65 428.21,-184.46 399.5,-191"/>
+</g>
+<!-- type~type_hcf_vapor&#45;&gt;type~abst_hcf -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge5" class="edge">
+<title>type~type_hcf_vapor&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M108.18,-257.14C133.55,-257.39 165.55,-257.1 194,-255 214.46,-253.49 237.11,-250.41 255.63,-247.53"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="256.41,-250.95 265.73,-245.91 255.3,-244.04 256.41,-250.95"/>
+<text text-anchor="middle" x="167" y="-260.4" font-family="Helvetica,sans-Serif" font-size="9.50">parent</text>
+</g>
+<!-- type~type_hcf_viscosity -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node14" class="node">
+<title>type~type_hcf_viscosity</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node14"><a xlink:href="../type/type_hcf_viscosity.html" xlink:title="type_hcf_viscosity">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="576,-77 468,-77 468,-53 576,-53 576,-77"/>
+<text text-anchor="middle" x="522" y="-62.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_viscosity</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_viscosity&#45;&gt;type~abst_hcf -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge9" class="edge">
+<title>type~type_hcf_viscosity&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" d="M467.95,-64.74C450.57,-67.33 432.52,-73.32 420,-86 386.58,-119.83 445.86,-180.43 399.5,-191"/>
+<path fill="none" stroke="#ff0000" d="M397.5,-191C370.44,-197.17 342.31,-211.66 322.46,-223.46"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="320.4,-220.62 313.69,-228.83 324.05,-226.6 320.4,-220.62"/>
+</g>
+<!-- type~type_hcf_base_bc -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node15" class="node">
+<title>type~type_hcf_base_bc</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node15"><a xlink:href="../type/type_hcf_base_bc.html" xlink:title="type_hcf_base_bc">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="347.5,-505 241.5,-505 241.5,-481 347.5,-481 347.5,-505"/>
+<text text-anchor="middle" x="294.5" y="-490.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_base_bc</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_base_bc&#45;&gt;type~abst_hcf_base -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge19" class="edge">
+<title>type~type_hcf_base_bc&#45;&gt;type~abst_hcf_base</title>
+<path fill="none" stroke="#ff0000" d="M241.37,-485.71C231,-482.62 220.65,-478.24 212,-472 182.79,-450.96 203.92,-406.4 168,-404"/>
+</g>
+<!-- type~type_hcf_base_durner -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node16" class="node">
+<title>type~type_hcf_base_durner</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node16"><a xlink:href="../type/type_hcf_base_durner.html" xlink:title="type_hcf_base_durner">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="359.5,-463 229.5,-463 229.5,-439 359.5,-439 359.5,-463"/>
+<text text-anchor="middle" x="294.5" y="-448.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_base_durner</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_base_durner&#45;&gt;type~abst_hcf_base -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge16" class="edge">
+<title>type~type_hcf_base_durner&#45;&gt;type~abst_hcf_base</title>
+<path fill="none" stroke="#ff0000" d="M238.01,-438.95C229.17,-436.39 220.23,-433.41 212,-430 191.02,-421.3 190.66,-405.51 168,-404"/>
+</g>
+<!-- type~type_hcf_base_dvgch -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node17" class="node">
+<title>type~type_hcf_base_dvgch</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node17"><a xlink:href="../type/type_hcf_base_dvgch.html" xlink:title="type_hcf_base_dvgch">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="357.5,-421 231.5,-421 231.5,-397 357.5,-397 357.5,-421"/>
+<text text-anchor="middle" x="294.5" y="-406.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_base_dvgch</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_base_dvgch&#45;&gt;type~abst_hcf_base -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge20" class="edge">
+<title>type~type_hcf_base_dvgch&#45;&gt;type~abst_hcf_base</title>
+<path fill="none" stroke="#ff0000" d="M231.23,-407.18C211.04,-406.41 188.56,-405.37 168,-404"/>
+</g>
+<!-- type~type_hcf_base_ko -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node18" class="node">
+<title>type~type_hcf_base_ko</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node18"><a xlink:href="../type/type_hcf_base_ko.html" xlink:title="type_hcf_base_ko">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="347.5,-379 241.5,-379 241.5,-355 347.5,-355 347.5,-379"/>
+<text text-anchor="middle" x="294.5" y="-364.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_base_ko</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_base_ko&#45;&gt;type~abst_hcf_base -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge18" class="edge">
+<title>type~type_hcf_base_ko&#45;&gt;type~abst_hcf_base</title>
+<path fill="none" stroke="#ff0000" d="M243.72,-379.01C233.19,-381.78 222.19,-384.84 212,-388 192.12,-394.16 188.76,-405.39 168,-404"/>
+</g>
+<!-- type~type_hcf_base_mvg -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node19" class="node">
+<title>type~type_hcf_base_mvg</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node19"><a xlink:href="../type/type_hcf_base_mvg.html" xlink:title="type_hcf_base_mvg">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="353,-337 236,-337 236,-313 353,-313 353,-337"/>
+<text text-anchor="middle" x="294.5" y="-322.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_base_mvg</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_base_mvg&#45;&gt;type~abst_hcf_base -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge15" class="edge">
+<title>type~type_hcf_base_mvg&#45;&gt;type~abst_hcf_base</title>
+<path fill="none" stroke="#ff0000" d="M235.79,-332.64C227.13,-335.74 218.83,-340.04 212,-346 196.08,-359.89 208.13,-374.29 194,-390 185.22,-399.76 181.1,-404.87 168,-404"/>
+</g>
+<!-- type~type_hcf_base_vg -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node20" class="node">
+<title>type~type_hcf_base_vg</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node20"><a xlink:href="../type/type_hcf_base_vg.html" xlink:title="type_hcf_base_vg">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="347.5,-295 241.5,-295 241.5,-271 347.5,-271 347.5,-295"/>
+<text text-anchor="middle" x="294.5" y="-280.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_base_vg</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_base_vg&#45;&gt;type~abst_hcf_base -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge17" class="edge">
+<title>type~type_hcf_base_vg&#45;&gt;type~abst_hcf_base</title>
+<path fill="none" stroke="#ff0000" d="M241.08,-287.51C230.24,-290.72 219.77,-295.86 212,-304 185.03,-332.24 217.37,-358.71 194,-390 186.15,-400.51 181.1,-404.87 168,-404"/>
+<path fill="none" stroke="#ff0000" d="M166,-404C144.97,-402.59 122.29,-397 103.49,-391.17"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="104.36,-387.77 93.77,-388.03 102.21,-394.44 104.36,-387.77"/>
+</g>
+<!-- type~type_hcf_impedance_exp -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node21" class="node">
+<title>type~type_hcf_impedance_exp</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node21"><a xlink:href="../type/type_hcf_impedance_exp.html" xlink:title="type_hcf_impedance_exp">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="368,-124 221,-124 221,-100 368,-100 368,-124"/>
+<text text-anchor="middle" x="294.5" y="-109.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_impedance_exp</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_impedance_exp&#45;&gt;type~abst_hcf_impedance -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge22" class="edge">
+<title>type~type_hcf_impedance_exp&#45;&gt;type~abst_hcf_impedance</title>
+<path fill="none" stroke="#ff7f00" d="M220.85,-111.28C194.75,-112.92 165.49,-117 140,-126 119.09,-133.38 98.34,-147.64 83.51,-159.36"/>
+<polygon fill="#ff7f00" stroke="#ff7f00" points="81.03,-156.86 75.5,-165.9 85.46,-162.28 81.03,-156.86"/>
+</g>
+<!-- type~type_hcf_viscosity_exp -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node22" class="node">
+<title>type~type_hcf_viscosity_exp</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node22"><a xlink:href="../type/type_hcf_viscosity_exp.html" xlink:title="type_hcf_viscosity_exp">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="360.5,-66 228.5,-66 228.5,-42 360.5,-42 360.5,-66"/>
+<text text-anchor="middle" x="294.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_viscosity_exp</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_viscosity_exp&#45;&gt;type~abst_hcf_viscosity -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge25" class="edge">
+<title>type~type_hcf_viscosity_exp&#45;&gt;type~abst_hcf_viscosity</title>
+<path fill="none" stroke="#ffff00" d="M228.34,-48.31C208.73,-48.11 187.29,-49.43 168,-54"/>
+</g>
+<!-- type~type_hcf_viscosity_supercool -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node23" class="node">
+<title>type~type_hcf_viscosity_supercool</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node23"><a xlink:href="../type/type_hcf_viscosity_supercool.html" xlink:title="type_hcf_viscosity_supercool">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="377,-24 212,-24 212,0 377,0 377,-24"/>
+<text text-anchor="middle" x="294.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_viscosity_supercool</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_viscosity_supercool&#45;&gt;type~abst_hcf_viscosity -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge24" class="edge">
+<title>type~type_hcf_viscosity_supercool&#45;&gt;type~abst_hcf_viscosity</title>
+<path fill="none" stroke="#ffff00" d="M240.44,-24.09C230.87,-26.71 221.06,-29.7 212,-33 191.64,-40.4 189.09,-49.01 168,-54"/>
+<path fill="none" stroke="#ffff00" d="M166,-54C145.84,-58.77 123.93,-65.49 105.44,-71.62"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="104.2,-68.34 95.83,-74.85 106.43,-74.98 104.2,-68.34"/>
+</g>
+<!-- type~type_models_manager -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node24" class="node">
+<title>type~type_models_manager</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node24"><a xlink:href="../type/type_models_manager.html" xlink:title="type_models_manager">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="809,-371 675,-371 675,-347 809,-347 809,-371"/>
+<text text-anchor="middle" x="742" y="-356.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_models_manager</text>
+</a>
+</g>
+</g>
+<!-- type~type_models_manager&#45;&gt;type~holder_hcfs -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge26" class="edge">
+<title>type~type_models_manager&#45;&gt;type~holder_hcfs</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M674.7,-359C640.75,-359 600.23,-359 569.61,-359"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="569.22,-355.5 559.22,-359 569.22,-362.5 569.22,-355.5"/>
+<text text-anchor="middle" x="649.5" y="-361.4" font-family="Helvetica,sans-Serif" font-size="9.50">hcf</text>
+</g>
+<!-- type~type_physics_manager -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node25" class="node">
+<title>type~type_physics_manager</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node25"><a xlink:href="../type/type_physics_manager.html" xlink:title="type_physics_manager">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1015,-371 881,-371 881,-347 1015,-347 1015,-371"/>
+<text text-anchor="middle" x="948" y="-356.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager</text>
+</a>
+</g>
+</g>
+<!-- type~type_physics_manager&#45;&gt;type~type_models_manager -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge28" class="edge">
+<title>type~type_physics_manager&#45;&gt;type~type_models_manager</title>
+<path fill="none" stroke="#ff0098" stroke-dasharray="5,2" d="M880.77,-359C861.16,-359 839.53,-359 819.34,-359"/>
+<polygon fill="#ff0098" stroke="#ff0098" points="819.25,-355.5 809.25,-359 819.25,-362.5 819.25,-355.5"/>
+<text text-anchor="middle" x="845" y="-361.4" font-family="Helvetica,sans-Serif" font-size="9.50">models</text>
+</g>
+<!-- type~type_hydraulic -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node26" class="node">
+<title>type~type_hydraulic</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node26"><a xlink:href="../type/type_hydraulic.html" xlink:title="type_hydraulic">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1179,-392 1088,-392 1088,-368 1179,-368 1179,-392"/>
+<text text-anchor="middle" x="1133.5" y="-377.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- type~type_hydraulic&#45;&gt;type~type_physics_manager -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge30" class="edge">
+<title>type~type_hydraulic&#45;&gt;type~type_physics_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1087.61,-374.86C1068.83,-372.71 1046.48,-370.16 1025.26,-367.73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1025.61,-364.25 1015.28,-366.59 1024.82,-371.2 1025.61,-364.25"/>
+<text text-anchor="middle" x="1051.5" y="-374.4" font-family="Helvetica,sans-Serif" font-size="9.50">physics</text>
+</g>
+<!-- type~type_thermal -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node27" class="node">
+<title>type~type_thermal</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node27"><a xlink:href="../type/type_thermal.html" xlink:title="type_thermal">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1175,-350 1092,-350 1092,-326 1175,-326 1175,-350"/>
+<text text-anchor="middle" x="1133.5" y="-335.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal</text>
+</a>
+</g>
+</g>
+<!-- type~type_thermal&#45;&gt;type~type_physics_manager -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge29" class="edge">
+<title>type~type_thermal&#45;&gt;type~type_physics_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1091.75,-339.99C1073.71,-341.1 1052.26,-342.72 1033,-345 1030.49,-345.3 1027.95,-345.62 1025.38,-345.95"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1024.83,-342.5 1015.4,-347.34 1025.79,-349.43 1024.83,-342.5"/>
+<text text-anchor="middle" x="1051.5" y="-347.4" font-family="Helvetica,sans-Serif" font-size="9.50">physics</text>
+</g>
+<!-- type~type_ftdss -->
+<g id="type~~type_config_hcf~~InheritedByGraph_node28" class="node">
+<title>type~type_ftdss</title>
+<g id="a_type~~type_config_hcf~~InheritedByGraph_node28"><a xlink:href="../type/type_ftdss.html" xlink:title="type_ftdss">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1326,-370 1260,-370 1260,-346 1326,-346 1326,-370"/>
+<text text-anchor="middle" x="1293" y="-355.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss</text>
+</a>
+</g>
+</g>
+<!-- type~type_ftdss&#45;&gt;type~type_hydraulic -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge31" class="edge">
+<title>type~type_ftdss&#45;&gt;type~type_hydraulic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1259.75,-362.51C1239.52,-365.33 1212.92,-369.05 1189.44,-372.33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1188.67,-368.9 1179.25,-373.75 1189.63,-375.83 1188.67,-368.9"/>
+<text text-anchor="middle" x="1219.5" y="-372.4" font-family="Helvetica,sans-Serif" font-size="9.50">hydraulic</text>
+</g>
+<!-- type~type_ftdss&#45;&gt;type~type_thermal -->
+<g id="type~~type_config_hcf~~InheritedByGraph_edge32" class="edge">
+<title>type~type_ftdss&#45;&gt;type~type_thermal</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1259.91,-348.7C1254,-347.26 1247.84,-345.94 1242,-345 1223.55,-342.03 1203.12,-340.31 1185.07,-339.32"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1185.19,-335.82 1175.03,-338.83 1184.85,-342.81 1185.19,-335.82"/>
+<text text-anchor="middle" x="1219.5" y="-347.4" font-family="Helvetica,sans-Serif" font-size="9.50">thermal</text>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var pantypetype_config_hcfInheritedByGraph = svgPanZoom('#typetype_config_hcfInheritedByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#InheritedByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="InheritedByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="186pt" height="32pt"
+ viewBox="0.00 0.00 185.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 181.5,-28 181.5,4 -4,4"/>
+<!-- Type -->
+<g id="node1" class="node">
+<title>Type</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="177.5,-24 72.5,-24 72.5,0 177.5,0 177.5,-24"/>
+<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a derived type to the parent type which it
+extends. Dashed arrows point from a derived type to the other
+types it contains as a components, with a label listing the name(s) of
+said component(s).
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    <br>
+
+    <section>
+    <h2>Components</h2>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-alpha1"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>alpha1</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                <p>Inverse of the air-entry value or scaling parameter, $\alpha_1$ [1/L]</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-alpha2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>alpha2</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                <p>Scaling parameter for secondary porosity, $\alpha_2$ [1/L]</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-gain_factor"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>gain_factor</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                <p>Gain factor for numerical adjustment [-]</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-h_crit"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>h_crit</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                <p>Critical pressure head for modified models, $h_\mathrm{crit}$ [L]</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-k_sat"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>k_sat</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                <p>Saturated hydraulic conductivity [L/T]</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-l"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>l</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                <p>Pore tortuosity / pore-connectivity parameter [-]</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-m1"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>m1</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                <p>Asymmetry parameter, $m_1$ [-]</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-m2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>m2</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                <p>Asymmetry parameter for secondary porosity, $m_2$ [-]</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-material_id~45"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>material_id</strong></td>
+<td> =</td>
+                <td>0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-model"></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>model</strong></td>
+<td> =</td>
+                <td>type_constant_id(&#34;none&#34;, &#34;none&#34;, -1)</td>
+            <td>
+                <p>HCF model identification</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-n1"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>n1</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                <p>Pore-size distribution index, $n_1$ [-]</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-n2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>n2</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                <p>Pore-size distribution index for secondary porosity, $n_2$ [-]</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-omega"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>omega</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                <p>Ice impedance factor [-]</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-swcc_model"></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>swcc_model</strong></td>
+<td> =</td>
+                <td>type_constant_id(&#34;none&#34;, &#34;none&#34;, -1)</td>
+            <td>
+                <p>Model identification number</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-theta_r"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>theta_r</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                <p>Residual water content, $\theta_\mathrm{r}$ [-]</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-theta_s"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>theta_s</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                <p>Saturated water content, $\theta_\mathrm{s}$ [-]</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-w1"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>w1</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                <p>Weighting factor for primary porosity, $w_1$ [-]</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-w2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>w2</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                <p>Weighting factor for secondary porosity, $w_2$ [-]</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-water_viscosity_model"></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>water_viscosity_model</strong></td>
+<td> =</td>
+                <td>type_constant_id(&#34;none&#34;, &#34;none&#34;, -1)</td>
+            <td>
+                <p>Water viscosity model identification</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    </section>
+    <br>
+    
+
+
+      <section>
+        <h2>Type-Bound Procedures</h2>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-copy~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>copy</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/copy_config_hcf.html'>copy_config_hcf</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/copy_config_hcf.html'>copy_config_hcf</a>(self, source)  
+</h3>
+    
+
+  <p>Copy values from another type_config_hcf, calling parent copy</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_config_hcf.html'>type_config_hcf</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_config.html'>abst_config</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>source</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-reset~3"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>reset</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/reset_config_hcf.html'>reset_config_hcf</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/reset_config_hcf.html'>reset_config_hcf</a>(self)  
+</h3>
+    
+
+  <p>Reset all values in type_config_hcf, calling parent reset</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_config_hcf.html'>type_config_hcf</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-set~18"></span>
+      <h3>
+          generic, public ::
+  <strong>set</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/abst_config.html#boundprocedure-set_int32'>set_int32</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/abst_config.html#boundprocedure-set_int32_1d'>set_int32_1d</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/abst_config.html#boundprocedure-set_int32_2d'>set_int32_2d</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/abst_config.html#boundprocedure-set_int32_3d'>set_int32_3d</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/abst_config.html#boundprocedure-set_real64'>set_real64</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/abst_config.html#boundprocedure-set_real64_1d'>set_real64_1d</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/abst_config.html#boundprocedure-set_real64_2d'>set_real64_2d</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/abst_config.html#boundprocedure-set_real64_3d'>set_real64_3d</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/abst_config.html#boundprocedure-set_constant_id'>set_constant_id</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/set_int32.html'>set_int32</a>(self, member, value)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_config.html'>abst_config</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>member</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/set_int32_1d.html'>set_int32_1d</a>(self, member, value)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_config.html'>abst_config</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>member</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>value</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/set_int32_2d.html'>set_int32_2d</a>(self, member, value)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_config.html'>abst_config</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>member</strong>(:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>value</strong>(:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/set_int32_3d.html'>set_int32_3d</a>(self, member, value)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_config.html'>abst_config</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>member</strong>(:,:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>value</strong>(:,:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/set_real64.html'>set_real64</a>(self, member, value)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_config.html'>abst_config</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>member</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/set_real64_1d.html'>set_real64_1d</a>(self, member, value)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_config.html'>abst_config</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>member</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>value</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/set_real64_2d.html'>set_real64_2d</a>(self, member, value)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_config.html'>abst_config</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>member</strong>(:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>value</strong>(:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/set_real64_3d.html'>set_real64_3d</a>(self, member, value)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_config.html'>abst_config</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>member</strong>(:,:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>value</strong>(:,:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/set_constant_id.html'>set_constant_id</a>(self, member, value)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_config.html'>abst_config</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>member</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+      </section>
+
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-23 23:52 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

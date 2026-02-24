@@ -22,7 +22,6 @@ contains
         character(256) :: buffer(3) = [character(256) :: history_output, "", ""]
         integer(int32) :: i
         logical :: found
-        character(:), allocatable :: tmp_string
 
         buffer(2) = file_format
         call get_json_value(json, join(buffer), self%history_output%file_format, &
@@ -35,15 +34,13 @@ contains
                                 is_required=.true., valid_list=valid_observation_types)
 
             buffer(2) = output_time_unit
-            call get_json_value(json, join(buffer(1:2)), tmp_string, &
+            call get_json_value(json, join(buffer(1:2)), self%history_output%output_time_unit, &
                                 is_required=.true., valid_list=valid_time_units)
-            self%history_output%output_time_unit = TIME_UNITS%to_id(tmp_string)
 
             buffer(2) = output_interval
             buffer(3) = unit
-            call get_json_value(json, join(buffer(1:3)), tmp_string, &
+            call get_json_value(json, join(buffer(1:3)), self%history_output%output_interval_unit, &
                                 is_required=.true., valid_list=valid_time_units)
-            self%history_output%output_interval_unit = TIME_UNITS%to_id(tmp_string)
 
             buffer(3) = value
             call get_json_value(json, join(buffer), self%history_output%output_interval_step, is_required=.true., &
@@ -75,7 +72,7 @@ contains
                 allocate (self%history_output%coordinates(self%history_output%num_observations))
 
                 do i = 1, self%history_output%num_observations
-                    buffer(2) = valid_observation_types(2)//"("//trim(adjustl(to_string(i)))//")"
+                    buffer(2) = valid_observation_types(2)//"("//strip(adjustl(to_string(i)))//")"
                     buffer(3) = x
                     call get_json_value(json, join(buffer), self%history_output%coordinates(i)%x, is_required=.true.)
                     buffer(3) = y
@@ -96,15 +93,15 @@ contains
         integer(int32) :: i
 
         write (output_unit, '(A)') "  History Output Settings:"
-        write (output_unit, '(A, A)') "    File Format: ", trim(self%file_format)
+        write (output_unit, '(A, A)') "    File Format: ", strip(self%file_format)
         select case (self%file_format)
         case (valid_history_file_formats(1), valid_history_file_formats(2)) ! "dat", "csv"
-            write (output_unit, '(A, A, F8.3)') "    Output Interval: ", get_time_unit_string(self%output_interval_unit), &
+            write (output_unit, '(A, A, F8.3)') "    Output Interval: ", strip(self%output_interval_unit), &
                 self%output_interval_step
-            write (output_unit, '(A, A)') "    Observation Type: ", trim(self%observation_type)
+            write (output_unit, '(A, A)') "    Observation Type: ", strip(self%observation_type)
             write (output_unit, '(A)') "    Variables:"
             do i = 1, size(self%variable_names)
-                write (output_unit, '(A, A)') "      - ", trim(self%variable_names(i))
+                write (output_unit, '(A, A)') "      - ", strip(self%variable_names(i))
             end do
             write (output_unit, '(A, I8)') "    Number of Observations: ", self%num_observations
             select case (self%observation_type)

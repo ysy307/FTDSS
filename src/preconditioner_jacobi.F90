@@ -10,8 +10,8 @@ contains
         type(type_preconditioner_settings), intent(in) :: info
 
         self%name = "Jacobi"
-        self%id = SOLVER_PRECONDITION_JACOBI
-        self%status = SOLVER_STATUS_SUCCESS
+        self%ID = PRECONDITIONER_TYPES%JACOBI%ID
+        self%status = SOLVER_STATUS%SUCCESS%ID
 
         ! 初期化時に設定されたノード数（自由度数）を正とする
         ! setupルーチンではこの値を変更しない
@@ -36,7 +36,7 @@ contains
         ! サイズ変更ロジックを削除
         ! Initializeで設定された self%num_nodes を信頼する
 
-        self%status = SOLVER_STATUS_NOT_IMPLEMENTED
+        self%status = SOLVER_STATUS%NOT_IMPLEMENTED%ID
 
         select type (A)
         type is (type_matrix_dense)
@@ -61,7 +61,7 @@ contains
 
         class default
             write (*, *) "Error: Jacobi preconditioner does not support this matrix type."
-            self%status = SOLVER_STATUS_NOT_IMPLEMENTED
+            self%status = SOLVER_STATUS%NOT_IMPLEMENTED%ID
         end select
 
     end subroutine setup_preconditioner_jacobi
@@ -85,7 +85,7 @@ contains
         ! 逆数を計算 (linalg側でゼロ除算回避処理が行われる)
         call vector_reciprocal(self%M_inv)
 
-        self%status = SOLVER_STATUS_SUCCESS
+        self%status = SOLVER_STATUS%SUCCESS%ID
     end subroutine setup_preconditioner_jacobi_point
 
     !> Block Jacobi のセットアップ
@@ -116,10 +116,10 @@ contains
             end do
             !$omp end parallel do
 
-            self%status = SOLVER_STATUS_SUCCESS
+            self%status = SOLVER_STATUS%SUCCESS%ID
 
         class default
-            self%status = SOLVER_STATUS_NOT_IMPLEMENTED
+            self%status = SOLVER_STATUS%NOT_IMPLEMENTED%ID
         end select
 
     end subroutine setup_preconditioner_jacobi_block
@@ -134,7 +134,7 @@ contains
         real(real64), dimension(:), pointer :: z_ptr
         integer(int32) :: i, idx_s, idx_e, ierr, bs, num_blocks
 
-        if (self%status /= SOLVER_STATUS_SUCCESS) then
+        if (self%status /= SOLVER_STATUS%SUCCESS%ID) then
             call z%copy(r)
             return
         end if
@@ -176,7 +176,7 @@ contains
         implicit none
         class(type_preconditioner_jacobi), intent(inout) :: self
 
-        self%id = -1
+        self%ID = -1
         if (allocated(self%name)) deallocate (self%name)
 
         if (allocated(self%M_inv_blocks)) deallocate (self%M_inv_blocks)
@@ -187,7 +187,7 @@ contains
         self%num_nodes = -1
         self%block_size = -1
         self%is_block = .false.
-        self%status = SOLVER_STATUS_SUCCESS
+        self%status = SOLVER_STATUS%SUCCESS%ID
 
     end subroutine destroy_preconditioner_jacobi
 

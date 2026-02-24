@@ -26,9 +26,9 @@ module physics_models_phase_change_liquid_solid_gcc
     public :: type_gcc_non_segregation
     public :: type_gcc_segregation
 
-!>
-!> @brief Holder for GCC objects to handle polymorphism.
-!>
+    !>
+    !> @brief Holder for GCC objects to handle polymorphism.
+    !>
     type :: holder_gccs
         !> Polymorphic pointer to the specific GCC implementation
         class(abst_gcc), allocatable :: p
@@ -44,11 +44,11 @@ module physics_models_phase_change_liquid_solid_gcc
 !> @brief Interface for initializing the holder.
 !>
     interface
-        module subroutine initialize_holder_gccs(self, material_id, gcc_id, water, ice)
+        module subroutine initialize_holder_gccs(self, material_id, config, water, ice)
             implicit none
             class(holder_gccs), intent(inout) :: self
             integer(int32), intent(in) :: material_id
-            integer(int32), intent(in) :: gcc_id
+            class(type_config_gcc), intent(in) :: config
             type(type_iapws97), target, intent(in) :: water
             type(type_iapws06), target, intent(in) :: ice
         end subroutine initialize_holder_gccs

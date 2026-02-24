@@ -1,0 +1,810 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>initialize_abst_wrf &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>initialize_abst_wrf
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">12 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/wrf_interface.f90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/wrf_interface.f90.html'>wrf_interface.f90</a></li>
+                <li class="breadcrumb-item"><a href='../module/physics_models_wrf.html'>physics_models_wrf</a></li>
+            <li class="breadcrumb-item active" aria-current="page">initialize_abst_wrf</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+    <em>None</em>
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>interface</h2>
+      
+      <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~initialize_abst_wrf~~CallsGraph Pages: 1 -->
+<svg id="interfaceinitialize_abst_wrfCallsGraph" width="641pt" height="199pt"
+ viewBox="0.00 0.00 641.00 199.25" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~initialize_abst_wrf~~CallsGraph" class="graph" transform="scale(0.49 0.49) rotate(0) translate(4 406)">
+<title>interface~~initialize_abst_wrf~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-406 1315,-406 1315,4 -4,4"/>
+<!-- interface~initialize_abst_wrf -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_node1" class="node">
+<title>interface~initialize_abst_wrf</title>
+<polygon fill="none" stroke="black" points="160,-213 0,-213 0,-189 160,-189 160,-213"/>
+<text text-anchor="middle" x="80" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50">abst_wrf%initialize_abst_wrf</text>
+</g>
+<!-- proc~initialize_abst_wrf -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_node2" class="node">
+<title>proc~initialize_abst_wrf</title>
+<g id="a_interface~~initialize_abst_wrf~~CallsGraph_node2"><a xlink:href="../proc/initialize_abst_wrf.html" xlink:title="initialize_abst_wrf">
+<polygon fill="#d9534f" stroke="#d9534f" points="302,-213 196,-213 196,-189 302,-189 302,-213"/>
+<text text-anchor="middle" x="249" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_abst_wrf</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_abst_wrf&#45;&gt;proc~initialize_abst_wrf -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge1" class="edge">
+<title>interface~initialize_abst_wrf&#45;&gt;proc~initialize_abst_wrf</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M160.1,-201C168.73,-201 177.42,-201 185.81,-201"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="185.86,-204.5 195.86,-201 185.86,-197.5 185.86,-204.5"/>
+</g>
+<!-- proc~copy_config_wrf -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_node3" class="node">
+<title>proc~copy_config_wrf</title>
+<g id="a_interface~~initialize_abst_wrf~~CallsGraph_node3"><a xlink:href="../proc/copy_config_wrf.html" xlink:title="type_config_wrf%copy_config_wrf">
+<polygon fill="#d9534f" stroke="#d9534f" points="529,-213 338,-213 338,-189 529,-189 529,-213"/>
+<text text-anchor="middle" x="433.5" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_config_wrf%copy_config_wrf</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_abst_wrf&#45;&gt;proc~copy_config_wrf -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge2" class="edge">
+<title>proc~initialize_abst_wrf&#45;&gt;proc~copy_config_wrf</title>
+<path fill="none" stroke="#ff0000" d="M302.3,-201C310.32,-201 318.84,-201 327.53,-201"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="327.79,-204.5 337.79,-201 327.79,-197.5 327.79,-204.5"/>
+</g>
+<!-- copy_config_physics_model -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_node4" class="node">
+<title>copy_config_physics_model</title>
+<polygon fill="#777777" stroke="#777777" points="741,-255 581,-255 581,-231 741,-231 741,-255"/>
+<text text-anchor="middle" x="661" y="-240.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">copy_config_physics_model</text>
+</g>
+<!-- proc~copy_config_wrf&#45;&gt;copy_config_physics_model -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge3" class="edge">
+<title>proc~copy_config_wrf&#45;&gt;copy_config_physics_model</title>
+<path fill="none" stroke="#ff0000" d="M499.12,-213.04C526.01,-218.04 557.4,-223.89 585.27,-229.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="584.9,-232.57 595.37,-230.96 586.18,-225.69 584.9,-232.57"/>
+</g>
+<!-- none~set~17 -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_node5" class="node">
+<title>none~set~17</title>
+<g id="a_interface~~initialize_abst_wrf~~CallsGraph_node5"><a xlink:href="../type/type_config_wrf.html#boundprocedure-set~17" xlink:title="type_config_wrf%set">
+<polygon fill="#a7506f" stroke="#a7506f" points="721.5,-213 600.5,-213 600.5,-189 721.5,-189 721.5,-213"/>
+<text text-anchor="middle" x="661" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_config_wrf%set</text>
+</a>
+</g>
+</g>
+<!-- proc~copy_config_wrf&#45;&gt;none~set~17 -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge4" class="edge">
+<title>proc~copy_config_wrf&#45;&gt;none~set~17</title>
+<path fill="none" stroke="#ff0000" d="M529.15,-201C549.59,-201 570.83,-201 590.12,-201"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="590.31,-204.5 600.31,-201 590.31,-197.5 590.31,-204.5"/>
+</g>
+<!-- proc~reset_config_wrf -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_node6" class="node">
+<title>proc~reset_config_wrf</title>
+<g id="a_interface~~initialize_abst_wrf~~CallsGraph_node6"><a xlink:href="../proc/reset_config_wrf.html" xlink:title="type_config_wrf%reset_config_wrf">
+<polygon fill="#d9534f" stroke="#d9534f" points="757,-108 565,-108 565,-84 757,-84 757,-108"/>
+<text text-anchor="middle" x="661" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_config_wrf%reset_config_wrf</text>
+</a>
+</g>
+</g>
+<!-- proc~copy_config_wrf&#45;&gt;proc~reset_config_wrf -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge5" class="edge">
+<title>proc~copy_config_wrf&#45;&gt;proc~reset_config_wrf</title>
+<path fill="none" stroke="#ff0000" d="M460.37,-188.96C500.87,-170.1 579.32,-133.57 624.89,-112.35"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="626.5,-115.46 634.09,-108.07 623.54,-109.11 626.5,-115.46"/>
+</g>
+<!-- proc~set_constant_id -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_node7" class="node">
+<title>proc~set_constant_id</title>
+<g id="a_interface~~initialize_abst_wrf~~CallsGraph_node7"><a xlink:href="../proc/set_constant_id.html" xlink:title="abst_config%set_constant_id">
+<polygon fill="#d9534f" stroke="#d9534f" points="958,-402 793,-402 793,-378 958,-378 958,-402"/>
+<text text-anchor="middle" x="875.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config%set_constant_id</text>
+</a>
+</g>
+</g>
+<!-- none~set~17&#45;&gt;proc~set_constant_id -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge6" class="edge">
+<title>none~set~17&#45;&gt;proc~set_constant_id</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M721.76,-203.86C734.76,-207.1 747.46,-212.67 757,-222 805.1,-269.02 745.72,-321.15 793,-369 794.09,-370.1 795.23,-371.15 796.42,-372.15"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="794.6,-375.15 804.81,-377.99 798.6,-369.4 794.6,-375.15"/>
+</g>
+<!-- proc~set_int32 -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_node8" class="node">
+<title>proc~set_int32</title>
+<g id="a_interface~~initialize_abst_wrf~~CallsGraph_node8"><a xlink:href="../proc/set_int32.html" xlink:title="abst_config%set_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="941,-360 810,-360 810,-336 941,-336 941,-360"/>
+<text text-anchor="middle" x="875.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config%set_int32</text>
+</a>
+</g>
+</g>
+<!-- none~set~17&#45;&gt;proc~set_int32 -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge7" class="edge">
+<title>none~set~17&#45;&gt;proc~set_int32</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M721.66,-204.61C734.52,-207.85 747.17,-213.22 757,-222 793.79,-254.86 756.78,-293.5 793,-327 795.47,-329.28 798.15,-331.32 800.99,-333.15"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="799.45,-336.3 809.91,-338 802.8,-330.15 799.45,-336.3"/>
+</g>
+<!-- proc~set_int32_1d -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_node9" class="node">
+<title>proc~set_int32_1d</title>
+<g id="a_interface~~initialize_abst_wrf~~CallsGraph_node9"><a xlink:href="../proc/set_int32_1d.html" xlink:title="abst_config%set_int32_1d">
+<polygon fill="#d9534f" stroke="#d9534f" points="950.5,-318 800.5,-318 800.5,-294 950.5,-294 950.5,-318"/>
+<text text-anchor="middle" x="875.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config%set_int32_1d</text>
+</a>
+</g>
+</g>
+<!-- none~set~17&#45;&gt;proc~set_int32_1d -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge8" class="edge">
+<title>none~set~17&#45;&gt;proc~set_int32_1d</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M721.52,-206.26C734.09,-209.45 746.66,-214.39 757,-222 782.97,-241.12 767.36,-265.43 793,-285 795.03,-286.55 797.17,-287.99 799.38,-289.32"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="797.78,-292.43 808.27,-293.95 801.02,-286.23 797.78,-292.43"/>
+</g>
+<!-- proc~set_int32_2d -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_node10" class="node">
+<title>proc~set_int32_2d</title>
+<g id="a_interface~~initialize_abst_wrf~~CallsGraph_node10"><a xlink:href="../proc/set_int32_2d.html" xlink:title="abst_config%set_int32_2d">
+<polygon fill="#d9534f" stroke="#d9534f" points="950.5,-276 800.5,-276 800.5,-252 950.5,-252 950.5,-276"/>
+<text text-anchor="middle" x="875.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config%set_int32_2d</text>
+</a>
+</g>
+</g>
+<!-- none~set~17&#45;&gt;proc~set_int32_2d -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge9" class="edge">
+<title>none~set~17&#45;&gt;proc~set_int32_2d</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M721.63,-211.21C733.55,-214.07 745.83,-217.63 757,-222 774.25,-228.75 775.87,-235.96 793,-243 798.15,-245.12 803.58,-247.07 809.08,-248.86"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="808.44,-252.33 819.03,-251.91 810.49,-245.63 808.44,-252.33"/>
+</g>
+<!-- proc~set_int32_3d -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_node11" class="node">
+<title>proc~set_int32_3d</title>
+<g id="a_interface~~initialize_abst_wrf~~CallsGraph_node11"><a xlink:href="../proc/set_int32_3d.html" xlink:title="abst_config%set_int32_3d">
+<polygon fill="#d9534f" stroke="#d9534f" points="950.5,-234 800.5,-234 800.5,-210 950.5,-210 950.5,-234"/>
+<text text-anchor="middle" x="875.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config%set_int32_3d</text>
+</a>
+</g>
+</g>
+<!-- none~set~17&#45;&gt;proc~set_int32_3d -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge10" class="edge">
+<title>none~set~17&#45;&gt;proc~set_int32_3d</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M721.76,-206.91C743.04,-209.01 767.42,-211.42 790.36,-213.68"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="790.14,-217.18 800.43,-214.68 790.83,-210.21 790.14,-217.18"/>
+</g>
+<!-- proc~set_real64 -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_node12" class="node">
+<title>proc~set_real64</title>
+<g id="a_interface~~initialize_abst_wrf~~CallsGraph_node12"><a xlink:href="../proc/set_real64.html" xlink:title="abst_config%set_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="944.5,-192 806.5,-192 806.5,-168 944.5,-168 944.5,-192"/>
+<text text-anchor="middle" x="875.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config%set_real64</text>
+</a>
+</g>
+</g>
+<!-- none~set~17&#45;&gt;proc~set_real64 -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge11" class="edge">
+<title>none~set~17&#45;&gt;proc~set_real64</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M721.76,-195.09C744.85,-192.81 771.59,-190.17 796.18,-187.74"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="796.59,-191.22 806.2,-186.75 795.91,-184.25 796.59,-191.22"/>
+</g>
+<!-- proc~set_real64_1d -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_node13" class="node">
+<title>proc~set_real64_1d</title>
+<g id="a_interface~~initialize_abst_wrf~~CallsGraph_node13"><a xlink:href="../proc/set_real64_1d.html" xlink:title="abst_config%set_real64_1d">
+<polygon fill="#d9534f" stroke="#d9534f" points="954,-150 797,-150 797,-126 954,-126 954,-150"/>
+<text text-anchor="middle" x="875.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config%set_real64_1d</text>
+</a>
+</g>
+</g>
+<!-- none~set~17&#45;&gt;proc~set_real64_1d -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge12" class="edge">
+<title>none~set~17&#45;&gt;proc~set_real64_1d</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M697.69,-188.94C723.93,-180.22 760.53,-168.38 793,-159 800.4,-156.86 808.21,-154.71 815.95,-152.65"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="816.9,-156.02 825.68,-150.09 815.11,-149.25 816.9,-156.02"/>
+</g>
+<!-- proc~set_real64_2d -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_node14" class="node">
+<title>proc~set_real64_2d</title>
+<g id="a_interface~~initialize_abst_wrf~~CallsGraph_node14"><a xlink:href="../proc/set_real64_2d.html" xlink:title="abst_config%set_real64_2d">
+<polygon fill="#d9534f" stroke="#d9534f" points="954,-108 797,-108 797,-84 954,-84 954,-108"/>
+<text text-anchor="middle" x="875.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config%set_real64_2d</text>
+</a>
+</g>
+</g>
+<!-- none~set~17&#45;&gt;proc~set_real64_2d -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge13" class="edge">
+<title>none~set~17&#45;&gt;proc~set_real64_2d</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M677.21,-188.93C700.73,-170.82 747.93,-136.65 793,-117 797.94,-114.85 803.15,-112.88 808.44,-111.08"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="809.55,-114.4 818.03,-108.05 807.44,-107.73 809.55,-114.4"/>
+</g>
+<!-- proc~set_real64_3d -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_node15" class="node">
+<title>proc~set_real64_3d</title>
+<g id="a_interface~~initialize_abst_wrf~~CallsGraph_node15"><a xlink:href="../proc/set_real64_3d.html" xlink:title="abst_config%set_real64_3d">
+<polygon fill="#d9534f" stroke="#d9534f" points="954,-66 797,-66 797,-42 954,-42 954,-66"/>
+<text text-anchor="middle" x="875.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config%set_real64_3d</text>
+</a>
+</g>
+</g>
+<!-- none~set~17&#45;&gt;proc~set_real64_3d -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge14" class="edge">
+<title>none~set~17&#45;&gt;proc~set_real64_3d</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M677.06,-188.79C696.29,-172.96 730.28,-144.14 757,-117 774.25,-99.48 772.13,-88 793,-75 795.94,-73.17 799.04,-71.49 802.23,-69.97"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="803.64,-73.17 811.46,-66.03 800.89,-66.73 803.64,-73.17"/>
+</g>
+<!-- reset_config_physics_model -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_node16" class="node">
+<title>reset_config_physics_model</title>
+<polygon fill="#777777" stroke="#777777" points="955.5,-24 795.5,-24 795.5,0 955.5,0 955.5,-24"/>
+<text text-anchor="middle" x="875.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">reset_config_physics_model</text>
+</g>
+<!-- proc~reset_config_wrf&#45;&gt;reset_config_physics_model -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge15" class="edge">
+<title>proc~reset_config_wrf&#45;&gt;reset_config_physics_model</title>
+<path fill="none" stroke="#0000ff" d="M683.68,-83.94C709.2,-70.13 753.18,-47.55 793,-33 798.94,-30.83 805.21,-28.79 811.52,-26.9"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="812.78,-30.18 821.43,-24.06 810.85,-23.45 812.78,-30.18"/>
+</g>
+<!-- proc~raise_error -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_node17" class="node">
+<title>proc~raise_error</title>
+<g id="a_interface~~initialize_abst_wrf~~CallsGraph_node17"><a xlink:href="../proc/raise_error.html" xlink:title="raise_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="1064,-192 994,-192 994,-168 1064,-168 1064,-192"/>
+<text text-anchor="middle" x="1029" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">raise_error</text>
+</a>
+</g>
+</g>
+<!-- proc~set_int32_1d&#45;&gt;proc~raise_error -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge16" class="edge">
+<title>proc~set_int32_1d&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#cbff00" d="M941.65,-293.96C947.44,-291.51 953,-288.55 958,-285 987.85,-263.8 1008.56,-225.53 1019.34,-201.51"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1022.62,-202.75 1023.35,-192.18 1016.19,-199.99 1022.62,-202.75"/>
+</g>
+<!-- proc~set_int32_2d&#45;&gt;proc~raise_error -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge17" class="edge">
+<title>proc~set_int32_2d&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#33ff00" d="M936.95,-251.95C944.25,-249.48 951.43,-246.52 958,-243 978.47,-232.01 997.79,-213.81 1010.92,-199.79"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1013.77,-201.86 1017.9,-192.1 1008.59,-197.15 1013.77,-201.86"/>
+</g>
+<!-- proc~set_int32_3d&#45;&gt;proc~raise_error -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge18" class="edge">
+<title>proc~set_int32_3d&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ff66" d="M924.42,-209.99C935.47,-207.12 947.16,-204.02 958,-201 966.52,-198.62 975.6,-195.98 984.29,-193.4"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="985.32,-196.75 993.9,-190.52 983.31,-190.04 985.32,-196.75"/>
+</g>
+<!-- proc~set_real64_1d&#45;&gt;proc~raise_error -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge19" class="edge">
+<title>proc~set_real64_1d&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#0066ff" d="M924.42,-150.01C935.47,-152.88 947.16,-155.98 958,-159 966.52,-161.38 975.6,-164.02 984.29,-166.6"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="983.31,-169.96 993.9,-169.48 985.32,-163.25 983.31,-169.96"/>
+</g>
+<!-- proc~set_real64_2d&#45;&gt;proc~raise_error -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge20" class="edge">
+<title>proc~set_real64_2d&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#3200ff" d="M936.95,-108.05C944.25,-110.52 951.43,-113.48 958,-117 978.47,-127.99 997.79,-146.19 1010.92,-160.21"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="1008.59,-162.85 1017.9,-167.9 1013.77,-158.14 1008.59,-162.85"/>
+</g>
+<!-- proc~set_real64_3d&#45;&gt;proc~raise_error -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge21" class="edge">
+<title>proc~set_real64_3d&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#cc00ff" d="M941.65,-66.04C947.44,-68.49 953,-71.45 958,-75 987.85,-96.2 1008.56,-134.47 1019.34,-158.49"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1016.19,-160.01 1023.35,-167.82 1022.62,-157.25 1016.19,-160.01"/>
+</g>
+<!-- proc~replace_placeholder -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_node18" class="node">
+<title>proc~replace_placeholder</title>
+<g id="a_interface~~initialize_abst_wrf~~CallsGraph_node18"><a xlink:href="../proc/replace_placeholder.html" xlink:title="replace_placeholder">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1221,-232 1100,-232 1100,-208 1221,-208 1221,-232"/>
+<text text-anchor="middle" x="1160.5" y="-217.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">replace_placeholder</text>
+</a>
+</g>
+</g>
+<!-- proc~raise_error&#45;&gt;proc~replace_placeholder -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge22" class="edge">
+<title>proc~raise_error&#45;&gt;proc~replace_placeholder</title>
+<path fill="none" stroke="#ff0000" d="M1064.02,-190.51C1078.16,-194.88 1094.85,-200.03 1110.28,-204.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1109.61,-208.25 1120.2,-207.86 1111.68,-201.57 1109.61,-208.25"/>
+</g>
+<!-- strip -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_node19" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="1311,-212 1257,-212 1257,-188 1311,-188 1311,-212"/>
+<text text-anchor="middle" x="1284" y="-197.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~raise_error&#45;&gt;strip -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge23" class="edge">
+<title>proc~raise_error&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M1064.12,-182.7C1111.75,-186.46 1197.78,-193.26 1246.6,-197.12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1246.47,-200.62 1256.71,-197.92 1247.02,-193.64 1246.47,-200.62"/>
+</g>
+<!-- to_string -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_node20" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="1189.5,-152 1131.5,-152 1131.5,-128 1189.5,-128 1189.5,-152"/>
+<text text-anchor="middle" x="1160.5" y="-137.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~raise_error&#45;&gt;to_string -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge24" class="edge">
+<title>proc~raise_error&#45;&gt;to_string</title>
+<path fill="none" stroke="#ff0000" d="M1064.02,-169.49C1081.73,-164.02 1103.42,-157.32 1121.65,-151.69"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1122.86,-154.98 1131.38,-148.69 1120.79,-148.29 1122.86,-154.98"/>
+</g>
+<!-- proc~replace_placeholder&#45;&gt;strip -->
+<g id="interface~~initialize_abst_wrf~~CallsGraph_edge25" class="edge">
+<title>proc~replace_placeholder&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M1221.18,-210.18C1229.86,-208.75 1238.57,-207.31 1246.6,-205.99"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1247.4,-209.41 1256.7,-204.33 1246.27,-202.5 1247.4,-209.41"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfaceinitialize_abst_wrfCallsGraph = svgPanZoom('#interfaceinitialize_abst_wrfCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~initialize_abst_wrf~~CalledByGraph Pages: 1 -->
+<svg id="interfaceinitialize_abst_wrfCalledByGraph" width="641pt" height="26pt"
+ viewBox="0.00 0.00 641.00 26.20" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~initialize_abst_wrf~~CalledByGraph" class="graph" transform="scale(0.82 0.82) rotate(0) translate(4 28)">
+<title>interface~~initialize_abst_wrf~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 779,-28 779,4 -4,4"/>
+<!-- interface~initialize_abst_wrf -->
+<g id="interface~~initialize_abst_wrf~~CalledByGraph_node1" class="node">
+<title>interface~initialize_abst_wrf</title>
+<polygon fill="none" stroke="black" points="775,-24 615,-24 615,0 775,0 775,-24"/>
+<text text-anchor="middle" x="695" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">abst_wrf%initialize_abst_wrf</text>
+</g>
+<!-- proc~initialize_holder_wrfs -->
+<g id="interface~~initialize_abst_wrf~~CalledByGraph_node2" class="node">
+<title>proc~initialize_holder_wrfs</title>
+<g id="a_interface~~initialize_abst_wrf~~CalledByGraph_node2"><a xlink:href="../proc/initialize_holder_wrfs.html" xlink:title="initialize_holder_wrfs">
+<polygon fill="#d9534f" stroke="#d9534f" points="579,-24 455,-24 455,0 579,0 579,-24"/>
+<text text-anchor="middle" x="517" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_holder_wrfs</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_holder_wrfs&#45;&gt;interface~initialize_abst_wrf -->
+<g id="interface~~initialize_abst_wrf~~CalledByGraph_edge1" class="edge">
+<title>proc~initialize_holder_wrfs&#45;&gt;interface~initialize_abst_wrf</title>
+<path fill="none" stroke="#ff0000" d="M579.06,-12C587.34,-12 595.97,-12 604.62,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="604.76,-15.5 614.76,-12 604.76,-8.5 604.76,-15.5"/>
+</g>
+<!-- interface~initialize_holder_wrfs -->
+<g id="interface~~initialize_abst_wrf~~CalledByGraph_node3" class="node">
+<title>interface~initialize_holder_wrfs</title>
+<g id="a_interface~~initialize_abst_wrf~~CalledByGraph_node3"><a xlink:href="../interface/initialize_holder_wrfs.html" xlink:title="holder_wrfs%initialize_holder_wrfs">
+<polygon fill="#a7506f" stroke="#a7506f" points="419,-24 224,-24 224,0 419,0 419,-24"/>
+<text text-anchor="middle" x="321.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">holder_wrfs%initialize_holder_wrfs</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_holder_wrfs&#45;&gt;proc~initialize_holder_wrfs -->
+<g id="interface~~initialize_abst_wrf~~CalledByGraph_edge2" class="edge">
+<title>interface~initialize_holder_wrfs&#45;&gt;proc~initialize_holder_wrfs</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M419.25,-12C427.85,-12 436.45,-12 444.77,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="444.78,-15.5 454.78,-12 444.78,-8.5 444.78,-15.5"/>
+</g>
+<!-- proc~initialize -->
+<g id="interface~~initialize_abst_wrf~~CalledByGraph_node4" class="node">
+<title>proc~initialize</title>
+<g id="a_interface~~initialize_abst_wrf~~CalledByGraph_node4"><a xlink:href="../proc/initialize.html" xlink:title="type_models_manager%initialize">
+<polygon fill="#d9534f" stroke="#d9534f" points="188,-24 0,-24 0,0 188,0 188,-24"/>
+<text text-anchor="middle" x="94" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_models_manager%initialize</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize&#45;&gt;interface~initialize_holder_wrfs -->
+<g id="interface~~initialize_abst_wrf~~CalledByGraph_edge3" class="edge">
+<title>proc~initialize&#45;&gt;interface~initialize_holder_wrfs</title>
+<path fill="none" stroke="#ff0000" d="M188.02,-12C196.48,-12 205.09,-12 213.66,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="213.68,-15.5 223.68,-12 213.68,-8.5 213.68,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfaceinitialize_abst_wrfCalledByGraph = svgPanZoom('#interfaceinitialize_abst_wrfCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+      <h2>private module subroutine initialize_abst_wrf(self, config)  
+    <a href="../proc/initialize_abst_wrf.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h2>
+
+    
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~1312"></span>
+              class(<a href='../type/abst_wrf.html'>abst_wrf</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-config~22"></span>
+              type(<a href='../type/type_config_wrf.html'>type_config_wrf</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>config</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+
+ </div>
+</div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-23 23:52 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

@@ -21,7 +21,7 @@ module core_types_vector
         integer(int32) :: num_nodes = 0
         integer(int32) :: num_blocks = 0
         logical :: is_initialized_vector = .false.
-        integer(int32) :: status = VECTOR_STATUS_SUCCESS
+        type(type_constant_id) :: status = VECTOR_STATUS%SUCCESS
     contains
         procedure, public, pass(self) :: initialize => initialize_vector_dp
         procedure, public, pass(self) :: destroy => destroy_vector_dp
@@ -52,7 +52,7 @@ module core_types_vector
         integer(int32) :: num_nodes = 0
         integer(int32) :: num_blocks = 0
         logical :: is_initialized_vector = .false.
-        integer(int32) :: status = VECTOR_STATUS_SUCCESS
+        type(type_constant_id) :: status = VECTOR_STATUS%SUCCESS
     contains
         procedure, public, pass(self) :: initialize => initialize_vector_int
         procedure, public, pass(self) :: destroy => destroy_vector_int
@@ -111,13 +111,14 @@ module core_types_vector
         module pure function get_status_vector_dp(self) result(status)
             implicit none
             class(type_vector_dp), intent(in) :: self
-            integer(int32) :: status
+            type(type_constant_id) :: status
+
         end function get_status_vector_dp
 
         module subroutine set_scalar_vector_dp(self, op, scalar_value, row_block)
             implicit none
             class(type_vector_dp), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             real(real64), intent(in) :: scalar_value
             integer(int32), intent(in), optional :: row_block
         end subroutine set_scalar_vector_dp
@@ -125,7 +126,7 @@ module core_types_vector
         module subroutine set_array_vector_dp(self, op, array_value, row_block)
             implicit none
             class(type_vector_dp), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             real(real64), intent(in) :: array_value(:)
             integer(int32), intent(in), optional :: row_block
         end subroutine set_array_vector_dp
@@ -133,7 +134,7 @@ module core_types_vector
         module subroutine set_value_at_index_vector_dp(self, op, global_index, value, row_block)
             implicit none
             class(type_vector_dp), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             integer(int32), intent(in) :: global_index
             real(real64), intent(in) :: value
             integer(int32), intent(in), optional :: row_block
@@ -142,7 +143,7 @@ module core_types_vector
         module subroutine set_values_at_indices_vector_dp(self, op, global_indices, new_values, row_block)
             implicit none
             class(type_vector_dp), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             integer(int32), intent(in) :: global_indices(:)
             real(real64), intent(in) :: new_values(:)
             integer(int32), intent(in), optional :: row_block
@@ -151,7 +152,7 @@ module core_types_vector
         module subroutine scale_vector_dp(self, op, alpha)
             implicit none
             class(type_vector_dp), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             class(type_vector_dp), intent(in) :: alpha
         end subroutine scale_vector_dp
 
@@ -211,13 +212,13 @@ module core_types_vector
         module pure function get_status_vector_int(self) result(status)
             implicit none
             class(type_vector_int), intent(in) :: self
-            integer(int32) :: status
+            type(type_constant_id) :: status
         end function get_status_vector_int
 
         module subroutine set_array_vector_int(self, op, array_value, row_block)
             implicit none
             class(type_vector_int), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             integer(int32), intent(in) :: array_value(:)
             integer(int32), intent(in), optional :: row_block
         end subroutine set_array_vector_int
@@ -225,7 +226,7 @@ module core_types_vector
         module subroutine set_value_at_index_vector_int(self, op, global_index, value, row_block)
             implicit none
             class(type_vector_int), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             integer(int32), intent(in) :: global_index
             integer(int32), intent(in) :: value
             integer(int32), intent(in), optional :: row_block
@@ -234,7 +235,7 @@ module core_types_vector
         module subroutine set_values_at_indices_vector_int(self, op, global_indices, new_values, row_block)
             implicit none
             class(type_vector_int), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             integer(int32), intent(in) :: global_indices(:)
             integer(int32), intent(in) :: new_values(:)
             integer(int32), intent(in), optional :: row_block
@@ -243,7 +244,7 @@ module core_types_vector
         module subroutine scale_vector_int(self, op, alpha)
             implicit none
             class(type_vector_int), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             class(type_vector_int), intent(in) :: alpha
         end subroutine scale_vector_int
 

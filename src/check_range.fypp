@@ -1,0 +1,78 @@
+#:set INT_KINDS = ['int8', 'int16', 'int32', 'int64']
+#:set REAL_KINDS = ['real32', 'real64', 'real128']
+
+!>
+!> Provides a generic function for checking if a numeric value is within an
+!> inclusive range.
+!>
+module core_check_range
+    use, intrinsic :: iso_fortran_env
+    implicit none
+    private
+
+    public :: value_in_range
+
+    !>
+    !> A generic interface for checking if a value is within a given range.
+    !>
+    interface value_in_range
+        ! Integer implementations
+        #:for k in INT_KINDS
+            module procedure :: value_in_range_${k}$
+        #:endfor
+
+        ! Real implementations
+        #:for k in REAL_KINDS
+            module procedure :: value_in_range_${k}$
+        #:endfor
+    end interface value_in_range
+
+contains
+
+    ! ==========================================================================
+    ! INTEGER IMPLEMENTATIONS
+    ! ==========================================================================
+    #:for k in INT_KINDS
+        !>
+        !> Checks if an ${k}$ value is within the inclusive range [min, max].
+        !>
+        pure function value_in_range_${k}$ (value, min, max) result(in_range)
+            implicit none
+            !> The value to check.
+            integer(${k}$), intent(in) :: value
+            !> The minimum value of the inclusive range.
+            integer(${k}$), intent(in) :: min
+            !> The maximum value of the inclusive range.
+            integer(${k}$), intent(in) :: max
+            !> Returns .true. if value is in [min, max], otherwise .false.
+            logical :: in_range
+
+            in_range = (value >= min .and. value <= max)
+        end function value_in_range_${k}$
+
+    #:endfor
+
+    ! ==========================================================================
+    ! REAL IMPLEMENTATIONS
+    ! ==========================================================================
+    #:for k in REAL_KINDS
+        !>
+        !> Checks if a ${k}$ value is within the inclusive range [min, max].
+        !>
+        pure function value_in_range_${k}$ (value, min, max) result(in_range)
+            implicit none
+            !> The value to check.
+            real(${k}$), intent(in) :: value
+            !> The minimum value of the inclusive range.
+            real(${k}$), intent(in) :: min
+            !> The maximum value of the inclusive range.
+            real(${k}$), intent(in) :: max
+            !> Returns .true. if value is in [min, max], otherwise .false.
+            logical :: in_range
+
+            in_range = (value >= min .and. value <= max)
+        end function value_in_range_${k}$
+
+    #:endfor
+
+end module core_check_range

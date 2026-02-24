@@ -92,20 +92,20 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.1% of total for procedures.">49 statements</a>
+                 title=" 0.1% of total for procedures.">41 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/node_element.F90"> Source File</a>
+              <a href="../src/materials.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/node_element.f90.html'>node_element.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/domain_adjacency_node_element.html'>domain_adjacency_node_element</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/materials.f90.html'>materials.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/module_physics_materials.html'>module_physics_materials</a></li>
             <li class="breadcrumb-item active" aria-current="page">initialize</li>
           </ol>
         </nav>
@@ -159,14 +159,13 @@
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>private  subroutine initialize(self, num_nodes, num_elements, conn_ind, conn_val)  
+    <h2>private  subroutine initialize(self, material_id, den_info, sph_info, vhc_info, thc_info, water, ice)  
 </h2>
     
 
-    <p>Builds the node-to-element map by transposing the element connectivity.</p>
 
     <h3>Type Bound</h3>
-    <p><a href='../type/type_map_node_to_element.html'>type_map_node_to_element</a></p>
+    <p><a href='../type/type_material_manager.html'>type_material_manager</a></p>
 
     <h3>Arguments</h3>
         <table class="table table-striped varlist">
@@ -181,8 +180,8 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~1264"></span>
-              class(<a href='../type/type_map_node_to_element.html'>type_map_node_to_element</a>),
+              <span class="anchor" id="variable-self~1472"></span>
+              class(<a href='../type/type_material_manager.html'>type_material_manager</a>),
             </td>
 <td>intent(inout)</td>
               <td></td>            <td>
@@ -196,7 +195,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-num_nodes~64"></span>
+              <span class="anchor" id="variable-material_id~79"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -204,52 +203,97 @@
               
             </td>
             <td>::</td>
-            <td><strong>num_nodes</strong></td>
+            <td><strong>material_id</strong></td>
             <td>
                 
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-num_elements~9"></span>
-              integer(kind=int32),
+              <span class="anchor" id="variable-den_info"></span>
+              type(<a href='../type/type_physics_info.html'>type_physics_info</a>),
             </td>
-<td>intent(in)</td>
-              <td></td>            <td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>num_elements</strong></td>
+            <td><strong>den_info</strong></td>
             <td>
                 
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-conn_ind~4"></span>
-              integer(kind=int32),
+              <span class="anchor" id="variable-sph_info"></span>
+              type(<a href='../type/type_physics_info.html'>type_physics_info</a>),
             </td>
-<td>intent(in)</td>
-              <td></td>            <td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>conn_ind</strong>(:)</td>
+            <td><strong>sph_info</strong></td>
             <td>
                 
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-conn_val~3"></span>
-              integer(kind=int32),
+              <span class="anchor" id="variable-vhc_info"></span>
+              type(<a href='../type/type_physics_info.html'>type_physics_info</a>),
             </td>
-<td>intent(in)</td>
-              <td></td>            <td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>conn_val</strong>(:)</td>
+            <td><strong>vhc_info</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-thc_info"></span>
+              type(<a href='../type/type_physics_info.html'>type_physics_info</a>),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>thc_info</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-water~26"></span>
+              type(type_iapws97),
+            </td>
+<td>intent(in),</td>
+              <td>optional,</td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>water</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ice~25"></span>
+              type(type_iapws06),
+            </td>
+<td>intent(in),</td>
+              <td>optional,</td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>ice</strong></td>
             <td>
                 
             </td>
@@ -269,35 +313,69 @@
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: proc~~initialize~5~~CallsGraph Pages: 1 -->
-<svg id="procinitialize5CallsGraph" width="472pt" height="32pt"
- viewBox="0.00 0.00 472.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~initialize~5~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<svg id="procinitialize5CallsGraph" width="641pt" height="24pt"
+ viewBox="0.00 0.00 641.00 23.96" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~initialize~5~~CallsGraph" class="graph" transform="scale(0.75 0.75) rotate(0) translate(4 28)">
 <title>proc~~initialize~5~~CallsGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 468,-28 468,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 852,-28 852,4 -4,4"/>
 <!-- proc~initialize~5 -->
 <g id="proc~~initialize~5~~CallsGraph_node1" class="node">
 <title>proc~initialize~5</title>
-<polygon fill="none" stroke="black" points="217,-24 0,-24 0,0 217,0 217,-24"/>
-<text text-anchor="middle" x="108.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_map_node_to_element%initialize</text>
+<polygon fill="none" stroke="black" points="194,-24 0,-24 0,0 194,0 194,-24"/>
+<text text-anchor="middle" x="97" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_material_manager%initialize</text>
 </g>
-<!-- proc~destroy~2 -->
+<!-- interface~initialize_holder_dens -->
 <g id="proc~~initialize~5~~CallsGraph_node2" class="node">
-<title>proc~destroy~2</title>
-<g id="a_proc~~initialize~5~~CallsGraph_node2"><a xlink:href="../proc/destroy~2.html" xlink:title="type_map_node_to_element%destroy">
-<polygon fill="#d9534f" stroke="#d9534f" points="464,-24 253,-24 253,0 464,0 464,-24"/>
-<text text-anchor="middle" x="358.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_map_node_to_element%destroy</text>
+<title>interface~initialize_holder_dens</title>
+<g id="a_proc~~initialize~5~~CallsGraph_node2"><a xlink:href="../interface/initialize_holder_dens.html" xlink:title="holder_dens%initialize_holder_dens">
+<polygon fill="#a7506f" stroke="#a7506f" points="432,-24 230,-24 230,0 432,0 432,-24"/>
+<text text-anchor="middle" x="331" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">holder_dens%initialize_holder_dens</text>
 </a>
 </g>
 </g>
-<!-- proc~initialize~5&#45;&gt;proc~destroy~2 -->
+<!-- proc~initialize~5&#45;&gt;interface~initialize_holder_dens -->
 <g id="proc~~initialize~5~~CallsGraph_edge1" class="edge">
-<title>proc~initialize~5&#45;&gt;proc~destroy~2</title>
-<path fill="none" stroke="#ff0000" d="M217.19,-12C225.56,-12 234.02,-12 242.43,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="242.65,-15.5 252.65,-12 242.65,-8.5 242.65,-15.5"/>
+<title>proc~initialize~5&#45;&gt;interface~initialize_holder_dens</title>
+<path fill="none" stroke="#ff0000" d="M194.04,-12C202.55,-12 211.21,-12 219.83,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="219.91,-15.5 229.91,-12 219.91,-8.5 219.91,-15.5"/>
+</g>
+<!-- proc~initialize_holder_dens -->
+<g id="proc~~initialize~5~~CallsGraph_node3" class="node">
+<title>proc~initialize_holder_dens</title>
+<g id="a_proc~~initialize~5~~CallsGraph_node3"><a xlink:href="../proc/initialize_holder_dens.html" xlink:title="initialize_holder_dens">
+<polygon fill="#d9534f" stroke="#d9534f" points="595,-24 468,-24 468,0 595,0 595,-24"/>
+<text text-anchor="middle" x="531.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_holder_dens</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_holder_dens&#45;&gt;proc~initialize_holder_dens -->
+<g id="proc~~initialize~5~~CallsGraph_edge2" class="edge">
+<title>interface~initialize_holder_dens&#45;&gt;proc~initialize_holder_dens</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M432.12,-12C440.75,-12 449.38,-12 457.73,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="457.76,-15.5 467.76,-12 457.76,-8.5 457.76,-15.5"/>
+</g>
+<!-- proc~initialize_abst_material -->
+<g id="proc~~initialize~5~~CallsGraph_node4" class="node">
+<title>proc~initialize_abst_material</title>
+<g id="a_proc~~initialize~5~~CallsGraph_node4"><a xlink:href="../proc/initialize_abst_material.html" xlink:title="abst_material%initialize_abst_material">
+<polygon fill="#d9534f" stroke="#d9534f" points="848,-24 631,-24 631,0 848,0 848,-24"/>
+<text text-anchor="middle" x="739.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_material%initialize_abst_material</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_holder_dens&#45;&gt;proc~initialize_abst_material -->
+<g id="proc~~initialize~5~~CallsGraph_edge3" class="edge">
+<title>proc~initialize_holder_dens&#45;&gt;proc~initialize_abst_material</title>
+<path fill="none" stroke="#ff0000" d="M595.15,-12C603.31,-12 611.88,-12 620.6,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="620.88,-15.5 630.88,-12 620.88,-8.5 620.88,-15.5"/>
 </g>
 </g>
 </svg>
-</div>          <div>
+</div>                <script>
+                  var panprocinitialize5CallsGraph = svgPanZoom('#procinitialize5CallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
             <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
           </div>
           <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
@@ -392,73 +470,51 @@ large graphs.</div>
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">initialize</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">num_nodes</span><span class="p">,</span><span class="w"> </span><span class="n">num_elements</span><span class="p">,</span><span class="w"> </span><span class="n">conn_ind</span><span class="p">,</span><span class="w"> </span><span class="n">conn_val</span><span class="p">)</span>
-<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">type_map_node_to_element</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_nodes</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_elements</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">conn_ind</span><span class="p">(:)</span><span class="w"> </span><span class="c">! Element -&gt; Node pointers</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">conn_val</span><span class="p">(:)</span><span class="w"> </span><span class="c">! Element -&gt; Node indices</span>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">initialize</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">material_id</span><span class="p">,</span><span class="w"> </span><span class="n">den_info</span><span class="p">,</span><span class="w"> </span><span class="n">sph_info</span><span class="p">,</span><span class="w"> </span><span class="n">vhc_info</span><span class="p">,</span><span class="w"> </span><span class="n">thc_info</span><span class="p">,</span><span class="w"> </span><span class="n">water</span><span class="p">,</span><span class="w"> </span><span class="n">ice</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_material_manager</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">material_id</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_physics_info</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">den_info</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_physics_info</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">sph_info</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_physics_info</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">vhc_info</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_physics_info</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">thc_info</span>
 
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="n">start_idx</span><span class="p">,</span><span class="w"> </span><span class="n">end_idx</span><span class="p">,</span><span class="w"> </span><span class="n">node_id</span><span class="p">,</span><span class="w"> </span><span class="n">cum_sum</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">counts</span><span class="p">(:)</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">next_pos</span><span class="p">(:)</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_iapws97</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="p">,</span><span class="w"> </span><span class="k">target</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">water</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_iapws06</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="p">,</span><span class="w"> </span><span class="k">target</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ice</span>
 
-<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">destroy</span><span class="p">()</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">num_nodes</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="n">num_elements</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">return</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_present_iapws</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
 
-<span class="k">        </span><span class="n">self</span><span class="p">%</span><span class="n">num_nodes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">num_nodes</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">present</span><span class="p">(</span><span class="n">water</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="p">.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">present</span><span class="p">(</span><span class="n">ice</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">is_present_iapws</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            </span><span class="n">is_present_iapws</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">        </span><span class="k">end if</span>
 
-<span class="w">        </span><span class="c">! --- Pass 1: Count elements per node (Degree calculation) ---</span>
-<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">counts</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">))</span>
-<span class="w">        </span><span class="n">counts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
-
-<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_elements</span>
-<span class="w">            </span><span class="n">start_idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn_ind</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-<span class="w">            </span><span class="n">end_idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn_ind</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
-<span class="w">            </span><span class="k">do </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">start_idx</span><span class="p">,</span><span class="w"> </span><span class="n">end_idx</span>
-<span class="w">                </span><span class="n">node_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn_val</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
-<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">node_id</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">node_id</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">num_nodes</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
-<span class="k">                    </span><span class="n">counts</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">counts</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
-<span class="w">                </span><span class="k">end if</span>
-<span class="k">            end do</span>
-<span class="k">        end do</span>
-
-<span class="w">        </span><span class="c">! --- Pass 2: Build CSR Row Pointers (Prefix Sum) ---</span>
-<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">num_nodes</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span>
-<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
-<span class="w">        </span><span class="n">cum_sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
-
-<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_nodes</span>
-<span class="w">            </span><span class="n">cum_sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cum_sum</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">counts</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cum_sum</span>
-<span class="w">        </span><span class="k">end do</span>
-
-<span class="k">        </span><span class="n">self</span><span class="p">%</span><span class="n">num_entries</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cum_sum</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
-
-<span class="w">        </span><span class="c">! --- Pass 3: Fill Element IDs (Transpose) ---</span>
-<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_entries</span><span class="p">))</span>
-
-<span class="w">        </span><span class="c">! Use &#39;counts&#39; array to keep track of current insert position for each node</span>
-<span class="w">        </span><span class="c">! Re-initialize next_pos using ptr</span>
-<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">next_pos</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">))</span>
-<span class="w">        </span><span class="n">next_pos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">num_nodes</span><span class="p">)</span>
-
-<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_elements</span>
-<span class="w">            </span><span class="n">start_idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn_ind</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-<span class="w">            </span><span class="n">end_idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn_ind</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
-<span class="w">            </span><span class="k">do </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">start_idx</span><span class="p">,</span><span class="w"> </span><span class="n">end_idx</span>
-<span class="w">                </span><span class="n">node_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn_val</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
-<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">node_id</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">node_id</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">num_nodes</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
-<span class="k">                    </span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">next_pos</span><span class="p">(</span><span class="n">node_id</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="c">! Store Element ID</span>
-<span class="w">                    </span><span class="n">next_pos</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">next_pos</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
-<span class="w">                </span><span class="k">end if</span>
-<span class="k">            end do</span>
-<span class="k">        end do</span>
-
-<span class="k">        deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
-<span class="w">        </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">next_pos</span><span class="p">)</span>
-
-<span class="w">    </span><span class="k">end subroutine </span><span class="n">initialize</span>
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">den_info</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">is_present_iapws</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                error stop</span><span class="w"> </span><span class="s2">&quot;Error in material_manager%initialize: water and ice must be provided when den_info is provided.&quot;</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">den</span><span class="p">%</span><span class="n">initialize</span><span class="p">(</span><span class="n">material_id</span><span class="p">,</span><span class="w"> </span><span class="n">den_info</span><span class="p">,</span><span class="w"> </span><span class="n">water</span><span class="p">,</span><span class="w"> </span><span class="n">ice</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">sph_info</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">is_present_iapws</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                error stop</span><span class="w"> </span><span class="s2">&quot;Error in material_manager%initialize: water and ice must be provided when sph_info is provided.&quot;</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">sph</span><span class="p">%</span><span class="n">initialize</span><span class="p">(</span><span class="n">material_id</span><span class="p">,</span><span class="w"> </span><span class="n">sph_info</span><span class="p">,</span><span class="w"> </span><span class="n">water</span><span class="p">,</span><span class="w"> </span><span class="n">ice</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">vhc_info</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">is_present_iapws</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                error stop</span><span class="w"> </span><span class="s2">&quot;Error in material_manager%initialize: water and ice must be provided when vhc_info is provided.&quot;</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">vhc</span><span class="p">%</span><span class="n">initialize</span><span class="p">(</span><span class="n">material_id</span><span class="p">,</span><span class="w"> </span><span class="n">vhc_info</span><span class="p">,</span><span class="w"> </span><span class="n">water</span><span class="p">,</span><span class="w"> </span><span class="n">ice</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">thc_info</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">is_present_iapws</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                error stop</span><span class="w"> </span><span class="s2">&quot;Error in material_manager%initialize: water and ice must be provided when thc_info is provided.&quot;</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">thc</span><span class="p">%</span><span class="n">initialize</span><span class="p">(</span><span class="n">material_id</span><span class="p">,</span><span class="w"> </span><span class="n">thc_info</span><span class="p">,</span><span class="w"> </span><span class="n">water</span><span class="p">,</span><span class="w"> </span><span class="n">ice</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+<span class="k">    end subroutine </span><span class="n">initialize</span>
 </pre></div>
 
     </section>
@@ -482,7 +538,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-22 12:12 +0000             </p>
+ on 2026-02-23 23:52 +0000             </p>
           </div>
         </div>
         <br>

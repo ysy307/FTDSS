@@ -29,8 +29,8 @@ module inout_input_output_conditions
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_field_output
         character(:), allocatable :: file_format
-        integer(int32) :: output_time_unit
-        integer(int32) :: output_interval_unit
+        character(:), allocatable :: output_time_unit
+        character(:), allocatable :: output_interval_unit
         real(real64) :: output_interval_step
         character(:), allocatable :: variable_names(:)
     contains
@@ -48,8 +48,8 @@ module inout_input_output_conditions
     type :: types_history_output
         character(:), allocatable :: file_format
         character(:), allocatable :: observation_type
-        integer(int32) :: output_time_unit
-        integer(int32) :: output_interval_unit
+        character(:), allocatable :: output_time_unit
+        character(:), allocatable :: output_interval_unit
         real(real64) :: output_interval_step
         character(:), allocatable :: variable_names(:)
         integer(int32) :: num_observations

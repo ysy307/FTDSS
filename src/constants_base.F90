@@ -10,9 +10,9 @@ module core_constants_base
     public :: type_constant_error
 
     type :: type_constant_id
-        character(len=64) :: group
-        character(len=64) :: name
-        integer(int32) :: id
+        character(len=64) :: GROUP
+        character(len=64) :: NAME
+        integer(int32) :: ID
     contains
         procedure, public, pass(self) :: display => display_constant_id
         
@@ -28,11 +28,11 @@ module core_constants_base
     end type type_constant_id
 
     type :: type_constant_value
-        character(len=64) :: group
-        character(len=64) :: name
-        integer(int32) :: id
-        character(len=16) :: unit
-        real(real64) :: value
+        character(len=64) :: GROUP
+        character(len=64) :: NAME
+        integer(int32) :: ID
+        character(len=16) :: UNIT
+        real(real64) :: VALUE
     contains
         procedure, public, pass(self) :: display => display_constant
 
@@ -75,7 +75,7 @@ contains
         integer(int32) :: unit
         unit = optval(unit_in, output_unit)
 
-        write (unit, '("[Group: ", a, "]", a, ": ", i6)') strip(self%group), strip(self%name), self%id
+        write (unit, '("[Group: ", a, "]", a, ": ", i6)') strip(self%Group), strip(self%Name), self%ID
     end subroutine display_constant_id
 
     pure elemental function eq_const_const_id(self, other) result(is_equal)
@@ -84,9 +84,9 @@ contains
         class(type_constant_id), intent(in) :: other
         logical :: is_equal
 
-        is_equal = ((self%id == other%id) .and. &
-                    (strip(self%name) == strip(other%name)) .and. &
-                    (strip(self%group) == strip(other%group)))
+        is_equal = ((self%ID == other%ID) .and. &
+                    (strip(self%Name) == strip(other%Name)) .and. &
+                    (strip(self%Group) == strip(other%Group)))
     end function eq_const_const_id
 
     pure elemental function eq_id_const_id(self, other) result(is_equal)
@@ -95,7 +95,7 @@ contains
         integer(int32), intent(in) :: other
         logical :: is_equal
 
-        is_equal = (self%id == other)
+        is_equal = (self%ID == other)
     end function eq_id_const_id
 
     pure elemental function eq_name_const_id(self, other) result(is_equal)
@@ -104,7 +104,7 @@ contains
         character(len=*), intent(in) :: other
         logical :: is_equal
 
-        is_equal = (strip(self%name) == strip(other))
+        is_equal = (strip(self%Name) == strip(other))
     end function eq_name_const_id
 
     pure elemental function neq_const_const_id(self, other) result(is_not_equal)
@@ -143,7 +143,7 @@ contains
         unit = optval(unit_in, output_unit)
 
         write (unit, '("[Group: ", a, "]", a, ": ", i6, " ", a, " ", es24.16)') &
-            strip(self%group), strip(self%name), self%id, strip(self%unit), self%value
+            strip(self%Group), strip(self%Name), self%ID, strip(self%UNIT), self%VALUE
     end subroutine display_constant
 
     pure elemental function eq_const_const_value(self, other) result(is_equal)
@@ -152,11 +152,11 @@ contains
         class(type_constant_value), intent(in) :: other
         logical :: is_equal
 
-        is_equal = ((self%id == other%id) .and. &
-                    (self%value == other%value) .and. &
-                    (strip(self%name) == strip(other%name)) .and. &
-                    (strip(self%unit) == strip(other%unit)) .and. &
-                    (strip(self%group) == strip(other%group)))
+        is_equal = ((self%ID == other%ID) .and. &
+                    (self%VALUE == other%VALUE) .and. &
+                    (strip(self%Name) == strip(other%Name)) .and. &
+                    (strip(self%UNIT) == strip(other%UNIT)) .and. &
+                    (strip(self%Group) == strip(other%Group)))
     end function eq_const_const_value
 
     pure elemental function eq_id_const_value(self, other) result(is_equal)
@@ -165,7 +165,7 @@ contains
         integer(int32), intent(in) :: other
         logical :: is_equal
 
-        is_equal = (self%id == other)
+        is_equal = (self%ID == other)
     end function eq_id_const_value
 
     pure elemental function eq_name_const_value(self, other) result(is_equal)
@@ -174,7 +174,7 @@ contains
         character(len=*), intent(in) :: other
         logical :: is_equal
 
-        is_equal = (strip(self%name) == strip(other))
+        is_equal = (strip(self%Name) == strip(other))
     end function eq_name_const_value
 
     pure elemental function neq_const_const_value(self, other) result(is_not_equal)
@@ -213,7 +213,7 @@ contains
         unit = optval(unit_in, output_unit)
 
         write (unit, '("[Group: ", a, "]", a, ": ", i6, " - ", a)') &
-            strip(self%group), strip(self%name), self%id, strip(self%message)
+            strip(self%Group), strip(self%Name), self%ID, strip(self%MESSAGE)
     end subroutine display_constant_error
 
     pure elemental function eq_const_const_error(self, other) result(is_equal)
@@ -222,9 +222,9 @@ contains
         class(type_constant_error), intent(in) :: other
         logical :: is_equal
 
-        is_equal = ((self%id == other%id) .and. &
-                    (strip(self%name) == strip(other%name)) .and. &
-                    (strip(self%group) == strip(other%group)))
+        is_equal = ((self%ID == other%ID) .and. &
+                    (strip(self%Name) == strip(other%Name)) .and. &
+                    (strip(self%Group) == strip(other%Group)))
     end function eq_const_const_error
 
     pure elemental function eq_id_const_error(self, other) result(is_equal)
@@ -233,7 +233,7 @@ contains
         integer(int32), intent(in) :: other
         logical :: is_equal
 
-        is_equal = (self%id == other)
+        is_equal = (self%ID == other)
     end function eq_id_const_error
 
     pure elemental function eq_name_const_error(self, other) result(is_equal)
@@ -242,7 +242,7 @@ contains
         character(len=*), intent(in) :: other
         logical :: is_equal
 
-        is_equal = (strip(self%name) == strip(other))
+        is_equal = (strip(self%Name) == strip(other))
     end function eq_name_const_error
 
     pure elemental function neq_const_const_error(self, other) result(is_not_equal)

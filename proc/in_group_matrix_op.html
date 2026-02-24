@@ -1,0 +1,1654 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>in_group_matrix_op &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>in_group_matrix_op
+      <small>Function</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">12 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/constans_ids.fypp"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/constans_ids.fypp.html'>constans_ids.fypp</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_constants_ids.html'>core_constants_ids</a></li>
+            <li class="breadcrumb-item active" aria-current="page">in_group_matrix_op</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private pure function in_group_matrix_op(self, object) result(is_in)  
+</h2>
+    
+
+    <p>Check if object belongs to Matrix operations</p>
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_matrix_ops.html'>type_matrix_ops</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~807"></span>
+              class(<a href='../type/type_matrix_ops.html'>type_matrix_ops</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                <p>Matrix operations instance</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-object~71"></span>
+              type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>object</strong></td>
+            <td>
+                <p>Constant object to check</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+      <h3>Return Value
+        <small>
+          <span class="anchor" id="variable-is_in~22"></span>
+          logical
+        </small>
+      </h3>
+      <p><code>True</code> if object belongs to the group</p>
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~in_group_matrix_op~~CallsGraph Pages: 1 -->
+<svg id="procin_group_matrix_opCallsGraph" width="316pt" height="74pt"
+ viewBox="0.00 0.00 316.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~in_group_matrix_op~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 70)">
+<title>proc~~in_group_matrix_op~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 312,-70 312,4 -4,4"/>
+<!-- proc~in_group_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CallsGraph_node1" class="node">
+<title>proc~in_group_matrix_op</title>
+<polygon fill="none" stroke="black" points="214,-45 0,-45 0,-21 214,-21 214,-45"/>
+<text text-anchor="middle" x="107" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_matrix_ops%in_group_matrix_op</text>
+</g>
+<!-- strip -->
+<g id="proc~~in_group_matrix_op~~CallsGraph_node2" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="306,-66 252,-66 252,-42 306,-42 306,-66"/>
+<text text-anchor="middle" x="279" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~in_group_matrix_op&#45;&gt;strip -->
+<g id="proc~~in_group_matrix_op~~CallsGraph_edge1" class="edge">
+<title>proc~in_group_matrix_op&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M205.41,-45.03C218.34,-46.63 230.88,-48.18 241.8,-49.53"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="241.37,-53 251.72,-50.75 242.23,-46.05 241.37,-53"/>
+</g>
+<!-- to_lower -->
+<g id="proc~~in_group_matrix_op~~CallsGraph_node3" class="node">
+<title>to_lower</title>
+<polygon fill="#777777" stroke="#777777" points="308,-24 250,-24 250,0 308,0 308,-24"/>
+<text text-anchor="middle" x="279" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_lower</text>
+</g>
+<!-- proc~in_group_matrix_op&#45;&gt;to_lower -->
+<g id="proc~~in_group_matrix_op~~CallsGraph_edge2" class="edge">
+<title>proc~in_group_matrix_op&#45;&gt;to_lower</title>
+<path fill="none" stroke="#ff0000" d="M205.41,-20.97C217.54,-19.47 229.33,-18.01 239.75,-16.73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="240.19,-20.2 249.68,-15.5 239.33,-13.25 240.19,-20.2"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~in_group_matrix_op~~CalledByGraph Pages: 1 -->
+<svg id="procin_group_matrix_opCalledByGraph" width="641pt" height="132pt"
+ viewBox="0.00 0.00 641.00 131.95" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~in_group_matrix_op~~CalledByGraph" class="graph" transform="scale(0.16 0.16) rotate(0) translate(4 807.45)">
+<title>proc~~in_group_matrix_op~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-807.45 3938,-807.45 3938,4 -4,4"/>
+<!-- proc~in_group_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node1" class="node">
+<title>proc~in_group_matrix_op</title>
+<polygon fill="none" stroke="black" points="3934,-425.45 3720,-425.45 3720,-401.45 3934,-401.45 3934,-425.45"/>
+<text text-anchor="middle" x="3827" y="-411.05" font-family="Helvetica,sans-Serif" font-size="10.50">type_matrix_ops%in_group_matrix_op</text>
+</g>
+<!-- proc~is_valid_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node2" class="node">
+<title>proc~is_valid_matrix_op</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node2"><a xlink:href="../proc/is_valid_matrix_op.html" xlink:title="type_matrix_ops%is_valid_matrix_op">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="3684,-425.45 3477,-425.45 3477,-401.45 3684,-401.45 3684,-425.45"/>
+<text text-anchor="middle" x="3580.5" y="-411.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_ops%is_valid_matrix_op</text>
+</a>
+</g>
+</g>
+<!-- proc~is_valid_matrix_op&#45;&gt;proc~in_group_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge1" class="edge">
+<title>proc~is_valid_matrix_op&#45;&gt;proc~in_group_matrix_op</title>
+<path fill="none" stroke="#ff0000" d="M3684.13,-413.45C3692.58,-413.45 3701.16,-413.45 3709.71,-413.45"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3709.71,-416.95 3719.71,-413.45 3709.71,-409.95 3709.71,-416.95"/>
+</g>
+<!-- proc~matrix_scale -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node3" class="node">
+<title>proc~matrix_scale</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node3"><a xlink:href="../proc/matrix_scale.html" xlink:title="matrix_scale">
+<polygon fill="#d9534f" stroke="#d9534f" points="3422,-803.45 3342,-803.45 3342,-779.45 3422,-779.45 3422,-803.45"/>
+<text text-anchor="middle" x="3382" y="-789.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_scale</text>
+</a>
+</g>
+</g>
+<!-- proc~matrix_scale&#45;&gt;proc~is_valid_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge2" class="edge">
+<title>proc~matrix_scale&#45;&gt;proc~is_valid_matrix_op</title>
+<path fill="none" stroke="#ff0000" d="M3422.17,-782.47C3429.07,-779.52 3435.72,-775.61 3441,-770.45 3540.13,-673.54 3569.66,-497.65 3577.2,-435.73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3580.71,-435.88 3578.37,-425.54 3573.76,-435.08 3580.71,-435.88"/>
+</g>
+<!-- proc~scale_csr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node4" class="node">
+<title>proc~scale_csr</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node4"><a xlink:href="../proc/scale_csr.html" xlink:title="scale_csr">
+<polygon fill="#d9534f" stroke="#d9534f" points="3412.5,-761.45 3351.5,-761.45 3351.5,-737.45 3412.5,-737.45 3412.5,-761.45"/>
+<text text-anchor="middle" x="3382" y="-747.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">scale_csr</text>
+</a>
+</g>
+</g>
+<!-- proc~scale_csr&#45;&gt;proc~is_valid_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge3" class="edge">
+<title>proc~scale_csr&#45;&gt;proc~is_valid_matrix_op</title>
+<path fill="none" stroke="#ff0000" d="M3412.65,-743.71C3422.62,-740.57 3433.18,-735.76 3441,-728.45 3530.58,-644.67 3565.56,-492.66 3575.9,-435.75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3579.38,-436.14 3577.64,-425.69 3572.49,-434.94 3579.38,-436.14"/>
+</g>
+<!-- proc~scale_dense -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node5" class="node">
+<title>proc~scale_dense</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node5"><a xlink:href="../proc/scale_dense.html" xlink:title="scale_dense">
+<polygon fill="#d9534f" stroke="#d9534f" points="3421,-719.45 3343,-719.45 3343,-695.45 3421,-695.45 3421,-719.45"/>
+<text text-anchor="middle" x="3382" y="-705.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">scale_dense</text>
+</a>
+</g>
+</g>
+<!-- proc~scale_dense&#45;&gt;proc~is_valid_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge4" class="edge">
+<title>proc~scale_dense&#45;&gt;proc~is_valid_matrix_op</title>
+<path fill="none" stroke="#ff0000" d="M3421.17,-698.29C3428.31,-695.35 3435.31,-691.49 3441,-686.45 3521.28,-615.42 3561.03,-486.84 3574.29,-435.5"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3577.76,-436.05 3576.78,-425.5 3570.96,-434.35 3577.76,-436.05"/>
+</g>
+<!-- proc~scale_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node6" class="node">
+<title>proc~scale_dia</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node6"><a xlink:href="../proc/scale_dia.html" xlink:title="scale_dia">
+<polygon fill="#d9534f" stroke="#d9534f" points="3413,-677.45 3351,-677.45 3351,-653.45 3413,-653.45 3413,-677.45"/>
+<text text-anchor="middle" x="3382" y="-663.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">scale_dia</text>
+</a>
+</g>
+</g>
+<!-- proc~scale_dia&#45;&gt;proc~is_valid_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge5" class="edge">
+<title>proc~scale_dia&#45;&gt;proc~is_valid_matrix_op</title>
+<path fill="none" stroke="#ff0000" d="M3413.05,-658.85C3422.71,-655.67 3432.98,-651.05 3441,-644.45 3512.17,-585.82 3555.87,-480.45 3572.2,-435.14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3575.59,-436.05 3575.6,-425.45 3568.98,-433.73 3575.59,-436.05"/>
+</g>
+<!-- proc~set_all_bsr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node7" class="node">
+<title>proc~set_all_bsr</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node7"><a xlink:href="../proc/set_all_bsr.html" xlink:title="set_all_bsr">
+<polygon fill="#d9534f" stroke="#d9534f" points="3416,-635.45 3348,-635.45 3348,-611.45 3416,-611.45 3416,-635.45"/>
+<text text-anchor="middle" x="3382" y="-621.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_all_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~set_all_bsr&#45;&gt;proc~is_valid_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge6" class="edge">
+<title>proc~set_all_bsr&#45;&gt;proc~is_valid_matrix_op</title>
+<path fill="none" stroke="#ff0000" d="M3416.01,-615.27C3424.66,-612.15 3433.63,-607.97 3441,-602.45 3503.17,-555.88 3549.65,-473.64 3569.26,-434.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3572.56,-436.06 3573.86,-425.54 3566.29,-432.95 3572.56,-436.06"/>
+</g>
+<!-- proc~set_all_coo -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node8" class="node">
+<title>proc~set_all_coo</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node8"><a xlink:href="../proc/set_all_coo.html" xlink:title="set_all_coo">
+<polygon fill="#d9534f" stroke="#d9534f" points="3417.5,-593.45 3346.5,-593.45 3346.5,-569.45 3417.5,-569.45 3417.5,-593.45"/>
+<text text-anchor="middle" x="3382" y="-579.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_all_coo</text>
+</a>
+</g>
+</g>
+<!-- proc~set_all_coo&#45;&gt;proc~is_valid_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge7" class="edge">
+<title>proc~set_all_coo&#45;&gt;proc~is_valid_matrix_op</title>
+<path fill="none" stroke="#ff0000" d="M3417.7,-571.88C3425.7,-568.87 3433.93,-565.09 3441,-560.45 3494.61,-525.23 3542.33,-465.28 3565.2,-433.93"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3568.24,-435.69 3571.22,-425.53 3562.55,-431.61 3568.24,-435.69"/>
+</g>
+<!-- proc~set_all_csr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node9" class="node">
+<title>proc~set_all_csr</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node9"><a xlink:href="../proc/set_all_csr.html" xlink:title="set_all_csr">
+<polygon fill="#d9534f" stroke="#d9534f" points="3415.5,-551.45 3348.5,-551.45 3348.5,-527.45 3415.5,-527.45 3415.5,-551.45"/>
+<text text-anchor="middle" x="3382" y="-537.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_all_csr</text>
+</a>
+</g>
+</g>
+<!-- proc~set_all_csr&#45;&gt;proc~is_valid_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge8" class="edge">
+<title>proc~set_all_csr&#45;&gt;proc~is_valid_matrix_op</title>
+<path fill="none" stroke="#ff0000" d="M3415.66,-529.57C3424.14,-526.48 3433.1,-522.75 3441,-518.45 3486.21,-493.87 3532.65,-455.44 3558.62,-432.52"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3561.17,-434.93 3566.3,-425.66 3556.51,-429.71 3561.17,-434.93"/>
+</g>
+<!-- proc~set_all_dense -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node10" class="node">
+<title>proc~set_all_dense</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node10"><a xlink:href="../proc/set_all_dense.html" xlink:title="set_all_dense">
+<polygon fill="#d9534f" stroke="#d9534f" points="3424,-509.45 3340,-509.45 3340,-485.45 3424,-485.45 3424,-509.45"/>
+<text text-anchor="middle" x="3382" y="-495.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_all_dense</text>
+</a>
+</g>
+</g>
+<!-- proc~set_all_dense&#45;&gt;proc~is_valid_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge9" class="edge">
+<title>proc~set_all_dense&#45;&gt;proc~is_valid_matrix_op</title>
+<path fill="none" stroke="#ff0000" d="M3417.83,-485.35C3425.5,-482.54 3433.56,-479.48 3441,-476.45 3476.88,-461.82 3517.12,-443.27 3544.94,-430.09"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3546.71,-433.13 3554.24,-425.67 3543.7,-426.81 3546.71,-433.13"/>
+</g>
+<!-- proc~set_all_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node11" class="node">
+<title>proc~set_all_dia</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node11"><a xlink:href="../proc/set_all_dia.html" xlink:title="set_all_dia">
+<polygon fill="#d9534f" stroke="#d9534f" points="3013,-385.45 2945,-385.45 2945,-361.45 3013,-361.45 3013,-385.45"/>
+<text text-anchor="middle" x="2979" y="-371.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_all_dia</text>
+</a>
+</g>
+</g>
+<!-- proc~set_all_dia&#45;&gt;proc~is_valid_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge10" class="edge">
+<title>proc~set_all_dia&#45;&gt;proc~is_valid_matrix_op</title>
+<path fill="none" stroke="#ff0000" d="M2986.18,-361.14C2998.85,-337.48 3030.3,-286.23 3074,-266.45 3148.3,-232.82 3366.13,-234.12 3441,-266.45 3501.03,-292.37 3547.09,-358.52 3567.68,-392.54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3564.71,-394.39 3572.81,-401.23 3570.74,-390.84 3564.71,-394.39"/>
+</g>
+<!-- proc~set_row_bsr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node12" class="node">
+<title>proc~set_row_bsr</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node12"><a xlink:href="../proc/set_row_bsr.html" xlink:title="set_row_bsr">
+<polygon fill="#d9534f" stroke="#d9534f" points="3419,-425.45 3345,-425.45 3345,-401.45 3419,-401.45 3419,-425.45"/>
+<text text-anchor="middle" x="3382" y="-411.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_row_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~set_row_bsr&#45;&gt;proc~is_valid_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge11" class="edge">
+<title>proc~set_row_bsr&#45;&gt;proc~is_valid_matrix_op</title>
+<path fill="none" stroke="#ff0000" d="M3419.04,-413.45C3432.84,-413.45 3449.42,-413.45 3466.62,-413.45"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3466.79,-416.95 3476.79,-413.45 3466.79,-409.95 3466.79,-416.95"/>
+</g>
+<!-- proc~set_row_coo -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node13" class="node">
+<title>proc~set_row_coo</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node13"><a xlink:href="../proc/set_row_coo.html" xlink:title="set_row_coo">
+<polygon fill="#d9534f" stroke="#d9534f" points="3420.5,-383.45 3343.5,-383.45 3343.5,-359.45 3420.5,-359.45 3420.5,-383.45"/>
+<text text-anchor="middle" x="3382" y="-369.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_row_coo</text>
+</a>
+</g>
+</g>
+<!-- proc~set_row_coo&#45;&gt;proc~is_valid_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge12" class="edge">
+<title>proc~set_row_coo&#45;&gt;proc~is_valid_matrix_op</title>
+<path fill="none" stroke="#ff0000" d="M3420.89,-379.55C3447.05,-385.14 3482.54,-392.72 3513.32,-399.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3512.61,-402.73 3523.13,-401.4 3514.08,-395.89 3512.61,-402.73"/>
+</g>
+<!-- proc~set_row_csr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node14" class="node">
+<title>proc~set_row_csr</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node14"><a xlink:href="../proc/set_row_csr.html" xlink:title="set_row_csr">
+<polygon fill="#d9534f" stroke="#d9534f" points="3418.5,-341.45 3345.5,-341.45 3345.5,-317.45 3418.5,-317.45 3418.5,-341.45"/>
+<text text-anchor="middle" x="3382" y="-327.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_row_csr</text>
+</a>
+</g>
+</g>
+<!-- proc~set_row_csr&#45;&gt;proc~is_valid_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge13" class="edge">
+<title>proc~set_row_csr&#45;&gt;proc~is_valid_matrix_op</title>
+<path fill="none" stroke="#ff0000" d="M3417.83,-341.55C3425.5,-344.36 3433.56,-347.42 3441,-350.45 3476.88,-365.08 3517.12,-383.63 3544.94,-396.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3543.7,-400.09 3554.24,-401.22 3546.71,-393.77 3543.7,-400.09"/>
+</g>
+<!-- proc~set_row_dense -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node15" class="node">
+<title>proc~set_row_dense</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node15"><a xlink:href="../proc/set_row_dense.html" xlink:title="set_row_dense">
+<polygon fill="#d9534f" stroke="#d9534f" points="3427,-299.45 3337,-299.45 3337,-275.45 3427,-275.45 3427,-299.45"/>
+<text text-anchor="middle" x="3382" y="-285.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_row_dense</text>
+</a>
+</g>
+</g>
+<!-- proc~set_row_dense&#45;&gt;proc~is_valid_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge14" class="edge">
+<title>proc~set_row_dense&#45;&gt;proc~is_valid_matrix_op</title>
+<path fill="none" stroke="#ff0000" d="M3421.47,-299.52C3428.14,-302.13 3434.88,-305.12 3441,-308.45 3486.21,-333.03 3532.65,-371.46 3558.62,-394.38"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3556.51,-397.19 3566.3,-401.24 3561.17,-391.97 3556.51,-397.19"/>
+</g>
+<!-- proc~set_row_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node16" class="node">
+<title>proc~set_row_dia</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node16"><a xlink:href="../proc/set_row_dia.html" xlink:title="set_row_dia">
+<polygon fill="#d9534f" stroke="#d9534f" points="3016,-179.45 2942,-179.45 2942,-155.45 3016,-155.45 3016,-179.45"/>
+<text text-anchor="middle" x="2979" y="-165.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_row_dia</text>
+</a>
+</g>
+</g>
+<!-- proc~set_row_dia&#45;&gt;proc~is_valid_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge15" class="edge">
+<title>proc~set_row_dia&#45;&gt;proc~is_valid_matrix_op</title>
+<path fill="none" stroke="#ff0000" d="M2986.18,-155.14C2998.85,-131.48 3030.3,-80.23 3074,-60.45 3222.6,6.8 3306.24,31.44 3441,-60.45 3555.17,-138.3 3575.23,-325.79 3578.75,-390.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3575.27,-391.31 3579.22,-401.14 3582.26,-390.99 3575.27,-391.31"/>
+</g>
+<!-- proc~set_value_block_bsr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node17" class="node">
+<title>proc~set_value_block_bsr</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node17"><a xlink:href="../proc/set_value_block_bsr.html" xlink:title="set_value_block_bsr">
+<polygon fill="#d9534f" stroke="#d9534f" points="3441,-219.45 3323,-219.45 3323,-195.45 3441,-195.45 3441,-219.45"/>
+<text text-anchor="middle" x="3382" y="-205.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_value_block_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~set_value_block_bsr&#45;&gt;proc~is_valid_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge16" class="edge">
+<title>proc~set_value_block_bsr&#45;&gt;proc~is_valid_matrix_op</title>
+<path fill="none" stroke="#ff0000" d="M3417.42,-219.52C3425.6,-223.27 3433.98,-227.91 3441,-233.45 3499.53,-279.65 3547.16,-355.81 3568.06,-392.46"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3565.07,-394.28 3573.01,-401.29 3571.17,-390.86 3565.07,-394.28"/>
+</g>
+<!-- proc~set_value_coo -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node18" class="node">
+<title>proc~set_value_coo</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node18"><a xlink:href="../proc/set_value_coo.html" xlink:title="set_value_coo">
+<polygon fill="#d9534f" stroke="#d9534f" points="3426,-177.45 3338,-177.45 3338,-153.45 3426,-153.45 3426,-177.45"/>
+<text text-anchor="middle" x="3382" y="-163.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_value_coo</text>
+</a>
+</g>
+</g>
+<!-- proc~set_value_coo&#45;&gt;proc~is_valid_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge17" class="edge">
+<title>proc~set_value_coo&#45;&gt;proc~is_valid_matrix_op</title>
+<path fill="none" stroke="#ff0000" d="M3426.28,-177.35C3431.54,-179.85 3436.61,-182.86 3441,-186.45 3511.32,-243.92 3555.35,-347.12 3571.97,-391.82"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3568.74,-393.18 3575.44,-401.39 3575.33,-390.8 3568.74,-393.18"/>
+</g>
+<!-- proc~set_value_csr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node19" class="node">
+<title>proc~set_value_csr</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node19"><a xlink:href="../proc/set_value_csr.html" xlink:title="set_value_csr">
+<polygon fill="#d9534f" stroke="#d9534f" points="3424,-135.45 3340,-135.45 3340,-111.45 3424,-111.45 3424,-135.45"/>
+<text text-anchor="middle" x="3382" y="-121.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_value_csr</text>
+</a>
+</g>
+</g>
+<!-- proc~set_value_csr&#45;&gt;proc~is_valid_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge18" class="edge">
+<title>proc~set_value_csr&#45;&gt;proc~is_valid_matrix_op</title>
+<path fill="none" stroke="#ff0000" d="M3424.15,-133.93C3430.23,-136.68 3436.09,-140.13 3441,-144.45 3520.37,-214.26 3560.54,-340.53 3574.09,-391.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3570.77,-392.48 3576.65,-401.29 3577.54,-390.73 3570.77,-392.48"/>
+</g>
+<!-- proc~set_value_dense -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node20" class="node">
+<title>proc~set_value_dense</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node20"><a xlink:href="../proc/set_value_dense.html" xlink:title="set_value_dense">
+<polygon fill="#d9534f" stroke="#d9534f" points="3432,-93.45 3332,-93.45 3332,-69.45 3432,-69.45 3432,-93.45"/>
+<text text-anchor="middle" x="3382" y="-79.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_value_dense</text>
+</a>
+</g>
+</g>
+<!-- proc~set_value_dense&#45;&gt;proc~is_valid_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge19" class="edge">
+<title>proc~set_value_dense&#45;&gt;proc~is_valid_matrix_op</title>
+<path fill="none" stroke="#ff0000" d="M3428.2,-93.57C3432.85,-96.02 3437.24,-98.95 3441,-102.45 3529.82,-185.13 3565.26,-335.23 3575.81,-391.42"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3572.38,-392.14 3577.59,-401.36 3579.27,-390.9 3572.38,-392.14"/>
+</g>
+<!-- proc~set_value_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node21" class="node">
+<title>proc~set_value_dia</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node21"><a xlink:href="../proc/set_value_dia.html" xlink:title="set_value_dia">
+<polygon fill="#d9534f" stroke="#d9534f" points="3424.5,-467.45 3339.5,-467.45 3339.5,-443.45 3424.5,-443.45 3424.5,-467.45"/>
+<text text-anchor="middle" x="3382" y="-453.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_value_dia</text>
+</a>
+</g>
+</g>
+<!-- proc~set_value_dia&#45;&gt;proc~is_valid_matrix_op -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge20" class="edge">
+<title>proc~set_value_dia&#45;&gt;proc~is_valid_matrix_op</title>
+<path fill="none" stroke="#ff0000" d="M3424.67,-446.54C3450.37,-441.05 3483.9,-433.88 3513.19,-427.62"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3514.3,-430.96 3523.35,-425.45 3512.84,-424.12 3514.3,-430.96"/>
+</g>
+<!-- interface~scale_csr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node22" class="node">
+<title>interface~scale_csr</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node22"><a xlink:href="../interface/scale_csr.html" xlink:title="type_matrix_csr%scale_csr">
+<polygon fill="#a7506f" stroke="#a7506f" points="3258,-761.45 3103,-761.45 3103,-737.45 3258,-737.45 3258,-761.45"/>
+<text text-anchor="middle" x="3180.5" y="-747.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_csr%scale_csr</text>
+</a>
+</g>
+</g>
+<!-- interface~scale_csr&#45;&gt;proc~scale_csr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge21" class="edge">
+<title>interface~scale_csr&#45;&gt;proc~scale_csr</title>
+<path fill="none" stroke="#ff5000" stroke-dasharray="5,2" d="M3258.06,-749.45C3286.39,-749.45 3317.37,-749.45 3341.14,-749.45"/>
+<polygon fill="#ff5000" stroke="#ff5000" points="3341.19,-752.95 3351.19,-749.45 3341.19,-745.95 3341.19,-752.95"/>
+</g>
+<!-- interface~scale_dense -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node23" class="node">
+<title>interface~scale_dense</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node23"><a xlink:href="../interface/scale_dense.html" xlink:title="type_matrix_dense%scale_dense">
+<polygon fill="#a7506f" stroke="#a7506f" points="3274.5,-719.45 3086.5,-719.45 3086.5,-695.45 3274.5,-695.45 3274.5,-719.45"/>
+<text text-anchor="middle" x="3180.5" y="-705.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dense%scale_dense</text>
+</a>
+</g>
+</g>
+<!-- interface~scale_dense&#45;&gt;proc~scale_dense -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge22" class="edge">
+<title>interface~scale_dense&#45;&gt;proc~scale_dense</title>
+<path fill="none" stroke="#ffa100" stroke-dasharray="5,2" d="M3274.53,-707.45C3294.74,-707.45 3315.32,-707.45 3332.93,-707.45"/>
+<polygon fill="#ffa100" stroke="#ffa100" points="3332.93,-710.95 3342.93,-707.45 3332.93,-703.95 3332.93,-710.95"/>
+</g>
+<!-- interface~scale_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node24" class="node">
+<title>interface~scale_dia</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node24"><a xlink:href="../interface/scale_dia.html" xlink:title="type_matrix_dia%scale_dia">
+<polygon fill="#a7506f" stroke="#a7506f" points="3259,-677.45 3102,-677.45 3102,-653.45 3259,-653.45 3259,-677.45"/>
+<text text-anchor="middle" x="3180.5" y="-663.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dia%scale_dia</text>
+</a>
+</g>
+</g>
+<!-- interface~scale_dia&#45;&gt;proc~scale_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge23" class="edge">
+<title>interface~scale_dia&#45;&gt;proc~scale_dia</title>
+<path fill="none" stroke="#fff100" stroke-dasharray="5,2" d="M3259.2,-665.45C3286.91,-665.45 3317,-665.45 3340.34,-665.45"/>
+<polygon fill="#fff100" stroke="#fff100" points="3340.56,-668.95 3350.56,-665.45 3340.56,-661.95 3340.56,-668.95"/>
+</g>
+<!-- interface~set_all_bsr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node25" class="node">
+<title>interface~set_all_bsr</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node25"><a xlink:href="../interface/set_all_bsr.html" xlink:title="type_matrix_bsr%set_all_bsr">
+<polygon fill="#a7506f" stroke="#a7506f" points="3262,-635.45 3099,-635.45 3099,-611.45 3262,-611.45 3262,-635.45"/>
+<text text-anchor="middle" x="3180.5" y="-621.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_bsr%set_all_bsr</text>
+</a>
+</g>
+</g>
+<!-- interface~set_all_bsr&#45;&gt;proc~set_all_bsr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge24" class="edge">
+<title>interface~set_all_bsr&#45;&gt;proc~set_all_bsr</title>
+<path fill="none" stroke="#bbff00" stroke-dasharray="5,2" d="M3262.07,-623.45C3287.93,-623.45 3315.58,-623.45 3337.7,-623.45"/>
+<polygon fill="#bbff00" stroke="#bbff00" points="3337.77,-626.95 3347.77,-623.45 3337.77,-619.95 3337.77,-626.95"/>
+</g>
+<!-- interface~set_all_coo -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node26" class="node">
+<title>interface~set_all_coo</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node26"><a xlink:href="../interface/set_all_coo.html" xlink:title="type_matrix_coo%set_all_coo">
+<polygon fill="#a7506f" stroke="#a7506f" points="3265,-593.45 3096,-593.45 3096,-569.45 3265,-569.45 3265,-593.45"/>
+<text text-anchor="middle" x="3180.5" y="-579.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_coo%set_all_coo</text>
+</a>
+</g>
+</g>
+<!-- interface~set_all_coo&#45;&gt;proc~set_all_coo -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge25" class="edge">
+<title>interface~set_all_coo&#45;&gt;proc~set_all_coo</title>
+<path fill="none" stroke="#6bff00" stroke-dasharray="5,2" d="M3265.24,-581.45C3289.59,-581.45 3315.26,-581.45 3336.21,-581.45"/>
+<polygon fill="#6bff00" stroke="#6bff00" points="3336.41,-584.95 3346.41,-581.45 3336.41,-577.95 3336.41,-584.95"/>
+</g>
+<!-- interface~set_all_csr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node27" class="node">
+<title>interface~set_all_csr</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node27"><a xlink:href="../interface/set_all_csr.html" xlink:title="type_matrix_csr%set_all_csr">
+<polygon fill="#a7506f" stroke="#a7506f" points="3261,-551.45 3100,-551.45 3100,-527.45 3261,-527.45 3261,-551.45"/>
+<text text-anchor="middle" x="3180.5" y="-537.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_csr%set_all_csr</text>
+</a>
+</g>
+</g>
+<!-- interface~set_all_csr&#45;&gt;proc~set_all_csr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge26" class="edge">
+<title>interface~set_all_csr&#45;&gt;proc~set_all_csr</title>
+<path fill="none" stroke="#1aff00" stroke-dasharray="5,2" d="M3261.21,-539.45C3287.54,-539.45 3315.81,-539.45 3338.27,-539.45"/>
+<polygon fill="#1aff00" stroke="#1aff00" points="3338.47,-542.95 3348.47,-539.45 3338.47,-535.95 3338.47,-542.95"/>
+</g>
+<!-- interface~set_all_dense -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node28" class="node">
+<title>interface~set_all_dense</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node28"><a xlink:href="../interface/set_all_dense.html" xlink:title="type_matrix_dense%set_all_dense">
+<polygon fill="#a7506f" stroke="#a7506f" points="3277.5,-509.45 3083.5,-509.45 3083.5,-485.45 3277.5,-485.45 3277.5,-509.45"/>
+<text text-anchor="middle" x="3180.5" y="-495.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dense%set_all_dense</text>
+</a>
+</g>
+</g>
+<!-- interface~set_all_dense&#45;&gt;proc~set_all_dense -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge27" class="edge">
+<title>interface~set_all_dense&#45;&gt;proc~set_all_dense</title>
+<path fill="none" stroke="#00ff35" stroke-dasharray="5,2" d="M3277.74,-497.45C3295.73,-497.45 3313.86,-497.45 3329.8,-497.45"/>
+<polygon fill="#00ff35" stroke="#00ff35" points="3329.94,-500.95 3339.94,-497.45 3329.94,-493.95 3329.94,-500.95"/>
+</g>
+<!-- interface~set_all_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node29" class="node">
+<title>interface~set_all_dia</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node29"><a xlink:href="../interface/set_all_dia.html" xlink:title="type_matrix_dia%set_all_dia">
+<polygon fill="#a7506f" stroke="#a7506f" points="2859,-385.45 2696,-385.45 2696,-361.45 2859,-361.45 2859,-385.45"/>
+<text text-anchor="middle" x="2777.5" y="-371.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dia%set_all_dia</text>
+</a>
+</g>
+</g>
+<!-- interface~set_all_dia&#45;&gt;proc~set_all_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge28" class="edge">
+<title>interface~set_all_dia&#45;&gt;proc~set_all_dia</title>
+<path fill="none" stroke="#00ff86" stroke-dasharray="5,2" d="M2859.07,-373.45C2884.93,-373.45 2912.58,-373.45 2934.7,-373.45"/>
+<polygon fill="#00ff86" stroke="#00ff86" points="2934.77,-376.95 2944.77,-373.45 2934.77,-369.95 2934.77,-376.95"/>
+</g>
+<!-- interface~set_row_bsr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node30" class="node">
+<title>interface~set_row_bsr</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node30"><a xlink:href="../interface/set_row_bsr.html" xlink:title="type_matrix_bsr%set_row_bsr">
+<polygon fill="#a7506f" stroke="#a7506f" points="3265,-425.45 3096,-425.45 3096,-401.45 3265,-401.45 3265,-425.45"/>
+<text text-anchor="middle" x="3180.5" y="-411.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_bsr%set_row_bsr</text>
+</a>
+</g>
+</g>
+<!-- interface~set_row_bsr&#45;&gt;proc~set_row_bsr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge29" class="edge">
+<title>interface~set_row_bsr&#45;&gt;proc~set_row_bsr</title>
+<path fill="none" stroke="#00ffd6" stroke-dasharray="5,2" d="M3265.24,-413.45C3289.05,-413.45 3314.11,-413.45 3334.8,-413.45"/>
+<polygon fill="#00ffd6" stroke="#00ffd6" points="3334.88,-416.95 3344.88,-413.45 3334.88,-409.95 3334.88,-416.95"/>
+</g>
+<!-- interface~set_row_coo -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node31" class="node">
+<title>interface~set_row_coo</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node31"><a xlink:href="../interface/set_row_coo.html" xlink:title="type_matrix_coo%set_row_coo">
+<polygon fill="#a7506f" stroke="#a7506f" points="3268,-383.45 3093,-383.45 3093,-359.45 3268,-359.45 3268,-383.45"/>
+<text text-anchor="middle" x="3180.5" y="-369.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_coo%set_row_coo</text>
+</a>
+</g>
+</g>
+<!-- interface~set_row_coo&#45;&gt;proc~set_row_coo -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge30" class="edge">
+<title>interface~set_row_coo&#45;&gt;proc~set_row_coo</title>
+<path fill="none" stroke="#00d6ff" stroke-dasharray="5,2" d="M3268.13,-371.45C3290.51,-371.45 3313.78,-371.45 3333.33,-371.45"/>
+<polygon fill="#00d6ff" stroke="#00d6ff" points="3333.49,-374.95 3343.49,-371.45 3333.49,-367.95 3333.49,-374.95"/>
+</g>
+<!-- interface~set_row_csr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node32" class="node">
+<title>interface~set_row_csr</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node32"><a xlink:href="../interface/set_row_csr.html" xlink:title="type_matrix_csr%set_row_csr">
+<polygon fill="#a7506f" stroke="#a7506f" points="3264,-341.45 3097,-341.45 3097,-317.45 3264,-317.45 3264,-341.45"/>
+<text text-anchor="middle" x="3180.5" y="-327.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_csr%set_row_csr</text>
+</a>
+</g>
+</g>
+<!-- interface~set_row_csr&#45;&gt;proc~set_row_csr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge31" class="edge">
+<title>interface~set_row_csr&#45;&gt;proc~set_row_csr</title>
+<path fill="none" stroke="#0086ff" stroke-dasharray="5,2" d="M3264.08,-329.45C3288.39,-329.45 3314.09,-329.45 3335.19,-329.45"/>
+<polygon fill="#0086ff" stroke="#0086ff" points="3335.46,-332.95 3345.46,-329.45 3335.46,-325.95 3335.46,-332.95"/>
+</g>
+<!-- interface~set_row_dense -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node33" class="node">
+<title>interface~set_row_dense</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node33"><a xlink:href="../interface/set_row_dense.html" xlink:title="type_matrix_dense%set_row_dense">
+<polygon fill="#a7506f" stroke="#a7506f" points="3280.5,-299.45 3080.5,-299.45 3080.5,-275.45 3280.5,-275.45 3280.5,-299.45"/>
+<text text-anchor="middle" x="3180.5" y="-285.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dense%set_row_dense</text>
+</a>
+</g>
+</g>
+<!-- interface~set_row_dense&#45;&gt;proc~set_row_dense -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge32" class="edge">
+<title>interface~set_row_dense&#45;&gt;proc~set_row_dense</title>
+<path fill="none" stroke="#0035ff" stroke-dasharray="5,2" d="M3280.67,-287.45C3296.56,-287.45 3312.48,-287.45 3326.8,-287.45"/>
+<polygon fill="#0035ff" stroke="#0035ff" points="3326.92,-290.95 3336.92,-287.45 3326.92,-283.95 3326.92,-290.95"/>
+</g>
+<!-- interface~set_row_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node34" class="node">
+<title>interface~set_row_dia</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node34"><a xlink:href="../interface/set_row_dia.html" xlink:title="type_matrix_dia%set_row_dia">
+<polygon fill="#a7506f" stroke="#a7506f" points="2862,-305.45 2693,-305.45 2693,-281.45 2862,-281.45 2862,-305.45"/>
+<text text-anchor="middle" x="2777.5" y="-291.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dia%set_row_dia</text>
+</a>
+</g>
+</g>
+<!-- interface~set_row_dia&#45;&gt;proc~set_row_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge33" class="edge">
+<title>interface~set_row_dia&#45;&gt;proc~set_row_dia</title>
+<path fill="none" stroke="#1a00ff" stroke-dasharray="5,2" d="M2797.63,-281.37C2833.08,-258.98 2909.11,-210.96 2950.23,-184.99"/>
+<polygon fill="#1a00ff" stroke="#1a00ff" points="2952.34,-187.79 2958.93,-179.49 2948.61,-181.87 2952.34,-187.79"/>
+</g>
+<!-- interface~set_value_block_bsr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node35" class="node">
+<title>interface~set_value_block_bsr</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node35"><a xlink:href="../interface/set_value_block_bsr.html" xlink:title="type_matrix_bsr%set_value_block_bsr">
+<polygon fill="#a7506f" stroke="#a7506f" points="3287,-219.45 3074,-219.45 3074,-195.45 3287,-195.45 3287,-219.45"/>
+<text text-anchor="middle" x="3180.5" y="-205.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_bsr%set_value_block_bsr</text>
+</a>
+</g>
+</g>
+<!-- interface~set_value_block_bsr&#45;&gt;proc~set_value_block_bsr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge34" class="edge">
+<title>interface~set_value_block_bsr&#45;&gt;proc~set_value_block_bsr</title>
+<path fill="none" stroke="#6b00ff" stroke-dasharray="5,2" d="M3287.09,-207.45C3295.86,-207.45 3304.57,-207.45 3312.95,-207.45"/>
+<polygon fill="#6b00ff" stroke="#6b00ff" points="3312.99,-210.95 3322.99,-207.45 3312.99,-203.95 3312.99,-210.95"/>
+</g>
+<!-- interface~set_value_coo -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node36" class="node">
+<title>interface~set_value_coo</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node36"><a xlink:href="../interface/set_value_coo.html" xlink:title="type_matrix_coo%set_value_coo">
+<polygon fill="#a7506f" stroke="#a7506f" points="3273,-177.45 3088,-177.45 3088,-153.45 3273,-153.45 3273,-177.45"/>
+<text text-anchor="middle" x="3180.5" y="-163.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_coo%set_value_coo</text>
+</a>
+</g>
+</g>
+<!-- interface~set_value_coo&#45;&gt;proc~set_value_coo -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge35" class="edge">
+<title>interface~set_value_coo&#45;&gt;proc~set_value_coo</title>
+<path fill="none" stroke="#bb00ff" stroke-dasharray="5,2" d="M3273.08,-165.45C3291.82,-165.45 3310.96,-165.45 3327.81,-165.45"/>
+<polygon fill="#bb00ff" stroke="#bb00ff" points="3327.98,-168.95 3337.98,-165.45 3327.98,-161.95 3327.98,-168.95"/>
+</g>
+<!-- interface~set_value_csr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node37" class="node">
+<title>interface~set_value_csr</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node37"><a xlink:href="../interface/set_value_csr.html" xlink:title="type_matrix_csr%set_value_csr">
+<polygon fill="#a7506f" stroke="#a7506f" points="3269.5,-135.45 3091.5,-135.45 3091.5,-111.45 3269.5,-111.45 3269.5,-135.45"/>
+<text text-anchor="middle" x="3180.5" y="-121.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_csr%set_value_csr</text>
+</a>
+</g>
+</g>
+<!-- interface~set_value_csr&#45;&gt;proc~set_value_csr -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge36" class="edge">
+<title>interface~set_value_csr&#45;&gt;proc~set_value_csr</title>
+<path fill="none" stroke="#ff00f1" stroke-dasharray="5,2" d="M3269.58,-123.45C3290.19,-123.45 3311.46,-123.45 3329.83,-123.45"/>
+<polygon fill="#ff00f1" stroke="#ff00f1" points="3329.99,-126.95 3339.99,-123.45 3329.99,-119.95 3329.99,-126.95"/>
+</g>
+<!-- interface~set_value_dense -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node38" class="node">
+<title>interface~set_value_dense</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node38"><a xlink:href="../interface/set_value_dense.html" xlink:title="type_matrix_dense%set_value_dense">
+<polygon fill="#a7506f" stroke="#a7506f" points="3286,-93.45 3075,-93.45 3075,-69.45 3286,-69.45 3286,-93.45"/>
+<text text-anchor="middle" x="3180.5" y="-79.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dense%set_value_dense</text>
+</a>
+</g>
+</g>
+<!-- interface~set_value_dense&#45;&gt;proc~set_value_dense -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge37" class="edge">
+<title>interface~set_value_dense&#45;&gt;proc~set_value_dense</title>
+<path fill="none" stroke="#ff00a1" stroke-dasharray="5,2" d="M3286.22,-81.45C3298.32,-81.45 3310.32,-81.45 3321.51,-81.45"/>
+<polygon fill="#ff00a1" stroke="#ff00a1" points="3321.54,-84.95 3331.54,-81.45 3321.54,-77.95 3321.54,-84.95"/>
+</g>
+<!-- interface~set_value_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node39" class="node">
+<title>interface~set_value_dia</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node39"><a xlink:href="../interface/set_value_dia.html" xlink:title="type_matrix_dia%set_value_dia">
+<polygon fill="#a7506f" stroke="#a7506f" points="3270,-467.45 3091,-467.45 3091,-443.45 3270,-443.45 3270,-467.45"/>
+<text text-anchor="middle" x="3180.5" y="-453.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dia%set_value_dia</text>
+</a>
+</g>
+</g>
+<!-- interface~set_value_dia&#45;&gt;proc~set_value_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge38" class="edge">
+<title>interface~set_value_dia&#45;&gt;proc~set_value_dia</title>
+<path fill="none" stroke="#ff0050" stroke-dasharray="5,2" d="M3270.17,-455.45C3290.44,-455.45 3311.34,-455.45 3329.44,-455.45"/>
+<polygon fill="#ff0050" stroke="#ff0050" points="3329.47,-458.95 3339.47,-455.45 3329.47,-451.95 3329.47,-458.95"/>
+</g>
+<!-- none~set~19 -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node40" class="node">
+<title>none~set~19</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node40"><a xlink:href="../type/type_matrix_dense.html#boundprocedure-set~19" xlink:title="type_matrix_dense%set">
+<polygon fill="#a7506f" stroke="#a7506f" points="2635,-344.45 2496,-344.45 2496,-320.45 2635,-320.45 2635,-344.45"/>
+<text text-anchor="middle" x="2565.5" y="-330.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dense%set</text>
+</a>
+</g>
+</g>
+<!-- none~set~19&#45;&gt;interface~set_all_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge39" class="edge">
+<title>none~set~19&#45;&gt;interface~set_all_dia</title>
+<path fill="none" stroke="#00ff55" d="M2628.09,-344.47C2652.13,-349.17 2679.85,-354.58 2704.78,-359.45"/>
+<polygon fill="#00ff55" stroke="#00ff55" points="2704.43,-362.94 2714.91,-361.42 2705.77,-356.07 2704.43,-362.94"/>
+</g>
+<!-- none~set~19&#45;&gt;interface~set_row_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge41" class="edge">
+<title>none~set~19&#45;&gt;interface~set_row_dia</title>
+<path fill="none" stroke="#0000ff" d="M2631.22,-320.43C2653.48,-316.3 2678.58,-311.63 2701.58,-307.36"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2702.44,-310.76 2711.63,-305.5 2701.16,-303.88 2702.44,-310.76"/>
+</g>
+<!-- none~set~19&#45;&gt;interface~set_value_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge43" class="edge">
+<title>none~set~19&#45;&gt;interface~set_value_dia</title>
+<path fill="none" stroke="#ff0055" d="M2635.17,-326.73C2749.94,-318.57 2974.43,-308.98 3038,-352.45 3070.86,-374.91 3042.97,-409.52 3074,-434.45 3076.47,-436.43 3079.07,-438.24 3081.78,-439.9"/>
+<polygon fill="#ff0055" stroke="#ff0055" points="3080.3,-443.07 3090.77,-444.67 3083.58,-436.89 3080.3,-443.07"/>
+</g>
+<!-- interface~set_value_block_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node43" class="node">
+<title>interface~set_value_block_dia</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node43"><a xlink:href="../interface/set_value_block_dia.html" xlink:title="type_matrix_dia%set_value_block_dia">
+<polygon fill="#a7506f" stroke="#a7506f" points="2884,-427.45 2671,-427.45 2671,-403.45 2884,-403.45 2884,-427.45"/>
+<text text-anchor="middle" x="2777.5" y="-413.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_dia%set_value_block_dia</text>
+</a>
+</g>
+</g>
+<!-- none~set~19&#45;&gt;interface~set_value_block_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge54" class="edge">
+<title>none~set~19&#45;&gt;interface~set_value_block_dia</title>
+<path fill="none" stroke="#ff0000" d="M2582.97,-344.64C2602.83,-358.76 2637.71,-381.69 2671,-394.45 2677.15,-396.81 2683.61,-398.91 2690.18,-400.79"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2689.28,-404.18 2699.85,-403.39 2691.1,-397.42 2689.28,-404.18"/>
+</g>
+<!-- none~set~5 -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node41" class="node">
+<title>none~set~5</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node41"><a xlink:href="../type/abst_matrix.html#boundprocedure-set~5" xlink:title="abst_matrix%set">
+<polygon fill="#a7506f" stroke="#a7506f" points="2615.5,-427.45 2515.5,-427.45 2515.5,-403.45 2615.5,-403.45 2615.5,-427.45"/>
+<text text-anchor="middle" x="2565.5" y="-413.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_matrix%set</text>
+</a>
+</g>
+</g>
+<!-- none~set~5&#45;&gt;interface~set_all_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge40" class="edge">
+<title>none~set~5&#45;&gt;interface~set_all_dia</title>
+<path fill="none" stroke="#00ff55" d="M2615.67,-405.55C2633.14,-402.04 2652.95,-398.06 2671,-394.45 2682.26,-392.2 2694.2,-389.82 2705.84,-387.5"/>
+<polygon fill="#00ff55" stroke="#00ff55" points="2706.84,-390.86 2715.96,-385.48 2705.47,-384 2706.84,-390.86"/>
+</g>
+<!-- none~set~5&#45;&gt;interface~set_row_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge42" class="edge">
+<title>none~set~5&#45;&gt;interface~set_row_dia</title>
+<path fill="none" stroke="#0000ff" d="M2586.03,-403.41C2606.94,-390.59 2641.14,-369.79 2671,-352.45 2695.82,-338.03 2724.23,-322.18 2745.31,-310.54"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2747.08,-313.56 2754.15,-305.67 2743.7,-307.43 2747.08,-313.56"/>
+</g>
+<!-- none~set~5&#45;&gt;interface~set_value_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge44" class="edge">
+<title>none~set~5&#45;&gt;interface~set_value_dia</title>
+<path fill="none" stroke="#ff0055" d="M2615.68,-427.03C2633.06,-430.67 2652.81,-434.3 2671,-436.45 2812.79,-453.23 2978.22,-456.4 3080.93,-456.45"/>
+<polygon fill="#ff0055" stroke="#ff0055" points="3080.98,-459.95 3090.98,-456.45 3080.98,-452.95 3080.98,-459.95"/>
+</g>
+<!-- none~set~5&#45;&gt;interface~set_value_block_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge55" class="edge">
+<title>none~set~5&#45;&gt;interface~set_value_block_dia</title>
+<path fill="none" stroke="#ff0000" d="M2615.74,-415.45C2629.36,-415.45 2644.75,-415.45 2660.47,-415.45"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2660.84,-418.95 2670.84,-415.45 2660.84,-411.95 2660.84,-418.95"/>
+</g>
+<!-- proc~set_value_block_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node42" class="node">
+<title>proc~set_value_block_dia</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node42"><a xlink:href="../proc/set_value_block_dia.html" xlink:title="set_value_block_dia">
+<polygon fill="#d9534f" stroke="#d9534f" points="3038,-427.45 2920,-427.45 2920,-403.45 3038,-403.45 3038,-427.45"/>
+<text text-anchor="middle" x="2979" y="-413.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_value_block_dia</text>
+</a>
+</g>
+</g>
+<!-- proc~set_value_block_dia&#45;&gt;interface~set_value_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge45" class="edge">
+<title>proc~set_value_block_dia&#45;&gt;interface~set_value_dia</title>
+<path fill="none" stroke="#ff0055" d="M3038.16,-427.23C3050.02,-429.63 3062.41,-432.12 3074,-434.45 3085.26,-436.71 3097.2,-439.09 3108.83,-441.41"/>
+<polygon fill="#ff0055" stroke="#ff0055" points="3108.47,-444.91 3118.96,-443.43 3109.84,-438.04 3108.47,-444.91"/>
+</g>
+<!-- interface~set_value_block_dia&#45;&gt;proc~set_value_block_dia -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge53" class="edge">
+<title>interface~set_value_block_dia&#45;&gt;proc~set_value_block_dia</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M2884.09,-415.45C2892.86,-415.45 2901.57,-415.45 2909.95,-415.45"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2909.99,-418.95 2919.99,-415.45 2909.99,-411.95 2909.99,-418.95"/>
+</g>
+<!-- proc~add_local_jacobian_matrix -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node44" class="node">
+<title>proc~add_local_jacobian_matrix</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node44"><a xlink:href="../proc/add_local_jacobian_matrix.html" xlink:title="type_jacobian_matrix%add_local_jacobian_matrix">
+<polygon fill="#d9534f" stroke="#d9534f" points="2458,-469.45 2180,-469.45 2180,-445.45 2458,-445.45 2458,-469.45"/>
+<text text-anchor="middle" x="2319" y="-455.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_jacobian_matrix%add_local_jacobian_matrix</text>
+</a>
+</g>
+</g>
+<!-- proc~add_local_jacobian_matrix&#45;&gt;none~set~5 -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge50" class="edge">
+<title>proc~add_local_jacobian_matrix&#45;&gt;none~set~5</title>
+<path fill="none" stroke="#00ff00" d="M2404.88,-445.41C2423.09,-442.63 2442.21,-439.57 2460,-436.45 2474.74,-433.86 2490.59,-430.82 2505.38,-427.86"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="2506.31,-431.24 2515.42,-425.83 2504.93,-424.38 2506.31,-431.24"/>
+</g>
+<!-- proc~add_value_jacobian_matrix -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node45" class="node">
+<title>proc~add_value_jacobian_matrix</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node45"><a xlink:href="../proc/add_value_jacobian_matrix.html" xlink:title="type_jacobian_matrix%add_value_jacobian_matrix">
+<polygon fill="#d9534f" stroke="#d9534f" points="2460,-427.45 2178,-427.45 2178,-403.45 2460,-403.45 2460,-427.45"/>
+<text text-anchor="middle" x="2319" y="-413.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_jacobian_matrix%add_value_jacobian_matrix</text>
+</a>
+</g>
+</g>
+<!-- proc~add_value_jacobian_matrix&#45;&gt;none~set~5 -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge51" class="edge">
+<title>proc~add_value_jacobian_matrix&#45;&gt;none~set~5</title>
+<path fill="none" stroke="#00ff00" d="M2460.1,-415.45C2475.83,-415.45 2491.16,-415.45 2505.01,-415.45"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="2505.3,-418.95 2515.3,-415.45 2505.3,-411.95 2505.3,-418.95"/>
+</g>
+<!-- proc~assemble_local_newton_hydraulic -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node46" class="node">
+<title>proc~assemble_local_newton_hydraulic</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node46"><a xlink:href="../proc/assemble_local_newton_hydraulic.html" xlink:title="assemble_local_newton_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="2415.5,-259.45 2222.5,-259.45 2222.5,-235.45 2415.5,-235.45 2415.5,-259.45"/>
+<text text-anchor="middle" x="2319" y="-245.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_newton_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_newton_hydraulic&#45;&gt;none~set~19 -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge46" class="edge">
+<title>proc~assemble_local_newton_hydraulic&#45;&gt;none~set~19</title>
+<path fill="none" stroke="#ff0000" d="M2415.79,-256.58C2430.84,-259.51 2446.03,-263.36 2460,-268.45 2489.95,-279.35 2520.64,-299.42 2540.94,-314.18"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2539.12,-317.19 2549.24,-320.34 2543.29,-311.57 2539.12,-317.19"/>
+</g>
+<!-- proc~assemble_local_newton_thermal -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node47" class="node">
+<title>proc~assemble_local_newton_thermal</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node47"><a xlink:href="../proc/assemble_local_newton_thermal.html" xlink:title="assemble_local_newton_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="2412,-343.45 2226,-343.45 2226,-319.45 2412,-319.45 2412,-343.45"/>
+<text text-anchor="middle" x="2319" y="-329.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_newton_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_newton_thermal&#45;&gt;none~set~19 -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge47" class="edge">
+<title>proc~assemble_local_newton_thermal&#45;&gt;none~set~19</title>
+<path fill="none" stroke="#ff0000" d="M2412.09,-331.83C2436.26,-331.92 2462.11,-332.03 2485.53,-332.13"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2485.74,-335.63 2495.75,-332.17 2485.77,-328.63 2485.74,-335.63"/>
+</g>
+<!-- proc~assemble_local_picard_hydraulic -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node48" class="node">
+<title>proc~assemble_local_picard_hydraulic</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node48"><a xlink:href="../proc/assemble_local_picard_hydraulic.html" xlink:title="assemble_local_picard_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="2413,-301.45 2225,-301.45 2225,-277.45 2413,-277.45 2413,-301.45"/>
+<text text-anchor="middle" x="2319" y="-287.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_picard_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_picard_hydraulic&#45;&gt;none~set~19 -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge48" class="edge">
+<title>proc~assemble_local_picard_hydraulic&#45;&gt;none~set~19</title>
+<path fill="none" stroke="#ff0000" d="M2405.64,-301.48C2423.63,-304.24 2442.46,-307.29 2460,-310.45 2473.09,-312.81 2487.04,-315.57 2500.35,-318.33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2499.88,-321.8 2510.38,-320.43 2501.31,-314.95 2499.88,-321.8"/>
+</g>
+<!-- proc~assemble_local_picard_thermal -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node49" class="node">
+<title>proc~assemble_local_picard_thermal</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node49"><a xlink:href="../proc/assemble_local_picard_thermal.html" xlink:title="assemble_local_picard_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="2409.5,-385.45 2228.5,-385.45 2228.5,-361.45 2409.5,-361.45 2409.5,-385.45"/>
+<text text-anchor="middle" x="2319" y="-371.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_picard_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_picard_thermal&#45;&gt;none~set~19 -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge49" class="edge">
+<title>proc~assemble_local_picard_thermal&#45;&gt;none~set~19</title>
+<path fill="none" stroke="#ff0000" d="M2404.11,-361.39C2422.55,-358.59 2441.95,-355.53 2460,-352.45 2470.98,-350.57 2482.6,-348.47 2493.93,-346.36"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2494.61,-349.79 2503.79,-344.5 2493.32,-342.91 2494.61,-349.79"/>
+</g>
+<!-- proc~set_value_jacobian_matrix -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node50" class="node">
+<title>proc~set_value_jacobian_matrix</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node50"><a xlink:href="../proc/set_value_jacobian_matrix.html" xlink:title="type_jacobian_matrix%set_value_jacobian_matrix">
+<polygon fill="#d9534f" stroke="#d9534f" points="2457.5,-511.45 2180.5,-511.45 2180.5,-487.45 2457.5,-487.45 2457.5,-511.45"/>
+<text text-anchor="middle" x="2319" y="-497.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_jacobian_matrix%set_value_jacobian_matrix</text>
+</a>
+</g>
+</g>
+<!-- proc~set_value_jacobian_matrix&#45;&gt;none~set~5 -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge52" class="edge">
+<title>proc~set_value_jacobian_matrix&#45;&gt;none~set~5</title>
+<path fill="none" stroke="#00ff00" d="M2429.2,-487.38C2439.75,-484.93 2450.17,-481.99 2460,-478.45 2489.69,-467.76 2520.21,-448.18 2540.54,-433.67"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="2542.84,-436.33 2548.86,-427.61 2538.72,-430.67 2542.84,-436.33"/>
+</g>
+<!-- interface~assemble_local_newton_hydraulic -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node51" class="node">
+<title>interface~assemble_local_newton_hydraulic</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node51"><a xlink:href="../interface/assemble_local_newton_hydraulic.html" xlink:title="type_hydraulic%assemble_local_newton_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="2142,-259.45 1861,-259.45 1861,-235.45 2142,-235.45 2142,-259.45"/>
+<text text-anchor="middle" x="2001.5" y="-245.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%assemble_local_newton_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_newton_hydraulic&#45;&gt;proc~assemble_local_newton_hydraulic -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge58" class="edge">
+<title>interface~assemble_local_newton_hydraulic&#45;&gt;proc~assemble_local_newton_hydraulic</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M2142.26,-247.45C2165.7,-247.45 2189.68,-247.45 2212.09,-247.45"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="2212.27,-250.95 2222.27,-247.45 2212.27,-243.95 2212.27,-250.95"/>
+</g>
+<!-- interface~assemble_local_newton_thermal -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node52" class="node">
+<title>interface~assemble_local_newton_thermal</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node52"><a xlink:href="../interface/assemble_local_newton_thermal.html" xlink:title="type_thermal%assemble_local_newton_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="2134.5,-343.45 1868.5,-343.45 1868.5,-319.45 2134.5,-319.45 2134.5,-343.45"/>
+<text text-anchor="middle" x="2001.5" y="-329.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%assemble_local_newton_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_newton_thermal&#45;&gt;proc~assemble_local_newton_thermal -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge59" class="edge">
+<title>interface~assemble_local_newton_thermal&#45;&gt;proc~assemble_local_newton_thermal</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M2134.93,-331.45C2161.87,-331.45 2189.83,-331.45 2215.55,-331.45"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2215.66,-334.95 2225.66,-331.45 2215.66,-327.95 2215.66,-334.95"/>
+</g>
+<!-- interface~assemble_local_picard_hydraulic -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node53" class="node">
+<title>interface~assemble_local_picard_hydraulic</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node53"><a xlink:href="../interface/assemble_local_picard_hydraulic.html" xlink:title="type_hydraulic%assemble_local_picard_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="2139.5,-301.45 1863.5,-301.45 1863.5,-277.45 2139.5,-277.45 2139.5,-301.45"/>
+<text text-anchor="middle" x="2001.5" y="-287.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%assemble_local_picard_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_picard_hydraulic&#45;&gt;proc~assemble_local_picard_hydraulic -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge60" class="edge">
+<title>interface~assemble_local_picard_hydraulic&#45;&gt;proc~assemble_local_picard_hydraulic</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M2139.51,-289.45C2164.68,-289.45 2190.57,-289.45 2214.55,-289.45"/>
+<polygon fill="#003fff" stroke="#003fff" points="2214.71,-292.95 2224.71,-289.45 2214.71,-285.95 2214.71,-292.95"/>
+</g>
+<!-- interface~assemble_local_picard_thermal -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node54" class="node">
+<title>interface~assemble_local_picard_thermal</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node54"><a xlink:href="../interface/assemble_local_picard_thermal.html" xlink:title="type_thermal%assemble_local_picard_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="2132,-385.45 1871,-385.45 1871,-361.45 2132,-361.45 2132,-385.45"/>
+<text text-anchor="middle" x="2001.5" y="-371.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%assemble_local_picard_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_picard_thermal&#45;&gt;proc~assemble_local_picard_thermal -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge61" class="edge">
+<title>interface~assemble_local_picard_thermal&#45;&gt;proc~assemble_local_picard_thermal</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M2132.19,-373.45C2160.83,-373.45 2190.73,-373.45 2217.98,-373.45"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="2218.28,-376.95 2228.28,-373.45 2218.28,-369.95 2218.28,-376.95"/>
+</g>
+<!-- none~add -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node55" class="node">
+<title>none~add</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node55"><a xlink:href="../type/type_jacobian_matrix.html#boundprocedure-add" xlink:title="type_jacobian_matrix%add">
+<polygon fill="#a7506f" stroke="#a7506f" points="2080,-427.45 1923,-427.45 1923,-403.45 2080,-403.45 2080,-427.45"/>
+<text text-anchor="middle" x="2001.5" y="-413.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_jacobian_matrix%add</text>
+</a>
+</g>
+</g>
+<!-- none~add&#45;&gt;proc~add_local_jacobian_matrix -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge56" class="edge">
+<title>none~add&#45;&gt;proc~add_local_jacobian_matrix</title>
+<path fill="none" stroke="#ffbf00" d="M2080.08,-425.78C2121.64,-431.31 2173.31,-438.19 2217.87,-444.12"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="2217.47,-447.6 2227.85,-445.45 2218.4,-440.66 2217.47,-447.6"/>
+</g>
+<!-- none~add&#45;&gt;proc~add_value_jacobian_matrix -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge57" class="edge">
+<title>none~add&#45;&gt;proc~add_value_jacobian_matrix</title>
+<path fill="none" stroke="#7fff00" d="M2080.08,-415.45C2106.64,-415.45 2137.32,-415.45 2167.64,-415.45"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="2167.9,-418.95 2177.9,-415.45 2167.9,-411.95 2167.9,-418.95"/>
+</g>
+<!-- none~set~4 -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node56" class="node">
+<title>none~set~4</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node56"><a xlink:href="../type/type_jacobian_matrix.html#boundprocedure-set~4" xlink:title="type_jacobian_matrix%set">
+<polygon fill="#a7506f" stroke="#a7506f" points="2077.5,-510.45 1925.5,-510.45 1925.5,-486.45 2077.5,-486.45 2077.5,-510.45"/>
+<text text-anchor="middle" x="2001.5" y="-496.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_jacobian_matrix%set</text>
+</a>
+</g>
+</g>
+<!-- none~set~4&#45;&gt;proc~set_value_jacobian_matrix -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge62" class="edge">
+<title>none~set~4&#45;&gt;proc~set_value_jacobian_matrix</title>
+<path fill="none" stroke="#ff00bf" d="M2077.67,-498.69C2105.46,-498.78 2138.02,-498.88 2170.04,-498.98"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="2170.4,-502.48 2180.41,-499.01 2170.42,-495.48 2170.4,-502.48"/>
+</g>
+<!-- proc~apply_essential_bc_generic -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node57" class="node">
+<title>proc~apply_essential_bc_generic</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node57"><a xlink:href="../proc/apply_essential_bc_generic.html" xlink:title="apply_essential_bc_generic">
+<polygon fill="#d9534f" stroke="#d9534f" points="1825,-509.45 1667,-509.45 1667,-485.45 1825,-485.45 1825,-509.45"/>
+<text text-anchor="middle" x="1746" y="-495.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">apply_essential_bc_generic</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_essential_bc_generic&#45;&gt;none~set~4 -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge68" class="edge">
+<title>proc~apply_essential_bc_generic&#45;&gt;none~set~4</title>
+<path fill="none" stroke="#ff00ff" d="M1825.13,-497.76C1853.63,-497.87 1885.99,-498 1915.09,-498.11"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="1915.22,-501.61 1925.24,-498.15 1915.25,-494.61 1915.22,-501.61"/>
+</g>
+<!-- proc~assemble_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node58" class="node">
+<title>proc~assemble_ftdss</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node58"><a xlink:href="../proc/assemble_ftdss.html" xlink:title="assemble_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="964.5,-427.45 870.5,-427.45 870.5,-403.45 964.5,-403.45 964.5,-427.45"/>
+<text text-anchor="middle" x="917.5" y="-413.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_ftdss&#45;&gt;none~add -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge67" class="edge">
+<title>proc~assemble_ftdss&#45;&gt;none~add</title>
+<path fill="none" stroke="#0000ff" d="M964.58,-415.45C1035.54,-415.45 1175.87,-415.45 1295,-415.45 1295,-415.45 1295,-415.45 1513.5,-415.45 1653.14,-415.45 1815.29,-415.45 1912.8,-415.45"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1912.9,-418.95 1922.9,-415.45 1912.9,-411.95 1912.9,-418.95"/>
+</g>
+<!-- interface~assemble_local_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node69" class="node">
+<title>interface~assemble_local_ftdss</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node69"><a xlink:href="../interface/assemble_local_ftdss.html" xlink:title="type_ftdss%assemble_local_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1198,-387.45 1011,-387.45 1011,-363.45 1198,-363.45 1198,-387.45"/>
+<text text-anchor="middle" x="1104.5" y="-373.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_local_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_ftdss&#45;&gt;interface~assemble_local_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge81" class="edge">
+<title>proc~assemble_ftdss&#45;&gt;interface~assemble_local_ftdss</title>
+<path fill="none" stroke="#00ff00" d="M964.71,-405.46C986.81,-400.68 1013.67,-394.87 1037.85,-389.64"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1038.63,-393.06 1047.67,-387.52 1037.15,-386.21 1038.63,-393.06"/>
+</g>
+<!-- proc~assemble_local_hydraulic -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node59" class="node">
+<title>proc~assemble_local_hydraulic</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node59"><a xlink:href="../proc/assemble_local_hydraulic.html" xlink:title="assemble_local_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="1820.5,-280.45 1671.5,-280.45 1671.5,-256.45 1820.5,-256.45 1820.5,-280.45"/>
+<text text-anchor="middle" x="1746" y="-266.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_newton_hydraulic -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge63" class="edge">
+<title>proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_newton_hydraulic</title>
+<path fill="none" stroke="#ff0000" d="M1820.66,-262.35C1830.3,-261.55 1840.44,-260.71 1850.79,-259.85"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1851.09,-263.34 1860.77,-259.02 1850.51,-256.36 1851.09,-263.34"/>
+</g>
+<!-- proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_picard_hydraulic -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge65" class="edge">
+<title>proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_picard_hydraulic</title>
+<path fill="none" stroke="#00ff00" d="M1820.66,-274.55C1830.96,-275.4 1841.83,-276.3 1852.91,-277.22"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1852.89,-280.73 1863.15,-278.07 1853.47,-273.76 1852.89,-280.73"/>
+</g>
+<!-- proc~assemble_local_thermal -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node60" class="node">
+<title>proc~assemble_local_thermal</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node60"><a xlink:href="../proc/assemble_local_thermal.html" xlink:title="assemble_local_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="1817,-385.45 1675,-385.45 1675,-361.45 1817,-361.45 1817,-385.45"/>
+<text text-anchor="middle" x="1746" y="-371.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_thermal&#45;&gt;interface~assemble_local_newton_thermal -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge64" class="edge">
+<title>proc~assemble_local_thermal&#45;&gt;interface~assemble_local_newton_thermal</title>
+<path fill="none" stroke="#ffff00" d="M1810.25,-361.42C1826.75,-358.38 1844.53,-355.21 1861,-352.45 1875.96,-349.95 1891.85,-347.42 1907.34,-345.04"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="1908.09,-348.47 1917.44,-343.5 1907.03,-341.55 1908.09,-348.47"/>
+</g>
+<!-- proc~assemble_local_thermal&#45;&gt;interface~assemble_local_picard_thermal -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge66" class="edge">
+<title>proc~assemble_local_thermal&#45;&gt;interface~assemble_local_picard_thermal</title>
+<path fill="none" stroke="#00ffff" d="M1817.28,-373.45C1830.85,-373.45 1845.51,-373.45 1860.41,-373.45"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1860.76,-376.95 1870.76,-373.45 1860.76,-369.95 1860.76,-376.95"/>
+</g>
+<!-- interface~apply_essential_bc_generic -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node61" class="node">
+<title>interface~apply_essential_bc_generic</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node61"><a xlink:href="../interface/apply_essential_bc_generic.html" xlink:title="type_ftdss%apply_essential_bc_generic">
+<polygon fill="#a7506f" stroke="#a7506f" points="1623,-509.45 1402,-509.45 1402,-485.45 1623,-485.45 1623,-509.45"/>
+<text text-anchor="middle" x="1512.5" y="-495.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%apply_essential_bc_generic</text>
+</a>
+</g>
+</g>
+<!-- interface~apply_essential_bc_generic&#45;&gt;proc~apply_essential_bc_generic -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge69" class="edge">
+<title>interface~apply_essential_bc_generic&#45;&gt;proc~apply_essential_bc_generic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1623.15,-497.45C1634.31,-497.45 1645.54,-497.45 1656.44,-497.45"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1656.76,-500.95 1666.76,-497.45 1656.76,-493.95 1656.76,-500.95"/>
+</g>
+<!-- interface~assemble_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node62" class="node">
+<title>interface~assemble_ftdss</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node62"><a xlink:href="../interface/assemble_ftdss.html" xlink:title="type_ftdss%assemble_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="813.5,-427.45 656.5,-427.45 656.5,-403.45 813.5,-403.45 813.5,-427.45"/>
+<text text-anchor="middle" x="735" y="-413.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge70" class="edge">
+<title>interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M813.6,-415.45C829.36,-415.45 845.64,-415.45 860.48,-415.45"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="860.49,-418.95 870.49,-415.45 860.49,-411.95 860.49,-418.95"/>
+</g>
+<!-- interface~assemble_local_hydraulic -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node63" class="node">
+<title>interface~assemble_local_hydraulic</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node63"><a xlink:href="../interface/assemble_local_hydraulic.html" xlink:title="type_hydraulic%assemble_local_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="1631,-280.45 1394,-280.45 1394,-256.45 1631,-256.45 1631,-280.45"/>
+<text text-anchor="middle" x="1512.5" y="-266.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%assemble_local_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_hydraulic&#45;&gt;proc~assemble_local_hydraulic -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge71" class="edge">
+<title>interface~assemble_local_hydraulic&#45;&gt;proc~assemble_local_hydraulic</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1631.28,-268.45C1641.4,-268.45 1651.49,-268.45 1661.25,-268.45"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1661.3,-271.95 1671.3,-268.45 1661.3,-264.95 1661.3,-271.95"/>
+</g>
+<!-- interface~assemble_local_thermal -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node64" class="node">
+<title>interface~assemble_local_thermal</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node64"><a xlink:href="../interface/assemble_local_thermal.html" xlink:title="type_thermal%assemble_local_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="1623.5,-386.45 1401.5,-386.45 1401.5,-362.45 1623.5,-362.45 1623.5,-386.45"/>
+<text text-anchor="middle" x="1512.5" y="-372.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%assemble_local_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_thermal&#45;&gt;proc~assemble_local_thermal -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge72" class="edge">
+<title>interface~assemble_local_thermal&#45;&gt;proc~assemble_local_thermal</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1623.83,-373.97C1637.52,-373.91 1651.31,-373.85 1664.44,-373.8"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1664.82,-377.3 1674.81,-373.75 1664.79,-370.3 1664.82,-377.3"/>
+</g>
+<!-- proc~apply_bc_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node65" class="node">
+<title>proc~apply_bc_ftdss</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node65"><a xlink:href="../proc/apply_bc_ftdss.html" xlink:title="apply_bc_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1341,-509.45 1251,-509.45 1251,-485.45 1341,-485.45 1341,-509.45"/>
+<text text-anchor="middle" x="1296" y="-495.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">apply_bc_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_bc_ftdss&#45;&gt;interface~apply_essential_bc_generic -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge73" class="edge">
+<title>proc~apply_bc_ftdss&#45;&gt;interface~apply_essential_bc_generic</title>
+<path fill="none" stroke="#ff0000" d="M1341.18,-497.45C1356.19,-497.45 1373.75,-497.45 1391.78,-497.45"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1391.84,-500.95 1401.84,-497.45 1391.84,-493.95 1391.84,-500.95"/>
+</g>
+<!-- proc~assemble_local_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node66" class="node">
+<title>proc~assemble_local_ftdss</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node66"><a xlink:href="../proc/assemble_local_ftdss.html" xlink:title="assemble_local_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1358,-387.45 1234,-387.45 1234,-363.45 1358,-363.45 1358,-387.45"/>
+<text text-anchor="middle" x="1296" y="-373.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_ftdss&#45;&gt;interface~assemble_local_thermal -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge75" class="edge">
+<title>proc~assemble_local_ftdss&#45;&gt;interface~assemble_local_thermal</title>
+<path fill="none" stroke="#7f00ff" d="M1358.18,-375.16C1368.62,-375.11 1379.78,-375.06 1391.14,-375.01"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1391.17,-378.51 1401.15,-374.96 1391.14,-371.51 1391.17,-378.51"/>
+</g>
+<!-- proc~solve_time_step_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node67" class="node">
+<title>proc~solve_time_step_ftdss</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node67"><a xlink:href="../proc/solve_time_step_ftdss.html" xlink:title="solve_time_step_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="610,-468.45 483,-468.45 483,-444.45 610,-444.45 610,-468.45"/>
+<text text-anchor="middle" x="546.5" y="-454.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge74" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss</title>
+<path fill="none" stroke="#7fff00" d="M602.2,-444.42C623.26,-439.79 647.51,-434.46 669.42,-429.65"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="670.29,-433.04 679.3,-427.47 668.79,-426.2 670.29,-433.04"/>
+</g>
+<!-- interface~apply_bc_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node68" class="node">
+<title>interface~apply_bc_ftdss</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node68"><a xlink:href="../interface/apply_bc_ftdss.html" xlink:title="type_ftdss%apply_bc_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1181,-509.45 1028,-509.45 1028,-485.45 1181,-485.45 1181,-509.45"/>
+<text text-anchor="middle" x="1104.5" y="-495.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%apply_bc_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~apply_bc_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge80" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~apply_bc_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M593.3,-468.46C609.8,-472.31 628.63,-476.17 646,-478.45 774.77,-495.37 925.51,-498.43 1017.74,-498.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1017.86,-501.93 1027.86,-498.42 1017.85,-494.93 1017.86,-501.93"/>
+</g>
+<!-- interface~apply_bc_ftdss&#45;&gt;proc~apply_bc_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge76" class="edge">
+<title>interface~apply_bc_ftdss&#45;&gt;proc~apply_bc_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1181.21,-497.45C1201.13,-497.45 1222.22,-497.45 1240.76,-497.45"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1240.78,-500.95 1250.78,-497.45 1240.78,-493.95 1240.78,-500.95"/>
+</g>
+<!-- interface~assemble_local_ftdss&#45;&gt;proc~assemble_local_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge77" class="edge">
+<title>interface~assemble_local_ftdss&#45;&gt;proc~assemble_local_ftdss</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1198.03,-375.45C1206.65,-375.45 1215.29,-375.45 1223.67,-375.45"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1223.74,-378.95 1233.74,-375.45 1223.74,-371.95 1223.74,-378.95"/>
+</g>
+<!-- interface~solve_time_step_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node70" class="node">
+<title>interface~solve_time_step_ftdss</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node70"><a xlink:href="../interface/solve_time_step_ftdss.html" xlink:title="type_ftdss%solve_time_step_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="447,-468.45 257,-468.45 257,-444.45 447,-444.45 447,-468.45"/>
+<text text-anchor="middle" x="352" y="-454.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge78" class="edge">
+<title>interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M447.28,-456.45C455.88,-456.45 464.5,-456.45 472.87,-456.45"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="472.93,-459.95 482.93,-456.45 472.93,-452.95 472.93,-459.95"/>
+</g>
+<!-- proc~initialize_type_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node71" class="node">
+<title>proc~initialize_type_ftdss</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node71"><a xlink:href="../proc/initialize_type_ftdss.html" xlink:title="initialize_type_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="975,-469.45 860,-469.45 860,-445.45 975,-445.45 975,-469.45"/>
+<text text-anchor="middle" x="917.5" y="-455.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_type_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_ftdss&#45;&gt;interface~apply_bc_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge79" class="edge">
+<title>proc~initialize_type_ftdss&#45;&gt;interface~apply_bc_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M974.01,-469.45C994.04,-473.78 1016.84,-478.71 1037.67,-483.21"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1037.2,-486.69 1047.71,-485.39 1038.68,-479.85 1037.2,-486.69"/>
+</g>
+<!-- proc~run_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node72" class="node">
+<title>proc~run_ftdss</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node72"><a xlink:href="../proc/run_ftdss.html" xlink:title="run_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-468.45 160,-468.45 160,-444.45 221,-444.45 221,-468.45"/>
+<text text-anchor="middle" x="190.5" y="-454.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge82" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss</title>
+<path fill="none" stroke="#0000ff" d="M221.13,-456.45C228.8,-456.45 237.52,-456.45 246.72,-456.45"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="246.86,-459.95 256.86,-456.45 246.86,-452.95 246.86,-459.95"/>
+</g>
+<!-- interface~initialize_type_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node73" class="node">
+<title>interface~initialize_type_ftdss</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node73"><a xlink:href="../interface/initialize_type_ftdss.html" xlink:title="type_ftdss%initialize_type_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="824,-469.45 646,-469.45 646,-445.45 824,-445.45 824,-469.45"/>
+<text text-anchor="middle" x="735" y="-455.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%initialize_type_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_ftdss&#45;&gt;proc~initialize_type_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge83" class="edge">
+<title>interface~initialize_type_ftdss&#45;&gt;proc~initialize_type_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M824.13,-457.45C832.79,-457.45 841.47,-457.45 849.85,-457.45"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="849.91,-460.95 859.91,-457.45 849.91,-453.95 849.91,-460.95"/>
+</g>
+<!-- interface~run_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_node74" class="node">
+<title>interface~run_ftdss</title>
+<g id="a_proc~~in_group_matrix_op~~CalledByGraph_node74"><a xlink:href="../interface/run_ftdss.html" xlink:title="type_ftdss%run_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="124,-468.45 0,-468.45 0,-444.45 124,-444.45 124,-468.45"/>
+<text text-anchor="middle" x="62" y="-454.05" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftdss&#45;&gt;proc~run_ftdss -->
+<g id="proc~~in_group_matrix_op~~CalledByGraph_edge84" class="edge">
+<title>interface~run_ftdss&#45;&gt;proc~run_ftdss</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M124.03,-456.45C132.82,-456.45 141.68,-456.45 149.91,-456.45"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="149.94,-459.95 159.94,-456.45 149.94,-452.95 149.94,-459.95"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocin_group_matrix_opCalledByGraph = svgPanZoom('#procin_group_matrix_opCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-23 23:52 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

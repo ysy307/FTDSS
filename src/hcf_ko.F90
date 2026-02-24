@@ -31,7 +31,7 @@ contains
         real(real64), intent(in) :: h
         real(real64), intent(inout) :: kr
 
-        associate (params => self%parent%params)
+        associate (params => self%parent%config)
             call calc_kr_ko(params%alpha1, params%n1, params%l, h, kr)
         end associate
 

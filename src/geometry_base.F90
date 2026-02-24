@@ -91,7 +91,7 @@ contains
         class(type_input_geometry), intent(inout) :: self
         character(:), allocatable :: field_list(:)
 
-        character(len=256) :: temp_list(NUM_IC_TARGETS)
+        character(len=256) :: temp_list(IC_TARGETS%NUM_ID)
         character(len=256) :: current_field_name
 
         integer(int32) :: num_fields, i, k
@@ -102,13 +102,13 @@ contains
         select type (p => self%parent)
         type is (type_input)
             ! 全ての初期条件を整数インデックスでループ
-            do i = 1, NUM_IC_TARGETS
+            do i = 1, IC_TARGETS%NUM_ID
 
                 ! この解析タイプが有効でない場合はスキップ
                 if (.not. p%basic%analysis_controls%is_active(i)) cycle
 
                 ! 初期条件がファイルから読み込む設定の場合のみ処理
-                if (p%conditions%initial_conditions%physics(i)%type == IC_METHOD_FROM_FILE) then
+                if (p%conditions%initial_conditions%physics(i)%type == IC_METHODS%FROM_FILE%NAME) then
 
                     ! フィールド名が割り当てられているか確認
                     if (allocated(p%conditions%initial_conditions%physics(i)%field_name)) then

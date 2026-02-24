@@ -11,7 +11,7 @@ contains
     function create_matrix(matrix_type, num_nodes, row, col, block_size) result(matrix)
         implicit none
         !> The type of matrix to create: "dense", "crs", or "coo".
-        integer(int32), intent(in) :: matrix_type
+        type(type_constant_id), intent(in) :: matrix_type
         !> The number of nodes.
         integer(int32), intent(in) :: num_nodes
         !> Optional node-level CSR `ptr` array to define sparsity.
@@ -23,22 +23,28 @@ contains
         !> The matrix object to initialize.
         class(abst_matrix), allocatable :: matrix
 
-        select case (matrix_type)
-        case (MATRIX_DENSE)
+        if (.not. MATRIX_TYPES%is_valid(matrix_type)) then
+            error stop "Error: Invalid matrix type in create_matrix."
+        end if
+
+        if (matrix_type == MATRIX_TYPES%DENSE) then
             allocate (type_matrix_dense :: matrix)
             call matrix%initialize(num_nodes)
-        case (MATRIX_CSR)
+        else if (matrix_type == MATRIX_TYPES%CSR) then
             allocate (type_matrix_csr :: matrix)
             call matrix%initialize(num_nodes, row, col)
-        case (MATRIX_COO)
+        else if (matrix_type == MATRIX_TYPES%COO) then
             allocate (type_matrix_coo :: matrix)
             call matrix%initialize(num_nodes, row, col)
-        case (MATRIX_BSR)
+        else if (matrix_type == MATRIX_TYPES%BSR) then
             allocate (type_matrix_bsr :: matrix)
             call matrix%initialize(num_nodes, row, col, block_size, block_size)
-        case default
+        else if (matrix_type == MATRIX_TYPES%DIA) then
+            allocate (type_matrix_dia :: matrix)
+            call matrix%initialize(num_nodes, row, col)
+        else
             error stop "Error: Unsupported matrix type in create_matrix."
-        end select
-
+        end if
+        
     end function create_matrix
 end module core_types_matrix_factory

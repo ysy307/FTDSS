@@ -45,34 +45,34 @@ contains
                 buffer(1) = boundary_conditions//"("//to_string(i)//")"
                 ! 必須のIDを読み込む
                 buffer(2) = id
-                call get_json_value(json, join(buffer(1:2)), self%boundary_conditions(i)%id, is_required=.true.)
+                call get_json_value(json, join(buffer(1:2)), self%boundary_conditions(i)%ID, is_required=.true.)
 
                 do j = 1, PHYSICS_TYPES%NUM_ID
                     ! do j = 1, NUM_PHYSICS_TYPES
                     if (p%basic%analysis_controls%is_active(j)) then
                         select case (j)
-                        case (PHYSICS_TYPES%THERMAL%id)
+                        case (PHYSICS_TYPES%THERMAL%ID)
                             buffer(2) = calculate_thermal
-                        case (PHYSICS_TYPES%HYDRAULIC%id)
+                        case (PHYSICS_TYPES%HYDRAULIC%ID)
                             buffer(2) = calculate_hydraulic
-                        case (PHYSICS_TYPES%MECHANICAL%id)
+                        case (PHYSICS_TYPES%MECHANICAL%ID)
                             buffer(2) = calculate_mechanical
                         end select
                         call get_json_value(json, join(buffer(1:2)), self%boundary_conditions(i)%physics(j)%is_active, &
                                             is_required=.true.)
                         if (self%boundary_conditions(i)%physics(j)%is_active) then
                             select case (j)
-                            case (PHYSICS_TYPES%THERMAL%id)
+                            case (PHYSICS_TYPES%THERMAL%ID)
                                 physics_type = PHYSICS_TYPES%THERMAL
                                 ! self%boundary_conditions(i)%physics(j)%state%physics_type = PHYSICS_TYPES%THERMAL
                                 buffer(2) = thermal
                                 valid_list => valid_thermal_boundary_types
-                            case (PHYSICS_TYPES%HYDRAULIC%id)
+                            case (PHYSICS_TYPES%HYDRAULIC%ID)
                                 physics_type = PHYSICS_TYPES%HYDRAULIC
                                 ! self%boundary_conditions(i)%physics(j)%state%physics_type = PHYSICS_TYPES%HYDRAULIC
                                 buffer(2) = hydraulic
                                 valid_list => valid_hydraulic_boundary_types
-                            case (PHYSICS_TYPES%MECHANICAL%id)
+                            case (PHYSICS_TYPES%MECHANICAL%ID)
                                 physics_type = PHYSICS_TYPES%MECHANICAL
                                 ! self%boundary_conditions(i)%physics(j)%state%physics_type = PHYSICS_TYPES%MECHANICAL
                                 buffer(2) = mechanical
@@ -183,7 +183,7 @@ contains
         implicit none
         class(type_boundary_conditions), intent(in) :: self
 
-        ! write (*, '(a, i0, a)') "  ■ Boundary Condition (ID: ", self%id, ") -------------------"
+        ! write (*, '(a, i0, a)') "  ■ Boundary Condition (ID: ", self%ID, ") -------------------"
         ! if (associated(self%parent)) then
         !     ! 次に、祖父母ポインタが有効かチェックする
         !     if (associated(self%parent%parent)) then
@@ -219,37 +219,7 @@ contains
         character(*), intent(in) :: title
         integer(int32), intent(in) :: target_physics
         integer(int32) :: n_vals
-
-        ! procedure(get_string), pointer :: p_get_string => null()
-
-        ! select case (target_physics)
-        ! case (PHYSICS_TYPE_THERMAL)
-        !     p_get_string => get_thermal_bc_type_string
-        ! case (PHYSICS_TYPE_HYDRAULIC)
-        !     p_get_string => get_hydraulic_bc_type_string
-        ! end select
-
-        ! write (*, '(a, a, a)') "    --- ", trim(title), " ---"
-        ! write (*, '(a, a)') "      Type                : ", p_get_string(boundary(target_physics)%type)
-
-        ! select case (p_get_string(boundary(target_physics)%type))
-        ! case ("dirichlet", "neumann", "flux", "robin", "heat_transfer", "head_radiation")
-        !     if (allocated(boundary(target_physics)%values)) then
-        !         n_vals = size(boundary(target_physics)%values)
-        !         if (n_vals == 0) then
-        !             write (*, '(a)') "      Values              : (0 points defined)"
-        !         else if (n_vals <= 6) then
-        !             write (*, '(a, *(es12.4e2, :, " "))') "      Values              : ", boundary(target_physics)%values
-        !         else
-        !             write (*, '(a, 3(es12.4e2, :, " "), a, 3(es12.4e2, :, " "))') &
-        !                 "      Values (summary)    : ", boundary(target_physics)%values(1:3), " ... ", boundary(target_physics)%values(n_vals - 2:n_vals)
-        !         end if
-        !     else
-        !         write (*, '(a)') "      Values              : Not allocated"
-        !     end if
-        ! case default
-        !     ! "adiabatic"のようなタイプは追加フィールドなし
-        ! end select
+        
     end subroutine display_boundary_local
 
 end submodule inout_input_conditions_boundry

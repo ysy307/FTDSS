@@ -181,7 +181,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~1232"></span>
+              <span class="anchor" id="variable-self~1029"></span>
               class(<a href='../type/type_preconditioner_settings.html'>type_preconditioner_settings</a>),
             </td>
 <td>intent(inout)</td>
@@ -196,7 +196,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-id~21"></span>
+              <span class="anchor" id="variable-id~111"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -211,7 +211,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-num_nodes~57"></span>
+              <span class="anchor" id="variable-num_nodes~42"></span>
               integer(kind=int32),
             </td>
 <td>intent(in),</td>
@@ -226,7 +226,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-block_size~5"></span>
+              <span class="anchor" id="variable-block_size~4"></span>
               integer(kind=int32),
             </td>
 <td>intent(in),</td>
@@ -284,9 +284,9 @@
 <span class="w">        </span><span class="c">!&gt; ILU fill-in level (optional, default 0)</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ilu_fillin_level</span>
 
-<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">id</span>
-<span class="w">        </span><span class="k">select case</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">id</span><span class="p">)</span>
-<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">SOLVER_PRECONDITION_JACOBI</span><span class="p">)</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">ID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">id</span>
+<span class="w">        </span><span class="k">select case</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">PRECONDITIONER_TYPES</span><span class="p">%</span><span class="n">JACOBI</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
 <span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
 <span class="k">                </span><span class="n">self</span><span class="p">%</span><span class="n">num_nodes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">num_nodes</span>
 <span class="w">            </span><span class="k">else</span>
@@ -297,7 +297,7 @@
 <span class="w">            </span><span class="k">else</span>
 <span class="k">                </span><span class="n">self</span><span class="p">%</span><span class="n">block_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
 <span class="w">            </span><span class="k">end if</span>
-<span class="k">        case</span><span class="w"> </span><span class="p">(</span><span class="n">SOLVER_PRECONDITION_ILU</span><span class="p">)</span>
+<span class="k">        case</span><span class="w"> </span><span class="p">(</span><span class="n">PRECONDITIONER_TYPES</span><span class="p">%</span><span class="n">ILU</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
 <span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
 <span class="k">                </span><span class="n">self</span><span class="p">%</span><span class="n">num_nodes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">num_nodes</span>
 <span class="w">            </span><span class="k">else</span>
@@ -338,7 +338,7 @@
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-22 12:12 +0000             </p>
+ on 2026-02-23 23:52 +0000             </p>
           </div>
         </div>
         <br>

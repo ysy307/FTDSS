@@ -179,7 +179,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~72"></span>
+              <span class="anchor" id="variable-self~1053"></span>
               class(<a href='../type/type_matrix_coo.html'>type_matrix_coo</a>),
             </td>
 <td>intent(inout)</td>
@@ -194,8 +194,8 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-op~2"></span>
-              integer(kind=int32),
+              <span class="anchor" id="variable-op~52"></span>
+              type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -209,7 +209,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-row~5"></span>
+              <span class="anchor" id="variable-row~57"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -224,7 +224,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-col~5"></span>
+              <span class="anchor" id="variable-col~47"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -239,7 +239,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-row_block"></span>
+              <span class="anchor" id="variable-row_block~33"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -254,7 +254,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-col_block"></span>
+              <span class="anchor" id="variable-col_block~9"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -269,7 +269,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-value~5"></span>
+              <span class="anchor" id="variable-value~83"></span>
               real(kind=real64),
             </td>
 <td>intent(in)</td>
@@ -425,7 +425,7 @@ large graphs.</div>
 <span class="w">        </span><span class="c">!&gt; The COO matrix object.</span>
 <span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">type_matrix_coo</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
 <span class="w">        </span><span class="c">!&gt; The operation to perform</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">op</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_constant_id</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">op</span>
 <span class="w">        </span><span class="c">!&gt; The 1-based node index for the row.</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">row</span>
 <span class="w">        </span><span class="c">!&gt; The 1-based node index for the column.</span>
@@ -437,7 +437,7 @@ large graphs.</div>
 <span class="w">        </span><span class="c">!&gt; The value to set at the specified entry.</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="k">value</span>
 
-<span class="k">        </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MATRIX_STATUS_NOT_IMPLEMENTED</span>
+<span class="k">        </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MATRIX_STATUS</span><span class="p">%</span><span class="n">NOT_IMPLEMENTED</span>
 <span class="w">    </span><span class="k">end subroutine </span><span class="n">set_value_block_coo</span>
 </pre></div>
 
@@ -462,7 +462,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-22 12:12 +0000             </p>
+ on 2026-02-23 23:52 +0000             </p>
           </div>
         </div>
         <br>

@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.1% of total for procedures.">27 statements</a>
+                 title=" 0.0% of total for procedures.">27 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -179,7 +179,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~349"></span>
+              <span class="anchor" id="variable-self~404"></span>
               class(<a href='../type/type_ftdss.html'>type_ftdss</a>),
             </td>
 <td>intent(inout)</td>
@@ -194,7 +194,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material_id~20"></span>
+              <span class="anchor" id="variable-material_id~19"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -209,7 +209,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-state~45"></span>
+              <span class="anchor" id="variable-state~57"></span>
               type(<a href='../type/type_state.html'>type_state</a>),
             </td>
 <td>intent(in)</td>
@@ -224,7 +224,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-grad_t~3"></span>
+              <span class="anchor" id="variable-grad_t~7"></span>
               type(<a href='../type/type_coordinate_dp.html'>type_coordinate_dp</a>),
             </td>
 <td>intent(in)</td>
@@ -239,7 +239,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-grad_p~3"></span>
+              <span class="anchor" id="variable-grad_p~7"></span>
               type(<a href='../type/type_coordinate_dp.html'>type_coordinate_dp</a>),
             </td>
 <td>intent(in)</td>
@@ -254,7 +254,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-water_flux~2"></span>
+              <span class="anchor" id="variable-water_flux~7"></span>
               type(<a href='../type/type_coordinate_dp.html'>type_coordinate_dp</a>),
             </td>
 <td>intent(inout)</td>
@@ -1307,15 +1307,15 @@ large graphs.</div>
 <span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">hydraulic</span><span class="p">%</span><span class="n">calc_K_vP</span><span class="p">(</span><span class="n">material_id</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">K_vP</span><span class="p">)</span>
 
 <span class="w">        </span><span class="k">select case</span><span class="w"> </span><span class="p">(</span><span class="n">computation_type</span><span class="p">)</span>
-<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">COMP_TYPE_2D_XY</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">COMP_TYPES</span><span class="p">%</span><span class="n">XY_2D</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
 <span class="w">            </span><span class="n">water_flux</span><span class="p">%</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">K_vT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">grad_T</span><span class="p">%</span><span class="n">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">K_vP</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">grad_P</span><span class="p">%</span><span class="n">x</span>
 <span class="w">            </span><span class="n">water_flux</span><span class="p">%</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">K_vT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">grad_T</span><span class="p">%</span><span class="n">y</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">K_vP</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">grad_P</span><span class="p">%</span><span class="n">y</span>
 <span class="w">            </span><span class="n">water_flux</span><span class="p">%</span><span class="n">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
-<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">COMP_TYPE_2D_XZ</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">COMP_TYPES</span><span class="p">%</span><span class="n">XZ_2D</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
 <span class="w">            </span><span class="n">water_flux</span><span class="p">%</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">K_vT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">grad_T</span><span class="p">%</span><span class="n">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">K_vP</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">grad_P</span><span class="p">%</span><span class="n">x</span>
 <span class="w">            </span><span class="n">water_flux</span><span class="p">%</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
 <span class="w">            </span><span class="n">water_flux</span><span class="p">%</span><span class="n">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">K_vT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">grad_T</span><span class="p">%</span><span class="n">z</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">K_vP</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">grad_P</span><span class="p">%</span><span class="n">z</span>
-<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">COMP_TYPE_3D</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">COMP_TYPES</span><span class="p">%</span><span class="n">XYZ_3D</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
 <span class="w">            </span><span class="n">water_flux</span><span class="p">%</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">K_vT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">grad_T</span><span class="p">%</span><span class="n">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">K_vP</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">grad_P</span><span class="p">%</span><span class="n">x</span>
 <span class="w">            </span><span class="n">water_flux</span><span class="p">%</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">K_vT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">grad_T</span><span class="p">%</span><span class="n">y</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">K_vP</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">grad_P</span><span class="p">%</span><span class="n">y</span>
 <span class="w">            </span><span class="n">water_flux</span><span class="p">%</span><span class="n">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">K_vT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">grad_T</span><span class="p">%</span><span class="n">z</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">K_vP</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">grad_P</span><span class="p">%</span><span class="n">z</span>
@@ -1345,7 +1345,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-22 12:12 +0000             </p>
+ on 2026-02-23 23:52 +0000             </p>
           </div>
         </div>
         <br>

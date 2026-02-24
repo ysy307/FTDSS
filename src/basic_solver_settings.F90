@@ -100,16 +100,16 @@ contains
         buffer(3) = method
         call get_json_value(json, join(buffer(1:3)), temp_string, &
                             is_required=.true., default_value="none", valid_list=valid_nonlinear_solver_methods_str)
-        self%solver_settings%nonlinear_solver%method = get_nonlinear_solver_type(temp_string)
+        self%solver_settings%nonlinear_solver%method = NONLINEAR_SOLVER%to_id(temp_string)
 
-        if (self%solver_settings%nonlinear_solver%method == NONLINEAR_SOLVER_MODIFIED_NEWTON) then
+        if (self%solver_settings%nonlinear_solver%method == NONLINEAR_SOLVER%MODIFIED_NEWTON%ID) then
             buffer(3) = update_frequency
             call get_json_value(json, join(buffer(1:3)), self%solver_settings%nonlinear_solver%update_frequency, &
                                 is_required=.true., default_value=5, valid_range=[1, huge(1)])
         end if
 
         if (any(self%solver_settings%nonlinear_solver%method == [ &
-                NONLINEAR_SOLVER_NEWTON, NONLINEAR_SOLVER_MODIFIED_NEWTON, NONLINEAR_SOLVER_PICARD])) then
+                NONLINEAR_SOLVER%NEWTON%ID, NONLINEAR_SOLVER%MODIFIED_NEWTON%ID, NONLINEAR_SOLVER%PICARD%ID])) then
             buffer(3) = max_iterations
             call get_json_value(json, join(buffer(1:3)), self%solver_settings%nonlinear_solver%max_iterations, &
                                 is_required=.true., default_value=1000, valid_range=[1, huge(1)])
@@ -118,28 +118,28 @@ contains
             buffer(4) = use_criteria
             call get_json_value(json, join(buffer), temp_string, &
                                 is_required=.true., default_value="both", valid_list=valid_criteria_types_str)
-            self%solver_settings%nonlinear_solver%convergence%use_criteria = get_nonlinear_norm_criteria(temp_string)
+            self%solver_settings%nonlinear_solver%convergence%use_criteria = NONLINEAR_NORM_CRITERIA%to_id(temp_string)
 
-            if (self%solver_settings%nonlinear_solver%convergence%use_criteria == NONLINEAR_NORM_CRITERIA_BOTH) then
+            if (self%solver_settings%nonlinear_solver%convergence%use_criteria == NONLINEAR_NORM_CRITERIA%BOTH%ID) then
                 buffer(4) = logic_between_criteria
                 call get_json_value(json, join(buffer), temp_string, &
                                     is_required=.true., default_value="and", valid_list=valid_logic_types_str)
-                self%solver_settings%nonlinear_solver%convergence%use_logic = get_nonlinear_logic(temp_string)
+                self%solver_settings%nonlinear_solver%convergence%use_logic = NONLINEAR_LOGIC%to_id(temp_string)
             end if
 
             buffer(4) = norm_type
             call get_json_value(json, join(buffer), temp_string, &
                                 is_required=.true., default_value="l2", valid_list=valid_norm_types_str)
-            self%solver_settings%nonlinear_solver%convergence%norm_type = get_norm_type(temp_string)
+            self%solver_settings%nonlinear_solver%convergence%norm_type = NORM_TYPES%to_id(temp_string)
 
             if (any(self%solver_settings%nonlinear_solver%convergence%use_criteria == &
-                    [NONLINEAR_NORM_CRITERIA_RESIDUAL, NONLINEAR_NORM_CRITERIA_BOTH])) then
+                    [NONLINEAR_NORM_CRITERIA%RESIDUAL%ID, NONLINEAR_NORM_CRITERIA%BOTH%ID])) then
                 buffer(4) = residual
                 call read_parameters_solver_settings_nonlinear_convergence( &
                     self%solver_settings%nonlinear_solver%convergence%residual, json, buffer, 4)
             end if
             if (any(self%solver_settings%nonlinear_solver%convergence%use_criteria == &
-                    [NONLINEAR_NORM_CRITERIA_UPDATE, NONLINEAR_NORM_CRITERIA_BOTH])) then
+                    [NONLINEAR_NORM_CRITERIA%UPDATE%ID, NONLINEAR_NORM_CRITERIA%BOTH%ID])) then
                 buffer(4) = update
                 call read_parameters_solver_settings_nonlinear_convergence( &
                     self%solver_settings%nonlinear_solver%convergence%update, json, buffer, 4)
@@ -165,21 +165,21 @@ contains
         local_buffer(end_index + 1) = criteria
         call get_json_value(json, join(local_buffer), temp_string, &
                             is_required=.true., default_value="both", valid_list=valid_local_criteria_types_str)
-        convergence_obj%criteria = get_nonlinear_criteria(temp_string)
+        convergence_obj%criteria = NONLINEAR_CRITERIA%to_id(temp_string)
 
-        if (convergence_obj%criteria == NONLINEAR_CRITERIA_BOTH) then
+        if (convergence_obj%criteria == NONLINEAR_CRITERIA%BOTH%ID) then
             local_buffer(end_index + 1) = logic
             call get_json_value(json, join(local_buffer), temp_string, &
                                 is_required=.true., default_value="and", valid_list=valid_logic_types_str)
-            convergence_obj%logic = get_nonlinear_logic(temp_string)
+            convergence_obj%logic = NONLINEAR_LOGIC%to_id(temp_string)
         end if
 
-        if (any(convergence_obj%criteria == [NONLINEAR_CRITERIA_ABSOLUTE, NONLINEAR_CRITERIA_BOTH])) then
+        if (any(convergence_obj%criteria == [NONLINEAR_CRITERIA%ABSOLUTE%ID, NONLINEAR_CRITERIA%BOTH%ID])) then
             local_buffer(end_index + 1) = absolute_tolerance
             call get_json_value(json, join(local_buffer), convergence_obj%absolute_tolerance, &
                                 is_required=.true., default_value=1.0d-6, valid_range=[0.0d0, huge(0.0d0)])
         end if
-        if (any(convergence_obj%criteria == [NONLINEAR_CRITERIA_RELATIVE, NONLINEAR_CRITERIA_BOTH])) then
+        if (any(convergence_obj%criteria == [NONLINEAR_CRITERIA%RELATIVE%ID, NONLINEAR_CRITERIA%BOTH%ID])) then
             local_buffer(end_index + 1) = relative_tolerance
             call get_json_value(json, join(local_buffer), convergence_obj%relative_tolerance, &
                                 is_required=.true., default_value=1.0d-6, valid_range=[0.0d0, huge(0.0d0)])
@@ -213,64 +213,9 @@ contains
         call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%tolerance, &
                             is_required=.true., default_value=1.0d-6, valid_range=[0.0d0, huge(0.0d0)])
 
-        ! target_id = get_physics_type(thermal)
-        ! if (self%analysis_controls%is_active(target_id)) then
-        !     buffer(3) = thermal
-        !     call read_parameters_solver_settings_linear_local(self%solver_settings%linear_solver%physics(target_id), &
-        !                                                       json, buffer, 3)
-        ! end if
-
-        ! target_id = get_physics_type(hydraulic)
-        ! if (self%analysis_controls%is_active(target_id)) then
-        !     buffer(3) = hydraulic
-        !     call read_parameters_solver_settings_linear_local(self%solver_settings%linear_solver%physics(target_id), &
-        !                                                       json, buffer, 3)
-        ! end if
-
-        ! target_id = get_physics_type(mechanical)
-        ! if (self%analysis_controls%is_active(target_id)) then
-        !     buffer(3) = mechanical
-        !     call read_parameters_solver_settings_linear_local(self%solver_settings%linear_solver%physics(target_id), &
-        !                                                       json, buffer, 3)
-        ! end if
     end subroutine read_parameters_solver_settings_linear
 
-    ! subroutine read_parameters_solver_settings_linear_local(solver_setting, json, buffer, end_index)
-    !     !> Reads linear solver settings for a specific physics.
-    !     implicit none
-    !     type(type_linear_solver_settings), intent(inout) :: solver_setting
-    !     type(json_file), intent(inout) :: json
-    !     character(*), intent(in) :: buffer(:)
-    !     integer(int32), intent(in) :: end_index
-    !     character(len=256), allocatable :: local_buffer(:)
-
-    !     allocate (local_buffer(size(buffer) + 2))
-    !     local_buffer(1:end_index) = buffer(1:end_index)
-
-    !     local_buffer(end_index + 1) = method
-    !     call get_json_value(json, join(local_buffer(1:end_index + 1)), solver_setting%method, &
-    !                         is_required=.true., valid_list=valid_linear_solver_methods)
-
-    !     if (solver_setting%method == LINEAR_METHOD_ITERATIVE) then
-    !         local_buffer(end_index + 1) = iterative_solver
-
-    !         local_buffer(end_index + 2) = solver_type
-    !         call get_json_value(json, join(local_buffer), solver_setting%iterative_solver%solver_type, is_required=.true.)
-    !         local_buffer(end_index + 2) = preconditioner_type
-    !         call get_json_value(json, join(local_buffer), solver_setting%iterative_solver%preconditioner_type, is_required=.true.)
-    !         local_buffer(end_index + 2) = max_iterations
-    !         call get_json_value(json, join(local_buffer), solver_setting%iterative_solver%max_iterations, &
-    !                             is_required=.true., default_value=10000, valid_range=[1, huge(1)])
-    !         local_buffer(end_index + 2) = tolerance
-    !         call get_json_value(json, join(local_buffer), solver_setting%iterative_solver%tolerance, &
-    !                             is_required=.true., default_value=1.0d-6, valid_range=[0.0d0, huge(0.0d0)])
-    !     end if
-
-    !     if (allocated(local_buffer)) deallocate (local_buffer)
-    ! end subroutine read_parameters_solver_settings_linear_local
-
-subroutine read_parameters_solver_parallel_settings(self, json)
-        !> Reads parallel processing settings.
+    subroutine read_parameters_solver_parallel_settings(self, json)
         implicit none
         class(type_input_basic), intent(inout) :: self
         type(json_file), intent(inout) :: json
@@ -284,7 +229,7 @@ subroutine read_parameters_solver_parallel_settings(self, json)
                             is_required=.true., default_value=.false.)
 
         if (self%solver_settings%parallel_settings%threads%is_parallel) then
-            
+
             buffer(3) = num_threads
             call get_json_value(json, join(buffer(1:3)), self%solver_settings%parallel_settings%threads%num_threads, &
                                 is_required=.true., valid_range=[1, huge(1)])
@@ -313,47 +258,29 @@ subroutine read_parameters_solver_parallel_settings(self, json)
     pure function nonlinear_solver_to_string(id) result(str)
         integer(int32), intent(in) :: id
         character(len=16) :: str
-        select case (id)
-        case (NONLINEAR_SOLVER_NONE); str = "none"
-        case (NONLINEAR_SOLVER_NEWTON); str = "newton"
-        case (NONLINEAR_SOLVER_MODIFIED_NEWTON); str = "modified_newton"
-        case (NONLINEAR_SOLVER_PICARD); str = "picard"
-        case default; str = "unknown"
-        end select
+        str = trim(NONLINEAR_SOLVER%to_name(id))
+        if (len_trim(str) == 0) str = "unknown"
     end function nonlinear_solver_to_string
 
     pure function norm_criteria_to_string(id) result(str)
         integer(int32), intent(in) :: id
         character(len=16) :: str
-        select case (id)
-        case (NONLINEAR_NORM_CRITERIA_NONE); str = "none"
-        case (NONLINEAR_NORM_CRITERIA_RESIDUAL); str = "residual"
-        case (NONLINEAR_NORM_CRITERIA_UPDATE); str = "update"
-        case (NONLINEAR_NORM_CRITERIA_BOTH); str = "both"
-        case default; str = "unknown"
-        end select
+        str = trim(NONLINEAR_NORM_CRITERIA%to_name(id))
+        if (len_trim(str) == 0) str = "unknown"
     end function norm_criteria_to_string
 
     pure function local_criteria_to_string(id) result(str)
         integer(int32), intent(in) :: id
         character(len=16) :: str
-        select case (id)
-        case (NONLINEAR_CRITERIA_NONE); str = "none"
-        case (NONLINEAR_CRITERIA_RELATIVE); str = "relative"
-        case (NONLINEAR_CRITERIA_ABSOLUTE); str = "absolute"
-        case (NONLINEAR_CRITERIA_BOTH); str = "both"
-        case default; str = "unknown"
-        end select
+        str = trim(NONLINEAR_CRITERIA%to_name(id))
+        if (len_trim(str) == 0) str = "unknown"
     end function local_criteria_to_string
 
     pure function logic_to_string(id) result(str)
         integer(int32), intent(in) :: id
         character(len=16) :: str
-        select case (id)
-        case (NONLINEAR_LOGIC_OR); str = "or"
-        case (NONLINEAR_LOGIC_AND); str = "and"
-        case default; str = "unknown"
-        end select
+        str = trim(NONLINEAR_LOGIC%to_name(id))
+        if (len_trim(str) == 0) str = "unknown"
     end function logic_to_string
 
     !======================================================================
@@ -386,22 +313,26 @@ subroutine read_parameters_solver_parallel_settings(self, json)
         write (*, '(/a)') "  --- Nonlinear Solver ---"
         write (*, '(a, a)') "    Method                : ", trim(nonlinear_solver_to_string(nonlinear%method))
 
-        if (nonlinear%method == NONLINEAR_SOLVER_MODIFIED_NEWTON) then
+        if (nonlinear%method == NONLINEAR_SOLVER%MODIFIED_NEWTON%ID) then
             write (*, '(a, i0)') "    Update Frequency      : ", nonlinear%update_frequency
         end if
 
-        if (any(nonlinear%method == [NONLINEAR_SOLVER_NEWTON, NONLINEAR_SOLVER_MODIFIED_NEWTON, NONLINEAR_SOLVER_PICARD])) then
+        if (any(nonlinear%method == [NONLINEAR_SOLVER%NEWTON%ID, &
+                                     NONLINEAR_SOLVER%MODIFIED_NEWTON%ID, &
+                                     NONLINEAR_SOLVER%PICARD%ID])) then
             write (*, '(a, i0)') "    Max Iterations        : ", nonlinear%max_iterations
             write (*, '(a)') "    --- Convergence ---"
             write (*, '(a, a)') "      Use Criteria          : ", trim(norm_criteria_to_string(nonlinear%convergence%use_criteria))
-            if (nonlinear%convergence%use_criteria == NONLINEAR_NORM_CRITERIA_BOTH) then
+            if (nonlinear%convergence%use_criteria == NONLINEAR_NORM_CRITERIA%BOTH%ID) then
                 write (*, '(a, a)') "      Logic Between         : ", trim(logic_to_string(nonlinear%convergence%use_logic))
             end if
 
-            if (any(nonlinear%convergence%use_criteria == [NONLINEAR_NORM_CRITERIA_RESIDUAL, NONLINEAR_NORM_CRITERIA_BOTH])) then
+            if (any(nonlinear%convergence%use_criteria == [NONLINEAR_NORM_CRITERIA%RESIDUAL%ID, &
+                                                           NONLINEAR_NORM_CRITERIA%BOTH%ID])) then
                 call display_solver_convergence_criteria(nonlinear%convergence%residual, "      Residual Criteria")
             end if
-            if (any(nonlinear%convergence%use_criteria == [NONLINEAR_NORM_CRITERIA_UPDATE, NONLINEAR_NORM_CRITERIA_BOTH])) then
+            if (any(nonlinear%convergence%use_criteria == [NONLINEAR_NORM_CRITERIA%UPDATE%ID, &
+                                                           NONLINEAR_NORM_CRITERIA%BOTH%ID])) then
                 call display_solver_convergence_criteria(nonlinear%convergence%update, "      Update Criteria")
             end if
         end if
@@ -414,13 +345,13 @@ subroutine read_parameters_solver_parallel_settings(self, json)
         character(*), intent(in) :: title
 
         write (*, '(a, a)') trim(title)//'        : ', trim(local_criteria_to_string(criteria_obj%criteria))
-        if (criteria_obj%criteria == NONLINEAR_CRITERIA_BOTH) then
+        if (criteria_obj%criteria == NONLINEAR_CRITERIA%BOTH%ID) then
             write (*, '(a, a)') "        Logic             : ", trim(logic_to_string(criteria_obj%logic))
         end if
-        if (any(criteria_obj%criteria == [NONLINEAR_CRITERIA_ABSOLUTE, NONLINEAR_CRITERIA_BOTH])) then
+        if (any(criteria_obj%criteria == [NONLINEAR_CRITERIA%ABSOLUTE%ID, NONLINEAR_CRITERIA%BOTH%ID])) then
             write (*, '(a, es12.4e2)') "        Absolute Tol.     : ", criteria_obj%absolute_tolerance
         end if
-        if (any(criteria_obj%criteria == [NONLINEAR_CRITERIA_RELATIVE, NONLINEAR_CRITERIA_BOTH])) then
+        if (any(criteria_obj%criteria == [NONLINEAR_CRITERIA%RELATIVE%ID, NONLINEAR_CRITERIA%BOTH%ID])) then
             write (*, '(a, es12.4e2)') "        Relative Tol.     : ", criteria_obj%relative_tolerance
         end if
     end subroutine display_solver_convergence_criteria
@@ -432,37 +363,7 @@ subroutine read_parameters_solver_parallel_settings(self, json)
 
         write (*, '(/a)') "  --- Linear Solver ---"
 
-        ! if (allocated(linear%physics(PHYSICS_TYPE_THERMAL)%method)) then
-        !     if (len_trim(linear%physics(PHYSICS_TYPE_THERMAL)%method) > 0) then
-        !         call display_solver_settings_linear_local(linear%physics(PHYSICS_TYPE_THERMAL), "    Thermal")
-        !     end if
-        ! end if
-        ! if (allocated(linear%physics(PHYSICS_TYPE_HYDRAULIC)%method)) then
-        !     if (len_trim(linear%physics(PHYSICS_TYPE_HYDRAULIC)%method) > 0) then
-        !         call display_solver_settings_linear_local(linear%physics(PHYSICS_TYPE_HYDRAULIC), "    Hydraulic")
-        !     end if
-        ! end if
-        ! if (allocated(linear%physics(PHYSICS_TYPE_MECHANICAL)%method)) then
-        !     if (len_trim(linear%physics(PHYSICS_TYPE_MECHANICAL)%method) > 0) then
-        !         call display_solver_settings_linear_local(linear%physics(PHYSICS_TYPE_MECHANICAL), "    Mechanical")
-        !     end if
-        ! end if
     end subroutine display_solver_settings_linear
-
-    subroutine display_solver_settings_linear_local(local_solver, title)
-        !> Reusable helper to display settings for a specific linear solver.
-        implicit none
-        type(type_linear_solver_settings), intent(in) :: local_solver
-        character(*), intent(in) :: title
-
-        write (*, '(a, a)') trim(title)//" Method         : ", trim(local_solver%method)
-        if (local_solver%method == LINEAR_METHOD_ITERATIVE) then
-            write (*, '(a, i0)') "      Solver Type         : ", local_solver%iterative_solver%solver_type
-            write (*, '(a, i0)') "      Preconditioner Type : ", local_solver%iterative_solver%preconditioner_type
-            write (*, '(a, i0)') "      Max Iterations      : ", local_solver%iterative_solver%max_iterations
-            write (*, '(a, es12.4e2)') "      Tolerance           : ", local_solver%iterative_solver%tolerance
-        end if
-    end subroutine display_solver_settings_linear_local
 
     subroutine display_solver_settings_parallel(parallel)
         !> Displays parallel processing settings.

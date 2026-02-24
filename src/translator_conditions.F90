@@ -2,61 +2,93 @@ submodule(inout_input_translator) input_translator_conditions
     implicit none
 contains
 
-    module subroutine execute_condition_boundary(self, input, index, target_physics, config_bc)
+    module subroutine execute_condition_boundary(self, input, index, target_physics, config)
         implicit none
         class(type_input_translator), intent(in) :: self
         class(type_input), intent(in) :: input
         integer(int32), intent(in) :: index
         type(type_constant_id), intent(in) :: target_physics
-        type(type_config_bc), intent(inout) :: config_bc
+        class(abst_config), intent(inout) :: config
 
         integer(int32) :: i
 
-        config_bc%boundary_id = input%conditions%boundary_conditions(index)%id
+        select type (config)
+        type is (type_config_bc)
 
-        associate (physics_data => input%conditions%boundary_conditions(index)%physics(target_physics%id))
+            config%boundary_id = input%conditions%boundary_conditions(index)%id
 
-            if (.not. physics_data%is_active) return
+            associate (physics_data => input%conditions%boundary_conditions(index)%physics(target_physics%ID))
 
-            config_bc%physics_type = target_physics
-            config_bc%num_time_points = physics_data%num_time_points
+                if (.not. physics_data%is_active) return
 
-            if (target_physics == PHYSICS_TYPES%THERMAL) then
-                config_bc%bc_kind = THERMAL_BC_TYPES%to_object(physics_data%bc_type)
-            else if (target_physics == PHYSICS_TYPES%HYDRAULIC) then
-                config_bc%bc_kind = HYDRAULIC_BC_TYPES%to_object(physics_data%bc_type)
-            end if
+                config%physics_type = target_physics
+                config%num_time_points = physics_data%num_time_points
 
-            if (config_bc%bc_kind == THERMAL_BC_TYPES%DIRICHLET .or. &
-                config_bc%bc_kind == THERMAL_BC_TYPES%NEUMANN .or. &
-                config_bc%bc_kind == THERMAL_BC_TYPES%FLUX .or. &
-                config_bc%bc_kind == HYDRAULIC_BC_TYPES%DIRICHLET .or. &
-                config_bc%bc_kind == HYDRAULIC_BC_TYPES%NEUMANN .or. &
-                config_bc%bc_kind == HYDRAULIC_BC_TYPES%FLUX) then
+                if (target_physics == PHYSICS_TYPES%THERMAL) then
+                    config%bc_kind = THERMAL_BC_TYPES%to_object(physics_data%bc_type)
+                else if (target_physics == PHYSICS_TYPES%HYDRAULIC) then
+                    config%bc_kind = HYDRAULIC_BC_TYPES%to_object(physics_data%bc_type)
+                end if
 
-                config_bc%num_variables = 1
-                call allocate_array(config_bc%time_points, config_bc%num_time_points)
-                call allocate_array(config_bc%values, config_bc%num_variables, config_bc%num_time_points)
+                if (config%bc_kind == THERMAL_BC_TYPES%DIRICHLET .or. &
+                    config%bc_kind == THERMAL_BC_TYPES%NEUMANN .or. &
+                    config%bc_kind == THERMAL_BC_TYPES%FLUX .or. &
+                    config%bc_kind == HYDRAULIC_BC_TYPES%DIRICHLET .or. &
+                    config%bc_kind == HYDRAULIC_BC_TYPES%NEUMANN .or. &
+                    config%bc_kind == HYDRAULIC_BC_TYPES%FLUX) then
 
-                do i = 1, config_bc%num_time_points
-                    config_bc%time_points(i) = physics_data%values(i)%time
-                    config_bc%values(1, i) = physics_data%values(i)%value
-                end do
+                    config%num_variables = 1
+                    call allocate_array(config%time_points, config%num_time_points)
+                    call allocate_array(config%values, config%num_variables, config%num_time_points)
 
-            else if (config_bc%bc_kind == THERMAL_BC_TYPES%ROBIN .or. &
-                     config_bc%bc_kind == THERMAL_BC_TYPES%CONVECTIVE .or. &
-                     config_bc%bc_kind == THERMAL_BC_TYPES%RADIATION) then
+                    do i = 1, config%num_time_points
+                        config%time_points(i) = physics_data%values(i)%time
+                        config%values(1, i) = physics_data%values(i)%value
+                    end do
 
-                config_bc%num_variables = 2
-                call allocate_array(config_bc%time_points, config_bc%num_time_points)
-                call allocate_array(config_bc%values, config_bc%num_variables, config_bc%num_time_points)
+                else if (config%bc_kind == THERMAL_BC_TYPES%ROBIN .or. &
+                         config%bc_kind == THERMAL_BC_TYPES%CONVECTIVE .or. &
+                         config%bc_kind == THERMAL_BC_TYPES%RADIATION) then
 
-                ! Assign values for 2 variables here
-            else
-                config_bc%num_variables = 0
-            end if
+                    config%num_variables = 2
+                    call allocate_array(config%time_points, config%num_time_points)
+                    call allocate_array(config%values, config%num_variables, config%num_time_points)
 
-        end associate
+                    ! Assign values for 2 variables here
+                else
+                    config%num_variables = 0
+                end if
+
+            end associate
+        end select
 
     end subroutine execute_condition_boundary
+
+    module subroutine execute_condition_initial(self, input, target_physics, config)
+        implicit none
+        class(type_input_translator), intent(in) :: self
+        class(type_input), intent(in) :: input
+        type(type_constant_id), intent(in) :: target_physics
+        class(abst_config), intent(inout) :: config
+
+        select type (config)
+        type is (type_config_ic)
+            if (.not. PHYSICS_TYPES%is_valid(target_physics)) then
+                call config%reset()
+                return
+            end if
+
+            config%physics_type = target_physics
+            associate (condition_data => input%conditions%initial_conditions%physics(target_physics%ID))
+                config%ic_kind = IC_METHODS%to_object(condition_data%type)
+                if (config%ic_kind == IC_METHODS%UNIFORM) then
+                    config%value = condition_data%value
+                else
+                    ! Handle other IC methods if needed
+                end if
+            end associate
+
+        end select
+
+    end subroutine execute_condition_initial
 end submodule input_translator_conditions

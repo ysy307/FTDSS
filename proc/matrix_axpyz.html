@@ -180,7 +180,7 @@ Stores the result in matrix C.</p>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-alpha~27"></span>
+              <span class="anchor" id="variable-alpha~15"></span>
               real(kind=real64),
             </td>
 <td>intent(in)</td>
@@ -196,7 +196,7 @@ Stores the result in matrix C.</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-a~25"></span>
+              <span class="anchor" id="variable-a~12"></span>
               class(<a href='../type/abst_matrix.html'>abst_matrix</a>),
             </td>
 <td>intent(in)</td>
@@ -211,7 +211,7 @@ Stores the result in matrix C.</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-b~5"></span>
+              <span class="anchor" id="variable-b~3"></span>
               class(<a href='../type/abst_matrix.html'>abst_matrix</a>),
             </td>
 <td>intent(in)</td>
@@ -226,7 +226,7 @@ Stores the result in matrix C.</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-c~3"></span>
+              <span class="anchor" id="variable-c"></span>
               class(<a href='../type/abst_matrix.html'>abst_matrix</a>),
             </td>
 <td>intent(inout)</td>
@@ -241,7 +241,7 @@ Stores the result in matrix C.</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-ierr~41"></span>
+              <span class="anchor" id="variable-ierr~12"></span>
               integer(kind=int32),
             </td>
 <td>intent(inout)</td>
@@ -416,15 +416,15 @@ large graphs.</div>
 <span class="w">                    </span><span class="n">B_data</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">B</span><span class="p">%</span><span class="n">get_val</span><span class="p">()</span>
 <span class="w">                    </span><span class="n">C_data</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">C</span><span class="p">%</span><span class="n">get_val</span><span class="p">()</span>
 <span class="w">                    </span><span class="n">C_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">alpha</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">A_data</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">B_data</span>
-<span class="w">                    </span><span class="n">ierr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MATRIX_STATUS_SUCCESS</span>
+<span class="w">                    </span><span class="n">ierr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MATRIX_STATUS</span><span class="p">%</span><span class="n">SUCCESS</span><span class="p">%</span><span class="n">ID</span>
 <span class="w">                </span><span class="k">class </span><span class="n">default</span>
-<span class="w">                    </span><span class="n">ierr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MATRIX_STATUS_ILL_OPERATIONS</span>
+<span class="w">                    </span><span class="n">ierr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MATRIX_STATUS</span><span class="p">%</span><span class="n">ILL_OPERATIONS</span><span class="p">%</span><span class="n">ID</span>
 <span class="w">                </span><span class="k">end select</span>
 <span class="k">            class </span><span class="n">default</span>
-<span class="w">                </span><span class="n">ierr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MATRIX_STATUS_ILL_OPERATIONS</span>
+<span class="w">                </span><span class="n">ierr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MATRIX_STATUS</span><span class="p">%</span><span class="n">ILL_OPERATIONS</span><span class="p">%</span><span class="n">ID</span>
 <span class="w">            </span><span class="k">end select</span>
 <span class="k">        class </span><span class="n">default</span>
-<span class="w">            </span><span class="n">ierr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MATRIX_STATUS_ILL_OPERATIONS</span>
+<span class="w">            </span><span class="n">ierr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MATRIX_STATUS</span><span class="p">%</span><span class="n">ILL_OPERATIONS</span><span class="p">%</span><span class="n">ID</span>
 <span class="w">        </span><span class="k">end select</span>
 
 <span class="k">    end subroutine </span><span class="n">matrix_axpyz</span>
@@ -451,7 +451,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-22 12:12 +0000             </p>
+ on 2026-02-23 23:52 +0000             </p>
           </div>
         </div>
         <br>

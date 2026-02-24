@@ -2,8 +2,7 @@ module core_utils
     use :: core_string_utils, only: &
         join, &
         filter, &
-        modify_path_format, &
-        get_bc_type_from_string
+        modify_path_format
     use :: core_unique, only: &
         unique
     use :: core_system_env, only: &

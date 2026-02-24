@@ -15,8 +15,17 @@ module core_types
         type_gauss_integration_rule
     use :: core_types_physics_state, only: &
         type_state
-    use :: core_types_physics_config_bc, only: &
-        type_config_bc
+    use :: core_types_config_base, only: &
+        abst_config
+    use :: core_types_config_conditions, only: &
+        type_config_bc, &
+        type_config_ic
+    use :: core_types_config_physics, only: &
+        abst_config_physics_model, &
+        abst_config_physics_material, &
+        type_config_wrf, &
+        type_config_hcf, &
+        type_config_gcc
     use :: core_types_physics_info, only: &
         type_physics_info
     use :: core_types_physics_meteorology, only: &
@@ -41,5 +50,6 @@ module core_types
     use :: core_types_solar, only: &
         type_solar_system
     implicit none
+    public
 
 end module core_types

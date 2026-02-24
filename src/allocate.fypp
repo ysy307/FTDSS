@@ -1,0 +1,241 @@
+#:set kinds_map = [ &
+    ('integer', 'int8',      'int8'), &
+    ('integer', 'int16',     'int16'), &
+    ('integer', 'int32',     'int32'), &
+    ('integer', 'int64',     'int64'), &
+    ('real',    'real32',    'real32'), &
+    ('real',    'real64',    'real64'), &
+    ('real',    'real128',   'real128'), &
+    ('logical', '1',         'logical1'), &
+    ('logical', '4',         'logical4'), &
+    ('logical', '8',         'logical8') &
+    ]
+#:set arg_kinds = ['int8', 'int16', 'int32', 'int64']
+
+module core_allocate
+    use, intrinsic :: iso_fortran_env
+    use :: core_constants, only:ERROR_CODES
+    use :: core_error, only:raise_error
+    implicit none
+    private
+
+    public :: allocate_array
+
+    interface allocate_array
+        #:for type_name, kind_name, suffix in kinds_map
+            module procedure :: allocate_rank1_${suffix}$_source
+            #:for akind in arg_kinds
+                module procedure :: allocate_rank1_${suffix}$_len_${akind}$
+                #:if not (type_name == 'integer' and suffix == akind)
+                    module procedure :: allocate_rank1_${suffix}$_bnds_${akind}$
+                #:endif
+            #:endfor
+
+            module procedure :: allocate_rank2_${suffix}$_source
+            #:for akind in arg_kinds
+                module procedure :: allocate_rank2_${suffix}$_sz_${akind}$
+            #:endfor
+
+            module procedure :: allocate_rank3_${suffix}$_source
+            #:for akind in arg_kinds
+                module procedure :: allocate_rank3_${suffix}$_sz_${akind}$
+            #:endfor
+        #:endfor
+    end interface
+
+contains
+
+    #:for type_name, kind_name, suffix in kinds_map
+        ! ----------------------------------------------------------
+        ! Rank-1 Implementations
+        ! ----------------------------------------------------------
+        subroutine allocate_rank1_${suffix}$_source(array, source)
+            implicit none
+            ${type_name}$ (${kind_name}$), intent(inout), allocatable :: array(:)
+            ${type_name}$ (${kind_name}$), intent(in) :: source(:)
+            integer(int32) :: stat
+
+            if (allocated(array)) then
+                if (size(array) == size(source)) then
+                    array = source
+                    return
+                end if
+                deallocate (array)
+            end if
+            allocate (array, source=source, stat=stat)
+            if (stat /= 0) call raise_error(ERROR_CODES%ALLOC_FAILED, &
+                                            scope="core_allocate:allocate_rank1_${suffix}$_source", &
+                                            line=__LINE__)
+        end subroutine allocate_rank1_${suffix}$_source
+
+        #:for akind in arg_kinds
+            subroutine allocate_rank1_${suffix}$_len_${akind}$ (array, length, source)
+                implicit none
+                ${type_name}$ (${kind_name}$), intent(inout), allocatable :: array(:)
+                integer(${akind}$), intent(in) :: length
+                ${type_name}$ (${kind_name}$), intent(in), optional :: source(:)
+                integer(int32) :: stat
+
+                if (allocated(array)) then
+                    if (size(array) == length) then
+                        if (present(source)) array = source
+                        return
+                    end if
+                    deallocate (array)
+                end if
+
+                if (length > 0) then
+                    if (present(source)) then
+                        allocate (array(length), source=source, stat=stat)
+                    else
+                        allocate (array(length), stat=stat)
+                    end if
+                    if (stat /= 0) call raise_error(ERROR_CODES%ALLOC_FAILED, &
+                                                    scope="core_allocate:allocate_rank1_${suffix}$_len_${akind}$", &
+                                                    line=__LINE__)
+                end if
+            end subroutine allocate_rank1_${suffix}$_len_${akind}$
+
+            subroutine allocate_rank1_${suffix}$_bnds_${akind}$ (array, bounds, source)
+                implicit none
+                ${type_name}$ (${kind_name}$), intent(inout), allocatable :: array(:)
+                integer(${akind}$), intent(in) :: bounds(:)
+                ${type_name}$ (${kind_name}$), intent(in), optional :: source(:)
+                integer(int32) :: stat
+                integer(${akind}$) :: lb, ub
+
+                if (size(bounds) /= 2) return
+                lb = bounds(1)
+                ub = bounds(2)
+
+                if (allocated(array)) then
+                    if (size(array) == (ub - lb + 1)) then
+                        if (present(source)) array = source
+                        return
+                    end if
+                    deallocate (array)
+                end if
+
+                if (ub >= lb) then
+                    if (present(source)) then
+                        allocate (array(lb:ub), source=source, stat=stat)
+                    else
+                        allocate (array(lb:ub), stat=stat)
+                    end if
+                    if (stat /= 0) call raise_error(ERROR_CODES%ALLOC_FAILED, &
+                                                    scope="core_allocate:allocate_rank1_${suffix}$_bnds_${akind}$", &
+                                                    line=__LINE__)
+                end if
+            end subroutine allocate_rank1_${suffix}$_bnds_${akind}$
+        #:endfor
+
+        ! ----------------------------------------------------------
+        ! Rank-2 Implementations
+        ! ----------------------------------------------------------
+        subroutine allocate_rank2_${suffix}$_source(array, source)
+            implicit none
+            ${type_name}$ (${kind_name}$), intent(inout), allocatable :: array(:, :)
+            ${type_name}$ (${kind_name}$), intent(in) :: source(:, :)
+            integer(int32) :: stat
+
+            if (allocated(array)) then
+                if (size(array, 1) == size(source, 1) .and. &
+                    size(array, 2) == size(source, 2)) then
+                    array = source
+                    return
+                end if
+                deallocate (array)
+            end if
+            allocate (array, source=source, stat=stat)
+            if (stat /= 0) call raise_error(ERROR_CODES%ALLOC_FAILED, &
+                                            scope="core_allocate:allocate_rank2_${suffix}$_source", &
+                                            line=__LINE__)
+        end subroutine allocate_rank2_${suffix}$_source
+
+        #:for akind in arg_kinds
+            subroutine allocate_rank2_${suffix}$_sz_${akind}$ (array, dim1, dim2, source)
+                implicit none
+                ${type_name}$ (${kind_name}$), intent(inout), allocatable :: array(:, :)
+                integer(${akind}$), intent(in) :: dim1, dim2
+                ${type_name}$ (${kind_name}$), intent(in), optional :: source(:, :)
+                integer(int32) :: stat
+
+                if (allocated(array)) then
+                    if (size(array, 1) == dim1 .and. size(array, 2) == dim2) then
+                        if (present(source)) array = source
+                        return
+                    end if
+                    deallocate (array)
+                end if
+
+                if (dim1 > 0 .and. dim2 > 0) then
+                    if (present(source)) then
+                        allocate (array(dim1, dim2), source=source, stat=stat)
+                    else
+                        allocate (array(dim1, dim2), stat=stat)
+                    end if
+                    if (stat /= 0) call raise_error(ERROR_CODES%ALLOC_FAILED, &
+                                                    scope="core_allocate:allocate_rank2_${suffix}$_sz_${akind}$", &
+                                                    line=__LINE__)
+                end if
+            end subroutine allocate_rank2_${suffix}$_sz_${akind}$
+        #:endfor
+
+        ! ----------------------------------------------------------
+        ! Rank-3 Implementations
+        ! ----------------------------------------------------------
+        subroutine allocate_rank3_${suffix}$_source(array, source)
+            implicit none
+            ${type_name}$ (${kind_name}$), intent(inout), allocatable :: array(:, :, :)
+            ${type_name}$ (${kind_name}$), intent(in) :: source(:, :, :)
+            integer(int32) :: stat
+
+            if (allocated(array)) then
+                if (size(array, 1) == size(source, 1) .and. &
+                    size(array, 2) == size(source, 2) .and. &
+                    size(array, 3) == size(source, 3)) then
+                    array = source
+                    return
+                end if
+                deallocate (array)
+            end if
+            allocate (array, source=source, stat=stat)
+            if (stat /= 0) call raise_error(ERROR_CODES%ALLOC_FAILED, &
+                                            scope="core_allocate:allocate_rank3_${suffix}$_source", &
+                                            line=__LINE__)
+        end subroutine allocate_rank3_${suffix}$_source
+
+        #:for akind in arg_kinds
+            subroutine allocate_rank3_${suffix}$_sz_${akind}$ (array, dim1, dim2, dim3, source)
+                implicit none
+                ${type_name}$ (${kind_name}$), intent(inout), allocatable :: array(:, :, :)
+                integer(${akind}$), intent(in) :: dim1, dim2, dim3
+                ${type_name}$ (${kind_name}$), intent(in), optional :: source(:, :, :)
+                integer(int32) :: stat
+
+                if (allocated(array)) then
+                    if (size(array, 1) == dim1 .and. &
+                        size(array, 2) == dim2 .and. &
+                        size(array, 3) == dim3) then
+                        if (present(source)) array = source
+                        return
+                    end if
+                    deallocate (array)
+                end if
+
+                if (dim1 > 0 .and. dim2 > 0 .and. dim3 > 0) then
+                    if (present(source)) then
+                        allocate (array(dim1, dim2, dim3), source=source, stat=stat)
+                    else
+                        allocate (array(dim1, dim2, dim3), stat=stat)
+                    end if
+                    if (stat /= 0) call raise_error(ERROR_CODES%ALLOC_FAILED, &
+                                                    scope="core_allocate:allocate_rank3_${suffix}$_sz_${akind}$", &
+                                                    line=__LINE__)
+                end if
+            end subroutine allocate_rank3_${suffix}$_sz_${akind}$
+        #:endfor
+
+    #:endfor
+
+end module core_allocate

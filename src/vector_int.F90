@@ -24,7 +24,7 @@ contains
         call allocate_array(self%val, self%num_blocks * self%num_nodes)
         self%val = 0 ! 一括初期化
 
-        self%status = VECTOR_STATUS_SUCCESS
+        self%status = VECTOR_STATUS%SUCCESS
         self%is_initialized_vector = .true.
     end subroutine initialize_vector_int
 
@@ -38,7 +38,7 @@ contains
         if (allocated(self%val)) call deallocate_array(self%val)
         self%num_nodes = 0
         self%num_blocks = 0
-        self%status = VECTOR_STATUS_SUCCESS
+        self%status = VECTOR_STATUS%SUCCESS
         self%is_initialized_vector = .false.
     end subroutine destroy_vector_int
 
@@ -76,7 +76,7 @@ contains
     module pure function get_status_vector_int(self) result(status)
         implicit none
         class(type_vector_int), intent(in) :: self
-        integer(int32) :: status
+        type(type_constant_id) :: status
 
         status = self%status
     end function get_status_vector_int
@@ -87,16 +87,20 @@ contains
     module subroutine set_array_vector_int(self, op, array_value, row_block)
         implicit none
         class(type_vector_int), intent(inout) :: self
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         integer(int32), intent(in) :: array_value(:)
         integer(int32), intent(in), optional :: row_block
 
         integer(int32) :: nb
-        nb = 1
-        if (present(row_block)) nb = row_block
 
+        if (.not. VECTOR_OPS%is_valid(op)) then
+            self%status = VECTOR_STATUS%ILL_OPERATIONS
+            return
+        end if
+
+        nb = optval(row_block, 1)
         if (.not. value_in_range(nb, 1_int32, self%num_blocks)) then
-            self%status = VECTOR_STATUS_OUT_OF_MEMORY
+            self%status = VECTOR_STATUS%OUT_OF_MEMORY
             return
         end if
 
@@ -107,14 +111,13 @@ contains
         end if
 
         associate (val => self%val, n_blks => self%num_blocks)
-            select case (op)
-            case (OP_INS)
+            if (op == VECTOR_OPS%INS) then
                 val(nb :: n_blks) = array_value
-            case (OP_ADD)
+            else if (op == VECTOR_OPS%ADD) then
                 val(nb :: n_blks) = val(nb :: n_blks) + array_value
-            case default
-                self%status = VECTOR_STATUS_ILL_OPERATIONS
-            end select
+            else
+                self%status = VECTOR_STATUS%ILL_OPERATIONS
+            end if
         end associate
     end subroutine set_array_vector_int
 
@@ -124,33 +127,37 @@ contains
     module subroutine set_value_at_index_vector_int(self, op, global_index, value, row_block)
         implicit none
         class(type_vector_int), intent(inout) :: self
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         integer(int32), intent(in) :: global_index
         integer(int32), intent(in) :: value
         integer(int32), intent(in), optional :: row_block
 
         integer(int32) :: nb, idx
-        nb = 1
-        if (present(row_block)) nb = row_block
+
+        if (.not. VECTOR_OPS%is_valid(op)) then
+            self%status = VECTOR_STATUS%ILL_OPERATIONS
+            return
+        end if
+        nb = optval(row_block, 1)
 
 #ifdef USE_DEBUG
         if (.not. value_in_range(nb, 1_int32, self%num_blocks) .or. &
             .not. value_in_range(global_index, 1_int32, self%num_nodes)) then
-            self%status = VECTOR_STATUS_OUT_OF_MEMORY
+            self%status = VECTOR_STATUS%OUT_OF_MEMORY
             return
         end if
 #endif
 
         idx = (global_index - 1) * self%num_blocks + nb
 
-        select case (op)
-        case (OP_INS)
+        if (op == VECTOR_OPS%INS) then
             self%val(idx) = value
-        case (OP_ADD)
+        else if (op == VECTOR_OPS%ADD) then
             self%val(idx) = self%val(idx) + value
-        case default
-            self%status = VECTOR_STATUS_ILL_OPERATIONS
-        end select
+        else
+            self%status = VECTOR_STATUS%ILL_OPERATIONS
+        end if
+
     end subroutine set_value_at_index_vector_int
 
     !>
@@ -159,7 +166,7 @@ contains
     module subroutine set_values_at_indices_vector_int(self, op, global_indices, new_values, row_block)
         implicit none
         class(type_vector_int), intent(inout) :: self
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         integer(int32), intent(in) :: global_indices(:)
         integer(int32), intent(in) :: new_values(:)
         integer(int32), intent(in), optional :: row_block
@@ -167,12 +174,15 @@ contains
         integer(int32) :: nb
         integer(int32), allocatable :: target_indices(:)
 
-        nb = 1
-        if (present(row_block)) nb = row_block
+        if (.not. VECTOR_OPS%is_valid(op)) then
+            self%status = VECTOR_STATUS%ILL_OPERATIONS
+            return
+        end if
+        nb = optval(row_block, 1)
 
 #ifdef USE_DEBUG
         if (.not. value_in_range(nb, 1_int32, self%num_blocks)) then
-            self%status = VECTOR_STATUS_OUT_OF_MEMORY
+            self%status = VECTOR_STATUS%OUT_OF_MEMORY
             return
         end if
 #endif
@@ -182,20 +192,19 @@ contains
 
 #ifdef USE_DEBUG
         if (any(target_indices < 1 .or. target_indices > size(self%val))) then
-            self%status = VECTOR_STATUS_OUT_OF_MEMORY
+            self%status = VECTOR_STATUS%OUT_OF_MEMORY
             call deallocate_array(target_indices)
             return
         end if
 #endif
 
-        select case (op)
-        case (OP_INS)
+        if (op == VECTOR_OPS%INS) then
             self%val(target_indices) = new_values
-        case (OP_ADD)
+        else if (op == VECTOR_OPS%ADD) then
             self%val(target_indices) = self%val(target_indices) + new_values
-        case default
-            self%status = VECTOR_STATUS_ILL_OPERATIONS
-        end select
+        else
+            self%status = VECTOR_STATUS%ILL_OPERATIONS
+        end if
 
         call deallocate_array(target_indices)
     end subroutine set_values_at_indices_vector_int
@@ -206,21 +215,28 @@ contains
     module subroutine scale_vector_int(self, op, alpha)
         implicit none
         class(type_vector_int), intent(inout) :: self
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         class(type_vector_int), intent(in) :: alpha
 
         integer(int32) :: i
         integer(int32), dimension(:), pointer :: alpha_data
 
+        if (.not. VECTOR_OPS%is_valid(op)) then
+            self%status = VECTOR_STATUS%ILL_OPERATIONS
+            return
+        end if
+
         alpha_data => alpha%get_data()
 
-        select case (op)
-
-        case (OP_SCALE_SYMM_DIAG, OP_SCALE_JACOBI)
-            self%val = self%val * alpha_data
-        case default
-            self%status = VECTOR_STATUS_ILL_OPERATIONS
-        end select
+        if (op == VECTOR_OPS%SCALE_SYMM_DIAG .or. op == VECTOR_OPS%SCALE_JACOBI) then
+            if (size(alpha_data) /= self%num_nodes) then
+                self%status = VECTOR_STATUS%ILL_OPERATIONS
+                return
+            end if
+        else
+            self%status = VECTOR_STATUS%ILL_OPERATIONS
+            return
+        end if
 
     end subroutine scale_vector_int
 
@@ -243,7 +259,7 @@ contains
             self%val = source_vector%val
         end if
 
-        self%status = VECTOR_STATUS_SUCCESS
+        self%status = VECTOR_STATUS%SUCCESS
     end subroutine copy_vector_int
 
     !>
@@ -288,18 +304,21 @@ contains
         implicit none
         class(type_vector_int), intent(in) :: self
 
-        select case (self%status)
-        case (VECTOR_STATUS_SUCCESS)
-            ! 正常
-        case (VECTOR_STATUS_OUT_OF_MEMORY)
+        if (.not. self%is_initialized_vector) then
+            write (*, *) "Error: Vector not initialized."
+            return
+        end if
+        if (self%status == VECTOR_STATUS%SUCCESS) return
+        if (self%status == VECTOR_STATUS%OUT_OF_MEMORY) then
             write (*, *) "Error: Vector operation failed due to out of memory."
-        case (VECTOR_STATUS_ILL_OPERATIONS)
+        else if (self%status == VECTOR_STATUS%ILL_OPERATIONS) then
             write (*, *) "Error: Vector operation failed due to illegal operation."
-        case (VECTOR_STATUS_NOT_IMPLEMENTED)
+        else if (self%status == VECTOR_STATUS%NOT_IMPLEMENTED) then
             write (*, *) "Error: Vector operation not implemented."
-        case default
+        else
             write (*, *) "Error: Vector operation failed due to unknown error."
-        end select
+        end if
+
     end subroutine check_vector_int
 
 end submodule core_types_vector_int

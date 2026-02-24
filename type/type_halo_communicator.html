@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 1.8% of total for derived types.</p>Including implementation: 345 statements,  2.0% of total for derived types.">40 statements</a>
+                 title="<p> 1.3% of total for derived types.</p>Including implementation: 345 statements,  1.5% of total for derived types.">40 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -135,7 +135,7 @@
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../type/type_halo_communicator.html#variable-comm">comm</a>
-            <a class="list-group-item" href="../type/type_halo_communicator.html#variable-is_initialized~9">is_initialized</a>
+            <a class="list-group-item" href="../type/type_halo_communicator.html#variable-is_initialized~7">is_initialized</a>
             <a class="list-group-item" href="../type/type_halo_communicator.html#variable-my_rank~3">my_rank</a>
             <a class="list-group-item" href="../type/type_halo_communicator.html#variable-num_partners">num_partners</a>
             <a class="list-group-item" href="../type/type_halo_communicator.html#variable-num_procs~3">num_procs</a>
@@ -195,15 +195,15 @@
             <a class="list-group-item" href="../type/type_halo_communicator.html#boundprocedure-assemble_scalar">assemble_scalar</a>
             <a class="list-group-item" href="../type/type_halo_communicator.html#boundprocedure-assemble_vector">assemble_vector</a>
             <a class="list-group-item" href="../type/type_halo_communicator.html#boundprocedure-build_communication_schedule">build_communication_schedule</a>
-            <a class="list-group-item" href="../type/type_halo_communicator.html#boundprocedure-display~22">display</a>
+            <a class="list-group-item" href="../type/type_halo_communicator.html#boundprocedure-display~34">display</a>
             <a class="list-group-item" href="../type/type_halo_communicator.html#boundprocedure-ensure_buffers_ready">ensure_buffers_ready</a>
             <a class="list-group-item" href="../type/type_halo_communicator.html#boundprocedure-exchange_and_operate_scalar_impl">exchange_and_operate_scalar_impl</a>
             <a class="list-group-item" href="../type/type_halo_communicator.html#boundprocedure-exchange_and_operate_vector_impl">exchange_and_operate_vector_impl</a>
             <a class="list-group-item" href="../type/type_halo_communicator.html#boundprocedure-exchange_communication_plan">exchange_communication_plan</a>
             <a class="list-group-item" href="../type/type_halo_communicator.html#boundprocedure-exchange_gids_and_build_indices">exchange_gids_and_build_indices</a>
-            <a class="list-group-item" href="../type/type_halo_communicator.html#boundprocedure-initialize~54">initialize</a>
+            <a class="list-group-item" href="../type/type_halo_communicator.html#boundprocedure-initialize~55">initialize</a>
             <a class="list-group-item" href="../type/type_halo_communicator.html#boundprocedure-setup_local_sorted_nodes">setup_local_sorted_nodes</a>
-            <a class="list-group-item" href="../type/type_halo_communicator.html#boundprocedure-update~5">update</a>
+            <a class="list-group-item" href="../type/type_halo_communicator.html#boundprocedure-update~7">update</a>
             <a class="list-group-item" href="../type/type_halo_communicator.html#boundprocedure-update_scalar">update_scalar</a>
             <a class="list-group-item" href="../type/type_halo_communicator.html#boundprocedure-update_vector~2">update_vector</a>
         </div>
@@ -349,7 +349,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-is_initialized~9"></span>
+              <span class="anchor" id="variable-is_initialized~7"></span>
               logical,
             </td>
               <td>private</td>
@@ -710,7 +710,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~900"></span>
+              <span class="anchor" id="variable-self~1077"></span>
               type(<a href='type_halo_communicator.html'>type_halo_communicator</a>),
             </td>
 <td>intent(inout)</td>
@@ -1099,7 +1099,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-display~22"></span>
+      <span class="anchor" id="boundprocedure-display~34"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>display</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/display_communicator_state.html'>display_communicator_state</a>
@@ -1262,7 +1262,7 @@ large graphs.</div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/exchange_and_operate_scalar_impl.html'>exchange_and_operate_scalar_impl</a>(self, data_array, operation)  
+    private  subroutine <a href='../proc/exchange_and_operate_scalar_impl.html'>exchange_and_operate_scalar_impl</a>(self, op, data_array)  
 </h3>
     
 
@@ -1297,6 +1297,21 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
               real(kind=real64),
             </td>
 <td>intent(inout)</td>
@@ -1305,21 +1320,6 @@ large graphs.</div>
             </td>
             <td>::</td>
             <td><strong>data_array</strong>(:)</td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              integer(kind=int32),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>operation</strong></td>
             <td>
 
             </td>
@@ -1346,7 +1346,7 @@ large graphs.</div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/exchange_and_operate_vector_impl.html'>exchange_and_operate_vector_impl</a>(self, data_array, num_components, operation)  
+    private  subroutine <a href='../proc/exchange_and_operate_vector_impl.html'>exchange_and_operate_vector_impl</a>(self, op, data_array, num_components)  
 </h3>
     
 
@@ -1381,6 +1381,21 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
               real(kind=real64),
             </td>
 <td>intent(inout)</td>
@@ -1404,21 +1419,6 @@ large graphs.</div>
             </td>
             <td>::</td>
             <td><strong>num_components</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              integer(kind=int32),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>operation</strong></td>
             <td>
 
             </td>
@@ -1633,7 +1633,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~54"></span>
+      <span class="anchor" id="boundprocedure-initialize~55"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>initialize</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/initialize_halo_communicator.html'>initialize_halo_communicator</a>
@@ -1731,7 +1731,7 @@ large graphs.</div>
 </h3>
     
 
-  <p>自領域の境界ノード(NODE_BORDER)を抽出し，GIDでソートして保持する．</p><a href="../proc/setup_local_sorted_nodes.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+  <p>自領域の境界ノード(COMM_NODE_TYPES%BORDER)を抽出し，GIDでソートして保持する．</p><a href="../proc/setup_local_sorted_nodes.html" class="pull-right"><emph>Read more&hellip;</emph></a>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -1786,7 +1786,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-update~5"></span>
+      <span class="anchor" id="boundprocedure-update~7"></span>
       <h3>
           generic, public ::
   <strong>update</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_halo_communicator.html#boundprocedure-update_scalar'>update_scalar</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_halo_communicator.html#boundprocedure-update_vector~2'>update_vector</a>
@@ -2160,7 +2160,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-22 12:12 +0000             </p>
+ on 2026-02-23 23:52 +0000             </p>
           </div>
         </div>
         <br>

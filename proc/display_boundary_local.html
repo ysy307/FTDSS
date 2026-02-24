@@ -178,7 +178,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-boundary~4"></span>
+              <span class="anchor" id="variable-boundary~2"></span>
               type(<a href='../type/type_boundary_local.html'>type_boundary_local</a>),
             </td>
 <td>intent(in)</td>
@@ -193,7 +193,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-title~7"></span>
+              <span class="anchor" id="variable-title"></span>
               character(len=*),
             </td>
 <td>intent(in)</td>
@@ -208,7 +208,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-target_physics~4"></span>
+              <span class="anchor" id="variable-target_physics"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -244,37 +244,7 @@
 <span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="o">*</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">title</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">target_physics</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">n_vals</span>
-
-<span class="w">        </span><span class="c">! procedure(get_string), pointer :: p_get_string =&gt; null()</span>
-
-<span class="w">        </span><span class="c">! select case (target_physics)</span>
-<span class="w">        </span><span class="c">! case (PHYSICS_TYPE_THERMAL)</span>
-<span class="w">        </span><span class="c">!     p_get_string =&gt; get_thermal_bc_type_string</span>
-<span class="w">        </span><span class="c">! case (PHYSICS_TYPE_HYDRAULIC)</span>
-<span class="w">        </span><span class="c">!     p_get_string =&gt; get_hydraulic_bc_type_string</span>
-<span class="w">        </span><span class="c">! end select</span>
-
-<span class="w">        </span><span class="c">! write (*, &#39;(a, a, a)&#39;) &quot;    --- &quot;, trim(title), &quot; ---&quot;</span>
-<span class="w">        </span><span class="c">! write (*, &#39;(a, a)&#39;) &quot;      Type                : &quot;, p_get_string(boundary(target_physics)%type)</span>
-
-<span class="w">        </span><span class="c">! select case (p_get_string(boundary(target_physics)%type))</span>
-<span class="w">        </span><span class="c">! case (&quot;dirichlet&quot;, &quot;neumann&quot;, &quot;flux&quot;, &quot;robin&quot;, &quot;heat_transfer&quot;, &quot;head_radiation&quot;)</span>
-<span class="w">        </span><span class="c">!     if (allocated(boundary(target_physics)%values)) then</span>
-<span class="w">        </span><span class="c">!         n_vals = size(boundary(target_physics)%values)</span>
-<span class="w">        </span><span class="c">!         if (n_vals == 0) then</span>
-<span class="w">        </span><span class="c">!             write (*, &#39;(a)&#39;) &quot;      Values              : (0 points defined)&quot;</span>
-<span class="w">        </span><span class="c">!         else if (n_vals &lt;= 6) then</span>
-<span class="w">        </span><span class="c">!             write (*, &#39;(a, *(es12.4e2, :, &quot; &quot;))&#39;) &quot;      Values              : &quot;, boundary(target_physics)%values</span>
-<span class="w">        </span><span class="c">!         else</span>
-<span class="w">        </span><span class="c">!             write (*, &#39;(a, 3(es12.4e2, :, &quot; &quot;), a, 3(es12.4e2, :, &quot; &quot;))&#39;) &amp;</span>
-<span class="w">        </span><span class="c">!                 &quot;      Values (summary)    : &quot;, boundary(target_physics)%values(1:3), &quot; ... &quot;, boundary(target_physics)%values(n_vals - 2:n_vals)</span>
-<span class="w">        </span><span class="c">!         end if</span>
-<span class="w">        </span><span class="c">!     else</span>
-<span class="w">        </span><span class="c">!         write (*, &#39;(a)&#39;) &quot;      Values              : Not allocated&quot;</span>
-<span class="w">        </span><span class="c">!     end if</span>
-<span class="w">        </span><span class="c">! case default</span>
-<span class="w">        </span><span class="c">!     ! &quot;adiabatic&quot;のようなタイプは追加フィールドなし</span>
-<span class="w">        </span><span class="c">! end select</span>
+<span class="w">        </span>
 <span class="w">    </span><span class="k">end subroutine </span><span class="n">display_boundary_local</span>
 </pre></div>
 
@@ -299,7 +269,7 @@
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-22 12:12 +0000             </p>
+ on 2026-02-23 23:52 +0000             </p>
           </div>
         </div>
         <br>

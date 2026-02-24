@@ -1,0 +1,1023 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>get_prev_index &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>get_prev_index
+      <small>Function</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">11 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/variable.fypp"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/variable.fypp.html'>variable.fypp</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_types_variable.html'>core_types_variable</a></li>
+            <li class="breadcrumb-item active" aria-current="page">get_prev_index</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/get_prev_index.html#src">get_prev_index</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private pure function get_prev_index(self, current_idx) result(prev)  
+</h2>
+    
+
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_variable.html'>type_variable</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~1450"></span>
+              class(<a href='../type/type_variable.html'>type_variable</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-current_idx~2"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_idx</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+      <h3>Return Value
+        <small>
+          <span class="anchor" id="variable-prev~6"></span>
+          integer(kind=int32)
+        </small>
+      </h3>
+      
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~get_prev_index~~CalledByGraph Pages: 1 -->
+<svg id="procget_prev_indexCalledByGraph" width="641pt" height="81pt"
+ viewBox="0.00 0.00 641.00 80.88" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_prev_index~~CalledByGraph" class="graph" transform="scale(0.23 0.23) rotate(0) translate(4 341.49)">
+<title>proc~~get_prev_index~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-341.49 2734,-341.49 2734,4 -4,4"/>
+<!-- proc~get_prev_index -->
+<g id="proc~~get_prev_index~~CalledByGraph_node1" class="node">
+<title>proc~get_prev_index</title>
+<polygon fill="none" stroke="black" points="2730,-188.57 2556,-188.57 2556,-164.57 2730,-164.57 2730,-188.57"/>
+<text text-anchor="middle" x="2643" y="-174.17" font-family="Helvetica,sans-Serif" font-size="10.50">type_variable%get_prev_index</text>
+</g>
+<!-- proc~compute_time_derivative_variable -->
+<g id="proc~~get_prev_index~~CalledByGraph_node2" class="node">
+<title>proc~compute_time_derivative_variable</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node2"><a xlink:href="../proc/compute_time_derivative_variable.html" xlink:title="type_variable%compute_time_derivative_variable">
+<polygon fill="#d9534f" stroke="#d9534f" points="2219,-283.57 1941,-283.57 1941,-259.57 2219,-259.57 2219,-283.57"/>
+<text text-anchor="middle" x="2080" y="-269.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%compute_time_derivative_variable</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_time_derivative_variable&#45;&gt;proc~get_prev_index -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge1" class="edge">
+<title>proc~compute_time_derivative_variable&#45;&gt;proc~get_prev_index</title>
+<path fill="none" stroke="#ff0000" d="M2219.45,-276.21C2307.15,-275.65 2422.07,-268.39 2520,-240.57 2555.29,-230.54 2592.1,-209.55 2615.93,-194.34"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2617.92,-197.21 2624.39,-188.82 2614.1,-191.35 2617.92,-197.21"/>
+</g>
+<!-- proc~get_history -->
+<g id="proc~~get_prev_index~~CalledByGraph_node3" class="node">
+<title>proc~get_history</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node3"><a xlink:href="../proc/get_history.html" xlink:title="type_variable%get_history">
+<polygon fill="#d9534f" stroke="#d9534f" points="2464,-327.57 2311,-327.57 2311,-303.57 2464,-303.57 2464,-327.57"/>
+<text text-anchor="middle" x="2387.5" y="-313.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%get_history</text>
+</a>
+</g>
+</g>
+<!-- proc~get_history&#45;&gt;proc~get_prev_index -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge2" class="edge">
+<title>proc~get_history&#45;&gt;proc~get_prev_index</title>
+<path fill="none" stroke="#ff0000" d="M2464.26,-307.94C2483.15,-304.08 2502.89,-298.28 2520,-289.57 2564.84,-266.73 2605.17,-222.61 2626.35,-196.77"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2629.25,-198.76 2632.78,-188.77 2623.79,-194.37 2629.25,-198.76"/>
+</g>
+<!-- proc~get_previous_scalar -->
+<g id="proc~~get_prev_index~~CalledByGraph_node4" class="node">
+<title>proc~get_previous_scalar</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node4"><a xlink:href="../proc/get_previous_scalar.html" xlink:title="type_variable%get_previous_scalar">
+<polygon fill="#d9534f" stroke="#d9534f" points="1905,-81.57 1706,-81.57 1706,-57.57 1905,-57.57 1905,-81.57"/>
+<text text-anchor="middle" x="1805.5" y="-67.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%get_previous_scalar</text>
+</a>
+</g>
+</g>
+<!-- proc~get_previous_scalar&#45;&gt;proc~get_prev_index -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge3" class="edge">
+<title>proc~get_previous_scalar&#45;&gt;proc~get_prev_index</title>
+<path fill="none" stroke="#ff0000" d="M1846.1,-57.55C1957.65,-25.95 2281.82,50.35 2520,-50.57 2570.6,-72.01 2610.49,-125.84 2629.62,-155.73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2626.84,-157.89 2635.09,-164.53 2632.78,-154.19 2626.84,-157.89"/>
+</g>
+<!-- proc~get_previous_values -->
+<g id="proc~~get_prev_index~~CalledByGraph_node5" class="node">
+<title>proc~get_previous_values</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node5"><a xlink:href="../proc/get_previous_values.html" xlink:title="type_variable%get_previous_values">
+<polygon fill="#d9534f" stroke="#d9534f" points="2181,-237.57 1979,-237.57 1979,-213.57 2181,-213.57 2181,-237.57"/>
+<text text-anchor="middle" x="2080" y="-223.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%get_previous_values</text>
+</a>
+</g>
+</g>
+<!-- proc~get_previous_values&#45;&gt;proc~get_prev_index -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge4" class="edge">
+<title>proc~get_previous_values&#45;&gt;proc~get_prev_index</title>
+<path fill="none" stroke="#ff0000" d="M2181.23,-232.87C2270.76,-237.29 2405.13,-238.73 2520,-218.57 2549.67,-213.36 2581.83,-202.04 2605.68,-192.46"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2607.11,-195.65 2615.04,-188.62 2604.46,-189.18 2607.11,-195.65"/>
+</g>
+<!-- proc~restore_previous_step_variable -->
+<g id="proc~~get_prev_index~~CalledByGraph_node6" class="node">
+<title>proc~restore_previous_step_variable</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node6"><a xlink:href="../proc/restore_previous_step_variable.html" xlink:title="type_variable%restore_previous_step_variable">
+<polygon fill="#d9534f" stroke="#d9534f" points="2516.5,-167.57 2258.5,-167.57 2258.5,-143.57 2516.5,-143.57 2516.5,-167.57"/>
+<text text-anchor="middle" x="2387.5" y="-153.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%restore_previous_step_variable</text>
+</a>
+</g>
+</g>
+<!-- proc~restore_previous_step_variable&#45;&gt;proc~get_prev_index -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge5" class="edge">
+<title>proc~restore_previous_step_variable&#45;&gt;proc~get_prev_index</title>
+<path fill="none" stroke="#ff0000" d="M2516.74,-166.19C2526.48,-167 2536.2,-167.8 2545.69,-168.59"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2545.62,-172.1 2555.88,-169.43 2546.2,-165.12 2545.62,-172.1"/>
+</g>
+<!-- proc~set_previous_array_variable -->
+<g id="proc~~get_prev_index~~CalledByGraph_node7" class="node">
+<title>proc~set_previous_array_variable</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node7"><a xlink:href="../proc/set_previous_array_variable.html" xlink:title="type_variable%set_previous_array_variable">
+<polygon fill="#d9534f" stroke="#d9534f" points="2509,-83.57 2266,-83.57 2266,-59.57 2509,-59.57 2509,-83.57"/>
+<text text-anchor="middle" x="2387.5" y="-69.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%set_previous_array_variable</text>
+</a>
+</g>
+</g>
+<!-- proc~set_previous_array_variable&#45;&gt;proc~get_prev_index -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge6" class="edge">
+<title>proc~set_previous_array_variable&#45;&gt;proc~get_prev_index</title>
+<path fill="none" stroke="#ff0000" d="M2491.99,-83.58C2501.62,-86.04 2511.09,-89 2520,-92.57 2559.12,-108.23 2598.15,-138.26 2621.17,-157.85"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2619.05,-160.64 2628.9,-164.54 2623.64,-155.35 2619.05,-160.64"/>
+</g>
+<!-- proc~set_previous_scalar_all_variable -->
+<g id="proc~~get_prev_index~~CalledByGraph_node8" class="node">
+<title>proc~set_previous_scalar_all_variable</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node8"><a xlink:href="../proc/set_previous_scalar_all_variable.html" xlink:title="type_variable%set_previous_scalar_all_variable">
+<polygon fill="#d9534f" stroke="#d9534f" points="2520,-209.57 2255,-209.57 2255,-185.57 2520,-185.57 2520,-209.57"/>
+<text text-anchor="middle" x="2387.5" y="-195.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%set_previous_scalar_all_variable</text>
+</a>
+</g>
+</g>
+<!-- proc~set_previous_scalar_all_variable&#45;&gt;proc~get_prev_index -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge7" class="edge">
+<title>proc~set_previous_scalar_all_variable&#45;&gt;proc~get_prev_index</title>
+<path fill="none" stroke="#ff0000" d="M2520.08,-186.67C2528.73,-185.95 2537.36,-185.24 2545.79,-184.54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2546.3,-188.01 2555.98,-183.69 2545.72,-181.03 2546.3,-188.01"/>
+</g>
+<!-- proc~set_previous_scalar_variable -->
+<g id="proc~~get_prev_index~~CalledByGraph_node9" class="node">
+<title>proc~set_previous_scalar_variable</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node9"><a xlink:href="../proc/set_previous_scalar_variable.html" xlink:title="type_variable%set_previous_scalar_variable">
+<polygon fill="#d9534f" stroke="#d9534f" points="2511,-125.57 2264,-125.57 2264,-101.57 2511,-101.57 2511,-125.57"/>
+<text text-anchor="middle" x="2387.5" y="-111.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%set_previous_scalar_variable</text>
+</a>
+</g>
+</g>
+<!-- proc~set_previous_scalar_variable&#45;&gt;proc~get_prev_index -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge8" class="edge">
+<title>proc~set_previous_scalar_variable&#45;&gt;proc~get_prev_index</title>
+<path fill="none" stroke="#ff0000" d="M2477.34,-125.61C2491.69,-128.17 2506.32,-131.15 2520,-134.57 2547.95,-141.56 2578.61,-152.12 2602.21,-160.91"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2601.26,-164.3 2611.86,-164.55 2603.74,-157.75 2601.26,-164.3"/>
+</g>
+<!-- none~get_previous -->
+<g id="proc~~get_prev_index~~CalledByGraph_node10" class="node">
+<title>none~get_previous</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node10"><a xlink:href="../type/type_variable.html#boundprocedure-get_previous" xlink:title="type_variable%get_previous">
+<polygon fill="#a7506f" stroke="#a7506f" points="1371,-140.57 1209,-140.57 1209,-116.57 1371,-116.57 1371,-140.57"/>
+<text text-anchor="middle" x="1290" y="-126.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%get_previous</text>
+</a>
+</g>
+</g>
+<!-- none~get_previous&#45;&gt;proc~get_previous_scalar -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge11" class="edge">
+<title>none~get_previous&#45;&gt;proc~get_previous_scalar</title>
+<path fill="none" stroke="#7fff00" d="M1371.23,-117.81C1390.17,-115.36 1410.29,-112.81 1429,-110.57 1518.55,-99.84 1620.26,-88.81 1695.21,-80.89"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1696.03,-84.32 1705.61,-79.79 1695.3,-77.36 1696.03,-84.32"/>
+</g>
+<!-- none~get_previous&#45;&gt;proc~get_previous_values -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge12" class="edge">
+<title>none~get_previous&#45;&gt;proc~get_previous_values</title>
+<path fill="none" stroke="#00ff3f" d="M1326.82,-140.72C1346.79,-148.04 1371.83,-158.15 1393,-169.57 1410.15,-178.81 1410.55,-188.31 1429,-194.57 1525.7,-227.4 1809.97,-229.32 1968.67,-227.62"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="1968.98,-231.11 1978.94,-227.5 1968.9,-224.11 1968.98,-231.11"/>
+</g>
+<!-- none~set_previous -->
+<g id="proc~~get_prev_index~~CalledByGraph_node11" class="node">
+<title>none~set_previous</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node11"><a xlink:href="../type/type_variable.html#boundprocedure-set_previous" xlink:title="type_variable%set_previous">
+<polygon fill="#a7506f" stroke="#a7506f" points="2160,-143.57 2000,-143.57 2000,-119.57 2160,-119.57 2160,-143.57"/>
+<text text-anchor="middle" x="2080" y="-129.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%set_previous</text>
+</a>
+</g>
+</g>
+<!-- none~set_previous&#45;&gt;proc~set_previous_array_variable -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge13" class="edge">
+<title>none~set_previous&#45;&gt;proc~set_previous_array_variable</title>
+<path fill="none" stroke="#003fff" d="M2130.71,-119.56C2165.42,-111.39 2212.89,-100.64 2255,-92.57 2268.25,-90.03 2282.28,-87.56 2296.07,-85.25"/>
+<polygon fill="#003fff" stroke="#003fff" points="2296.74,-88.69 2306.04,-83.6 2295.6,-81.78 2296.74,-88.69"/>
+</g>
+<!-- none~set_previous&#45;&gt;proc~set_previous_scalar_all_variable -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge14" class="edge">
+<title>none~set_previous&#45;&gt;proc~set_previous_scalar_all_variable</title>
+<path fill="none" stroke="#7f00ff" d="M2122.93,-143.6C2158.01,-153.39 2209.49,-167.07 2255,-176.57 2267.44,-179.16 2280.61,-181.61 2293.61,-183.86"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="2293.06,-187.32 2303.51,-185.54 2294.23,-180.42 2293.06,-187.32"/>
+</g>
+<!-- none~set_previous&#45;&gt;proc~set_previous_scalar_variable -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge15" class="edge">
+<title>none~set_previous&#45;&gt;proc~set_previous_scalar_variable</title>
+<path fill="none" stroke="#ff00bf" d="M2160.07,-126.91C2188.63,-125.23 2221.7,-123.28 2253.6,-121.4"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="2254.13,-124.87 2263.91,-120.79 2253.72,-117.89 2254.13,-124.87"/>
+</g>
+<!-- proc~reflect_variables_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node12" class="node">
+<title>proc~reflect_variables_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node12"><a xlink:href="../proc/reflect_variables_ftdss.html" xlink:title="reflect_variables_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1118,-266.57 988,-266.57 988,-242.57 1118,-242.57 1118,-266.57"/>
+<text text-anchor="middle" x="1053" y="-252.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">reflect_variables_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;proc~compute_time_derivative_variable -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge9" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;proc~compute_time_derivative_variable</title>
+<path fill="none" stroke="#ff0000" d="M1118.12,-255.63C1279.01,-258.3 1703.17,-265.33 1930.35,-269.1"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1930.63,-272.61 1940.69,-269.27 1930.75,-265.61 1930.63,-272.61"/>
+</g>
+<!-- proc~set_state_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node13" class="node">
+<title>proc~set_state_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node13"><a xlink:href="../proc/set_state_ftdss.html" xlink:title="set_state_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="2125,-327.57 2035,-327.57 2035,-303.57 2125,-303.57 2125,-327.57"/>
+<text text-anchor="middle" x="2080" y="-313.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_state_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~set_state_ftdss&#45;&gt;proc~get_history -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge10" class="edge">
+<title>proc~set_state_ftdss&#45;&gt;proc~get_history</title>
+<path fill="none" stroke="#ffbf00" d="M2125.1,-315.57C2170.85,-315.57 2243.56,-315.57 2300.7,-315.57"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="2300.81,-319.07 2310.81,-315.57 2300.81,-312.07 2300.81,-319.07"/>
+</g>
+<!-- interface~reflect_variables_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node14" class="node">
+<title>interface~reflect_variables_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node14"><a xlink:href="../interface/reflect_variables_ftdss.html" xlink:title="type_ftdss%reflect_variables_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="886,-266.57 693,-266.57 693,-242.57 886,-242.57 886,-266.57"/>
+<text text-anchor="middle" x="789.5" y="-252.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%reflect_variables_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~reflect_variables_ftdss&#45;&gt;proc~reflect_variables_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge21" class="edge">
+<title>interface~reflect_variables_ftdss&#45;&gt;proc~reflect_variables_ftdss</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M886.02,-254.57C916.16,-254.57 949.01,-254.57 977.47,-254.57"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="977.74,-258.07 987.74,-254.57 977.74,-251.07 977.74,-258.07"/>
+</g>
+<!-- interface~set_state_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node15" class="node">
+<title>interface~set_state_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node15"><a xlink:href="../interface/set_state_ftdss.html" xlink:title="type_ftdss%set_state_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1882,-327.57 1729,-327.57 1729,-303.57 1882,-303.57 1882,-327.57"/>
+<text text-anchor="middle" x="1805.5" y="-313.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%set_state_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~set_state_ftdss&#45;&gt;proc~set_state_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge22" class="edge">
+<title>interface~set_state_ftdss&#45;&gt;proc~set_state_ftdss</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1882.04,-315.57C1927.35,-315.57 1983.91,-315.57 2024.78,-315.57"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="2024.82,-319.07 2034.82,-315.57 2024.82,-312.07 2024.82,-319.07"/>
+</g>
+<!-- proc~apply_ic_uniform -->
+<g id="proc~~get_prev_index~~CalledByGraph_node16" class="node">
+<title>proc~apply_ic_uniform</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node16"><a xlink:href="../proc/apply_ic_uniform.html" xlink:title="apply_ic_uniform">
+<polygon fill="#d9534f" stroke="#d9534f" points="1857,-185.57 1754,-185.57 1754,-161.57 1857,-161.57 1857,-185.57"/>
+<text text-anchor="middle" x="1805.5" y="-171.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">apply_ic_uniform</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_ic_uniform&#45;&gt;none~set_previous -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge19" class="edge">
+<title>proc~apply_ic_uniform&#45;&gt;none~set_previous</title>
+<path fill="none" stroke="#7fff00" d="M1857.12,-165.77C1894.68,-159.98 1946.84,-151.94 1991.16,-145.11"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1991.72,-148.56 2001.07,-143.58 1990.65,-141.64 1991.72,-148.56"/>
+</g>
+<!-- proc~output_fields_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node17" class="node">
+<title>proc~output_fields_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node17"><a xlink:href="../proc/output_fields_ftdss.html" xlink:title="output_fields_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1108.5,-98.57 997.5,-98.57 997.5,-74.57 1108.5,-74.57 1108.5,-98.57"/>
+<text text-anchor="middle" x="1053" y="-84.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">output_fields_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~output_fields_ftdss&#45;&gt;none~get_previous -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge16" class="edge">
+<title>proc~output_fields_ftdss&#45;&gt;none~get_previous</title>
+<path fill="none" stroke="#ff0000" d="M1108.5,-96.31C1139.23,-101.8 1178.12,-108.75 1211.93,-114.79"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1211.32,-118.24 1221.78,-116.55 1212.55,-111.35 1211.32,-118.24"/>
+</g>
+<!-- proc~output_history_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node18" class="node">
+<title>proc~output_history_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node18"><a xlink:href="../proc/output_history_ftdss.html" xlink:title="output_history_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1112,-140.57 994,-140.57 994,-116.57 1112,-116.57 1112,-140.57"/>
+<text text-anchor="middle" x="1053" y="-126.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">output_history_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~output_history_ftdss&#45;&gt;none~get_previous -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge17" class="edge">
+<title>proc~output_history_ftdss&#45;&gt;none~get_previous</title>
+<path fill="none" stroke="#ff0000" d="M1112.09,-128.57C1138.23,-128.57 1169.69,-128.57 1198.79,-128.57"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1198.98,-132.07 1208.98,-128.57 1198.98,-125.07 1198.98,-132.07"/>
+</g>
+<!-- proc~prescribe_essential_bc_generic -->
+<g id="proc~~get_prev_index~~CalledByGraph_node19" class="node">
+<title>proc~prescribe_essential_bc_generic</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node19"><a xlink:href="../proc/prescribe_essential_bc_generic.html" xlink:title="prescribe_essential_bc_generic">
+<polygon fill="#d9534f" stroke="#d9534f" points="1894.5,-143.57 1716.5,-143.57 1716.5,-119.57 1894.5,-119.57 1894.5,-143.57"/>
+<text text-anchor="middle" x="1805.5" y="-129.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prescribe_essential_bc_generic</text>
+</a>
+</g>
+</g>
+<!-- proc~prescribe_essential_bc_generic&#45;&gt;none~set_previous -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge20" class="edge">
+<title>proc~prescribe_essential_bc_generic&#45;&gt;none~set_previous</title>
+<path fill="none" stroke="#7fff00" d="M1894.6,-131.57C1925.05,-131.57 1959.19,-131.57 1989.74,-131.57"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1989.95,-135.07 1999.95,-131.57 1989.95,-128.07 1989.95,-135.07"/>
+</g>
+<!-- proc~solve_time_step_initial_setup_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node20" class="node">
+<title>proc~solve_time_step_initial_setup_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node20"><a xlink:href="../proc/solve_time_step_initial_setup_ftdss.html" xlink:title="solve_time_step_initial_setup_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1151,-182.57 955,-182.57 955,-158.57 1151,-158.57 1151,-182.57"/>
+<text text-anchor="middle" x="1053" y="-168.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_initial_setup_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_initial_setup_ftdss&#45;&gt;none~get_previous -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge18" class="edge">
+<title>proc~solve_time_step_initial_setup_ftdss&#45;&gt;none~get_previous</title>
+<path fill="none" stroke="#ff0000" d="M1121.34,-158.53C1149.49,-153.5 1182.36,-147.63 1211.51,-142.42"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1212.42,-145.81 1221.65,-140.61 1211.19,-138.92 1212.42,-145.81"/>
+</g>
+<!-- interface~apply_ic_uniform -->
+<g id="proc~~get_prev_index~~CalledByGraph_node21" class="node">
+<title>interface~apply_ic_uniform</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node21"><a xlink:href="../interface/apply_ic_uniform.html" xlink:title="type_ic_uniform%apply_ic_uniform">
+<polygon fill="#a7506f" stroke="#a7506f" points="1648.5,-185.57 1450.5,-185.57 1450.5,-161.57 1648.5,-161.57 1648.5,-185.57"/>
+<text text-anchor="middle" x="1549.5" y="-171.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ic_uniform%apply_ic_uniform</text>
+</a>
+</g>
+</g>
+<!-- interface~apply_ic_uniform&#45;&gt;proc~apply_ic_uniform -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge26" class="edge">
+<title>interface~apply_ic_uniform&#45;&gt;proc~apply_ic_uniform</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M1648.7,-173.57C1680.66,-173.57 1715.18,-173.57 1743.58,-173.57"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="1743.76,-177.07 1753.76,-173.57 1743.76,-170.07 1743.76,-177.07"/>
+</g>
+<!-- interface~output_fields_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node22" class="node">
+<title>interface~output_fields_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node22"><a xlink:href="../interface/output_fields_ftdss.html" xlink:title="type_ftdss%output_fields_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="876.5,-98.57 702.5,-98.57 702.5,-74.57 876.5,-74.57 876.5,-98.57"/>
+<text text-anchor="middle" x="789.5" y="-84.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%output_fields_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~output_fields_ftdss&#45;&gt;proc~output_fields_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge27" class="edge">
+<title>interface~output_fields_ftdss&#45;&gt;proc~output_fields_ftdss</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M876.85,-86.57C912.85,-86.57 953.94,-86.57 987.27,-86.57"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="987.35,-90.07 997.35,-86.57 987.35,-83.07 987.35,-90.07"/>
+</g>
+<!-- interface~output_history_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node23" class="node">
+<title>interface~output_history_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node23"><a xlink:href="../interface/output_history_ftdss.html" xlink:title="type_ftdss%output_history_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="880,-140.57 699,-140.57 699,-116.57 880,-116.57 880,-140.57"/>
+<text text-anchor="middle" x="789.5" y="-126.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%output_history_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~output_history_ftdss&#45;&gt;proc~output_history_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge28" class="edge">
+<title>interface~output_history_ftdss&#45;&gt;proc~output_history_ftdss</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M880.13,-128.57C914.01,-128.57 952,-128.57 983.63,-128.57"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="983.66,-132.07 993.66,-128.57 983.66,-125.07 983.66,-132.07"/>
+</g>
+<!-- interface~prescribe_essential_bc_generic -->
+<g id="proc~~get_prev_index~~CalledByGraph_node24" class="node">
+<title>interface~prescribe_essential_bc_generic</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node24"><a xlink:href="../interface/prescribe_essential_bc_generic.html" xlink:title="type_ftdss%prescribe_essential_bc_generic">
+<polygon fill="#a7506f" stroke="#a7506f" points="1670,-143.57 1429,-143.57 1429,-119.57 1670,-119.57 1670,-143.57"/>
+<text text-anchor="middle" x="1549.5" y="-129.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%prescribe_essential_bc_generic</text>
+</a>
+</g>
+</g>
+<!-- interface~prescribe_essential_bc_generic&#45;&gt;proc~prescribe_essential_bc_generic -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge29" class="edge">
+<title>interface~prescribe_essential_bc_generic&#45;&gt;proc~prescribe_essential_bc_generic</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M1670.06,-131.57C1682.1,-131.57 1694.24,-131.57 1706.02,-131.57"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="1706.28,-135.07 1716.28,-131.57 1706.28,-128.07 1706.28,-135.07"/>
+</g>
+<!-- interface~solve_time_step_initial_setup_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node25" class="node">
+<title>interface~solve_time_step_initial_setup_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node25"><a xlink:href="../interface/solve_time_step_initial_setup_ftdss.html" xlink:title="type_ftdss%solve_time_step_initial_setup_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="919,-224.57 660,-224.57 660,-200.57 919,-200.57 919,-224.57"/>
+<text text-anchor="middle" x="789.5" y="-210.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_initial_setup_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_initial_setup_ftdss&#45;&gt;proc~solve_time_step_initial_setup_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge30" class="edge">
+<title>interface~solve_time_step_initial_setup_ftdss&#45;&gt;proc~solve_time_step_initial_setup_ftdss</title>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M865.44,-200.53C897.17,-195.44 934.3,-189.47 967.04,-184.21"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="967.74,-187.65 977.05,-182.61 966.63,-180.74 967.74,-187.65"/>
+</g>
+<!-- proc~assemble_initialize_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node26" class="node">
+<title>proc~assemble_initialize_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node26"><a xlink:href="../proc/assemble_initialize_ftdss.html" xlink:title="assemble_initialize_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1621,-308.57 1478,-308.57 1478,-284.57 1621,-284.57 1621,-308.57"/>
+<text text-anchor="middle" x="1549.5" y="-294.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_initialize_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_initialize_ftdss&#45;&gt;interface~set_state_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge24" class="edge">
+<title>proc~assemble_initialize_ftdss&#45;&gt;interface~set_state_ftdss</title>
+<path fill="none" stroke="#ffda00" d="M1621.25,-301.86C1651.45,-304.12 1686.97,-306.78 1718.66,-309.15"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="1718.56,-312.65 1728.8,-309.91 1719.09,-305.67 1718.56,-312.65"/>
+</g>
+<!-- proc~solve_time_step_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node27" class="node">
+<title>proc~solve_time_step_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node27"><a xlink:href="../proc/solve_time_step_ftdss.html" xlink:title="solve_time_step_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="620.5,-224.57 493.5,-224.57 493.5,-200.57 620.5,-200.57 620.5,-224.57"/>
+<text text-anchor="middle" x="557" y="-210.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~reflect_variables_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge23" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~reflect_variables_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M614.3,-224.59C629.14,-227.64 645.15,-230.83 660,-233.57 673.42,-236.04 687.65,-238.52 701.57,-240.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="701.19,-244.34 711.63,-242.53 702.34,-237.44 701.19,-244.34"/>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~solve_time_step_initial_setup_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge36" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~solve_time_step_initial_setup_ftdss</title>
+<path fill="none" stroke="#00ffff" d="M620.68,-212.57C629.88,-212.57 639.65,-212.57 649.66,-212.57"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="649.75,-216.07 659.75,-212.57 649.75,-209.07 649.75,-216.07"/>
+</g>
+<!-- interface~apply_bc_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node35" class="node">
+<title>interface~apply_bc_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node35"><a xlink:href="../interface/apply_bc_ftdss.html" xlink:title="type_ftdss%apply_bc_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="866,-182.57 713,-182.57 713,-158.57 866,-158.57 866,-182.57"/>
+<text text-anchor="middle" x="789.5" y="-168.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%apply_bc_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~apply_bc_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge47" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~apply_bc_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M614.3,-200.55C629.14,-197.5 645.15,-194.31 660,-191.57 673.91,-189 688.69,-186.43 703.09,-184.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="703.7,-187.47 712.99,-182.38 702.55,-180.56 703.7,-187.47"/>
+</g>
+<!-- interface~assemble_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node39" class="node">
+<title>interface~assemble_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node39"><a xlink:href="../interface/assemble_ftdss.html" xlink:title="type_ftdss%assemble_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="868,-308.57 711,-308.57 711,-284.57 868,-284.57 868,-308.57"/>
+<text text-anchor="middle" x="789.5" y="-294.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge49" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M573.24,-224.67C592.35,-239.18 626.66,-263.11 660,-275.57 672.86,-280.38 686.86,-284.08 700.73,-286.94"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="700.3,-290.43 710.78,-288.88 701.62,-283.55 700.3,-290.43"/>
+</g>
+<!-- proc~update_variables_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node28" class="node">
+<title>proc~update_variables_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node28"><a xlink:href="../proc/update_variables_ftdss.html" xlink:title="update_variables_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="624,-307.57 490,-307.57 490,-283.57 624,-283.57 624,-307.57"/>
+<text text-anchor="middle" x="557" y="-293.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">update_variables_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~update_variables_ftdss&#45;&gt;interface~set_state_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge25" class="edge">
+<title>proc~update_variables_ftdss&#45;&gt;interface~set_state_ftdss</title>
+<path fill="none" stroke="#ffda00" d="M605.97,-307.61C622.93,-311.42 642.22,-315.24 660,-317.57 832.95,-340.25 877.57,-336.57 1052,-336.57 1052,-336.57 1052,-336.57 1291,-336.57 1441.53,-336.57 1616.67,-327.45 1718.6,-321.23"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="1719.08,-324.71 1728.84,-320.6 1718.65,-317.72 1719.08,-324.71"/>
+</g>
+<!-- interface~assemble_initialize_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node29" class="node">
+<title>interface~assemble_initialize_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node29"><a xlink:href="../interface/assemble_initialize_ftdss.html" xlink:title="type_ftdss%assemble_initialize_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1393,-308.57 1187,-308.57 1187,-284.57 1393,-284.57 1393,-308.57"/>
+<text text-anchor="middle" x="1290" y="-294.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_initialize_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_initialize_ftdss&#45;&gt;proc~assemble_initialize_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge37" class="edge">
+<title>interface~assemble_initialize_ftdss&#45;&gt;proc~assemble_initialize_ftdss</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M1393.14,-296.57C1417.85,-296.57 1443.92,-296.57 1467.51,-296.57"/>
+<polygon fill="#003fff" stroke="#003fff" points="1467.8,-300.07 1477.8,-296.57 1467.8,-293.07 1467.8,-300.07"/>
+</g>
+<!-- interface~solve_time_step_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node30" class="node">
+<title>interface~solve_time_step_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node30"><a xlink:href="../interface/solve_time_step_ftdss.html" xlink:title="type_ftdss%solve_time_step_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="450.5,-223.57 260.5,-223.57 260.5,-199.57 450.5,-199.57 450.5,-223.57"/>
+<text text-anchor="middle" x="355.5" y="-209.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge38" class="edge">
+<title>interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M450.7,-212.04C461.52,-212.09 472.43,-212.15 482.91,-212.2"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="483.22,-215.7 493.23,-212.25 483.25,-208.7 483.22,-215.7"/>
+</g>
+<!-- interface~update_variables_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node31" class="node">
+<title>interface~update_variables_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node31"><a xlink:href="../interface/update_variables_ftdss.html" xlink:title="type_ftdss%update_variables_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="454,-286.57 257,-286.57 257,-262.57 454,-262.57 454,-286.57"/>
+<text text-anchor="middle" x="355.5" y="-272.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%update_variables_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~update_variables_ftdss&#45;&gt;proc~update_variables_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge39" class="edge">
+<title>interface~update_variables_ftdss&#45;&gt;proc~update_variables_ftdss</title>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M454.2,-284.85C462.77,-285.75 471.35,-286.66 479.7,-287.54"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="479.44,-291.03 489.75,-288.6 480.18,-284.07 479.44,-291.03"/>
+</g>
+<!-- proc~apply_bc_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node32" class="node">
+<title>proc~apply_bc_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node32"><a xlink:href="../proc/apply_bc_ftdss.html" xlink:title="apply_bc_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1335,-202.57 1245,-202.57 1245,-178.57 1335,-178.57 1335,-202.57"/>
+<text text-anchor="middle" x="1290" y="-188.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">apply_bc_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_bc_ftdss&#45;&gt;interface~prescribe_essential_bc_generic -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge35" class="edge">
+<title>proc~apply_bc_ftdss&#45;&gt;interface~prescribe_essential_bc_generic</title>
+<path fill="none" stroke="#00ff3f" d="M1330.9,-178.5C1358.33,-170.47 1395.66,-160.07 1429,-152.57 1440.13,-150.06 1451.89,-147.68 1463.53,-145.48"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="1464.51,-148.86 1473.7,-143.59 1463.23,-141.97 1464.51,-148.86"/>
+</g>
+<!-- proc~initialize_type_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node33" class="node">
+<title>proc~initialize_type_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node33"><a xlink:href="../proc/initialize_type_ftdss.html" xlink:title="initialize_type_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="614.5,-140.57 499.5,-140.57 499.5,-116.57 614.5,-116.57 614.5,-140.57"/>
+<text text-anchor="middle" x="557" y="-126.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_type_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_ftdss&#45;&gt;interface~output_fields_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge31" class="edge">
+<title>proc~initialize_type_ftdss&#45;&gt;interface~output_fields_ftdss</title>
+<path fill="none" stroke="#ffbf00" d="M614.3,-116.55C629.14,-113.5 645.15,-110.31 660,-107.57 673.42,-105.09 687.65,-102.62 701.57,-100.28"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="702.34,-103.7 711.63,-98.6 701.19,-96.79 702.34,-103.7"/>
+</g>
+<!-- proc~initialize_type_ftdss&#45;&gt;interface~output_history_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge33" class="edge">
+<title>proc~initialize_type_ftdss&#45;&gt;interface~output_history_ftdss</title>
+<path fill="none" stroke="#7fff00" d="M614.68,-128.57C637.04,-128.57 663.4,-128.57 688.75,-128.57"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="688.78,-132.07 698.78,-128.57 688.78,-125.07 688.78,-132.07"/>
+</g>
+<!-- proc~initialize_type_ftdss&#45;&gt;interface~apply_bc_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge46" class="edge">
+<title>proc~initialize_type_ftdss&#45;&gt;interface~apply_bc_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M614.3,-140.59C629.14,-143.64 645.15,-146.83 660,-149.57 673.91,-152.14 688.69,-154.7 703.09,-157.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="702.55,-160.57 712.99,-158.76 703.7,-153.67 702.55,-160.57"/>
+</g>
+<!-- proc~run_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node34" class="node">
+<title>proc~run_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node34"><a xlink:href="../proc/run_ftdss.html" xlink:title="run_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-201.57 160,-201.57 160,-177.57 221,-177.57 221,-201.57"/>
+<text text-anchor="middle" x="190.5" y="-187.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~output_fields_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge32" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~output_fields_ftdss</title>
+<path fill="none" stroke="#ffbf00" d="M197.03,-177.35C206.33,-158.44 227.08,-122.7 257,-107.57 409.33,-30.54 618.78,-53.8 723.45,-72.68"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="723.08,-76.17 733.55,-74.55 724.35,-69.29 723.08,-76.17"/>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~output_history_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge34" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~output_history_ftdss</title>
+<path fill="none" stroke="#7fff00" d="M221.16,-187.18C291.29,-181.46 472.78,-166.21 624,-149.57 645,-147.26 667.48,-144.55 688.86,-141.85"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="689.44,-145.31 698.92,-140.58 688.56,-138.36 689.44,-145.31"/>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge41" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss</title>
+<path fill="none" stroke="#ffff00" d="M221.02,-193.55C231.08,-194.91 242.96,-196.51 255.41,-198.19"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="255.12,-201.69 265.49,-199.56 256.05,-194.75 255.12,-201.69"/>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~update_variables_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge42" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~update_variables_ftdss</title>
+<path fill="none" stroke="#00ff00" d="M208.24,-201.73C221.18,-210.84 239.75,-223.28 257,-232.57 274.94,-242.22 295.56,-251.37 313.21,-258.65"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="312.09,-261.97 322.67,-262.49 314.72,-255.49 312.09,-261.97"/>
+</g>
+<!-- interface~apply_bc_ftdss&#45;&gt;proc~apply_bc_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge43" class="edge">
+<title>interface~apply_bc_ftdss&#45;&gt;proc~apply_bc_ftdss</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M866.06,-182.26C893.94,-186.03 925.84,-189.71 955,-191.57 1041.94,-197.09 1063.89,-191.88 1151,-191.57 1178.59,-191.47 1209.27,-191.26 1234.69,-191.05"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1234.9,-194.55 1244.87,-190.97 1234.85,-187.55 1234.9,-194.55"/>
+</g>
+<!-- interface~initialize_type_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node36" class="node">
+<title>interface~initialize_type_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node36"><a xlink:href="../interface/initialize_type_ftdss.html" xlink:title="type_ftdss%initialize_type_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="444.5,-140.57 266.5,-140.57 266.5,-116.57 444.5,-116.57 444.5,-140.57"/>
+<text text-anchor="middle" x="355.5" y="-126.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%initialize_type_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_ftdss&#45;&gt;proc~initialize_type_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge44" class="edge">
+<title>interface~initialize_type_ftdss&#45;&gt;proc~initialize_type_ftdss</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M444.58,-128.57C459.54,-128.57 474.84,-128.57 489.13,-128.57"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="489.34,-132.07 499.34,-128.57 489.34,-125.07 489.34,-132.07"/>
+</g>
+<!-- interface~run_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node37" class="node">
+<title>interface~run_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node37"><a xlink:href="../interface/run_ftdss.html" xlink:title="type_ftdss%run_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="124,-201.57 0,-201.57 0,-177.57 124,-177.57 124,-201.57"/>
+<text text-anchor="middle" x="62" y="-187.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftdss&#45;&gt;proc~run_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge45" class="edge">
+<title>interface~run_ftdss&#45;&gt;proc~run_ftdss</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M124.03,-189.57C132.82,-189.57 141.68,-189.57 149.91,-189.57"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="149.94,-193.07 159.94,-189.57 149.94,-186.07 149.94,-193.07"/>
+</g>
+<!-- proc~assemble_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_node38" class="node">
+<title>proc~assemble_ftdss</title>
+<g id="a_proc~~get_prev_index~~CalledByGraph_node38"><a xlink:href="../proc/assemble_ftdss.html" xlink:title="assemble_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1100,-308.57 1006,-308.57 1006,-284.57 1100,-284.57 1100,-308.57"/>
+<text text-anchor="middle" x="1053" y="-294.17" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_ftdss&#45;&gt;interface~assemble_initialize_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge40" class="edge">
+<title>proc~assemble_ftdss&#45;&gt;interface~assemble_initialize_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M1100.15,-296.57C1122.08,-296.57 1149.34,-296.57 1176.27,-296.57"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1176.56,-300.07 1186.56,-296.57 1176.56,-293.07 1176.56,-300.07"/>
+</g>
+<!-- interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss -->
+<g id="proc~~get_prev_index~~CalledByGraph_edge48" class="edge">
+<title>interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M868.25,-296.57C909.12,-296.57 958.31,-296.57 995.51,-296.57"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="995.66,-300.07 1005.66,-296.57 995.66,-293.07 995.66,-300.07"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocget_prev_indexCalledByGraph = svgPanZoom('#procget_prev_indexCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">pure function </span><span class="n">get_prev_index</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">current_idx</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">prev</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_variable</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">current_idx</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">prev</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">current_idx</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">prev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_time_slots</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            </span><span class="n">prev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_idx</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">        </span><span class="k">end if</span>
+<span class="k">    end function </span><span class="n">get_prev_index</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-23 23:52 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

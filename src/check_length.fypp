@@ -1,0 +1,69 @@
+#:set INT_KINDS = ['int8', 'int16', 'int32', 'int64']
+#:set REAL_KINDS = ['real32', 'real64', 'real128']
+
+module core_check_length
+    use, intrinsic :: iso_fortran_env
+    implicit none
+    private
+
+    public :: check_match_length
+
+    interface check_match_length
+        ! Real implementations
+        #:for k in REAL_KINDS
+            module procedure :: check_match_length_${k}$
+        #:endfor
+
+        ! Integer implementations
+        #:for k in INT_KINDS
+            module procedure :: check_match_length_${k}$
+        #:endfor
+    end interface
+
+contains
+
+    ! ==========================================================================
+    ! REAL IMPLEMENTATIONS
+    ! ==========================================================================
+    #:for k in REAL_KINDS
+        !> Checks if two ${k}$ arrays have the same size.
+        subroutine check_match_length_${k}$ (a, b, routine_name)
+            implicit none
+            !> The first array.
+            real(${k}$), intent(in) :: a(:)
+            !> The second array.
+            real(${k}$), intent(in) :: b(:)
+            !> The name of the calling routine for error messages.
+            character(len=*), intent(in) :: routine_name
+
+            if (size(a) /= size(b)) then
+                write (*, '(A,A,A)') "ERROR in ", trim(routine_name), ": Array sizes do not match."
+                error stop 1
+            end if
+        end subroutine check_match_length_${k}$
+
+    #:endfor
+
+    ! ==========================================================================
+    ! INTEGER IMPLEMENTATIONS
+    ! ==========================================================================
+    #:for k in INT_KINDS
+        !> Checks if two ${k}$ arrays have the same size.
+        subroutine check_match_length_${k}$ (a, b, routine_name)
+            implicit none
+            !> The first array.
+            integer(${k}$), intent(in) :: a(:)
+            !> The second array.
+            integer(${k}$), intent(in) :: b(:)
+            !> The name of the calling routine for error messages.
+            character(len=*), intent(in) :: routine_name
+
+            if (size(a) /= size(b)) then
+                write (*, '(A,A,A)') "ERROR in ", trim(routine_name), ": Array sizes do not match."
+                error stop 1
+            end if
+        end subroutine check_match_length_${k}$
+
+    #:endfor
+
+end module core_check_length

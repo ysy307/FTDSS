@@ -179,7 +179,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~682"></span>
+              <span class="anchor" id="variable-self~563"></span>
               class(<a href='../type/type_thermal.html'>type_thermal</a>),
             </td>
 <td>intent(in)</td>
@@ -194,7 +194,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material_id~52"></span>
+              <span class="anchor" id="variable-material_id~31"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -209,7 +209,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-state~114"></span>
+              <span class="anchor" id="variable-state~84"></span>
               type(<a href='../type/type_state.html'>type_state</a>),
             </td>
 <td>intent(inout)</td>
@@ -224,7 +224,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-v_tt~2"></span>
+              <span class="anchor" id="variable-v_tt"></span>
               real(kind=real64),
             </td>
 <td>intent(inout)</td>
@@ -747,13 +747,13 @@ large graphs.</div>
 <span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">physics</span><span class="p">%</span><span class="n">calc_specific_heat_vapor</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">c_v</span><span class="p">)</span>
 
 <span class="w">        </span><span class="k">select case</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">computation_type</span><span class="p">)</span>
-<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">COMP_TYPE_2D_XY</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">COMP_TYPES</span><span class="p">%</span><span class="n">XY_2D</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
 <span class="w">            </span><span class="n">V_TT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rho_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">c_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">water_flux</span><span class="p">%</span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">c_v</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">vapor_flux</span><span class="p">%</span><span class="n">x</span><span class="p">)</span>
 <span class="w">            </span><span class="n">V_TT</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rho_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">c_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">water_flux</span><span class="p">%</span><span class="n">y</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">c_v</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">vapor_flux</span><span class="p">%</span><span class="n">y</span><span class="p">)</span>
-<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">COMP_TYPE_2D_XZ</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">COMP_TYPES</span><span class="p">%</span><span class="n">XZ_2D</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
 <span class="w">            </span><span class="n">V_TT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rho_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">c_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">water_flux</span><span class="p">%</span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">c_v</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">vapor_flux</span><span class="p">%</span><span class="n">x</span><span class="p">)</span>
 <span class="w">            </span><span class="n">V_TT</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rho_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">c_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">water_flux</span><span class="p">%</span><span class="n">z</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">c_v</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">vapor_flux</span><span class="p">%</span><span class="n">z</span><span class="p">)</span>
-<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">COMP_TYPE_3D</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">COMP_TYPES</span><span class="p">%</span><span class="n">XYZ_3D</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
 <span class="w">            </span><span class="n">V_TT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rho_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">c_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">water_flux</span><span class="p">%</span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">c_v</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">vapor_flux</span><span class="p">%</span><span class="n">x</span><span class="p">)</span>
 <span class="w">            </span><span class="n">V_TT</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rho_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">c_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">water_flux</span><span class="p">%</span><span class="n">y</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">c_v</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">vapor_flux</span><span class="p">%</span><span class="n">y</span><span class="p">)</span>
 <span class="w">            </span><span class="n">V_TT</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rho_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">c_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">water_flux</span><span class="p">%</span><span class="n">z</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">c_v</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">vapor_flux</span><span class="p">%</span><span class="n">z</span><span class="p">)</span>
@@ -782,7 +782,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-22 12:12 +0000             </p>
+ on 2026-02-23 23:52 +0000             </p>
           </div>
         </div>
         <br>

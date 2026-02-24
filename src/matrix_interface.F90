@@ -50,7 +50,7 @@ module core_types_matrix
         !> The number of nodes associated with the matrix dimensions.
         integer(int32) :: num_nodes = 0
         !> Status flag for the matrix or matrix operations.
-        integer(int32) :: status = 0
+        type(type_constant_id) :: status = MATRIX_STATUS%SUCCESS
         !> flag of the matrix initialized or not.
         logical :: is_initialized_matrix = .false.
     contains
@@ -85,7 +85,7 @@ module core_types_matrix
         !> Initializes the matrix structure based on the number of nodes and DOFs.
         !> For sparse matrices, a sparsity pattern can be provided.
         subroutine abst_initialize(self, num_nodes, row, col, row_blocks, col_blocks)
-            import :: abst_matrix, int32
+            import :: abst_matrix, type_constant_id, int32
             implicit none
             !> The matrix object to initialize.
             class(abst_matrix), intent(inout) :: self
@@ -102,7 +102,7 @@ module core_types_matrix
         end subroutine abst_initialize
 
         subroutine abst_get_info(self, info)
-            import :: abst_matrix, type_matrix_info
+            import :: abst_matrix, type_constant_id, type_matrix_info
             implicit none
             !> The matrix object.
             class(abst_matrix), intent(in) :: self
@@ -111,7 +111,7 @@ module core_types_matrix
         end subroutine abst_get_info
 
         subroutine abst_get_diagonal(self, diagonal)
-            import :: abst_matrix, type_vector_dp
+            import :: abst_matrix, type_constant_id, type_vector_dp
             implicit none
             !> The matrix object.
             class(abst_matrix), intent(in) :: self
@@ -122,12 +122,12 @@ module core_types_matrix
         !>
         !> Sets the value of a single entry in the matrix.
         subroutine abst_set_value(self, op, row, col, value)
-            import :: abst_matrix, int32, real64
+            import :: abst_matrix, type_constant_id, int32, real64
             implicit none
             !> The matrix object.
             class(abst_matrix), intent(inout) :: self
             !> The operation to perform
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             !> The 1-based node index for the row.
             integer(int32), intent(in) :: row
             !> The 1-based node index for the column.
@@ -139,12 +139,12 @@ module core_types_matrix
         !>
         !> Sets the value in block of a single entry in the matrix.
         subroutine abst_set_value_block(self, op, row, col, row_block, col_block, value)
-            import :: abst_matrix, int32, real64
+            import :: abst_matrix, type_constant_id, int32, real64
             implicit none
             !> The matrix object.
             class(abst_matrix), intent(inout) :: self
             !> The operation to perform
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             !> The 1-based node index for the row.
             integer(int32), intent(in) :: row
             !> The 1-based node index for the column.
@@ -160,12 +160,12 @@ module core_types_matrix
         !>
         !> Sets all entries in a specified row to a single value.
         subroutine abst_set_row(self, op, row, value, row_block)
-            import :: abst_matrix, real64, int32
+            import :: abst_matrix, type_constant_id, real64, int32
             implicit none
             !> The matrix object.
             class(abst_matrix), intent(inout) :: self
             !> The operation to perform
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             !> The 1-based node index for the row.
             integer(int32), intent(in) :: row
             !> The scalar value to assign.
@@ -177,12 +177,12 @@ module core_types_matrix
         !>
         !> Sets all stored entries in the matrix to a single value.
         subroutine abst_set_all(self, op, value)
-            import :: abst_matrix, real64, int32
+            import :: abst_matrix, type_constant_id, real64, int32
             implicit none
             !> The matrix object.
             class(abst_matrix), intent(inout) :: self
             !> The operation to perform
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             !> The scalar value to assign.
             real(real64), intent(in) :: value
         end subroutine abst_set_all
@@ -190,12 +190,12 @@ module core_types_matrix
         !>
         !> Scales the matrix by a given scalar value.
         subroutine abst_scale(self, op, alpha)
-            import :: abst_matrix, int32, type_vector_dp
+            import :: abst_matrix, type_constant_id, int32, type_vector_dp
             implicit none
             !> The matrix object.
             class(abst_matrix), intent(inout) :: self
             !> The operation to perform
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             !> The scaling factor.
             type(type_vector_dp), intent(in) :: alpha
         end subroutine abst_scale
@@ -212,7 +212,7 @@ module core_types_matrix
         !>
         !> Sets all entries in a specified row to zero.
         subroutine abst_zero_row(self, row, row_block)
-            import :: abst_matrix, int32
+            import :: abst_matrix, type_constant_id, int32
             implicit none
             !> The matrix object.
             class(abst_matrix), intent(inout) :: self
@@ -224,7 +224,7 @@ module core_types_matrix
 
         !> Finds the storage index of a matrix entry.
         pure function abst_find(self, row, col) result(index)
-            import :: abst_matrix, int32
+            import :: abst_matrix, type_constant_id, int32
             implicit none
             class(abst_matrix), intent(in) :: self
             integer(int32), intent(in) :: row, col
@@ -234,7 +234,7 @@ module core_types_matrix
         !>
         !> Prints the matrix contents to standard output for debugging.
         subroutine abst_display(self, unit_in)
-            import :: abst_matrix, int32
+            import :: abst_matrix, type_constant_id, int32
             implicit none
             !> The matrix object.
             class(abst_matrix), intent(in) :: self
@@ -327,7 +327,7 @@ module core_types_matrix
         module subroutine set_value_dense(self, op, row, col, value)
             implicit none
             class(type_matrix_dense), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             integer(int32), intent(in) :: row, col
             real(real64), intent(in) :: value
         end subroutine set_value_dense
@@ -336,7 +336,7 @@ module core_types_matrix
         module subroutine set_value_block_dense(self, op, row, col, row_block, col_block, value)
             implicit none
             class(type_matrix_dense), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             integer(int32), intent(in) :: row, col
             integer(int32), intent(in) :: row_block, col_block
             real(real64), intent(in) :: value
@@ -346,7 +346,7 @@ module core_types_matrix
         module subroutine set_row_dense(self, op, row, value, row_block)
             implicit none
             class(type_matrix_dense), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             integer(int32), intent(in) :: row
             real(real64), intent(in) :: value
             integer(int32), intent(in), optional :: row_block
@@ -355,7 +355,7 @@ module core_types_matrix
         !> Sets all values in the dense matrix to a single scalar value.
         module subroutine set_all_dense(self, op, value)
             class(type_matrix_dense), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             real(real64), intent(in) :: value
         end subroutine set_all_dense
 
@@ -363,7 +363,7 @@ module core_types_matrix
         module subroutine scale_dense(self, op, alpha)
             implicit none
             class(type_matrix_dense), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             type(type_vector_dp), intent(in) :: alpha
         end subroutine scale_dense
 
@@ -501,7 +501,7 @@ module core_types_matrix
         module subroutine set_value_csr(self, op, row, col, value)
             implicit none
             class(type_matrix_csr), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             integer(int32), intent(in) :: row, col
             real(real64), intent(in) :: value
         end subroutine set_value_csr
@@ -510,7 +510,7 @@ module core_types_matrix
         module subroutine set_value_block_csr(self, op, row, col, row_block, col_block, value)
             implicit none
             class(type_matrix_csr), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             integer(int32), intent(in) :: row, col
             integer(int32), intent(in) :: row_block, col_block
             real(real64), intent(in) :: value
@@ -520,7 +520,7 @@ module core_types_matrix
         module subroutine set_row_csr(self, op, row, value, row_block)
             implicit none
             class(type_matrix_csr), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             integer(int32), intent(in) :: row
             real(real64), intent(in) :: value
             integer(int32), intent(in), optional :: row_block
@@ -530,7 +530,7 @@ module core_types_matrix
         module subroutine set_all_csr(self, op, value)
             implicit none
             class(type_matrix_csr), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             real(real64), intent(in) :: value
         end subroutine set_all_csr
 
@@ -538,7 +538,7 @@ module core_types_matrix
         module subroutine scale_csr(self, op, alpha)
             implicit none
             class(type_matrix_csr), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             type(type_vector_dp), intent(in) :: alpha
         end subroutine scale_csr
 
@@ -668,7 +668,7 @@ module core_types_matrix
         module subroutine set_value_coo(self, op, row, col, value)
             implicit none
             class(type_matrix_coo), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             integer(int32), intent(in) :: row, col
             real(real64), intent(in) :: value
         end subroutine set_value_coo
@@ -677,7 +677,7 @@ module core_types_matrix
         module subroutine set_value_block_coo(self, op, row, col, row_block, col_block, value)
             implicit none
             class(type_matrix_coo), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             integer(int32), intent(in) :: row, col
             integer(int32), intent(in) :: row_block, col_block
             real(real64), intent(in) :: value
@@ -687,7 +687,7 @@ module core_types_matrix
         module subroutine set_row_coo(self, op, row, value, row_block)
             implicit none
             class(type_matrix_coo), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             integer(int32), intent(in) :: row
             real(real64), intent(in) :: value
             integer(int32), intent(in), optional :: row_block
@@ -697,7 +697,7 @@ module core_types_matrix
         module subroutine set_all_coo(self, op, value)
             implicit none
             class(type_matrix_coo), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             real(real64), intent(in) :: value
         end subroutine set_all_coo
 
@@ -705,7 +705,7 @@ module core_types_matrix
         module subroutine scale_coo(self, op, alpha)
             implicit none
             class(type_matrix_coo), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             type(type_vector_dp), intent(in) :: alpha
         end subroutine scale_coo
 
@@ -835,7 +835,7 @@ module core_types_matrix
         module subroutine set_value_bsr(self, op, row, col, value)
             implicit none
             class(type_matrix_bsr), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             integer(int32), intent(in) :: row, col
             real(real64), intent(in) :: value
         end subroutine set_value_bsr
@@ -843,7 +843,7 @@ module core_types_matrix
         module subroutine set_value_block_bsr(self, op, row, col, row_block, col_block, value)
             implicit none
             class(type_matrix_bsr), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             integer(int32), intent(in) :: row, col
             integer(int32), intent(in) :: row_block, col_block
             real(real64), intent(in) :: value
@@ -852,7 +852,7 @@ module core_types_matrix
         module subroutine set_row_bsr(self, op, row, value, row_block)
             implicit none
             class(type_matrix_bsr), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             integer(int32), intent(in) :: row
             real(real64), intent(in) :: value
             integer(int32), intent(in), optional :: row_block
@@ -861,14 +861,14 @@ module core_types_matrix
         module subroutine set_all_bsr(self, op, value)
             implicit none
             class(type_matrix_bsr), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             real(real64), intent(in) :: value
         end subroutine set_all_bsr
 
         module subroutine scale_bsr(self, op, alpha)
             implicit none
             class(type_matrix_bsr), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             type(type_vector_dp), intent(in) :: alpha
         end subroutine scale_bsr
 
@@ -986,7 +986,7 @@ module core_types_matrix
         module subroutine set_value_dia(self, op, row, col, value)
             implicit none
             class(type_matrix_dia), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             integer(int32), intent(in) :: row, col
             real(real64), intent(in) :: value
         end subroutine set_value_dia
@@ -994,7 +994,7 @@ module core_types_matrix
         module subroutine set_value_block_dia(self, op, row, col, row_block, col_block, value)
             implicit none
             class(type_matrix_dia), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             integer(int32), intent(in) :: row, col
             integer(int32), intent(in) :: row_block, col_block
             real(real64), intent(in) :: value
@@ -1003,7 +1003,7 @@ module core_types_matrix
         module subroutine set_row_dia(self, op, row, value, row_block)
             implicit none
             class(type_matrix_dia), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             integer(int32), intent(in) :: row
             real(real64), intent(in) :: value
             integer(int32), intent(in), optional :: row_block
@@ -1012,14 +1012,14 @@ module core_types_matrix
         module subroutine set_all_dia(self, op, value)
             implicit none
             class(type_matrix_dia), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             real(real64), intent(in) :: value
         end subroutine set_all_dia
 
         module subroutine scale_dia(self, op, alpha)
             implicit none
             class(type_matrix_dia), intent(inout) :: self
-            integer(int32), intent(in) :: op
+            type(type_constant_id), intent(in) :: op
             type(type_vector_dp), intent(in) :: alpha
         end subroutine scale_dia
 
@@ -1046,7 +1046,7 @@ contains
     pure function get_status(self) result(status)
         implicit none
         class(abst_matrix), intent(in) :: self
-        integer(int32) :: status
+        type(type_constant_id) :: status
 
         status = self%status
     end function get_status
@@ -1063,7 +1063,7 @@ contains
         implicit none
         class(abst_matrix), intent(in) :: self
 
-        if (self%status /= MATRIX_STATUS_SUCCESS) then
+        if (self%status /= MATRIX_STATUS%SUCCESS) then
             write (*, *) "Matrix status indicates an error: ", self%status
             stop "Matrix check failed."
         end if

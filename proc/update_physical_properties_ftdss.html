@@ -179,7 +179,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~395"></span>
+              <span class="anchor" id="variable-self~47"></span>
               class(<a href='../type/type_ftdss.html'>type_ftdss</a>),
             </td>
 <td>intent(inout)</td>
@@ -194,7 +194,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material_id~22"></span>
+              <span class="anchor" id="variable-material_id~5"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -209,7 +209,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-state~51"></span>
+              <span class="anchor" id="variable-state~24"></span>
               type(<a href='../type/type_state.html'>type_state</a>),
             </td>
 <td>intent(inout)</td>
@@ -293,18 +293,18 @@
 <path fill="none" stroke="#ff0000" d="M109.38,-201.23C132.12,-219.87 178.49,-255.1 224,-273 293.51,-300.34 375.35,-315.65 443.08,-324.22"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="443.04,-327.74 453.39,-325.49 443.89,-320.79 443.04,-327.74"/>
 </g>
-<!-- none~set~12 -->
+<!-- none~set~11 -->
 <g id="proc~~update_physical_properties_ftdss~~CallsGraph_node5" class="node">
-<title>none~set~12</title>
-<g id="a_proc~~update_physical_properties_ftdss~~CallsGraph_node5"><a xlink:href="../type/type_coordinate_dp.html#boundprocedure-set~12" xlink:title="type_coordinate_dp%set">
+<title>none~set~11</title>
+<g id="a_proc~~update_physical_properties_ftdss~~CallsGraph_node5"><a xlink:href="../type/type_coordinate_dp.html#boundprocedure-set~11" xlink:title="type_coordinate_dp%set">
 <polygon fill="#a7506f" stroke="#a7506f" points="391.5,-180 248.5,-180 248.5,-156 391.5,-156 391.5,-180"/>
 <text text-anchor="middle" x="320" y="-165.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_coordinate_dp%set</text>
 </a>
 </g>
 </g>
-<!-- proc~update_physical_properties_ftdss&#45;&gt;none~set~12 -->
+<!-- proc~update_physical_properties_ftdss&#45;&gt;none~set~11 -->
 <g id="proc~~update_physical_properties_ftdss~~CallsGraph_edge4" class="edge">
-<title>proc~update_physical_properties_ftdss&#45;&gt;none~set~12</title>
+<title>proc~update_physical_properties_ftdss&#45;&gt;none~set~11</title>
 <path fill="none" stroke="#ff0000" d="M188.05,-180.28C204.77,-178.71 222.08,-177.09 238.41,-175.56"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="238.81,-179.03 248.44,-174.61 238.16,-172.06 238.81,-179.03"/>
 </g>
@@ -392,9 +392,9 @@
 </a>
 </g>
 </g>
-<!-- none~set~12&#45;&gt;proc~set_coordinate_dp -->
+<!-- none~set~11&#45;&gt;proc~set_coordinate_dp -->
 <g id="proc~~update_physical_properties_ftdss~~CallsGraph_edge10" class="edge">
-<title>none~set~12&#45;&gt;proc~set_coordinate_dp</title>
+<title>none~set~11&#45;&gt;proc~set_coordinate_dp</title>
 <path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M391.57,-156.58C423.94,-151.34 462.57,-145.09 496.44,-139.61"/>
 <polygon fill="#00ffff" stroke="#00ffff" points="497.01,-143.06 506.32,-138.01 495.89,-136.15 497.01,-143.06"/>
 </g>
@@ -407,9 +407,9 @@
 </a>
 </g>
 </g>
-<!-- none~set~12&#45;&gt;proc~set_coordinate_dp_array -->
+<!-- none~set~11&#45;&gt;proc~set_coordinate_dp_array -->
 <g id="proc~~update_physical_properties_ftdss~~CallsGraph_edge11" class="edge">
-<title>none~set~12&#45;&gt;proc~set_coordinate_dp_array</title>
+<title>none~set~11&#45;&gt;proc~set_coordinate_dp_array</title>
 <path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M391.57,-168C407.12,-168 424.13,-168 441.35,-168"/>
 <polygon fill="#00ffff" stroke="#00ffff" points="441.51,-171.5 451.51,-168 441.51,-164.5 441.51,-171.5"/>
 </g>
@@ -2002,7 +2002,7 @@ large graphs.</div>
 
 <span class="w">        </span><span class="c">! 2. 流束計算 (advectionやdiffusionで使用)</span>
 <span class="w">        </span><span class="c">!    Stateに入っている勾配(grad_T, grad_P)を使用</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">controls</span><span class="p">%</span><span class="n">is_target</span><span class="p">(</span><span class="n">PHYSICS_TYPE_HYDRAULIC</span><span class="p">,</span><span class="w"> </span><span class="n">material_id</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">controls</span><span class="p">%</span><span class="n">is_target</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">HYDRAULIC</span><span class="p">,</span><span class="w"> </span><span class="n">material_id</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
 <span class="k">            call </span><span class="n">state</span><span class="p">%</span><span class="n">grad_T</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">grad_T</span><span class="p">)</span>
 <span class="w">            </span><span class="k">call </span><span class="n">state</span><span class="p">%</span><span class="n">grad_P</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">grad_P</span><span class="p">)</span>
 <span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">calc_water_flux</span><span class="p">(</span><span class="n">material_id</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">grad_T</span><span class="p">,</span><span class="w"> </span><span class="n">grad_P</span><span class="p">,</span><span class="w"> </span><span class="n">water_flux</span><span class="p">)</span>
@@ -2037,7 +2037,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-22 12:12 +0000             </p>
+ on 2026-02-23 23:52 +0000             </p>
           </div>
         </div>
         <br>

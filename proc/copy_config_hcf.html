@@ -1,0 +1,942 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>copy_config_hcf &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>copy_config_hcf
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">17 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/config_swcc.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/config_swcc.f90.html'>config_swcc.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_types_config_physics_swcc.html'>core_types_config_physics_swcc</a></li>
+            <li class="breadcrumb-item active" aria-current="page">copy_config_hcf</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/copy_config_hcf.html#src">copy_config_hcf</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine copy_config_hcf(self, source)  
+</h2>
+    
+
+    <p>Copy values from another type_config_hcf, calling parent copy</p>
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_config_hcf.html'>type_config_hcf</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~298"></span>
+              class(<a href='../type/type_config_hcf.html'>type_config_hcf</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-source~2"></span>
+              class(<a href='../type/abst_config.html'>abst_config</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>source</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~copy_config_hcf~~CallsGraph Pages: 1 -->
+<svg id="proccopy_config_hcfCallsGraph" width="641pt" height="217pt"
+ viewBox="0.00 0.00 641.00 217.38" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~copy_config_hcf~~CallsGraph" class="graph" transform="scale(0.53 0.53) rotate(0) translate(4 406)">
+<title>proc~~copy_config_hcf~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-406 1205,-406 1205,4 -4,4"/>
+<!-- proc~copy_config_hcf -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node1" class="node">
+<title>proc~copy_config_hcf</title>
+<polygon fill="none" stroke="black" points="191,-150 0,-150 0,-126 191,-126 191,-150"/>
+<text text-anchor="middle" x="95.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_config_hcf%copy_config_hcf</text>
+</g>
+<!-- none~set~18 -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node2" class="node">
+<title>none~set~18</title>
+<g id="a_proc~~copy_config_hcf~~CallsGraph_node2"><a xlink:href="../type/type_config_hcf.html#boundprocedure-set~18" xlink:title="type_config_hcf%set">
+<polygon fill="#a7506f" stroke="#a7506f" points="611.5,-234 490.5,-234 490.5,-210 611.5,-210 611.5,-234"/>
+<text text-anchor="middle" x="551" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_config_hcf%set</text>
+</a>
+</g>
+</g>
+<!-- proc~copy_config_hcf&#45;&gt;none~set~18 -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge1" class="edge">
+<title>proc~copy_config_hcf&#45;&gt;none~set~18</title>
+<path fill="none" stroke="#ff0000" d="M161.48,-150.04C246.05,-165.7 393.28,-192.97 480.18,-209.07"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="479.74,-212.54 490.21,-210.92 481.01,-205.66 479.74,-212.54"/>
+</g>
+<!-- proc~copy_config_wrf -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node3" class="node">
+<title>proc~copy_config_wrf</title>
+<g id="a_proc~~copy_config_hcf~~CallsGraph_node3"><a xlink:href="../proc/copy_config_wrf.html" xlink:title="type_config_wrf%copy_config_wrf">
+<polygon fill="#d9534f" stroke="#d9534f" points="418.5,-150 227.5,-150 227.5,-126 418.5,-126 418.5,-150"/>
+<text text-anchor="middle" x="323" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_config_wrf%copy_config_wrf</text>
+</a>
+</g>
+</g>
+<!-- proc~copy_config_hcf&#45;&gt;proc~copy_config_wrf -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge2" class="edge">
+<title>proc~copy_config_hcf&#45;&gt;proc~copy_config_wrf</title>
+<path fill="none" stroke="#ff0000" d="M191.15,-138C199.73,-138 208.45,-138 217.11,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="217.23,-141.5 227.23,-138 217.23,-134.5 217.23,-141.5"/>
+</g>
+<!-- proc~reset_config_hcf -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node4" class="node">
+<title>proc~reset_config_hcf</title>
+<g id="a_proc~~copy_config_hcf~~CallsGraph_node4"><a xlink:href="../proc/reset_config_hcf.html" xlink:title="type_config_hcf%reset_config_hcf">
+<polygon fill="#d9534f" stroke="#d9534f" points="419,-108 227,-108 227,-84 419,-84 419,-108"/>
+<text text-anchor="middle" x="323" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_config_hcf%reset_config_hcf</text>
+</a>
+</g>
+</g>
+<!-- proc~copy_config_hcf&#45;&gt;proc~reset_config_hcf -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge3" class="edge">
+<title>proc~copy_config_hcf&#45;&gt;proc~reset_config_hcf</title>
+<path fill="none" stroke="#ff0000" d="M161.12,-125.96C188.01,-120.96 219.4,-115.11 247.27,-109.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="248.18,-113.31 257.37,-108.04 246.9,-106.43 248.18,-113.31"/>
+</g>
+<!-- proc~set_constant_id -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node8" class="node">
+<title>proc~set_constant_id</title>
+<g id="a_proc~~copy_config_hcf~~CallsGraph_node8"><a xlink:href="../proc/set_constant_id.html" xlink:title="abst_config%set_constant_id">
+<polygon fill="#d9534f" stroke="#d9534f" points="848,-402 683,-402 683,-378 848,-378 848,-402"/>
+<text text-anchor="middle" x="765.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config%set_constant_id</text>
+</a>
+</g>
+</g>
+<!-- none~set~18&#45;&gt;proc~set_constant_id -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge4" class="edge">
+<title>none~set~18&#45;&gt;proc~set_constant_id</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M559.16,-234.06C576.56,-262.31 624.04,-333.05 683,-369 685.96,-370.8 689.07,-372.45 692.28,-373.96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="690.96,-377.21 701.53,-377.85 693.67,-370.75 690.96,-377.21"/>
+</g>
+<!-- proc~set_int32 -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node9" class="node">
+<title>proc~set_int32</title>
+<g id="a_proc~~copy_config_hcf~~CallsGraph_node9"><a xlink:href="../proc/set_int32.html" xlink:title="abst_config%set_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="831,-360 700,-360 700,-336 831,-336 831,-360"/>
+<text text-anchor="middle" x="765.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config%set_int32</text>
+</a>
+</g>
+</g>
+<!-- none~set~18&#45;&gt;proc~set_int32 -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge5" class="edge">
+<title>none~set~18&#45;&gt;proc~set_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M563.42,-234.05C584.8,-255.9 633.21,-302.09 683,-327 687,-329 691.22,-330.83 695.53,-332.49"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="694.5,-335.84 705.1,-335.86 696.83,-329.24 694.5,-335.84"/>
+</g>
+<!-- proc~set_int32_1d -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node10" class="node">
+<title>proc~set_int32_1d</title>
+<g id="a_proc~~copy_config_hcf~~CallsGraph_node10"><a xlink:href="../proc/set_int32_1d.html" xlink:title="abst_config%set_int32_1d">
+<polygon fill="#d9534f" stroke="#d9534f" points="840.5,-318 690.5,-318 690.5,-294 840.5,-294 840.5,-318"/>
+<text text-anchor="middle" x="765.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config%set_int32_1d</text>
+</a>
+</g>
+</g>
+<!-- none~set~18&#45;&gt;proc~set_int32_1d -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge6" class="edge">
+<title>none~set~18&#45;&gt;proc~set_int32_1d</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M573.68,-234.06C599.2,-247.87 643.18,-270.45 683,-285 688.94,-287.17 695.21,-289.21 701.52,-291.1"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="700.85,-294.55 711.43,-293.94 702.78,-287.82 700.85,-294.55"/>
+</g>
+<!-- proc~set_int32_2d -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node11" class="node">
+<title>proc~set_int32_2d</title>
+<g id="a_proc~~copy_config_hcf~~CallsGraph_node11"><a xlink:href="../proc/set_int32_2d.html" xlink:title="abst_config%set_int32_2d">
+<polygon fill="#d9534f" stroke="#d9534f" points="840.5,-276 690.5,-276 690.5,-252 840.5,-252 840.5,-276"/>
+<text text-anchor="middle" x="765.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config%set_int32_2d</text>
+</a>
+</g>
+</g>
+<!-- none~set~18&#45;&gt;proc~set_int32_2d -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge7" class="edge">
+<title>none~set~18&#45;&gt;proc~set_int32_2d</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M611.76,-233.81C637.23,-238.85 667.14,-244.76 693.71,-250.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="693.23,-253.48 703.71,-251.99 694.58,-246.61 693.23,-253.48"/>
+</g>
+<!-- proc~set_int32_3d -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node12" class="node">
+<title>proc~set_int32_3d</title>
+<g id="a_proc~~copy_config_hcf~~CallsGraph_node12"><a xlink:href="../proc/set_int32_3d.html" xlink:title="abst_config%set_int32_3d">
+<polygon fill="#d9534f" stroke="#d9534f" points="840.5,-234 690.5,-234 690.5,-210 840.5,-210 840.5,-234"/>
+<text text-anchor="middle" x="765.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config%set_int32_3d</text>
+</a>
+</g>
+</g>
+<!-- none~set~18&#45;&gt;proc~set_int32_3d -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge8" class="edge">
+<title>none~set~18&#45;&gt;proc~set_int32_3d</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M611.76,-222C633.04,-222 657.42,-222 680.36,-222"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="680.43,-225.5 690.43,-222 680.43,-218.5 680.43,-225.5"/>
+</g>
+<!-- proc~set_real64 -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node13" class="node">
+<title>proc~set_real64</title>
+<g id="a_proc~~copy_config_hcf~~CallsGraph_node13"><a xlink:href="../proc/set_real64.html" xlink:title="abst_config%set_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="834.5,-66 696.5,-66 696.5,-42 834.5,-42 834.5,-66"/>
+<text text-anchor="middle" x="765.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config%set_real64</text>
+</a>
+</g>
+</g>
+<!-- none~set~18&#45;&gt;proc~set_real64 -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge9" class="edge">
+<title>none~set~18&#45;&gt;proc~set_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M611.51,-218.88C624.52,-215.65 637.28,-210.14 647,-201 689.41,-161.09 641.28,-115.64 683,-75 684.45,-73.59 685.99,-72.26 687.59,-71.03"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="689.61,-73.89 696.12,-65.53 685.82,-68 689.61,-73.89"/>
+</g>
+<!-- proc~set_real64_1d -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node14" class="node">
+<title>proc~set_real64_1d</title>
+<g id="a_proc~~copy_config_hcf~~CallsGraph_node14"><a xlink:href="../proc/set_real64_1d.html" xlink:title="abst_config%set_real64_1d">
+<polygon fill="#d9534f" stroke="#d9534f" points="844,-192 687,-192 687,-168 844,-168 844,-192"/>
+<text text-anchor="middle" x="765.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config%set_real64_1d</text>
+</a>
+</g>
+</g>
+<!-- none~set~18&#45;&gt;proc~set_real64_1d -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge10" class="edge">
+<title>none~set~18&#45;&gt;proc~set_real64_1d</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M611.76,-210.19C637.23,-205.15 667.14,-199.24 693.71,-193.99"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="694.58,-197.39 703.71,-192.01 693.23,-190.52 694.58,-197.39"/>
+</g>
+<!-- proc~set_real64_2d -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node15" class="node">
+<title>proc~set_real64_2d</title>
+<g id="a_proc~~copy_config_hcf~~CallsGraph_node15"><a xlink:href="../proc/set_real64_2d.html" xlink:title="abst_config%set_real64_2d">
+<polygon fill="#d9534f" stroke="#d9534f" points="844,-150 687,-150 687,-126 844,-126 844,-150"/>
+<text text-anchor="middle" x="765.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config%set_real64_2d</text>
+</a>
+</g>
+</g>
+<!-- none~set~18&#45;&gt;proc~set_real64_2d -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge11" class="edge">
+<title>none~set~18&#45;&gt;proc~set_real64_2d</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M611.52,-214.99C623.82,-211.89 636.28,-207.42 647,-201 668.09,-188.36 662.13,-172 683,-159 685.94,-157.17 689.04,-155.49 692.23,-153.97"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="693.64,-157.17 701.46,-150.03 690.89,-150.73 693.64,-157.17"/>
+</g>
+<!-- proc~set_real64_3d -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node16" class="node">
+<title>proc~set_real64_3d</title>
+<g id="a_proc~~copy_config_hcf~~CallsGraph_node16"><a xlink:href="../proc/set_real64_3d.html" xlink:title="abst_config%set_real64_3d">
+<polygon fill="#d9534f" stroke="#d9534f" points="844,-108 687,-108 687,-84 844,-84 844,-108"/>
+<text text-anchor="middle" x="765.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config%set_real64_3d</text>
+</a>
+</g>
+</g>
+<!-- none~set~18&#45;&gt;proc~set_real64_3d -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge12" class="edge">
+<title>none~set~18&#45;&gt;proc~set_real64_3d</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M611.69,-217.73C624.4,-214.5 636.98,-209.3 647,-201 678.28,-175.09 652.17,-143.45 683,-117 684.54,-115.68 686.15,-114.44 687.82,-113.28"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="689.79,-116.18 696.62,-108.08 686.23,-110.15 689.79,-116.18"/>
+</g>
+<!-- copy_config_physics_model -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node5" class="node">
+<title>copy_config_physics_model</title>
+<polygon fill="#777777" stroke="#777777" points="631,-150 471,-150 471,-126 631,-126 631,-150"/>
+<text text-anchor="middle" x="551" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">copy_config_physics_model</text>
+</g>
+<!-- proc~copy_config_wrf&#45;&gt;copy_config_physics_model -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge13" class="edge">
+<title>proc~copy_config_wrf&#45;&gt;copy_config_physics_model</title>
+<path fill="none" stroke="#00ff00" d="M418.53,-138C432.55,-138 446.96,-138 460.86,-138"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="460.88,-141.5 470.88,-138 460.88,-134.5 460.88,-141.5"/>
+</g>
+<!-- none~set~17 -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node6" class="node">
+<title>none~set~17</title>
+<g id="a_proc~~copy_config_hcf~~CallsGraph_node6"><a xlink:href="../type/type_config_wrf.html#boundprocedure-set~17" xlink:title="type_config_wrf%set">
+<polygon fill="#a7506f" stroke="#a7506f" points="611.5,-192 490.5,-192 490.5,-168 611.5,-168 611.5,-192"/>
+<text text-anchor="middle" x="551" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_config_wrf%set</text>
+</a>
+</g>
+</g>
+<!-- proc~copy_config_wrf&#45;&gt;none~set~17 -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge14" class="edge">
+<title>proc~copy_config_wrf&#45;&gt;none~set~17</title>
+<path fill="none" stroke="#00ff00" d="M388.76,-150.04C417.35,-155.35 451,-161.6 480.15,-167.02"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="479.79,-170.51 490.26,-168.9 481.07,-163.63 479.79,-170.51"/>
+</g>
+<!-- proc~reset_config_wrf -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node7" class="node">
+<title>proc~reset_config_wrf</title>
+<g id="a_proc~~copy_config_hcf~~CallsGraph_node7"><a xlink:href="../proc/reset_config_wrf.html" xlink:title="type_config_wrf%reset_config_wrf">
+<polygon fill="#d9534f" stroke="#d9534f" points="647,-108 455,-108 455,-84 647,-84 647,-108"/>
+<text text-anchor="middle" x="551" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_config_wrf%reset_config_wrf</text>
+</a>
+</g>
+</g>
+<!-- proc~copy_config_wrf&#45;&gt;proc~reset_config_wrf -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge15" class="edge">
+<title>proc~copy_config_wrf&#45;&gt;proc~reset_config_wrf</title>
+<path fill="none" stroke="#00ff00" d="M388.76,-125.96C415.71,-120.96 447.17,-115.11 475.11,-109.92"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="476.04,-113.31 485.23,-108.04 474.76,-106.42 476.04,-113.31"/>
+</g>
+<!-- proc~reset_config_hcf&#45;&gt;proc~reset_config_wrf -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge16" class="edge">
+<title>proc~reset_config_hcf&#45;&gt;proc~reset_config_wrf</title>
+<path fill="none" stroke="#0000ff" d="M419.19,-96C427.69,-96 436.32,-96 444.9,-96"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="444.92,-99.5 454.92,-96 444.92,-92.5 444.92,-99.5"/>
+</g>
+<!-- none~set~17&#45;&gt;proc~set_constant_id -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge17" class="edge">
+<title>none~set~17&#45;&gt;proc~set_constant_id</title>
+<path fill="none" stroke="#ff7f00" stroke-dasharray="5,2" d="M611.95,-182.66C624.95,-185.91 637.59,-191.53 647,-201 700.82,-255.17 630.12,-313.91 683,-369 683.94,-369.98 684.92,-370.91 685.93,-371.81"/>
+<polygon fill="#ff7f00" stroke="#ff7f00" points="684.16,-374.85 694.31,-377.88 688.27,-369.18 684.16,-374.85"/>
+</g>
+<!-- none~set~17&#45;&gt;proc~set_int32 -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge18" class="edge">
+<title>none~set~17&#45;&gt;proc~set_int32</title>
+<path fill="none" stroke="#ff7f00" stroke-dasharray="5,2" d="M611.51,-183.12C624.52,-186.35 637.28,-191.86 647,-201 689.41,-240.91 641.28,-286.36 683,-327 685.41,-329.35 688.04,-331.44 690.84,-333.31"/>
+<polygon fill="#ff7f00" stroke="#ff7f00" points="689.23,-336.42 699.67,-338.26 692.66,-330.31 689.23,-336.42"/>
+</g>
+<!-- none~set~17&#45;&gt;proc~set_int32_1d -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge19" class="edge">
+<title>none~set~17&#45;&gt;proc~set_int32_1d</title>
+<path fill="none" stroke="#ff7f00" stroke-dasharray="5,2" d="M611.69,-184.27C624.4,-187.5 636.98,-192.7 647,-201 678.28,-226.91 652.17,-258.55 683,-285 684.54,-286.32 686.15,-287.56 687.82,-288.72"/>
+<polygon fill="#ff7f00" stroke="#ff7f00" points="686.23,-291.85 696.62,-293.92 689.79,-285.82 686.23,-291.85"/>
+</g>
+<!-- none~set~17&#45;&gt;proc~set_int32_2d -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge20" class="edge">
+<title>none~set~17&#45;&gt;proc~set_int32_2d</title>
+<path fill="none" stroke="#ff7f00" stroke-dasharray="5,2" d="M611.52,-187.01C623.82,-190.11 636.28,-194.58 647,-201 668.09,-213.64 662.13,-230 683,-243 685.94,-244.83 689.04,-246.51 692.23,-248.03"/>
+<polygon fill="#ff7f00" stroke="#ff7f00" points="690.89,-251.27 701.46,-251.97 693.64,-244.83 690.89,-251.27"/>
+</g>
+<!-- none~set~17&#45;&gt;proc~set_int32_3d -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge21" class="edge">
+<title>none~set~17&#45;&gt;proc~set_int32_3d</title>
+<path fill="none" stroke="#ff7f00" stroke-dasharray="5,2" d="M611.76,-191.81C637.23,-196.85 667.14,-202.76 693.71,-208.01"/>
+<polygon fill="#ff7f00" stroke="#ff7f00" points="693.23,-211.48 703.71,-209.99 694.58,-204.61 693.23,-211.48"/>
+</g>
+<!-- none~set~17&#45;&gt;proc~set_real64 -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge22" class="edge">
+<title>none~set~17&#45;&gt;proc~set_real64</title>
+<path fill="none" stroke="#ff7f00" stroke-dasharray="5,2" d="M611.69,-175.73C624.4,-172.5 636.98,-167.3 647,-159 678.28,-133.09 652.17,-101.45 683,-75 684.54,-73.68 686.15,-72.44 687.82,-71.28"/>
+<polygon fill="#ff7f00" stroke="#ff7f00" points="689.79,-74.18 696.62,-66.08 686.23,-68.15 689.79,-74.18"/>
+</g>
+<!-- none~set~17&#45;&gt;proc~set_real64_1d -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge23" class="edge">
+<title>none~set~17&#45;&gt;proc~set_real64_1d</title>
+<path fill="none" stroke="#ff7f00" stroke-dasharray="5,2" d="M611.76,-180C631.89,-180 654.8,-180 676.64,-180"/>
+<polygon fill="#ff7f00" stroke="#ff7f00" points="676.93,-183.5 686.93,-180 676.93,-176.5 676.93,-183.5"/>
+</g>
+<!-- none~set~17&#45;&gt;proc~set_real64_2d -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge24" class="edge">
+<title>none~set~17&#45;&gt;proc~set_real64_2d</title>
+<path fill="none" stroke="#ff7f00" stroke-dasharray="5,2" d="M611.76,-168.19C637.23,-163.15 667.14,-157.24 693.71,-151.99"/>
+<polygon fill="#ff7f00" stroke="#ff7f00" points="694.58,-155.39 703.71,-150.01 693.23,-148.52 694.58,-155.39"/>
+</g>
+<!-- none~set~17&#45;&gt;proc~set_real64_3d -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge25" class="edge">
+<title>none~set~17&#45;&gt;proc~set_real64_3d</title>
+<path fill="none" stroke="#ff7f00" stroke-dasharray="5,2" d="M611.52,-172.99C623.82,-169.89 636.28,-165.42 647,-159 668.09,-146.36 662.13,-130 683,-117 685.94,-115.17 689.04,-113.49 692.23,-111.97"/>
+<polygon fill="#ff7f00" stroke="#ff7f00" points="693.64,-115.17 701.46,-108.03 690.89,-108.73 693.64,-115.17"/>
+</g>
+<!-- reset_config_physics_model -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node18" class="node">
+<title>reset_config_physics_model</title>
+<polygon fill="#777777" stroke="#777777" points="845.5,-24 685.5,-24 685.5,0 845.5,0 845.5,-24"/>
+<text text-anchor="middle" x="765.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">reset_config_physics_model</text>
+</g>
+<!-- proc~reset_config_wrf&#45;&gt;reset_config_physics_model -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge26" class="edge">
+<title>proc~reset_config_wrf&#45;&gt;reset_config_physics_model</title>
+<path fill="none" stroke="#ffff00" d="M573.68,-83.94C599.2,-70.13 643.18,-47.55 683,-33 688.94,-30.83 695.21,-28.79 701.52,-26.9"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="702.78,-30.18 711.43,-24.06 700.85,-23.45 702.78,-30.18"/>
+</g>
+<!-- proc~raise_error -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node17" class="node">
+<title>proc~raise_error</title>
+<g id="a_proc~~copy_config_hcf~~CallsGraph_node17"><a xlink:href="../proc/raise_error.html" xlink:title="raise_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="954,-213 884,-213 884,-189 954,-189 954,-213"/>
+<text text-anchor="middle" x="919" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">raise_error</text>
+</a>
+</g>
+</g>
+<!-- proc~set_int32_1d&#45;&gt;proc~raise_error -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge27" class="edge">
+<title>proc~set_int32_1d&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ff7f" d="M830.01,-293.88C836.32,-291.44 842.44,-288.52 848,-285 873.23,-269.04 893.88,-240.99 906.05,-221.72"/>
+<polygon fill="#00ff7f" stroke="#00ff7f" points="909.11,-223.42 911.33,-213.06 903.14,-219.78 909.11,-223.42"/>
+</g>
+<!-- proc~set_int32_2d&#45;&gt;proc~raise_error -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge28" class="edge">
+<title>proc~set_int32_2d&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ffff" d="M822.01,-252C830.85,-249.43 839.78,-246.44 848,-243 863.51,-236.51 879.68,-227.02 892.56,-218.7"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="894.5,-221.61 900.91,-213.18 890.64,-215.77 894.5,-221.61"/>
+</g>
+<!-- proc~set_int32_3d&#45;&gt;proc~raise_error -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge29" class="edge">
+<title>proc~set_int32_3d&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#007fff" d="M840.92,-211.68C852.14,-210.13 863.41,-208.57 873.72,-207.14"/>
+<polygon fill="#007fff" stroke="#007fff" points="874.26,-210.6 883.69,-205.76 873.3,-203.66 874.26,-210.6"/>
+</g>
+<!-- proc~set_real64_1d&#45;&gt;proc~raise_error -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge30" class="edge">
+<title>proc~set_real64_1d&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#7f00ff" d="M844.03,-190.75C854.18,-192.15 864.29,-193.56 873.63,-194.85"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="873.43,-198.35 883.81,-196.26 874.39,-191.42 873.43,-198.35"/>
+</g>
+<!-- proc~set_real64_2d&#45;&gt;proc~raise_error -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge31" class="edge">
+<title>proc~set_real64_2d&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff00ff" d="M822.01,-150C830.85,-152.57 839.78,-155.56 848,-159 863.51,-165.49 879.68,-174.98 892.56,-183.3"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="890.64,-186.23 900.91,-188.82 894.5,-180.39 890.64,-186.23"/>
+</g>
+<!-- proc~set_real64_3d&#45;&gt;proc~raise_error -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge32" class="edge">
+<title>proc~set_real64_3d&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff007f" d="M830.01,-108.12C836.32,-110.56 842.44,-113.48 848,-117 873.23,-132.96 893.88,-161.01 906.05,-180.28"/>
+<polygon fill="#ff007f" stroke="#ff007f" points="903.14,-182.22 911.33,-188.94 909.11,-178.58 903.14,-182.22"/>
+</g>
+<!-- proc~replace_placeholder -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node19" class="node">
+<title>proc~replace_placeholder</title>
+<g id="a_proc~~copy_config_hcf~~CallsGraph_node19"><a xlink:href="../proc/replace_placeholder.html" xlink:title="replace_placeholder">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1111,-253 990,-253 990,-229 1111,-229 1111,-253"/>
+<text text-anchor="middle" x="1050.5" y="-238.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">replace_placeholder</text>
+</a>
+</g>
+</g>
+<!-- proc~raise_error&#45;&gt;proc~replace_placeholder -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge33" class="edge">
+<title>proc~raise_error&#45;&gt;proc~replace_placeholder</title>
+<path fill="none" stroke="#ff0000" d="M954.02,-211.51C968.16,-215.88 984.85,-221.03 1000.28,-225.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="999.61,-229.25 1010.2,-228.86 1001.68,-222.57 999.61,-229.25"/>
+</g>
+<!-- strip -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node20" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="1201,-233 1147,-233 1147,-209 1201,-209 1201,-233"/>
+<text text-anchor="middle" x="1174" y="-218.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~raise_error&#45;&gt;strip -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge34" class="edge">
+<title>proc~raise_error&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M954.12,-203.7C1001.75,-207.46 1087.78,-214.26 1136.6,-218.12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1136.47,-221.62 1146.71,-218.92 1137.02,-214.64 1136.47,-221.62"/>
+</g>
+<!-- to_string -->
+<g id="proc~~copy_config_hcf~~CallsGraph_node21" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="1079.5,-173 1021.5,-173 1021.5,-149 1079.5,-149 1079.5,-173"/>
+<text text-anchor="middle" x="1050.5" y="-158.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~raise_error&#45;&gt;to_string -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge35" class="edge">
+<title>proc~raise_error&#45;&gt;to_string</title>
+<path fill="none" stroke="#ff0000" d="M954.02,-190.49C971.73,-185.02 993.42,-178.32 1011.65,-172.69"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1012.86,-175.98 1021.38,-169.69 1010.79,-169.29 1012.86,-175.98"/>
+</g>
+<!-- proc~replace_placeholder&#45;&gt;strip -->
+<g id="proc~~copy_config_hcf~~CallsGraph_edge36" class="edge">
+<title>proc~replace_placeholder&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M1111.18,-231.18C1119.86,-229.75 1128.57,-228.31 1136.6,-226.99"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1137.4,-230.41 1146.7,-225.33 1136.27,-223.5 1137.4,-230.41"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccopy_config_hcfCallsGraph = svgPanZoom('#proccopy_config_hcfCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~copy_config_hcf~~CalledByGraph Pages: 1 -->
+<svg id="proccopy_config_hcfCalledByGraph" width="641pt" height="22pt"
+ viewBox="0.00 0.00 641.00 22.10" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~copy_config_hcf~~CalledByGraph" class="graph" transform="scale(0.69 0.69) rotate(0) translate(4 28)">
+<title>proc~~copy_config_hcf~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 924,-28 924,4 -4,4"/>
+<!-- proc~copy_config_hcf -->
+<g id="proc~~copy_config_hcf~~CalledByGraph_node1" class="node">
+<title>proc~copy_config_hcf</title>
+<polygon fill="none" stroke="black" points="920,-24 729,-24 729,0 920,0 920,-24"/>
+<text text-anchor="middle" x="824.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_config_hcf%copy_config_hcf</text>
+</g>
+<!-- proc~initialize_abst_hcf -->
+<g id="proc~~copy_config_hcf~~CalledByGraph_node2" class="node">
+<title>proc~initialize_abst_hcf</title>
+<g id="a_proc~~copy_config_hcf~~CalledByGraph_node2"><a xlink:href="../proc/initialize_abst_hcf.html" xlink:title="initialize_abst_hcf">
+<polygon fill="#d9534f" stroke="#d9534f" points="693,-24 587,-24 587,0 693,0 693,-24"/>
+<text text-anchor="middle" x="640" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_abst_hcf</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_abst_hcf&#45;&gt;proc~copy_config_hcf -->
+<g id="proc~~copy_config_hcf~~CalledByGraph_edge1" class="edge">
+<title>proc~initialize_abst_hcf&#45;&gt;proc~copy_config_hcf</title>
+<path fill="none" stroke="#ff0000" d="M693.3,-12C701.32,-12 709.84,-12 718.53,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="718.79,-15.5 728.79,-12 718.79,-8.5 718.79,-15.5"/>
+</g>
+<!-- interface~initialize_abst_hcf -->
+<g id="proc~~copy_config_hcf~~CalledByGraph_node3" class="node">
+<title>interface~initialize_abst_hcf</title>
+<g id="a_proc~~copy_config_hcf~~CalledByGraph_node3"><a xlink:href="../interface/initialize_abst_hcf.html" xlink:title="abst_hcf%initialize_abst_hcf">
+<polygon fill="#a7506f" stroke="#a7506f" points="551,-24 391,-24 391,0 551,0 551,-24"/>
+<text text-anchor="middle" x="471" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_hcf%initialize_abst_hcf</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_abst_hcf&#45;&gt;proc~initialize_abst_hcf -->
+<g id="proc~~copy_config_hcf~~CalledByGraph_edge2" class="edge">
+<title>interface~initialize_abst_hcf&#45;&gt;proc~initialize_abst_hcf</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M551.1,-12C559.73,-12 568.42,-12 576.81,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="576.86,-15.5 586.86,-12 576.86,-8.5 576.86,-15.5"/>
+</g>
+<!-- proc~initialize_holder_hcfs -->
+<g id="proc~~copy_config_hcf~~CalledByGraph_node4" class="node">
+<title>proc~initialize_holder_hcfs</title>
+<g id="a_proc~~copy_config_hcf~~CalledByGraph_node4"><a xlink:href="../proc/initialize_holder_hcfs.html" xlink:title="initialize_holder_hcfs">
+<polygon fill="#d9534f" stroke="#d9534f" points="355,-24 231,-24 231,0 355,0 355,-24"/>
+<text text-anchor="middle" x="293" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_holder_hcfs</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_holder_hcfs&#45;&gt;interface~initialize_abst_hcf -->
+<g id="proc~~copy_config_hcf~~CalledByGraph_edge3" class="edge">
+<title>proc~initialize_holder_hcfs&#45;&gt;interface~initialize_abst_hcf</title>
+<path fill="none" stroke="#ff0000" d="M355.06,-12C363.34,-12 371.97,-12 380.62,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="380.76,-15.5 390.76,-12 380.76,-8.5 380.76,-15.5"/>
+</g>
+<!-- interface~initialize_holder_hcfs -->
+<g id="proc~~copy_config_hcf~~CalledByGraph_node5" class="node">
+<title>interface~initialize_holder_hcfs</title>
+<g id="a_proc~~copy_config_hcf~~CalledByGraph_node5"><a xlink:href="../interface/initialize_holder_hcfs.html" xlink:title="holder_hcfs%initialize_holder_hcfs">
+<polygon fill="#a7506f" stroke="#a7506f" points="195,-24 0,-24 0,0 195,0 195,-24"/>
+<text text-anchor="middle" x="97.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">holder_hcfs%initialize_holder_hcfs</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_holder_hcfs&#45;&gt;proc~initialize_holder_hcfs -->
+<g id="proc~~copy_config_hcf~~CalledByGraph_edge4" class="edge">
+<title>interface~initialize_holder_hcfs&#45;&gt;proc~initialize_holder_hcfs</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M195.25,-12C203.85,-12 212.45,-12 220.77,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="220.78,-15.5 230.78,-12 220.78,-8.5 220.78,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccopy_config_hcfCalledByGraph = svgPanZoom('#proccopy_config_hcfCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">copy_config_hcf</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_config_hcf</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">abst_config</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">source</span>
+
+<span class="w">        </span><span class="k">select type</span><span class="w"> </span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+<span class="w">        </span><span class="k">type is</span><span class="w"> </span><span class="p">(</span><span class="n">type_config_hcf</span><span class="p">)</span>
+<span class="w">            </span><span class="c">! まず親型の copy を呼ぶ</span>
+<span class="w">            </span><span class="k">call </span><span class="n">copy_config_wrf</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="p">)</span>
+<span class="w">            </span><span class="c">! 追加メンバーのみコピー</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">set</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">model</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="p">%</span><span class="n">model</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">set</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">water_viscosity_model</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="p">%</span><span class="n">water_viscosity_model</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">set</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">k_sat</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="p">%</span><span class="n">k_sat</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">set</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">l</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="p">%</span><span class="n">l</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">set</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">omega</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="p">%</span><span class="n">omega</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">set</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">gain_factor</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="p">%</span><span class="n">gain_factor</span><span class="p">)</span>
+<span class="w">        </span><span class="k">class </span><span class="n">default</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">reset</span><span class="p">()</span>
+<span class="w">        </span><span class="k">end select</span>
+<span class="k">    end subroutine </span><span class="n">copy_config_hcf</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-23 23:52 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

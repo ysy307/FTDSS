@@ -37,7 +37,7 @@ module solver_solve
         !> Name of the solver.
         character(:), allocatable :: name
         !> Status of the solver after execution.
-        integer(int32) :: status = SOLVER_STATUS_SUCCESS
+        integer(int32) :: status = SOLVER_STATUS%SUCCESS%ID
 
         integer(int32) :: num_nodes = -1
         integer(int32) :: num_dofs_per_node = -1
@@ -185,13 +185,13 @@ contains
         integer(int32), intent(in) :: max_iterations
         integer(int32), intent(in), optional :: m_restart
 
-        self%id = id
+        self%ID = id
         self%num_nodes = num_nodes
         self%tolerance = tolerance
         self%max_iterations = max_iterations
 
-        select case (self%id)
-        case (SOLVER_GMRES_M)
+        select case (self%ID)
+        case (LINEAR_SOLVER_TYPES%GMRES_M%ID)
             if (present(m_restart)) then
                 self%m_restart = m_restart
             else
@@ -208,7 +208,7 @@ contains
         integer(int32), intent(in), optional :: unit_display
         integer(int32) :: unit
 
-        if (self%status == SOLVER_STATUS_SUCCESS) return
+        if (self%status == SOLVER_STATUS%SUCCESS%ID) return
 
         if (present(unit_display)) then
             unit = unit_display
@@ -218,28 +218,28 @@ contains
 
         if (present(time)) then
             select case (self%status)
-            case (SOLVER_STATUS_ILL_OPTIONS)
+            case (SOLVER_STATUS%ILL_OPTIONS%ID)
                 write (unit, '(a,es13.4,a)') strip(self%name), ": ", time, " Day: Solver occures ILL_OPTIONS."
-            case (SOLVER_STATUS_BREAKDOWN)
+            case (SOLVER_STATUS%BREAKDOWN%ID)
                 write (unit, '(a,es13.4,a)') strip(self%name), ": ", time, " Day: Solver occures BREAKDOWN."
-            case (SOLVER_STATUS_OUT_OF_MEMORY)
+            case (SOLVER_STATUS%OUT_OF_MEMORY%ID)
                 write (unit, '(a,es13.4,a)') strip(self%name), ": ", time, " Day: Solver occures OUT_OF_MEMORY."
-            case (SOLVER_STATUS_MAXITER)
+            case (SOLVER_STATUS%MAXITER%ID)
                 write (unit, '(a,es13.4,a)') strip(self%name), ": ", time, " Day: Solver occures MAXITER."
-            case (SOLVER_STATUS_NOT_IMPLEMENTED)
+            case (SOLVER_STATUS%NOT_IMPLEMENTED%ID)
                 write (unit, '(a,es13.4,a)') strip(self%name), ": ", time, " Day: Solver occures NOT_IMPLEMENTED."
             end select
         else
             select case (self%status)
-            case (SOLVER_STATUS_ILL_OPTIONS)
+            case (SOLVER_STATUS%ILL_OPTIONS%ID)
                 write (unit, '(2a)') strip(self%name), ": Solver occures ILL_OPTIONS."
-            case (SOLVER_STATUS_BREAKDOWN)
+            case (SOLVER_STATUS%BREAKDOWN%ID)
                 write (unit, '(2a)') strip(self%name), ": Solver occures BREAKDOWN."
-            case (SOLVER_STATUS_OUT_OF_MEMORY)
+            case (SOLVER_STATUS%OUT_OF_MEMORY%ID)
                 write (unit, '(2a)') strip(self%name), ": Solver occures OUT_OF_MEMORY."
-            case (SOLVER_STATUS_MAXITER)
+            case (SOLVER_STATUS%MAXITER%ID)
                 write (unit, '(2a)') strip(self%name), ": Solver occures MAXITER."
-            case (SOLVER_STATUS_NOT_IMPLEMENTED)
+            case (SOLVER_STATUS%NOT_IMPLEMENTED%ID)
                 write (unit, '(2a)') strip(self%name), ": Solver occures NOT_IMPLEMENTED."
             end select
         end if
@@ -280,63 +280,63 @@ contains
             deallocate (solver)
         end if
 
-        select case (solver_settings%id)
-        case (SOLVER_CG)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_BICG)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_CGS)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_BICGSTAB)
+        select case (solver_settings%ID)
+        case (LINEAR_SOLVER_TYPES%CG%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%BICG%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%CGS%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%BICGSTAB%ID)
             allocate (type_solver_bicgstab :: solver)
             call solver%initialize(solver_settings, preconditioner_settings)
             ierr = solver%status
-        case (SOLVER_BICGSTAB_L)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_GPBICG)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_TFQMR)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_ORTHOMIN_M)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_GMRES_M)
+        case (LINEAR_SOLVER_TYPES%BICGSTAB_L%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%GPBICG%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%TFQMR%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%ORTHOMIN_M%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%GMRES_M%ID)
             allocate (type_solver_gmres :: solver)
             call solver%initialize(solver_settings, preconditioner_settings)
             ierr = solver%status
-        case (SOLVER_JACOBI)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_GAUSS_SEIDEL)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_SOR)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_BICGSAFE)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_CR)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_BICR)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_CRS)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_BICRSTAB)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_GPBICR)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_BICRSAFE)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_FGMRES_M)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_IDR_S)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_IDR1)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_MINRES)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_COCG)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
-        case (SOLVER_COCR)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
+        case (LINEAR_SOLVER_TYPES%JACOBI%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%GAUSS_SEIDEL%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%SOR%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%BICGSAFE%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%CR%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%BICR%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%CRS%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%BICRSTAB%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%GPBICR%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%BICRSAFE%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%FGMRES_M%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%IDR_S%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%IDR1%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%MINRES%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%COCG%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%COCR%ID)
+            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
         case default
-            ierr = SOLVER_STATUS_ILL_OPTIONS
+            ierr = SOLVER_STATUS%ILL_OPTIONS%ID
         end select
 
     end subroutine create_solver

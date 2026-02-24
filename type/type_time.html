@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 1.4% of total for derived types.</p>Including implementation: 248 statements,  1.4% of total for derived types.">32 statements</a>
+                 title="<p> 1.1% of total for derived types.</p>Including implementation: 248 statements,  1.1% of total for derived types.">32 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -142,8 +142,8 @@
             <a class="list-group-item" href="../type/type_time.html#variable-dt_s_history">dt_s_history</a>
             <a class="list-group-item" href="../type/type_time.html#variable-dt_s_max">dt_s_max</a>
             <a class="list-group-item" href="../type/type_time.html#variable-dt_s_min">dt_s_min</a>
-            <a class="list-group-item" href="../type/type_time.html#variable-end_time~2">end_time</a>
-            <a class="list-group-item" href="../type/type_time.html#variable-start_time~2">start_time</a>
+            <a class="list-group-item" href="../type/type_time.html#variable-end_time">end_time</a>
+            <a class="list-group-item" href="../type/type_time.html#variable-start_time">start_time</a>
             <a class="list-group-item" href="../type/type_time.html#variable-target_bdf_order">target_bdf_order</a>
             <a class="list-group-item" href="../type/type_time.html#variable-time_old">time_old</a>
         </div>
@@ -173,20 +173,20 @@
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-compute_bdf_coefficients">compute_bdf_coefficients</a>
-            <a class="list-group-item" href="../type/type_time.html#boundprocedure-display~40">display</a>
+            <a class="list-group-item" href="../type/type_time.html#boundprocedure-display~25">display</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-get_bdf_coeffs">get_bdf_coeffs</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-get_bdf_order">get_bdf_order</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-get_dt">get_dt</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-get_end_time">get_end_time</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-get_time">get_time</a>
-            <a class="list-group-item" href="../type/type_time.html#boundprocedure-initialize~66">initialize</a>
+            <a class="list-group-item" href="../type/type_time.html#boundprocedure-initialize~49">initialize</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-is_end_time~3">is_end_time</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-is_max_dt">is_max_dt</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-is_min_dt">is_min_dt</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-set_dt">set_dt</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-shift~2">shift</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-sync_with_output">sync_with_output</a>
-            <a class="list-group-item" href="../type/type_time.html#boundprocedure-update~7">update</a>
+            <a class="list-group-item" href="../type/type_time.html#boundprocedure-update~5">update</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-update_bdf_coefficients">update_bdf_coefficients</a>
         </div>
       </div>
@@ -562,7 +562,7 @@ Note: Coefficients include the $1/\Delta t$ scaling.</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-end_time~2"></span>
+              <span class="anchor" id="variable-end_time"></span>
               real(kind=real64),
             </td>
               <td>private</td>
@@ -579,7 +579,7 @@ Note: Coefficients include the $1/\Delta t$ scaling.</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-start_time~2"></span>
+              <span class="anchor" id="variable-start_time"></span>
               real(kind=real64),
             </td>
               <td>private</td>
@@ -701,7 +701,7 @@ Note: Coefficients <script type="math/tex"> \alpha_j </script> inherently includ
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-display~40"></span>
+      <span class="anchor" id="boundprocedure-display~25"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>display</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/display_status.html'>display_status</a>
@@ -1171,7 +1171,7 @@ If a target time unit is provided, the <code>current_time</code> is converted ac
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~66"></span>
+      <span class="anchor" id="boundprocedure-initialize~49"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>initialize</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/initialize_type_time.html'>initialize_type_time</a>
@@ -1646,7 +1646,7 @@ Also manages the ramping up of BDF order during initial steps.</p>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-update~7"></span>
+      <span class="anchor" id="boundprocedure-update~5"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>update</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/update_type_time.html'>update_type_time</a>
@@ -1891,7 +1891,7 @@ Also manages the ramping up of BDF order during initial steps.</p>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-22 12:12 +0000             </p>
+ on 2026-02-23 23:52 +0000             </p>
           </div>
         </div>
         <br>

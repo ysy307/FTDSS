@@ -31,8 +31,8 @@ contains
         call self%F%zero()
 
         call self%domain%get_num_colors(num_colors)
-        call self%domain%get_target_dof(PHYSICS_TYPE_THERMAL, thermal_dof)
-        call self%domain%get_target_dof(PHYSICS_TYPE_HYDRAULIC, hydraulic_dof)
+        call self%domain%get_target_dof(PHYSICS_TYPES%THERMAL, thermal_dof)
+        call self%domain%get_target_dof(PHYSICS_TYPES%HYDRAULIC, hydraulic_dof)
 
         do i_color = 1, num_colors
 

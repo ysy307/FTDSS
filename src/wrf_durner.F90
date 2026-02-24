@@ -8,11 +8,11 @@ contains
         real(real64), intent(inout) :: Qw
 
         if (h < 0.0d0) then
-            Qw = self%params%theta_r + (self%params%theta_s - self%params%theta_r) * &
-                 (self%params%w1 * (1.0d0 + abs(self%params%alpha1 * h)**self%params%n1)**(-self%params%m1) &
-                  + self%params%w2 * (1.0d0 + abs(self%params%alpha2 * h)**self%params%n2)**(-self%params%m2))
+            Qw = self%config%theta_r + (self%config%theta_s - self%config%theta_r) * &
+                 (self%config%w1 * (1.0d0 + abs(self%config%alpha1 * h)**self%config%n1)**(-self%config%m1) &
+                  + self%config%w2 * (1.0d0 + abs(self%config%alpha2 * h)**self%config%n2)**(-self%config%m2))
         else
-            Qw = self%params%theta_s
+            Qw = self%config%theta_s
         end if
 
     end subroutine calculate_wrf_durner
@@ -24,13 +24,13 @@ contains
         real(real64), intent(inout) :: dQw_dh
 
         if (h < 0.0d0) then
-            dQw_dh = (self%params%theta_s - self%params%theta_r) * &
-                     (self%params%w1 * self%params%alpha1**self%params%n1 * &
-                      self%params%m1 * self%params%n1 * (-h)**(self%params%n1 - 1.0d0) * &
-                      (1.0d0 + (-self%params%alpha1 * h)**self%params%n1)**(-self%params%m1 - 1.0d0) &
-                      + self%params%w2 * self%params%alpha2**self%params%n2 * &
-                      self%params%m2 * self%params%n2 * (-h)**(self%params%n2 - 1.0d0) * &
-                      (1.0d0 + (-self%params%alpha2 * h)**self%params%n2)**(-self%params%m2 - 1.0d0))
+            dQw_dh = (self%config%theta_s - self%config%theta_r) * &
+                     (self%config%w1 * self%config%alpha1**self%config%n1 * &
+                      self%config%m1 * self%config%n1 * (-h)**(self%config%n1 - 1.0d0) * &
+                      (1.0d0 + (-self%config%alpha1 * h)**self%config%n1)**(-self%config%m1 - 1.0d0) &
+                      + self%config%w2 * self%config%alpha2**self%config%n2 * &
+                      self%config%m2 * self%config%n2 * (-h)**(self%config%n2 - 1.0d0) * &
+                      (1.0d0 + (-self%config%alpha2 * h)**self%config%n2)**(-self%config%m2 - 1.0d0))
         else
             dQw_dh = 0.0d0
         end if

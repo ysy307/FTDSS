@@ -1,0 +1,1007 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>get_current_values &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>get_current_values
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">7 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/variable.fypp"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/variable.fypp.html'>variable.fypp</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_types_variable.html'>core_types_variable</a></li>
+            <li class="breadcrumb-item active" aria-current="page">get_current_values</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/get_current_values.html#src">get_current_values</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine get_current_values(self, values)  
+</h2>
+    
+
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_variable.html'>type_variable</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~1433"></span>
+              class(<a href='../type/type_variable.html'>type_variable</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-values~22"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              pointer, contiguous
+            </td>
+            <td>::</td>
+            <td><strong>values</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~get_current_values~~CallsGraph Pages: 1 -->
+<svg id="procget_current_valuesCallsGraph" width="641pt" height="93pt"
+ viewBox="0.00 0.00 641.00 92.63" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_current_values~~CallsGraph" class="graph" transform="scale(0.83 0.83) rotate(0) translate(4 108)">
+<title>proc~~get_current_values~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-108 771,-108 771,4 -4,4"/>
+<!-- proc~get_current_values -->
+<g id="proc~~get_current_values~~CallsGraph_node1" class="node">
+<title>proc~get_current_values</title>
+<polygon fill="none" stroke="black" points="195,-64 0,-64 0,-40 195,-40 195,-64"/>
+<text text-anchor="middle" x="97.5" y="-49.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_variable%get_current_values</text>
+</g>
+<!-- proc~assert_initialized -->
+<g id="proc~~get_current_values~~CallsGraph_node2" class="node">
+<title>proc~assert_initialized</title>
+<g id="a_proc~~get_current_values~~CallsGraph_node2"><a xlink:href="../proc/assert_initialized.html" xlink:title="type_variable%assert_initialized">
+<polygon fill="#d9534f" stroke="#d9534f" points="414,-64 231,-64 231,-40 414,-40 414,-64"/>
+<text text-anchor="middle" x="322.5" y="-49.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%assert_initialized</text>
+</a>
+</g>
+</g>
+<!-- proc~get_current_values&#45;&gt;proc~assert_initialized -->
+<g id="proc~~get_current_values~~CallsGraph_edge1" class="edge">
+<title>proc~get_current_values&#45;&gt;proc~assert_initialized</title>
+<path fill="none" stroke="#ff0000" d="M195.01,-52C203.56,-52 212.22,-52 220.8,-52"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="220.82,-55.5 230.82,-52 220.82,-48.5 220.82,-55.5"/>
+</g>
+<!-- proc~raise_error -->
+<g id="proc~~get_current_values~~CallsGraph_node3" class="node">
+<title>proc~raise_error</title>
+<g id="a_proc~~get_current_values~~CallsGraph_node3"><a xlink:href="../proc/raise_error.html" xlink:title="raise_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="520,-64 450,-64 450,-40 520,-40 520,-64"/>
+<text text-anchor="middle" x="485" y="-49.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">raise_error</text>
+</a>
+</g>
+</g>
+<!-- proc~assert_initialized&#45;&gt;proc~raise_error -->
+<g id="proc~~get_current_values~~CallsGraph_edge2" class="edge">
+<title>proc~assert_initialized&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff0000" d="M414.07,-52C422.87,-52 431.5,-52 439.53,-52"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="439.71,-55.5 449.71,-52 439.71,-48.5 439.71,-55.5"/>
+</g>
+<!-- proc~replace_placeholder -->
+<g id="proc~~get_current_values~~CallsGraph_node4" class="node">
+<title>proc~replace_placeholder</title>
+<g id="a_proc~~get_current_values~~CallsGraph_node4"><a xlink:href="../proc/replace_placeholder.html" xlink:title="replace_placeholder">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="677,-104 556,-104 556,-80 677,-80 677,-104"/>
+<text text-anchor="middle" x="616.5" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">replace_placeholder</text>
+</a>
+</g>
+</g>
+<!-- proc~raise_error&#45;&gt;proc~replace_placeholder -->
+<g id="proc~~get_current_values~~CallsGraph_edge3" class="edge">
+<title>proc~raise_error&#45;&gt;proc~replace_placeholder</title>
+<path fill="none" stroke="#ff0000" d="M520.02,-62.51C534.16,-66.88 550.85,-72.03 566.28,-76.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="565.61,-80.25 576.2,-79.86 567.68,-73.57 565.61,-80.25"/>
+</g>
+<!-- strip -->
+<g id="proc~~get_current_values~~CallsGraph_node5" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="767,-84 713,-84 713,-60 767,-60 767,-84"/>
+<text text-anchor="middle" x="740" y="-69.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~raise_error&#45;&gt;strip -->
+<g id="proc~~get_current_values~~CallsGraph_edge4" class="edge">
+<title>proc~raise_error&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M520.12,-54.7C567.75,-58.46 653.78,-65.26 702.6,-69.12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="702.47,-72.62 712.71,-69.92 703.02,-65.64 702.47,-72.62"/>
+</g>
+<!-- to_string -->
+<g id="proc~~get_current_values~~CallsGraph_node6" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="645.5,-24 587.5,-24 587.5,0 645.5,0 645.5,-24"/>
+<text text-anchor="middle" x="616.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~raise_error&#45;&gt;to_string -->
+<g id="proc~~get_current_values~~CallsGraph_edge5" class="edge">
+<title>proc~raise_error&#45;&gt;to_string</title>
+<path fill="none" stroke="#ff0000" d="M520.02,-41.49C537.73,-36.02 559.42,-29.32 577.65,-23.69"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="578.86,-26.98 587.38,-20.69 576.79,-20.29 578.86,-26.98"/>
+</g>
+<!-- proc~replace_placeholder&#45;&gt;strip -->
+<g id="proc~~get_current_values~~CallsGraph_edge6" class="edge">
+<title>proc~replace_placeholder&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M677.18,-82.18C685.86,-80.75 694.57,-79.31 702.6,-77.99"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="703.4,-81.41 712.7,-76.33 702.27,-74.5 703.4,-81.41"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocget_current_valuesCallsGraph = svgPanZoom('#procget_current_valuesCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~get_current_values~~CalledByGraph Pages: 1 -->
+<svg id="procget_current_valuesCalledByGraph" width="641pt" height="51pt"
+ viewBox="0.00 0.00 641.00 50.93" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_current_values~~CalledByGraph" class="graph" transform="scale(0.26 0.26) rotate(0) translate(4 194)">
+<title>proc~~get_current_values~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-194 2488,-194 2488,4 -4,4"/>
+<!-- proc~get_current_values -->
+<g id="proc~~get_current_values~~CalledByGraph_node1" class="node">
+<title>proc~get_current_values</title>
+<polygon fill="none" stroke="black" points="2484,-108 2289,-108 2289,-84 2484,-84 2484,-108"/>
+<text text-anchor="middle" x="2386.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_variable%get_current_values</text>
+</g>
+<!-- none~get_current -->
+<g id="proc~~get_current_values~~CalledByGraph_node2" class="node">
+<title>none~get_current</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node2"><a xlink:href="../type/type_variable.html#boundprocedure-get_current" xlink:title="type_variable%get_current">
+<polygon fill="#a7506f" stroke="#a7506f" points="2253,-108 2098,-108 2098,-84 2253,-84 2253,-108"/>
+<text text-anchor="middle" x="2175.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%get_current</text>
+</a>
+</g>
+</g>
+<!-- none~get_current&#45;&gt;proc~get_current_values -->
+<g id="proc~~get_current_values~~CalledByGraph_edge1" class="edge">
+<title>none~get_current&#45;&gt;proc~get_current_values</title>
+<path fill="none" stroke="#ff0000" d="M2253.14,-96C2261.51,-96 2270.14,-96 2278.79,-96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2278.94,-99.5 2288.94,-96 2278.94,-92.5 2278.94,-99.5"/>
+</g>
+<!-- proc~apply_natural_bc_generic -->
+<g id="proc~~get_current_values~~CalledByGraph_node3" class="node">
+<title>proc~apply_natural_bc_generic</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node3"><a xlink:href="../proc/apply_natural_bc_generic.html" xlink:title="apply_natural_bc_generic">
+<polygon fill="#d9534f" stroke="#d9534f" points="1788.5,-24 1639.5,-24 1639.5,0 1788.5,0 1788.5,-24"/>
+<text text-anchor="middle" x="1714" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">apply_natural_bc_generic</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_natural_bc_generic&#45;&gt;none~get_current -->
+<g id="proc~~get_current_values~~CalledByGraph_edge2" class="edge">
+<title>proc~apply_natural_bc_generic&#45;&gt;none~get_current</title>
+<path fill="none" stroke="#ff0000" d="M1788.73,-7.06C1860.12,-4.45 1970.65,-6.19 2062,-33 2094.66,-42.58 2128.21,-63.01 2150.07,-78.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2148.21,-80.99 2158.41,-83.87 2152.23,-75.26 2148.21,-80.99"/>
+</g>
+<!-- proc~calc_gradient_pressure_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node4" class="node">
+<title>proc~calc_gradient_pressure_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node4"><a xlink:href="../proc/calc_gradient_pressure_ftdss.html" xlink:title="calc_gradient_pressure_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="2051,-108 1886,-108 1886,-84 2051,-84 2051,-108"/>
+<text text-anchor="middle" x="1968.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_gradient_pressure_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_pressure_ftdss&#45;&gt;none~get_current -->
+<g id="proc~~get_current_values~~CalledByGraph_edge3" class="edge">
+<title>proc~calc_gradient_pressure_ftdss&#45;&gt;none~get_current</title>
+<path fill="none" stroke="#ff0000" d="M2051.11,-96C2063.15,-96 2075.59,-96 2087.73,-96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2087.84,-99.5 2097.84,-96 2087.84,-92.5 2087.84,-99.5"/>
+</g>
+<!-- proc~calc_gradient_temperature_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node5" class="node">
+<title>proc~calc_gradient_temperature_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node5"><a xlink:href="../proc/calc_gradient_temperature_ftdss.html" xlink:title="calc_gradient_temperature_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="2062,-66 1875,-66 1875,-42 2062,-42 2062,-66"/>
+<text text-anchor="middle" x="1968.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_gradient_temperature_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_temperature_ftdss&#45;&gt;none~get_current -->
+<g id="proc~~get_current_values~~CalledByGraph_edge4" class="edge">
+<title>proc~calc_gradient_temperature_ftdss&#45;&gt;none~get_current</title>
+<path fill="none" stroke="#ff0000" d="M2028.24,-66.04C2052.48,-71 2080.73,-76.79 2105.9,-81.95"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2105.25,-85.38 2115.75,-83.96 2106.65,-78.53 2105.25,-85.38"/>
+</g>
+<!-- proc~reflect_variables_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node6" class="node">
+<title>proc~reflect_variables_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node6"><a xlink:href="../proc/reflect_variables_ftdss.html" xlink:title="reflect_variables_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1537,-108 1407,-108 1407,-84 1537,-84 1537,-108"/>
+<text text-anchor="middle" x="1472" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">reflect_variables_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;none~get_current -->
+<g id="proc~~get_current_values~~CalledByGraph_edge5" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;none~get_current</title>
+<path fill="none" stroke="#ff0000" d="M1527.9,-108.02C1547.12,-111.67 1568.92,-115.2 1589,-117 1798.38,-135.8 1852.67,-136.37 2062,-117 2077.99,-115.52 2095.09,-112.88 2111.01,-109.97"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2112.1,-113.32 2121.28,-108.02 2110.8,-106.44 2112.1,-113.32"/>
+</g>
+<!-- interface~calc_gradient_pressure_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node9" class="node">
+<title>interface~calc_gradient_pressure_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node9"><a xlink:href="../interface/calc_gradient_pressure_ftdss.html" xlink:title="type_ftdss%calc_gradient_pressure_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1828,-108 1600,-108 1600,-84 1828,-84 1828,-108"/>
+<text text-anchor="middle" x="1714" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%calc_gradient_pressure_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;interface~calc_gradient_pressure_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge13" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;interface~calc_gradient_pressure_ftdss</title>
+<path fill="none" stroke="#cbff00" d="M1537,-96C1553.29,-96 1571.35,-96 1589.51,-96"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1589.6,-99.5 1599.6,-96 1589.6,-92.5 1589.6,-99.5"/>
+</g>
+<!-- interface~calc_gradient_temperature_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node10" class="node">
+<title>interface~calc_gradient_temperature_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node10"><a xlink:href="../interface/calc_gradient_temperature_ftdss.html" xlink:title="type_ftdss%calc_gradient_temperature_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1839,-66 1589,-66 1589,-42 1839,-42 1839,-66"/>
+<text text-anchor="middle" x="1714" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%calc_gradient_temperature_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftdss&#45;&gt;interface~calc_gradient_temperature_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge15" class="edge">
+<title>proc~reflect_variables_ftdss&#45;&gt;interface~calc_gradient_temperature_ftdss</title>
+<path fill="none" stroke="#00ff66" d="M1537.1,-84.26C1553.97,-81.21 1572.17,-77.95 1589,-75 1602.59,-72.62 1617.02,-70.14 1631.05,-67.74"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1631.91,-71.15 1641.18,-66.02 1630.73,-64.25 1631.91,-71.15"/>
+</g>
+<!-- proc~set_state_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node7" class="node">
+<title>proc~set_state_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node7"><a xlink:href="../proc/set_state_ftdss.html" xlink:title="set_state_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="2013.5,-188 1923.5,-188 1923.5,-164 2013.5,-164 2013.5,-188"/>
+<text text-anchor="middle" x="1968.5" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">set_state_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~set_state_ftdss&#45;&gt;none~get_current -->
+<g id="proc~~get_current_values~~CalledByGraph_edge6" class="edge">
+<title>proc~set_state_ftdss&#45;&gt;none~get_current</title>
+<path fill="none" stroke="#ff0000" d="M2013.76,-165.24C2029.21,-161.04 2046.55,-155.83 2062,-150 2090.2,-139.36 2120.98,-124.34 2143.2,-112.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2144.93,-115.88 2152.17,-108.15 2141.68,-109.68 2144.93,-115.88"/>
+</g>
+<!-- interface~apply_natural_bc_generic -->
+<g id="proc~~get_current_values~~CalledByGraph_node8" class="node">
+<title>interface~apply_natural_bc_generic</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node8"><a xlink:href="../interface/apply_natural_bc_generic.html" xlink:title="type_ftdss%apply_natural_bc_generic">
+<polygon fill="#a7506f" stroke="#a7506f" points="1355,-24 1143,-24 1143,0 1355,0 1355,-24"/>
+<text text-anchor="middle" x="1249" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%apply_natural_bc_generic</text>
+</a>
+</g>
+</g>
+<!-- interface~apply_natural_bc_generic&#45;&gt;proc~apply_natural_bc_generic -->
+<g id="proc~~get_current_values~~CalledByGraph_edge7" class="edge">
+<title>interface~apply_natural_bc_generic&#45;&gt;proc~apply_natural_bc_generic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1355.06,-12C1438.05,-12 1552.3,-12 1629.21,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1629.34,-15.5 1639.34,-12 1629.34,-8.5 1629.34,-15.5"/>
+</g>
+<!-- interface~calc_gradient_pressure_ftdss&#45;&gt;proc~calc_gradient_pressure_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge8" class="edge">
+<title>interface~calc_gradient_pressure_ftdss&#45;&gt;proc~calc_gradient_pressure_ftdss</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M1828.32,-96C1844.24,-96 1860.44,-96 1875.88,-96"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1875.91,-99.5 1885.91,-96 1875.91,-92.5 1875.91,-99.5"/>
+</g>
+<!-- interface~calc_gradient_temperature_ftdss&#45;&gt;proc~calc_gradient_temperature_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge9" class="edge">
+<title>interface~calc_gradient_temperature_ftdss&#45;&gt;proc~calc_gradient_temperature_ftdss</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M1839.03,-54C1847.63,-54 1856.25,-54 1864.71,-54"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1864.96,-57.5 1874.96,-54 1864.96,-50.5 1864.96,-57.5"/>
+</g>
+<!-- interface~reflect_variables_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node11" class="node">
+<title>interface~reflect_variables_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node11"><a xlink:href="../interface/reflect_variables_ftdss.html" xlink:title="type_ftdss%reflect_variables_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1107,-108 914,-108 914,-84 1107,-84 1107,-108"/>
+<text text-anchor="middle" x="1010.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%reflect_variables_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~reflect_variables_ftdss&#45;&gt;proc~reflect_variables_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge10" class="edge">
+<title>interface~reflect_variables_ftdss&#45;&gt;proc~reflect_variables_ftdss</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M1107.27,-96C1193.23,-96 1317.66,-96 1396.41,-96"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1396.74,-99.5 1406.74,-96 1396.74,-92.5 1396.74,-99.5"/>
+</g>
+<!-- interface~set_state_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node12" class="node">
+<title>interface~set_state_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node12"><a xlink:href="../interface/set_state_ftdss.html" xlink:title="type_ftdss%set_state_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1790.5,-188 1637.5,-188 1637.5,-164 1790.5,-164 1790.5,-188"/>
+<text text-anchor="middle" x="1714" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%set_state_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~set_state_ftdss&#45;&gt;proc~set_state_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge11" class="edge">
+<title>interface~set_state_ftdss&#45;&gt;proc~set_state_ftdss</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1790.76,-176C1830.16,-176 1877.41,-176 1913.14,-176"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1913.37,-179.5 1923.37,-176 1913.37,-172.5 1913.37,-179.5"/>
+</g>
+<!-- proc~apply_bc_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node13" class="node">
+<title>proc~apply_bc_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node13"><a xlink:href="../proc/apply_bc_ftdss.html" xlink:title="apply_bc_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1055.5,-24 965.5,-24 965.5,0 1055.5,0 1055.5,-24"/>
+<text text-anchor="middle" x="1010.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">apply_bc_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_bc_ftdss&#45;&gt;interface~apply_natural_bc_generic -->
+<g id="proc~~get_current_values~~CalledByGraph_edge12" class="edge">
+<title>proc~apply_bc_ftdss&#45;&gt;interface~apply_natural_bc_generic</title>
+<path fill="none" stroke="#ff0000" d="M1055.71,-12C1077.62,-12 1105.2,-12 1132.58,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1132.65,-15.5 1142.65,-12 1132.65,-8.5 1132.65,-15.5"/>
+</g>
+<!-- proc~assemble_initialize_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node14" class="node">
+<title>proc~assemble_initialize_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node14"><a xlink:href="../proc/assemble_initialize_ftdss.html" xlink:title="assemble_initialize_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1543.5,-150 1400.5,-150 1400.5,-126 1543.5,-126 1543.5,-150"/>
+<text text-anchor="middle" x="1472" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_initialize_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_initialize_ftdss&#45;&gt;interface~set_state_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge18" class="edge">
+<title>proc~assemble_initialize_ftdss&#45;&gt;interface~set_state_ftdss</title>
+<path fill="none" stroke="#cc00ff" d="M1543.71,-149.2C1569.94,-153.35 1599.97,-158.1 1627.39,-162.45"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1626.94,-165.92 1637.36,-164.02 1628.03,-159 1626.94,-165.92"/>
+</g>
+<!-- proc~solve_time_step_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node15" class="node">
+<title>proc~solve_time_step_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node15"><a xlink:href="../proc/solve_time_step_ftdss.html" xlink:title="solve_time_step_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="617,-108 490,-108 490,-84 617,-84 617,-108"/>
+<text text-anchor="middle" x="553.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~reflect_variables_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge17" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~reflect_variables_ftdss</title>
+<path fill="none" stroke="#0066ff" d="M617.29,-96C691.11,-96 814.82,-96 903.57,-96"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="903.67,-99.5 913.67,-96 903.67,-92.5 903.67,-99.5"/>
+</g>
+<!-- interface~apply_bc_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node18" class="node">
+<title>interface~apply_bc_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node18"><a xlink:href="../interface/apply_bc_ftdss.html" xlink:title="type_ftdss%apply_bc_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="842,-25 689,-25 689,-1 842,-1 842,-25"/>
+<text text-anchor="middle" x="765.5" y="-10.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%apply_bc_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~apply_bc_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge26" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~apply_bc_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M569.94,-83.96C588.57,-70.04 621.36,-47.44 653,-35 661.29,-31.74 670.13,-28.94 679.06,-26.55"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="679.92,-29.94 688.77,-24.11 678.22,-23.16 679.92,-29.94"/>
+</g>
+<!-- interface~solve_time_step_setup_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node21" class="node">
+<title>interface~solve_time_step_setup_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node21"><a xlink:href="../interface/solve_time_step_setup_ftdss.html" xlink:title="type_ftdss%solve_time_step_setup_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="878,-68 653,-68 653,-44 878,-44 878,-68"/>
+<text text-anchor="middle" x="765.5" y="-53.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_setup_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~solve_time_step_setup_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge29" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~solve_time_step_setup_ftdss</title>
+<path fill="none" stroke="#0066ff" d="M617.22,-84.05C640.59,-79.6 667.32,-74.51 691.53,-69.9"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="692.21,-73.33 701.38,-68.02 690.9,-66.46 692.21,-73.33"/>
+</g>
+<!-- interface~assemble_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node26" class="node">
+<title>interface~assemble_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node26"><a xlink:href="../interface/assemble_ftdss.html" xlink:title="type_ftdss%assemble_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="844,-148 687,-148 687,-124 844,-124 844,-148"/>
+<text text-anchor="middle" x="765.5" y="-133.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge34" class="edge">
+<title>proc~solve_time_step_ftdss&#45;&gt;interface~assemble_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M617.22,-107.95C640.59,-112.4 667.32,-117.49 691.53,-122.1"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="690.9,-125.54 701.38,-123.98 692.21,-118.67 690.9,-125.54"/>
+</g>
+<!-- proc~solve_time_step_setup_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node16" class="node">
+<title>proc~solve_time_step_setup_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node16"><a xlink:href="../proc/solve_time_step_setup_ftdss.html" xlink:title="solve_time_step_setup_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1553,-66 1391,-66 1391,-42 1553,-42 1553,-66"/>
+<text text-anchor="middle" x="1472" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_setup_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_setup_ftdss&#45;&gt;interface~calc_gradient_pressure_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge14" class="edge">
+<title>proc~solve_time_step_setup_ftdss&#45;&gt;interface~calc_gradient_pressure_ftdss</title>
+<path fill="none" stroke="#cbff00" d="M1538.62,-66.01C1555.06,-68.99 1572.67,-72.14 1589,-75 1602.59,-77.38 1617.02,-79.86 1631.05,-82.26"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1630.73,-85.75 1641.18,-83.98 1631.91,-78.85 1630.73,-85.75"/>
+</g>
+<!-- proc~solve_time_step_setup_ftdss&#45;&gt;interface~calc_gradient_temperature_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge16" class="edge">
+<title>proc~solve_time_step_setup_ftdss&#45;&gt;interface~calc_gradient_temperature_ftdss</title>
+<path fill="none" stroke="#00ff66" d="M1553.25,-54C1561.48,-54 1569.99,-54 1578.59,-54"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1578.74,-57.5 1588.74,-54 1578.74,-50.5 1578.74,-57.5"/>
+</g>
+<!-- proc~update_variables_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node17" class="node">
+<title>proc~update_variables_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node17"><a xlink:href="../proc/update_variables_ftdss.html" xlink:title="update_variables_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="832.5,-190 698.5,-190 698.5,-166 832.5,-166 832.5,-190"/>
+<text text-anchor="middle" x="765.5" y="-175.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">update_variables_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~update_variables_ftdss&#45;&gt;interface~set_state_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge19" class="edge">
+<title>proc~update_variables_ftdss&#45;&gt;interface~set_state_ftdss</title>
+<path fill="none" stroke="#cc00ff" d="M832.68,-177.86C1000.12,-177.51 1440.53,-176.58 1627.31,-176.18"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1627.36,-179.68 1637.35,-176.16 1627.35,-172.68 1627.36,-179.68"/>
+</g>
+<!-- interface~apply_bc_ftdss&#45;&gt;proc~apply_bc_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge20" class="edge">
+<title>interface~apply_bc_ftdss&#45;&gt;proc~apply_bc_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M842.05,-12.69C878.67,-12.54 921.81,-12.36 955.14,-12.22"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="955.16,-15.72 965.15,-12.18 955.13,-8.72 955.16,-15.72"/>
+</g>
+<!-- interface~assemble_initialize_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node19" class="node">
+<title>interface~assemble_initialize_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node19"><a xlink:href="../interface/assemble_initialize_ftdss.html" xlink:title="type_ftdss%assemble_initialize_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="1352,-150 1146,-150 1146,-126 1352,-126 1352,-150"/>
+<text text-anchor="middle" x="1249" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%assemble_initialize_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_initialize_ftdss&#45;&gt;proc~assemble_initialize_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge21" class="edge">
+<title>interface~assemble_initialize_ftdss&#45;&gt;proc~assemble_initialize_ftdss</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M1352.09,-138C1364.81,-138 1377.69,-138 1390.03,-138"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1390.26,-141.5 1400.26,-138 1390.26,-134.5 1390.26,-141.5"/>
+</g>
+<!-- interface~solve_time_step_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node20" class="node">
+<title>interface~solve_time_step_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node20"><a xlink:href="../interface/solve_time_step_ftdss.html" xlink:title="type_ftdss%solve_time_step_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="450.5,-128 260.5,-128 260.5,-104 450.5,-104 450.5,-128"/>
+<text text-anchor="middle" x="355.5" y="-113.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%solve_time_step_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge22" class="edge">
+<title>interface~solve_time_step_ftdss&#45;&gt;proc~solve_time_step_ftdss</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M450.77,-106.38C460.49,-105.39 470.26,-104.39 479.7,-103.43"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="480.2,-106.9 489.79,-102.4 479.49,-99.93 480.2,-106.9"/>
+</g>
+<!-- interface~solve_time_step_setup_ftdss&#45;&gt;proc~solve_time_step_setup_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge23" class="edge">
+<title>interface~solve_time_step_setup_ftdss&#45;&gt;proc~solve_time_step_setup_ftdss</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M878.13,-55.68C1017.24,-55.29 1252.25,-54.62 1380.64,-54.26"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1380.84,-57.76 1390.83,-54.23 1380.82,-50.76 1380.84,-57.76"/>
+</g>
+<!-- interface~update_variables_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node22" class="node">
+<title>interface~update_variables_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node22"><a xlink:href="../interface/update_variables_ftdss.html" xlink:title="type_ftdss%update_variables_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="454,-175 257,-175 257,-151 454,-151 454,-175"/>
+<text text-anchor="middle" x="355.5" y="-160.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%update_variables_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~update_variables_ftdss&#45;&gt;proc~update_variables_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge24" class="edge">
+<title>interface~update_variables_ftdss&#45;&gt;proc~update_variables_ftdss</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M454.23,-166.59C525.95,-169.23 621.98,-172.76 688.11,-175.19"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="688.34,-178.7 698.46,-175.57 688.6,-171.71 688.34,-178.7"/>
+</g>
+<!-- proc~assemble_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node23" class="node">
+<title>proc~assemble_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node23"><a xlink:href="../proc/assemble_ftdss.html" xlink:title="assemble_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="1057.5,-150 963.5,-150 963.5,-126 1057.5,-126 1057.5,-150"/>
+<text text-anchor="middle" x="1010.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_ftdss&#45;&gt;interface~assemble_initialize_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge27" class="edge">
+<title>proc~assemble_ftdss&#45;&gt;interface~assemble_initialize_ftdss</title>
+<path fill="none" stroke="#cbff00" d="M1057.66,-138C1080.05,-138 1108.01,-138 1135.55,-138"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1135.67,-141.5 1145.67,-138 1135.67,-134.5 1135.67,-141.5"/>
+</g>
+<!-- proc~initialize_type_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node24" class="node">
+<title>proc~initialize_type_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node24"><a xlink:href="../proc/initialize_type_ftdss.html" xlink:title="initialize_type_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="611,-25 496,-25 496,-1 611,-1 611,-25"/>
+<text text-anchor="middle" x="553.5" y="-10.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_type_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_ftdss&#45;&gt;interface~apply_bc_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge25" class="edge">
+<title>proc~initialize_type_ftdss&#45;&gt;interface~apply_bc_ftdss</title>
+<path fill="none" stroke="#ff0000" d="M611.05,-13C631.9,-13 656.01,-13 678.85,-13"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="678.9,-16.5 688.9,-13 678.9,-9.5 678.9,-16.5"/>
+</g>
+<!-- proc~run_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node25" class="node">
+<title>proc~run_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node25"><a xlink:href="../proc/run_ftdss.html" xlink:title="run_ftdss">
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-151 160,-151 160,-127 221,-127 221,-151"/>
+<text text-anchor="middle" x="190.5" y="-136.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge28" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~solve_time_step_ftdss</title>
+<path fill="none" stroke="#00ff66" d="M221.02,-134.83C232.09,-133.27 245.36,-131.4 259.18,-129.45"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="259.9,-132.88 269.31,-128.02 258.92,-125.95 259.9,-132.88"/>
+</g>
+<!-- proc~run_ftdss&#45;&gt;interface~update_variables_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge30" class="edge">
+<title>proc~run_ftdss&#45;&gt;interface~update_variables_ftdss</title>
+<path fill="none" stroke="#cc00ff" d="M221.02,-143.35C233.06,-145.12 247.7,-147.27 262.81,-149.5"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="262.39,-152.98 272.79,-150.97 263.41,-146.05 262.39,-152.98"/>
+</g>
+<!-- interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge31" class="edge">
+<title>interface~assemble_ftdss&#45;&gt;proc~assemble_ftdss</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M844.05,-136.64C879.52,-136.93 920.77,-137.27 953.2,-137.54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="953.38,-141.04 963.41,-137.62 953.44,-134.04 953.38,-141.04"/>
+</g>
+<!-- interface~initialize_type_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node27" class="node">
+<title>interface~initialize_type_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node27"><a xlink:href="../interface/initialize_type_ftdss.html" xlink:title="type_ftdss%initialize_type_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="444.5,-25 266.5,-25 266.5,-1 444.5,-1 444.5,-25"/>
+<text text-anchor="middle" x="355.5" y="-10.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%initialize_type_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_ftdss&#45;&gt;proc~initialize_type_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge32" class="edge">
+<title>interface~initialize_type_ftdss&#45;&gt;proc~initialize_type_ftdss</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M444.75,-13C458.46,-13 472.43,-13 485.57,-13"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="485.9,-16.5 495.9,-13 485.9,-9.5 485.9,-16.5"/>
+</g>
+<!-- interface~run_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_node28" class="node">
+<title>interface~run_ftdss</title>
+<g id="a_proc~~get_current_values~~CalledByGraph_node28"><a xlink:href="../interface/run_ftdss.html" xlink:title="type_ftdss%run_ftdss">
+<polygon fill="#a7506f" stroke="#a7506f" points="124,-151 0,-151 0,-127 124,-127 124,-151"/>
+<text text-anchor="middle" x="62" y="-136.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss%run_ftdss</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftdss&#45;&gt;proc~run_ftdss -->
+<g id="proc~~get_current_values~~CalledByGraph_edge33" class="edge">
+<title>interface~run_ftdss&#45;&gt;proc~run_ftdss</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M124.03,-139C132.82,-139 141.68,-139 149.91,-139"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="149.94,-142.5 159.94,-139 149.94,-135.5 149.94,-142.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocget_current_valuesCalledByGraph = svgPanZoom('#procget_current_valuesCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">get_current_values</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_variable</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">),</span><span class="w"> </span><span class="k">target</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">),</span><span class="w"> </span><span class="k">contiguous</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">values</span><span class="p">(:)</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">assert_initialized</span><span class="p">(</span><span class="err">__</span><span class="n">LINE__</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;core_types_variable:get_current_values&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="n">values</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">values</span><span class="p">(:,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">head_idx</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">get_current_values</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-23 23:52 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

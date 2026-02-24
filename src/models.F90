@@ -1,7 +1,7 @@
 module module_physics_models
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
-    use :: module_core, only:type_state
+    use :: module_core
     use :: physics_models_wrf
     use :: physics_models_hcf
     use :: physics_models_phase_change_liquid_solid_gcc
@@ -12,8 +12,8 @@ module module_physics_models
     private
 
     public :: type_models_manager
-    public :: type_wrf_params
-    public :: type_hcf_params
+    public :: type_config_wrf
+    public :: type_config_hcf
 
     type :: type_models_manager
         private
@@ -35,26 +35,24 @@ module module_physics_models
 
 contains
 
-    subroutine initialize(self, material_id, wrf_id, wrf_params, hcf_id, hcf_params, gcc_id, water, ice)
+    subroutine initialize(self, material_id, config_wrf, config_hcf, config_gcc, water, ice)
         implicit none
         class(type_models_manager), intent(inout) :: self
         integer(int32), intent(in) :: material_id
-        integer(int32), intent(in), optional :: wrf_id
-        type(type_wrf_params), intent(in), optional :: wrf_params
-        integer(int32), intent(in), optional :: hcf_id
-        type(type_hcf_params), intent(in), optional :: hcf_params
-        integer(int32), intent(in), optional :: gcc_id
+        type(type_config_wrf), intent(in), optional :: config_wrf
+        type(type_config_hcf), intent(in), optional :: config_hcf
+        type(type_config_gcc), intent(in), optional :: config_gcc
         type(type_iapws97), intent(in), optional, target :: water
         type(type_iapws06), intent(in), optional, target :: ice
 
-        if (present(wrf_id) .and. present(wrf_params)) then
-            call self%wrf%initialize(wrf_id, wrf_params)
+        if (present(config_wrf)) then
+            call self%wrf%initialize(config_wrf)
         end if
-        if (present(hcf_id) .and. present(hcf_params) .and. present(water)) then
-            call self%hcf%initialize(hcf_id, hcf_params, water, ice)
+        if (present(config_hcf) .and. present(water)) then
+            call self%hcf%initialize(config_hcf, water, ice)
         end if
-        if (present(gcc_id) .and. present(water) .and. present(ice)) then
-            call self%gcc%initialize(material_id, gcc_id, water, ice)
+        if (present(config_gcc) .and. present(water) .and. present(ice)) then
+            call self%gcc%initialize(material_id, config_gcc, water, ice)
         end if
 
         if (allocated(self%wrf%p) .and. allocated(self%gcc%p)) then

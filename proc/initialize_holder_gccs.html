@@ -159,7 +159,7 @@
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>module subroutine initialize_holder_gccs(self, material_id, gcc_id, water, ice)  
+    <h2>module subroutine initialize_holder_gccs(self, material_id, config, water, ice)  
     <a href="../interface/initialize_holder_gccs.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
 </h2>
     
@@ -179,7 +179,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~845"></span>
+              <span class="anchor" id="variable-self~602"></span>
               class(<a href='../type/holder_gccs.html'>holder_gccs</a>),
             </td>
 <td>intent(inout)</td>
@@ -194,7 +194,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material_id~58"></span>
+              <span class="anchor" id="variable-material_id~42"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -209,22 +209,22 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-gcc_id~3"></span>
-              integer(kind=int32),
+              <span class="anchor" id="variable-config~15"></span>
+              class(<a href='../type/type_config_gcc.html'>type_config_gcc</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>gcc_id</strong></td>
+            <td><strong>config</strong></td>
             <td>
                 
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-water~17"></span>
+              <span class="anchor" id="variable-water~10"></span>
               type(type_iapws97),
             </td>
 <td>intent(in),</td>
@@ -239,7 +239,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-ice~16"></span>
+              <span class="anchor" id="variable-ice~10"></span>
               type(type_iapws06),
             </td>
 <td>intent(in),</td>
@@ -525,18 +525,18 @@ large graphs.</div>
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">initialize_holder_gccs</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">material_id</span><span class="p">,</span><span class="w"> </span><span class="n">gcc_id</span><span class="p">,</span><span class="w"> </span><span class="n">water</span><span class="p">,</span><span class="w"> </span><span class="n">ice</span><span class="p">)</span>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">initialize_holder_gccs</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">material_id</span><span class="p">,</span><span class="w"> </span><span class="n">config</span><span class="p">,</span><span class="w"> </span><span class="n">water</span><span class="p">,</span><span class="w"> </span><span class="n">ice</span><span class="p">)</span>
 <span class="w">        </span><span class="k">implicit none</span>
 <span class="k">        class</span><span class="p">(</span><span class="n">holder_gccs</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">material_id</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">gcc_id</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">type_config_gcc</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">config</span>
 <span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_iapws97</span><span class="p">),</span><span class="w"> </span><span class="k">target</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">water</span>
 <span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_iapws06</span><span class="p">),</span><span class="w"> </span><span class="k">target</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ice</span>
 
-<span class="w">        </span><span class="k">select case</span><span class="w"> </span><span class="p">(</span><span class="n">gcc_id</span><span class="p">)</span>
-<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">GCC_NON_SEGREGATION</span><span class="p">)</span>
+<span class="w">        </span><span class="k">select case</span><span class="w"> </span><span class="p">(</span><span class="n">config</span><span class="p">%</span><span class="n">gcc_model</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">GCC_TYPES</span><span class="p">%</span><span class="n">NON_SEGREGATION</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
 <span class="w">            </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">type_gcc_non_segregation</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">p</span><span class="p">)</span>
-<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">GCC_SEGREGATION</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">GCC_TYPES</span><span class="p">%</span><span class="n">SEGREGATION</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
 <span class="w">            </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">type_gcc_segregation</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">p</span><span class="p">)</span>
 <span class="w">        </span><span class="k">end select</span>
 
@@ -567,7 +567,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-22 12:12 +0000             </p>
+ on 2026-02-23 23:52 +0000             </p>
           </div>
         </div>
         <br>

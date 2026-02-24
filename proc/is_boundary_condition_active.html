@@ -179,7 +179,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-idx"></span>
+              <span class="anchor" id="variable-idx~6"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -209,7 +209,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-input~12"></span>
+              <span class="anchor" id="variable-input~25"></span>
               type(<a href='../type/type_input.html'>type_input</a>),
             </td>
 <td>intent(in)</td>
@@ -242,7 +242,7 @@
 
       <h3>Return Value
         <small>
-          <span class="anchor" id="variable-is_active"></span>
+          <span class="anchor" id="variable-is_active~12"></span>
           logical
         </small>
       </h3>
@@ -427,12 +427,12 @@ large graphs.</div>
 <span class="w">        </span><span class="k">select case</span><span class="w"> </span><span class="p">(</span><span class="n">physics_type_id</span><span class="p">)</span>
 <span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">PHYSICS_TYPE_THERMAL</span><span class="p">)</span>
 <span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">input</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">boundary_conditions</span><span class="p">(</span><span class="n">idx</span><span class="p">)%</span><span class="n">physics</span><span class="p">(</span><span class="n">PHYSICS_TYPE_THERMAL</span><span class="p">)%</span><span class="n">is_active</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">&amp;</span>
-<span class="w">                </span><span class="nb">any</span><span class="p">(</span><span class="n">active_region_id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">boundary_conditions</span><span class="p">(</span><span class="n">idx</span><span class="p">)%</span><span class="n">id</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="w">                </span><span class="nb">any</span><span class="p">(</span><span class="n">active_region_id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">boundary_conditions</span><span class="p">(</span><span class="n">idx</span><span class="p">)%</span><span class="n">ID</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
 <span class="k">                </span><span class="n">is_active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
 <span class="w">            </span><span class="k">end if</span>
 <span class="k">        case</span><span class="w"> </span><span class="p">(</span><span class="n">PHYSICS_TYPE_HYDRAULIC</span><span class="p">)</span>
 <span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">input</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">boundary_conditions</span><span class="p">(</span><span class="n">idx</span><span class="p">)%</span><span class="n">physics</span><span class="p">(</span><span class="n">PHYSICS_TYPE_HYDRAULIC</span><span class="p">)%</span><span class="n">is_active</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">&amp;</span>
-<span class="w">                </span><span class="nb">any</span><span class="p">(</span><span class="n">active_region_id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">boundary_conditions</span><span class="p">(</span><span class="n">idx</span><span class="p">)%</span><span class="n">id</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="w">                </span><span class="nb">any</span><span class="p">(</span><span class="n">active_region_id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">boundary_conditions</span><span class="p">(</span><span class="n">idx</span><span class="p">)%</span><span class="n">ID</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
 <span class="k">                </span><span class="n">is_active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
 <span class="w">            </span><span class="k">end if</span>
 <span class="k">        case</span><span class="w"> </span><span class="p">(</span><span class="n">PHYSICS_TYPE_MECHANICAL</span><span class="p">)</span>
@@ -462,7 +462,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-22 12:12 +0000             </p>
+ on 2026-02-23 23:52 +0000             </p>
           </div>
         </div>
         <br>

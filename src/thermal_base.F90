@@ -41,7 +41,7 @@ contains
 
         do i = 1, num_materials
             do j = 1, size(active_region_ids)
-                if (input%basic%materials(i)%id == active_region_ids(j)) then
+                if (input%basic%materials(i)%ID == active_region_ids(j)) then
 
                     call density_info(i)%reset()
                     call specific_heat_info(i)%reset()

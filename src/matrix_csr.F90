@@ -45,7 +45,7 @@ contains
         call self%zero()
 
         self%is_initialized_matrix = .true.
-        self%status = MATRIX_STATUS_SUCCESS
+        self%status = MATRIX_STATUS%SUCCESS
     end subroutine initialize_type_matrix_csr
 
     !>
@@ -65,6 +65,7 @@ contains
         self%nnz = 0
 
         self%is_initialized_matrix = .false.
+        self%status = MATRIX_STATUS%SUCCESS
     end subroutine destroy_csr
 
     !>
@@ -96,7 +97,7 @@ contains
             row_end = self%ptr(i + 1) - 1
             do j = row_start, row_end
                 if (self%ind(j) == i) then
-                    call diagonal%set(OP_INS, i, self%val(j))
+                    call diagonal%set(MATRIX_OPS%INS, i, self%val(j))
                     exit
                 end if
             end do
@@ -151,7 +152,7 @@ contains
         !> The csr matrix object.
         class(type_matrix_csr), intent(inout) :: self
         !> The operation to perform.
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         !> The 1-based node index for the row.
         integer(int32), intent(in) :: row
         !> The 1-based node index for the column.
@@ -161,21 +162,26 @@ contains
 
         integer(int32) :: index
 
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
+
         index = self%find(row, col)
 #ifdef USE_DEBUG
         if (index > 0) then
 #endif
-            select case (op)
-            case (OP_INS)
+            if (op == MATRIX_OPS%INS) then
                 self%val(index) = value
-            case (OP_ADD)
+            else if (op == MATRIX_OPS%ADD) then
                 self%val(index) = self%val(index) + value
-            case default
-                self%status = MATRIX_STATUS_ILL_OPERATIONS
-            end select
+            else
+                self%status = MATRIX_STATUS%ILL_OPERATIONS
+            end if
+
 #ifdef USE_DEBUG
         else
-            self%status = MATRIX_STATUS_OUT_OF_MEMORY
+            self%status = MATRIX_STATUS%OUT_OF_MEMORY
         end if
 #endif
     end subroutine set_value_csr
@@ -188,7 +194,7 @@ contains
         !> The csr matrix object.
         class(type_matrix_csr), intent(inout) :: self
         !> The operation to perform.
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         !> The 1-based node index for the row.
         integer(int32), intent(in) :: row
         !> The 1-based node index for the column.
@@ -200,7 +206,7 @@ contains
         !> The value to set at the specified entry.
         real(real64), intent(in) :: value
 
-        self%status = MATRIX_STATUS_NOT_IMPLEMENTED
+        self%status = MATRIX_STATUS%NOT_IMPLEMENTED
     end subroutine set_value_block_csr
 
     !>
@@ -211,7 +217,7 @@ contains
         !> The csr matrix object.
         class(type_matrix_csr), intent(inout) :: self
         !> The operation to perform.
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         !> The 1-based node index for the row.
         integer(int32), intent(in) :: row
         !> The scalar value to assign.
@@ -221,17 +227,22 @@ contains
 
         integer(int32) :: is, ie
 
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
+
         is = self%ptr(row)
         ie = self%ptr(row + 1) - 1
 
-        select case (op)
-        case (OP_INS)
+        if (op == MATRIX_OPS%INS) then
             self%val(is:ie) = value
-        case (OP_ADD)
+        else if (op == MATRIX_OPS%ADD) then
             self%val(is:ie) = self%val(is:ie) + value
-        case default
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
-        end select
+        else
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end if
+
     end subroutine set_row_csr
 
     !>
@@ -242,18 +253,23 @@ contains
         !> The csr matrix object.
         class(type_matrix_csr), intent(inout) :: self
         !> The operation to perform.
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         !> The scalar value to assign to all non-zero entries.
         real(real64), intent(in) :: value
 
-        select case (op)
-        case (OP_INS)
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
+
+        if (op == MATRIX_OPS%INS) then
             self%val = value
-        case (OP_ADD)
+        else if (op == MATRIX_OPS%ADD) then
             self%val = self%val + value
-        case default
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
-        end select
+        else
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end if
+
     end subroutine set_all_csr
 
     !>
@@ -263,29 +279,31 @@ contains
         !> The CSR matrix object.
         class(type_matrix_csr), intent(inout) :: self
         !> The operation to perform
-        integer(int32), intent(in) :: op
+        type(type_constant_id), intent(in) :: op
         !> The scaling vector.
         type(type_vector_dp), intent(in) :: alpha
 
         integer(int32) :: i, k, col
         real(real64), dimension(:), pointer :: alpha_data
 
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
+
         alpha_data => alpha%get_data()
 
         ! alphaのサイズチェック
         if (size(alpha_data) /= self%num_nodes) then
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
             return
         end if
 
-        select case (op)
-
-            !-------------------------------------------------
-            ! Symmetric Scaling: A_ij <- A_ij * alpha(i) * alpha(j)
-            ! (alpha には 1/sqrt(|D|) が入っている)
-            !-------------------------------------------------
-        case (OP_SCALE_SYMM_DIAG)
-
+        !-------------------------------------------------
+        ! Symmetric Scaling: A_ij <- A_ij * alpha(i) * alpha(j)
+        ! (alpha には 1/sqrt(|D|) が入っている)
+        !-------------------------------------------------
+        if (op == MATRIX_OPS%SCALE_SYMM_DIAG) then
             !$omp parallel do default(shared) private(i, k, col) schedule(static)
             do i = 1, self%num_nodes
                 ! i行目の非ゼロ要素を走査
@@ -298,13 +316,13 @@ contains
             end do
             !$omp end parallel do
 
-            self%status = MATRIX_STATUS_SUCCESS
+            self%status = MATRIX_STATUS%SUCCESS
 
             !-------------------------------------------------
             ! Jacobi Scaling: A_ij <- A_ij * alpha(i)
             ! (alpha には 1/D が入っている)
             !-------------------------------------------------
-        case (OP_SCALE_JACOBI)
+        else if (op == MATRIX_OPS%SCALE_JACOBI) then
 
             !$omp parallel do default(shared) private(i, k) schedule(static)
             do i = 1, self%num_nodes
@@ -316,11 +334,11 @@ contains
             end do
             !$omp end parallel do
 
-            self%status = MATRIX_STATUS_SUCCESS
+            self%status = MATRIX_STATUS%SUCCESS
 
-        case default
-            self%status = MATRIX_STATUS_ILL_OPERATIONS
-        end select
+        else
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end if
 
     end subroutine scale_csr
 

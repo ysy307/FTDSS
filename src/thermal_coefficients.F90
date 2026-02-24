@@ -311,17 +311,17 @@ contains
 
         D_TT(:, :) = 0.0d0
         select case (self%computation_type)
-        case (COMP_TYPE_2D_XY)
+        case (COMP_TYPES%XY_2D%ID)
             D_TT(1, 1) = lambda%lambda_xx
             D_TT(1, 2) = lambda%lambda_xy
             D_TT(2, 1) = lambda%lambda_xy
             D_TT(2, 2) = lambda%lambda_yy
-        case (COMP_TYPE_2D_XZ)
+        case (COMP_TYPES%XZ_2D%ID)
             D_TT(1, 1) = lambda%lambda_xx
             D_TT(1, 2) = lambda%lambda_zx
             D_TT(2, 1) = lambda%lambda_zx
             D_TT(2, 2) = lambda%lambda_zz
-        case (COMP_TYPE_3D)
+        case (COMP_TYPES%XYZ_3D%ID)
             D_TT(1, 1) = lambda%lambda_xx
             D_TT(1, 2) = lambda%lambda_xy
             D_TT(1, 3) = lambda%lambda_zx
@@ -357,13 +357,13 @@ contains
         call self%physics%calc_specific_heat_vapor(state, c_v)
 
         select case (self%computation_type)
-        case (COMP_TYPE_2D_XY)
+        case (COMP_TYPES%XY_2D%ID)
             V_TT(1) = rho_w * (c_w * water_flux%x + c_v * vapor_flux%x)
             V_TT(2) = rho_w * (c_w * water_flux%y + c_v * vapor_flux%y)
-        case (COMP_TYPE_2D_XZ)
+        case (COMP_TYPES%XZ_2D%ID)
             V_TT(1) = rho_w * (c_w * water_flux%x + c_v * vapor_flux%x)
             V_TT(2) = rho_w * (c_w * water_flux%z + c_v * vapor_flux%z)
-        case (COMP_TYPE_3D)
+        case (COMP_TYPES%XYZ_3D%ID)
             V_TT(1) = rho_w * (c_w * water_flux%x + c_v * vapor_flux%x)
             V_TT(2) = rho_w * (c_w * water_flux%y + c_v * vapor_flux%y)
             V_TT(3) = rho_w * (c_w * water_flux%z + c_v * vapor_flux%z)

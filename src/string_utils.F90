@@ -13,7 +13,6 @@ module core_string_utils
     public :: join
     public :: filter
     public :: modify_path_format
-    public :: get_bc_type_from_string
 
     interface filter
         module procedure :: filter_character_array
@@ -175,57 +174,5 @@ contains
             path = trim(path)//"/"
         end if
     end subroutine modify_path_format
-
-    !>
-    !> Converts a boundary condition type string to its corresponding integer ID.
-    !>
-    pure function get_bc_type_from_string(str, physics_type_id) result(bc_type)
-        implicit none
-        !> The string representing the BC type (e.g., "dirichlet", "neumann").
-        character(*), intent(in) :: str
-        !> The integer ID for the physics context (e.g., thermal, hydraulic).
-        integer(int32), intent(in) :: physics_type_id
-        !> The integer constant for the BC type, or -1 if the string is not recognized.
-        integer(int32) :: bc_type
-
-        select case (physics_type_id)
-        case (PHYSICS_TYPE_THERMAL)
-            select case (strip(str))
-            case ("dirichlet")
-                bc_type = THERMAL_BC_DIRICHLET
-            case ("neumann")
-                bc_type = THERMAL_BC_NEUMANN
-            case ("flux")
-                bc_type = THERMAL_BC_FLUX
-            case ("robin")
-                bc_type = THERMAL_BC_ROBIN
-            case ("convective")
-                bc_type = THERMAL_BC_CONVECTIVE
-            case ("radiation")
-                bc_type = THERMAL_BC_RADIATION
-            case ("adiabatic")
-                bc_type = THERMAL_BC_ADIABATIC
-            case ("free")
-                bc_type = THERMAL_BC_FREE
-            case default
-                bc_type = -1
-            end select
-        case (PHYSICS_TYPE_HYDRAULIC)
-            select case (strip(str))
-            case ("dirichlet")
-                bc_type = HYDRAULIC_BC_DIRICHLET
-            case ("neumann")
-                bc_type = HYDRAULIC_BC_NEUMANN
-            case ("flux")
-                bc_type = HYDRAULIC_BC_FLUX
-            case ("impermeable")
-                bc_type = HYDRAULIC_BC_IMPERMEABLE
-            case ("seepage")
-                bc_type = HYDRAULIC_BC_SEEPAGE
-            case default
-                bc_type = -1
-            end select
-        end select
-    end function get_bc_type_from_string
 
 end module core_string_utils

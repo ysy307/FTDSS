@@ -8,10 +8,10 @@ contains
         real(real64), intent(inout) :: Qw
 
         if (h < 0.0d0) then
-            Qw = self%params%theta_r + (self%params%theta_s - self%params%theta_r) &
-                 * (1.0d0 + (-self%params%alpha1 * h)**self%params%n1)**(-self%params%m1)
+            Qw = self%config%theta_r + (self%config%theta_s - self%config%theta_r) &
+                 * (1.0d0 + (-self%config%alpha1 * h)**self%config%n1)**(-self%config%m1)
         else
-            Qw = self%params%theta_s
+            Qw = self%config%theta_s
         end if
 
     end subroutine calculate_wrf_vg
@@ -22,9 +22,9 @@ contains
         real(real64), intent(in) :: h
         real(real64), intent(inout) :: dQw_dh
         if (h < 0.0d0) then
-            dQw_dh = (self%params%theta_s - self%params%theta_r) * &
-                     self%params%alpha1**self%params%n1 * self%params%m1 * self%params%n1 * (-h)**(self%params%n1 - 1.0d0) &
-                     * (1.0d0 + (-self%params%alpha1 * h)**self%params%n1)**(-self%params%m1 - 1.0d0)
+            dQw_dh = (self%config%theta_s - self%config%theta_r) * &
+                     self%config%alpha1**self%config%n1 * self%config%m1 * self%config%n1 * (-h)**(self%config%n1 - 1.0d0) &
+                     * (1.0d0 + (-self%config%alpha1 * h)**self%config%n1)**(-self%config%m1 - 1.0d0)
         else
             dQw_dh = 0.0d0
         end if

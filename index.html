@@ -96,28 +96,32 @@
       <div class="row" id='text'>
         <div class=col-md-8>
           <h1>FTDSS</h1>
-          <div class="alert alert-warning">
-<p class="alert-title h4">Warning</p>
-<p>Work in progress</p>
-</div>
-<h2 id="_1">概要</h2>
-<p>土壌凍結融解過程の水分・熱移動の数値計算</p>
-<div class="alert alert-info">
-<p class="alert-title h4">Note</p>
-<p>このプロジェクトでは，Fortranで書かれている．</p>
-</div>
-<div class="alert alert-success">
-<p class="alert-title h4">Todo</p>
+          <hr>
+<p>title: FTDSS Documentation
+author: Kikuchi Shun</p>
+<hr>
+<h1 id="ftdss-freezingthawing-dynamics-soil-solver">FTDSS (Freezing/Thawing Dynamics Soil Solver)</h1>
+<p>FTDSS is a Fortran-based numerical solver designed to simulate freezing and thawing processes in soil, integrating heat and water transport (TH coupling).</p>
+<h2 id="features">Features</h2>
 <ul>
-<li>リファクタリング</li>
-<li>コマンドライン引数への対応</li>
-<li>他</li>
+<li><strong>Physical Modeling</strong>: Simulates phase change in soil using the enthalpy method.</li>
+<li><strong>Spatial Discretization</strong>: Finite Element Method (FEM).</li>
+<li><strong>Nonlinear Iteration</strong>: Picard and Newton-Raphson methods.</li>
+<li><strong>Linear Solvers</strong>: Iterative solvers including BiCGSTAB and GMRES with preconditioners (e.g., ILU).</li>
 </ul>
-</div>
-<div class="alert alert-danger">
-<p class="alert-title h4">Bug</p>
-<p>現在の所バグは見つかっていない．</p>
-</div>
+<h2 id="documentation-structure">Documentation Structure</h2>
+<p>Use the navigation bar to browse the API documentation:
+* <strong>Modules</strong>: Module specifications and dependencies.
+* <strong>Procedures</strong>: Subroutine and function interfaces.
+* <strong>Types</strong>: Derived type definitions and methods.
+* <strong>Source Files</strong>: Directory structure and file descriptions.</p>
+<h2 id="build-requirements">Build Requirements</h2>
+<ul>
+<li>Fortran compiler</li>
+<li>CMake</li>
+<li>fypp (Fortran preprocessor)</li>
+</ul>
+<p>For more details, visit the <a href="https://github.com/ysy307/FTDSS.git">GitHub repository</a>.</p>
         </div>
           <div class="col-md-4">
             <div class="card card-body bg-light">
@@ -143,7 +147,7 @@
           <div class="col-xs-6 col-sm-3">
             <div>
               <h3>Source Files</h3>
-              <ul><li><a href='sourcefile/adjacency.f90.html'>adjacency.F90</a></li><li><a href='sourcefile/ats.f90.html'>ats.F90</a></li><li><a href='sourcefile/basic_analysis_controls.f90.html'>basic_analysis_controls.F90</a></li><li><a href='sourcefile/basic_base.f90.html'>basic_base.F90</a></li><li><a href='sourcefile/basic_geometry_settings.f90.html'>basic_geometry_settings.F90</a></li><li><a href='sourcefile/basic_interface.f90.html'>basic_interface.F90</a></li><li><a href='sourcefile/basic_materials.f90.html'>basic_materials.F90</a></li><li><a href='sourcefile/basic_simulation_setting.f90.html'>basic_simulation_setting.F90</a></li><li><a href='sourcefile/basic_solver_settings.f90.html'>basic_solver_settings.F90</a></li><li><a href='sourcefile/boundary.f90.html'>boundary.F90</a></li></ul>
+              <ul><li><a href='sourcefile/adjacency.f90.html'>adjacency.F90</a></li><li><a href='sourcefile/allocate.fypp.html'>allocate.fypp</a></li><li><a href='sourcefile/atmosphere.f90.html'>atmosphere.F90</a></li><li><a href='sourcefile/ats.f90.html'>ats.F90</a></li><li><a href='sourcefile/basic_analysis_controls.f90.html'>basic_analysis_controls.F90</a></li><li><a href='sourcefile/basic_base.f90.html'>basic_base.F90</a></li><li><a href='sourcefile/basic_geometry_settings.f90.html'>basic_geometry_settings.F90</a></li><li><a href='sourcefile/basic_interface.f90.html'>basic_interface.F90</a></li><li><a href='sourcefile/basic_materials.f90.html'>basic_materials.F90</a></li><li><a href='sourcefile/basic_simulation_setting.f90.html'>basic_simulation_setting.F90</a></li></ul>
             </div>
             <div>
               <ul>
@@ -176,7 +180,7 @@
           <div class="col-xs-6 col-sm-3">
             <div>
               <h3>Derived Types</h3>
-              <ul><li><a href='type/abst_bc.html'>abst_bc</a></li><li><a href='type/abst_den.html'>abst_den</a></li><li><a href='type/abst_fe.html'>abst_fe</a></li><li><a href='type/abst_gcc.html'>abst_gcc</a></li><li><a href='type/abst_hcf.html'>abst_hcf</a></li><li><a href='type/abst_hcf_base.html'>abst_hcf_base</a></li><li><a href='type/abst_hcf_impedance.html'>abst_hcf_impedance</a></li><li><a href='type/abst_hcf_viscosity.html'>abst_hcf_viscosity</a></li><li><a href='type/abst_ic.html'>abst_ic</a></li><li><a href='type/abst_input.html'>abst_input</a></li></ul>
+              <ul><li><a href='type/abst_bc.html'>abst_bc</a></li><li><a href='type/abst_config.html'>abst_config</a></li><li><a href='type/abst_config_physics_material.html'>abst_config_physics_material</a></li><li><a href='type/abst_config_physics_model.html'>abst_config_physics_model</a></li><li><a href='type/abst_den.html'>abst_den</a></li><li><a href='type/abst_fe.html'>abst_fe</a></li><li><a href='type/abst_gcc.html'>abst_gcc</a></li><li><a href='type/abst_hcf.html'>abst_hcf</a></li><li><a href='type/abst_hcf_base.html'>abst_hcf_base</a></li><li><a href='type/abst_hcf_impedance.html'>abst_hcf_impedance</a></li></ul>
             </div>
             <div>
               <ul>
@@ -200,7 +204,7 @@
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-22 12:12 +0000             </p>
+ on 2026-02-23 23:52 +0000             </p>
           </div>
         </div>
         <br>

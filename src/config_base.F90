@@ -1,0 +1,160 @@
+module core_types_config_base
+    use, intrinsic :: iso_fortran_env
+    use :: core_constants, only:type_constant_id, ERROR_CODES
+    use :: core_validation, only:raise_error
+    implicit none
+    private
+
+    public :: abst_config
+
+    type, abstract :: abst_config
+    contains
+        procedure, private, pass(self) :: set_int32
+        procedure, private, pass(self) :: set_int32_1d
+        procedure, private, pass(self) :: set_int32_2d
+        procedure, private, pass(self) :: set_int32_3d
+        procedure, private, pass(self) :: set_real64
+        procedure, private, pass(self) :: set_real64_1d
+        procedure, private, pass(self) :: set_real64_2d
+        procedure, private, pass(self) :: set_real64_3d
+        procedure, private, pass(self) :: set_constant_id
+        generic :: set => &
+            set_int32, set_int32_1d, set_int32_2d, set_int32_3d, &
+            set_real64, set_real64_1d, set_real64_2d, set_real64_3d, &
+            set_constant_id
+
+        procedure(abst_copy_config), public, pass(self), deferred :: copy
+        procedure(abst_reset_config), public, pass(self), deferred :: reset
+    end type abst_config
+
+    abstract interface
+        subroutine abst_copy_config(self, source)
+            import :: abst_config
+            implicit none
+            class(abst_config), intent(inout) :: self
+            class(abst_config), intent(in) :: source
+        end subroutine abst_copy_config
+
+        subroutine abst_reset_config(self)
+            import :: abst_config
+            implicit none
+            class(abst_config), intent(inout) :: self
+        end subroutine abst_reset_config
+    end interface
+
+contains
+
+    subroutine set_int32(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        integer(int32), intent(inout) :: member
+        integer(int32), intent(in) :: value
+
+        member = value
+    end subroutine set_int32
+
+    subroutine set_int32_1d(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        integer(int32), allocatable, intent(inout) :: member(:)
+        integer(int32), allocatable, intent(in) :: value(:)
+
+        if (.not. allocated(value)) then
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_int32_1d")
+        end if
+
+        if (allocated(member)) deallocate (member)
+        allocate (member, source=value)
+    end subroutine set_int32_1d
+
+    subroutine set_int32_2d(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        integer(int32), allocatable, intent(inout) :: member(:, :)
+        integer(int32), allocatable, intent(in) :: value(:, :)
+
+        if (.not. allocated(value)) then
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_int32_2d")
+        end if
+
+        if (allocated(member)) deallocate (member)
+        allocate (member, source=value)
+    end subroutine set_int32_2d
+
+    subroutine set_int32_3d(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        integer(int32), allocatable, intent(inout) :: member(:, :, :)
+        integer(int32), allocatable, intent(in) :: value(:, :, :)
+
+        if (.not. allocated(value)) then
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_int32_3d")
+        end if
+
+        if (allocated(member)) deallocate (member)
+        allocate (member, source=value)
+    end subroutine set_int32_3d
+
+    ! --- real(real64) implementations ---
+
+    subroutine set_real64(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        real(real64), intent(inout) :: member
+        real(real64), intent(in) :: value
+
+        member = value
+    end subroutine set_real64
+
+    subroutine set_real64_1d(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        real(real64), allocatable, intent(inout) :: member(:)
+        real(real64), allocatable, intent(in) :: value(:)
+
+        if (.not. allocated(value)) then
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_real64_1d")
+        end if
+
+        if (allocated(member)) deallocate (member)
+        allocate (member, source=value)
+    end subroutine set_real64_1d
+
+    subroutine set_real64_2d(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        real(real64), allocatable, intent(inout) :: member(:, :)
+        real(real64), allocatable, intent(in) :: value(:, :)
+
+        if (.not. allocated(value)) then
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_real64_2d")
+        end if
+
+        if (allocated(member)) deallocate (member)
+        allocate (member, source=value)
+    end subroutine set_real64_2d
+
+    subroutine set_real64_3d(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        real(real64), allocatable, intent(inout) :: member(:, :, :)
+        real(real64), allocatable, intent(in) :: value(:, :, :)
+
+        if (.not. allocated(value)) then
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_real64_3d")
+        end if
+
+        if (allocated(member)) deallocate (member)
+        allocate (member, source=value)
+    end subroutine set_real64_3d
+
+    subroutine set_constant_id(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        type(type_constant_id), intent(inout) :: member
+        type(type_constant_id), intent(in) :: value
+
+        member = value
+    end subroutine set_constant_id
+
+end module core_types_config_base
