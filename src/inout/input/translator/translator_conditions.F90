@@ -96,7 +96,7 @@ contains
         implicit none
         class(type_input_translator), intent(in) :: self
         class(type_input), intent(in) :: input
-        class(abst_config), intent(inout) :: config
+        class(type_config_acceleration), intent(inout) :: config
 
         select type (config)
         type is (type_config_acceleration)

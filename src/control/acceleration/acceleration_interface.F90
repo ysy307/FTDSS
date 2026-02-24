@@ -5,6 +5,9 @@ module control_acceleration
     implicit none
     private
 
+    public :: abst_acceleration
+    public :: type_acceleration_aitken
+
     type, abstract :: abst_acceleration
     contains
         procedure(abst_initialize_acceleration), public, pass(self), deferred :: initialize

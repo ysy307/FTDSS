@@ -427,6 +427,25 @@
         'num' : 2, &
         'id_range' : [1, 2] &
     }
+
+    #:set FILE_FORMATS = { &
+        'type_name' : 'type_file_formats', &
+        'obj_name'  : 'FILE_FORMATS', &
+        'category'  : 'FILE_FORMAT', &
+        'suffix'    : 'file_format', &
+        'description': 'File formats', &
+        'items'     : [ &
+            ('NONE', 0, 'none'), &
+            ('VTK',  1, 'vtk'), &
+            ('VTU',  2, 'vtu'), &
+            ('CSV',  3, 'csv'), &
+            ('DAT',  4, 'dat'), &
+        ], &
+        'num' : 5, &
+        'id_range' : [0, 4] &
+    }
+
+
     #:set FE_TYPES = { &
         'type_name' : 'type_fe_types', &
         'obj_name'  : 'FE_TYPE', &
@@ -630,7 +649,8 @@
         HCF_VISCOSITY_TYPES, &
         GCC_TYPES, &
         ACCELERATION_METHODS, &
-        TIME_RECORDS &
+        TIME_RECORDS, &
+        FILE_FORMATS &
     ]
 
 

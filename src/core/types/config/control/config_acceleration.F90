@@ -18,9 +18,9 @@ module core_types_config_control_acceleration
         procedure, public, pass(self) :: reset => reset_config_acceleration
     end type type_config_acceleration
 
-    contains
+contains
 
-        subroutine copy_config_acceleration(self, source)
+    subroutine copy_config_acceleration(self, source)
         implicit none
         class(type_config_acceleration), intent(inout) :: self
         class(abst_config), intent(in) :: source

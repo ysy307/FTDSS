@@ -1,6 +1,6 @@
 module core_types_config_base
     use, intrinsic :: iso_fortran_env
-    use :: core_constants, only:type_constant_id, ERROR_CODES
+    use :: core_constants, only:type_constant_id, type_constant_value, ERROR_CODES
     use :: core_validation, only:raise_error
     implicit none
     private
@@ -18,10 +18,11 @@ module core_types_config_base
         procedure, private, pass(self) :: set_real64_2d
         procedure, private, pass(self) :: set_real64_3d
         procedure, private, pass(self) :: set_constant_id
+        procedure, private, pass(self) :: set_constant_value
         generic :: set => &
             set_int32, set_int32_1d, set_int32_2d, set_int32_3d, &
             set_real64, set_real64_1d, set_real64_2d, set_real64_3d, &
-            set_constant_id
+            set_constant_id, set_constant_value
 
         procedure(abst_copy_config), public, pass(self), deferred :: copy
         procedure(abst_reset_config), public, pass(self), deferred :: reset
@@ -156,5 +157,14 @@ contains
 
         member = value
     end subroutine set_constant_id
+
+    subroutine set_constant_value(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        type(type_constant_value), intent(inout) :: member
+        type(type_constant_value), intent(in) :: value
+
+        member = value
+    end subroutine set_constant_value
 
 end module core_types_config_base

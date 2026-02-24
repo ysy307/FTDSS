@@ -12,11 +12,13 @@ module inout_input_translator
         procedure, private, pass(self) :: execute_condition_acceleration
         procedure, private, pass(self) :: execute_basic_swcc
         procedure, private, pass(self) :: execute_basic_gcc
+        procedure, private, pass(self) :: execute_output_field
         generic, public :: execute => execute_condition_boundary, &
             execute_condition_initial, &
             execute_condition_acceleration, &
             execute_basic_swcc, &
-            execute_basic_gcc
+            execute_basic_gcc, &
+            execute_output_field
     end type type_input_translator
 
     type(type_input_translator), parameter, public :: input_translator = type_input_translator()
@@ -44,7 +46,7 @@ module inout_input_translator
             implicit none
             class(type_input_translator), intent(in) :: self
             class(type_input), intent(in) :: input
-            class(abst_config), intent(inout) :: config
+            class(type_config_acceleration), intent(inout) :: config
 
         end subroutine execute_condition_acceleration
 
@@ -64,6 +66,14 @@ module inout_input_translator
             class(type_config_gcc), intent(inout) :: config
 
         end subroutine execute_basic_gcc
+
+        module subroutine execute_output_field(self, input, config)
+            implicit none
+            class(type_input_translator), intent(in) :: self
+            class(type_input), intent(in) :: input
+            class(type_config_output_manager), intent(inout) :: config
+
+        end subroutine execute_output_field
     end interface
 
 ! contains

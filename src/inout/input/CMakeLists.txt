@@ -23,8 +23,8 @@ set(INPUT_SOURCES
     input_interface.F90
     translator/translator_interface.F90
     translator/translator_basic.F90
-    # translator/translator_physics.F90
     translator/translator_conditions.F90
+    translator/translator_output.F90
     input.F90
 )
 add_library(Input_Main STATIC ${INPUT_SOURCES})
