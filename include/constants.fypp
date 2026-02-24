@@ -196,6 +196,21 @@
         'id_range' : [1, 2] &
     }
 
+    #:set ACCELERATION_METHODS = { &
+        'type_name'  : 'type_acceleration_methods', &
+        'obj_name'   : 'ACCELERATION_METHODS', &
+        'category'   : 'ACCELERATION_METHODS', &
+        'suffix'     : 'acceleration_methods', &
+        'description': 'Acceleration methods types', &
+        'items'      : [ &
+            ('NONE',     0, 'none'), &
+            ('AITKEN',   1, 'aitken'), &
+            ('ANDERSON', 2, 'anderson') &
+        ], &
+        'num' : 3, &
+        'id_range' : [0, 2] &
+    }
+
     #:set NORM_TYPES = { &
         'type_name'  : 'type_norm_types', &
         'obj_name'   : 'NORM_TYPES', &
@@ -614,6 +629,7 @@
         HCF_MODES, &
         HCF_VISCOSITY_TYPES, &
         GCC_TYPES, &
+        ACCELERATION_METHODS, &
         TIME_RECORDS &
     ]
 
@@ -637,7 +653,7 @@
     }
 
     #:set constant_value_groups = [ &
-        TIME_UNITS &
+        TIME_UNITS, &
     ]
 
 

@@ -9,12 +9,14 @@
 # --- Control Library ---
 # This library contains all core control logic.
 set(CONTROL_SOURCES
+    acceleration/acceleration_interface.F90
+    acceleration/aitken.F90
     time/ats.F90
     time/time.F90
     time/time_profiler.F90
-    iteration.F90
+    iteration/iteration.F90
+    output/output_manager.F90
     openmp.F90
-    output.F90
     control.F90
 )
 add_library(Control_Main STATIC ${CONTROL_SOURCES})

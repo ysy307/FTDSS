@@ -82,6 +82,8 @@ list(APPEND CORE_SOURCES
     types/config/physics/config_swcc.F90
     types/config/physics/config_gcc.F90
     types/config/physics/config_physics.F90
+    types/config/control/config_acceleration.F90
+    types/config/control/config_control.F90
     types/math/gauss.F90
     types/matrix/matrix_interface.F90
     types/matrix/matrix_dense.F90
