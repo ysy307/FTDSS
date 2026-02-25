@@ -120,8 +120,8 @@ contains
 
         call self%controls%time%get_time(current_time)
 
-        if (self%controls%out_field%is_due(current_time)) then
-            call self%controls%out_field%get_step(iter)
+        if (self%controls%is_output_triggered(OUTPUT_TYPES%FIELD, current_time)) then
+            call self%controls%get_output_step_control(OUTPUT_TYPES%FIELD, iter)
             call self%porosity%get_previous(porosity)
             if (self%is_active_thermal()) then
                 call self%temperature%get_previous(temperature)
@@ -132,7 +132,7 @@ contains
             call self%Qi%get_previous(ice_content)
             call self%output%output_fields(iter, self%domain, porosity, &
                                            temperature, ice_content, pressure)
-            call self%controls%out_field%update(current_time)
+            call self%controls%update_output(OUTPUT_TYPES%FIELD, current_time)
 
             nullify (porosity)
             nullify (temperature)
@@ -160,7 +160,7 @@ contains
 
         call self%controls%time%get_time(current_time)
 
-        if (self%controls%out_history%is_due(current_time)) then
+        if (self%controls%is_output_triggered(OUTPUT_TYPES%HISTORY, current_time)) then
             call self%porosity%get_previous(porosity)
             if (self%is_active_thermal()) then
                 call self%temperature%get_previous(temperature)
@@ -168,10 +168,10 @@ contains
             if (self%is_active_hydraulic()) then
                 call self%pressure%get_previous(pressure)
             end if
-            current_time_converted = self%controls%out_history%convert_output_time(current_time)
+            call self%controls%get_output_time(OUTPUT_TYPES%HISTORY, current_time, current_time_converted)
             call self%output%output_history(current_time_converted, self%domain, porosity, &
                                             temperature, pressure)
-            call self%controls%out_history%update(current_time)
+            call self%controls%update_output(OUTPUT_TYPES%HISTORY, current_time)
 
             nullify (porosity)
             nullify (temperature)
