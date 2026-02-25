@@ -19,6 +19,7 @@ module control_time
 
     !> Data structure holding time stepping state and integration parameters.
     type :: type_time
+        logical, private :: initialized = .false.
         type(type_config_time), private :: config
 
         !! --- Time Coefficients ---
@@ -70,6 +71,8 @@ module control_time
         procedure, public, pass(self) :: sync_with_output
         procedure, public, pass(self) :: update => update_type_time
 
+        procedure, public, pass(self) :: is_initialized => is_initialized_time
+
         ! --- Private Procedures ---
         !> Compute variable step BDF coefficients.
         procedure, private, pass(self) :: compute_bdf_coefficients
@@ -117,7 +120,8 @@ contains
 
         ! --- 3. ATS の初期化を追加 ---
         call self%ats%initialize(config_time_ats)
-        ! end associate
+
+        self%initialized = .true.
     end subroutine initialize_type_time
     ! ==========================================================================
     ! Time Stepping & BDF
@@ -429,4 +433,12 @@ contains
         end if
     end subroutine sync_with_output
 
+    !> Check if the time control has been initialized.
+    pure function is_initialized_time(self) result(is_initialized)
+        implicit none
+        class(type_time), intent(in) :: self
+        logical :: is_initialized
+
+        is_initialized = self%initialized
+    end function is_initialized_time
 end module control_time

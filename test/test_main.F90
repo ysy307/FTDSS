@@ -4,7 +4,6 @@ program test_main
     use :: mpi_f08
 #endif
     use :: module_ftdss
-    use :: module_domain
 
     implicit none
 

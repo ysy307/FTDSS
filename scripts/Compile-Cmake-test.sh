@@ -2,12 +2,13 @@
 set -e
 set -o pipefail
 
-# スクリプト終了時に必ず実行
+# Define the target test module here
+TARGET_TEST="main"
+
 trap '/usr/bin/python3 /workspaces/FTDSS/scripts/check_log.py' EXIT
 
 cmake -S . -B CMakeBuild \
-    -DBUILD_APP=test \
-    -DTEST_NAME=main \
+    -DBUILD_TESTING=ON \
     -DCMAKE_BUILD_TYPE=Debug \
     -DCMAKE_Fortran_COMPILER=mpiifx \
     -DCMAKE_C_COMPILER=mpiicx \
@@ -15,4 +16,4 @@ cmake -S . -B CMakeBuild \
     -DMKL_SYCL_LINK=OFF \
     -G "Ninja"
 
-cmake --build CMakeBuild --parallel --verbose
+cmake --build CMakeBuild --target test_${TARGET_TEST} --parallel --verbose

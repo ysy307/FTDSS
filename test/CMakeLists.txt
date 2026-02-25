@@ -1,63 +1,47 @@
 # ====================================================================
-# Helper Function: Create Solver Test
+# Test Target: test_main
 # ====================================================================
-function(create_solver_test test_name dependencies)
-    set(target_name "test_${test_name}")
+set(target_name "test_main")
 
-    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${target_name}.F90")
-        message(FATAL_ERROR "Test source file not found: ${target_name}.F90")
-    endif()
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${target_name}.F90")
+    message(FATAL_ERROR "Test source file not found: ${target_name}.F90")
+endif()
 
-    # 実行ファイル作成
-    add_executable(${target_name} ${target_name}.F90)
-    set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE Fortran)
+add_executable(${target_name} ${target_name}.F90)
+set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE Fortran)
 
-    # 依存ライブラリのリンク自動化 (例: core -> Solver::Core)
-    foreach(dep ${dependencies})
-        string(SUBSTRING ${dep} 0 1 FIRST_CHAR)
-        string(TOUPPER ${FIRST_CHAR} FIRST_CHAR)
-        string(SUBSTRING ${dep} 1 -1 REMAINDER)
-        target_link_libraries(${target_name} PRIVATE "Solver::${FIRST_CHAR}${REMAINDER}")
-    endforeach()
+# 定義済みのエイリアスをリンクする
+target_link_libraries(${target_name} PRIVATE 
+    SOLVER::CORE
+    SOLVER::LINALG
+    SOLVER::PARALLEL
+    SOLVER::SOLVER
+    SOLVER::SYSTEM
+    SOLVER::DOMAIN
+    SOLVER::INPUT
+    SOLVER::OUTPUT
+    SOLVER::CONSTITUTIVE
+    SOLVER::GOVERNING
+    SOLVER::FTDSS
+)
 
-    # 個別のビルドフラグや設定が必要な場合のフック (physics等)
-    if(test_name STREQUAL "physics")
-        if(COMMAND enable_build_flags)
-             enable_build_flags(${target_name})
-        endif()
-        if(COMMAND enable_thirdparty)
-             enable_thirdparty(${target_name})
-        endif()
-    endif()
+# CTest登録
+add_test(NAME ${target_name} COMMAND $<TARGET_FILE:${target_name}>)
 
-    # CTest登録
-    add_test(NAME ${target_name} COMMAND $<TARGET_FILE:${target_name}>)
+# ログ出力先ディレクトリの確保
+file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/log)
 
-    # カスタム実行ターゲット (run_xxx)
-    if(ENABLE_MPI)
-        add_custom_target(run_${test_name}
-            COMMAND mpirun -np 4 $<TARGET_FILE:${target_name}> >| log/output_${test_name}.md
-            DEPENDS ${target_name}
-            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-        )
-    else()
-        add_custom_target(run_${test_name}
-            COMMAND OMP_NUM_THREADS=4 $<TARGET_FILE:${target_name}> >| log/output_${test_name}.md
-            DEPENDS ${target_name}
-            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-        )
-    endif()
-
-endfunction()
-
-# ====================================================================
-# Define Test Target
-# ====================================================================
-
-# 親のCMakeLists.txtで定義された依存関係リスト(DEPS_xxx)を利用してテストを生成
-if(DEFINED DEPS_${TEST_NAME})
-    message(STATUS "Creating test target: test_${TEST_NAME}")
-    create_solver_test(${TEST_NAME} "${DEPS_${TEST_NAME}}")
+# カスタム実行ターゲット (run_main)
+if(ENABLE_MPI AND MPI_Fortran_FOUND)
+    add_custom_target(run_main
+        COMMAND sh -c "${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} 4 $<TARGET_FILE:${target_name}> > ${PROJECT_SOURCE_DIR}/log/results.md"
+        DEPENDS ${target_name}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    )
 else()
-    message(WARNING "No dependencies defined for test: ${TEST_NAME}. Test target skipped.")
+    add_custom_target(run_main
+        COMMAND sh -c "env OMP_NUM_THREADS=4 $<TARGET_FILE:${target_name}> > ${PROJECT_SOURCE_DIR}/log/results.md"
+        DEPENDS ${target_name}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    )
 endif()
