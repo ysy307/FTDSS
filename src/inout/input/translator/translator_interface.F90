@@ -10,12 +10,14 @@ module inout_input_translator
         procedure, private, pass(self) :: execute_condition_boundary
         procedure, private, pass(self) :: execute_condition_initial
         procedure, private, pass(self) :: execute_condition_acceleration
+        procedure, private, pass(self) :: execute_condition_time_ats
         procedure, private, pass(self) :: execute_basic_swcc
         procedure, private, pass(self) :: execute_basic_gcc
         procedure, private, pass(self) :: execute_output_field
         generic, public :: execute => execute_condition_boundary, &
             execute_condition_initial, &
             execute_condition_acceleration, &
+            execute_condition_time_ats, &
             execute_basic_swcc, &
             execute_basic_gcc, &
             execute_output_field
@@ -49,6 +51,14 @@ module inout_input_translator
             class(type_config_acceleration), intent(inout) :: config
 
         end subroutine execute_condition_acceleration
+
+        module subroutine execute_condition_time_ats(self, input, config)
+            implicit none
+            class(type_input_translator), intent(in) :: self
+            class(type_input), intent(in) :: input
+            class(type_config_time_ats), intent(inout) :: config
+
+        end subroutine execute_condition_time_ats
 
         module subroutine execute_basic_swcc(self, input, material_id, config)
             implicit none

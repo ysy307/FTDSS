@@ -11,7 +11,6 @@ module control_time
     private
 
     public :: type_time
-    public :: type_ats
 
     ! --- Constants ---
     !> Maximum supported order for BDF schemes.
@@ -35,10 +34,6 @@ module control_time
         real(real64) :: dt_s = 0.0d0
         !> History of time steps
         real(real64), allocatable :: dt_s_history(:)
-        !> Minimum allowable time step [s]
-        real(real64) :: dt_s_min = 0.0d0
-        !> Maximum allowable time step [s]
-        real(real64) :: dt_s_max = 0.0d0
 
         ! --- BDF Coefficients ---
         !> Coefficients $\alpha_j$ for the BDF formula:
@@ -93,10 +88,11 @@ contains
     ! ==========================================================================
 
 !> Initialize the time control object using input configuration.
-    subroutine initialize_type_time(self, input)
+    subroutine initialize_type_time(self, input, config_ats)
         implicit none
         class(type_time), intent(inout) :: self
         type(type_input), intent(in) :: input
+        type(type_config_time_ats), intent(in) :: config_ats
 
         integer(int32) :: istat
         real(real64) :: time_conv_coeff
@@ -115,8 +111,6 @@ contains
             time_conv_coeff = time_unit%value
 
             self%dt_s = time_control%time_stepping%initial_step * time_conv_coeff
-            self%dt_s_max = time_control%time_stepping%max_step * time_conv_coeff
-            self%dt_s_min = time_control%time_stepping%min_step * time_conv_coeff
 
             ! --- Allocate History ---
             if (allocated(self%dt_s_history)) deallocate (self%dt_s_history)
@@ -138,7 +132,7 @@ contains
             self%current_time_s = self%start_time
 
             ! --- 3. ATS の初期化を追加 ---
-            call self%ats%initialize(input, self%dt_s_min, self%dt_s_max)
+            call self%ats%initialize(config_ats)
         end associate
     end subroutine initialize_type_time
     ! ==========================================================================
@@ -312,10 +306,10 @@ contains
             dt = new_dt
         end if
 
-        if (dt <= self%dt_s_min) then
-            self%dt_s = self%dt_s_min
-        else if (dt >= self%dt_s_max) then
-            self%dt_s = self%dt_s_max
+        if (dt <= self%ats%config%dt_min) then
+            self%dt_s = self%ats%config%dt_min
+        else if (dt >= self%ats%config%dt_max) then
+            self%dt_s = self%ats%config%dt_max
         else
             self%dt_s = dt
         end if
@@ -332,7 +326,7 @@ contains
         !> Result flag
         logical :: is_min_dt
 
-        is_min_dt = abs(self%dt_s - self%dt_s_min) <= EPS_TIME
+        is_min_dt = abs(self%dt_s - self%ats%config%dt_min) <= EPS_TIME
     end function is_min_dt_reached
 
     !>
@@ -344,7 +338,7 @@ contains
         !> Result flag
         logical :: is_max_dt
 
-        is_max_dt = abs(self%dt_s_max - self%dt_s) <= EPS_TIME
+        is_max_dt = abs(self%ats%config%dt_max - self%dt_s) <= EPS_TIME
     end function is_max_dt_reached
 
     !> Get current BDF order.

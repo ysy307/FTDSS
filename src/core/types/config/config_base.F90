@@ -17,11 +17,17 @@ module core_types_config_base
         procedure, private, pass(self) :: set_real64_1d
         procedure, private, pass(self) :: set_real64_2d
         procedure, private, pass(self) :: set_real64_3d
+        procedure, private, pass(self) :: set_logical
+        procedure, private, pass(self) :: set_logical_1d
+        procedure, private, pass(self) :: set_logical_2d
+        procedure, private, pass(self) :: set_logical_3d
+
         procedure, private, pass(self) :: set_constant_id
         procedure, private, pass(self) :: set_constant_value
         generic :: set => &
             set_int32, set_int32_1d, set_int32_2d, set_int32_3d, &
             set_real64, set_real64_1d, set_real64_2d, set_real64_3d, &
+            set_logical, set_logical_1d, set_logical_2d, set_logical_3d, &
             set_constant_id, set_constant_value
 
         procedure(abst_copy_config), public, pass(self), deferred :: copy
@@ -148,6 +154,57 @@ contains
         if (allocated(member)) deallocate (member)
         allocate (member, source=value)
     end subroutine set_real64_3d
+
+    subroutine set_logical(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        logical, intent(inout) :: member
+        logical, intent(in) :: value
+
+        member = value
+    end subroutine set_logical
+
+    subroutine set_logical_1d(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        logical, allocatable, intent(inout) :: member(:)
+        logical, allocatable, intent(in) :: value(:)
+
+        if (.not. allocated(value)) then
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_logical_1d")
+        end if
+
+        if (allocated(member)) deallocate (member)
+        allocate (member, source=value)
+    end subroutine set_logical_1d
+
+    subroutine set_logical_2d(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        logical, allocatable, intent(inout) :: member(:, :)
+        logical, allocatable, intent(in) :: value(:, :)
+
+        if (.not. allocated(value)) then
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_logical_2d")
+        end if
+
+        if (allocated(member)) deallocate (member)
+        allocate (member, source=value)
+    end subroutine set_logical_2d
+
+    subroutine set_logical_3d(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        logical, allocatable, intent(inout) :: member(:, :, :)
+        logical, allocatable, intent(in) :: value(:, :, :)
+
+        if (.not. allocated(value)) then
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_logical_3d")
+        end if
+
+        if (allocated(member)) deallocate (member)
+        allocate (member, source=value)
+    end subroutine set_logical_3d
 
     subroutine set_constant_id(self, member, value)
         implicit none

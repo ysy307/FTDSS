@@ -2,31 +2,17 @@ module control_ats
     use, intrinsic :: iso_fortran_env
     use :: stdlib_optval, only:optval
     use :: module_core
-    use :: module_input, only:type_input
     implicit none
+    private
+
+    public :: type_ats
 
     ! ==========================================================================
     !> Type for Adaptive Time Stepping Strategy
     !> Manages thresholds and scaling factors for automatic time step adjustment.
     ! ==========================================================================
     type :: type_ats
-        logical, private :: is_active = .false.
-
-        !> [Config] Thresholds for iteration counts
-        integer(int32), private :: iter_min = 4 ! If iter < min, increase dt
-        integer(int32), private :: iter_max = 8 ! If iter > max, decrease dt
-
-        !> [Config] Scaling factors
-        real(real64), private :: scale_up = 1.2d0 ! Success (easy)
-        real(real64), private :: scale_down = 0.8d0 ! Success (hard)
-        real(real64), private :: scale_retry = 0.5d0 ! Failure (diverged)
-
-        real(real64), private :: safety_factor = 0.9d0
-        real(real64), private :: max_growth_rate = 2.0d0
-
-        !> [Config] Absolute limits (Copies from time control for easy access)
-        real(real64), private :: dt_min = 1.0d-5
-        real(real64), private :: dt_max = 1.0d+2
+        type(type_config_time_ats) :: config
     contains
         procedure, public, pass(self) :: initialize => initialize_type_ats
         procedure, public, pass(self) :: is_enabled => is_enabled_ats
@@ -39,29 +25,13 @@ contains
     ! ==========================================================================
 
     !> Initialize ATS settings.
-    subroutine initialize_type_ats(self, input, dt_min_limit, dt_max_limit)
+    subroutine initialize_type_ats(self, config_time_ats)
         implicit none
         class(type_ats), intent(inout) :: self
-        type(type_input), intent(in) :: input
-        real(real64), intent(in) :: dt_min_limit, dt_max_limit
+        type(type_config_time_ats), intent(in) :: config_time_ats
 
-        ! Assume ats_settings exists in the input structure and load it.
-        ! Use default values or trigger an error if not present.
-        associate (ats_config => input%conditions%time_control%adaptive_stepping)
-            self%is_active = ats_config%is_active
+        call self%config%copy(config_time_ats)
 
-            if (self%is_active) then
-                self%iter_min = ats_config%iter_min
-                self%iter_max = ats_config%iter_max
-                self%scale_up = ats_config%scale_up
-                self%scale_down = ats_config%scale_down
-                self%scale_retry = ats_config%scale_retry
-            end if
-        end associate
-
-        ! Store physical limits passed from the control_time side.
-        self%dt_min = dt_min_limit
-        self%dt_max = dt_max_limit
     end subroutine initialize_type_ats
 
     !> Check if ATS is enabled.
@@ -69,7 +39,8 @@ contains
         implicit none
         class(type_ats), intent(in) :: self
         logical :: is_enabled
-        is_enabled = self%is_active
+
+        is_enabled = self%config%active
     end function is_enabled_ats
 
     !> Calculate the recommended dt for the next step after successful convergence.
@@ -83,26 +54,26 @@ contains
         real(real64) :: dt_temp
 
         next_dt = current_dt
-        if (.not. self%is_active) return
+        if (.not. self%config%active) return
 
-        if (iter_count <= self%iter_min) then
+        if (iter_count <= self%config%iter_min) then
             ! 1. Predict with scale_up and apply safety factor
-            if (self%scale_up * self%safety_factor > 1.0d0) then
-                dt_temp = current_dt * self%scale_up * self%safety_factor
+            if (self%config%scale_up * self%config%safety_factor > 1.0d0) then
+                dt_temp = current_dt * self%config%scale_up * self%config%safety_factor
             else
-                dt_temp = current_dt * self%scale_up
+                dt_temp = current_dt * self%config%scale_up
             end if
 
             ! 2. Apply hard growth cap for BDF stability
             ! Even if scale_up is large, we limit the ratio dt_next/dt_now
-            next_dt = min(dt_temp, current_dt * self%max_growth_rate)
-        else if (iter_count >= self%iter_max) then
+            next_dt = min(dt_temp, current_dt * self%config%max_growth_rate)
+        else if (iter_count >= self%config%iter_max) then
             ! Convergence is hard -> decelerate.
-            next_dt = current_dt * self%scale_down
+            next_dt = current_dt * self%config%scale_down
         end if
 
         ! Limiters
-        next_dt = max(self%dt_min, min(next_dt, self%dt_max))
+        next_dt = max(self%config%dt_min, min(next_dt, self%config%dt_max))
     end subroutine predict_next_dt
 
     !> Calculate a reduced dt for retry upon divergence.
@@ -113,12 +84,12 @@ contains
         real(real64), intent(inout) :: retry_dt
 
         retry_dt = current_dt
-        if (.not. self%is_active) return
+        if (.not. self%config%active) return
 
-        retry_dt = current_dt * self%scale_retry
+        retry_dt = current_dt * self%config%scale_retry
 
         ! Clip to minimum allowed dt
-        if (retry_dt < self%dt_min) retry_dt = self%dt_min
+        if (retry_dt < self%config%dt_min) retry_dt = self%config%dt_min
     end subroutine calc_retry_dt
 
 end module control_ats
