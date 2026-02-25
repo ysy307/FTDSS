@@ -43,7 +43,7 @@ module control_iteration_convergence
         ! ---- Mutator ----
         procedure, public, pass(self) :: reset => reset_criterion
         ! ---- Algorithm / Operation ----
-        procedure, public, pass(self) :: check => check_convergence_criterion
+        procedure, public, pass(self) :: check_convergence => check_convergence_criterion
         ! ---- Inquiry ----
         ! ---- Getter ----
         procedure, public, pass(self) :: get_current_norm => get_current_norm_convergence_criterion
@@ -128,6 +128,7 @@ module control_iteration_convergence
         ! ---- Mutator ----
         procedure, public, pass(self) :: reset => reset_convergence_control
         ! ---- Algorithm / Operation ----
+        procedure, public, pass(self) :: check_convergence => check_convergence_control
         ! ---- Inquiry ----
         procedure, public, pass(self) :: is_initialized => is_initialized_convergence_control
         procedure, public, pass(self) :: should_check_residual => should_check_residual_convergence_control
@@ -157,6 +158,24 @@ module control_iteration_convergence
 
         end subroutine reset_convergence_control
 
+        module function check_convergence_control(self, physics_type, nonlinear_iter, residual_vector, update_vector) result(is_ok)
+            implicit none
+            class(type_convergence_control), intent(inout) :: self
+            type(type_constant_id), intent(in) :: physics_type
+            integer(int32), intent(in) :: nonlinear_iter
+            real(real64), intent(in), optional :: residual_vector(:)
+            real(real64), intent(in), optional :: update_vector(:)
+            logical :: is_ok
+
+        end function check_convergence_control
+
+        module pure function is_initialized_convergence_control(self) result(is_initialized)
+            implicit none
+            class(type_convergence_control), intent(in) :: self
+            logical :: is_initialized
+
+        end function is_initialized_convergence_control
+
         module pure function should_check_residual_convergence_control(self) result(should_check)
             implicit none
             class(type_convergence_control), intent(in) :: self
@@ -170,13 +189,6 @@ module control_iteration_convergence
             logical :: should_check
 
         end function should_check_update_convergence_control
-
-        module pure function is_initialized_convergence_control(self) result(is_initialized)
-            implicit none
-            class(type_convergence_control), intent(in) :: self
-            logical :: is_initialized
-
-        end function is_initialized_convergence_control
 
         module subroutine get_norm_type_convergence_control(self, norm_type)
             implicit none

@@ -18,47 +18,58 @@ module module_control
     public :: type_control
 
     type :: type_control
-        private
-        logical :: is_active(PHYSICS_TYPES%NUM_ID) = .false.
-        type(type_constant_id) :: coupling_mode
-        logical, allocatable :: physics_active(:, :)
+        logical, private :: is_active(PHYSICS_TYPES%NUM_ID) = .false.
+        type(type_constant_id), private :: coupling_mode
+        logical, private, allocatable :: physics_active(:, :)
 
-        type(type_iteration), public :: iteration
-        type(type_time), public :: time
-        type(type_time_profiler), public :: profiler
+        type(type_iteration), private :: iteration
+        type(type_time), private :: time
+        type(type_time_profiler), private :: profiler
 
         type(type_output_manager), private :: out_field
         type(type_output_manager), private :: out_history
 
-        class(abst_acceleration), allocatable, public :: acceleration
+        class(abst_acceleration), private, allocatable :: acceleration
 
     contains
-        procedure, pass(self), public :: initialize => initialize_type_control
-        procedure, pass(self), public :: is_physics_active => is_physics_active_control
-        procedure, pass(self), public :: is_target => is_target_control
-        procedure, pass(self), public :: get_coupling_mode => get_coupling_mode_control
+        ! ---- Lifecycle ----
+        ! initialize, destroy, reset, etc.
+        procedure, public, pass(self) :: initialize => initialize_type_control
 
-        procedure, pass(self), public :: is_monolithic => is_monolithic_control
-        procedure, pass(self), public :: is_staggered => is_staggered_control
+        ! ---- Mutator ----
+        ! set_XXX, increment_XXX, update_XXX, etc.
+        procedure, public, pass(self) :: update => update_controls
+        procedure, public, pass(self) :: update_output => update_output_control
 
-        procedure, pass(self), public :: is_end_time => is_end_time_control
+        ! ---- Algorithm / Operation ----
 
-        procedure, pass(self), public :: update => update_controls
+        ! ---- Inquiry ----
+        procedure, public, pass(self) :: is_physics_active => is_physics_active_control
+        procedure, public, pass(self) :: is_target => is_target_control
+        procedure, public, pass(self) :: is_monolithic => is_monolithic_control
+        procedure, public, pass(self) :: is_staggered => is_staggered_control
+        procedure, public, pass(self) :: is_end_time => is_end_time_control
+        procedure, public, pass(self) :: is_output_triggered => is_output_triggered_control
 
-        procedure, pass(self), public :: display => display_controls
-        ! output series
-        procedure, pass(self), public :: is_output_triggered => is_output_triggered_control
-        procedure, pass(self), public :: get_output_time => get_output_time_control
-        procedure, pass(self), public :: get_output_step => get_output_step_control
-        procedure, pass(self), public :: update_output => update_output_control
+        ! ---- Getter ----
+        ! get_XXX, etc.
+        procedure, public, pass(self) :: get_coupling_mode => get_coupling_mode_control
+        procedure, public, pass(self) :: get_output_time => get_output_time_control
+        procedure, public, pass(self) :: get_output_step => get_output_step_control
+
+        ! ---- Meta / Utility ----
+        ! display, to_string, etc.
+        procedure, public, pass(self) :: display => display_controls
+        
     end type type_control
 
 contains
-    subroutine initialize_type_control(self, input, config_time, config_time_ats, config_output_field, &
+    subroutine initialize_type_control(self, input, config_iteration, config_time, config_time_ats, config_output_field, &
                                        config_output_history, config_acceleration)
         implicit none
         class(type_control), intent(inout) :: self
         class(type_input), intent(in) :: input
+        type(type_config_iteration), intent(in), optional :: config_iteration
         type(type_config_time), intent(in), optional :: config_time
         type(type_config_time_ats), intent(in), optional :: config_time_ats
         class(type_config_output_manager), intent(in), optional :: config_output_field
@@ -112,22 +123,31 @@ contains
         self%coupling_mode = &
             COUPLING_MODES%to_object(input%basic%analysis_controls%coupling_mode)
 
+        ! Control time settings initialization
         if (present(config_time) .and. present(config_time_ats)) then
             call self%time%initialize(config_time, config_time_ats)
         end if
-        call self%iteration%initialize(input)
+
+        ! Control iteration settings initialization
+        if (present(config_iteration)) then
+            call self%iteration%initialize(config_iteration)
+        end if
+
+
         call initialize_openmp(input)
 
+        ! Acceleration method initialization
         if (present(config_acceleration)) then
             select case (config_acceleration%method%ID)
             case (ACCELERATION_METHODS%AITKEN%ID)
                 allocate (type_acceleration_aitken :: self%acceleration)
             case (ACCELERATION_METHODS%ANDERSON%ID)
-                ! 将来実装
+                ! TBI
             end select
             call self%acceleration%initialize(config_acceleration)
         end if
 
+        ! Output managers initialization with the current time 
         call self%time%get_time(current_time_s)
         if (present(config_output_field)) then
             call self%out_field%initialize(config_output_field, current_time_s)

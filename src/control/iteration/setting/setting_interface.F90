@@ -23,6 +23,7 @@ module control_iteration_setting
         ! ---- Mutator ----
         procedure, public, pass(self) :: reset => reset_iteration_setting
         ! ---- Algorithm / Operation ----
+        procedure, public, pass(self) :: check_convergence => check_convergence_setting
         ! ---- Inquiry ----
         ! ---- Getter ----
         procedure, public, pass(self) :: get_max_iterations => get_max_iterations_iteration_setting
@@ -55,8 +56,7 @@ contains
 
     end subroutine reset_iteration_setting
 
-    function evaluate_convergence_setting(self, physics_type, nonlinear_iter, &
-                                          residual_vector, update_vector) result(is_ok)
+    function check_convergence_setting(self, physics_type, nonlinear_iter, residual_vector, update_vector) result(is_ok)
         implicit none
         class(type_iteration_setting), intent(inout) :: self
         type(type_constant_id), intent(in) :: physics_type
@@ -65,44 +65,9 @@ contains
         real(real64), intent(in), optional :: update_vector(:)
         logical :: is_ok
 
-        logical :: is_residual_ok, is_update_ok
-        logical :: check_residual, check_update
+        is_ok = self%convergence_control%check_convergence(physics_type, nonlinear_iter, residual_vector, update_vector)
 
-        check_residual = self%convergence_control%should_check_residual()
-        check_update = self%convergence_control%should_check_update()
-
-        is_residual_ok = .true.
-        is_update_ok = .true.
-
-        associate (control => self%convergence_control)
-            ! --- Residual vector check ---
-            if (present(residual_vector)) then
-                write (*, '(A, i0)') '    [Debug] Checking residual convergence for physics type ID: ', physics_type%ID
-                is_residual_ok = control%residual(physics_type%ID)%check( &
-                                 residual_vector, nonlinear_iter, control%norm_type)
-                if (.not. check_residual) is_residual_ok = .true.
-            else
-                is_residual_ok = .not. check_residual
-            end if
-
-            ! --- Update vector check ---
-            if (present(update_vector)) then
-                write (*, '(A, i0)') '    [Debug] Checking update convergence for physics type ID: ', physics_type%ID
-                is_update_ok = control%update(physics_type%ID)%check( &
-                               update_vector, nonlinear_iter, control%norm_type)
-                if (.not. check_update) is_update_ok = .true.
-            else
-                is_update_ok = .not. check_update
-            end if
-
-            ! --- Combine Logic (AND / OR) ---
-            if (control%combination_logic == NONLINEAR_LOGIC%OR) then
-                is_ok = is_residual_ok .or. is_update_ok
-            else ! Default AND
-                is_ok = is_residual_ok .and. is_update_ok
-            end if
-        end associate
-    end function evaluate_convergence_setting
+    end function check_convergence_setting
 
     pure subroutine get_max_iterations_iteration_setting(self, max_iterations)
         implicit none

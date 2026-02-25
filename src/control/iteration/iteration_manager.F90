@@ -5,9 +5,12 @@ module control_iteration_manager
     use :: control_iteration_setting, only:type_iteration_setting
     use :: control_iteration_strategy, only:type_iteration_strategy
     implicit none
+    private
+
+    public :: type_iteration
 
     !>
-    !> 反復管理クラス (Main)
+    !> 反復管理クラス
     !>
     type :: type_iteration
         ! --- カウンタ ---
@@ -40,6 +43,8 @@ module control_iteration_manager
         procedure, public, pass(self) :: set_diverged => set_diverged_iteration
 
         ! ---- Algorithm / Operation ----
+        procedure, public, pass(self) :: check_convergence => check_convergence_iteration
+
         ! ---- Inquiry ----
         procedure, public, pass(self) :: is_converged => is_converged_iteration
         procedure, public, pass(self) :: is_diverged => is_diverged_iteration
@@ -49,7 +54,6 @@ module control_iteration_manager
         procedure, public, pass(self) :: is_newton => is_newton_iteration
         procedure, public, pass(self) :: is_picard => is_picard_iteration
         procedure, public, pass(self) :: is_none => is_none_iteration
-
         procedure, public, pass(self) :: should_continue => should_continue_iteration
 
         ! ---- Getter ----
@@ -149,7 +153,6 @@ contains
         self%diverged(physics_type%ID) = diverged
     end subroutine set_diverged_iteration
 
-    ! Manager層 (control_iteration_manager)
     subroutine check_convergence_iteration(self, physics_type, residual_vector, update_vector)
         implicit none
         class(type_iteration), intent(inout) :: self
@@ -169,11 +172,11 @@ contains
             return
         end if
 
-        ! ! 判定の詳細は Settings (Convergence層) に委譲
-        ! is_ok = self%settings%evaluate_convergence(physics_type, self%nonlinear_iter, residual_vector, update_vector)
+        is_ok = self%settings%check_convergence(physics_type, self%nonlinear_iter, residual_vector, update_vector)
 
-        ! ! Managerは結果を受け取って自身の状態を更新するのみ
-        ! call self%set_converged(physics_type, is_ok)
+        ! Managerは結果を受け取って自身の状態を更新するのみ
+        call self%set_converged(physics_type, is_ok)
+        call self%set_diverged(physics_type, .not. is_ok)
     end subroutine check_convergence_iteration
 
     pure function is_converged_iteration(self) result(is_converged)

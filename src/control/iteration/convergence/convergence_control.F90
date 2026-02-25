@@ -54,6 +54,56 @@ contains
 
     end subroutine reset_convergence_control
 
+    module function check_convergence_control(self, physics_type, nonlinear_iter, residual_vector, update_vector) result(is_ok)
+        implicit none
+        class(type_convergence_control), intent(inout) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        integer(int32), intent(in) :: nonlinear_iter
+        real(real64), intent(in), optional :: residual_vector(:)
+        real(real64), intent(in), optional :: update_vector(:)
+        logical :: is_ok
+
+        logical :: is_residual_ok, is_update_ok
+        logical :: check_residual, check_update
+
+        check_residual = self%should_check_residual()
+        check_update = self%should_check_update()
+
+        is_residual_ok = .true.
+        is_update_ok = .true.
+
+        ! --- Residual vector check ---
+        if (present(residual_vector)) then
+            is_residual_ok = self%residual(physics_type%ID)%check_convergence(residual_vector, nonlinear_iter, self%norm_type)
+            if (.not. check_residual) is_residual_ok = .true.
+        else
+            is_residual_ok = .not. check_residual
+        end if
+
+        ! --- Update vector check ---
+        if (present(update_vector)) then
+            is_update_ok = self%update(physics_type%ID)%check_convergence(update_vector, nonlinear_iter, self%norm_type)
+            if (.not. check_update) is_update_ok = .true.
+        else
+            is_update_ok = .not. check_update
+        end if
+
+        ! --- Combine Logic (AND / OR) ---
+        if (self%combination_logic == NONLINEAR_LOGIC%OR) then
+            is_ok = is_residual_ok .or. is_update_ok
+        else ! Default AND
+            is_ok = is_residual_ok .and. is_update_ok
+        end if
+    end function check_convergence_control
+
+    module pure function is_initialized_convergence_control(self) result(is_initialized)
+        implicit none
+        class(type_convergence_control), intent(in) :: self
+        logical :: is_initialized
+
+        is_initialized = self%initialized
+    end function is_initialized_convergence_control
+
     module pure function should_check_residual_convergence_control(self) result(should_check)
         implicit none
         class(type_convergence_control), intent(in) :: self
@@ -79,14 +129,6 @@ contains
             should_check = .false.
         end if
     end function should_check_update_convergence_control
-
-    module pure function is_initialized_convergence_control(self) result(is_initialized)
-        implicit none
-        class(type_convergence_control), intent(in) :: self
-        logical :: is_initialized
-
-        is_initialized = self%initialized
-    end function is_initialized_convergence_control
 
     module subroutine get_norm_type_convergence_control(self, norm_type)
         implicit none
