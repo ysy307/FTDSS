@@ -21,6 +21,10 @@ module core_types_config_base
         procedure, private, pass(self) :: set_logical_1d
         procedure, private, pass(self) :: set_logical_2d
         procedure, private, pass(self) :: set_logical_3d
+        procedure, private, pass(self) :: set_character
+        procedure, private, pass(self) :: set_character_1d
+        procedure, private, pass(self) :: set_character_2d
+        procedure, private, pass(self) :: set_character_3d
 
         procedure, private, pass(self) :: set_constant_id
         procedure, private, pass(self) :: set_constant_value
@@ -28,6 +32,7 @@ module core_types_config_base
             set_int32, set_int32_1d, set_int32_2d, set_int32_3d, &
             set_real64, set_real64_1d, set_real64_2d, set_real64_3d, &
             set_logical, set_logical_1d, set_logical_2d, set_logical_3d, &
+            set_character, set_character_1d, set_character_2d, set_character_3d, &
             set_constant_id, set_constant_value
 
         procedure(abst_copy_config), public, pass(self), deferred :: copy
@@ -205,6 +210,62 @@ contains
         if (allocated(member)) deallocate (member)
         allocate (member, source=value)
     end subroutine set_logical_3d
+
+    subroutine set_character(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        character(:), allocatable, intent(inout) :: member
+        character(:), allocatable, intent(in) :: value
+
+        if (.not. allocated(value)) then
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_character")
+        end if
+
+        if (allocated(member)) deallocate (member)
+        allocate (member, source=value)
+    end subroutine set_character
+
+    subroutine set_character_1d(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        character(:), allocatable, intent(inout) :: member(:)
+        character(:), allocatable, intent(in) :: value(:)
+
+        if (.not. allocated(value)) then
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_character_1d")
+        end if
+
+        if (allocated(member)) deallocate (member)
+        allocate (member, source=value)
+    end subroutine set_character_1d
+
+    subroutine set_character_2d(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        character(:), allocatable, intent(inout) :: member(:, :)
+        character(:), allocatable, intent(in) :: value(:, :)
+
+        if (.not. allocated(value)) then
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_character_2d")
+        end if
+
+        if (allocated(member)) deallocate (member)
+        allocate (member, source=value)
+    end subroutine set_character_2d
+
+    subroutine set_character_3d(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        character(:), allocatable, intent(inout) :: member(:, :, :)
+        character(:), allocatable, intent(in) :: value(:, :, :)
+
+        if (.not. allocated(value)) then
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_character_3d")
+        end if
+
+        if (allocated(member)) deallocate (member)
+        allocate (member, source=value)
+    end subroutine set_character_3d
 
     subroutine set_constant_id(self, member, value)
         implicit none

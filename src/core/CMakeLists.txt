@@ -87,6 +87,7 @@ list(APPEND CORE_SOURCES
     types/config/control/config_control.F90
     types/config/control/config_iteration.F90
     types/config/control/config_time.F90
+    types/config/control/config_parallel.F90
     types/math/gauss.F90
     types/matrix/matrix_interface.F90
     types/matrix/matrix_dense.F90

@@ -14,6 +14,8 @@ module inout_input_translator
         procedure, private, pass(self) :: execute_condition_time_ats
         procedure, private, pass(self) :: execute_basic_swcc
         procedure, private, pass(self) :: execute_basic_gcc
+        procedure, private, pass(self) :: execute_basic_iteration
+        procedure, private, pass(self) :: execute_basic_parallel_openmp
         procedure, private, pass(self) :: execute_output_field
         generic, public :: execute => execute_condition_boundary, &
             execute_condition_initial, &
@@ -22,6 +24,8 @@ module inout_input_translator
             execute_condition_time_ats, &
             execute_basic_swcc, &
             execute_basic_gcc, &
+            execute_basic_iteration, &
+            execute_basic_parallel_openmp, &
             execute_output_field
     end type type_input_translator
 
@@ -94,6 +98,14 @@ module inout_input_translator
             class(type_config_iteration), intent(inout) :: config
 
         end subroutine execute_basic_iteration
+
+        module subroutine execute_basic_parallel_openmp(self, input, config)
+            implicit none
+            class(type_input_translator), intent(in) :: self
+            class(type_input), intent(in) :: input
+            class(type_config_parallel_openmp), intent(inout) :: config
+
+        end subroutine execute_basic_parallel_openmp
 
         module subroutine execute_output_field(self, input, config)
             implicit none

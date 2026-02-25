@@ -33,7 +33,8 @@ module core_types
         type_config_time_ats, &
         type_config_iteration, &
         type_config_iteration_nonlinear, &
-        type_config_iteration_criterion
+        type_config_iteration_criterion, &
+        type_config_parallel_openmp
     use :: core_types_physics_info, only: &
         type_physics_info
     use :: core_types_physics_meteorology, only: &

@@ -10,6 +10,8 @@ module core_types_config_control
         type_config_iteration,&
         type_config_iteration_nonlinear,&
         type_config_iteration_criterion
+    use :: core_types_config_control_parallel, only: &
+        type_config_parallel_openmp
     implicit none
     private
 
@@ -22,5 +24,7 @@ module core_types_config_control
     public :: type_config_iteration
     public :: type_config_iteration_nonlinear
     public :: type_config_iteration_criterion
+
+    public :: type_config_parallel_openmp
 
 end module core_types_config_control

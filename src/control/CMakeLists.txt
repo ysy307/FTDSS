@@ -23,7 +23,8 @@ set(CONTROL_SOURCES
     iteration/iteration_manager.F90
     iteration/iteration.F90
     output/output_manager.F90
-    openmp.F90
+    parallel/openmp.F90
+    parallel/parallel.F90
     control.F90
 )
 add_library(Control_Main STATIC ${CONTROL_SOURCES})

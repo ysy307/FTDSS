@@ -95,7 +95,7 @@ function(enable_build_flags target)
         if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel|IntelLLVM")
             target_compile_options(${target} ${KEYWORD} 
                 # Common for Intel (Standard, Preprocessor, Traceback)
-                $<$<COMPILE_LANGUAGE:Fortran>:-stand f18 -fpp -traceback>
+                $<$<COMPILE_LANGUAGE:Fortran>:-stand f18 -fpp -traceback -fpscomp logicals>
 
                 # Release: Fortran Only
                 $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Release>>:-O3 -xHost>
@@ -111,7 +111,7 @@ function(enable_build_flags target)
         elseif(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
             target_compile_options(${target} ${KEYWORD} 
                 # Common for GNU (Standard, Preprocessor)
-                $<$<COMPILE_LANGUAGE:Fortran>:-std=f2018 -cpp>
+                $<$<COMPILE_LANGUAGE:Fortran>:-std=f2018 -cpp -flogical-argument=0/1>
 
                 # Release: Fortran Only
                 $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Release>>:-O3 -march=native>

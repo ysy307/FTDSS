@@ -237,4 +237,24 @@ contains
 
     end subroutine execute_basic_iteration_criterion
 
+    module subroutine execute_basic_parallel_openmp(self, input, config)
+        implicit none
+        class(type_input_translator), intent(in) :: self
+        class(type_input), intent(in) :: input
+        class(type_config_parallel_openmp), intent(inout) :: config
+
+        select type (config)
+        type is (type_config_parallel_openmp)
+            associate (parallel => input%basic%solver_settings%parallel_settings%threads)
+                config%is_parallel = parallel%is_parallel
+                if (config%is_parallel) then
+                    config%num_threads = parallel%num_threads
+                    config%schedule = parallel%schedule
+                    config%max_active_levels = parallel%max_active_levels
+                end if
+            end associate
+        end select
+
+    end subroutine execute_basic_parallel_openmp
+
 end submodule input_translator_basic

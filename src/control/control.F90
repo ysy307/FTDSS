@@ -8,7 +8,7 @@ module module_control
     use :: control_time_profiler, only:type_time_profiler
     use :: control_iteration, only:type_iteration
     use :: control_output, only:type_output_manager
-    use :: control_openmp, only:initialize_openmp
+    use :: control_parallel, only:initialize_openmp
     use :: module_linalg
     implicit none
     private
@@ -60,12 +60,12 @@ module module_control
         ! ---- Meta / Utility ----
         ! display, to_string, etc.
         procedure, public, pass(self) :: display => display_controls
-        
+
     end type type_control
 
 contains
     subroutine initialize_type_control(self, input, config_iteration, config_time, config_time_ats, config_output_field, &
-                                       config_output_history, config_acceleration)
+                                       config_output_history, config_acceleration, config_parallel_openmp)
         implicit none
         class(type_control), intent(inout) :: self
         class(type_input), intent(in) :: input
@@ -75,7 +75,7 @@ contains
         class(type_config_output_manager), intent(in), optional :: config_output_field
         class(type_config_output_manager), intent(in), optional :: config_output_history
         class(type_config_acceleration), intent(in), optional :: config_acceleration
-
+        type(type_config_parallel_openmp), intent(in), optional :: config_parallel_openmp
         integer(int32), allocatable :: unique_material_ids(:)
         integer(int32) :: i, num_unique_regions, max_region_id
         integer(int32) :: current_material_id, pid
@@ -133,8 +133,10 @@ contains
             call self%iteration%initialize(config_iteration)
         end if
 
-
-        call initialize_openmp(input)
+        ! OpenMP settings initialization
+        if (present(config_parallel_openmp)) then
+            call initialize_openmp(config_parallel_openmp)
+        end if
 
         ! Acceleration method initialization
         if (present(config_acceleration)) then
@@ -147,7 +149,7 @@ contains
             call self%acceleration%initialize(config_acceleration)
         end if
 
-        ! Output managers initialization with the current time 
+        ! Output managers initialization with the current time
         call self%time%get_time(current_time_s)
         if (present(config_output_field)) then
             call self%out_field%initialize(config_output_field, current_time_s)
