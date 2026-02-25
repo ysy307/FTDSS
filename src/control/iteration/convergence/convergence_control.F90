@@ -111,4 +111,50 @@ contains
 
         convergence_norm_type => self%convergence_norm_type
     end subroutine get_convergence_norm_type_convergence_control
+
+    module subroutine get_current_norm_convergence_control(self, physics_type, criteria_type, &
+                                                           norm_type, nonlinear_iter, current_norm)
+        implicit none
+        class(type_convergence_control), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        type(type_constant_id), intent(in) :: criteria_type
+        type(type_constant_id), intent(in) :: norm_type
+        integer(int32), intent(in) :: nonlinear_iter
+        real(real64), intent(inout) :: current_norm
+
+        if (.not. PHYSICS_TYPES%is_valid(physics_type)) then
+            current_norm = 0.0d0
+            return
+        end if
+
+        if (criteria_type == NONLINEAR_NORM_CRITERIA%RESIDUAL) then
+            call self%residual(physics_type%ID)%get_current_norm(norm_type, nonlinear_iter, current_norm)
+        else if (criteria_type == NONLINEAR_NORM_CRITERIA%UPDATE) then
+            call self%update(physics_type%ID)%get_current_norm(norm_type, nonlinear_iter, current_norm)
+        else
+            current_norm = 0.0d0
+        end if
+
+    end subroutine get_current_norm_convergence_control
+
+    module subroutine get_tolerances_convergence_control(self, physics_type, absolute_tolerance, relative_tolerance)
+        implicit none
+        class(type_convergence_control), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        real(real64), intent(inout), optional :: absolute_tolerance
+        real(real64), intent(inout), optional :: relative_tolerance
+
+        if (.not. PHYSICS_TYPES%is_valid(physics_type)) then
+            if (present(absolute_tolerance)) then
+                absolute_tolerance = 0.0d0
+            end if
+            if (present(relative_tolerance)) then
+                relative_tolerance = 0.0d0
+            end if
+            return
+        end if
+
+        call self%residual(physics_type%ID)%get_tolerances(absolute_tolerance, relative_tolerance)
+
+    end subroutine get_tolerances_convergence_control
 end submodule convergence_control

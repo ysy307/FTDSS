@@ -109,4 +109,35 @@ contains
 
     end function check_convergence_criterion
 
+    module subroutine get_current_norm_convergence_criterion(self, norm_type, nonlinear_iter, current_norm)
+        implicit none
+        class(type_convergence_criterion), intent(in) :: self
+        type(type_constant_id), intent(in) :: norm_type
+        integer(int32), intent(in) :: nonlinear_iter
+        real(real64), intent(inout) :: current_norm
+
+        current_norm = 0.0d0
+        if (.not. NORM_TYPES%is_valid(norm_type)) return
+
+        if (nonlinear_iter >= 1 .and. nonlinear_iter <= self%max_iterations) then
+            current_norm = self%norms_history(norm_type%ID, nonlinear_iter)
+        end if
+
+    end subroutine get_current_norm_convergence_criterion
+
+    module subroutine get_tolerances_convergence_criterion(self, absolute_tolerance, relative_tolerance)
+        implicit none
+        class(type_convergence_criterion), intent(in) :: self
+        real(real64), intent(inout), optional :: absolute_tolerance
+        real(real64), intent(inout), optional :: relative_tolerance
+
+        if (present(absolute_tolerance)) then
+            absolute_tolerance = self%absolute_tolerance
+        end if
+
+        if (present(relative_tolerance)) then
+            relative_tolerance = self%relative_tolerance
+        end if
+
+    end subroutine get_tolerances_convergence_criterion
 end submodule convergence_criterion

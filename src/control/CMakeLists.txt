@@ -19,6 +19,7 @@ set(CONTROL_SOURCES
     iteration/convergence/convergence_criterion.F90
     iteration/convergence/convergence_control.F90
     iteration/strategy/strategy_interface.F90
+    iteration/strategy/strategy_procedures.F90
     iteration/iteration_manager.F90
     iteration/iteration.F90
     output/output_manager.F90

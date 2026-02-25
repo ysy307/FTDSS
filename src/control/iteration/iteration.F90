@@ -100,43 +100,43 @@ module control_iteration
 
         type(type_iterator_config), private :: config
     contains
-        ! Initialization / Reset
-        procedure, public, pass(self) :: initialize
-        procedure, public, pass(self) :: reset => reset_nonlinear
+        ! ! Initialization / Reset
+        ! procedure, public, pass(self) :: initialize
+        ! procedure, public, pass(self) :: reset => reset_nonlinear
 
-        ! Operation
-        procedure, public, pass(self) :: increment_nonlinear
-        procedure, public, pass(self) :: increment_total
+        ! ! Operation
+        ! procedure, public, pass(self) :: increment_nonlinear
+        ! procedure, public, pass(self) :: increment_total
         procedure, public, pass(self) :: check_convergence
         ! Query
-        procedure, public, pass(self) :: should_continue => should_continue_iteration
-        procedure, public, pass(self) :: has_converged => has_converged_iteration
-        procedure, public, pass(self) :: has_diverged => has_diverged_iteration
+        ! procedure, public, pass(self) :: should_continue => should_continue_iteration
+        ! procedure, public, pass(self) :: has_converged => has_converged_iteration
+        ! procedure, public, pass(self) :: has_diverged => has_diverged_iteration
 
-        procedure, public, pass(self) :: set_converged
-        procedure, public, pass(self) :: set_diverged
+        ! procedure, public, pass(self) :: set_converged
+        ! procedure, public, pass(self) :: set_diverged
 
-        procedure, public, pass(self) :: get_nonlinear_iter
-        procedure, public, pass(self) :: get_total_iter
-        procedure, public, pass(self) :: get_max_iterations
-        procedure, public, pass(self) :: get_update_frequency
+        ! procedure, public, pass(self) :: get_nonlinear_iter
+        ! procedure, public, pass(self) :: get_total_iter
+        ! procedure, public, pass(self) :: get_max_iterations
+        ! procedure, public, pass(self) :: get_update_frequency
 
-        procedure, public, pass(self) :: get_current_update_norm => get_current_update_norm_iteration
-        procedure, public, pass(self) :: get_current_residual_norm => get_current_residual_norm_iteration
+        ! procedure, public, pass(self) :: get_current_update_norm => get_current_update_norm_iteration
+        ! procedure, public, pass(self) :: get_current_residual_norm => get_current_residual_norm_iteration
 
-        procedure, public, pass(self) :: get_absolute_tolerance => get_absolute_tolerance_iteration
-        procedure, public, pass(self) :: get_relative_tolerance => get_relative_tolerance_iteration
+        ! procedure, public, pass(self) :: get_absolute_tolerance => get_absolute_tolerance_iteration
+        ! procedure, public, pass(self) :: get_relative_tolerance => get_relative_tolerance_iteration
 
         ! 以下のメソッドは compute_nonlinear_solver_type (動的) を操作/参照するように変更
-        procedure, public, pass(self) :: get_nonlinear_solver => get_nonlinear_type_iteration
-        procedure, public, pass(self) :: set_nonlinear_solver => set_nonlinear_type_iteration
+        ! procedure, public, pass(self) :: get_nonlinear_solver => get_nonlinear_type_iteration
+        ! procedure, public, pass(self) :: set_nonlinear_solver => set_nonlinear_type_iteration
 
-        procedure, public, pass(self) :: is_compute_newton => is_compute_newton_method_iteration
-        procedure, public, pass(self) :: is_compute_picard => is_compute_picard_method_iteration
-        procedure, public, pass(self) :: is_compute_none => is_compute_none_method_iteration
-        procedure, public, pass(self) :: is_newton => is_newton_method_iteration
-        procedure, public, pass(self) :: is_picard => is_picard_method_iteration
-        procedure, public, pass(self) :: is_none => is_none_method_iteration
+        ! procedure, public, pass(self) :: is_compute_newton => is_compute_newton_method_iteration
+        ! procedure, public, pass(self) :: is_compute_picard => is_compute_picard_method_iteration
+        ! procedure, public, pass(self) :: is_compute_none => is_compute_none_method_iteration
+        ! procedure, public, pass(self) :: is_newton => is_newton_method_iteration
+        ! procedure, public, pass(self) :: is_picard => is_picard_method_iteration
+        ! procedure, public, pass(self) :: is_none => is_none_method_iteration
     end type type_iteration
 
 contains
@@ -435,7 +435,7 @@ contains
             end if
 
         end associate
-    end subroutine check_convergence
+    end subroutine check_convergence    
 
     function should_continue_iteration(self) result(should_continue)
         implicit none
@@ -546,10 +546,11 @@ contains
         end associate
     end subroutine get_current_residual_norm_iteration
 
-    pure subroutine get_current_update_norm_iteration(self, physics_type, norm_type, current_norm)
+    pure subroutine get_current_update_norm_iteration(self, physics_type, criteria_type, norm_type, current_norm)
         implicit none
         class(type_iteration), intent(in) :: self
         type(type_constant_id), intent(in) :: physics_type
+        type(type_constant_id), intent(in) :: criteria_type
         type(type_constant_id), intent(in) :: norm_type
         real(real64), intent(inout) :: current_norm
 

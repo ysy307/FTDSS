@@ -199,8 +199,8 @@ contains
                 config%convergence_norm_type = NONLINEAR_NORM_CRITERIA%to_object(nls%convergence%use_criteria)
 
                 do i = 1, PHYSICS_TYPES%NUM_ID
-                    call execute_basic_iteration_criterion(input, VECTOR_NORM_CRITERIA%RESIDUAL, config%residual(i))
-                    call execute_basic_iteration_criterion(input, VECTOR_NORM_CRITERIA%UPDATE, config%update(i))
+                    call execute_basic_iteration_criterion(input, NONLINEAR_NORM_CRITERIA%RESIDUAL, config%residual(i))
+                    call execute_basic_iteration_criterion(input, NONLINEAR_NORM_CRITERIA%UPDATE, config%update(i))
                 end do
 
             end associate
@@ -214,7 +214,7 @@ contains
         type(type_constant_id), intent(in) :: vector_norm_type
         class(type_config_iteration_criterion), intent(inout) :: config
 
-        if (.not. VECTOR_NORM_CRITERIA%is_valid(vector_norm_type)) then
+        if (.not. NONLINEAR_NORM_CRITERIA%is_valid(vector_norm_type)) then
             error stop "Input Error: Invalid vector norm type for iteration criterion."
         end if
 
@@ -222,11 +222,11 @@ contains
         type is (type_config_iteration_criterion)
             associate (nls => input%basic%solver_settings%nonlinear_solver)
                 select case (vector_norm_type%ID)
-                case (VECTOR_NORM_CRITERIA%RESIDUAL%ID)
+                case (NONLINEAR_NORM_CRITERIA%RESIDUAL%ID)
                     config%criterion = NONLINEAR_CRITERIA%to_object(nls%convergence%residual%criteria)
                     config%absolute_tolerance = nls%convergence%residual%absolute_tolerance
                     config%relative_tolerance = nls%convergence%residual%relative_tolerance
-                case (VECTOR_NORM_CRITERIA%UPDATE%ID)
+                case (NONLINEAR_NORM_CRITERIA%UPDATE%ID)
                     config%criterion = NONLINEAR_CRITERIA%to_object(nls%convergence%update%criteria)
                     config%absolute_tolerance = nls%convergence%update%absolute_tolerance
                     config%relative_tolerance = nls%convergence%update%relative_tolerance

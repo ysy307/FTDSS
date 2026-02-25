@@ -1,5 +1,6 @@
 module control_iteration_convergence
     use, intrinsic :: iso_fortran_env
+    use :: stdlib_optval, only:optval
     use :: module_core
     use :: module_linalg, only:vector_norm1, vector_norm2, vector_norminf
     implicit none
@@ -23,7 +24,7 @@ module control_iteration_convergence
         !> Tolerance of relative errorF
         real(real64), private :: relative_tolerance = 1.0d-6
         !> Maximum number of iterations for which to store norm history (used for convergence check and debugging)
-        integer(int32), private :: max_iterations
+        integer(int32), private :: max_iterations = 0
         !> Reference value for relative error evaluation.
         !> This value is used as the denominator to normalize the error.
         !> The default is 1.0, which effectively performs an absolute error check.
@@ -36,10 +37,18 @@ module control_iteration_convergence
         !> (3,:) -> LInf norm history
         real(real64), private, allocatable :: norms_history(:, :)
     contains
+        ! ---- Lifecycle ----
         procedure, public, pass(self) :: initialize => initialize_type_convergence_criterion
         procedure, public, pass(self) :: destroy => destroy_type_convergence_criterion
+        ! ---- Mutator ----
         procedure, public, pass(self) :: reset => reset_criterion
+        ! ---- Algorithm / Operation ----
         procedure, public, pass(self) :: check => check_convergence_criterion
+        ! ---- Inquiry ----
+        ! ---- Getter ----
+        procedure, public, pass(self) :: get_current_norm => get_current_norm_convergence_criterion
+        procedure, public, pass(self) :: get_tolerances => get_tolerances_convergence_criterion
+        ! ---- Meta / Utility ----
     end type type_convergence_criterion
 
     interface
@@ -75,6 +84,23 @@ module control_iteration_convergence
 
         end function check_convergence_criterion
 
+        module subroutine get_current_norm_convergence_criterion(self, norm_type, nonlinear_iter, current_norm)
+            implicit none
+            class(type_convergence_criterion), intent(in) :: self
+            type(type_constant_id), intent(in) :: norm_type
+            integer(int32), intent(in) :: nonlinear_iter
+            real(real64), intent(inout) :: current_norm
+
+        end subroutine get_current_norm_convergence_criterion
+
+        module subroutine get_tolerances_convergence_criterion(self, absolute_tolerance, relative_tolerance)
+            implicit none
+            class(type_convergence_criterion), intent(in) :: self
+            real(real64), intent(inout), optional :: absolute_tolerance
+            real(real64), intent(inout), optional :: relative_tolerance
+
+        end subroutine get_tolerances_convergence_criterion
+
     end interface
 
     !>
@@ -103,13 +129,15 @@ module control_iteration_convergence
         procedure, public, pass(self) :: reset => reset_convergence_control
         ! ---- Algorithm / Operation ----
         ! ---- Inquiry ----
+        procedure, public, pass(self) :: is_initialized => is_initialized_convergence_control
         procedure, public, pass(self) :: should_check_residual => should_check_residual_convergence_control
         procedure, public, pass(self) :: should_check_update => should_check_update_convergence_control
-        procedure, public, pass(self) :: is_initialized => is_initialized_convergence_control
         ! ---- Getter ----
         procedure, public, pass(self) :: get_norm_type => get_norm_type_convergence_control
         procedure, public, pass(self) :: get_combination_logic => get_combination_logic_convergence_control
         procedure, public, pass(self) :: get_convergence_norm_type => get_convergence_norm_type_convergence_control
+        procedure, public, pass(self) :: get_current_norm => get_current_norm_convergence_control
+        procedure, public, pass(self) :: get_tolerances => get_tolerances_convergence_control
         ! ---- Meta / Utility ----
     end type type_convergence_control
 
@@ -170,6 +198,27 @@ module control_iteration_convergence
             type(type_constant_id), intent(inout), pointer :: convergence_norm_type
 
         end subroutine get_convergence_norm_type_convergence_control
+
+        module subroutine get_current_norm_convergence_control(self, physics_type, criteria_type, &
+                                                               norm_type, nonlinear_iter, current_norm)
+            implicit none
+            class(type_convergence_control), intent(in) :: self
+            type(type_constant_id), intent(in) :: physics_type
+            type(type_constant_id), intent(in) :: criteria_type
+            type(type_constant_id), intent(in) :: norm_type
+            integer(int32), intent(in) :: nonlinear_iter
+            real(real64), intent(inout) :: current_norm
+
+        end subroutine get_current_norm_convergence_control
+
+        module subroutine get_tolerances_convergence_control(self, physics_type, absolute_tolerance, relative_tolerance)
+            implicit none
+            class(type_convergence_control), intent(in) :: self
+            type(type_constant_id), intent(in) :: physics_type
+            real(real64), intent(inout), optional :: absolute_tolerance
+            real(real64), intent(inout), optional :: relative_tolerance
+
+        end subroutine get_tolerances_convergence_control
 
     end interface
 
