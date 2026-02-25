@@ -3,6 +3,7 @@ module inout_output
     use, intrinsic :: iso_c_binding, only: c_int64_t, c_ptr, c_f_pointer, c_char, c_null_char, c_associated
     use :: omp_lib
     use :: stdlib_strings, only:to_string, strip
+    use :: stdlib_io, only:open
     use :: vtk_fortran, only:vtk_file
     use :: module_core
     use :: module_input
@@ -163,6 +164,37 @@ module inout_output
         end subroutine initialize_output_overall_vtu
     end interface
 
+    type :: type_output_log
+        logical :: initialized = .false.
+        character(:), allocatable :: log_file_name
+        integer(int32) :: io_unit = -1
+    contains
+        procedure, pass(self) :: initialize => initialize_type_output_log
+        procedure, pass(self) :: destroy => destroy_type_output_log
+        procedure, pass(self) :: output_system_log => output_system_log_type_output_log
+    end type type_output_log
+
+    interface
+        module subroutine initialize_type_output_log(self, dir_output)
+            implicit none
+            class(type_output_log), intent(inout) :: self
+            character(*), intent(in) :: dir_output
+        end subroutine initialize_type_output_log
+
+        module subroutine destroy_type_output_log(self, dir_output)
+            implicit none
+            class(type_output_log), intent(inout) :: self
+            character(*), intent(in) :: dir_output
+
+        end subroutine destroy_type_output_log
+
+        module subroutine output_system_log_type_output_log(self)
+            implicit none
+            class(type_output_log), intent(in) :: self
+
+        end subroutine output_system_log_type_output_log
+    end interface
+
     !---------------------------------------------------------------------------
     ! type_output
     !---------------------------------------------------------------------------
@@ -170,18 +202,19 @@ module inout_output
         private
         character(:), allocatable :: dir_output
         character(:), allocatable :: dir_output_field
-        character(:), allocatable :: log_file_name
 
         logical :: is_thermal
         logical :: is_hydraulic
 
         type(type_output_observation), allocatable :: observations(:)
         type(type_output_overall) :: overall
+        type(type_output_log) :: log
 
     contains
         procedure, pass(self), public :: initialize => initialize_type_output
         procedure, pass(self), public :: output_fields
         procedure, pass(self), public :: output_history
+        procedure, pass(self), public :: get_log_io_unit
         procedure, pass(self), public :: output_system_log
     end type type_output
 
@@ -191,22 +224,6 @@ module inout_output
             character(*), intent(in) :: dir_path
             character(*), intent(in) :: file_extensions(:)
         end subroutine setup_directory
-    end interface
-
-    interface
-    module subroutine output_system_log(self, start_time_str, end_time_str, &
-                                        sec_labels, sec_total_times, sec_call_counts, sec_percentages)
-        implicit none
-        class(type_output), intent(inout) :: self
-        ! Receive primitive data instead of control object
-        character(*), intent(in) :: start_time_str
-        character(*), intent(in) :: end_time_str
-        character(*), intent(in) :: sec_labels(:)
-        real(real64), intent(in) :: sec_total_times(:)
-        integer(int32), intent(in) :: sec_call_counts(:)
-        real(real64), intent(in) :: sec_percentages(:)
-
-        end subroutine output_system_log
     end interface
 
 contains
@@ -296,5 +313,24 @@ contains
                 values=obsValues)
         end do
     end subroutine output_history
+
+    pure subroutine get_log_io_unit(self, io_unit)
+        implicit none
+        class(type_output), intent(in) :: self
+        integer(int32), intent(out) :: io_unit
+
+        if (.not. self%log%initialized) then
+            call raise_error(ERROR_CODES%NOT_INITIALIZED)
+        end if
+
+        io_unit = self%log%io_unit
+    end subroutine get_log_io_unit
+
+    subroutine output_system_log(self)
+        implicit none
+        class(type_output), intent(inout) :: self
+
+        call self%log%output_system_log()
+    end subroutine output_system_log
 
 end module inout_output

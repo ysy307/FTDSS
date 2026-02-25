@@ -20,11 +20,16 @@ contains
         !> Configuration parameters
         type(type_config_acceleration), intent(in) :: config
 
-        call self%config%copy(config)
+        self%method = config%method
+        self%max_relaxation = config%max_relaxation
+        self%min_relaxation = config%min_relaxation
+
         if (allocated(self%du_raw)) deallocate (self%du_raw)
-        call allocate_array(self%du_raw, self%config%num_dofs, PHYSICS_TYPES%NUM_ID)
+        call allocate_array(self%du_raw, config%num_dofs, PHYSICS_TYPES%NUM_ID)
 
         call self%reset()
+
+        self%initialized = .true.
     end subroutine initialize_acceleration_aitken
 
     module subroutine destory_acceleration_aitken(self)
@@ -32,11 +37,13 @@ contains
         !> Aitken acceleration object
         class(type_acceleration_aitken), intent(inout) :: self
 
-        call self%config%reset()
-        if (allocated(self%du_raw)) call deallocate_array(self%du_raw)
-
+        self%method = type_constant_id("", "", -1)
+        self%max_relaxation = 0.0d0
+        self%min_relaxation = 0.0d0
+        call deallocate_array(self%du_raw)
         self%relaxation_factor(:) = 0.0d0
         self%previous_relaxation_factor(:) = 0.0d0
+        self%initialized = .false.
     end subroutine destory_acceleration_aitken
 
     module subroutine compute_acceleration_aitken(self, physics_type, iter, du, vec)
@@ -67,12 +74,12 @@ contains
             if (denominator > epsilon(1.0d0)) then
                 omega = -self%previous_relaxation_factor(pid) * (numerator / denominator)
 
-                if (omega < self%config%min_relaxation) then
-                    omega = self%config%min_relaxation
-                else if (omega > self%config%max_relaxation) then
-                    omega = self%config%max_relaxation
+                if (omega < self%min_relaxation) then
+                    omega = self%min_relaxation
+                else if (omega > self%max_relaxation) then
+                    omega = self%max_relaxation
                 end if
-                
+
                 self%relaxation_factor(pid) = omega
                 self%previous_relaxation_factor(pid) = omega
             else
@@ -97,5 +104,5 @@ contains
         self%relaxation_factor(:) = 1.0d0
         self%previous_relaxation_factor(:) = 0.0d0
     end subroutine reset_acceleration_aitken
-    
+
 end submodule acceleration_aitken

@@ -10,6 +10,10 @@ module control_acceleration
 
     !> Abstract base type for acceleration methods
     type, abstract :: abst_acceleration
+        !> Type identifier for the acceleration method
+        type(type_constant_id) :: method = type_constant_id("", "", -1)
+        !> Flag to indicate if the acceleration method has been initialized
+        logical :: initialized = .false.
     contains
         procedure(abst_initialize_acceleration), public, pass(self), deferred :: initialize
         procedure(abst_destory_acceleration), public, pass(self), deferred :: destory
@@ -131,8 +135,10 @@ module control_acceleration
 
     !> Aitken relaxation method for nonlinear iterations
     type, extends(abst_acceleration) :: type_acceleration_aitken
-        !> Configuration parameters
-        type(type_config_acceleration) :: config
+        !> Maximum relaxation factor \(\omega_{\max}\)
+        real(real64) :: max_relaxation = 1.0d0
+        !> Minimum relaxation factor \(\omega_{\min}\)
+        real(real64) :: min_relaxation = 0.05d0
         !> Current relaxation factor
         real(real64), private :: relaxation_factor(PHYSICS_TYPES%NUM_ID) = 0.5d0
         !> Previous relaxation factor

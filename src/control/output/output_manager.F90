@@ -28,11 +28,11 @@ module control_output
 
 contains
 
-    subroutine initialize_manager(self, config, current_time)
+    subroutine initialize_manager(self, config, current_time_seconds)
         implicit none
         class(type_output_manager), intent(inout) :: self
         type(type_config_output_manager), intent(in) :: config
-        real(real64), intent(in) :: current_time
+        real(real64), intent(in) :: current_time_seconds
 
         type(type_constant_value) :: interval_time_unit
 
@@ -50,7 +50,7 @@ contains
         self%output_time_unit = config%output_unit
 
         ! 3. 次回出力時刻を「秒」で設定
-        self%next_output_seconds = current_time
+        self%next_output_seconds = current_time_seconds
 
         self%current_step = 0
     end subroutine initialize_manager

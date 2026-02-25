@@ -630,6 +630,26 @@
         'num' : 3, &
         'id_range' : [1, 3] &
     }
+
+    #:set PROFILER_TYPES = { &
+        'type_name'  : 'type_profiler_type', &
+        'obj_name'   : 'PROFILER_TYPES', &
+        'category'   : 'PROFILER_TYPE', &
+        'suffix'     : 'profiler_type', &
+        'description': 'Profiler phase categories', &
+        'items'      : [ &
+            ('IO',       1, 'io'), &
+            ('SETUP',    2, 'setup'), &
+            ('NONLIN',   3, 'nonlin'), &
+            ('ASSEMBLE', 4, 'assemble'), &
+            ('PREC',     5, 'prec'), &
+            ('SOLVE',    6, 'solve'), &
+            ('COMM',     7, 'comm'), &
+            ('TOTAL',    8, 'total') &
+        ], &
+        'num' : 8, &
+        'id_range' : [1, 8] &
+    }
     
 
     #:set constant_id_groups = [ &
@@ -666,7 +686,8 @@
         ACCELERATION_METHODS, &
         TIME_RECORDS, &
         FILE_FORMATS, &
-        OUTPUT_TYPES &
+        OUTPUT_TYPES, &
+        PROFILER_TYPES &
     ]
 
 

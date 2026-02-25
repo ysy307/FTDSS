@@ -5,7 +5,7 @@ module module_control
     use :: module_input, only:type_input
     use :: control_acceleration, only:abst_acceleration, type_acceleration_aitken
     use :: control_time, only:type_time
-    use :: control_time_profiler, only:type_profiler
+    use :: control_time_profiler, only:type_time_profiler
     use :: control_iteration, only:type_iteration
     use :: control_output, only:type_output_manager
     use :: control_openmp, only:initialize_openmp
@@ -25,7 +25,7 @@ module module_control
 
         type(type_iteration), public :: iteration
         type(type_time), public :: time
-        type(type_profiler), public :: profiler
+        type(type_time_profiler), public :: profiler
 
         type(type_output_manager), private :: out_field
         type(type_output_manager), private :: out_history
@@ -59,11 +59,11 @@ contains
         implicit none
         class(type_control), intent(inout) :: self
         class(type_input), intent(in) :: input
-        type(type_config_time), intent(in) :: config_time
-        type(type_config_time_ats), intent(in) :: config_time_ats
-        class(type_config_output_manager), intent(in) :: config_output_field
-        class(type_config_output_manager), intent(in) :: config_output_history
-        class(type_config_acceleration), intent(in) :: config_acceleration
+        type(type_config_time), intent(in), optional :: config_time
+        type(type_config_time_ats), intent(in), optional :: config_time_ats
+        class(type_config_output_manager), intent(in), optional :: config_output_field
+        class(type_config_output_manager), intent(in), optional :: config_output_history
+        class(type_config_acceleration), intent(in), optional :: config_acceleration
 
         integer(int32), allocatable :: unique_material_ids(:)
         integer(int32) :: i, num_unique_regions, max_region_id
@@ -112,21 +112,31 @@ contains
         self%coupling_mode = &
             COUPLING_MODES%to_object(input%basic%analysis_controls%coupling_mode)
 
-        call self%time%initialize(config_time, config_time_ats)
+        if (present(config_time) .and. present(config_time_ats)) then
+            call self%time%initialize(config_time, config_time_ats)
+        end if
         call self%iteration%initialize(input)
         call initialize_openmp(input)
 
-        select case (config_acceleration%method%ID)
-        case (ACCELERATION_METHODS%AITKEN%ID)
-            allocate (type_acceleration_aitken :: self%acceleration)
-        case (ACCELERATION_METHODS%ANDERSON%ID)
-            ! 将来実装
-        end select
-        call self%acceleration%initialize(config_acceleration)
+        if (present(config_acceleration)) then
+            select case (config_acceleration%method%ID)
+            case (ACCELERATION_METHODS%AITKEN%ID)
+                allocate (type_acceleration_aitken :: self%acceleration)
+            case (ACCELERATION_METHODS%ANDERSON%ID)
+                ! 将来実装
+            end select
+            call self%acceleration%initialize(config_acceleration)
+        end if
 
         call self%time%get_time(current_time_s)
-        call self%out_field%initialize(config_output_field, current_time_s)
-        call self%out_history%initialize(config_output_history, current_time_s)
+        if (present(config_output_field)) then
+            call self%out_field%initialize(config_output_field, current_time_s)
+        end if
+        if (present(config_output_history)) then
+            call self%out_history%initialize(config_output_history, current_time_s)
+        end if
+
+        call self%profiler%initialize()
 
         deallocate (unique_material_ids)
 
