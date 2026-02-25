@@ -54,11 +54,13 @@ module module_control
     end type type_control
 
 contains
-    subroutine initialize_type_control(self, input, config_output_field, &
+    subroutine initialize_type_control(self, input, config_time, config_time_ats, config_output_field, &
                                        config_output_history, config_acceleration)
         implicit none
         class(type_control), intent(inout) :: self
         class(type_input), intent(in) :: input
+        type(type_config_time), intent(in) :: config_time
+        type(type_config_time_ats), intent(in) :: config_time_ats
         class(type_config_output_manager), intent(in) :: config_output_field
         class(type_config_output_manager), intent(in) :: config_output_history
         class(type_config_acceleration), intent(in) :: config_acceleration
@@ -110,7 +112,7 @@ contains
         self%coupling_mode = &
             COUPLING_MODES%to_object(input%basic%analysis_controls%coupling_mode)
 
-        call self%time%initialize(input)
+        call self%time%initialize(config_time, config_time_ats)
         call self%iteration%initialize(input)
         call initialize_openmp(input)
 

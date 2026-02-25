@@ -6,7 +6,7 @@ contains
     module subroutine assemble_local_thermal(self, controls, workspace, K_TT, K_TH, F_T)
         implicit none
         class(type_thermal), intent(in) :: self
-        type(type_controls), intent(in) :: controls
+        type(type_control), intent(in) :: controls
         type(type_assemble_workspace), intent(inout) :: workspace
         type(type_matrix_dense), intent(inout), optional :: K_TT
         type(type_matrix_dense), intent(inout), optional :: K_TH
@@ -27,7 +27,7 @@ contains
     module subroutine assemble_local_newton_thermal(self, controls, workspace, K_TT, K_TH, F_T)
         implicit none
         class(type_thermal), intent(in) :: self
-        type(type_controls), intent(in) :: controls
+        type(type_control), intent(in) :: controls
         type(type_assemble_workspace), intent(inout) :: workspace
         type(type_matrix_dense), intent(inout), optional :: K_TT
         type(type_matrix_dense), intent(inout), optional :: K_TH
@@ -116,7 +116,7 @@ contains
     module subroutine assemble_local_picard_thermal(self, controls, workspace, K_TT, K_TH, F_T)
         implicit none
         class(type_thermal), intent(in) :: self
-        type(type_controls), intent(in) :: controls
+        type(type_control), intent(in) :: controls
         type(type_assemble_workspace), intent(inout) :: workspace
         type(type_matrix_dense), intent(inout), optional :: K_TT
         type(type_matrix_dense), intent(inout), optional :: K_TH

@@ -141,7 +141,7 @@ module inout_output
             implicit none
             class(type_output_overall), intent(inout) :: self
             type(type_input), intent(in) :: input
-            type(type_controls), intent(in) :: control
+            type(type_control), intent(in) :: control
             type(type_domain), intent(inout) :: domain
             character(*), intent(in) :: dir_output
         end subroutine initialize_input_type_output_overall
@@ -215,7 +215,7 @@ contains
         implicit none
         class(type_output), intent(inout) :: self
         type(type_input), intent(in) :: input
-        type(type_controls), intent(in) :: control
+        type(type_control), intent(in) :: control
         type(type_domain), intent(inout) :: domain
 
         integer(int32) :: i

@@ -7,7 +7,7 @@ program test_domain
     use :: module_domain
     implicit none
     type(type_input) :: input
-    type(type_controls) :: controls
+    type(type_control) :: controls
     type(type_domain) :: domain
     integer(int32) :: ierr
     integer(int32) :: myrank

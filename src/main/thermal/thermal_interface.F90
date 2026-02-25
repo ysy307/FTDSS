@@ -1,7 +1,7 @@
 module main_thermal
     use, intrinsic :: iso_fortran_env
     use :: module_core
-    use :: module_control, only:type_controls
+    use :: module_control, only:type_control
     use :: module_input, only:type_input
     use :: module_physics, only:type_physics_manager, type_wrf_params, type_hcf_params, type_thc_dispersivity
     use :: module_linalg
@@ -158,7 +158,7 @@ module main_thermal
         module subroutine assemble_local_thermal(self, controls, workspace, K_TT, K_TH, F_T)
             implicit none
             class(type_thermal), intent(in) :: self
-            type(type_controls), intent(in) :: controls
+            type(type_control), intent(in) :: controls
             type(type_assemble_workspace), intent(inout) :: workspace
             type(type_matrix_dense), intent(inout), optional :: K_TT
             type(type_matrix_dense), intent(inout), optional :: K_TH
@@ -169,7 +169,7 @@ module main_thermal
         module subroutine assemble_local_newton_thermal(self, controls, workspace, K_TT, K_TH, F_T)
             implicit none
             class(type_thermal), intent(in) :: self
-            type(type_controls), intent(in) :: controls
+            type(type_control), intent(in) :: controls
             type(type_assemble_workspace), intent(inout) :: workspace
             type(type_matrix_dense), intent(inout), optional :: K_TT
             type(type_matrix_dense), intent(inout), optional :: K_TH
@@ -180,7 +180,7 @@ module main_thermal
         module subroutine assemble_local_picard_thermal(self, controls, workspace, K_TT, K_TH, F_T)
             implicit none
             class(type_thermal), intent(in) :: self
-            type(type_controls), intent(in) :: controls
+            type(type_control), intent(in) :: controls
             type(type_assemble_workspace), intent(inout) :: workspace
             type(type_matrix_dense), intent(inout), optional :: K_TT
             type(type_matrix_dense), intent(inout), optional :: K_TH

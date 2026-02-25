@@ -85,7 +85,7 @@ contains
         integer(int32), intent(in) :: element_id
         integer(int32), intent(in) :: computation_type
         real(real64), intent(in) :: coordinates(:, :)
-        type(type_controls), intent(in) :: controls
+        type(type_control), intent(in) :: controls
 
         integer(int32) :: fe_type
 
@@ -251,7 +251,7 @@ contains
     subroutine set_bdf_info(self, controls)
         implicit none
         class(type_assemble_workspace), intent(inout) :: self
-        type(type_controls), intent(in) :: controls
+        type(type_control), intent(in) :: controls
 
         call controls%time%get_bdf_order(self%bdf_order)
         call controls%time%get_bdf_coeffs(self%bdf_coeffs)

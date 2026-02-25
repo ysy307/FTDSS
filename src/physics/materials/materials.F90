@@ -30,7 +30,8 @@ module module_physics_materials
         procedure, public :: calc_specific_heat
         procedure, private :: calc_thermal_conductivity_nondispersivity
         procedure, private :: calc_thermal_conductivity_dispersivity
-        generic, public :: calc_thermal_conductivity => calc_thermal_conductivity_nondispersivity, calc_thermal_conductivity_dispersivity
+        generic, public :: calc_thermal_conductivity => calc_thermal_conductivity_nondispersivity, &
+            calc_thermal_conductivity_dispersivity
         procedure, public :: calc_vol_heat_capacity
     end type type_material_manager
 

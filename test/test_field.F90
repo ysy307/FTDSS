@@ -8,7 +8,7 @@ program test_field
     use :: module_field
     implicit none
     type(type_input) :: input
-    type(type_controls) :: controls
+    type(type_control) :: controls
     type(type_domain) :: domain
     type(type_jacobian_matrix) :: J
     type(type_residual_vector) :: R

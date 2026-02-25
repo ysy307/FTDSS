@@ -6,7 +6,7 @@ contains
     module subroutine assemble_local_hydraulic(self, controls, workspace, K_HH, K_HT, F_H)
         implicit none
         class(type_hydraulic), intent(in) :: self
-        type(type_controls), intent(in) :: controls
+        type(type_control), intent(in) :: controls
         type(type_assemble_workspace), intent(inout) :: workspace
         type(type_matrix_dense), intent(inout), optional :: K_HH
         type(type_matrix_dense), intent(inout), optional :: K_HT
@@ -24,7 +24,7 @@ contains
     module subroutine assemble_local_newton_hydraulic(self, controls, workspace, K_HH, K_HT, F_H)
         implicit none
         class(type_hydraulic), intent(in) :: self
-        type(type_controls), intent(in) :: controls
+        type(type_control), intent(in) :: controls
         type(type_assemble_workspace), intent(inout) :: workspace
         type(type_matrix_dense), intent(inout), optional :: K_HH
         type(type_matrix_dense), intent(inout), optional :: K_HT
@@ -123,7 +123,7 @@ contains
     module subroutine assemble_local_picard_hydraulic(self, controls, workspace, K_HH, K_HT, F_H)
         implicit none
         class(type_hydraulic), intent(in) :: self
-        type(type_controls), intent(in) :: controls
+        type(type_control), intent(in) :: controls
         type(type_assemble_workspace), intent(inout) :: workspace
         type(type_matrix_dense), intent(inout), optional :: K_HH
         type(type_matrix_dense), intent(inout), optional :: K_HT

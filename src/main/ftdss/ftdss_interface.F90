@@ -9,7 +9,7 @@ module main_ftdss
     use :: module_input, only:type_input
     use :: module_output, only:type_output
 
-    use :: module_control, only:type_controls
+    use :: module_control, only:type_control
     use :: module_domain, only:type_domain, abst_fe
     use :: module_boundary, only:abst_bc, type_bc_dirichlet
     use :: module_initial, only:type_ic_manager
@@ -45,7 +45,7 @@ module main_ftdss
 
         class(abst_solver), allocatable :: solver
 
-        type(type_controls) :: controls
+        type(type_control) :: controls
         type(type_output) :: output
 
     contains

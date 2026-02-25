@@ -1,7 +1,7 @@
 submodule(inout_output) inout_output_overall_base
     use :: iso_fortran_env, only:int32, real64
     use :: stdlib_strings, only:to_string
-    use :: module_control, only:type_controls
+    use :: module_control, only:type_control
     implicit none
 
 contains
@@ -10,7 +10,7 @@ contains
         implicit none
         class(type_output_overall), intent(inout) :: self
         type(type_input), intent(in) :: input
-        type(type_controls), intent(in) :: control
+        type(type_control), intent(in) :: control
         type(type_domain), intent(inout) :: domain
         character(*), intent(in) :: dir_output
 

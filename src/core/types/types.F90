@@ -29,6 +29,7 @@ module core_types
     use :: core_types_config_control, only: &
         type_config_acceleration, &
         type_config_output_manager, &
+        type_config_time, &
         type_config_time_ats
     use :: core_types_physics_info, only: &
         type_physics_info

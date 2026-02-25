@@ -110,6 +110,30 @@ contains
 
     end subroutine execute_condition_acceleration
 
+    module subroutine execute_condition_time(self, input, config)
+        implicit none
+        class(type_input_translator), intent(in) :: self
+        class(type_input), intent(in) :: input
+        class(type_config_time), intent(inout) :: config
+
+        select type (config)
+        type is (type_config_time)
+            config%target_bdf_order = input%basic%solver_settings%bdf_order
+
+            associate (time_control => input%conditions%time_control)
+                config%time_stepping_unit = TIME_UNITS%to_object(time_control%time_stepping%unit)
+                config%initial_step = time_control%time_stepping%initial_step * config%time_stepping_unit%value
+
+                config%simulation_period_unit = TIME_UNITS%to_object(time_control%simulation_period%unit)
+                config%start_time = time_control%simulation_period%start * config%simulation_period_unit%value
+                config%end_time = time_control%simulation_period%end * config%simulation_period_unit%value
+
+            end associate
+
+        end select
+
+    end subroutine execute_condition_time
+
     module subroutine execute_condition_time_ats(self, input, config)
         implicit none
         class(type_input_translator), intent(in) :: self

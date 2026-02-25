@@ -8,7 +8,7 @@ module domain_manager
     use :: stdlib_strings, only:strip
     use :: module_core
     use :: module_input, only:type_input, input_translator
-    use :: module_control, only:type_controls
+    use :: module_control, only:type_control
     use :: module_fe, only:type_fe_manager, abst_fe
     use :: module_boundary
     use :: domain_multicoloring, only:type_coloring
@@ -201,7 +201,7 @@ contains
         implicit none
         class(type_domain), intent(inout) :: self
         type(type_input), intent(in) :: input
-        type(type_controls), intent(in) :: controls
+        type(type_control), intent(in) :: controls
 
         if (.not. self%is_associated) call self%associate_parent(self%nodes, self%elements, self%boundaries)
         call self%set_basic_info_and_dof_map(input)
@@ -341,7 +341,7 @@ contains
         implicit none
         class(type_boundary_manager), intent(inout) :: self
         type(type_input), intent(in) :: input
-        type(type_controls), intent(in) :: controls
+        type(type_control), intent(in) :: controls
 
         if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_THERMAL)) then
             call self%process_single_physics_bcs(PHYSICS_TYPE_THERMAL, input, controls)
@@ -364,7 +364,7 @@ contains
         class(type_boundary_manager), intent(inout) :: self
         integer(int32), intent(in) :: physics_type_id
         type(type_input), intent(in) :: input
-        type(type_controls), intent(in) :: controls
+        type(type_control), intent(in) :: controls
 
         integer(int32) :: target_dimension, num_groups
         integer(int32), allocatable :: bc_idx_list(:)
@@ -560,7 +560,7 @@ contains
         class(type_boundary_manager), intent(in) :: self
         integer(int32), intent(in) :: physics_type_id
         type(type_input), intent(in) :: input
-        type(type_controls), intent(in) :: controls
+        type(type_control), intent(in) :: controls
         integer(int32), intent(in) :: bc_idx_list(:), group_cell_types(:)
         class(type_boundary_patch), intent(inout) :: bcs(:)
 
