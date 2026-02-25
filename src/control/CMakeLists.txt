@@ -14,6 +14,12 @@ set(CONTROL_SOURCES
     time/ats.F90
     time/time.F90
     time/time_profiler.F90
+    iteration/config/config_interface.F90
+    iteration/convergence/convergence_interface.F90
+    iteration/convergence/convergence_criterion.F90
+    iteration/convergence/convergence_control.F90
+    iteration/strategy/strategy_interface.F90
+    iteration/iteration_manager.F90
     iteration/iteration.F90
     output/output_manager.F90
     openmp.F90

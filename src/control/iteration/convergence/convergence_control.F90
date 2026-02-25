@@ -1,4 +1,4 @@
-submodule(control_iteration_convergence) convergence_criterion
+submodule(control_iteration_convergence) convergence_control
     implicit none
 contains
 
@@ -66,4 +66,4 @@ contains
             should_check = .false.
         end if
     end function should_check_update_convergence_control
-end submodule convergence_criterion
+end submodule convergence_control
