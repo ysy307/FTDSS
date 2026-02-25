@@ -14,7 +14,7 @@ set(CONTROL_SOURCES
     time/ats.F90
     time/time.F90
     time/time_profiler.F90
-    iteration/config/config_interface.F90
+    iteration/setting/setting_interface.F90
     iteration/convergence/convergence_interface.F90
     iteration/convergence/convergence_criterion.F90
     iteration/convergence/convergence_control.F90

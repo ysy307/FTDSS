@@ -97,9 +97,20 @@ module control_iteration_convergence
         !> Update vector convergence criteria (for each physical quantity)
         type(type_convergence_criterion), private :: update(PHYSICS_TYPES%NUM_ID)
     contains
+        ! ---- Lifecycle ----
         procedure, public, pass(self) :: initialize => initialize_convergence_control
+        ! ---- Mutator ----
+        procedure, public, pass(self) :: reset => reset_convergence_control
+        ! ---- Algorithm / Operation ----
+        ! ---- Inquiry ----
         procedure, public, pass(self) :: should_check_residual => should_check_residual_convergence_control
         procedure, public, pass(self) :: should_check_update => should_check_update_convergence_control
+        procedure, public, pass(self) :: is_initialized => is_initialized_convergence_control
+        ! ---- Getter ----
+        procedure, public, pass(self) :: get_norm_type => get_norm_type_convergence_control
+        procedure, public, pass(self) :: get_combination_logic => get_combination_logic_convergence_control
+        procedure, public, pass(self) :: get_convergence_norm_type => get_convergence_norm_type_convergence_control
+        ! ---- Meta / Utility ----
     end type type_convergence_control
 
     interface
@@ -111,6 +122,12 @@ module control_iteration_convergence
             real(real64), intent(in), optional :: reference_values(:)
 
         end subroutine initialize_convergence_control
+
+        module subroutine reset_convergence_control(self)
+            implicit none
+            class(type_convergence_control), intent(inout) :: self
+
+        end subroutine reset_convergence_control
 
         module pure function should_check_residual_convergence_control(self) result(should_check)
             implicit none
@@ -125,6 +142,34 @@ module control_iteration_convergence
             logical :: should_check
 
         end function should_check_update_convergence_control
+
+        module pure function is_initialized_convergence_control(self) result(is_initialized)
+            implicit none
+            class(type_convergence_control), intent(in) :: self
+            logical :: is_initialized
+
+        end function is_initialized_convergence_control
+
+        module subroutine get_norm_type_convergence_control(self, norm_type)
+            implicit none
+            class(type_convergence_control), intent(in), target :: self
+            type(type_constant_id), intent(inout), pointer :: norm_type
+
+        end subroutine get_norm_type_convergence_control
+
+        module subroutine get_combination_logic_convergence_control(self, combination_logic)
+            implicit none
+            class(type_convergence_control), intent(in), target :: self
+            type(type_constant_id), intent(inout), pointer :: combination_logic
+
+        end subroutine get_combination_logic_convergence_control
+
+        module subroutine get_convergence_norm_type_convergence_control(self, convergence_norm_type)
+            implicit none
+            class(type_convergence_control), intent(in), target :: self
+            type(type_constant_id), intent(inout), pointer :: convergence_norm_type
+
+        end subroutine get_convergence_norm_type_convergence_control
 
     end interface
 

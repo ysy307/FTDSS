@@ -41,6 +41,19 @@ contains
 
     end subroutine initialize_convergence_control
 
+    module subroutine reset_convergence_control(self)
+        implicit none
+        class(type_convergence_control), intent(inout) :: self
+
+        integer(int32) :: i
+
+        do i = 1, PHYSICS_TYPES%NUM_ID
+            call self%residual(i)%reset()
+            call self%update(i)%reset()
+        end do
+
+    end subroutine reset_convergence_control
+
     module pure function should_check_residual_convergence_control(self) result(should_check)
         implicit none
         class(type_convergence_control), intent(in) :: self
@@ -66,4 +79,36 @@ contains
             should_check = .false.
         end if
     end function should_check_update_convergence_control
+
+    module pure function is_initialized_convergence_control(self) result(is_initialized)
+        implicit none
+        class(type_convergence_control), intent(in) :: self
+        logical :: is_initialized
+
+        is_initialized = self%initialized
+    end function is_initialized_convergence_control
+
+    module subroutine get_norm_type_convergence_control(self, norm_type)
+        implicit none
+        class(type_convergence_control), intent(in), target :: self
+        type(type_constant_id), intent(inout), pointer :: norm_type
+
+        norm_type => self%norm_type
+    end subroutine get_norm_type_convergence_control
+
+    module subroutine get_combination_logic_convergence_control(self, combination_logic)
+        implicit none
+        class(type_convergence_control), intent(in), target :: self
+        type(type_constant_id), intent(inout), pointer :: combination_logic
+
+        combination_logic => self%combination_logic
+    end subroutine get_combination_logic_convergence_control
+
+    module subroutine get_convergence_norm_type_convergence_control(self, convergence_norm_type)
+        implicit none
+        class(type_convergence_control), intent(in), target :: self
+        type(type_constant_id), intent(inout), pointer :: convergence_norm_type
+
+        convergence_norm_type => self%convergence_norm_type
+    end subroutine get_convergence_norm_type_convergence_control
 end submodule convergence_control
