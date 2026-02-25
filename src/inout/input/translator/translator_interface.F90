@@ -87,6 +87,14 @@ module inout_input_translator
 
         end subroutine execute_basic_gcc
 
+        module subroutine execute_basic_iteration(self, input, config)
+            implicit none
+            class(type_input_translator), intent(in) :: self
+            class(type_input), intent(in) :: input
+            class(type_config_iteration), intent(inout) :: config
+
+        end subroutine execute_basic_iteration
+
         module subroutine execute_output_field(self, input, config)
             implicit none
             class(type_input_translator), intent(in) :: self

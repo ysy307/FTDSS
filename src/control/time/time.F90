@@ -290,10 +290,10 @@ contains
             dt = new_dt
         end if
 
-        if (dt <= self%ats%config%dt_min) then
-            self%dt = self%ats%config%dt_min
-        else if (dt >= self%ats%config%dt_max) then
-            self%dt = self%ats%config%dt_max
+        if (dt <= self%ats%dt_min) then
+            self%dt = self%ats%dt_min
+        else if (dt >= self%ats%dt_max) then
+            self%dt = self%ats%dt_max
         else
             self%dt = dt
         end if
@@ -310,7 +310,7 @@ contains
         !> Result flag
         logical :: is_min_dt
 
-        is_min_dt = abs(self%dt - self%ats%config%dt_min) <= EPS_TIME
+        is_min_dt = abs(self%dt - self%ats%dt_min) <= EPS_TIME
     end function is_min_dt_reached
 
     !>
@@ -322,7 +322,7 @@ contains
         !> Result flag
         logical :: is_max_dt
 
-        is_max_dt = abs(self%ats%config%dt_max - self%dt) <= EPS_TIME
+        is_max_dt = abs(self%ats%dt_max - self%dt) <= EPS_TIME
     end function is_max_dt_reached
 
     !> Get current BDF order.

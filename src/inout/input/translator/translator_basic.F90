@@ -161,4 +161,80 @@ contains
 
     end subroutine execute_basic_gcc
 
+    module subroutine execute_basic_iteration(self, input, config)
+        implicit none
+        class(type_input_translator), intent(in) :: self
+        class(type_input), intent(in) :: input
+        class(type_config_iteration), intent(inout) :: config
+
+        select type (config)
+        type is (type_config_iteration)
+            associate (nls => input%basic%solver_settings%nonlinear_solver)
+                config%nonlinear_solver_type = NONLINEAR_SOLVER%to_object(nls%method)
+                if (config%nonlinear_solver_type == NONLINEAR_SOLVER%NONE) then
+                    return
+                end if
+
+                call execute_basic_iteration_nonlinear(input, config%nonlinear)
+            end associate
+        end select
+
+    end subroutine execute_basic_iteration
+
+    subroutine execute_basic_iteration_nonlinear(input, config)
+        implicit none
+        class(type_input), intent(in) :: input
+        class(type_config_iteration_nonlinear), intent(inout) :: config
+
+        integer(int32) :: i
+
+        select type (config)
+        type is (type_config_iteration_nonlinear)
+            associate (nls => input%basic%solver_settings%nonlinear_solver)
+                config%max_iterations = nls%max_iterations
+                config%update_frequency = nls%update_frequency
+
+                config%norm_type = NORM_TYPES%to_object(nls%convergence%norm_type)
+                config%combination_logic = NONLINEAR_LOGIC%to_object(nls%convergence%use_logic)
+                config%convergence_norm_type = NONLINEAR_NORM_CRITERIA%to_object(nls%convergence%use_criteria)
+
+                do i = 1, PHYSICS_TYPES%NUM_ID
+                    call execute_basic_iteration_criterion(input, VECTOR_NORM_CRITERIA%RESIDUAL, config%residual(i))
+                    call execute_basic_iteration_criterion(input, VECTOR_NORM_CRITERIA%UPDATE, config%update(i))
+                end do
+
+            end associate
+        end select
+
+    end subroutine execute_basic_iteration_nonlinear
+
+    subroutine execute_basic_iteration_criterion(input, vector_norm_type, config)
+        implicit none
+        class(type_input), intent(in) :: input
+        type(type_constant_id), intent(in) :: vector_norm_type
+        class(type_config_iteration_criterion), intent(inout) :: config
+
+        if (.not. VECTOR_NORM_CRITERIA%is_valid(vector_norm_type)) then
+            error stop "Input Error: Invalid vector norm type for iteration criterion."
+        end if
+
+        select type (config)
+        type is (type_config_iteration_criterion)
+            associate (nls => input%basic%solver_settings%nonlinear_solver)
+                select case (vector_norm_type%ID)
+                case (VECTOR_NORM_CRITERIA%RESIDUAL%ID)
+                    config%criterion = NONLINEAR_CRITERIA%to_object(nls%convergence%residual%criteria)
+                    config%absolute_tolerance = nls%convergence%residual%absolute_tolerance
+                    config%relative_tolerance = nls%convergence%residual%relative_tolerance
+                case (VECTOR_NORM_CRITERIA%UPDATE%ID)
+                    config%criterion = NONLINEAR_CRITERIA%to_object(nls%convergence%update%criteria)
+                    config%absolute_tolerance = nls%convergence%update%absolute_tolerance
+                    config%relative_tolerance = nls%convergence%update%relative_tolerance
+                end select
+
+            end associate
+        end select
+
+    end subroutine execute_basic_iteration_criterion
+
 end submodule input_translator_basic

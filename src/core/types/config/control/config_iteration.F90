@@ -1,32 +1,32 @@
-module core_tpes_config_control_iteration
+module core_types_config_control_iteration
     use, intrinsic :: iso_fortran_env
     use :: core_constants, only:type_constant_id, PHYSICS_TYPES
     use :: core_types_config_base, only:abst_config
     implicit none
     private
 
-    public :: type_config_nonlinear
-    public :: type_config_criterion
+    public :: type_config_iteration
+    public :: type_config_iteration_nonlinear
+    public :: type_config_iteration_criterion
 
-    type, extends(abst_config) :: type_config_criterion
-        logical :: should_check = .false.
+    type, extends(abst_config) :: type_config_iteration_criterion
         type(type_constant_id) :: criterion = type_constant_id("", "", -1)
         real(real64) :: absolute_tolerance = 0.0d0
         real(real64) :: relative_tolerance = 0.0d0
     contains
         procedure, public, pass(self) :: copy => copy_config_criterion
         procedure, public, pass(self) :: reset => reset_config_criterion
-    end type type_config_criterion
+    end type type_config_iteration_criterion
 
-    type, extends(abst_config) :: type_config_nonlinear
+    type, extends(abst_config) :: type_config_iteration_nonlinear
         integer(int32) :: max_iterations = 0
         integer(int32) :: update_frequency = 0
         type(type_constant_id) :: norm_type = type_constant_id("", "", -1)
         type(type_constant_id) :: combination_logic = type_constant_id("", "", -1)
         type(type_constant_id) :: convergence_norm_type = type_constant_id("", "", -1)
 
-        type(type_config_criterion) :: residual(PHYSICS_TYPES%NUM_ID)
-        type(type_config_criterion) :: update(PHYSICS_TYPES%NUM_ID)
+        type(type_config_iteration_criterion) :: residual(PHYSICS_TYPES%NUM_ID)
+        type(type_config_iteration_criterion) :: update(PHYSICS_TYPES%NUM_ID)
 
     contains
         procedure, public, pass(self) :: copy => copy_config_nonlinear
@@ -35,7 +35,7 @@ module core_tpes_config_control_iteration
 
     type, extends(abst_config) :: type_config_iteration
         type(type_constant_id) :: nonlinear_solver_type = type_constant_id("", "", -1)
-        type(type_config_nonlinear) :: nonlinear
+        type(type_config_iteration_nonlinear) :: nonlinear
     contains
         procedure, public, pass(self) :: copy => copy_config_iteration
         procedure, public, pass(self) :: reset => reset_config_iteration
@@ -45,14 +45,13 @@ contains
 
     subroutine copy_config_criterion(self, source)
         implicit none
-        class(type_config_criterion), intent(inout) :: self
+        class(type_config_iteration_criterion), intent(inout) :: self
         class(abst_config), intent(in) :: source
 
         call self%reset()
 
         select type (source)
-        type is (type_config_criterion)
-            call self%set(self%should_check, source%should_check)
+        type is (type_config_iteration_criterion)
             call self%set(self%criterion, source%criterion)
             call self%set(self%absolute_tolerance, source%absolute_tolerance)
             call self%set(self%relative_tolerance, source%relative_tolerance)
@@ -62,9 +61,8 @@ contains
 
     subroutine reset_config_criterion(self)
         implicit none
-        class(type_config_criterion), intent(inout) :: self
+        class(type_config_iteration_criterion), intent(inout) :: self
 
-        self%should_check = .false.
         self%criterion = type_constant_id("", "", -1)
         self%absolute_tolerance = 0.0d0
         self%relative_tolerance = 0.0d0
@@ -72,14 +70,14 @@ contains
 
     subroutine copy_config_nonlinear(self, source)
         implicit none
-        class(type_config_nonlinear), intent(inout) :: self
+        class(type_config_iteration_nonlinear), intent(inout) :: self
         class(abst_config), intent(in) :: source
         integer(int32) :: i
 
         call self%reset()
 
         select type (source)
-        type is (type_config_nonlinear)
+        type is (type_config_iteration_nonlinear)
             call self%set(self%max_iterations, source%max_iterations)
             call self%set(self%update_frequency, source%update_frequency)
             call self%set(self%norm_type, source%norm_type)
@@ -96,7 +94,7 @@ contains
 
     subroutine reset_config_nonlinear(self)
         implicit none
-        class(type_config_nonlinear), intent(inout) :: self
+        class(type_config_iteration_nonlinear), intent(inout) :: self
         integer(int32) :: i
 
         self%max_iterations = 0
@@ -134,4 +132,4 @@ contains
         call self%nonlinear%reset()
     end subroutine reset_config_iteration
 
-end module core_tpes_config_control_iteration
+end module core_types_config_control_iteration

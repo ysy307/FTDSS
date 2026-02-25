@@ -6,6 +6,10 @@ module core_types_config_control
     use :: core_types_config_control_time, only: &
         type_config_time, &
         type_config_time_ats
+    use :: core_types_config_control_iteration, only: &
+        type_config_iteration,&
+        type_config_iteration_nonlinear,&
+        type_config_iteration_criterion
     implicit none
     private
 
@@ -14,5 +18,9 @@ module core_types_config_control
 
     public :: type_config_time
     public :: type_config_time_ats
+
+    public :: type_config_iteration
+    public :: type_config_iteration_nonlinear
+    public :: type_config_iteration_criterion
 
 end module core_types_config_control
