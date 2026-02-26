@@ -1,4 +1,4 @@
-submodule(inout_input_basic) inout_input_basic_materials
+submodule(io_input_basic) input_basic_materials
     implicit none
     !!------------------------------------------------------------------------------------------------------------------------------
     ! JSON key names for materials
@@ -46,7 +46,7 @@ submodule(inout_input_basic) inout_input_basic_materials
     character(*), parameter :: water_viscosity_model = "water_viscosity_model"
     character(*), parameter :: water_retention_model = "water_retention_model"
 contains
-    module subroutine read_parameters_materials(self, json)
+    module subroutine read_materials(self, json)
         implicit none
         class(type_input_basic), intent(inout) :: self
         type(json_file), intent(inout) :: json
@@ -65,24 +65,24 @@ contains
         allocate (self%materials(self%num_materials))
 
         do i = 1, self%num_materials
-            call read_parameters_materials_basic(self, json, i)
+            call read_materials_basic(self, json, i)
 
-            call read_parameters_materials_physics(self, json, i)
+            call read_materials_physics(self, json, i)
 
             ! if (self%analysis_controls%is_active(get_physics_type(thermal))) then
-            !     call read_parameters_materials_thermal(self, json, i)
+            !     call read_materials_thermal(self, json, i)
             ! end if
             ! if (self%analysis_controls%is_active(get_physics_type(hydraulic))) then
-            !     call read_parameters_materials_hydraulic(self, json, i)
+            !     call read_materials_hydraulic(self, json, i)
             ! end if
             ! if (self%analysis_controls%is_active(get_physics_type(mechanical))) then
             !     ! Mechanical parameters can be added here in the future
             ! end if
         end do
 
-    end subroutine read_parameters_materials
+    end subroutine read_materials
 
-    subroutine read_parameters_materials_basic(self, json, i_material)
+    subroutine read_materials_basic(self, json, i_material)
         !> Load the basic material parameters from the JSON file
         implicit none
         class(type_input_basic), intent(inout) :: self
@@ -122,9 +122,9 @@ contains
         call get_json_value(json, join(buffer), self%materials(i_material)%phase, &
                             is_required=.true., valid_range=[1, 4])
 
-    end subroutine read_parameters_materials_basic
+    end subroutine read_materials_basic
 
-    subroutine read_parameters_materials_physics(self, json, i_material)
+    subroutine read_materials_physics(self, json, i_material)
         implicit none
         class(type_input_basic), intent(inout) :: self
         type(json_file), intent(inout) :: json !! JSON parser
@@ -183,13 +183,13 @@ contains
             call get_json_value(json, join(buffer), self%materials(i_material)%phase_change%equilibrium_model%segregation, &
                                 is_required=.true., default_value=.false.)
 
-            call read_parameters_materials_swcc(self, json, i_material)
-            call read_parameters_materials_hydraulic_model(self, json, i_material)
+            call read_materials_swcc(self, json, i_material)
+            call read_materials_hydraulic_model(self, json, i_material)
         end if
 
-    end subroutine read_parameters_materials_physics
+    end subroutine read_materials_physics
 
-    subroutine read_parameters_materials_hydraulic_model(self, json, i_material)
+    subroutine read_materials_hydraulic_model(self, json, i_material)
         !> Load the hydraulic parameters from the JSON file
         implicit none
         class(type_input_basic), intent(inout) :: self
@@ -222,9 +222,9 @@ contains
             call get_json_value(json, join(buffer(1:3)), hydraulic_conductivity%gain_factor, &
                                 is_required=.false., default_value=1.0d0, valid_range=[0.0d0, huge(0.0d0)])
         end associate
-    end subroutine read_parameters_materials_hydraulic_model
+    end subroutine read_materials_hydraulic_model
 
-    subroutine read_parameters_materials_swcc(self, json, i_material)
+    subroutine read_materials_swcc(self, json, i_material)
         implicit none
         class(type_input_basic), intent(inout) :: self
         type(json_file), intent(inout) :: json !! JSON parser
@@ -291,7 +291,7 @@ contains
 
         end associate
 
-    end subroutine read_parameters_materials_swcc
+    end subroutine read_materials_swcc
 
     ! !---
     ! ! getter
@@ -609,4 +609,4 @@ contains
 
     end subroutine display_wcc
 
-end submodule inout_input_basic_materials
+end submodule input_basic_materials

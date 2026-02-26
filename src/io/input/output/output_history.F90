@@ -1,4 +1,4 @@
-submodule(inout_input_output_conditions) inout_input_output_conditions_history
+submodule(io_input_output_conditions) input_output_conditions_history
     implicit none
     !!------------------------------------------------------------------------------------------------------------------------------
     !! JSON key names for history output
@@ -121,4 +121,4 @@ contains
 
     end subroutine display_output_settings_history
 
-end submodule inout_input_output_conditions_history
+end submodule input_output_conditions_history

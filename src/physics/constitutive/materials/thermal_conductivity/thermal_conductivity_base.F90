@@ -1,11 +1,11 @@
-submodule(constitutive_materials_thermal_conductivity) thermal_conductivity_base
+submodule(materials_thermal_conductivity) thermal_conductivity_base
     implicit none
 contains
     module subroutine initialize_abst_thc(self, material_id, constitutive_info, water, ice)
         implicit none
         class(abst_thc), intent(inout) :: self
         integer(int32), intent(in) :: material_id
-        type(type_constitutive_info), intent(in) :: constitutive_info
+        type(type_config_constitutive), intent(in) :: constitutive_info
         type(type_iapws97), intent(in), target :: water
         type(type_iapws06), intent(in), target :: ice
 
@@ -35,7 +35,7 @@ contains
         implicit none
         class(holder_thcs), intent(inout) :: self
         integer(int32), intent(in) :: material_id
-        type(type_constitutive_info), intent(in) :: constitutive_info
+        type(type_config_constitutive), intent(in) :: constitutive_info
         type(type_iapws97), intent(in), target :: water
         type(type_iapws06), intent(in), target :: ice
 

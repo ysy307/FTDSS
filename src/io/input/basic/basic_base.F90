@@ -1,4 +1,4 @@
-submodule(inout_input_basic) inout_input_basic_base
+submodule(io_input_basic) input_basic_base
     implicit none
 contains
 
@@ -13,11 +13,11 @@ contains
         call json%load(filename=self%file_name)
         call json%print_error_message(output_unit)
 
-        call read_parameters_simulation_settings(self, json)
-        call read_parameters_analysis_controls(self, json)
-        call read_parameters_geometry_settings(self, json)
-        call read_parameters_materials(self, json)
-        call read_parameters_solver_settings(self, json)
+        call read_simulation_settings(self, json)
+        call read_analysis_controls(self, json)
+        call read_geometry_settings(self, json)
+        call read_materials(self, json)
+        call read_solver_settings(self, json)
 
         call json%destroy()
         call json%print_error_message(output_unit)
@@ -48,4 +48,4 @@ contains
         end if
     end subroutine display_input_basic
 
-end submodule inout_input_basic_base
+end submodule input_basic_base

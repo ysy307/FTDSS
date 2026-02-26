@@ -1,15 +1,15 @@
-module constitutive_materials_base
+module materials_base
     use, intrinsic :: iso_fortran_env
     use :: iapws, only:type_iapws97, type_iapws06
-    use :: module_core, only:type_state, type_constitutive_info
+    use :: module_core, only:type_state, type_config_constitutive
     use :: constitutive_constants, only:TtoK => celsius_to_kelvin, P_atm => standard_atmospheric_pressure
-    use :: constitutive_base, only:abst_physics
+    use :: constitutive_base, only:abst_constitutive
     implicit none
     private
 
     public :: abst_material
 
-    type, extends(abst_physics), abstract :: abst_material
+    type, extends(abst_constitutive), abstract :: abst_material
         integer(int32) :: material_id = -1
         real(real64) :: material1 = 0.0d0 !! like a soil or a rock, a concrete
         real(real64) :: material2 = 0.0d0 !! like a water
@@ -33,7 +33,7 @@ contains
         implicit none
         class(abst_material), intent(inout) :: self
         integer(int32), intent(in) :: material_id
-        type(type_constitutive_info), intent(in) :: constitutive_info
+        type(type_config_constitutive), intent(in) :: constitutive_info
         type(type_iapws97), intent(in), target :: water
         type(type_iapws06), intent(in), target :: ice
 
@@ -165,4 +165,4 @@ contains
 
     end subroutine calc_vapor_cp_abst_material
 
-end module constitutive_materials_base
+end module materials_base

@@ -17,6 +17,7 @@ module core_types_config_physics_base
 
     type, abstract, extends(abst_config) :: abst_config_physics_material
         integer(int32) :: material_id = 0
+        integer(int32) :: num_phases = 0
     contains
         procedure, public, pass(self) :: copy => copy_config_physics_material
         procedure, public, pass(self) :: reset => reset_config_physics_material
@@ -49,6 +50,7 @@ contains
         select type (source)
         type is (abst_config_physics_material)
             call self%set(self%material_id, source%material_id)
+            call self%set(self%num_phases, source%num_phases)
         end select
     end subroutine copy_config_physics_material
 
@@ -56,5 +58,6 @@ contains
         implicit none
         class(abst_config_physics_material), intent(inout) :: self
         self%material_id = 0
+        self%num_phases = 0
     end subroutine reset_config_physics_material
 end module core_types_config_physics_base

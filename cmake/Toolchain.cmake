@@ -95,7 +95,7 @@ function(enable_build_flags target)
         if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel|IntelLLVM")
             target_compile_options(${target} ${KEYWORD} 
                 # Common for Intel (Standard, Preprocessor, Traceback)
-                $<$<COMPILE_LANGUAGE:Fortran>:-stand f18 -fpp -traceback -fpscomp logicals>
+                $<$<COMPILE_LANGUAGE:Fortran>:-stand f18 -fpp -traceback -fpscomp logicals -extend-source>
 
                 # Release: Fortran Only
                 $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Release>>:-O3 -xHost>

@@ -1,4 +1,4 @@
-submodule(inout_input_conditions) inout_input_conditions_time_controlss
+submodule(io_input_conditions) input_conditions_time_controls
     implicit none
     !!------------------------------------------------------------------------------------------------------------------------------
     ! JSON key names for time control
@@ -166,4 +166,4 @@ contains
         write (*, '(a)') "======================================================================"
     end subroutine display_time_controls
 
-end submodule inout_input_conditions_time_controlss
+end submodule input_conditions_time_controls

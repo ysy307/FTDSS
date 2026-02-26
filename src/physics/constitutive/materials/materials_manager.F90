@@ -1,12 +1,12 @@
-module module_constitutive_materials
+module constitutive_materials_manager
     use :: iso_fortran_env, only:int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
-    use :: module_core, only:type_constitutive_info, type_state
-    use :: constitutive_materials_base
-    use :: constitutive_materials_density
-    use :: constitutive_materials_specific_heat
-    use :: constitutive_materials_thermal_conductivity
-    use :: constitutive_materials_heat_capacity
+    use :: module_core, only:type_config_constitutive, type_state
+    use :: materials_base
+    use :: materials_density
+    use :: materials_specific_heat
+    use :: materials_thermal_conductivity
+    use :: materials_heat_capacity
     implicit none
     private
 
@@ -41,10 +41,10 @@ contains
         implicit none
         class(type_material_manager), intent(inout) :: self
         integer(int32), intent(in) :: material_id
-        type(type_constitutive_info), intent(in), optional :: den_info
-        type(type_constitutive_info), intent(in), optional :: sph_info
-        type(type_constitutive_info), intent(in), optional :: vhc_info
-        type(type_constitutive_info), intent(in), optional :: thc_info
+        type(type_config_constitutive), intent(in), optional :: den_info
+        type(type_config_constitutive), intent(in), optional :: sph_info
+        type(type_config_constitutive), intent(in), optional :: vhc_info
+        type(type_config_constitutive), intent(in), optional :: thc_info
 
         type(type_iapws97), intent(in), optional, target :: water
         type(type_iapws06), intent(in), optional, target :: ice
@@ -198,4 +198,4 @@ contains
         call self%vhc%p%calc(state, vhc)
 
     end subroutine calc_vol_heat_capacity
-end module module_constitutive_materials
+end module constitutive_materials_manager

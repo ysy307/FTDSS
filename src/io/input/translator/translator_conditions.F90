@@ -1,4 +1,4 @@
-submodule(inout_input_translator) input_translator_conditions
+submodule(io_input_translator) translator_conditions
     implicit none
 contains
 
@@ -167,4 +167,4 @@ contains
         end select
 
     end subroutine execute_condition_time_ats
-end submodule input_translator_conditions
+end submodule translator_conditions

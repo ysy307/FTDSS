@@ -1,4 +1,4 @@
-submodule(inout_input_output_conditions) inout_input_output_conditions_standard
+submodule(io_input_output_conditions) input_output_conditions_standard
     implicit none
 
     !!------------------------------------------------------------------------------------------------------------------------------
@@ -39,4 +39,4 @@ contains
 
     end subroutine display_output_settings_standard
 
-end submodule inout_input_output_conditions_standard
+end submodule input_output_conditions_standard

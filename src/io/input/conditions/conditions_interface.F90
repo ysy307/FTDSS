@@ -1,4 +1,4 @@
-module inout_input_conditions
+module io_input_conditions
     use, intrinsic :: iso_fortran_env
 !$  use :: omp_lib
     use :: mpi_f08
@@ -6,7 +6,7 @@ module inout_input_conditions
     use :: stdlib_logger
     use :: json_module, only:json_file
     use :: module_core
-    use :: inout_input_base, only:get_json_value, abst_input
+    use :: io_input_base, only:get_json_value, abst_input
     implicit none
     private
 
@@ -160,4 +160,4 @@ module inout_input_conditions
 
 contains
 
-end module inout_input_conditions
+end module io_input_conditions

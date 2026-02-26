@@ -87,7 +87,6 @@ target_sources(SOLVER_CORE PRIVATE
     types/datetime.F90
     types/solar.F90
     types/physics/state.F90
-    types/physics/physics_info.F90
     types/physics/meteorology.F90
     types/config/config_base.F90
     types/config/conditions/config_boundary.F90
@@ -96,6 +95,7 @@ target_sources(SOLVER_CORE PRIVATE
     types/config/physics/config_physics_base.F90
     types/config/physics/config_swcc.F90
     types/config/physics/config_gcc.F90
+    types/config/physics/config_constitutive.F90
     types/config/physics/config_physics.F90
     types/config/control/config_acceleration.F90
     types/config/control/config_output_manager.F90

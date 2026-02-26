@@ -1,4 +1,4 @@
-submodule(inout_input_basic) inout_input_basic_geometry_settings
+submodule(io_input_basic) input_basic_geometry_settings
     implicit none
     !!------------------------------------------------------------------------------------------------------------------------------
     ! JSON key names for geometry settings
@@ -19,7 +19,7 @@ submodule(inout_input_basic) inout_input_basic_geometry_settings
     character(*), parameter :: valid_integration_types(3) = [character(len=16) :: "full", "reduced", "free"]
     character(*), parameter :: integration_points = "integration_points"
 contains
-    module subroutine read_parameters_geometry_settings(self, json)
+    module subroutine read_geometry_settings(self, json)
         implicit none
         class(type_input_basic), intent(inout) :: self
         type(json_file), intent(inout) :: json
@@ -75,7 +75,7 @@ contains
         !                         is_required=.true., valid_range=[0.0d0, 1.0d0])
         ! end if
 
-    end subroutine read_parameters_geometry_settings
+    end subroutine read_geometry_settings
 
     module subroutine display_geometry_settings(self)
         implicit none
@@ -100,4 +100,4 @@ contains
 
     end subroutine display_geometry_settings
 
-end submodule inout_input_basic_geometry_settings
+end submodule input_basic_geometry_settings

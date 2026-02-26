@@ -1,4 +1,4 @@
-submodule(physics_models_wrf) wrf_bc
+submodule(models_wrf) wrf_bc
     implicit none
 contains
 

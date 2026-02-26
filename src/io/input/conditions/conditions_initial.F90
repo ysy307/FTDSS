@@ -1,5 +1,5 @@
-submodule(inout_input_conditions) inout_input_conditions_initial
-    use :: inout_input
+submodule(io_input_conditions) input_conditions_initial
+    use :: io_input
     implicit none
     !------------------------------------------------------------------------------------------------------------------------------
     ! JSON key names for initial conditions
@@ -102,4 +102,4 @@ contains
         end select
     end subroutine display_initial_local
 
-end submodule inout_input_conditions_initial
+end submodule input_conditions_initial

@@ -5,7 +5,7 @@
 !> suction and its derivatives based on the Generalized Clausius-Clapeyron equation.
 !> It serves as the foundation for phase change models involving liquid and solid water.
 !>
-module constitutive_models_phase_change_liquid_solid_gcc
+module models_phase_change_gcc
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core
@@ -17,7 +17,7 @@ module constitutive_models_phase_change_liquid_solid_gcc
         Tf0 => water_freezing_point_at_standard_atmospheric_pressure, &
         Tf0_K => water_freezing_point_at_standard_atmospheric_pressure_k
 
-    use :: constitutive_base, only:abst_physics
+    use :: constitutive_base, only:abst_constitutive
     implicit none
     private
 
@@ -57,7 +57,7 @@ module constitutive_models_phase_change_liquid_solid_gcc
 !>
 !> @brief Abstract base class for GCC models.
 !>
-    type, extends(abst_physics), abstract :: abst_gcc
+    type, extends(abst_constitutive), abstract :: abst_gcc
         !> Material ID
         integer(int32) :: material_id = -1
     contains
@@ -269,4 +269,4 @@ module constitutive_models_phase_change_liquid_solid_gcc
         end subroutine deriv_pressure_ice_water_seg
     end interface
 
-end module constitutive_models_phase_change_liquid_solid_gcc
+end module models_phase_change_gcc

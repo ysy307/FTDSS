@@ -1,5 +1,5 @@
-submodule(inout_input_geometry) inout_input_geometry_base
-    use :: inout_input
+submodule(io_input_geometry) input_geometry_base
+    use :: io_input
     implicit none
 contains
 !================================================================!
@@ -140,4 +140,4 @@ contains
         end select
     end function collect_fields_from_conditions
 
-end submodule inout_input_geometry_base
+end submodule input_geometry_base

@@ -1,9 +1,9 @@
-module constitutive_materials_thermal_conductivity
+module materials_thermal_conductivity
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
-    use :: module_core, only:type_state, type_constitutive_info, allocate_array, type_coordinate_dp
+    use :: module_core, only:type_state, type_config_constitutive, allocate_array, type_coordinate_dp
     use :: constitutive_constants, only:TtoK => celsius_to_kelvin
-    use :: constitutive_materials_base, only:abst_material
+    use :: materials_base, only:abst_material
     implicit none
     private
 
@@ -26,7 +26,7 @@ module constitutive_materials_thermal_conductivity
             implicit none
             class(holder_thcs), intent(inout) :: self
             integer(int32), intent(in) :: material_id
-            type(type_constitutive_info), intent(in) :: constitutive_info
+            type(type_config_constitutive), intent(in) :: constitutive_info
             type(type_iapws97), intent(in), target :: water
             type(type_iapws06), intent(in), target :: ice
 
@@ -85,11 +85,11 @@ module constitutive_materials_thermal_conductivity
 
     interface
         module subroutine initialize_abst_thc(self, material_id, constitutive_info, water, ice)
-            import :: abst_thc, type_constitutive_info, type_iapws97, type_iapws06, int32
+            import :: abst_thc, type_config_constitutive, type_iapws97, type_iapws06, int32
             implicit none
             class(abst_thc), intent(inout) :: self
             integer(int32), intent(in) :: material_id
-            type(type_constitutive_info), intent(in) :: constitutive_info
+            type(type_config_constitutive), intent(in) :: constitutive_info
             type(type_iapws97), intent(in), target :: water
             type(type_iapws06), intent(in), target :: ice
 
@@ -258,4 +258,4 @@ module constitutive_materials_thermal_conductivity
         end subroutine calc_lambda_dispersivity_abst_thc
     end interface
 
-end module constitutive_materials_thermal_conductivity
+end module materials_thermal_conductivity

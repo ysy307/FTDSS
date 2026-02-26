@@ -1,7 +1,7 @@
-module inout_input_translator
+module io_input_translator
     use, intrinsic :: iso_fortran_env
     use :: module_core
-    use :: inout_input, only:type_input
+    use :: io_input, only:type_input
     implicit none
     private
 
@@ -128,4 +128,4 @@ module inout_input_translator
 
 ! contains
 
-end module inout_input_translator
+end module io_input_translator

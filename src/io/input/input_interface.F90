@@ -1,16 +1,16 @@
-module inout_input
+module io_input
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
     use :: mpi_f08
-!$  use :: omp_lib
+    use :: omp_lib
     use :: stdlib_strings, only:to_string, strip, ends_with
     use :: stdlib_logger
     use :: json_module, only:json_file
-    use :: inout_input_base, only:abst_input
-    use :: inout_input_basic, only:type_input_basic
-    use :: inout_input_conditions, only:type_conditions
-    use :: inout_input_output_conditions, only:type_output_settings
-    use :: inout_input_geometry, only:type_input_geometry
     use :: module_core
+    use :: io_input_base, only:abst_input
+    use :: io_input_basic, only:type_input_basic
+    use :: io_input_conditions, only:type_conditions
+    use :: io_input_output_conditions, only:type_output_settings
+    use :: io_input_geometry, only:type_input_geometry
     ! use :: module_physics
     implicit none
     private
@@ -243,4 +243,4 @@ contains
 
     end function file_exists
 
-end module inout_input
+end module io_input

@@ -1,7 +1,7 @@
 !> This implementation based on:
 !> Saito, H., Šimůnek, J. and Mohanty, B.P. (2006)
 !> Numerical analysis of coupled water, vapor, and heat transport in the vadose zone, Vadose zone journal: VZJ, 5(2), pp. 784–800.
-submodule(physics_models_hcf) hcf_vapor
+submodule(models_hcf) hcf_vapor
     implicit none
 contains
 

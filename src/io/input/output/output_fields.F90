@@ -1,4 +1,4 @@
-submodule(inout_input_output_conditions) inout_input_output_conditions_fields
+submodule(io_input_output_conditions) input_output_conditions_fields
     implicit none
     !!------------------------------------------------------------------------------------------------------------------------------
     !! JSON key names for field output
@@ -51,4 +51,4 @@ contains
         end do
 
     end subroutine display_output_settings_fields
-end submodule inout_input_output_conditions_fields
+end submodule input_output_conditions_fields

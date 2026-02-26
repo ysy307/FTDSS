@@ -5,7 +5,7 @@
 !> for both non-segregation and segregation GCC models.
 !> Calculations are performed in Pascal [Pa].
 !>
-submodule(constitutive_models_phase_change_liquid_solid_gcc) gcc_base
+submodule(models_phase_change_gcc) gcc_base
     implicit none
 
 contains

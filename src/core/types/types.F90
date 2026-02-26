@@ -25,7 +25,8 @@ module core_types
         abst_config_physics_material, &
         type_config_wrf, &
         type_config_hcf, &
-        type_config_gcc
+        type_config_gcc, &
+        type_config_constitutive
     use :: core_types_config_control, only: &
         type_config_acceleration, &
         type_config_output_manager, &
@@ -36,8 +37,6 @@ module core_types
         type_config_iteration_criterion, &
         type_config_parallel_openmp, &
         type_config_control_manager
-    use :: core_types_physics_info, only: &
-        type_physics_info
     use :: core_types_physics_meteorology, only: &
         type_meteorology, &
         type_meteorology_data

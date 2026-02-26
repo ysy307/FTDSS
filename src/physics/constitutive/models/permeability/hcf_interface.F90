@@ -1,10 +1,10 @@
-module constitutive_models_hcf
+module models_hcf
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core
     use :: constitutive_constants, only:TtoK => celsius_to_kelvin, Mw => molar_mass_water, &
         Rg => universal_gas_constant, g => gravity_acceleration, rho_std => reference_water_density
-    use :: constitutive_base, only:abst_physics
+    use :: constitutive_base, only:abst_constitutive
     implicit none
     private
 
@@ -85,7 +85,7 @@ module constitutive_models_hcf
         end subroutine initialize_holder_hcfs
     end interface
 
-    type, extends(abst_physics) :: type_hcf_vapor
+    type, extends(abst_constitutive) :: type_hcf_vapor
         private
         class(abst_hcf), pointer :: parent
     contains
@@ -141,7 +141,7 @@ module constitutive_models_hcf
         end subroutine calc_KvT_vapor
     end interface
 
-    type, extends(abst_physics), abstract :: abst_hcf
+    type, extends(abst_constitutive), abstract :: abst_hcf
         private
         type(type_config_hcf) :: config
         class(abst_hcf_base), allocatable :: base
@@ -522,4 +522,4 @@ module constitutive_models_hcf
 
     end interface
 
-end module constitutive_models_hcf
+end module models_hcf

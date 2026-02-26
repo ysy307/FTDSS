@@ -1,4 +1,4 @@
-module inout_input_geometry
+module io_input_geometry
     use, intrinsic :: iso_fortran_env
 !$  use :: omp_lib
     use :: mpi_f08
@@ -6,7 +6,7 @@ module inout_input_geometry
     use :: stdlib_logger
     use :: json_module, only:json_file
     use :: module_core
-    use :: inout_input_base, only:get_json_value, abst_input
+    use :: io_input_base, only:get_json_value, abst_input
     implicit none
     private
 
@@ -46,4 +46,4 @@ module inout_input_geometry
         ! end subroutine display_input_geometry
     end interface
 
-end module inout_input_geometry
+end module io_input_geometry

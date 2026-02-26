@@ -35,22 +35,22 @@ target_sources(SOLVER_CONSTITUTIVE
         materials/heat_capacity/heat_capacity_base.F90
         materials/heat_capacity/heat_capacity_multiphase.F90
 
-        materials/materials.F90
+        materials/materials_manager.F90
 
         # ====================================================
         # 3. Models
         # ====================================================
-        models/hydraulic_conductivity/hcf_interface.F90
-        models/hydraulic_conductivity/hcf_base.F90
-        models/hydraulic_conductivity/hcf_bc.F90
-        models/hydraulic_conductivity/hcf_vg.F90
-        models/hydraulic_conductivity/hcf_ko.F90
-        models/hydraulic_conductivity/hcf_mvg.F90
-        models/hydraulic_conductivity/hcf_durner.F90
-        models/hydraulic_conductivity/hcf_dvgch.F90
-        models/hydraulic_conductivity/hcf_impedance.F90
-        models/hydraulic_conductivity/hcf_viscosity.F90
-        models/hydraulic_conductivity/hcf_vapor.F90
+        models/permeability/hcf_interface.F90
+        models/permeability/hcf_base.F90
+        models/permeability/hcf_bc.F90
+        models/permeability/hcf_vg.F90
+        models/permeability/hcf_ko.F90
+        models/permeability/hcf_mvg.F90
+        models/permeability/hcf_durner.F90
+        models/permeability/hcf_dvgch.F90
+        models/permeability/hcf_impedance.F90
+        models/permeability/hcf_viscosity.F90
+        models/permeability/hcf_vapor.F90
 
         models/water_retention/wrf_interface.F90
         models/water_retention/wrf_base.F90
@@ -67,7 +67,7 @@ target_sources(SOLVER_CONSTITUTIVE
         models/phase_change/liquid_vapor/vaporization.F90
         models/phase_change/phase_systems.F90
 
-        models/models.F90
+        models/models_manager.F90
 
         # ====================================================
         # 4. Service Layer

@@ -2,15 +2,15 @@
 !> @brief Manages phase composition (water, ice, gas, vapor) and their derivatives.
 !> Integrates Fusion and Vaporization models to ensure thermodynamic consistency.
 !>
-module physics_models_phase_systems
+module models_phase_change_manager
     use, intrinsic :: iso_fortran_env
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core, only:type_state
-    use :: physics_constants, only:latent_heat_fusion_water_0C
-    use :: physics_models_phase_change_liquid_solid_gcc, only:abst_gcc
-    use :: physics_models_wrf, only:abst_wrf
-    use :: physics_models_phase_change_liquid_solid_fusion, only:type_fusion
-    use :: physics_models_phase_change_liquid_vapor_vaporization, only:type_evaporation
+    use :: constitutive_constants, only:latent_heat_fusion_water_0C
+    use :: models_phase_change_gcc, only:abst_gcc
+    use :: models_wrf, only:abst_wrf
+    use :: models_phase_change_fusion, only:type_fusion
+    use :: models_phase_change_vaporization, only:type_evaporation
     implicit none
     private
 
@@ -194,4 +194,4 @@ contains
 
     end subroutine deriv_pressure_ice_water
 
-end module physics_models_phase_systems
+end module models_phase_change_manager

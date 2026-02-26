@@ -1,4 +1,4 @@
-submodule(main_hydraulic) hydraulic_coefficients
+submodule(governing_hydraulic) hydraulic_coefficients
     implicit none
 contains
 

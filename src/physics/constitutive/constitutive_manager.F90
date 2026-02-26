@@ -1,10 +1,10 @@
-module constitutive_service
+module constitutive_manager
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core
     use :: constitutive_base, only:type_iapws_wrapper
-    use :: module_constitutive_materials, only:type_material_manager, type_thc_dispersivity
-    use :: module_constitutive_models, only:type_models_manager
+    use :: constitutive_materials_manager, only:type_material_manager, type_thc_dispersivity
+    use :: constitutive_models_manager, only:type_models_manager
     implicit none
     private
     public :: type_constitutive_manager
@@ -67,10 +67,10 @@ contains
         implicit none
         class(type_constitutive_manager), intent(inout) :: self
         integer(int32), intent(in) :: unique_material_ids(:)
-        type(type_constitutive_info), intent(in), optional :: density_info(:)
-        type(type_constitutive_info), intent(in), optional :: specific_heat_info(:)
-        type(type_constitutive_info), intent(in), optional :: heat_capacity_info(:)
-        type(type_constitutive_info), intent(in), optional :: thermal_conductivity_info(:)
+        type(type_config_constitutive), intent(in), optional :: density_info(:)
+        type(type_config_constitutive), intent(in), optional :: specific_heat_info(:)
+        type(type_config_constitutive), intent(in), optional :: heat_capacity_info(:)
+        type(type_config_constitutive), intent(in), optional :: thermal_conductivity_info(:)
         type(type_config_wrf), intent(in), optional :: configs_wrf(:)
         type(type_config_hcf), intent(in), optional :: configs_hcf(:)
         type(type_config_gcc), intent(in), optional :: configs_gcc(:)
@@ -445,4 +445,4 @@ contains
         call self%models(self%materials_id_map(material_id))%calc_KvT(state, KvT)
     end subroutine calc_KvT
 
-end module constitutive_service
+end module constitutive_manager

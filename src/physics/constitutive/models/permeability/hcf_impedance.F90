@@ -1,4 +1,4 @@
-submodule(physics_models_hcf) hcf_impedance
+submodule(models_hcf) hcf_impedance
     implicit none
 contains
 

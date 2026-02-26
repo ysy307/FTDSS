@@ -1,9 +1,9 @@
 module module_constitutive
     use :: constitutive_constants
     use :: constitutive_base
-    use :: module_constitutive_materials
-    use :: module_constitutive_models
-    use :: constitutive_service
+    use :: constitutive_materials_manager
+    use :: constitutive_models_manager
+    use :: constitutive_manager
 
     implicit none
 

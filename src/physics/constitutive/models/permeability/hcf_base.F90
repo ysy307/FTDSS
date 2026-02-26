@@ -1,4 +1,4 @@
-submodule(constitutive_models_hcf) hcf_base
+submodule(models_hcf) hcf_base
     use, intrinsic :: iso_fortran_env
     implicit none
     real(real64), parameter :: gamma_0 = 71.88875d0 ! g/s^2

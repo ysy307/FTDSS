@@ -1,4 +1,4 @@
-submodule(inout_input_conditions) inout_input_conditions_base
+submodule(io_input_conditions) input_conditions_base
     implicit none
 contains
     module subroutine initialize_type_conditions(self)
@@ -47,4 +47,4 @@ contains
         end if
     end subroutine display_conditions
 
-end submodule inout_input_conditions_base
+end submodule input_conditions_base

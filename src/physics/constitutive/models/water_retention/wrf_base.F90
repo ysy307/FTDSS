@@ -1,4 +1,4 @@
-submodule(physics_models_wrf) calculate_wrf_base
+submodule(models_wrf) calculate_wrf_base
     implicit none
 contains
     ! module subroutine reset_config_wrf(self)
@@ -60,13 +60,13 @@ contains
 
     !     ! --- 変換係数の決定 ---
     !     select case (unit_id)
-    !     case (PHYSICS_UNIT_M)
+    !     case (constitutive_UNIT_M)
     !         ! m -> Pa
     !         scale_pres = pg_val
-    !     case (PHYSICS_UNIT_CM)
+    !     case (constitutive_UNIT_CM)
     !         ! cm -> m -> Pa
     !         scale_pres = pg_val * 1.0d-2
-    !     case (PHYSICS_UNIT_PA)
+    !     case (constitutive_UNIT_PA)
     !         ! Pa -> Pa (係数は1.0)
     !         scale_pres = 1.0d0
     !     case default

@@ -1,4 +1,4 @@
-module inout_input_base
+module io_input_base
     use, intrinsic :: iso_fortran_env
     use :: stdlib_strings, only:to_string, strip, ends_with
     use :: json_module, only:json_file
@@ -348,4 +348,4 @@ contains
 
     end subroutine get_json_string_array
 
-end module inout_input_base
+end module io_input_base

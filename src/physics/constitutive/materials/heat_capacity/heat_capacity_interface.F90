@@ -1,9 +1,9 @@
-module constitutive_materials_heat_capacity
+module materials_heat_capacity
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
-    use :: module_core, only:type_state, type_constitutive_info
+    use :: module_core, only:type_state, type_config_constitutive
     use :: constitutive_constants, only:TtoK => celsius_to_kelvin
-    use :: constitutive_materials_base, only:abst_material
+    use :: materials_base, only:abst_material
     implicit none
     private
 
@@ -26,7 +26,7 @@ module constitutive_materials_heat_capacity
             implicit none
             class(holder_vhcs), intent(inout) :: self
             integer(int32), intent(in) :: material_id
-            type(type_constitutive_info), intent(in) :: constitutive_info
+            type(type_config_constitutive), intent(in) :: constitutive_info
             type(type_iapws97), intent(in), target :: water
             type(type_iapws06), intent(in), target :: ice
 
@@ -154,4 +154,4 @@ module constitutive_materials_heat_capacity
         end subroutine calc_vhc_4a
     end interface
 
-end module constitutive_materials_heat_capacity
+end module materials_heat_capacity

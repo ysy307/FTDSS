@@ -1,10 +1,10 @@
-module constitutive_models_phase_change_liquid_solid_fusion
+module models_phase_change_fusion
     use, intrinsic :: iso_fortran_env
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core, only:type_state
-    use :: constitutive_base, only:abst_physics
-    use :: constitutive_models_wrf, only:abst_wrf
-    use :: constitutive_models_phase_change_liquid_solid_gcc, only:abst_gcc
+    use :: constitutive_base, only:abst_constitutive
+    use :: models_wrf, only:abst_wrf
+    use :: models_phase_change_gcc, only:abst_gcc
     implicit none
     private
 
@@ -13,7 +13,7 @@ module constitutive_models_phase_change_liquid_solid_fusion
     !>
     !> @brief Model for fusion (melting/freezing) physics.
     !>
-    type, extends(abst_physics) :: type_fusion
+    type, extends(abst_constitutive) :: type_fusion
         private
         class(abst_wrf), pointer :: wrf
         class(abst_gcc), pointer :: gcc
@@ -278,4 +278,4 @@ contains
 
     end subroutine deriv_pressure_ice_water
 
-end module constitutive_models_phase_change_liquid_solid_fusion
+end module models_phase_change_fusion

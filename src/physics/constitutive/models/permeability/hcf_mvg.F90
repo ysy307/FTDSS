@@ -1,4 +1,4 @@
-submodule(physics_models_hcf) hcf_mvg
+submodule(models_hcf) hcf_mvg
     implicit none
 contains
 

@@ -1,4 +1,4 @@
-submodule(inout_input_translator) input_translator_basic
+submodule(io_input_translator) translator_basic
     implicit none
 contains
 
@@ -307,4 +307,4 @@ contains
 
     end subroutine execute_basic_control_manager
 
-end submodule input_translator_basic
+end submodule translator_basic

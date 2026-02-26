@@ -1,4 +1,4 @@
-module governing_thermal_
+module governing_thermal
     use, intrinsic :: iso_fortran_env
     use :: module_core
     use :: module_control, only:type_control

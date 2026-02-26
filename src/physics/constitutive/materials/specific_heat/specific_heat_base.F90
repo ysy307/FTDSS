@@ -1,4 +1,4 @@
-submodule(constitutive_materials_specific_heat) specific_heat_base
+submodule(materials_specific_heat) specific_heat_base
     implicit none
 
 contains
@@ -7,7 +7,7 @@ contains
         implicit none
         class(holder_sphs), intent(inout) :: self
         integer(int32), intent(in) :: material_id
-        type(type_constitutive_info), intent(in) :: constitutive_info
+        type(type_config_constitutive), intent(in) :: constitutive_info
         type(type_iapws97), intent(in), target :: water
         type(type_iapws06), intent(in), target :: ice
 

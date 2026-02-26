@@ -1,7 +1,7 @@
 !>
 !> @brief Physics models for vaporization.
 !>
-module constitutive_models_phase_change_liquid_vapor_vaporization
+module models_phase_change_vaporization
     use, intrinsic :: iso_fortran_env
     use :: iapws, only:type_iapws97
     use :: module_core, only:type_state
@@ -12,14 +12,14 @@ module constitutive_models_phase_change_liquid_vapor_vaporization
         Mw => molar_mass_water, &
         rho_std => reference_water_density, &
         P_atm => standard_atmospheric_pressure
-    use :: constitutive_base, only:abst_physics
+    use :: constitutive_base, only:abst_constitutive
 
     implicit none
     private
 
     public :: type_evaporation
 
-    type, extends(abst_physics) :: type_evaporation
+    type, extends(abst_constitutive) :: type_evaporation
     contains
         procedure, pass(self), public :: initialize => initialize_evaporation_model
         procedure, pass(self), public :: calc_latent_heat_vaporization
@@ -224,4 +224,4 @@ contains
 
     end subroutine calc_vapor_content_derivatives
 
-end module constitutive_models_phase_change_liquid_vapor_vaporization
+end module models_phase_change_vaporization

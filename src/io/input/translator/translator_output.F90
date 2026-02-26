@@ -1,4 +1,4 @@
-submodule(inout_input_translator) input_translator_output
+submodule(io_input_translator) translator_output
     implicit none
 contains
 
@@ -20,4 +20,4 @@ contains
 
     end subroutine execute_output_field
 
-end submodule input_translator_output
+end submodule translator_output

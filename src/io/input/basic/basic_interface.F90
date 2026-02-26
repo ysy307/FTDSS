@@ -1,4 +1,4 @@
-module inout_input_basic
+module io_input_basic
     use, intrinsic :: iso_fortran_env
 !$  use :: omp_lib
     use :: mpi_f08
@@ -6,7 +6,7 @@ module inout_input_basic
     use :: stdlib_logger
     use :: json_module, only:json_file
     use :: module_core
-    use :: inout_input_base, only:get_json_value, abst_input
+    use :: io_input_base, only:get_json_value, abst_input
     ! use :: module_physics
     implicit none
     private
@@ -295,35 +295,35 @@ module inout_input_basic
     end type type_input_basic
 
     interface
-        module subroutine read_parameters_simulation_settings(self, json)
+        module subroutine read_simulation_settings(self, json)
             implicit none
             class(type_input_basic), intent(inout) :: self
             type(json_file), intent(inout) :: json
-        end subroutine read_parameters_simulation_settings
+        end subroutine read_simulation_settings
 
-        module subroutine read_parameters_analysis_controls(self, json)
+        module subroutine read_analysis_controls(self, json)
             implicit none
             class(type_input_basic), intent(inout) :: self
             type(json_file), intent(inout) :: json
-        end subroutine read_parameters_analysis_controls
+        end subroutine read_analysis_controls
 
-        module subroutine read_parameters_geometry_settings(self, json)
+        module subroutine read_geometry_settings(self, json)
             implicit none
             class(type_input_basic), intent(inout) :: self
             type(json_file), intent(inout) :: json
-        end subroutine read_parameters_geometry_settings
+        end subroutine read_geometry_settings
 
-        module subroutine read_parameters_materials(self, json)
+        module subroutine read_materials(self, json)
             implicit none
             class(type_input_basic), intent(inout) :: self
             type(json_file), intent(inout) :: json
-        end subroutine read_parameters_materials
+        end subroutine read_materials
 
-        module subroutine read_parameters_solver_settings(self, json)
+        module subroutine read_solver_settings(self, json)
             implicit none
             class(type_input_basic), intent(inout) :: self
             type(json_file), intent(inout) :: json
-        end subroutine read_parameters_solver_settings
+        end subroutine read_solver_settings
     end interface
 
     interface
@@ -338,4 +338,4 @@ module inout_input_basic
         end subroutine display_input_basic
     end interface
 
-end module inout_input_basic
+end module io_input_basic

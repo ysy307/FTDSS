@@ -1,5 +1,5 @@
-submodule(inout_input_conditions) inout_input_conditions_boundry
-    use :: inout_input
+submodule(io_input_conditions) input_conditions_boundary
+    use :: io_input
     implicit none
     !------------------------------------------------------------------------------------------------------------------------------
     ! JSON key names for boundary conditions
@@ -222,4 +222,4 @@ contains
         
     end subroutine display_boundary_local
 
-end submodule inout_input_conditions_boundry
+end submodule input_conditions_boundary
