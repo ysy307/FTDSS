@@ -22,4 +22,8 @@
     #:def rank_suffix(rank)
         ${"({0})".format(":" + ",:" * (rank - 1)) if rank > 0 else ""}$
     #:enddef
+
+    #:def alloc_args(rank)
+        ${", ".join(["lb({0}):ub({0})".format(i) for i in range(1, rank+1)])}$
+    #:enddef
 #:endmute

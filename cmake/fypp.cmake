@@ -6,7 +6,7 @@ set(FYPP_INCLUDE_DIR
 
 # fypp から include されうる全ファイルを列挙（GLOB禁止）
 set(FYPP_INCLUDE_FILES
-    ${FYPP_INCLUDE_DIR}/common.fypp
+    ${FYPP_INCLUDE_DIR}/kinds.fypp
     ${FYPP_INCLUDE_DIR}/constants.fypp
 )
 

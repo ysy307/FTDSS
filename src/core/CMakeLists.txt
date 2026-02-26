@@ -47,7 +47,7 @@ set(CORE_MEMORY_FYPP
     memory/allocate.fypp
     memory/deallocate.fypp
 )
-fypp_F90("" "${CORE_MEMORY_FYPP}" CORE_MEMORY_GENERATED)
+fypp_F90("-D MAX_RANK=3" "${CORE_MEMORY_FYPP}" CORE_MEMORY_GENERATED)
 
 target_sources(SOLVER_CORE PRIVATE
     memory/memory.F90
