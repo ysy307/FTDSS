@@ -12,9 +12,9 @@ add_library(SOLVER_CORE STATIC)
 # Constants
 # ------------------------------------------------------------
 set(CORE_CONSTANTS_FYPP
-    constants/constans_ids.fypp
-    constants/constans_values.fypp
-    constants/constans_error.fypp
+    constants/constants_ids.fypp
+    constants/constants_values.fypp
+    constants/constants_error.fypp
 )
 fypp_F90("" "${CORE_CONSTANTS_FYPP}" CORE_CONSTANTS_GENERATED)
 
