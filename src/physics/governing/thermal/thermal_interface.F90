@@ -1,4 +1,4 @@
-module main_thermal
+module governing_thermal_
     use, intrinsic :: iso_fortran_env
     use :: module_core
     use :: module_control, only:type_control
@@ -192,4 +192,4 @@ module main_thermal
 
 contains
 
-end module main_thermal
+end module governing_thermal_

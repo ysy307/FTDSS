@@ -1,4 +1,4 @@
-module main_hydraulic
+module governing_hydraulic
     use, intrinsic :: iso_fortran_env
     use :: module_core
     use :: module_control, only:type_control
@@ -175,4 +175,4 @@ contains
         implicit none
         class(type_hydraulic), intent(inout) :: self
     end subroutine destroy_type_hydraulic
-end module main_hydraulic
+end module governing_hydraulic

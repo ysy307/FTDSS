@@ -1,4 +1,4 @@
-submodule(physics_materials_heat_capacity) heat_capacity_multiphase
+submodule(constitutive_materials_heat_capacity) heat_capacity_multiphase
     implicit none
 contains
     module subroutine calc_vhc_gp_1phase(self, state, vhc)

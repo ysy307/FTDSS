@@ -1,4 +1,4 @@
-submodule(physics_materials_density) density_multiphase
+submodule(constitutive_materials_density) density_multiphase
     implicit none
 contains
     module subroutine calc_den_gp_1phase(self, state, density)

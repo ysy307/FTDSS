@@ -1,4 +1,4 @@
-submodule(physics_materials_thermal_conductivity) thermal_conductivity_multiphase
+submodule(constitutive_materials_thermal_conductivity) thermal_conductivity_multiphase
     implicit none
 contains
 

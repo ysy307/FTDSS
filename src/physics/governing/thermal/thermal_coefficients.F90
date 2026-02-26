@@ -1,4 +1,4 @@
-submodule(main_thermal) thermal_coefficients
+submodule(governing_thermal) thermal_coefficients
     implicit none
 
 contains

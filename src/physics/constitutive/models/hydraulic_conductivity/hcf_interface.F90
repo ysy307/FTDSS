@@ -1,10 +1,10 @@
-module physics_models_hcf
+module constitutive_models_hcf
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core
-    use :: physics_constants, only:TtoK => celsius_to_kelvin, Mw => molar_mass_water, &
+    use :: constitutive_constants, only:TtoK => celsius_to_kelvin, Mw => molar_mass_water, &
         Rg => universal_gas_constant, g => gravity_acceleration, rho_std => reference_water_density
-    use :: physics_base, only:abst_physics
+    use :: constitutive_base, only:abst_physics
     implicit none
     private
 
@@ -522,4 +522,4 @@ module physics_models_hcf
 
     end interface
 
-end module physics_models_hcf
+end module constitutive_models_hcf

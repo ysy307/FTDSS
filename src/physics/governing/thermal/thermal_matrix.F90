@@ -1,4 +1,4 @@
-submodule(main_thermal) thermal_matrix
+submodule(governing_thermal) thermal_matrix
     implicit none
 contains
 

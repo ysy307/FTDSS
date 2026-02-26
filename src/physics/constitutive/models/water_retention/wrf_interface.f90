@@ -10,7 +10,7 @@ module physics_models_wrf
     use :: module_core, only:type_config_wrf, SWCC_MODELS
     ! use :: module_core, only:WRF_BC, WRF_VG, WRF_KO, WRF_MVG, WRF_DURNER, WRF_DVGCH, &
     !     PHYSICS_UNIT_M, PHYSICS_UNIT_CM, PHYSICS_UNIT_PA
-    use :: physics_constants, only:pi => circle_ratio, g => gravity_acceleration, rho_std => reference_water_density
+    use :: constitutive_constants, only:pi => circle_ratio, g => gravity_acceleration, rho_std => reference_water_density
     implicit none
     private
 

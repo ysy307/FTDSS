@@ -1,4 +1,4 @@
-submodule(main_hydraulic) hydraulic_matrix
+submodule(governing_hydraulic) hydraulic_matrix
     implicit none
 contains
 

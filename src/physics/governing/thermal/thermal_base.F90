@@ -1,4 +1,4 @@
-submodule(main_thermal) thermal_base
+submodule(governing_thermal) thermal_base
     implicit none
 contains
     module subroutine initialize_type_thermal(self, input, active_region_ids)

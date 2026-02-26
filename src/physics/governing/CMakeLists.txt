@@ -37,7 +37,6 @@ target_sources(SOLVER_GOVERNING
         thermal/thermal_base.F90
         thermal/thermal_matrix.F90
         thermal/thermal_coefficients.F90
-        thermal/thermal.F90
 
         # ====================================================
         # 5. Hydraulic
@@ -46,7 +45,11 @@ target_sources(SOLVER_GOVERNING
         hydraulic/hydraulic_base.F90
         hydraulic/hydraulic_matrix.F90
         hydraulic/hydraulic_coefficients.F90
-        hydraulic/hydraulic.F90
+
+        # ====================================================
+        # 6. Atmosphere
+        # ====================================================
+        atmosphere/atmosphere.F90
 )
 
 # ------------------------------------------------------------

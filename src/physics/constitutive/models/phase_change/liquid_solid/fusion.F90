@@ -1,10 +1,10 @@
-module physics_models_phase_change_liquid_solid_fusion
+module constitutive_models_phase_change_liquid_solid_fusion
     use, intrinsic :: iso_fortran_env
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core, only:type_state
-    use :: physics_base, only:abst_physics
-    use :: physics_models_wrf, only:abst_wrf
-    use :: physics_models_phase_change_liquid_solid_gcc, only:abst_gcc
+    use :: constitutive_base, only:abst_physics
+    use :: constitutive_models_wrf, only:abst_wrf
+    use :: constitutive_models_phase_change_liquid_solid_gcc, only:abst_gcc
     implicit none
     private
 
@@ -278,4 +278,4 @@ contains
 
     end subroutine deriv_pressure_ice_water
 
-end module physics_models_phase_change_liquid_solid_fusion
+end module constitutive_models_phase_change_liquid_solid_fusion

@@ -1,9 +1,9 @@
-module physics_materials_base
+module constitutive_materials_base
     use, intrinsic :: iso_fortran_env
     use :: iapws, only:type_iapws97, type_iapws06
-    use :: module_core, only:type_state, type_physics_info
-    use :: physics_constants, only:TtoK => celsius_to_kelvin, P_atm => standard_atmospheric_pressure
-    use :: physics_base, only:abst_physics
+    use :: module_core, only:type_state, type_constitutive_info
+    use :: constitutive_constants, only:TtoK => celsius_to_kelvin, P_atm => standard_atmospheric_pressure
+    use :: constitutive_base, only:abst_physics
     implicit none
     private
 
@@ -29,20 +29,20 @@ module physics_materials_base
 
 contains
 
-    subroutine initialize_abst_material(self, material_id, physics_info, water, ice)
+    subroutine initialize_abst_material(self, material_id, constitutive_info, water, ice)
         implicit none
         class(abst_material), intent(inout) :: self
         integer(int32), intent(in) :: material_id
-        type(type_physics_info), intent(in) :: physics_info
+        type(type_constitutive_info), intent(in) :: constitutive_info
         type(type_iapws97), intent(in), target :: water
         type(type_iapws06), intent(in), target :: ice
 
         self%material_id = material_id
 
-        self%material1 = physics_info%solid
-        self%material2 = physics_info%water
-        self%material3 = physics_info%ice
-        self%material4 = physics_info%vapor
+        self%material1 = constitutive_info%solid
+        self%material2 = constitutive_info%water
+        self%material3 = constitutive_info%ice
+        self%material4 = constitutive_info%vapor
 
         self%water => water
         self%ice => ice
@@ -165,4 +165,4 @@ contains
 
     end subroutine calc_vapor_cp_abst_material
 
-end module physics_materials_base
+end module constitutive_materials_base

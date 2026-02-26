@@ -1,18 +1,18 @@
 !>
 !> @brief Physics models for vaporization.
 !>
-module physics_models_phase_change_liquid_vapor_vaporization
+module constitutive_models_phase_change_liquid_vapor_vaporization
     use, intrinsic :: iso_fortran_env
     use :: iapws, only:type_iapws97
     use :: module_core, only:type_state
-    use :: physics_constants, only: &
+    use :: constitutive_constants, only: &
         g => gravity_acceleration, &
         T_to_K => celsius_to_kelvin, &
         Rg => universal_gas_constant, &
         Mw => molar_mass_water, &
         rho_std => reference_water_density, &
         P_atm => standard_atmospheric_pressure
-    use :: physics_base, only:abst_physics
+    use :: constitutive_base, only:abst_physics
 
     implicit none
     private
@@ -224,4 +224,4 @@ contains
 
     end subroutine calc_vapor_content_derivatives
 
-end module physics_models_phase_change_liquid_vapor_vaporization
+end module constitutive_models_phase_change_liquid_vapor_vaporization

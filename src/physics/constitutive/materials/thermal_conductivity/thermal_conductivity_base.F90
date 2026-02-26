@@ -1,28 +1,28 @@
-submodule(physics_materials_thermal_conductivity) thermal_conductivity_base
+submodule(constitutive_materials_thermal_conductivity) thermal_conductivity_base
     implicit none
 contains
-    module subroutine initialize_abst_thc(self, material_id, physics_info, water, ice)
+    module subroutine initialize_abst_thc(self, material_id, constitutive_info, water, ice)
         implicit none
         class(abst_thc), intent(inout) :: self
         integer(int32), intent(in) :: material_id
-        type(type_physics_info), intent(in) :: physics_info
+        type(type_constitutive_info), intent(in) :: constitutive_info
         type(type_iapws97), intent(in), target :: water
         type(type_iapws06), intent(in), target :: ice
 
         self%material_id = material_id
 
-        self%material1 = physics_info%solid
-        self%material2 = physics_info%water
-        self%material3 = physics_info%ice
-        self%material4 = physics_info%vapor
+        self%material1 = constitutive_info%solid
+        self%material2 = constitutive_info%water
+        self%material3 = constitutive_info%ice
+        self%material4 = constitutive_info%vapor
 
-        if (allocated(physics_info%dispersivity)) then
-            call allocate_array(self%dispersivity, source=physics_info%dispersivity)
+        if (allocated(constitutive_info%dispersivity)) then
+            call allocate_array(self%dispersivity, source=constitutive_info%dispersivity)
             self%use_dispersivity = .true.
         end if
 
-        if (allocated(physics_info%params)) then
-            call allocate_array(self%params, source=physics_info%params)
+        if (allocated(constitutive_info%params)) then
+            call allocate_array(self%params, source=constitutive_info%params)
         end if
 
         self%water => water
@@ -31,27 +31,27 @@ contains
         self%initialized = .true.
     end subroutine initialize_abst_thc
 
-    module subroutine initialize_holder_thcs(self, material_id, physics_info, water, ice)
+    module subroutine initialize_holder_thcs(self, material_id, constitutive_info, water, ice)
         implicit none
         class(holder_thcs), intent(inout) :: self
         integer(int32), intent(in) :: material_id
-        type(type_physics_info), intent(in) :: physics_info
+        type(type_constitutive_info), intent(in) :: constitutive_info
         type(type_iapws97), intent(in), target :: water
         type(type_iapws06), intent(in), target :: ice
 
-        select case (physics_info%num_phases)
+        select case (constitutive_info%num_phases)
         case (1)
             allocate (type_thc_1phase :: self%p)
-            call self%p%initialize(material_id, physics_info, water, ice)
+            call self%p%initialize(material_id, constitutive_info, water, ice)
         case (2)
             allocate (type_thc_2phase :: self%p)
-            call self%p%initialize(material_id, physics_info, water, ice)
+            call self%p%initialize(material_id, constitutive_info, water, ice)
         case (3)
             allocate (type_thc_3phase :: self%p)
-            call self%p%initialize(material_id, physics_info, water, ice)
+            call self%p%initialize(material_id, constitutive_info, water, ice)
         case (4)
             allocate (type_thc_4phase :: self%p)
-            call self%p%initialize(material_id, physics_info, water, ice)
+            call self%p%initialize(material_id, constitutive_info, water, ice)
         end select
 
     end subroutine initialize_holder_thcs

@@ -9,7 +9,7 @@ module system_residual_vector
     use :: module_core
     use :: module_domain, only:type_domain
     use :: module_linalg
-    use :: core_types_vector
+    ! use :: core_types_vector
     implicit none
     private
 

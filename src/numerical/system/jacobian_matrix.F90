@@ -4,7 +4,7 @@ module system_jacobian_matrix
     use :: module_core
     use :: module_domain, only:type_domain
     use :: module_linalg
-    use :: core_types_matrix_factory
+    ! use :: core_types_matrix_factory
     implicit none
     private
 

@@ -1,9 +1,9 @@
-module physics_materials_thermal_conductivity
+module constitutive_materials_thermal_conductivity
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
-    use :: module_core, only:type_state, type_physics_info, allocate_array, type_coordinate_dp
-    use :: physics_constants, only:TtoK => celsius_to_kelvin
-    use :: physics_materials_base, only:abst_material
+    use :: module_core, only:type_state, type_constitutive_info, allocate_array, type_coordinate_dp
+    use :: constitutive_constants, only:TtoK => celsius_to_kelvin
+    use :: constitutive_materials_base, only:abst_material
     implicit none
     private
 
@@ -22,11 +22,11 @@ module physics_materials_thermal_conductivity
     end type holder_thcs
 
     interface
-        module subroutine initialize_holder_thcs(self, material_id, physics_info, water, ice)
+        module subroutine initialize_holder_thcs(self, material_id, constitutive_info, water, ice)
             implicit none
             class(holder_thcs), intent(inout) :: self
             integer(int32), intent(in) :: material_id
-            type(type_physics_info), intent(in) :: physics_info
+            type(type_constitutive_info), intent(in) :: constitutive_info
             type(type_iapws97), intent(in), target :: water
             type(type_iapws06), intent(in), target :: ice
 
@@ -84,12 +84,12 @@ module physics_materials_thermal_conductivity
     end interface
 
     interface
-        module subroutine initialize_abst_thc(self, material_id, physics_info, water, ice)
-            import :: abst_thc, type_physics_info, type_iapws97, type_iapws06, int32
+        module subroutine initialize_abst_thc(self, material_id, constitutive_info, water, ice)
+            import :: abst_thc, type_constitutive_info, type_iapws97, type_iapws06, int32
             implicit none
             class(abst_thc), intent(inout) :: self
             integer(int32), intent(in) :: material_id
-            type(type_physics_info), intent(in) :: physics_info
+            type(type_constitutive_info), intent(in) :: constitutive_info
             type(type_iapws97), intent(in), target :: water
             type(type_iapws06), intent(in), target :: ice
 
@@ -258,4 +258,4 @@ module physics_materials_thermal_conductivity
         end subroutine calc_lambda_dispersivity_abst_thc
     end interface
 
-end module physics_materials_thermal_conductivity
+end module constitutive_materials_thermal_conductivity
