@@ -8,43 +8,52 @@ add_library(SOLVER_INPUT STATIC)
 # ------------------------------------------------------------
 target_sources(SOLVER_INPUT
     PRIVATE
-        input_base.F90
+    # ----------------------------
+    # Reader layer
+    # ----------------------------
+    reader/input_base.F90
 
-        # --- Basic ---
-        basic/basic_base.F90
-        basic/basic_interface.F90
-        basic/basic_simulation_setting.F90
-        basic/basic_analysis_controls.F90
-        basic/basic_geometry_settings.F90
-        basic/basic_materials.F90
-        basic/basic_solver_settings.F90
+    # --- Basic ---
+    reader/basic/basic_base.F90
+    reader/basic/basic_interface.F90
+    reader/basic/basic_simulation_setting.F90
+    reader/basic/basic_analysis_controls.F90
+    reader/basic/basic_geometry_settings.F90
+    reader/basic/basic_materials.F90
+    reader/basic/basic_solver_settings.F90
 
-        # --- Conditions ---
-        conditions/conditions_base.F90
-        conditions/conditions_interface.F90
-        conditions/conditions_time_controls.F90
-        conditions/conditions_boundary.F90
-        conditions/conditions_initial.F90
+    # --- Conditions ---
+    reader/conditions/conditions_base.F90
+    reader/conditions/conditions_interface.F90
+    reader/conditions/conditions_time_controls.F90
+    reader/conditions/conditions_boundary.F90
+    reader/conditions/conditions_initial.F90
 
-        # --- Output ---
-        output/output_interface.F90
-        output/output_fields.F90
-        output/output_history.F90
-        output/output_standard.F90
+    # --- Output ---
+    reader/output/output_interface.F90
+    reader/output/output_fields.F90
+    reader/output/output_history.F90
+    reader/output/output_standard.F90
 
-        # --- Geometry ---
-        geometry/geometry_base.F90
-        geometry/geometry_interface.F90
+    # --- Geometry ---
+    reader/geometry/geometry_base.F90
+    reader/geometry/geometry_interface.F90
 
-        # --- Translator ---
-        input_interface.F90
-        translator/translator_interface.F90
-        translator/translator_basic.F90
-        translator/translator_conditions.F90
-        translator/translator_output.F90
+    # Input manager
+    reader/input_manager.F90
 
-        # --- Entry ---
-        input.F90
+    # ----------------------------
+    # Translator layer
+    # ----------------------------
+    translator/translator_interface.F90
+    translator/translator_basic.F90
+    translator/translator_conditions.F90
+    translator/translator_output.F90
+
+    # ----------------------------
+    # Entry point
+    # ----------------------------
+    input.F90
 )
 
 # ------------------------------------------------------------
