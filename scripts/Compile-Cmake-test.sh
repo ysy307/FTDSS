@@ -16,4 +16,4 @@ cmake -S . -B CMakeBuild \
     -DMKL_SYCL_LINK=OFF \
     -G "Ninja"
 
-cmake --build CMakeBuild --target test_${TARGET_TEST} --verbose
+cmake --build CMakeBuild --target test_${TARGET_TEST} --parallel --verbose
