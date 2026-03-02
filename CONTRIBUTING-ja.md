@@ -23,7 +23,7 @@
 * プロジェクト内のモジュールを読み込みます．
 * 今のファイルが帰属しているフォルダ以外からのmoduleを読み込みます．そのあとに自分の帰属しているフォルダから使うモジュールを読み込みます．
   * 例：今の編集ファイル `src/domain/element_factory.F90` では，別のフォルダ以下で実装している `module_core` を先に読み込んで，その後に `domain/*` でつかうmoduleを読み込みます．
-
+  
 ---
 
 ## 2. 命名規則 📜
@@ -131,15 +131,15 @@
 
 ### 6.2. メソッドの分類と定義
 
-| カテゴリ | 役割 | 引数 (`self`) | 戻り値 | 命名例 |
-| --- | --- | --- | --- | --- |
-| **Lifecycle** | インスタンスの生成・破棄・再初期化 | `intent(inout)` | なし | `initialize`, `destroy`, `reset` |
-| **Mutator** | 内部状態（成分）の変更 | `intent(inout)` | なし | `set_*`, `increment_*`, `update_*` |
-| **Algorithm** | 主要な計算処理・演算の実行 | `intent(inout/in)` | 任意 | `compute_*`, `check_*`, `solve_*` |
-| **Inquiry** | 内部状態の論理判定（副作用なし） | `intent(in)` | `logical` | `is_*`, `has_*`, `should_*` |
-| **Getter** | 内部データの参照（副作用なし） | `intent(in)` | 値 または ポインタ | `get_*` |
-| **Meta / Utility** | デバッグ・情報取得・文字列整形 | `intent(in)` | 任意 | `display`, `to_string` |
-| **Operator** | 演算子のオーバーロード | `intent(inout/in)` | 任意 | `operator(+)`, `assignment(=)` |
+| カテゴリ           | 役割                               | 引数 (`self`)      | 戻り値             | 命名例                             |
+|--------------------|------------------------------------|--------------------|--------------------|------------------------------------|
+| **Lifecycle**      | インスタンスの生成・破棄・再初期化 | `intent(inout)`    | なし               | `initialize`, `destroy`, `reset`   |
+| **Mutator**        | 内部状態（成分）の変更             | `intent(inout)`    | なし               | `set_*`, `increment_*`, `update_*` |
+| **Algorithm**      | 主要な計算処理・演算の実行         | `intent(inout/in)` | 任意               | `compute_*`, `check_*`, `solve_*`  |
+| **Inquiry**        | 内部状態の論理判定（副作用なし）   | `intent(in)`       | `logical`          | `is_*`, `has_*`, `should_*`        |
+| **Getter**         | 内部データの参照（副作用なし）     | `intent(in)`       | 値 または ポインタ | `get_*`                            |
+| **Meta / Utility** | デバッグ・情報取得・文字列整形     | `intent(in)`       | 任意               | `display`, `to_string`             |
+| **Operator**       | 演算子のオーバーロード             | `intent(inout/in)` | 任意               | `operator(+)`, `assignment(=)`     |
 
 ---
 

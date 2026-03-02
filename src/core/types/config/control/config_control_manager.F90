@@ -1,8 +1,8 @@
-module core_types_config_control_manager
+module types_config_control_manager
     use, intrinsic :: iso_fortran_env
     use :: core_memory, only:deallocate_array
     use :: core_constants, only:type_constant_id, type_constant_value
-    use :: core_types_config_base, only:abst_config
+    use :: types_config_base, only:abst_config
     implicit none
     private
 
@@ -45,4 +45,4 @@ contains
         self%coupling_mode = type_constant_id("", "", -1)
     end subroutine reset_config_control_manager
 
-end module core_types_config_control_manager
+end module types_config_control_manager

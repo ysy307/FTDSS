@@ -1,7 +1,7 @@
-module core_types_config_physics_base
+module types_config_physics_base
     use, intrinsic :: iso_fortran_env
     use :: core_constants, only:ERROR_CODES
-    use :: core_types_config_base, only:abst_config
+    use :: types_config_base, only:abst_config
     implicit none
     private
 
@@ -60,4 +60,4 @@ contains
         self%material_id = 0
         self%num_phases = 0
     end subroutine reset_config_physics_material
-end module core_types_config_physics_base
+end module types_config_physics_base

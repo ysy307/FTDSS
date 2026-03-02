@@ -18,15 +18,17 @@ target_sources(SOLVER_DOMAIN
         fe/base/fe_compute.F90
         fe/base/fe_coefficients.F90
 
+        fe/side/side_interface.F90
+        fe/side/side_first.F90
+        fe/side/side_second.F90
+
         fe/element/element_interface.F90
         fe/element/element_triangle_first.F90
         fe/element/element_triangle_second.F90
         fe/element/element_square_first.F90
         fe/element/element_square_second.F90
 
-        fe/side/side_interface.F90
-        fe/side/side_first.F90
-        fe/side/side_second.F90
+        fe/volume/volume_interface.F90
 
         fe/fe_factory.F90
         fe/fe_manager.F90
@@ -68,11 +70,10 @@ target_link_libraries(SOLVER_DOMAIN
         SOLVER::LINALG
         SOLVER::INPUT
         SOLVER::CONTROL
-        # SOLVER::CONDITION
 )
 
 enable_build_flags(SOLVER_DOMAIN)
-enable_thirdparty(SOLVER_DOMAIN)
+enable_thirdparty (SOLVER_DOMAIN)
 
 # ------------------------------------------------------------
 # Namespaced alias

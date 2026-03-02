@@ -2,7 +2,7 @@
 !> Defines derived types for handling single 3D coordinates, supporting both
 !> double precision real and integer components.
 !>
-module core_types_coordinate
+module types_geometry_coordinate
     use, intrinsic :: iso_fortran_env
     use :: stdlib_optval, only:optval
     use :: stdlib_strings, only:strip
@@ -201,4 +201,4 @@ contains
             strip(label), " :(", self%x, ", ", self%y, ", ", self%z, ") "
     end subroutine display_coordinate_int
 
-end module core_types_coordinate
+end module types_geometry_coordinate

@@ -1,6 +1,6 @@
-module module_type_matrix
-    use :: core_types_matrix
-    use :: core_types_matrix_factory
+module core_types_matrix
+    use :: types_algebra_matrix
+    use :: types_algebra_matrix_factory
     implicit none
     private
 
@@ -14,4 +14,4 @@ module module_type_matrix
     public :: type_matrix_info
     public :: create_matrix
 
-end module module_type_matrix
+end module core_types_matrix

@@ -1,13 +1,13 @@
-module core_types_vector
+module types_algebra_vector
     use, intrinsic :: iso_fortran_env
 !$  use :: omp_lib
     use :: stdlib_optval, only:optval
     use :: core_constants
     use :: core_check_length, only:check_match_length
     use :: core_check_range, only:value_in_range
-    use :: core_allocate, only:allocate_array
-    use :: core_deallocate, only:deallocate_array
+    use :: core_memory, only:allocate_array, deallocate_array
     implicit none
+    private
 
     public :: type_vector_dp
     public :: type_vector_int
@@ -272,4 +272,4 @@ module core_types_vector
 
     end interface
 
-end module core_types_vector
+end module types_algebra_vector

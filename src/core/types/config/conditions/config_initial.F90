@@ -1,8 +1,8 @@
-module core_types_config_conditions_initial
+module types_config_conditions_initial
     use, intrinsic :: iso_fortran_env
     use :: core_memory, only:allocate_array, deallocate_array
     use :: core_constants, only:type_constant_id
-    use :: core_types_config_base, only:abst_config
+    use :: types_config_base, only:abst_config
     implicit none
     private
 
@@ -50,4 +50,4 @@ contains
 
     end subroutine reset_config_ic
 
-end module core_types_config_conditions_initial
+end module types_config_conditions_initial

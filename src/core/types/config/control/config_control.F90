@@ -1,18 +1,18 @@
-module core_types_config_control
-    use :: core_types_config_control_acceleration, only: &
+module types_config_control
+    use :: types_config_control_acceleration, only: &
         type_config_acceleration
-    use :: core_types_config_control_output_manager, only: &
+    use :: types_config_control_output_manager, only: &
         type_config_output_manager
-    use :: core_types_config_control_time, only: &
+    use :: types_config_control_time, only: &
         type_config_time, &
         type_config_time_ats
-    use :: core_types_config_control_iteration, only: &
+    use :: types_config_control_iteration, only: &
         type_config_iteration, &
         type_config_iteration_nonlinear, &
         type_config_iteration_criterion
-    use :: core_types_config_control_parallel, only: &
+    use :: types_config_control_parallel, only: &
         type_config_parallel_openmp
-    use :: core_types_config_control_manager, only: &
+    use :: types_config_control_manager, only: &
         type_config_control_manager
     implicit none
     private
@@ -31,4 +31,4 @@ module core_types_config_control
 
     public :: type_config_control_manager
 
-end module core_types_config_control
+end module types_config_control

@@ -74,20 +74,25 @@ target_sources(SOLVER_CORE PRIVATE
 # Types
 # ------------------------------------------------------------
 set(CORE_TYPES_FYPP
-    types/variable.fypp
+    types/physics/variable.fypp
 )
 fypp_F90("" "${CORE_TYPES_FYPP}" CORE_TYPES_GENERATED)
 
 target_sources(SOLVER_CORE PRIVATE
-    types/types.F90
-    types/coordinate_array.F90
-    types/coordinate.F90
-    types/pointer.F90
-    types/graph.F90
-    types/datetime.F90
-    types/solar.F90
-    types/physics/state.F90
-    types/physics/meteorology.F90
+    # Algebla
+    types/algebra/matrix/matrix_interface.F90
+    types/algebra/matrix/matrix_dense.F90
+    types/algebra/matrix/matrix_coo.F90
+    types/algebra/matrix/matrix_csr.F90
+    types/algebra/matrix/matrix_bsr.F90
+    types/algebra/matrix/matrix_dia.F90
+    types/algebra/matrix/matrix_factory.F90
+    types/algebra/matrix/matrix.F90
+    types/algebra/vector/vector_interface.F90
+    types/algebra/vector/vector_dp.F90
+    types/algebra/vector/vector_int.F90
+    types/algebra/vector/vector.F90
+    # Config
     types/config/config_base.F90
     types/config/conditions/config_boundary.F90
     types/config/conditions/config_initial.F90
@@ -104,19 +109,23 @@ target_sources(SOLVER_CORE PRIVATE
     types/config/control/config_time.F90
     types/config/control/config_parallel.F90
     types/config/control/config_control_manager.F90
-    types/math/gauss.F90
-    types/matrix/matrix_interface.F90
-    types/matrix/matrix_dense.F90
-    types/matrix/matrix_coo.F90
-    types/matrix/matrix_csr.F90
-    types/matrix/matrix_bsr.F90
-    types/matrix/matrix_dia.F90
-    types/matrix/matrix_factory.F90
-    types/matrix/matrix.F90
-    types/vector/vector_interface.F90
-    types/vector/vector_dp.F90
-    types/vector/vector_int.F90
-    types/vector/vector.F90
+    # Discritization
+    types/discretization/dof_map.F90
+    # geometry
+    types/geometry/coordinate_array.F90
+    types/geometry/coordinate.F90
+    # Physics
+    types/physics/meteorology.F90
+    types/physics/solar.F90
+    types/physics/state.F90
+    # Topology
+    types/topology/connectivity.F90
+    types/topology/graph.F90
+    # Utils
+    types/utils/datetime.F90
+    # Core
+    types/types.F90
+    
     ${CORE_TYPES_GENERATED}
 )
 

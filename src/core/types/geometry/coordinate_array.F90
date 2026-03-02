@@ -2,10 +2,10 @@
 !> Defines derived types for handling arrays of 3D coordinates, supporting
 !> both double precision real and integer components.
 !>
-module core_types_coordinate_array
+module types_geometry_coordinate_array
     use, intrinsic :: iso_fortran_env, only: real64, int32
     use :: core_memory
-    use :: core_types_coordinate, only:type_coordinate_dp, type_coordinate_int
+    use :: types_geometry_coordinate, only:type_coordinate_dp, type_coordinate_int
     implicit none
     private
 
@@ -293,4 +293,4 @@ contains
             call coordinate%set(0, 0, 0)
         end if
     end subroutine get_coordinate_type_coordinate_array_int
-end module core_types_coordinate_array
+end module types_geometry_coordinate_array

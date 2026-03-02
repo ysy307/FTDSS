@@ -1,8 +1,8 @@
-module core_types_config_physics_constitutive
+module types_config_physics_constitutive
     use, intrinsic :: iso_fortran_env
     use :: core_constants, only:type_constant_id
-    use :: core_types_config_base, only:abst_config
-    use :: core_types_config_physics_base, only:abst_config_physics_material
+    use :: types_config_base, only:abst_config
+    use :: types_config_physics_base, only:abst_config_physics_material
     implicit none
     private
 
@@ -54,4 +54,4 @@ contains
 
     end subroutine reset_config_constitutive
 
-end module core_types_config_physics_constitutive
+end module types_config_physics_constitutive

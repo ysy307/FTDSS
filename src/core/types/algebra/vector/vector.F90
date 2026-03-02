@@ -1,9 +1,9 @@
-module module_type_vector
-    use :: core_types_vector
+module core_types_vector
+    use :: types_algebra_vector
     implicit none
     private
 
     public :: type_vector_dp
     public :: type_vector_int
 
-end module module_type_vector
+end module core_types_vector

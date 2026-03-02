@@ -1,7 +1,7 @@
 !>
 !> Implements the procedures for a Diagonal (DIA) storage sparse matrix.
 !>
-submodule(core_types_matrix) core_types_matrix_dia
+submodule(types_algebra_matrix) algebra_matrix_dia
     implicit none
 
 contains
@@ -383,4 +383,4 @@ contains
         end do
     end subroutine display_dia
 
-end submodule core_types_matrix_dia
+end submodule algebra_matrix_dia

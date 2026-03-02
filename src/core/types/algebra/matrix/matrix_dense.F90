@@ -1,7 +1,7 @@
 !>
 !> Implements the procedures for the dense matrix type.
 !>
-submodule(core_types_matrix) core_types_matrix_dense
+submodule(types_algebra_matrix) algebra_matrix_dense
     implicit none
 
 contains
@@ -329,4 +329,4 @@ contains
         end do
     end subroutine display_dense
 
-end submodule core_types_matrix_dense
+end submodule algebra_matrix_dense

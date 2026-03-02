@@ -1,7 +1,7 @@
-module core_types_config_control_acceleration
+module types_config_control_acceleration
     use, intrinsic :: iso_fortran_env
     use :: core_constants, only:type_constant_id
-    use :: core_types_config_base, only:abst_config
+    use :: types_config_base, only:abst_config
     implicit none
     private
 
@@ -46,4 +46,4 @@ contains
         self%num_dofs = -1
     end subroutine reset_config_acceleration
 
-end module core_types_config_control_acceleration
+end module types_config_control_acceleration

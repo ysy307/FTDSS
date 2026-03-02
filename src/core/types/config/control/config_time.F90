@@ -1,7 +1,7 @@
-module core_types_config_control_time
+module types_config_control_time
     use, intrinsic :: iso_fortran_env
     use :: core_constants, only:type_constant_value
-    use :: core_types_config_base, only:abst_config
+    use :: types_config_base, only:abst_config
     implicit none
     private
 
@@ -118,4 +118,4 @@ contains
         self%dt_max = 1.0d+2
     end subroutine reset_config_time_ats
 
-end module core_types_config_control_time
+end module types_config_control_time

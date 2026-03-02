@@ -1,8 +1,8 @@
-module core_types_config_physics_swcc
+module types_config_physics_swcc
     use, intrinsic :: iso_fortran_env
     use :: core_constants, only:type_constant_id
-    use :: core_types_config_base, only:abst_config
-    use :: core_types_config_physics_base, only:abst_config_physics_model
+    use :: types_config_base, only:abst_config
+    use :: types_config_physics_base, only:abst_config_physics_model
     implicit none
     private
 
@@ -148,4 +148,4 @@ contains
         self%gain_factor = 0.0d0
     end subroutine reset_config_hcf
 
-end module core_types_config_physics_swcc
+end module types_config_physics_swcc

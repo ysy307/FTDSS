@@ -1,7 +1,7 @@
-module core_types_config_control_iteration
+module types_config_control_iteration
     use, intrinsic :: iso_fortran_env
     use :: core_constants, only:type_constant_id, PHYSICS_TYPES
-    use :: core_types_config_base, only:abst_config
+    use :: types_config_base, only:abst_config
     implicit none
     private
 
@@ -132,4 +132,4 @@ contains
         call self%nonlinear%reset()
     end subroutine reset_config_iteration
 
-end module core_types_config_control_iteration
+end module types_config_control_iteration

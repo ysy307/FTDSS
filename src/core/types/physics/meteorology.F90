@@ -1,9 +1,9 @@
-module core_types_physics_meteorology
+module types_physics_meteorology
     use, intrinsic :: iso_fortran_env
     use :: stdlib_optval, only:optval
     use :: core_constants, only:TIME_UNITS
     use :: core_memory, only:allocate_array, deallocate_array
-    use :: core_types_datetime, only:type_datetime
+    use :: types_utils_datetime, only:type_datetime
 
     implicit none
     private
@@ -245,4 +245,4 @@ contains
 
     end subroutine import_meteorology_data
 
-end module core_types_physics_meteorology
+end module types_physics_meteorology

@@ -1,8 +1,8 @@
-module core_types_physics_state
+module types_physics_state
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: core_types_coordinate, only:type_coordinate_dp
     use :: core_allocate, only:allocate_array
     use :: core_deallocate, only:deallocate_array
+    use :: types_geometry_coordinate, only:type_coordinate_dp
     implicit none
     private
 
@@ -532,4 +532,4 @@ contains
 
     end subroutine copy_state
 
-end module core_types_physics_state
+end module types_physics_state

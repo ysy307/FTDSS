@@ -10,7 +10,7 @@ module domain_manager
     use :: module_input, only:type_input, input_translator
     use :: module_control, only:type_control
     use :: module_fe, only:type_fe_manager, abst_fe
-    use :: module_boundary
+    ! use :: module_boundary
     use :: domain_multicoloring, only:type_coloring
     use :: domain_adjacency, only:type_node_adjacency, type_map_node_to_element
 
@@ -19,18 +19,18 @@ module domain_manager
 
     public :: type_domain
 
-    !>
-    !> Stores element connectivity in Compressed Sparse Row (CSR) format.
-    !>
-    type :: type_fe_connectivity
-        !> Index array for CSR format. Stores the starting position of each element's nodes in 'val'.
-        !> Size is (num_elements + 1).
-        integer(int32), allocatable :: ind(:)
-        !> Value array for CSR format. Stores the concatenated node IDs for all elements.
-        integer(int32), allocatable :: val(:)
-    contains
-        procedure, public, pass(self) :: display => display_connectivity
-    end type type_fe_connectivity
+    ! !>
+    ! !> Stores element connectivity in Compressed Sparse Row (CSR) format.
+    ! !>
+    ! type :: type_csr_index
+    !     !> Index array for CSR format. Stores the starting position of each element's nodes in 'val'.
+    !     !> Size is (num_elements + 1).
+    !     integer(int32), allocatable :: ind(:)
+    !     !> Value array for CSR format. Stores the concatenated node IDs for all elements.
+    !     integer(int32), allocatable :: val(:)
+    ! contains
+    !     procedure, public, pass(self) :: display => display_connectivity
+    ! end type type_csr_index
 
     !>
     !> Represents a single, unique boundary condition applied to a set of geometric entities.
@@ -45,7 +45,7 @@ module domain_manager
         !> Manager for FE type-specific operations (shape functions, etc.).
         type(type_fe_manager) :: fe_manager
         !> Connectivity data for the elements in this BC set.
-        type(type_fe_connectivity) :: connectivity
+        type(type_csr_index) :: connectivity
         !> The polymorphic boundary condition logic.
         class(abst_bc), allocatable :: condition
     contains
@@ -71,7 +71,7 @@ module domain_manager
         !> Pointer to the parent domain object.
         type(type_domain), pointer, private :: parent => null()
         !> Array of BC managers, one for each physics type.
-        type(type_physics_bc_manager) :: physics(NUM_PHYSICS_TYPES)
+        type(type_physics_bc_manager) :: physics(PHYSICS_TYPES%NUM_ID)
     contains
         procedure, public, pass(self) :: initialize => initialize_boundary_manager
         procedure, private, pass(self) :: process_single_physics_bcs
@@ -90,9 +90,9 @@ module domain_manager
         !> Total number of degrees of freedom per node for the active physics.
         integer(int32) :: num_dof_per_node = 0
         !> Number of DOFs for each individual physics type.
-        integer(int32) :: num_dof_of_physics(NUM_PHYSICS_TYPES) = 0
+        integer(int32) :: num_dof_of_physics(PHYSICS_TYPES%NUM_ID) = 0
         !> The starting index for each physics' DOFs within the block of DOFs for a single node.
-        integer(int32) :: start_dof_index(NUM_PHYSICS_TYPES) = 0
+        integer(int32) :: start_dof_index(PHYSICS_TYPES%NUM_ID) = 0
     contains
         procedure, public, pass(self) :: display => display_dof_map
     end type type_dof_map
@@ -129,7 +129,7 @@ module domain_manager
         !> Manager for FE type-specific operations.
         type(type_fe_manager) :: fe_manager
         !> Connectivity data for all elements.
-        type(type_fe_connectivity) :: connectivity
+        type(type_csr_index) :: connectivity
         !> Coloring information for parallel element processing.
         type(type_coloring) :: colors
     contains
@@ -905,14 +905,7 @@ contains
         call self%boundaries%display()
     end subroutine display_domain
 
-    subroutine display_dof_map(self)
-        implicit none
-        class(type_dof_map), intent(in) :: self
-        write (*, '(A)') '### DOF Map'
-        write (*, '(A)')
-        write (*, '(A, I0)') '  - **Total DOFs per Node**: ', self%num_dof_per_node
-        write (*, '(A)')
-    end subroutine display_dof_map
+
 
     subroutine display_node_manager(self)
         implicit none
@@ -940,7 +933,7 @@ contains
         character(len=20) :: physics_name
 
         write (*, '(A)') '### Boundary Manager'
-        do i = 1, NUM_PHYSICS_TYPES
+        do i = 1, PHYSICS_TYPES%NUM_ID
             if (self%physics(i)%num_bcs > 0) then
                 select case (i)
                 case (PHYSICS_TYPE_THERMAL); physics_name = 'Thermal'
@@ -975,7 +968,7 @@ contains
 
     subroutine display_connectivity(self, title)
         implicit none
-        class(type_fe_connectivity), intent(in) :: self
+        class(type_csr_index), intent(in) :: self
         character(len=*), intent(in) :: title
         write (*, '(A,A,A)') '        - **Connectivity (', strip(title), ')**:'
         if (allocated(self%ind)) then
