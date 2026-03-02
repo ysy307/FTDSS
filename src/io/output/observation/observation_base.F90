@@ -3,179 +3,143 @@ submodule(io_output_observation) output_observation_base
 
 contains
 
-    module subroutine initialize_type_output_observation(self, input, domain, dir_output, variable_name)
+    module subroutine initialize_type_output_observation(self, input, domain, dir_output, variable_type)
         implicit none
         class(type_output_observation), intent(inout) :: self
         type(type_input), intent(in) :: input
         type(type_domain), intent(inout) :: domain
         character(*), intent(in) :: dir_output
-        character(*), intent(in) :: variable_name
+        type(type_constant_id), intent(in) :: variable_type
 
-        integer(int32) :: iObs, iElem, num_elements
-        integer(int32) :: elem_id, comp_dim, calc_type
-        type(type_coordinate_dp) :: cartesian, normalized
-        logical :: inside
+        !     integer(int32) :: iObs, iElem, num_elements
+        !     integer(int32) :: elem_id, comp_dim, calc_type
+        !     type(type_coordinate_dp) :: cartesian, normalized
+        !     logical :: inside
 
-        class(abst_fe), pointer :: fe
-        integer(int32), pointer, contiguous :: conn(:)
-        real(real64), allocatable :: ele_coords(:, :)
+        !     class(abst_fe), pointer :: fe
+        !     integer(int32), pointer, contiguous :: conn(:)
+        !     real(real64), allocatable :: ele_coords(:, :)
 
-        ! --- 設定の取得 ---
-        self%type = input%output_settings%history_output%observation_type
+        type(type_constant_value) :: file_format
 
-        if (trim(self%type) == "none") then
-            self%do_output = .false.
-            return
-        else
-            self%do_output = .true.
-        end if
+        !     ! --- 設定の取得 ---
+        !     self%variable_type = input%output_settings%history_output%observation_type
 
-        self%num_observations = input%output_settings%history_output%num_observations
+        !     if (self%variable_type == OUTPUT_OBSERVATION_TYPES%NONE) then
+        !         self%do_output = .false.
+        !         return
+        !     else
+        !         self%do_output = .true.
+        !     end if
+        !     ! --- デリミタとフォーマット文字列の設定 ---
+        !     select case (file_format%ID)
+        !     case (FILE_FORMATS%CSV%ID)
+        !         self%delimiter = ","
+        !     case (FILE_FORMATS%DAT%ID)
+        !         self%delimiter = "  "
+        !     case default
+        !         self%delimiter = "  "
+        !     end select
 
-        select case (trim(self%type))
-        case ("node_ids")
-            if (allocated(self%node_ids)) deallocate (self%node_ids)
-            allocate (self%node_ids, source=input%output_settings%history_output%node_ids)
+        !     self%fmt_line = '(*(es22.15,:,"'//self%delimiter//'"))'
 
-        case ("coordinates")
-            call self%coordinate%initialize(self%num_observations)
-            do iObs = 1, self%num_observations
-                self%coordinate%x(iObs) = input%output_settings%history_output%coordinates(iObs)%x
-                self%coordinate%y(iObs) = input%output_settings%history_output%coordinates(iObs)%y
-                self%coordinate%z(iObs) = input%output_settings%history_output%coordinates(iObs)%z
-            end do
+        !     self%self%num_observations = input%output_settings%history_output%self%num_observations
 
-            ! 要素ID保存用配列の確保
-            if (allocated(self%element_ids)) deallocate (self%element_ids)
-            allocate (self%element_ids(self%num_observations))
-            self%element_ids = -1
+        !     select case (trim(self%type))
+        !     case ("node_ids")
+        !         if (allocated(self%node_ids)) deallocate (self%node_ids)
+        !         allocate (self%node_ids, source=input%output_settings%history_output%node_ids)
 
-            if (allocated(self%coordinate_normalized)) deallocate (self%coordinate_normalized)
-            allocate (self%coordinate_normalized(self%num_observations))
+        !     case ("coordinates")
+        !         call self%coordinate%initialize(self%self%num_observations)
+        !         do iObs = 1, self%self%num_observations
+        !             self%coordinate%x(iObs) = input%output_settings%history_output%coordinates(iObs)%x
+        !             self%coordinate%y(iObs) = input%output_settings%history_output%coordinates(iObs)%y
+        !             self%coordinate%z(iObs) = input%output_settings%history_output%coordinates(iObs)%z
+        !         end do
 
-            ! --- 座標探索ロジック ---
-            call domain%get_num_fe(num_elements)
-            call domain%get_computation_dimension(comp_dim)
-            calc_type = input%basic%simulation_settings%calculate_type
+        !         ! 要素ID保存用配列の確保
+        !         if (allocated(self%element_ids)) deallocate (self%element_ids)
+        !         allocate (self%element_ids(self%self%num_observations))
+        !         self%element_ids = -1
 
-            do iObs = 1, self%num_observations
-                ! 観測点座標セット (探索点)
-                if (comp_dim == 2) then
-                    if (calc_type == 1) then ! XY (2D)
-                        call cartesian%set(self%coordinate%x(iObs), self%coordinate%y(iObs), 0.0d0)
-                    else ! XZ (2D)
-                        ! XZ平面の場合、Y成分にZ座標を入れて2D探索を行う (domain側の格納形式に合わせる)
-                        call cartesian%set(self%coordinate%x(iObs), self%coordinate%z(iObs), 0.0d0)
-                    end if
-                else ! 3D
-                    call cartesian%set(self%coordinate%x(iObs), self%coordinate%y(iObs), self%coordinate%z(iObs))
-                end if
+        !         if (allocated(self%coordinate_normalized)) deallocate (self%coordinate_normalized)
+        !         allocate (self%coordinate_normalized(self%self%num_observations))
 
-                do iElem = 1, num_elements
-                    call domain%get_fe(iElem, fe)
-                    if (.not. associated(fe)) cycle
-                    call domain%get_fe_connectivity(iElem, conn)
-                    if (.not. associated(conn)) cycle
-                    call domain%get_fe_coordinate(iElem, ele_coords)
+        !         ! --- 座標探索ロジック ---
+        !         call domain%get_num_fe(num_elements)
+        !         call domain%get_computation_dimension(comp_dim)
+        !         calc_type = input%basic%simulation_settings%calculate_type
 
-                    ! 包含判定
-                    call fe%is_inside(cartesian, normalized, ele_coords, inside)
+        !         do iObs = 1, self%self%num_observations
+        !             ! 観測点座標セット (探索点)
+        !             if (comp_dim == 2) then
+        !                 if (calc_type == 1) then ! XY (2D)
+        !                     call cartesian%set(self%coordinate%x(iObs), self%coordinate%y(iObs), 0.0d0)
+        !                 else ! XZ (2D)
+        !                     ! XZ平面の場合、Y成分にZ座標を入れて2D探索を行う (domain側の格納形式に合わせる)
+        !                     call cartesian%set(self%coordinate%x(iObs), self%coordinate%z(iObs), 0.0d0)
+        !                 end if
+        !             else ! 3D
+        !                 call cartesian%set(self%coordinate%x(iObs), self%coordinate%y(iObs), self%coordinate%z(iObs))
+        !             end if
 
-                    if (inside) then
-                        self%element_ids(iObs) = iElem
-                        self%coordinate_normalized(iObs) = normalized
-                        exit
-                    end if
-                end do
+        !             do iElem = 1, num_elements
+        !                 call domain%get_fe(iElem, fe)
+        !                 if (.not. associated(fe)) cycle
+        !                 call domain%get_fe_connectivity(iElem, conn)
+        !                 if (.not. associated(conn)) cycle
+        !                 call domain%get_fe_coordinate(iElem, ele_coords)
 
-                ! デバッグ用: 見つからない場合の警告
-                if (self%element_ids(iObs) == -1) then
-                    print *, "Warning: Observation point ", iObs, " is outside the domain."
-                end if
-            end do
-        end select
+        !                 ! 包含判定
+        !                 call fe%is_inside(cartesian, normalized, ele_coords, inside)
 
-        if (associated(self%get_values)) nullify (self%get_values)
+        !                 if (inside) then
+        !                     self%element_ids(iObs) = iElem
+        !                     self%coordinate_normalized(iObs) = normalized
+        !                     exit
+        !                 end if
+        !             end do
 
-        select case (strip(variable_name))
-        case ("temperature")
-            self%name = "Temperature"
-            self%unit = "deg C"
-            self%file_name = strip(dir_output//"obsf_T."//strip(input%output_settings%history_output%file_format))
+        !             ! デバッグ用: 見つからない場合の警告
+        !             if (self%element_ids(iObs) == -1) then
+        !                 print *, "Warning: Observation point ", iObs, " is outside the domain."
+        !             end if
+        !         end do
+        !     end select
+
+        !     if (associated(self%get_values)) nullify (self%get_values)
+
+        select case (self%variable_type%ID)
+        case (OUTPUT_VARIABLE_TYPES%TEMPERATURE%ID)
+            self%variable_unit = "deg C"
+            self%file_name = strip(dir_output)//"obsf_T."//strip(file_format%NAME)
             self%io_unit = 99999999
-            select case (trim(self%type))
-            case ("node_ids")
-                self%get_values => get_observations_temperature
-            case ("coordinates")
-                self%get_values => interpolate_observations_temperature
-            end select
-        case ("ice_saturation")
-            self%name = "Ice Saturation"
-            self%unit = "-"
-            self%file_name = strip(dir_output)//"obsf_Si."//strip(input%output_settings%history_output%file_format)
+        case (OUTPUT_VARIABLE_TYPES%WATER_CONTENT%ID)
+            self%variable_unit = "-"
+            self%file_name = strip(dir_output)//"obsf_Si."//strip(file_format%NAME)
             self%io_unit = 99999999
-            select case (trim(self%type))
-            case ("node_ids")
-                self%get_values => get_observations_si
-            case ("coordinates")
-                self%get_values => interpolate_observations_si
-            end select
-        case ("thermal_conductivity")
-            self%name = "Thermal Conductivity"
-            self%unit = "W/m/K"
-            self%file_name = strip(dir_output)//"obsf_TC."//strip(input%output_settings%history_output%file_format)
+        case (OUTPUT_VARIABLE_TYPES%THERMAL_CONDUCTIVITY%ID)
+            self%variable_unit = "W/m/K"
+            self%file_name = strip(dir_output)//"obsf_TC."//strip(file_format%NAME)
             self%io_unit = 99999999
-            select case (trim(self%type))
-            case ("node_ids")
-                self%get_values => get_observations_thc
-            case ("coordinates")
-                self%get_values => interpolate_observations_thc
-            end select
-        case ("volumetric_heat_capacity")
-            self%name = "Volumetric Heat Capacity"
-            self%unit = "J/m3/K"
-            self%file_name = strip(dir_output)//"obsf_C."//strip(input%output_settings%history_output%file_format)
+        case (OUTPUT_VARIABLE_TYPES%VOLUMETRIC_HEAT_CAPACITY%ID)
+            self%variable_unit = "J/m3/K"
+            self%file_name = strip(dir_output)//"obsf_C."//strip(file_format%NAME)
             self%io_unit = 99999999
-            select case (trim(self%type))
-            case ("node_ids")
-                self%get_values => get_observations_vhc
-            case ("coordinates")
-                self%get_values => interpolate_observations_vhc
-            end select
-        case ("pressure")
-            self%name = "Pressure"
-            self%unit = "m"
-            self%file_name = strip(dir_output)//"obsf_P."//strip(input%output_settings%history_output%file_format)
+        case (OUTPUT_VARIABLE_TYPES%PRESSURE%ID)
+            self%variable_unit = "m"
+            self%file_name = strip(dir_output)//"obsf_P."//strip(file_format%NAME)
             self%io_unit = 99999999
-            select case (trim(self%type))
-            case ("node_ids")
-                self%get_values => get_observations_pw
-            case ("coordinates")
-                self%get_values => interpolate_observations_pw
-            end select
-        case ("water_flux")
-            self%name = "Water Flux"
-            self%unit = "m/s"
-            self%file_name = strip(dir_output)//"obsf_Flux."//strip(input%output_settings%history_output%file_format)
+        case (OUTPUT_VARIABLE_TYPES%WATER_FLUX%ID)
+            self%variable_unit = "m/s"
+            self%file_name = strip(dir_output)//"obsf_Flux."//strip(file_format%NAME)
             self%io_unit = 99999999
             self%num_observations = self%num_observations * 3
-        case ("hydraulic_conductivity")
-            self%name = "Hydraulic Conductivity"
-            self%unit = "m/s"
-            self%file_name = strip(dir_output)//"obsf_K."//strip(input%output_settings%history_output%file_format)
+        case (OUTPUT_VARIABLE_TYPES%HYDRAULIC_CONDUCTIVITY%ID)
+            self%variable_unit = "m/s"
+            self%file_name = strip(dir_output)//"obsf_K."//strip(file_format%NAME)
             self%io_unit = 99999999
-        end select
-
-        if (associated(self%write_line)) nullify (self%write_line)
-        if (associated(self%write_header)) nullify (self%write_header)
-
-        select case (strip(input%output_settings%history_output%file_format))
-        case ("dat")
-            self%write_header => write_observation_header_dat
-            self%write_line => output_observation_line_dat
-        case ("csv")
-            self%write_header => write_observation_header_csv
-            self%write_line => output_observation_line_csv
         end select
 
     end subroutine initialize_type_output_observation
@@ -184,347 +148,72 @@ contains
     ! Writer Subroutines
     ! ==============================================================================
 
-    subroutine write_observation_header_dat(self, time_unit)
+    module subroutine write_observation_header(self, output_time_unit)
         implicit none
         class(type_output_observation), intent(inout) :: self
-        integer(int32), intent(in) :: time_unit
+        type(type_constant_id), intent(in) :: output_time_unit
 
-        integer(int32) :: iObs, num_observations, elem_id
+        integer(int32) :: i
 
         if (.not. self%do_output) return
 
-        num_observations = self%num_observations
-
         open (newunit=self%io_unit, file=strip(self%file_name), status='replace', action='write')
 
-        write (self%io_unit, '(a)') "# "//trim(self%name)//" time variation"
+        write (self%io_unit, '(a)') "# "//trim(self%variable_type%NAME)//" time variation"
         write (self%io_unit, '(a)') "#"
 
-        select case (trim(self%type))
-        case ("node_ids")
+        ! --- 観測点の情報出力（ポリモーフィズムを利用） ---
+        select case (self%observation_type%ID)
+        case (OUTPUT_OBSERVATION_TYPES%NODE_IDS%ID)
             write (self%io_unit, '(a)') "# Observation Node ID"
-            do iObs = 1, num_observations
-                write (self%io_unit, '(a,i0,a,1x,i0)') "# Node ID ", iObs, ":", self%node_ids(iObs)
+            do i = 1, self%num_observations
+                select type (p => self%observation_points(i)%point)
+                type is (type_observation_point_node)
+                    write (self%io_unit, '(a,i0,a,1x,i0)') "# Node ID ", i, ":", p%node_id
+                end select
             end do
-        case ("coordinates")
+
+        case (OUTPUT_OBSERVATION_TYPES%COORDINATES%ID)
             write (self%io_unit, '(a)') "# Observation Coordinate (x,y,z)"
-            do iObs = 1, num_observations
-                elem_id = -1
-                if (allocated(self%element_ids)) elem_id = self%element_ids(iObs)
-                write (self%io_unit, '(a,1x,i0,a,3(1x,es18.11,a),a,i0)') &
-                    "#    Point", iObs, ": (", &
-                    self%coordinate%x(iObs), ",", &
-                    self%coordinate%y(iObs), ",", &
-                    self%coordinate%z(iObs), ")", &
-                    " => Element ID: ", elem_id
+            do i = 1, self%num_observations
+                select type (p => self%observation_points(i)%point)
+                type is (type_observation_point_coordinate)
+                    write (self%io_unit, '(a,1x,i0,a,3(1x,es18.11,a),a,i0)') &
+                        "#    Point", i, ": (", &
+                        p%coordinate%x, ",", &
+                        p%coordinate%y, ",", &
+                        p%coordinate%z, ")", &
+                        " => Element ID: ", p%element_id
+                end select
             end do
         end select
 
         write (self%io_unit, '(a)') "#"
-        write (self%io_unit, '(a)') "# Output Unit: Time ["//trim(TIME_UNITS%to_name(time_unit))//"], " &
-            //trim(self%name)//" ["//trim(self%unit)//"]"
+        write (self%io_unit, '(a)') "# Output Unit: Time ["//trim(output_time_unit%NAME)//"], " &
+            //trim(self%variable_type%NAME)//" ["//trim(self%variable_unit)//"]"
         write (self%io_unit, '(a)') "#"
 
-        select case (trim(self%name))
-        case ("water_flux")
-            write (self%io_unit, '(a,'//to_string(num_observations)//'(2x,a))') &
-                "Time", (("Obs"//to_string(iObs)//"_x", "Obs"//to_string(iObs)//"_y", "Obs"//to_string(iObs)//"_z"), &
-                         iObs=1, num_observations / 3)
+        ! --- ヘッダー行の出力 ---
+        select case (self%variable_type%ID)
+        case (OUTPUT_VARIABLE_TYPES%WATER_FLUX%ID)
+            write (self%io_unit, '(a,'//to_string(self%num_observations)//'("'//self%delimiter//'",a))') &
+                "Time", (("Obs"//to_string(i)//"_x", "Obs"//to_string(i)//"_y", "Obs"//to_string(i)//"_z"), &
+                         i=1, self%num_observations / 3)
         case default
-            write (self%io_unit, '(a,'//to_string(num_observations)//'(2x,a))') &
-                "Time", ("Obs"//to_string(iObs), iObs=1, num_observations)
+            write (self%io_unit, '(a,'//to_string(self%num_observations)//'("'//self%delimiter//'",a))') &
+                "Time", ("Obs"//to_string(i), i=1, self%num_observations)
         end select
 
-    end subroutine write_observation_header_dat
+    end subroutine write_observation_header
 
-    subroutine write_observation_header_csv(self, time_unit)
-        implicit none
-        class(type_output_observation), intent(inout) :: self
-        integer(int32), intent(in) :: time_unit
-
-        integer(int32) :: iObs, num_observations, elem_id
-
-        if (.not. self%do_output) return
-
-        num_observations = self%num_observations
-
-        open (newunit=self%io_unit, file=strip(self%file_name), status='replace', action='write')
-
-        write (self%io_unit, '(a)') "# "//trim(self%name)//" time variation"
-        write (self%io_unit, '(a)') "#"
-
-        select case (trim(self%type))
-        case ("node_ids")
-            write (self%io_unit, '(a)') "# Observation Node ID"
-            do iObs = 1, num_observations
-                write (self%io_unit, '(a,i0,a,1x,i0)') "# Node ID ", iObs, ":", self%node_ids(iObs)
-            end do
-        case ("coordinates")
-            write (self%io_unit, '(a)') "# Observation Coordinate (x,y,z)"
-            do iObs = 1, num_observations
-                elem_id = -1
-                if (allocated(self%element_ids)) elem_id = self%element_ids(iObs)
-                write (self%io_unit, '(a,1x,i0,a,3(1x,es18.11,a),a,i0)') &
-                    "#    Point", iObs, ": (", &
-                    self%coordinate%x(iObs), ",", &
-                    self%coordinate%y(iObs), ",", &
-                    self%coordinate%z(iObs), ")", &
-                    " => Element ID: ", elem_id
-            end do
-        end select
-
-        write (self%io_unit, '(a)') "#"
-        write (self%io_unit, '(a)') "# Output Unit: Time ["//trim(TIME_UNITS%to_name(time_unit))//"], " &
-            //trim(self%name)//" ["//trim(self%unit)//"]"
-        write (self%io_unit, '(a)') "#"
-
-        select case (trim(self%name))
-        case ("water_flux")
-            write (self%io_unit, '(a,'//to_string(num_observations)//'(",",a))') &
-                "Time", (("Obs"//to_string(iObs)//"_x", "Obs"//to_string(iObs)//"_y", "Obs"//to_string(iObs)//"_z"), &
-                         iObs=1, num_observations / 3)
-        case default
-            write (self%io_unit, '(a,'//to_string(num_observations)//'(",",a))') &
-                "Time", ("Obs"//to_string(iObs), iObs=1, num_observations)
-        end select
-
-    end subroutine write_observation_header_csv
-
-    subroutine output_observation_line_dat(self, time, values)
+    module subroutine write_observation_line(self, time, values)
         implicit none
         class(type_output_observation), intent(in) :: self
         real(real64), intent(in) :: time
         real(real64), intent(in) :: values(:)
 
-        write (self%io_unit, '(*(es22.15,:,2x))') time, values(1:self%num_observations)
-    end subroutine output_observation_line_dat
-
-    subroutine output_observation_line_csv(self, time, values)
-        implicit none
-        class(type_output_observation), intent(in) :: self
-        real(real64), intent(in) :: time
-        real(real64), intent(in) :: values(:)
-
-        write (self%io_unit, '(*(es22.15,:,","))') time, values(1:self%num_observations)
-    end subroutine output_observation_line_csv
-
-    ! ==============================================================================
-    ! Interpolation / Getter Subroutines
-    ! ==============================================================================
-
-    subroutine interpolate_observations_temperature(self, obs_values, domain, &
-                                                    nodal_temperature, nodal_porosity, nodal_pw)
-        implicit none
-        class(type_output_observation), intent(inout) :: self
-        real(real64), intent(inout) :: obs_values(:)
-        type(type_domain), intent(inout), optional :: domain
-        real(real64), intent(in), optional :: nodal_temperature(:)
-        real(real64), intent(in), optional :: nodal_porosity(:)
-        real(real64), intent(in), optional :: nodal_pw(:)
-
-        integer(int32) :: iObs, elem_id
-        integer(int32), pointer, contiguous :: p_conn(:)
-        class(abst_fe), pointer :: fe
-        real(real64) :: val
-
-        obs_values(:) = 0.0d0
-        if (.not. present(nodal_temperature)) return
-        if (.not. present(domain)) return
-
-        do iObs = 1, self%num_observations
-            if (allocated(self%element_ids)) then
-                elem_id = self%element_ids(iObs)
-                if (elem_id > 0) then
-                    call domain%get_fe(elem_id, fe)
-                    call domain%get_fe_connectivity(elem_id, p_conn)
-
-                    if (associated(fe) .and. associated(p_conn)) then
-                        call fe%lerp(self%coordinate_normalized(iObs), nodal_temperature(p_conn), val)
-                        obs_values(iObs) = val
-                    end if
-                end if
-            end if
-        end do
-    end subroutine interpolate_observations_temperature
-
-    subroutine get_observations_temperature(self, obs_values, domain, &
-                                            nodal_temperature, nodal_porosity, nodal_pw)
-        implicit none
-        class(type_output_observation), intent(inout) :: self
-        real(real64), intent(inout) :: obs_values(:)
-        type(type_domain), intent(inout), optional :: domain
-        real(real64), intent(in), optional :: nodal_temperature(:)
-        real(real64), intent(in), optional :: nodal_porosity(:)
-        real(real64), intent(in), optional :: nodal_pw(:)
-
-        integer(int32) :: iObs
-
-        obs_values(:) = 0.0d0
-        if (.not. present(nodal_temperature)) return
-
-        do iObs = 1, self%num_observations
-            if (iObs <= size(self%node_ids)) then
-                if (self%node_ids(iObs) > 0 .and. self%node_ids(iObs) <= size(nodal_temperature)) then
-                    obs_values(iObs) = nodal_temperature(self%node_ids(iObs))
-                end if
-            end if
-        end do
-    end subroutine get_observations_temperature
-
-    subroutine interpolate_observations_si(self, obs_values, domain, &
-                                           nodal_temperature, nodal_porosity, nodal_pw)
-        implicit none
-        class(type_output_observation), intent(inout) :: self
-        real(real64), intent(inout) :: obs_values(:)
-        type(type_domain), intent(inout), optional :: domain
-        real(real64), intent(in), optional :: nodal_temperature(:)
-        real(real64), intent(in), optional :: nodal_porosity(:)
-        real(real64), intent(in), optional :: nodal_pw(:)
-
-        integer(int32) :: iObs, elem_id
-        integer(int32), pointer, contiguous :: p_conn(:)
-        class(abst_fe), pointer :: fe
-        real(real64) :: val_T, val_phi
-
-        obs_values(:) = 0.0d0
-        if (.not. present(domain)) return
-        if (.not. present(nodal_temperature) .or. .not. present(nodal_porosity)) return
-
-        do iObs = 1, self%num_observations
-            if (allocated(self%element_ids)) then
-                elem_id = self%element_ids(iObs)
-                if (elem_id > 0) then
-                    call domain%get_fe(elem_id, fe)
-                    call domain%get_fe_connectivity(elem_id, p_conn)
-                    if (associated(fe) .and. associated(p_conn)) then
-                        call fe%lerp(self%coordinate_normalized(iObs), nodal_temperature(p_conn), val_T)
-                        call fe%lerp(self%coordinate_normalized(iObs), nodal_porosity(p_conn), val_phi)
-                        obs_values(iObs) = 0.0d0
-                    end if
-                end if
-            end if
-        end do
-    end subroutine interpolate_observations_si
-
-    subroutine get_observations_si(self, obs_values, domain, &
-                                   nodal_temperature, nodal_porosity, nodal_pw)
-        implicit none
-        class(type_output_observation), intent(inout) :: self
-        real(real64), intent(inout) :: obs_values(:)
-        type(type_domain), intent(inout), optional :: domain
-        real(real64), intent(in), optional :: nodal_temperature(:)
-        real(real64), intent(in), optional :: nodal_porosity(:)
-        real(real64), intent(in), optional :: nodal_pw(:)
-
-        obs_values(:) = 0.0d0
-    end subroutine get_observations_si
-
-    subroutine interpolate_observations_thc(self, obs_values, domain, &
-                                            nodal_temperature, nodal_porosity, nodal_pw)
-        implicit none
-        class(type_output_observation), intent(inout) :: self
-        real(real64), intent(inout) :: obs_values(:)
-        type(type_domain), intent(inout), optional :: domain
-        real(real64), intent(in), optional :: nodal_temperature(:)
-        real(real64), intent(in), optional :: nodal_porosity(:)
-        real(real64), intent(in), optional :: nodal_pw(:)
-
-        obs_values(:) = 0.0d0
-    end subroutine interpolate_observations_thc
-
-    subroutine get_observations_thc(self, obs_values, domain, &
-                                    nodal_temperature, nodal_porosity, nodal_pw)
-        implicit none
-        class(type_output_observation), intent(inout) :: self
-        real(real64), intent(inout) :: obs_values(:)
-        type(type_domain), intent(inout), optional :: domain
-        real(real64), intent(in), optional :: nodal_temperature(:)
-        real(real64), intent(in), optional :: nodal_porosity(:)
-        real(real64), intent(in), optional :: nodal_pw(:)
-
-        obs_values(:) = 0.0d0
-    end subroutine get_observations_thc
-
-    subroutine interpolate_observations_vhc(self, obs_values, domain, &
-                                            nodal_temperature, nodal_porosity, nodal_pw)
-        implicit none
-        class(type_output_observation), intent(inout) :: self
-        real(real64), intent(inout) :: obs_values(:)
-        type(type_domain), intent(inout), optional :: domain
-        real(real64), intent(in), optional :: nodal_temperature(:)
-        real(real64), intent(in), optional :: nodal_porosity(:)
-        real(real64), intent(in), optional :: nodal_pw(:)
-
-        obs_values(:) = 0.0d0
-    end subroutine interpolate_observations_vhc
-
-    subroutine get_observations_vhc(self, obs_values, domain, &
-                                    nodal_temperature, nodal_porosity, nodal_pw)
-        implicit none
-        class(type_output_observation), intent(inout) :: self
-        real(real64), intent(inout) :: obs_values(:)
-        type(type_domain), intent(inout), optional :: domain
-        real(real64), intent(in), optional :: nodal_temperature(:)
-        real(real64), intent(in), optional :: nodal_porosity(:)
-        real(real64), intent(in), optional :: nodal_pw(:)
-
-        obs_values(:) = 0.0d0
-    end subroutine get_observations_vhc
-
-    subroutine interpolate_observations_pw(self, obs_values, domain, &
-                                           nodal_temperature, nodal_porosity, nodal_pw)
-        implicit none
-        class(type_output_observation), intent(inout) :: self
-        real(real64), intent(inout) :: obs_values(:)
-        type(type_domain), intent(inout), optional :: domain
-        real(real64), intent(in), optional :: nodal_temperature(:)
-        real(real64), intent(in), optional :: nodal_porosity(:)
-        real(real64), intent(in), optional :: nodal_pw(:)
-
-        integer(int32) :: iObs, elem_id
-        integer(int32), pointer, contiguous :: p_conn(:)
-        class(abst_fe), pointer :: fe
-        real(real64) :: val
-
-        obs_values(:) = 0.0d0
-        if (.not. present(domain)) return
-        if (.not. present(nodal_pw)) return
-
-        do iObs = 1, self%num_observations
-            if (allocated(self%element_ids)) then
-                elem_id = self%element_ids(iObs)
-                if (elem_id > 0) then
-                    call domain%get_fe(elem_id, fe)
-                    call domain%get_fe_connectivity(elem_id, p_conn)
-                    if (associated(fe) .and. associated(p_conn)) then
-                        call fe%lerp(self%coordinate_normalized(iObs), nodal_pw(p_conn), val)
-                        obs_values(iObs) = val
-                    end if
-                end if
-            end if
-        end do
-    end subroutine interpolate_observations_pw
-
-    subroutine get_observations_pw(self, obs_values, domain, &
-                                   nodal_temperature, nodal_porosity, nodal_pw)
-        implicit none
-        class(type_output_observation), intent(inout) :: self
-        real(real64), intent(inout) :: obs_values(:)
-        type(type_domain), intent(inout), optional :: domain
-        real(real64), intent(in), optional :: nodal_temperature(:)
-        real(real64), intent(in), optional :: nodal_porosity(:)
-        real(real64), intent(in), optional :: nodal_pw(:)
-        integer(int32) :: iObs
-        obs_values(:) = 0.0d0
-        if (.not. present(nodal_pw)) return
-        do iObs = 1, self%num_observations
-            if (iObs <= size(self%node_ids)) then
-                if (self%node_ids(iObs) > 0 .and. self%node_ids(iObs) <= size(nodal_pw)) then
-                    obs_values(iObs) = nodal_pw(self%node_ids(iObs))
-                end if
-            end if
-        end do
-    end subroutine get_observations_pw
+        write (self%io_unit, self%fmt_line) time, values(1:self%num_observations)
+    end subroutine write_observation_line
 
     module pure function should_output_overall(self) result(should_output)
         implicit none
@@ -534,4 +223,32 @@ contains
         should_output = self%do_output
 
     end function should_output_overall
+
+    module subroutine extract_value_coordinate(self, nodal_values, value)
+        implicit none
+        class(type_observation_point_coordinate), intent(in) :: self
+        real(real64), intent(in) :: nodal_values(:)
+        real(real64), intent(inout) :: value
+
+        value = 0.0d0
+
+        if (associated(self%fe) .and. allocated(self%connectivity)) then
+            call self%fe%lerp(self%coordinate_normalized, nodal_values(self%connectivity), value)
+        end if
+
+    end subroutine extract_value_coordinate
+
+    module subroutine extract_value_node(self, nodal_values, value)
+        implicit none
+        class(type_observation_point_node), intent(in) :: self
+        real(real64), intent(in) :: nodal_values(:)
+        real(real64), intent(inout) :: value
+
+        if (value_in_range(self%node_id, 1, size(nodal_values))) then
+            value = nodal_values(self%node_id)
+        else
+            value = 0.0d0
+        end if
+    end subroutine extract_value_node
+
 end submodule output_observation_base
