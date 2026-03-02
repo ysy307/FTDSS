@@ -8,12 +8,10 @@ module domain_manager
     use :: stdlib_strings, only:strip
     use :: stdlib_optval, only:optval
     use :: module_core
-    ! use :: module_input, only:type_input, input_translator
-    ! use :: module_control, only:type_control
+
     use :: module_fe, only:type_fe_manager, abst_fe
     use :: domain_multicoloring, only:type_coloring
     use :: domain_adjacency, only:type_node_adjacency, type_map_node_to_element
-
     use :: components_domain_nodes, only:type_nodes_manager
     use :: components_domain_elements, only:type_elements_manager
     use :: components_domain_boundaries, only:type_boundaries_manager
@@ -34,9 +32,9 @@ module domain_manager
         !> The spatial dimension of the computation (e.g., 2 for 2D, 3 for 3D).
         integer(int32) :: computation_dimension
         !> The type of computation (e.g., 1 for XY-plane, 2 for XZ-plane, 3 for 3D).
-        integer(int32), private :: computation_type
+        type(type_constant_id) :: computation_type
         !> The type of coupling (e.g., staggered or monolithic).
-        integer(int32) :: coupling_mode
+        type(type_constant_id) :: coupling_mode
         !> Manages the degree of freedom layout.
         type(type_dof_map) :: dof_map
         !> Manages all nodal data.
@@ -74,23 +72,21 @@ module domain_manager
         ! is_XXX, has_XXX, should_XXX, etc.
 
         ! ---- Getter ----
-        ! nodes
-        procedure, public, pass(self) :: get_num_nodes => get_num_nodes_domain
-        ! elements
-        procedure, public, pass(self) :: get_num_fe => get_num_fe_domain
-        procedure, public, pass(self) :: get_num_dofs_per_node => get_num_dofs_per_node_domain
-        procedure, public, pass(self) :: get_total_dofs => get_total_dofs_domain
         procedure, public, pass(self) :: get_computation_dimension => get_computation_dimension_domain
         procedure, public, pass(self) :: get_computation_type => get_computation_type_domain
         procedure, public, pass(self) :: get_coupling_mode => get_coupling_mode_domain
+        procedure, public, pass(self) :: get_num_nodes => get_num_nodes_domain
+        procedure, public, pass(self) :: get_num_fe => get_num_fe_domain
+        procedure, public, pass(self) :: get_fe => get_fe_domain
+        procedure, public, pass(self) :: get_fe_connectivity => get_fe_connectivity_domain
+        procedure, public, pass(self) :: get_fe_coordinate => get_fe_coordinate_domain
+        procedure, public, pass(self) :: get_num_dof_per_node => get_num_dof_per_node_domain
         procedure, public, pass(self) :: get_node_adjacency => get_node_adjacency_domain
-        procedure, public, pass(self) :: get_element => get_element_domain
-        procedure, public, pass(self) :: get_element_connectivity => get_element_connectivity_domain
-        procedure, public, pass(self) :: get_element_coordinate => get_element_coordinate_domain
         procedure, public, pass(self) :: get_target_dof => get_target_dof_domain
         procedure, public, pass(self) :: get_material_id => get_material_id_domain
         procedure, public, pass(self) :: get_num_colors => get_num_colors_domain
         procedure, public, pass(self) :: get_colored_elements => get_colored_elements_domain
+        procedure, public, pass(self) :: get_total_dofs => get_total_dofs_domain
 
         ! ---- Meta / Utility ----
         ! display, to_string, etc.
@@ -127,6 +123,30 @@ contains
     ! --------------------------------------------------------------------------
     ! Getter Functions
     ! --------------------------------------------------------------------------
+    subroutine get_computation_dimension_domain(self, computation_dimension)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(inout) :: computation_dimension
+
+        computation_dimension = self%computation_dimension
+    end subroutine get_computation_dimension_domain
+
+    subroutine get_computation_type_domain(self, computation_type)
+        implicit none
+        class(type_domain), intent(in), target :: self
+        type(type_constant_id), intent(inout) ,pointer :: computation_type
+
+        computation_type => self%computation_type
+    end subroutine get_computation_type_domain
+
+    subroutine get_coupling_mode_domain(self, coupling_mode)
+        implicit none
+        class(type_domain), intent(in), target :: self
+        type(type_constant_id), intent(inout) ,pointer :: coupling_mode
+
+        coupling_mode => self%coupling_mode
+    end subroutine get_coupling_mode_domain
+
     subroutine get_num_nodes_domain(self, num_nodes)
         implicit none
         class(type_domain), intent(in) :: self
@@ -141,16 +161,36 @@ contains
         class(type_domain), intent(in) :: self
         integer(int32), intent(inout) :: num_fe
 
-        num_fe = self%elements%num_fe
+        call self%elements%get_num_fe(num_fe)
+
     end subroutine get_num_fe_domain
 
-    subroutine get_num_dofs_per_node_domain(self, num_dofs_per_node)
+    subroutine get_fe_domain(self, elem_id, fe)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(in) :: elem_id
+        class(abst_fe), pointer, intent(inout) :: fe
+
+        call self%elements%get_fe(elem_id, fe)
+    end subroutine get_fe_domain
+
+    subroutine get_fe_connectivity_domain(self, element_id, connectivity)
+        implicit none
+        class(type_domain), intent(in), target :: self
+        integer(int32), intent(in) :: element_id
+        integer(int32), intent(inout), pointer, contiguous, dimension(:) :: connectivity
+
+        call self%elements%get_fe_connectivity(element_id, connectivity)
+
+    end subroutine get_fe_connectivity_domain
+
+    subroutine get_num_dof_per_node_domain(self, num_dofs_per_node)
         implicit none
         class(type_domain), intent(in) :: self
         integer(int32), intent(inout) :: num_dofs_per_node
 
-        num_dofs_per_node = self%dof_map%num_dof_per_node
-    end subroutine get_num_dofs_per_node_domain
+        call self%dof_map%get_num_dof_per_node(num_dofs_per_node)
+    end subroutine get_num_dof_per_node_domain
 
     subroutine get_total_dofs_domain(self, total_dofs)
         implicit none
@@ -158,35 +198,13 @@ contains
         integer(int32), intent(inout) :: total_dofs
 
         integer(int32) :: num_nodes
+        integer(int32) :: num_dofs_per_node
 
         call self%nodes%get_num_nodes(num_nodes)
+        call self%dof_map%get_num_dof_per_node(num_dofs_per_node)
 
-        total_dofs = num_nodes * self%dof_map%num_dof_per_node
+        total_dofs = num_nodes * num_dofs_per_node
     end subroutine get_total_dofs_domain
-
-    subroutine get_computation_dimension_domain(self, computation_dimension)
-        implicit none
-        class(type_domain), intent(in) :: self
-        integer(int32), intent(inout) :: computation_dimension
-
-        computation_dimension = self%computation_dimension
-    end subroutine get_computation_dimension_domain
-
-    subroutine get_computation_type_domain(self, computation_type)
-        implicit none
-        class(type_domain), intent(in) :: self
-        integer(int32), intent(inout) :: computation_type
-
-        computation_type = self%computation_type
-    end subroutine get_computation_type_domain
-
-    subroutine get_coupling_mode_domain(self, coupling_mode)
-        implicit none
-        class(type_domain), intent(in) :: self
-        integer(int32), intent(inout) :: coupling_mode
-
-        coupling_mode = self%coupling_mode
-    end subroutine get_coupling_mode_domain
 
     subroutine get_node_adjacency_domain(self, matrix_type, row, col)
         implicit none
@@ -207,45 +225,7 @@ contains
         end select
     end subroutine get_node_adjacency_domain
 
-    subroutine get_element_domain(self, elem_id, element)
-        implicit none
-        class(type_domain), intent(in) :: self
-        integer(int32), intent(in) :: elem_id
-        class(abst_fe), pointer, intent(inout) :: element
-
-        integer(int32) :: type_id
-
-        if (elem_id < 1 .or. elem_id > self%elements%num_fe) then
-            element => null()
-            return
-        end if
-
-        type_id = self%elements%fe_types(elem_id)
-        element => self%elements%fe_manager%get_fe(type_id)
-
-    end subroutine get_element_domain
-
-    subroutine get_element_connectivity_domain(self, element_id, connectivity)
-        implicit none
-        class(type_domain), intent(in), target :: self
-        integer(int32), intent(in) :: element_id
-        integer(int32), intent(inout), pointer, contiguous, dimension(:) :: connectivity
-
-        integer(int32) :: istart, iend
-
-        if (value_in_range(element_id, 1, self%elements%num_fe)) then
-            connectivity => null()
-            return
-        end if
-
-        istart = self%elements%connectivity%row_ptr(element_id)
-        iend = self%elements%connectivity%row_ptr(element_id + 1) - 1
-
-        connectivity => self%elements%connectivity%col_ind(istart:iend)
-
-    end subroutine get_element_connectivity_domain
-
-    subroutine get_element_coordinate_domain(self, element_id, coordinates)
+    subroutine get_fe_coordinate_domain(self, element_id, coordinates)
         implicit none
         class(type_domain), intent(in), target :: self
         integer(int32), intent(in) :: element_id
@@ -255,14 +235,14 @@ contains
         integer(int32) :: num_nodes, n_dim
         logical :: need_reallocate
 
-        call self%get_element_connectivity(element_id, connectivity)
+        call self%get_fe_connectivity(element_id, connectivity)
 
         if (.not. associated(connectivity)) then
             return
         end if
 
         num_nodes = size(connectivity)
-         call self%nodes%get_dimension(n_dim)
+        call self%nodes%get_dimension(n_dim)
 
         need_reallocate = .true.
 
@@ -279,15 +259,15 @@ contains
 
         call self%nodes%get_coordinate(connectivity, coordinates)
 
-    end subroutine get_element_coordinate_domain
+    end subroutine get_fe_coordinate_domain
 
-    subroutine get_target_dof_domain(self, physics_type_id, target_dof)
+    subroutine get_target_dof_domain(self, physics_type, target_dof)
         implicit none
         class(type_domain), intent(in) :: self
-        integer(int32), intent(in) :: physics_type_id
+        type(type_constant_id), intent(in) :: physics_type
         integer(int32), intent(inout) :: target_dof
 
-        target_dof = self%dof_map%num_dof_of_physics(physics_type_id)
+        call self%dof_map%get_num_dof_of_physics(physics_type, target_dof)
 
     end subroutine get_target_dof_domain
 
@@ -327,8 +307,8 @@ contains
         class(abst_fe), pointer :: fe
         real(real64), allocatable :: coordinates(:, :)
 
-        call self%get_element(element_id, fe)
-        call self%get_element_coordinate(element_id, coordinates)
+        call self%get_fe(element_id, fe)
+        call self%get_fe_coordinate(element_id, coordinates)
 
         call fe%calc_measure(coordinates, measure)
 
@@ -344,7 +324,7 @@ contains
 
         class(abst_fe), pointer :: fe
 
-        call self%get_element(element_id, fe)
+        call self%get_fe(element_id, fe)
 
         call fe%lerp(r, value, lerped_value)
 
@@ -360,7 +340,7 @@ contains
 
         class(abst_fe), pointer :: fe
 
-        call self%get_element(element_id, fe)
+        call self%get_fe(element_id, fe)
 
         call fe%lerp(r, value, lerped_value)
 
@@ -376,7 +356,7 @@ contains
 
         class(abst_fe), pointer :: fe
 
-        call self%get_element(element_id, fe)
+        call self%get_fe(element_id, fe)
 
         call fe%lerp(r, value, lerped_value)
 
@@ -393,10 +373,10 @@ contains
         class(abst_fe), pointer :: fe
         real(real64), allocatable :: coordinates(:, :)
 
-        call self%get_element(element_id, fe)
-        call self%get_element_coordinate(element_id, coordinates)
+        call self%get_fe(element_id, fe)
+        call self%get_fe_coordinate(element_id, coordinates)
 
-        call fe%dlerp(r, values, coordinates, self%computation_type, dlerped_value)
+        call fe%dlerp(r, values, coordinates, self%computation_type%ID, dlerped_value)
 
     end subroutine dlerp_domain
 
@@ -426,8 +406,8 @@ contains
         write (unit, '(A)')
 
         call self%dof_map%display(unit)
-        ! call self%nodes%display(unit)
-        ! call self%elements%display(unit)
+        call self%nodes%display(unit)
+        call self%elements%display(unit)
         call self%boundaries%display(unit)
     end subroutine display_domain
 

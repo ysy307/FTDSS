@@ -2,7 +2,7 @@ module components_domain_elements
     use, intrinsic :: iso_fortran_env
     use :: stdlib_optval, only:optval
     use :: module_core
-    use :: domain_fe_manager, only:type_fe_manager
+    use :: module_fe, only:type_fe_manager, abst_fe
     use :: domain_multicoloring, only:type_coloring
     implicit none
     private
@@ -42,6 +42,9 @@ module components_domain_elements
 
         ! ---- Getter ----
         ! get_XXX, etc.
+        procedure, public, pass(self) :: get_num_fe => get_num_fe_elements_manager
+        procedure, public, pass(self) :: get_fe => get_fe_elements_manager
+        procedure, public, pass(self) :: get_fe_connectivity => get_fe_connectivity_elements_manager
 
         ! ---- Meta / Utility ----
         ! display, to_string, etc.
@@ -78,6 +81,52 @@ contains
         call deallocate_array(self%fe_material_ids)
         self%num_fe = 0
     end subroutine destroy_elements_manager
+
+    subroutine get_num_fe_elements_manager(self, num_fe)
+        implicit none
+        class(type_elements_manager), intent(in) :: self
+        integer(int32), intent(inout) :: num_fe
+
+        num_fe = self%num_fe
+    end subroutine get_num_fe_elements_manager
+
+    subroutine get_fe_elements_manager(self, elem_id, element)
+        implicit none
+        class(type_elements_manager), intent(in) :: self
+        integer(int32), intent(in) :: elem_id
+        class(abst_fe), pointer, intent(inout) :: element
+
+        integer(int32) :: type_id
+
+        if (value_in_range(elem_id, 1, self%num_fe)) then
+            element => null()
+            return
+        end if
+
+        type_id = self%fe_types(elem_id)
+        element => self%fe_manager%get_fe(type_id)
+
+    end subroutine get_fe_elements_manager
+
+    subroutine get_fe_connectivity_elements_manager(self, element_id, connectivity)
+        implicit none
+        class(type_elements_manager), intent(in), target :: self
+        integer(int32), intent(in) :: element_id
+        integer(int32), intent(inout), pointer, contiguous, dimension(:) :: connectivity
+
+        integer(int32) :: istart, iend
+
+        if (value_in_range(element_id, 1, self%num_fe)) then
+            connectivity => null()
+            return
+        end if
+
+        istart = self%connectivity%row_ptr(element_id)
+        iend = self%connectivity%row_ptr(element_id + 1) - 1
+
+        connectivity => self%connectivity%col_ind(istart:iend)
+
+    end subroutine get_fe_connectivity_elements_manager
 
     subroutine display_elements_manager(self, unit_in)
         implicit none
