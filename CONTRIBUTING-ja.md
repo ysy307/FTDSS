@@ -69,7 +69,6 @@
     [ public | private | protected ], &
     [ parameter | intent(in | inout) ], &
     [ value | optional ], &
-    [ public | private | protected ], &
     [ allocatable | pointer ], &
     [ contiguous ], &
     [ save | target ], &

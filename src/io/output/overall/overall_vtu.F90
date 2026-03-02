@@ -2,11 +2,10 @@ submodule(io_output_overall) output_overall_vtu
     implicit none
 
 contains
-    module subroutine initialize_output_overall_vtu(self, input, domain)
+    module subroutine initialize_output_overall_vtu(self, input)
         implicit none
         class(type_output_overall), intent(inout) :: self
         type(type_input), intent(in) :: input
-        type(type_domain), intent(inout) :: domain
 
         integer(int32) :: i, j
         integer(int32) :: total_connectivity_size, current_offset, start_index
@@ -53,11 +52,10 @@ contains
 
     end subroutine initialize_output_overall_vtu
 
-    subroutine output_overall_vtu_fields(self, file_counts, domain, porosity, temperature, si, pressure, water_flux)
+    subroutine output_overall_vtu_fields(self, file_counts, porosity, temperature, si, pressure, water_flux)
         implicit none
         class(type_output_overall), intent(inout) :: self
         integer(int32), intent(in) :: file_counts
-        type(type_domain), intent(in) :: domain
         real(real64), intent(in), optional :: porosity(:)
         real(real64), intent(in), optional :: temperature(:)
         real(real64), intent(in), optional :: si(:)
@@ -85,8 +83,8 @@ contains
                                                    offset=self%vtk%offsets, &
                                                    cell_type=self%vtk%cell_types)
 
+        status = vtu%xml_writer%write_dataarray(location='node', action='open')
         do i = 1, size(self%variable_names)
-            if (i == 1) status = vtu%xml_writer%write_dataarray(location='node', action='open')
             select case (self%variable_names(i))
             case ("temperature")
                 if (present(temperature)) status = vtu%xml_writer%write_dataarray(data_name='Temperature', x=temperature)

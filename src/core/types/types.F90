@@ -40,11 +40,13 @@ module core_types
         type_config_hcf, &
         type_config_gcc, &
         type_config_constitutive
-    use :: type_config_domain, only: &
+    use :: types_config_domain, only: &
         type_config_elements, &
         type_config_multicoloring, &
         type_config_colored_elements, &
         type_config_nodes
+    use :: types_config_output, only: &
+        type_config_output
 
     !-----------------------------------------------------------------
     ! Discretization - DOF mapping types

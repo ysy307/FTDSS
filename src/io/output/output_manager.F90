@@ -23,18 +23,11 @@ module io_output_manager
     ! ! type_output
     ! !---------------------------------------------------------------------------
     type :: type_output
-        private
-        character(:), allocatable :: dir_output
-        character(:), allocatable :: dir_output_field
+        logical, private, allocatable :: active(:)
 
-        logical :: active(PHYSICS_TYPES%NUM_ID)
-
-        logical :: is_thermal
-        logical :: is_hydraulic
-
-        type(type_output_observation), allocatable :: observations(:)
-        type(type_output_overall) :: overall
-        type(type_output_log) :: log
+        type(type_output_observation), private, allocatable :: observations(:)
+        type(type_output_overall), private :: overall
+        type(type_output_log), private :: log
 
     contains
         procedure, pass(self), public :: initialize => initialize_type_output
@@ -46,12 +39,10 @@ module io_output_manager
 
 contains
 
-    subroutine initialize_type_output(self, input, control, domain)
+    subroutine initialize_type_output(self, config_output)
         implicit none
         class(type_output), intent(inout) :: self
-        type(type_input), intent(in) :: input
-        type(type_control), intent(in) :: control
-        type(type_domain), intent(inout) :: domain
+        type(type_config_output), intent(in) :: config_output
 
         integer(int32) :: i
         character(:), allocatable :: project_path_env
@@ -59,46 +50,44 @@ contains
         character(8) :: output_file_extentions(5) = [".dat", ".csv", ".vtk", ".vtu", ".log"]
         character(*), parameter :: PROJECT_ENV = "FTDSS_PROJECT_PATH"
 
+        character(:), allocatable :: dir_output
+        character(:), allocatable :: dir_output_field
+
         call get_env_string(PROJECT_ENV, project_path_env)
         call modify_path_format(project_path_env)
-        self%dir_output = trim(adjustl(project_path_env))//"Output/"
-        call setup_directory(self%dir_output, output_extentions)
-        self%dir_output_field = trim(adjustl(project_path_env))//"Output/Files/"
-        call setup_directory(self%dir_output_field, output_file_extentions)
+        dir_output = trim(adjustl(project_path_env))//"Output/"
+        call setup_directory(dir_output, output_extentions)
+        dir_output_field = trim(adjustl(project_path_env))//"Output/Files/"
+        call setup_directory(dir_output_field, output_file_extentions)
 
-        ! self%log_file_name = trim(adjustl(self%dir_output))//"run.log"
+        call allocate_array(self%active, source=config_output%is_output_enabled)
 
-        self%is_thermal = input%basic%analysis_controls%is_active(PHYSICS_TYPES%THERMAL%ID)
-        self%is_hydraulic = input%basic%analysis_controls%is_active(PHYSICS_TYPES%HYDRAULIC%ID)
+        ! if (allocated(self%observations)) deallocate (self%observations)
+        ! allocate (self%observations(size(input%output_settings%history_output%variable_names)))
+        ! do i = 1, size(input%output_settings%history_output%variable_names)
+        !     ! [修正] coordinate 引数を削除, domain を渡す
+        !     call self%observations(i)%initialize(input, dir_output, &
+        !                                          input%output_settings%history_output%variable_names(i))
+        !     call self%observations(i)%write_header(input%output_settings%history_output%output_time_unit)
+        ! end do
 
-        if (allocated(self%observations)) deallocate (self%observations)
-        allocate (self%observations(size(input%output_settings%history_output%variable_names)))
-        do i = 1, size(input%output_settings%history_output%variable_names)
-            ! [修正] coordinate 引数を削除, domain を渡す
-            call self%observations(i)%initialize(input, domain, self%dir_output, &
-                                                 input%output_settings%history_output%variable_names(i))
-            call self%observations(i)%write_header(input%output_settings%history_output%output_time_unit)
-        end do
-
-        ! [修正] control を渡し, coordinate を削除
-        call self%overall%initialize(input, control, domain, self%dir_output_field)
+        ! ! [修正] control を渡し, coordinate を削除
+        ! call self%overall%initialize(input, control, dir_output_field)
     end subroutine initialize_type_output
 
-    subroutine output_fields(self, file_counts, domain, porosity, temperature, si, pressure, water_flux)
+    subroutine output_fields(self, file_counts, porosity, temperature, si, pressure, water_flux)
         implicit none
         class(type_output), intent(inout) :: self
         integer(int32), intent(in) :: file_counts
-        type(type_domain), intent(in) :: domain
         real(real64), intent(in), optional :: porosity(:)
         real(real64), intent(in), optional :: temperature(:)
         real(real64), intent(in), optional :: si(:)
         real(real64), intent(in), optional :: pressure(:)
         type(type_coordinate_array_dp), intent(in), optional :: water_flux
 
-        if (.not. self%overall%do_output) return
+        if (.not. self%overall%should_output()) return
 
         call self%overall%write_fields(file_counts=file_counts, &
-                                       domain=domain, &
                                        porosity=porosity, &
                                        temperature=temperature, &
                                        si=si, &
@@ -119,16 +108,13 @@ contains
         integer(int32) :: iObs
 
         do iObs = 1, size(self%observations)
-            if (.not. self%observations(iObs)%do_output) cycle
+            if (.not. self%observations(iObs)%should_output()) cycle
             call self%observations(iObs)%get_values(obs_values=obsValues, &
                                                     nodal_temperature=temperature, &
                                                     nodal_porosity=porosity, &
                                                     nodal_pw=pressure, &
                                                     domain=domain)
-            call self%observations(iObs)%write_line( &
-                unit=self%observations(iObs)%num_unit, &
-                time=time, &
-                values=obsValues)
+            call self%observations(iObs)%write_line(time=time, values=obsValues)
         end do
     end subroutine output_history
 

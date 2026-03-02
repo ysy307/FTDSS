@@ -1,4 +1,4 @@
-module type_config_domain
+module types_config_domain
     use :: types_config_elements, only: &
         type_config_elements, &
         type_config_multicoloring, &
@@ -14,4 +14,4 @@ module type_config_domain
 
     public :: type_config_nodes
 
-end module type_config_domain
+end module types_config_domain

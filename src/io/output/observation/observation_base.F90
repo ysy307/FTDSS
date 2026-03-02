@@ -97,12 +97,12 @@ contains
 
         if (associated(self%get_values)) nullify (self%get_values)
 
-        select case (trim(adjustl(variable_name)))
+        select case (strip(variable_name))
         case ("temperature")
             self%name = "Temperature"
             self%unit = "deg C"
-            self%file_name = trim(adjustl(dir_output))//"obsf_T."//trim(adjustl(input%output_settings%history_output%file_format))
-            self%num_unit = 99999999
+            self%file_name = strip(dir_output//"obsf_T."//strip(input%output_settings%history_output%file_format))
+            self%io_unit = 99999999
             select case (trim(self%type))
             case ("node_ids")
                 self%get_values => get_observations_temperature
@@ -112,8 +112,8 @@ contains
         case ("ice_saturation")
             self%name = "Ice Saturation"
             self%unit = "-"
-            self%file_name = trim(adjustl(dir_output))//"obsf_Si."//trim(adjustl(input%output_settings%history_output%file_format))
-            self%num_unit = 99999999
+            self%file_name = strip(dir_output)//"obsf_Si."//strip(input%output_settings%history_output%file_format)
+            self%io_unit = 99999999
             select case (trim(self%type))
             case ("node_ids")
                 self%get_values => get_observations_si
@@ -123,8 +123,8 @@ contains
         case ("thermal_conductivity")
             self%name = "Thermal Conductivity"
             self%unit = "W/m/K"
-            self%file_name = trim(adjustl(dir_output))//"obsf_TC."//trim(adjustl(input%output_settings%history_output%file_format))
-            self%num_unit = 99999999
+            self%file_name = strip(dir_output)//"obsf_TC."//strip(input%output_settings%history_output%file_format)
+            self%io_unit = 99999999
             select case (trim(self%type))
             case ("node_ids")
                 self%get_values => get_observations_thc
@@ -133,9 +133,9 @@ contains
             end select
         case ("volumetric_heat_capacity")
             self%name = "Volumetric Heat Capacity"
-            self%unit = "J/m^3/K"
-            self%file_name = trim(adjustl(dir_output))//"obsf_C."//trim(adjustl(input%output_settings%history_output%file_format))
-            self%num_unit = 99999999
+            self%unit = "J/m3/K"
+            self%file_name = strip(dir_output)//"obsf_C."//strip(input%output_settings%history_output%file_format)
+            self%io_unit = 99999999
             select case (trim(self%type))
             case ("node_ids")
                 self%get_values => get_observations_vhc
@@ -145,8 +145,8 @@ contains
         case ("pressure")
             self%name = "Pressure"
             self%unit = "m"
-            self%file_name = trim(adjustl(dir_output))//"obsf_P."//trim(adjustl(input%output_settings%history_output%file_format))
-            self%num_unit = 99999999
+            self%file_name = strip(dir_output)//"obsf_P."//strip(input%output_settings%history_output%file_format)
+            self%io_unit = 99999999
             select case (trim(self%type))
             case ("node_ids")
                 self%get_values => get_observations_pw
@@ -156,20 +156,20 @@ contains
         case ("water_flux")
             self%name = "Water Flux"
             self%unit = "m/s"
-            self%file_name = trim(adjustl(dir_output))//"obsf_Flux."//trim(adjustl(input%output_settings%history_output%file_format))
-            self%num_unit = 99999999
+            self%file_name = strip(dir_output)//"obsf_Flux."//strip(input%output_settings%history_output%file_format)
+            self%io_unit = 99999999
             self%num_observations = self%num_observations * 3
         case ("hydraulic_conductivity")
             self%name = "Hydraulic Conductivity"
             self%unit = "m/s"
-            self%file_name = trim(adjustl(dir_output))//"obsf_K."//trim(adjustl(input%output_settings%history_output%file_format))
-            self%num_unit = 99999999
+            self%file_name = strip(dir_output)//"obsf_K."//strip(input%output_settings%history_output%file_format)
+            self%io_unit = 99999999
         end select
 
         if (associated(self%write_line)) nullify (self%write_line)
         if (associated(self%write_header)) nullify (self%write_header)
 
-        select case (trim(adjustl(input%output_settings%history_output%file_format)))
+        select case (strip(input%output_settings%history_output%file_format))
         case ("dat")
             self%write_header => write_observation_header_dat
             self%write_line => output_observation_line_dat
@@ -195,23 +195,23 @@ contains
 
         num_observations = self%num_observations
 
-        open (newunit=self%num_unit, file=trim(adjustl(self%file_name)), status='replace', action='write')
+        open (newunit=self%io_unit, file=strip(self%file_name), status='replace', action='write')
 
-        write (self%num_unit, '(a)') "# "//trim(self%name)//" time variation"
-        write (self%num_unit, '(a)') "#"
+        write (self%io_unit, '(a)') "# "//trim(self%name)//" time variation"
+        write (self%io_unit, '(a)') "#"
 
         select case (trim(self%type))
         case ("node_ids")
-            write (self%num_unit, '(a)') "# Observation Node ID"
+            write (self%io_unit, '(a)') "# Observation Node ID"
             do iObs = 1, num_observations
-                write (self%num_unit, '(a,i0,a,1x,i0)') "# Node ID ", iObs, ":", self%node_ids(iObs)
+                write (self%io_unit, '(a,i0,a,1x,i0)') "# Node ID ", iObs, ":", self%node_ids(iObs)
             end do
         case ("coordinates")
-            write (self%num_unit, '(a)') "# Observation Coordinate (x,y,z)"
+            write (self%io_unit, '(a)') "# Observation Coordinate (x,y,z)"
             do iObs = 1, num_observations
                 elem_id = -1
                 if (allocated(self%element_ids)) elem_id = self%element_ids(iObs)
-                write (self%num_unit, '(a,1x,i0,a,3(x,es18.11,a),a,i0)') &
+                write (self%io_unit, '(a,1x,i0,a,3(1x,es18.11,a),a,i0)') &
                     "#    Point", iObs, ": (", &
                     self%coordinate%x(iObs), ",", &
                     self%coordinate%y(iObs), ",", &
@@ -220,18 +220,18 @@ contains
             end do
         end select
 
-        write (self%num_unit, '(a)') "#"
-        write (self%num_unit, '(a)') "# Output Unit: Time ["//trim(TIME_UNITS%to_name(time_unit))//"], " &
+        write (self%io_unit, '(a)') "#"
+        write (self%io_unit, '(a)') "# Output Unit: Time ["//trim(TIME_UNITS%to_name(time_unit))//"], " &
             //trim(self%name)//" ["//trim(self%unit)//"]"
-        write (self%num_unit, '(a)') "#"
+        write (self%io_unit, '(a)') "#"
 
         select case (trim(self%name))
         case ("water_flux")
-            write (self%num_unit, '(a,'//to_string(num_observations)//'(2x,a))') &
+            write (self%io_unit, '(a,'//to_string(num_observations)//'(2x,a))') &
                 "Time", (("Obs"//to_string(iObs)//"_x", "Obs"//to_string(iObs)//"_y", "Obs"//to_string(iObs)//"_z"), &
                          iObs=1, num_observations / 3)
         case default
-            write (self%num_unit, '(a,'//to_string(num_observations)//'(2x,a))') &
+            write (self%io_unit, '(a,'//to_string(num_observations)//'(2x,a))') &
                 "Time", ("Obs"//to_string(iObs), iObs=1, num_observations)
         end select
 
@@ -248,23 +248,23 @@ contains
 
         num_observations = self%num_observations
 
-        open (newunit=self%num_unit, file=trim(adjustl(self%file_name)), status='replace', action='write')
+        open (newunit=self%io_unit, file=strip(self%file_name), status='replace', action='write')
 
-        write (self%num_unit, '(a)') "# "//trim(self%name)//" time variation"
-        write (self%num_unit, '(a)') "#"
+        write (self%io_unit, '(a)') "# "//trim(self%name)//" time variation"
+        write (self%io_unit, '(a)') "#"
 
         select case (trim(self%type))
         case ("node_ids")
-            write (self%num_unit, '(a)') "# Observation Node ID"
+            write (self%io_unit, '(a)') "# Observation Node ID"
             do iObs = 1, num_observations
-                write (self%num_unit, '(a,i0,a,1x,i0)') "# Node ID ", iObs, ":", self%node_ids(iObs)
+                write (self%io_unit, '(a,i0,a,1x,i0)') "# Node ID ", iObs, ":", self%node_ids(iObs)
             end do
         case ("coordinates")
-            write (self%num_unit, '(a)') "# Observation Coordinate (x,y,z)"
+            write (self%io_unit, '(a)') "# Observation Coordinate (x,y,z)"
             do iObs = 1, num_observations
                 elem_id = -1
                 if (allocated(self%element_ids)) elem_id = self%element_ids(iObs)
-                write (self%num_unit, '(a,1x,i0,a,3(x,es18.11,a),a,i0)') &
+                write (self%io_unit, '(a,1x,i0,a,3(1x,es18.11,a),a,i0)') &
                     "#    Point", iObs, ": (", &
                     self%coordinate%x(iObs), ",", &
                     self%coordinate%y(iObs), ",", &
@@ -273,39 +273,39 @@ contains
             end do
         end select
 
-        write (self%num_unit, '(a)') "#"
-        write (self%num_unit, '(a)') "# Output Unit: Time ["//trim(TIME_UNITS%to_name(time_unit))//"], " &
+        write (self%io_unit, '(a)') "#"
+        write (self%io_unit, '(a)') "# Output Unit: Time ["//trim(TIME_UNITS%to_name(time_unit))//"], " &
             //trim(self%name)//" ["//trim(self%unit)//"]"
-        write (self%num_unit, '(a)') "#"
+        write (self%io_unit, '(a)') "#"
 
         select case (trim(self%name))
         case ("water_flux")
-            write (self%num_unit, '(a,'//to_string(num_observations)//'(",",a))') &
+            write (self%io_unit, '(a,'//to_string(num_observations)//'(",",a))') &
                 "Time", (("Obs"//to_string(iObs)//"_x", "Obs"//to_string(iObs)//"_y", "Obs"//to_string(iObs)//"_z"), &
                          iObs=1, num_observations / 3)
         case default
-            write (self%num_unit, '(a,'//to_string(num_observations)//'(",",a))') &
+            write (self%io_unit, '(a,'//to_string(num_observations)//'(",",a))') &
                 "Time", ("Obs"//to_string(iObs), iObs=1, num_observations)
         end select
 
     end subroutine write_observation_header_csv
 
-    subroutine output_observation_line_dat(self, unit, time, values)
+    subroutine output_observation_line_dat(self, time, values)
         implicit none
         class(type_output_observation), intent(in) :: self
-        integer(int32), intent(in) :: unit
         real(real64), intent(in) :: time
         real(real64), intent(in) :: values(:)
-        write (unit, '(*(es22.15,:,2x))') time, values(1:self%num_observations)
+
+        write (self%io_unit, '(*(es22.15,:,2x))') time, values(1:self%num_observations)
     end subroutine output_observation_line_dat
 
-    subroutine output_observation_line_csv(self, unit, time, values)
+    subroutine output_observation_line_csv(self, time, values)
         implicit none
         class(type_output_observation), intent(in) :: self
-        integer(int32), intent(in) :: unit
         real(real64), intent(in) :: time
         real(real64), intent(in) :: values(:)
-        write (unit, '(*(es22.15,:,","))') time, values(1:self%num_observations)
+
+        write (self%io_unit, '(*(es22.15,:,","))') time, values(1:self%num_observations)
     end subroutine output_observation_line_csv
 
     ! ==============================================================================
@@ -415,6 +415,7 @@ contains
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
+
         obs_values(:) = 0.0d0
     end subroutine get_observations_si
 
@@ -427,6 +428,7 @@ contains
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
+
         obs_values(:) = 0.0d0
     end subroutine interpolate_observations_thc
 
@@ -439,6 +441,7 @@ contains
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
+
         obs_values(:) = 0.0d0
     end subroutine get_observations_thc
 
@@ -451,6 +454,7 @@ contains
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
+
         obs_values(:) = 0.0d0
     end subroutine interpolate_observations_vhc
 
@@ -463,6 +467,7 @@ contains
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
+
         obs_values(:) = 0.0d0
     end subroutine get_observations_vhc
 
@@ -521,4 +526,12 @@ contains
         end do
     end subroutine get_observations_pw
 
+    module pure function should_output_overall(self) result(should_output)
+        implicit none
+        class(type_output_observation), intent(in) :: self
+        logical :: should_output
+
+        should_output = self%do_output
+
+    end function should_output_overall
 end submodule output_observation_base

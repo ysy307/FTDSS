@@ -1,14 +1,9 @@
 module io_output_logging
-    use, intrinsic :: iso_fortran_env
-    use, intrinsic :: iso_c_binding, only: c_int64_t, c_ptr, c_f_pointer, c_char, c_null_char, c_associated
-    use :: omp_lib
+    use, intrinsic :: iso_fortran_env, only: int32, real64
+!$  use :: omp_lib
     use :: stdlib_strings, only:to_string, strip
     use :: stdlib_io, only:open
-    use :: vtk_fortran, only:vtk_file
     use :: module_core
-    use :: module_input
-    use :: module_domain
-    use :: module_control
 
     implicit none
     private

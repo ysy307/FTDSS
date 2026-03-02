@@ -112,6 +112,7 @@ target_sources(SOLVER_CORE PRIVATE
     types/config/control/config_time.F90
     types/config/control/config_parallel.F90
     types/config/control/config_control_manager.F90
+    types/config/output/config_output.F90
     # Discritization
     types/discretization/dof_map.F90
     # geometry

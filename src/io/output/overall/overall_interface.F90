@@ -7,7 +7,6 @@ module io_output_overall
     use :: vtk_fortran, only:vtk_file
     use :: module_core
     use :: module_input
-    use :: module_domain
     use :: module_control
 
     implicit none
@@ -36,21 +35,23 @@ module io_output_overall
         logical :: do_output
         ! DATA
         type(type_output_vtk) :: vtk
-        procedure(abst_output_overall_fields), pointer, pass(self) :: write_fields => null()
-        procedure(abst_output_overall_cell), pointer, pass(self) :: write_cell => null()
+
+        procedure(abst_output_overall_fields), public, pointer, pass(self) :: write_fields => null()
+        procedure(abst_output_overall_cell), public, pointer, pass(self) :: write_cell => null()
     contains
-        procedure, pass(self), public :: initialize => initialize_input_type_output_overall
-        procedure, pass(self) :: initialize_vtk => initialize_output_overall_vtk
-        procedure, pass(self) :: initialize_vtu => initialize_output_overall_vtu
+        procedure, public, pass(self) :: initialize => initialize_input_type_output_overall
+        procedure, private, pass(self) :: initialize_vtk => initialize_output_overall_vtk
+        procedure, private, pass(self) :: initialize_vtu => initialize_output_overall_vtu
+
+        procedure, public, pass(self) :: should_output => should_output_overall
     end type
 
     abstract interface
-        subroutine abst_output_overall_fields(self, file_counts, domain, porosity, temperature, si, pressure, water_flux)
-            import :: type_output_overall, type_domain, type_coordinate_array_dp, real64, int32
+        subroutine abst_output_overall_fields(self, file_counts, porosity, temperature, si, pressure, water_flux)
+            import :: type_output_overall, type_coordinate_array_dp, real64, int32
             implicit none
             class(type_output_overall), intent(inout) :: self
             integer(int32), intent(in) :: file_counts
-            type(type_domain), intent(in) :: domain
             real(real64), intent(in), optional :: porosity(:)
             real(real64), intent(in), optional :: temperature(:)
             real(real64), intent(in), optional :: si(:)
@@ -70,33 +71,36 @@ module io_output_overall
 
     interface
         ! [修正] control 追加, coordinate 削除
-        module subroutine initialize_input_type_output_overall(self, input, control, domain, dir_output)
+        module subroutine initialize_input_type_output_overall(self, input, control, dir_output)
             implicit none
             class(type_output_overall), intent(inout) :: self
             type(type_input), intent(in) :: input
             type(type_control), intent(in) :: control
-            type(type_domain), intent(inout) :: domain
+            ! type(type_domain), intent(inout) :: domain
             character(*), intent(in) :: dir_output
         end subroutine initialize_input_type_output_overall
 
         ! [修正] coordinate 削除
-        module subroutine initialize_output_overall_vtk(self, input, domain)
+        module subroutine initialize_output_overall_vtk(self, input)
             implicit none
             class(type_output_overall), intent(inout) :: self
             type(type_input), intent(in) :: input
-            type(type_domain), intent(inout) :: domain
+            ! type(type_domain), intent(inout) :: domain
         end subroutine initialize_output_overall_vtk
 
         ! [修正] coordinate 削除
-        module subroutine initialize_output_overall_vtu(self, input, domain)
+        module subroutine initialize_output_overall_vtu(self, input)
             implicit none
             class(type_output_overall), intent(inout) :: self
             type(type_input), intent(in) :: input
-            type(type_domain), intent(inout) :: domain
+            ! type(type_domain), intent(inout) :: domain
         end subroutine initialize_output_overall_vtu
+
+        module pure function should_output_overall(self) result(should_output)
+            implicit none
+            class(type_output_overall), intent(in) :: self
+            logical :: should_output
+        end function should_output_overall
     end interface
-
-
-
 
 end module io_output_overall

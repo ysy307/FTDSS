@@ -77,7 +77,7 @@ module governing_base
 
 contains
 
-    subroutine initialize_type_assemble_workspace(self, fe, material_id, element_id, computation_type, coordinates, controls)
+    subroutine initialize_type_assemble_workspace(self, fe, material_id, element_id, computation_type, coordinates, control)
         implicit none
         class(type_assemble_workspace), intent(inout) :: self
         class(abst_fe), intent(in), target :: fe
@@ -85,12 +85,12 @@ contains
         integer(int32), intent(in) :: element_id
         integer(int32), intent(in) :: computation_type
         real(real64), intent(in) :: coordinates(:, :)
-        type(type_control), intent(in) :: controls
+        type(type_control), intent(in) :: control
 
         integer(int32) :: fe_type
 
         if (.not. self%associated_bdf) then
-            call self%set_bdf_info(controls)
+            call self%set_bdf_info(control)
         end if
 
         if (.not. self%is_initialized) then
@@ -103,7 +103,7 @@ contains
             if (fe_type /= self%fe_type) then
                 call self%destroy()
                 self%fe => fe
-                if (self%bdf_order == -1) call self%set_bdf_info(controls)
+                if (self%bdf_order == -1) call self%set_bdf_info(control)
                 call self%set_basic()
             end if
         end if
@@ -248,13 +248,12 @@ contains
 
     end subroutine set_basic
 
-    subroutine set_bdf_info(self, controls)
+    subroutine set_bdf_info(self, control)
         implicit none
         class(type_assemble_workspace), intent(inout) :: self
-        type(type_control), intent(in) :: controls
+        type(type_control), intent(in) :: control
 
-        call controls%time%get_bdf_order(self%bdf_order)
-        call controls%time%get_bdf_coeffs(self%bdf_coeffs)
+        call control%get_bdf_coeffs(self%bdf_order, self%bdf_coeffs)
 
         self%associated_bdf = .true.
     end subroutine set_bdf_info

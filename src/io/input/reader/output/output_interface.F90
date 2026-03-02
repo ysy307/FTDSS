@@ -22,7 +22,7 @@ module io_input_output_conditions
                                                            ! --- Thermal Category ---
                                                            'temperature', 'thermal_conductivity', 'volumetric_heat_capacity', &
                                                            ! --- Ice Category ---
-                                                           'ice_saturation', &
+                                                           'water_content', &
                                                            ! --- Water/Hydraulic Category ---
                                                            'pressure', 'water_flux', 'hydraulic_conductivity']
 

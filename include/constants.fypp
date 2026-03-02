@@ -645,6 +645,39 @@
         'id_range' : [1, 3] &
     }
 
+    #:set OUTPUT_VARIABLE_TYPES = { &
+        'type_name'  : 'type_output_variable_type', &
+        'obj_name'   : 'OUTPUT_VARIABLE_TYPES', &
+        'category'   : 'OUTPUT_VARIABLE_TYPE', &
+        'suffix'     : 'output_variable_type', &
+        'description': 'Output variable types', &
+        'items'      : [ &
+            ('WATER_CONTENT',            1, 'water_content'), &
+            ('TEMPERATURE',              2, 'temperature'), &
+            ('THERMAL_CONDUCTIVITY',     3, 'thermal_conductivity'), &
+            ('VOLUMETRIC_HEAT_CAPACITY', 4, 'volumetric_heat_capacity'), &
+            ('PRESSURE',                 5, 'pressure'), &
+            ('WATER_FLUX',               6, 'water_flux'), &
+            ('HYDRAULIC_CONDUCTIVITY',   7, 'hydraulic_conductivity'), &
+        ], &
+        'num' : 7, &
+        'id_range' : [1, 7] &
+    }
+    #:set OUTPUT_OBSERVATION_TYPES = { &
+        'type_name'  : 'type_output_observation_type', &
+        'obj_name'   : 'OUTPUT_OBSERVATION_TYPES', &
+        'category'   : 'OUTPUT_OBSERVATION_TYPE', &
+        'suffix'     : 'output_observation_type', &
+        'description': 'Output observation types', &
+        'items'      : [ &
+            ('NONE',        0, 'none'), &
+            ('COORDINATES', 1, 'coordinates'), &
+            ('NODE_IDS',    2, 'node_ids') &
+        ], &
+        'num' : 3, &
+        'id_range' : [0, 2] &
+    }
+
     #:set PROFILER_TYPES = { &
         'type_name'  : 'type_profiler_type', &
         'obj_name'   : 'PROFILER_TYPES', &
@@ -701,6 +734,8 @@
         TIME_RECORDS, &
         FILE_FORMATS, &
         OUTPUT_TYPES, &
+        OUTPUT_OBSERVATION_TYPES, &
+        OUTPUT_VARIABLE_TYPES, &
         VECTOR_NORM_CRITERIA, &
         PROFILER_TYPES &
     ]

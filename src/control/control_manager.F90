@@ -1,14 +1,15 @@
 module core_control_manager
     use, intrinsic :: iso_fortran_env
     use :: stdlib_strings, only:strip
+    use :: stdlib_optval, only:optval
     use :: module_core
+    use :: module_linalg
     use :: control_acceleration, only:abst_acceleration, type_acceleration_aitken
     use :: control_time, only:type_time
     use :: control_time_profiler, only:type_time_profiler
     use :: control_iteration, only:type_iteration
-    use :: control_scheduler, only:type_scheduler_manager   
+    use :: control_scheduler, only:type_scheduler_manager
     use :: control_parallel, only:initialize_openmp
-    use :: module_linalg
     implicit none
     private
 
@@ -30,11 +31,9 @@ module core_control_manager
 
     contains
         ! ---- Lifecycle ----
-        ! initialize, destroy, reset, etc.
         procedure, public, pass(self) :: initialize => initialize_type_control
 
         ! ---- Mutator ----
-        ! set_XXX, increment_XXX, update_XXX, etc.
         procedure, public, pass(self) :: update => update_controls
         procedure, public, pass(self) :: update_output => update_output_control
 
@@ -49,13 +48,12 @@ module core_control_manager
         procedure, public, pass(self) :: is_output_triggered => is_output_triggered_control
 
         ! ---- Getter ----
-        ! get_XXX, etc.
         procedure, public, pass(self) :: get_coupling_mode => get_coupling_mode_control
         procedure, public, pass(self) :: get_output_time => get_output_time_control
         procedure, public, pass(self) :: get_output_step => get_output_step_control
+        procedure, public, pass(self) :: get_bdf_coeffs => get_bdf_coeffs_control
 
         ! ---- Meta / Utility ----
-        ! display, to_string, etc.
         procedure, public, pass(self) :: display => display_controls
 
     end type type_control
@@ -190,6 +188,17 @@ contains
         coupling_mode => self%coupling_mode
     end subroutine get_coupling_mode_control
 
+    subroutine get_bdf_coeffs_control(self, bdf_order, bdf_coeffs)
+        implicit none
+        class(type_control), intent(in) :: self
+        integer(int32), intent(inout) :: bdf_order
+        real(real64), intent(inout), pointer, contiguous, dimension(:) :: bdf_coeffs
+
+        call self%time%get_bdf_order(bdf_order)
+        call self%time%get_bdf_coeffs(bdf_coeffs)
+
+    end subroutine get_bdf_coeffs_control
+
     pure function is_monolithic_control(self) result(is_monolithic)
         implicit none
         class(type_control), intent(in) :: self
@@ -216,9 +225,14 @@ contains
 
     end subroutine reset_controls
 
-    subroutine display_controls(self)
-
+    subroutine display_controls(self, unit_in)
+        implicit none
         class(type_control), intent(in) :: self
+        integer(int32), intent(in), optional :: unit_in
+
+        integer(int32) :: unit
+
+        unit = optval(unit_in, output_unit)
         ! integer(int32) :: pid, mid
 
         ! write (*, '(a)') "# Control Settings"

@@ -15,11 +15,10 @@ submodule(io_output_overall) output_overall_vtk
 
 contains
 
-    module subroutine initialize_output_overall_vtk(self, input, domain)
+    module subroutine initialize_output_overall_vtk(self, input)
         implicit none
         class(type_output_overall), intent(inout) :: self
         type(type_input), intent(in) :: input
-        type(type_domain), intent(inout) :: domain
 
         integer(int32) :: i, j, idx, total
 
@@ -54,11 +53,10 @@ contains
 
     end subroutine initialize_output_overall_vtk
 
-    subroutine output_overall_vtk_fields(self, file_counts, domain, porosity, temperature, si, pressure, water_flux)
+    subroutine output_overall_vtk_fields(self, file_counts, porosity, temperature, si, pressure, water_flux)
         implicit none
         class(type_output_overall), intent(inout) :: self
         integer(int32), intent(in) :: file_counts
-        type(type_domain), intent(in) :: domain
         real(real64), intent(in), optional :: porosity(:)
         real(real64), intent(in), optional :: temperature(:)
         real(real64), intent(in), optional :: si(:)
@@ -99,8 +97,8 @@ contains
         write (unit_num, '(i0)') self%vtk%cell_types(:)
         write (unit_num, '(a)') ""
 
+        write (unit_num, '(a, i0)') "POINT_DATA ", self%vtk%num_points
         do i = 1, size(self%variable_names)
-            if (i == 1) write (unit_num, '(a, i0)') "POINT_DATA ", self%vtk%num_points
             select case (self%variable_names(i))
             case ("temperature")
                 if (present(temperature)) call write_field(unit_num, "Temperature", temperature)
@@ -150,10 +148,10 @@ contains
         end do
         write (unit_num, '(a)') ""
 
-        write (unit_num, '(a,i0,x,i0,a)') "CELLS ", self%vtk%num_cells, sum(self%vtk%offsets(:)) + self%vtk%num_cells
+        write (unit_num, '(a,i0,1x,i0,a)') "CELLS ", self%vtk%num_cells, sum(self%vtk%offsets(:)) + self%vtk%num_cells
         idx = 1
         do iE = 1, self%vtk%num_cells
-            write (unit_num, '(i0,'//to_string(self%vtk%offsets(iE))//'(x,i0))') self%vtk%offsets(iE), &
+            write (unit_num, '(i0,'//to_string(self%vtk%offsets(iE))//'(1x,i0))') self%vtk%offsets(iE), &
                 self%vtk%connectivities(idx:idx + self%vtk%offsets(iE) - 1)
             idx = idx + self%vtk%offsets(iE)
         end do

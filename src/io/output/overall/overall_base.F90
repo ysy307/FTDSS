@@ -63,4 +63,11 @@ contains
 
     end subroutine initialize_input_type_output_overall
 
+    module pure function should_output_overall(self) result(should_output)
+        implicit none
+        class(type_output_overall), intent(in) :: self
+        logical :: should_output
+
+        should_output = self%do_output
+    end function should_output_overall
 end submodule output_overall_base

@@ -54,9 +54,9 @@ contains
         real(real64) :: rss_mb
         character(len=32) :: fmt
 
-        ! if (.not. self%initialized) then
-        !     call raise_error(ERROR_CODES%OUTPUT_NOT_INITIALIZED)
-        ! end if
+        if (.not. self%initialized) then
+            call raise_error(ERROR_CODES%NOT_INITIALIZED, opt="type_output_log")
+        end if
 
         ! --- Initialization ---
         fmt = ''
@@ -109,9 +109,9 @@ contains
         class(type_output_log), intent(in) :: self
         integer(int32), intent(inout) :: io_unit
 
-        ! if (.not. self%initialized) then
-        !     call raise_error(ERROR_CODES%OUTPUT_NOT_INITIALIZED)
-        ! end if
+        if (.not. self%initialized) then
+            call raise_error(ERROR_CODES%NOT_INITIALIZED, opt="type_output_log")
+        end if
 
         io_unit = self%io_unit
 
