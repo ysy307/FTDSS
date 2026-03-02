@@ -1,7 +1,4 @@
 submodule(solver_preconditioner) solver_preconditioner_iluk
-    use :: core_constants
-    use :: core_types_matrix
-    use :: module_type_vector, only:type_vector_dp
     implicit none
 
 contains

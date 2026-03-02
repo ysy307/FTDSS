@@ -30,6 +30,7 @@ target_sources(SOLVER_DOMAIN
 
         fe/volume/volume_interface.F90
 
+        fe/fe_integration.F90
         fe/fe_factory.F90
         fe/fe_manager.F90
         fe/fe.F90
