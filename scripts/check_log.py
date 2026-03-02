@@ -123,7 +123,7 @@ with open(output_file, "w", encoding="utf-8") as f:
             for caller in sorted(callers):
                 f.write(f"- `{caller}`\n")
             f.write("\n")
-        f.write("---\n")
+        f.write("---\n\n")
 
     # 2. Global Name Warnings (Deduped)
     if global_name_warnings:
@@ -131,7 +131,7 @@ with open(output_file, "w", encoding="utf-8") as f:
         f.write("> **Note:** These symbols were shortened by the compiler because they exceeded the length limit. This warning appeared across multiple files but is listed here once per symbol.\n\n")
         for msg in sorted(global_name_warnings):
              f.write(f"- ⚠️ {msg}\n")
-        f.write("\n---\n")
+        f.write("\n---\n\n")
 
     # 3. General Warnings
     if general_messages:
@@ -139,7 +139,7 @@ with open(output_file, "w", encoding="utf-8") as f:
         for entry in general_messages:
             sev_icon = "🛑" if entry['type'] == 'error' else "⚠️"
             f.write(f"- {sev_icon} **{entry['tool']}**: {entry['msg']}\n")
-        f.write("\n---\n")
+        f.write("\n---\n\n")
 
     # 4. File-based Errors
     if not file_messages and not linker_issues and not general_messages and not global_name_warnings:
@@ -168,6 +168,6 @@ with open(output_file, "w", encoding="utf-8") as f:
                 f.write("  ```\n")
             f.write("\n")
         
-        f.write("---\n")
+        f.write("---\n\n")
 
 print(f"Analysis complete. Summary saved to: {output_file}")

@@ -1,6 +1,6 @@
 module module_initial
-    use :: conditions_initial
-    use :: conditions_initial_manager
+    use :: condition_initial
+    use :: condition_initial_manager
     implicit none
 
 end module module_initial

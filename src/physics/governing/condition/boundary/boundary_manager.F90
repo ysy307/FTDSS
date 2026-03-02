@@ -20,27 +20,21 @@ contains
 
         ! 1. IDに基づいて適切なクラスを割り当てる (Allocate)
         !    ※ 熱(Thermal)も水(Hydraulic)も、数学的性質が同じなら同じ型を使う
-        if (config_bc%bc_kind == THERMAL_BC_TYPES%DIRICHLET .or. &
-            config_bc%bc_kind == HYDRAULIC_BC_TYPES%DIRICHLET) then
+        select case (config_bc%bc_kind%ID)
+        case (THERMAL_BC_TYPES%DIRICHLET%ID, HYDRAULIC_BC_TYPES%DIRICHLET%ID)
             allocate (type_bc_dirichlet :: bc)
-        else if (config_bc%bc_kind == THERMAL_BC_TYPES%NEUMANN .or. &
-                 config_bc%bc_kind == THERMAL_BC_TYPES%FLUX .or. &
-                 config_bc%bc_kind == HYDRAULIC_BC_TYPES%NEUMANN .or. &
-                 config_bc%bc_kind == HYDRAULIC_BC_TYPES%FLUX .or. &
-                 config_bc%bc_kind == HYDRAULIC_BC_TYPES%SEEPAGE) then
+        case (THERMAL_BC_TYPES%NEUMANN%ID, THERMAL_BC_TYPES%FLUX%ID, HYDRAULIC_BC_TYPES%NEUMANN%ID, &
+              HYDRAULIC_BC_TYPES%FLUX%ID, HYDRAULIC_BC_TYPES%SEEPAGE%ID)
             allocate (type_bc_neumann :: bc)
-        else if (config_bc%bc_kind == THERMAL_BC_TYPES%ROBIN .or. &
-                 config_bc%bc_kind == THERMAL_BC_TYPES%CONVECTIVE .or. &
-                 config_bc%bc_kind == THERMAL_BC_TYPES%RADIATION) then
+        case (THERMAL_BC_TYPES%ROBIN%ID, THERMAL_BC_TYPES%CONVECTIVE%ID, THERMAL_BC_TYPES%RADIATION%ID)
             allocate (type_bc_robin :: bc)
-        else if (config_bc%bc_kind == THERMAL_BC_TYPES%ADIABATIC .or. &
-                 config_bc%bc_kind == HYDRAULIC_BC_TYPES%IMPERMEABLE) then
+        case (THERMAL_BC_TYPES%ADIABATIC%ID, HYDRAULIC_BC_TYPES%IMPERMEABLE%ID)
             allocate (type_bc_zero_flux :: bc)
-        else if (config_bc%bc_kind == THERMAL_BC_TYPES%FREE) then
+        case (THERMAL_BC_TYPES%FREE%ID)
             allocate (type_bc_neumann :: bc)
-        else
+        case default
             call raise_error(ERROR_CODES%INVALID_BC_TYPE)
-        end if
+        end select
 
         ! 2. 共通初期化メソッドを呼ぶ
         !    ここでデータの読み込み、時間係数の計算準備などが行われる

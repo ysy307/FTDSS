@@ -82,14 +82,14 @@ contains
         write (unit_num, '(a,i0,a)') "POINTS ", self%vtk%num_points, " double"
 
         do iN = 1, self%vtk%num_points
-            write (unit_num, '(3(es22.15,x))') self%vtk%coordinate%x(iN), self%vtk%coordinate%y(iN), self%vtk%coordinate%z(iN)
+            write (unit_num, '(3(es22.15,1x))') self%vtk%coordinate%x(iN), self%vtk%coordinate%y(iN), self%vtk%coordinate%z(iN)
         end do
         write (unit_num, '(a)') ""
 
-        write (unit_num, '(a,i0,x,i0,a)') "CELLS ", self%vtk%num_cells, sum(self%vtk%offsets(:)) + self%vtk%num_cells
+        write (unit_num, '(a,i0,1x,i0,a)') "CELLS ", self%vtk%num_cells, sum(self%vtk%offsets(:)) + self%vtk%num_cells
         idx = 1
         do iE = 1, self%vtk%num_cells
-            write (unit_num, '(i0,'//to_string(self%vtk%offsets(iE))//'(x,i0))') self%vtk%offsets(iE), &
+            write (unit_num, '(i0,'//to_string(self%vtk%offsets(iE))//'(1x,i0))') self%vtk%offsets(iE), &
                 self%vtk%connectivities(idx:idx + self%vtk%offsets(iE) - 1)
             idx = idx + self%vtk%offsets(iE)
         end do
@@ -146,7 +146,7 @@ contains
         write (unit_num, '(a,i0,a)') "POINTS ", self%vtk%num_points, " double"
 
         do iN = 1, self%vtk%num_points
-            write (unit_num, '(3(es22.15,x))') self%vtk%coordinate%x(iN), self%vtk%coordinate%y(iN), self%vtk%coordinate%z(iN)
+            write (unit_num, '(3(es22.15,1x))') self%vtk%coordinate%x(iN), self%vtk%coordinate%y(iN), self%vtk%coordinate%z(iN)
         end do
         write (unit_num, '(a)') ""
 
@@ -206,7 +206,7 @@ contains
 
         write (unit_num, '(3a)') "VECTORS ", trim(adjustl(data_name)), " double"
         do i = 1, size(x)
-            write (unit_num, '(3(es22.15,x))') x(i), y(i), z(i)
+            write (unit_num, '(3(es22.15,1x))') x(i), y(i), z(i)
         end do
         write (unit_num, '(a)') ""
 
@@ -222,7 +222,7 @@ contains
 
         write (unit_num, '(3a)') "VECTORS ", trim(adjustl(data_name)), " double"
         do i = 1, size(x)
-            write (unit_num, '(3(i0,x))') x(i), y(i), z(i)
+            write (unit_num, '(3(i0,1x))') x(i), y(i), z(i)
         end do
         write (unit_num, '(a)') ""
 

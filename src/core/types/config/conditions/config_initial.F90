@@ -9,6 +9,7 @@ module types_config_conditions_initial
     public :: type_config_ic
 
     type, extends(abst_config) :: type_config_ic
+        logical :: active = .false.
         !> 対象とする現象の種類
         !> 熱移動，水分移動など
         type(type_constant_id) :: physics_type = type_constant_id("", "", -1)
@@ -32,6 +33,8 @@ contains
 
         select type (source)
         type is (type_config_ic)
+        
+            call self%set(self%active, source%active)
             call self%set(self%physics_type, source%physics_type)
             call self%set(self%ic_kind, source%ic_kind)
             call self%set(self%value, source%value)
@@ -44,6 +47,7 @@ contains
         implicit none
         class(type_config_ic), intent(inout) :: self
 
+        self%active = .false.
         self%physics_type = type_constant_id("", "", -1)
         self%ic_kind = type_constant_id("", "", -1)
         self%value = 0.0d0

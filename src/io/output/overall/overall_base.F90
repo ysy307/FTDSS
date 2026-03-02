@@ -14,6 +14,7 @@ contains
         real(real64) :: simulation_period_second
         real(real64) :: output_step_second
         integer(int32) :: max_file_counts_digit
+        character(:), allocatable :: format_count
 
         type(type_constant_value) :: time_unit
 
@@ -56,7 +57,8 @@ contains
 
             if (max_file_counts_digit < 1) max_file_counts_digit = 1
 
-            self%format_output = "(a,a,i"//trim(to_string(max_file_counts_digit))//"."//trim(to_string(max_file_counts_digit))//",a)"
+            format_count = "i"//trim(to_string(max_file_counts_digit))//"."//trim(to_string(max_file_counts_digit))
+            self%format_output = "(a,a,"//format_count//",a)"
         end if
 
     end subroutine initialize_input_type_output_overall

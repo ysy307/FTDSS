@@ -10,8 +10,9 @@ module types_topology_connectivity
 
     !>
     !> Stores element connectivity in Compressed Sparse Row (CSR) format.
-    !> This structure is used to represent the connectivity of nodes in a mesh, where each element's nodes are stored in a compact format for efficient access.
-    !> The `row_ptr` array indicates the starting index of each element's nodes in the `col_ind` array, which contains the actual node IDs for all elements concatenated together.
+    !> This structure is used to represent the connectivity of nodes in a mesh, where each element's nodes are stored
+    !> in a compact format for efficient access. The `row_ptr` array indicates the starting index of each element's nodes 
+    !> in the `col_ind` array, which contains the actual node IDs for all elements concatenated together.
     !>
     type :: type_csr_index
         !> Index array for CSR format. Stores the starting position of each element's nodes.

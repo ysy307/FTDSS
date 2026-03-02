@@ -12,7 +12,12 @@ contains
         class(abst_bc), intent(inout) :: self
         type(type_config_bc), intent(in) :: config_bc
 
-        call self%config%copy(config_bc)
+        self%physics_type = config_bc%physics_type
+        self%bc_kind = config_bc%bc_kind
+        self%num_time_points = config_bc%num_time_points
+        self%num_variables = config_bc%num_variables
+        call allocate_array(self%time_points, source=config_bc%time_points)
+        call allocate_array(self%values, source=config_bc%values)
 
         self%current_idx = 0
 
@@ -34,21 +39,21 @@ contains
         integer(int32), parameter :: MAX_LINEAR_STEPS = 4
         logical :: found
 
-        if (.not. allocated(self%config%time_points)) then
+        if (.not. allocated(self%time_points)) then
             coef = 0.0d0
             idx = 1
             return
         end if
 
-        n = size(self%config%time_points)
+        n = size(self%time_points)
 
-        if (n < 2 .or. current_time <= self%config%time_points(1)) then
+        if (n < 2 .or. current_time <= self%time_points(1)) then
             coef = 0.0d0
             idx = 1
             self%current_idx = 1
             return
         end if
-        if (current_time >= self%config%time_points(n)) then
+        if (current_time >= self%time_points(n)) then
             coef = 0.0d0
             idx = n
             self%current_idx = n
@@ -61,8 +66,8 @@ contains
 
         if (hint >= 1 .and. hint < n) then
             ! Check current interval [hint, hint+1)
-            if (current_time >= self%config%time_points(hint) .and. &
-                current_time < self%config%time_points(hint + 1)) then
+            if (current_time >= self%time_points(hint) .and. &
+                current_time < self%time_points(hint + 1)) then
                 idx = hint
                 found = .true.
             end if
@@ -71,8 +76,8 @@ contains
             if (.not. found) then
                 do i = 1, MAX_LINEAR_STEPS
                     if (hint + i >= n) exit
-                    if (current_time >= self%config%time_points(hint + i) .and. &
-                        current_time < self%config%time_points(hint + i + 1)) then
+                    if (current_time >= self%time_points(hint + i) .and. &
+                        current_time < self%time_points(hint + i + 1)) then
                         idx = hint + i
                         found = .true.
                         exit
@@ -84,8 +89,8 @@ contains
             if (.not. found) then
                 do i = 1, MAX_LINEAR_STEPS
                     if (hint - i < 1) exit
-                    if (current_time >= self%config%time_points(hint - i) .and. &
-                        current_time < self%config%time_points(hint - i + 1)) then
+                    if (current_time >= self%time_points(hint - i) .and. &
+                        current_time < self%time_points(hint - i + 1)) then
                         idx = hint - i
                         found = .true.
                         exit
@@ -100,7 +105,7 @@ contains
             high = n
             do while (high - low > 1)
                 mid = (low + high) / 2
-                if (current_time >= self%config%time_points(mid)) then
+                if (current_time >= self%time_points(mid)) then
                     low = mid
                 else
                     high = mid
@@ -113,9 +118,9 @@ contains
         self%current_idx = idx
 
         ! Compute interpolation coefficient
-        if (self%config%time_points(idx + 1) - self%config%time_points(idx) > epsilon(1.0d0)) then
-            coef = (current_time - self%config%time_points(idx)) / &
-                   (self%config%time_points(idx + 1) - self%config%time_points(idx))
+        if (self%time_points(idx + 1) - self%time_points(idx) > epsilon(1.0d0)) then
+            coef = (current_time - self%time_points(idx)) / &
+                   (self%time_points(idx + 1) - self%time_points(idx))
         else
             coef = 0.0d0
         end if
@@ -140,11 +145,11 @@ contains
 
         call self%calc_time_coefficient(current_time, coef, idx)
 
-        if (idx < self%config%num_time_points) then
-            out_values(1:self%config%num_variables) = self%config%values(:, idx) + &
-                                                      coef * (self%config%values(:, idx + 1) - self%config%values(:, idx))
+        if (idx < self%num_time_points) then
+            out_values(1:self%num_variables) = self%values(:, idx) + &
+                                                      coef * (self%values(:, idx + 1) - self%values(:, idx))
         else
-            out_values(1:self%config%num_variables) = self%config%values(:, self%config%num_time_points)
+            out_values(1:self%num_variables) = self%values(:, self%num_time_points)
         end if
     end subroutine calc_values_raw_bc
 
@@ -205,9 +210,9 @@ contains
 
         ! self%bc_kind = -1
         ! self%physics_type = -1
-        self%config%num_variables = 0
-        call deallocate_array(self%config%values)
-        call deallocate_array(self%config%time_points)
+        self%num_variables = 0
+        call deallocate_array(self%values)
+        call deallocate_array(self%time_points)
         self%initialized = .false.
     end subroutine destroy_bc
 

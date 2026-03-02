@@ -44,15 +44,15 @@ module io_input_translator
             class(type_input), intent(in) :: input
             integer(int32), intent(in) :: index
             type(type_constant_id), intent(in) :: target_physics
-            class(abst_config), intent(inout) :: config
+            class(type_config_bc), intent(inout) :: config
         end subroutine execute_condition_boundary
 
-        module subroutine execute_condition_initial(self, input, target_physics, config)
+        module subroutine execute_condition_initial(self, input, ic_target, config)
             implicit none
             class(type_input_translator), intent(in) :: self
             class(type_input), intent(in) :: input
-            type(type_constant_id), intent(in) :: target_physics
-            class(abst_config), intent(inout) :: config
+            type(type_constant_id), intent(in) :: ic_target
+            class(type_config_ic), intent(inout) :: config
 
         end subroutine execute_condition_initial
 

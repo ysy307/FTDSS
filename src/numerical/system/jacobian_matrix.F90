@@ -65,7 +65,7 @@ contains
 
         call domain%get_total_dofs(self%size)
         call domain%get_num_nodes(self%num_nodes)
-        call domain%get_num_dofs_per_node(self%num_dofs_per_node)
+        call domain%get_num_dof_per_node(self%num_dofs_per_node)
         call domain%get_node_adjacency(MATRIX_TYPES%CSR, row, col)
 
         self%matrix_type = MATRIX_TYPES%BSR%ID

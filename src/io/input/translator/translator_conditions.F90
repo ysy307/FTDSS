@@ -8,7 +8,7 @@ contains
         class(type_input), intent(in) :: input
         integer(int32), intent(in) :: index
         type(type_constant_id), intent(in) :: target_physics
-        class(abst_config), intent(inout) :: config
+        class(type_config_bc), intent(inout) :: config
 
         integer(int32) :: i
 
@@ -64,22 +64,27 @@ contains
 
     end subroutine execute_condition_boundary
 
-    module subroutine execute_condition_initial(self, input, target_physics, config)
+    module subroutine execute_condition_initial(self, input, ic_target, config)
         implicit none
         class(type_input_translator), intent(in) :: self
         class(type_input), intent(in) :: input
-        type(type_constant_id), intent(in) :: target_physics
-        class(abst_config), intent(inout) :: config
+        type(type_constant_id), intent(in) :: ic_target
+        class(type_config_ic), intent(inout) :: config
 
         select type (config)
         type is (type_config_ic)
-            if (.not. PHYSICS_TYPES%is_valid(target_physics)) then
+            if (.not. IC_TARGETS%is_valid(ic_target)) then
                 call config%reset()
                 return
             end if
 
-            config%physics_type = target_physics
-            associate (condition_data => input%conditions%initial_conditions%physics(target_physics%ID))
+            config%physics_type = ic_target
+            associate (condition_data => input%conditions%initial_conditions%physics(ic_target%ID))
+                if (ic_target == IC_TARGETS%POROSITY) then
+                    config%active = .true. ! Porosity IC might always be needed
+                else
+                    config%active = input%basic%analysis_controls%is_active(ic_target%ID)
+                end if
                 config%ic_kind = IC_METHODS%to_object(condition_data%type)
                 if (config%ic_kind == IC_METHODS%UNIFORM) then
                     config%value = condition_data%value

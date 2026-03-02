@@ -14,11 +14,11 @@ module conditions_boundary
     public :: type_bc_robin
     public :: type_bc_zero_flux
 
-    ! --- Public Constants ---
-    integer(int32), public, parameter :: ERR_BC_UNKNOWN = 801
-    integer(int32), public, parameter :: ERR_BC_INIT = 802
+    ! ! --- Public Constants ---
+    ! integer(int32), public, parameter :: ERR_BC_UNKNOWN = 801
+    ! integer(int32), public, parameter :: ERR_BC_INIT = 802
 
-    ! 値配列のインデックス定義 (ManagerやSolverも使う可能性があるため公開)
+    ! ! 値配列のインデックス定義 (ManagerやSolverも使う可能性があるため公開)
     integer(int32), public, parameter :: IDX_BC_VAL = 1
     integer(int32), public, parameter :: IDX_BC_COEFF = 2
 
@@ -26,9 +26,21 @@ module conditions_boundary
     ! Abstract Base Class
     ! ==========================================================================
     type, abstract :: abst_bc
-        type(type_config_bc) :: config
+        !> 対象とする現象の種類
+        !> 熱移動，水分移動など
+        type(type_constant_id), private :: physics_type = type_constant_id("", "", -1)
+        !> 境界条件の種類
+        !> ディリクレ，ノイマンなど
+        type(type_constant_id), private :: bc_kind = type_constant_id("", "", -1)
+
+        real(real64), allocatable, private :: time_points(:)
+        real(real64), allocatable, private :: values(:, :) ! (成分, 時間)
+
+        integer(int32), private :: num_time_points = 0
+        integer(int32), private :: num_variables = 0
+
         integer(int32), private :: current_idx = 0
-        logical :: initialized = .false.
+        logical, private :: initialized = .false.
     contains
         ! 初期化・破棄
         procedure, public, pass(self) :: initialize => initialize_bc

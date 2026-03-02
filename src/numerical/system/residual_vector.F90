@@ -71,7 +71,7 @@ contains
         type(type_domain), intent(in) :: domain
 
         call domain%get_total_dofs(self%size)
-        call domain%get_num_dofs_per_node(self%num_dofs_per_node)
+        call domain%get_num_dof_per_node(self%num_dofs_per_node)
         call domain%get_num_nodes(self%num_nodes)
 
         ! num_blocks = num_dofs_per_node として初期化
@@ -132,7 +132,7 @@ contains
         integer(int32), intent(in) :: row_dof
         real(real64), intent(in) :: value
 
-        call self%data%set(OP_INS, value, row_block=row_dof)
+        call self%data%set(VECTOR_OPS%INS, value, row_block=row_dof)
     end subroutine set_scalar_residual_vector
 
     subroutine set_array_residual_vector(self, row_dof, values)
@@ -141,7 +141,7 @@ contains
         integer(int32), intent(in) :: row_dof
         real(real64), intent(in) :: values(:)
 
-        call self%data%set(OP_INS, values, row_block=row_dof)
+        call self%data%set(VECTOR_OPS%INS, values, row_block=row_dof)
     end subroutine set_array_residual_vector
 
     subroutine set_value_at_index_residual_vector(self, row_dof, global_index, value)
@@ -151,7 +151,7 @@ contains
         integer(int32), intent(in) :: global_index
         real(real64), intent(in) :: value
 
-        call self%data%set(OP_INS, global_index, value, row_block=row_dof)
+        call self%data%set(VECTOR_OPS%INS, global_index, value, row_block=row_dof)
     end subroutine set_value_at_index_residual_vector
 
     subroutine set_values_at_indices_residual_vector(self, row_dof, global_indices, values)
@@ -161,11 +161,11 @@ contains
         integer(int32), intent(in) :: global_indices(:)
         real(real64), intent(in) :: values(:)
 
-        call self%data%set(OP_INS, global_indices, values, row_block=row_dof)
+        call self%data%set(VECTOR_OPS%INS, global_indices, values, row_block=row_dof)
     end subroutine set_values_at_indices_residual_vector
 
     ! -------------------------------------------------------------------
-    !  Adders (Mapping row_dof to row_block with OP_ADD)
+    !  Adders (Mapping row_dof to row_block with VECTOR_OPS%ADD)
     ! -------------------------------------------------------------------
 
     subroutine add_value_residual_vector(self, row_dof, value)
@@ -174,7 +174,7 @@ contains
         integer(int32), intent(in) :: row_dof
         real(real64), intent(in) :: value
 
-        call self%data%set(OP_ADD, value, row_block=row_dof)
+        call self%data%set(VECTOR_OPS%ADD, value, row_block=row_dof)
     end subroutine add_value_residual_vector
 
     subroutine add_array_residual_vector(self, row_dof, values)
@@ -183,7 +183,7 @@ contains
         integer(int32), intent(in) :: row_dof
         real(real64), intent(in) :: values(:)
 
-        call self%data%set(OP_ADD, values, row_block=row_dof)
+        call self%data%set(VECTOR_OPS%ADD, values, row_block=row_dof)
     end subroutine add_array_residual_vector
 
     subroutine add_value_at_index_residual_vector(self, row_dof, global_index, value)
@@ -193,7 +193,7 @@ contains
         integer(int32), intent(in) :: global_index
         real(real64), intent(in) :: value
 
-        call self%data%set(OP_ADD, global_index, value, row_block=row_dof)
+        call self%data%set(VECTOR_OPS%ADD, global_index, value, row_block=row_dof)
     end subroutine add_value_at_index_residual_vector
 
     subroutine add_values_at_indices_residual_vector(self, row_dof, global_indices, values)
@@ -203,7 +203,7 @@ contains
         integer(int32), intent(in) :: global_indices(:)
         real(real64), intent(in) :: values(:)
 
-        call self%data%set(OP_ADD, global_indices, values, row_block=row_dof)
+        call self%data%set(VECTOR_OPS%ADD, global_indices, values, row_block=row_dof)
     end subroutine add_values_at_indices_residual_vector
 
     subroutine add_values_from_vector_residual_vector(self, row_dof, global_indices, values)
@@ -220,7 +220,7 @@ contains
 
         ! ループ処理で値を加算
         do i = 1, size(global_indices)
-            call self%data%set(OP_ADD, global_indices(i), vals_data(i), row_block=row_dof)
+            call self%data%set(VECTOR_OPS%ADD, global_indices(i), vals_data(i), row_block=row_dof)
         end do
     end subroutine add_values_from_vector_residual_vector
 

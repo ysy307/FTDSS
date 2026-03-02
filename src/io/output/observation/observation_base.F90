@@ -204,14 +204,14 @@ contains
         case ("node_ids")
             write (self%num_unit, '(a)') "# Observation Node ID"
             do iObs = 1, num_observations
-                write (self%num_unit, '(a,i0,a,x,i0)') "# Node ID ", iObs, ":", self%node_ids(iObs)
+                write (self%num_unit, '(a,i0,a,1x,i0)') "# Node ID ", iObs, ":", self%node_ids(iObs)
             end do
         case ("coordinates")
             write (self%num_unit, '(a)') "# Observation Coordinate (x,y,z)"
             do iObs = 1, num_observations
                 elem_id = -1
                 if (allocated(self%element_ids)) elem_id = self%element_ids(iObs)
-                write (self%num_unit, '(a,x,i0,a,3(x,es18.11,a),a,i0)') &
+                write (self%num_unit, '(a,1x,i0,a,3(x,es18.11,a),a,i0)') &
                     "#    Point", iObs, ": (", &
                     self%coordinate%x(iObs), ",", &
                     self%coordinate%y(iObs), ",", &
@@ -257,14 +257,14 @@ contains
         case ("node_ids")
             write (self%num_unit, '(a)') "# Observation Node ID"
             do iObs = 1, num_observations
-                write (self%num_unit, '(a,i0,a,x,i0)') "# Node ID ", iObs, ":", self%node_ids(iObs)
+                write (self%num_unit, '(a,i0,a,1x,i0)') "# Node ID ", iObs, ":", self%node_ids(iObs)
             end do
         case ("coordinates")
             write (self%num_unit, '(a)') "# Observation Coordinate (x,y,z)"
             do iObs = 1, num_observations
                 elem_id = -1
                 if (allocated(self%element_ids)) elem_id = self%element_ids(iObs)
-                write (self%num_unit, '(a,x,i0,a,3(x,es18.11,a),a,i0)') &
+                write (self%num_unit, '(a,1x,i0,a,3(x,es18.11,a),a,i0)') &
                     "#    Point", iObs, ": (", &
                     self%coordinate%x(iObs), ",", &
                     self%coordinate%y(iObs), ",", &
