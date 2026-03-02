@@ -1,6 +1,4 @@
-submodule(inout_output) inout_output_observation
-    use :: iso_fortran_env, only:int32, real64
-    use :: stdlib_strings, only:to_string
+submodule(io_output_observation) output_observation_base
     implicit none
 
 contains
@@ -56,7 +54,7 @@ contains
             allocate (self%coordinate_normalized(self%num_observations))
 
             ! --- 座標探索ロジック ---
-            call domain%get_num_elements(num_elements)
+            call domain%get_num_fe(num_elements)
             call domain%get_computation_dimension(comp_dim)
             calc_type = input%basic%simulation_settings%calculate_type
 
@@ -74,11 +72,11 @@ contains
                 end if
 
                 do iElem = 1, num_elements
-                    call domain%get_element(iElem, fe)
+                    call domain%get_fe(iElem, fe)
                     if (.not. associated(fe)) cycle
-                    call domain%get_element_connectivity(iElem, conn)
+                    call domain%get_fe_connectivity(iElem, conn)
                     if (.not. associated(conn)) cycle
-                    call domain%get_element_coordinate(iElem, ele_coords)
+                    call domain%get_fe_coordinate(iElem, ele_coords)
 
                     ! 包含判定
                     call fe%is_inside(cartesian, normalized, ele_coords, inside)
@@ -276,7 +274,7 @@ contains
         end select
 
         write (self%num_unit, '(a)') "#"
-        write (self%num_unit, '(a)') "# Output Unit: Time ["//trim(get_time_unit_string(time_unit))//"], " &
+        write (self%num_unit, '(a)') "# Output Unit: Time ["//trim(TIME_UNITS%to_name(time_unit))//"], " &
             //trim(self%name)//" ["//trim(self%unit)//"]"
         write (self%num_unit, '(a)') "#"
 
@@ -337,8 +335,8 @@ contains
             if (allocated(self%element_ids)) then
                 elem_id = self%element_ids(iObs)
                 if (elem_id > 0) then
-                    call domain%get_element(elem_id, fe)
-                    call domain%get_element_connectivity(elem_id, p_conn)
+                    call domain%get_fe(elem_id, fe)
+                    call domain%get_fe_connectivity(elem_id, p_conn)
 
                     if (associated(fe) .and. associated(p_conn)) then
                         call fe%lerp(self%coordinate_normalized(iObs), nodal_temperature(p_conn), val)
@@ -396,8 +394,8 @@ contains
             if (allocated(self%element_ids)) then
                 elem_id = self%element_ids(iObs)
                 if (elem_id > 0) then
-                    call domain%get_element(elem_id, fe)
-                    call domain%get_element_connectivity(elem_id, p_conn)
+                    call domain%get_fe(elem_id, fe)
+                    call domain%get_fe_connectivity(elem_id, p_conn)
                     if (associated(fe) .and. associated(p_conn)) then
                         call fe%lerp(self%coordinate_normalized(iObs), nodal_temperature(p_conn), val_T)
                         call fe%lerp(self%coordinate_normalized(iObs), nodal_porosity(p_conn), val_phi)
@@ -491,8 +489,8 @@ contains
             if (allocated(self%element_ids)) then
                 elem_id = self%element_ids(iObs)
                 if (elem_id > 0) then
-                    call domain%get_element(elem_id, fe)
-                    call domain%get_element_connectivity(elem_id, p_conn)
+                    call domain%get_fe(elem_id, fe)
+                    call domain%get_fe_connectivity(elem_id, p_conn)
                     if (associated(fe) .and. associated(p_conn)) then
                         call fe%lerp(self%coordinate_normalized(iObs), nodal_pw(p_conn), val)
                         obs_values(iObs) = val
@@ -523,4 +521,4 @@ contains
         end do
     end subroutine get_observations_pw
 
-end submodule inout_output_observation
+end submodule output_observation_base

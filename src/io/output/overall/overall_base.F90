@@ -1,7 +1,4 @@
-submodule(inout_output) inout_output_overall_base
-    use :: iso_fortran_env, only:int32, real64
-    use :: stdlib_strings, only:to_string
-    use :: module_control, only:type_control
+submodule(io_output_overall) output_overall_base
     implicit none
 
 contains
@@ -64,4 +61,4 @@ contains
 
     end subroutine initialize_input_type_output_overall
 
-end submodule inout_output_overall_base
+end submodule output_overall_base

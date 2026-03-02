@@ -1,6 +1,4 @@
-submodule(inout_output) inout_output_overall_vtk
-    use :: iso_fortran_env, only:int32, real64
-    use :: stdlib_strings, only:to_string
+submodule(io_output_overall) output_overall_vtk
     implicit none
 
     interface write_field
@@ -256,4 +254,4 @@ contains
 
     end subroutine output_vtk_cell_int32
 
-end submodule inout_output_overall_vtk
+end submodule output_overall_vtk

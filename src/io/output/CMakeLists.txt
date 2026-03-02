@@ -8,13 +8,16 @@ add_library(SOLVER_OUTPUT STATIC)
 # ------------------------------------------------------------
 target_sources(SOLVER_OUTPUT
     PRIVATE
-        output_interface.F90
         output_base.F90
-        output_observation.F90
-        output_overall_base.F90
-        output_overall_vtk.F90
-        output_overall_vtu.F90
-        output_system_logger.F90
+        logging/logging_interface.F90
+        logging/system_logger.F90
+        observation/observation_interface.F90
+        observation/observation_base.F90
+        overall/overall_interface.F90
+        overall/overall_base.F90
+        overall/overall_vtk.F90
+        overall/overall_vtu.F90
+        output_manager.F90
         output.F90
 )
 
@@ -34,7 +37,6 @@ target_link_libraries(SOLVER_OUTPUT
         SOLVER::CORE
         SOLVER::INPUT
         SOLVER::DOMAIN
-        # Solver::Physics
         SOLVER::CONTROL
 )
 

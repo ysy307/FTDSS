@@ -1,5 +1,5 @@
 module module_output
-    use :: inout_output, only:type_output
+    use :: io_output_manager, only:type_output
     implicit none
     private
 

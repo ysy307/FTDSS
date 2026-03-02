@@ -1,6 +1,4 @@
-submodule(inout_output) inout_output_overall_vtu
-    use :: iso_fortran_env, only:int32, real64
-    use :: stdlib_strings, only:to_string
+submodule(io_output_overall) output_overall_vtu
     implicit none
 
 contains
@@ -147,4 +145,4 @@ contains
 
     end subroutine output_overall_vtu_cell
 
-end submodule inout_output_overall_vtu
+end submodule output_overall_vtu

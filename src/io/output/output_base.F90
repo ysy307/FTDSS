@@ -1,7 +1,10 @@
-submodule(inout_output) input_output_base
+module io_output_base
+    use :: iso_fortran_env, only:int32
     implicit none
+    private
+    public :: setup_directory
 contains
-    module subroutine setup_directory(dir_path, file_extensions)
+    subroutine setup_directory(dir_path, file_extensions)
         implicit none
         character(*), intent(in) :: dir_path
         character(*), intent(in) :: file_extensions(:)
@@ -35,4 +38,4 @@ contains
         end if
     end subroutine setup_directory
 
-end submodule input_output_base
+end module io_output_base
