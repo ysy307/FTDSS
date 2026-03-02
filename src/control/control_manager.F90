@@ -6,7 +6,7 @@ module core_control_manager
     use :: control_time, only:type_time
     use :: control_time_profiler, only:type_time_profiler
     use :: control_iteration, only:type_iteration
-    use :: control_output, only:type_output_manager
+    use :: control_scheduler, only:type_scheduler_manager   
     use :: control_parallel, only:initialize_openmp
     use :: module_linalg
     implicit none
@@ -23,8 +23,8 @@ module core_control_manager
         type(type_time), private :: time
         type(type_time_profiler), private :: profiler
 
-        type(type_output_manager), private :: out_field
-        type(type_output_manager), private :: out_history
+        type(type_scheduler_manager), private :: scheduler_field
+        type(type_scheduler_manager), private :: scheduler_history
 
         class(abst_acceleration), private, allocatable :: acceleration
 
@@ -115,10 +115,10 @@ contains
             self%time%is_initialized()) then
             call self%time%get_time(current_time_s)
             if (present(config_output_field)) then
-                call self%out_field%initialize(config_output_field, current_time_s)
+                call self%scheduler_field%initialize(config_output_field, current_time_s)
             end if
             if (present(config_output_history)) then
-                call self%out_history%initialize(config_output_history, current_time_s)
+                call self%scheduler_history%initialize(config_output_history, current_time_s)
             end if
         end if
 
@@ -281,12 +281,12 @@ contains
         call self%time%get_end_time(t_target)
 
         ! 到達時刻(300) を渡して，次のターゲット(600) を取得する
-        if (self%out_field%is_active()) then
-            call self%out_field%get_next_target_time(t_arrival, t_target_out)
+        if (self%scheduler_field%is_active()) then
+            call self%scheduler_field%get_next_target_time(t_arrival, t_target_out)
             t_target = min(t_target, t_target_out)
         end if
-        if (self%out_history%is_active()) then
-            call self%out_history%get_next_target_time(t_arrival, t_target_out)
+        if (self%scheduler_history%is_active()) then
+            call self%scheduler_history%get_next_target_time(t_arrival, t_target_out)
             t_target = min(t_target, t_target_out)
         end if
 
@@ -304,9 +304,9 @@ contains
 
         select case (output_type%ID)
         case (OUTPUT_TYPES%FIELD%ID)
-            is_output_triggered = self%out_field%is_output_triggered(current_time_seconds)
+            is_output_triggered = self%scheduler_field%is_output_triggered(current_time_seconds)
         case (OUTPUT_TYPES%HISTORY%ID)
-            is_output_triggered = self%out_history%is_output_triggered(current_time_seconds)
+            is_output_triggered = self%scheduler_history%is_output_triggered(current_time_seconds)
         case default
             is_output_triggered = .false.
         end select
@@ -322,9 +322,9 @@ contains
 
         select case (output_type%ID)
         case (OUTPUT_TYPES%FIELD%ID)
-            call self%out_field%get_output_time(current_time_seconds, converted_time)
+            call self%scheduler_field%get_output_time(current_time_seconds, converted_time)
         case (OUTPUT_TYPES%HISTORY%ID)
-            call self%out_history%get_output_time(current_time_seconds, converted_time)
+            call self%scheduler_history%get_output_time(current_time_seconds, converted_time)
         case default
             converted_time = current_time_seconds
         end select
@@ -339,9 +339,9 @@ contains
 
         select case (output_type%ID)
         case (OUTPUT_TYPES%FIELD%ID)
-            call self%out_field%get_step(step)
+            call self%scheduler_field%get_step(step)
         case (OUTPUT_TYPES%HISTORY%ID)
-            call self%out_history%get_step(step)
+            call self%scheduler_history%get_step(step)
         case default
             step = -1
         end select
@@ -356,9 +356,9 @@ contains
 
         select case (output_type%ID)
         case (OUTPUT_TYPES%FIELD%ID)
-            call self%out_field%update(current_time_seconds)
+            call self%scheduler_field%update(current_time_seconds)
         case (OUTPUT_TYPES%HISTORY%ID)
-            call self%out_history%update(current_time_seconds)
+            call self%scheduler_history%update(current_time_seconds)
         case default
             ! 何もしない
         end select

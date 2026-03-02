@@ -1,4 +1,4 @@
-module control_output
+module control_scheduler
     use, intrinsic :: iso_fortran_env
     use :: stdlib_optval, only:optval
     use :: stdlib_strings, only:strip
@@ -7,9 +7,9 @@ module control_output
     implicit none
     private
 
-    public :: type_output_manager
+    public :: type_scheduler_manager
 
-    type :: type_output_manager
+    type :: type_scheduler_manager
         logical, private :: active = .false.
         real(real64), private :: interval_seconds = 0.0d0 ! 常に[秒]で保持
         real(real64), private :: next_output_seconds = 0.0d0 ! 常に[秒]で保持
@@ -20,17 +20,17 @@ module control_output
         procedure, pass(self), public :: is_output_triggered => check_output_timing
         procedure, pass(self), public :: update => update_state
         procedure, pass(self), public :: get_step
-        procedure, pass(self), public :: get_output_time => get_output_time_output_manager
-        procedure, pass(self), public :: is_active => is_active_output_manager
+        procedure, pass(self), public :: get_output_time => get_output_time_scheduler_manager
+        procedure, pass(self), public :: is_active => is_active_scheduler_manager
         procedure, pass(self), public :: get_next_time
         procedure, pass(self), public :: get_next_target_time
-    end type type_output_manager
+    end type type_scheduler_manager
 
 contains
 
     subroutine initialize_manager(self, config, current_time_seconds)
         implicit none
-        class(type_output_manager), intent(inout) :: self
+        class(type_scheduler_manager), intent(inout) :: self
         type(type_config_output_manager), intent(in) :: config
         real(real64), intent(in) :: current_time_seconds
 
@@ -60,7 +60,7 @@ contains
     ! ----------------------------------------------------------------------
     pure function check_output_timing(self, current_time_seconds) result(is_ready)
         implicit none
-        class(type_output_manager), intent(in) :: self
+        class(type_scheduler_manager), intent(in) :: self
         real(real64), intent(in) :: current_time_seconds
         logical :: is_ready
         real(real64), parameter :: tolerance = 1.0d-9
@@ -82,7 +82,7 @@ contains
     ! ----------------------------------------------------------------------
     subroutine update_state(self, current_time_seconds)
         implicit none
-        class(type_output_manager), intent(inout) :: self
+        class(type_scheduler_manager), intent(inout) :: self
         real(real64), intent(in) :: current_time_seconds
         real(real64), parameter :: tolerance = 1.0d-9
         real(real64) :: diff, steps_to_add
@@ -101,9 +101,9 @@ contains
         self%current_step = self%current_step + 1
     end subroutine update_state
 
-    pure subroutine get_output_time_output_manager(self, current_time_seconds,converted_time)
+    pure subroutine get_output_time_scheduler_manager(self, current_time_seconds,converted_time)
         implicit none
-        class(type_output_manager), intent(in) :: self
+        class(type_scheduler_manager), intent(in) :: self
         real(real64), intent(in) :: current_time_seconds
         real(real64), intent(inout) :: converted_time
 
@@ -112,28 +112,28 @@ contains
         else
             converted_time = current_time_seconds
         end if
-    end subroutine get_output_time_output_manager
+    end subroutine get_output_time_scheduler_manager
 
     pure subroutine get_step(self, step)
         implicit none
-        class(type_output_manager), intent(in) :: self
+        class(type_scheduler_manager), intent(in) :: self
         integer(int32), intent(inout) :: step
         step = self%current_step
     end subroutine get_step
 
     !> 出力が有効かどうかを判定する
-    pure function is_active_output_manager(self) result(is_active)
+    pure function is_active_scheduler_manager(self) result(is_active)
         implicit none
-        class(type_output_manager), intent(in) :: self
+        class(type_scheduler_manager), intent(in) :: self
         logical :: is_active
 
         is_active = self%active
-    end function is_active_output_manager
+    end function is_active_scheduler_manager
 
     !> 次回の出力予定時刻（秒）を取得する
     pure function get_next_time(self) result(next_output_seconds)
         implicit none
-        class(type_output_manager), intent(in) :: self
+        class(type_scheduler_manager), intent(in) :: self
         real(real64) :: next_output_seconds
 
         next_output_seconds = self%next_output_seconds
@@ -142,7 +142,7 @@ contains
     !> 現在時刻に基づき，次に同期すべきターゲット時刻を返す
     subroutine get_next_target_time(self, current_time, target_time)
         implicit none
-        class(type_output_manager), intent(in) :: self
+        class(type_scheduler_manager), intent(in) :: self
         real(real64), intent(in) :: current_time
         real(real64), intent(inout) :: target_time
 
@@ -162,4 +162,4 @@ contains
         end if
     end subroutine get_next_target_time
 
-end module control_output
+end module control_scheduler

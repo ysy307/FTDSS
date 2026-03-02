@@ -25,7 +25,7 @@ target_sources(SOLVER_CONTROL
         iteration/iteration_manager.F90
         iteration/iteration.F90
 
-        output/output_manager.F90
+        scheduler/scheduler_manager.F90
 
         parallel/openmp.F90
         parallel/parallel.F90
