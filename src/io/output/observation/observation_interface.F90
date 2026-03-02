@@ -32,15 +32,26 @@ module io_output_observation
     !> Observation point defined by spatial coordinates
     type, extends(abst_observation_point) :: type_observation_point_coordinate
         type(type_coordinate_dp), private :: coordinate
-        integer(int32), private :: element_id
+        integer(int32), private :: fe_id
         type(type_coordinate_dp), private :: coordinate_normalized
-        integer(int32), allocatable :: connectivity(:)
         class(abst_fe), pointer :: fe => null()
+        integer(int32), allocatable :: connectivity(:)
     contains
+        procedure, pass(self) :: initialize => initialize_observation_point_coordinate
         procedure, pass(self) :: extract_value => extract_value_coordinate
     end type type_observation_point_coordinate
 
     interface
+        module subroutine initialize_observation_point_coordinate(self, coordinate, fe_id, coordinate_normalized, fe, connectivity)
+            implicit none
+            class(type_observation_point_coordinate), intent(inout) :: self
+            type(type_coordinate_dp), intent(in) :: coordinate
+            integer(int32), intent(in) :: fe_id
+            type(type_coordinate_dp), intent(in) :: coordinate_normalized
+            class(abst_fe), intent(in), pointer :: fe
+            integer(int32), intent(in) :: connectivity(:)
+        end subroutine initialize_observation_point_coordinate
+
         module subroutine extract_value_coordinate(self, nodal_values, value)
             implicit none
             class(type_observation_point_coordinate), intent(in) :: self
@@ -53,10 +64,17 @@ module io_output_observation
     type, extends(abst_observation_point) :: type_observation_point_node
         integer(int32) :: node_id
     contains
+        procedure, pass(self) :: initialize => initialize_observation_point_node
         procedure, pass(self) :: extract_value => extract_value_node
     end type type_observation_point_node
 
     interface
+        module subroutine initialize_observation_point_node(self, node_id)
+            implicit none
+            class(type_observation_point_node), intent(inout) :: self
+            integer(int32), intent(in) :: node_id
+        end subroutine initialize_observation_point_node
+
         module subroutine extract_value_node(self, nodal_values, value)
             implicit none
             class(type_observation_point_node), intent(in) :: self

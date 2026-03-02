@@ -67,6 +67,7 @@ module domain_manager
         procedure, private, pass(self) :: lerp_2d_domain
         procedure, private, pass(self) :: lerp_3d_domain
         procedure, public, pass(self) :: dlerp => dlerp_domain
+        procedure, public, pass(self) :: find_element => find_element_domain
 
         ! ---- Inquiry ----
         ! is_XXX, has_XXX, should_XXX, etc.
@@ -134,7 +135,7 @@ contains
     subroutine get_computation_type_domain(self, computation_type)
         implicit none
         class(type_domain), intent(in), target :: self
-        type(type_constant_id), intent(inout) ,pointer :: computation_type
+        type(type_constant_id), intent(inout), pointer :: computation_type
 
         computation_type => self%computation_type
     end subroutine get_computation_type_domain
@@ -142,7 +143,7 @@ contains
     subroutine get_coupling_mode_domain(self, coupling_mode)
         implicit none
         class(type_domain), intent(in), target :: self
-        type(type_constant_id), intent(inout) ,pointer :: coupling_mode
+        type(type_constant_id), intent(inout), pointer :: coupling_mode
 
         coupling_mode => self%coupling_mode
     end subroutine get_coupling_mode_domain
@@ -379,6 +380,54 @@ contains
         call fe%dlerp(r, values, coordinates, self%computation_type%ID, dlerped_value)
 
     end subroutine dlerp_domain
+
+    subroutine find_element_domain(self, coordinate, coordinate_normalized, found_fe_id)
+        implicit none
+        class(type_domain), intent(in) :: self
+        type(type_coordinate_dp), intent(in) :: coordinate
+        type(type_coordinate_dp), intent(inout) :: coordinate_normalized
+        integer(int32), intent(inout) :: found_fe_id
+
+        integer(int32) :: i
+        integer(int32) :: num_fe
+        type(type_coordinate_dp) :: cartesian, normalized
+        class(abst_fe), pointer :: fe
+        integer(int32), pointer, contiguous, dimension(:) :: conn => null()
+        real(real64), allocatable :: element_coordinate(:, :)
+        logical :: inside
+
+        found_fe_id = -1
+
+        ! 観測点座標セット (探索点)
+        select case (self%computation_type%ID)
+        case (COMP_TYPES%XY_2D%ID)
+            call cartesian%set(coordinate%x, coordinate%y, 0.0d0)
+        case (COMP_TYPES%XZ_2D%ID)
+            call cartesian%set(coordinate%x, coordinate%z, 0.0d0)
+        case (COMP_TYPES%XYZ_3D%ID)
+            call cartesian%set(coordinate%x, coordinate%y, coordinate%z)
+        end select
+
+        call self%elements%get_num_fe(num_fe)
+
+        do i = 1, num_fe
+            call self%get_fe(i, fe)
+            if (.not. associated(fe)) cycle
+            call self%get_fe_connectivity(i, conn)
+            if (.not. associated(conn)) cycle
+            call self%get_fe_coordinate(i, element_coordinate)
+            if (.not. allocated(element_coordinate)) cycle
+            !                 ! 包含判定
+            call fe%is_inside(cartesian, normalized, element_coordinate, inside)
+
+            if (inside) then
+                coordinate_normalized = normalized
+                found_fe_id = i
+                exit
+            end if
+        end do
+
+    end subroutine find_element_domain
 
     ! --------------------------------------------------------------------------
     ! Display Procedures for Debugging

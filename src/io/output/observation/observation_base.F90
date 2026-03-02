@@ -11,6 +11,7 @@ contains
         character(*), intent(in) :: dir_output
         type(type_constant_id), intent(in) :: variable_type
 
+        integer(int32) :: i
         !     integer(int32) :: iObs, iElem, num_elements
         !     integer(int32) :: elem_id, comp_dim, calc_type
         !     type(type_coordinate_dp) :: cartesian, normalized
@@ -23,92 +24,109 @@ contains
         type(type_constant_value) :: file_format
 
         !     ! --- 設定の取得 ---
-        !     self%variable_type = input%output_settings%history_output%observation_type
+        ! self%variable_type = input%output_settings%history_output%observation_type
 
-        !     if (self%variable_type == OUTPUT_OBSERVATION_TYPES%NONE) then
-        !         self%do_output = .false.
-        !         return
-        !     else
-        !         self%do_output = .true.
-        !     end if
-        !     ! --- デリミタとフォーマット文字列の設定 ---
-        !     select case (file_format%ID)
-        !     case (FILE_FORMATS%CSV%ID)
-        !         self%delimiter = ","
-        !     case (FILE_FORMATS%DAT%ID)
-        !         self%delimiter = "  "
-        !     case default
-        !         self%delimiter = "  "
-        !     end select
+        if (self%variable_type == OUTPUT_OBSERVATION_TYPES%NONE) then
+            self%do_output = .false.
+            return
+        else
+            self%do_output = .true.
+        end if
 
-        !     self%fmt_line = '(*(es22.15,:,"'//self%delimiter//'"))'
+        ! --- デリミタとフォーマット文字列の設定 ---
+        select case (file_format%ID)
+        case (FILE_FORMATS%CSV%ID)
+            self%delimiter = ","
+        case (FILE_FORMATS%DAT%ID)
+            self%delimiter = "  "
+        case default
+            self%delimiter = "  "
+        end select
 
-        !     self%self%num_observations = input%output_settings%history_output%self%num_observations
+        self%fmt_line = '(*(es22.15,:,"'//self%delimiter//'"))'
 
-        !     select case (trim(self%type))
-        !     case ("node_ids")
-        !         if (allocated(self%node_ids)) deallocate (self%node_ids)
-        !         allocate (self%node_ids, source=input%output_settings%history_output%node_ids)
+        self%num_observations = input%output_settings%history_output%num_observations
 
-        !     case ("coordinates")
-        !         call self%coordinate%initialize(self%self%num_observations)
-        !         do iObs = 1, self%self%num_observations
-        !             self%coordinate%x(iObs) = input%output_settings%history_output%coordinates(iObs)%x
-        !             self%coordinate%y(iObs) = input%output_settings%history_output%coordinates(iObs)%y
-        !             self%coordinate%z(iObs) = input%output_settings%history_output%coordinates(iObs)%z
-        !         end do
+        if (allocated(self%observation_points)) deallocate (self%observation_points)
+        allocate (self%observation_points(self%num_observations))
 
-        !         ! 要素ID保存用配列の確保
-        !         if (allocated(self%element_ids)) deallocate (self%element_ids)
-        !         allocate (self%element_ids(self%self%num_observations))
-        !         self%element_ids = -1
+        select case (self%observation_type%ID)
+        case (OUTPUT_OBSERVATION_TYPES%NODE_IDS%ID)
+            do i = 1, self%num_observations
+                allocate (type_observation_point_node :: self%observation_points(i)%point)
+                select type (p => self%observation_points(i)%point)
+                type is (type_observation_point_node)
+                    call p%initialize(input%output_settings%history_output%node_ids(i))
+                end select
+            end do
+        case (OUTPUT_OBSERVATION_TYPES%COORDINATES%ID)
+            do i = 1, self%num_observations
+                allocate (type_observation_point_coordinate :: self%observation_points(i)%point)
+                select type (p => self%observation_points(i)%point)
+                type is (type_observation_point_coordinate)
+                    ! call p%initialize(input%output_settings%history_output%coordinates(i), &
+                    !     input%output_settings%history_output%fe_ids(i), &
+                    !     input%output_settings%history_output%normalized_coordinates(i), &
+                    !     domain%get_fe(input%output_settings%history_output%fe_ids(i)), &
+                    !     input%output_settings%history_output%connectivities(i))
+                end select
+            end do
+            !         call self%coordinate%initialize(self%self%num_observations)
+            !         do iObs = 1, self%self%num_observations
+            !             self%coordinate%x(iObs) = input%output_settings%history_output%coordinates(iObs)%x
+            !             self%coordinate%y(iObs) = input%output_settings%history_output%coordinates(iObs)%y
+            !             self%coordinate%z(iObs) = input%output_settings%history_output%coordinates(iObs)%z
+            !         end do
 
-        !         if (allocated(self%coordinate_normalized)) deallocate (self%coordinate_normalized)
-        !         allocate (self%coordinate_normalized(self%self%num_observations))
+            !         ! 要素ID保存用配列の確保
+            !         if (allocated(self%element_ids)) deallocate (self%element_ids)
+            !         allocate (self%element_ids(self%self%num_observations))
+            !         self%element_ids = -1
 
-        !         ! --- 座標探索ロジック ---
-        !         call domain%get_num_fe(num_elements)
-        !         call domain%get_computation_dimension(comp_dim)
-        !         calc_type = input%basic%simulation_settings%calculate_type
+            !         if (allocated(self%coordinate_normalized)) deallocate (self%coordinate_normalized)
+            !         allocate (self%coordinate_normalized(self%self%num_observations))
 
-        !         do iObs = 1, self%self%num_observations
-        !             ! 観測点座標セット (探索点)
-        !             if (comp_dim == 2) then
-        !                 if (calc_type == 1) then ! XY (2D)
-        !                     call cartesian%set(self%coordinate%x(iObs), self%coordinate%y(iObs), 0.0d0)
-        !                 else ! XZ (2D)
-        !                     ! XZ平面の場合、Y成分にZ座標を入れて2D探索を行う (domain側の格納形式に合わせる)
-        !                     call cartesian%set(self%coordinate%x(iObs), self%coordinate%z(iObs), 0.0d0)
-        !                 end if
-        !             else ! 3D
-        !                 call cartesian%set(self%coordinate%x(iObs), self%coordinate%y(iObs), self%coordinate%z(iObs))
-        !             end if
+            !         ! --- 座標探索ロジック ---
+            !         call domain%get_num_fe(num_elements)
+            !         call domain%get_computation_dimension(comp_dim)
+            !         calc_type = input%basic%simulation_settings%calculate_type
 
-        !             do iElem = 1, num_elements
-        !                 call domain%get_fe(iElem, fe)
-        !                 if (.not. associated(fe)) cycle
-        !                 call domain%get_fe_connectivity(iElem, conn)
-        !                 if (.not. associated(conn)) cycle
-        !                 call domain%get_fe_coordinate(iElem, ele_coords)
+            !         do iObs = 1, self%self%num_observations
+            !             ! 観測点座標セット (探索点)
+            !             if (comp_dim == 2) then
+            !                 if (calc_type == 1) then ! XY (2D)
+            !                     call cartesian%set(self%coordinate%x(iObs), self%coordinate%y(iObs), 0.0d0)
+            !                 else ! XZ (2D)
+            !                     ! XZ平面の場合、Y成分にZ座標を入れて2D探索を行う (domain側の格納形式に合わせる)
+            !                     call cartesian%set(self%coordinate%x(iObs), self%coordinate%z(iObs), 0.0d0)
+            !                 end if
+            !             else ! 3D
+            !                 call cartesian%set(self%coordinate%x(iObs), self%coordinate%y(iObs), self%coordinate%z(iObs))
+            !             end if
 
-        !                 ! 包含判定
-        !                 call fe%is_inside(cartesian, normalized, ele_coords, inside)
+            !             do iElem = 1, num_elements
+            !                 call domain%get_fe(iElem, fe)
+            !                 if (.not. associated(fe)) cycle
+            !                 call domain%get_fe_connectivity(iElem, conn)
+            !                 if (.not. associated(conn)) cycle
+            !                 call domain%get_fe_coordinate(iElem, ele_coords)
 
-        !                 if (inside) then
-        !                     self%element_ids(iObs) = iElem
-        !                     self%coordinate_normalized(iObs) = normalized
-        !                     exit
-        !                 end if
-        !             end do
+            !                 ! 包含判定
+            !                 call fe%is_inside(cartesian, normalized, ele_coords, inside)
 
-        !             ! デバッグ用: 見つからない場合の警告
-        !             if (self%element_ids(iObs) == -1) then
-        !                 print *, "Warning: Observation point ", iObs, " is outside the domain."
-        !             end if
-        !         end do
-        !     end select
+            !                 if (inside) then
+            !                     self%element_ids(iObs) = iElem
+            !                     self%coordinate_normalized(iObs) = normalized
+            !                     exit
+            !                 end if
+            !             end do
 
-        !     if (associated(self%get_values)) nullify (self%get_values)
+            !             ! デバッグ用: 見つからない場合の警告
+            !             if (self%element_ids(iObs) == -1) then
+            !                 print *, "Warning: Observation point ", iObs, " is outside the domain."
+            !             end if
+            !         end do
+        end select
 
         select case (self%variable_type%ID)
         case (OUTPUT_VARIABLE_TYPES%TEMPERATURE%ID)
@@ -135,7 +153,6 @@ contains
             self%variable_unit = "m/s"
             self%file_name = strip(dir_output)//"obsf_Flux."//strip(file_format%NAME)
             self%io_unit = 99999999
-            self%num_observations = self%num_observations * 3
         case (OUTPUT_VARIABLE_TYPES%HYDRAULIC_CONDUCTIVITY%ID)
             self%variable_unit = "m/s"
             self%file_name = strip(dir_output)//"obsf_K."//strip(file_format%NAME)
@@ -183,7 +200,7 @@ contains
                         p%coordinate%x, ",", &
                         p%coordinate%y, ",", &
                         p%coordinate%z, ")", &
-                        " => Element ID: ", p%element_id
+                        " => Element ID: ", p%fe_id
                 end select
             end do
         end select
@@ -224,6 +241,22 @@ contains
 
     end function should_output_overall
 
+    module subroutine initialize_observation_point_coordinate(self, coordinate, fe_id, coordinate_normalized, fe, connectivity)
+        implicit none
+        class(type_observation_point_coordinate), intent(inout) :: self
+        type(type_coordinate_dp), intent(in) :: coordinate
+        integer(int32), intent(in) :: fe_id
+        type(type_coordinate_dp), intent(in) :: coordinate_normalized
+        class(abst_fe), intent(in), pointer :: fe
+        integer(int32), intent(in) :: connectivity(:)
+
+        self%coordinate = coordinate
+        self%fe_id = fe_id
+        self%coordinate_normalized = coordinate_normalized
+        self%fe => fe
+        self%connectivity = connectivity
+    end subroutine initialize_observation_point_coordinate
+
     module subroutine extract_value_coordinate(self, nodal_values, value)
         implicit none
         class(type_observation_point_coordinate), intent(in) :: self
@@ -237,6 +270,14 @@ contains
         end if
 
     end subroutine extract_value_coordinate
+
+    module subroutine initialize_observation_point_node(self, node_id)
+        implicit none
+        class(type_observation_point_node), intent(inout) :: self
+        integer(int32), intent(in) :: node_id
+
+        self%node_id = node_id
+    end subroutine initialize_observation_point_node
 
     module subroutine extract_value_node(self, nodal_values, value)
         implicit none
