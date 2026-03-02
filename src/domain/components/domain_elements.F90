@@ -14,7 +14,7 @@ module components_domain_elements
     !>
     type :: type_elements_manager
         !> Number of elements in this subdomain.
-        integer(int32) :: num_elements = 0
+        integer(int32) :: num_fe = 0
         !> Finite element type ID for each element.
         integer(int32), allocatable :: fe_types(:)
         !> Material ID for each element.
@@ -58,11 +58,11 @@ contains
         type(type_config_elements), intent(in) :: config_elements
         type(type_config_multicoloring), intent(in) :: config_multicoloring
 
-        self%num_elements = config_elements%num_elements
+        self%num_fe = config_elements%num_elements
         call allocate_array(self%fe_types, source=config_elements%fe_types)
         call allocate_array(self%fe_material_ids, source=config_elements%fe_material_ids)
 
-        call self%fe_manager%initialize(config_elements%integration_order, self%num_elements, self%fe_types)
+        call self%fe_manager%initialize(config_elements%integration_order, self%num_fe, self%fe_types)
         call self%colors%initialize(config_multicoloring)
     end subroutine initialize_elements_manager
 
@@ -76,7 +76,7 @@ contains
         call self%fe_manager%destroy()
         call deallocate_array(self%fe_types)
         call deallocate_array(self%fe_material_ids)
-        self%num_elements = 0
+        self%num_fe = 0
     end subroutine destroy_elements_manager
 
     subroutine display_elements_manager(self, unit_in)
@@ -90,7 +90,7 @@ contains
 
         write (unit, '(A)') '### Elements Manager'
         write (unit, '(A)')
-        write (unit, '(A, I0)') '  - **Number of Elements**: ', self%num_elements
+        write (unit, '(A, I0)') '  - **Number of Elements**: ', self%num_fe
         call self%connectivity%display(unit_in=unit, title='Volume Elements')
         write (unit, '(A)')
     end subroutine display_elements_manager

@@ -128,6 +128,7 @@ module io_input_translator
             class(type_config_nodes), intent(inout) :: config
 
         end subroutine execute_geometry_domain_nodes
+
         module subroutine execute_geometry_domain_elements(self, input, config_elements, config_multicoloring)
             implicit none
             class(type_input_translator), intent(in) :: self
@@ -136,6 +137,14 @@ module io_input_translator
             class(type_config_multicoloring), intent(inout) :: config_multicoloring
 
         end subroutine execute_geometry_domain_elements
+
+        module subroutine execute_geometry_domain_boundaries(self, input, config_elements)
+            implicit none
+            class(type_input_translator), intent(in) :: self
+            class(type_input), intent(in) :: input
+            class(type_config_elements), intent(inout), allocatable :: config_elements(:)
+
+        end subroutine execute_geometry_domain_boundaries
 
         module subroutine execute_output_field(self, input, config)
             implicit none
