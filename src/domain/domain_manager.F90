@@ -7,30 +7,20 @@ module domain_manager
     use :: stdlib_logger
     use :: stdlib_strings, only:strip
     use :: module_core
-    use :: module_input, only:type_input, input_translator
-    use :: module_control, only:type_control
+    ! use :: module_input, only:type_input, input_translator
+    ! use :: module_control, only:type_control
     use :: module_fe, only:type_fe_manager, abst_fe
-    ! use :: module_boundary
     use :: domain_multicoloring, only:type_coloring
     use :: domain_adjacency, only:type_node_adjacency, type_map_node_to_element
+
+    use :: components_domain_nodes, only:type_nodes_manager
+    use :: components_domain_elements, only:type_elements_manager
+    use :: components_domain_boundaries, only:type_boundaries_manager
 
     implicit none
     private
 
     public :: type_domain
-
-    ! !>
-    ! !> Stores element connectivity in Compressed Sparse Row (CSR) format.
-    ! !>
-    ! type :: type_csr_index
-    !     !> Index array for CSR format. Stores the starting position of each element's nodes in 'val'.
-    !     !> Size is (num_elements + 1).
-    !     integer(int32), allocatable :: ind(:)
-    !     !> Value array for CSR format. Stores the concatenated node IDs for all elements.
-    !     integer(int32), allocatable :: val(:)
-    ! contains
-    !     procedure, public, pass(self) :: display => display_connectivity
-    ! end type type_csr_index
 
     !>
     !> Represents a single, unique boundary condition applied to a set of geometric entities.
@@ -49,7 +39,7 @@ module domain_manager
         !> The polymorphic boundary condition logic.
         class(abst_bc), allocatable :: condition
     contains
-        procedure, public, pass(self) :: display => display_boundary_patch
+        ! procedure, public, pass(self) :: display => display_boundary_patch
     end type type_boundary_patch
 
     !>
@@ -61,7 +51,7 @@ module domain_manager
         !> Array of unique boundary condition sets.
         type(type_boundary_patch), allocatable :: bcs(:)
     contains
-        procedure, public, pass(self) :: display => display_physics_bc_manager
+        ! procedure, public, pass(self) :: display => display_physics_bc_manager
     end type type_physics_bc_manager
 
     !>
@@ -80,62 +70,31 @@ module domain_manager
         procedure, private, pass(self) :: measure_and_allocate_bc_geometry
         procedure, private, pass(self) :: store_bc_geometry
         procedure, private, pass(self) :: create_bc_instances
-        procedure, public, pass(self) :: display => display_boundary_manager
+        ! procedure, public, pass(self) :: display => display_boundary_manager
     end type type_boundary_manager
 
-    !>
-    !> Stores the mapping and layout of degrees of freedom (DOF) per node.
-    !>
-    type :: type_dof_map
-        !> Total number of degrees of freedom per node for the active physics.
-        integer(int32) :: num_dof_per_node = 0
-        !> Number of DOFs for each individual physics type.
-        integer(int32) :: num_dof_of_physics(PHYSICS_TYPES%NUM_ID) = 0
-        !> The starting index for each physics' DOFs within the block of DOFs for a single node.
-        integer(int32) :: start_dof_index(PHYSICS_TYPES%NUM_ID) = 0
-    contains
-        procedure, public, pass(self) :: display => display_dof_map
-    end type type_dof_map
-
-    !>
-    !> Manages all data related to nodes (points) in the domain.
-    !>
-    type :: type_node_manager
-        !> Pointer to the parent domain object.
-        type(type_domain), pointer, private :: parent => null()
-        !> Number of nodes in this subdomain.
-        integer(int32) :: num_nodes = 0
-        !> Nodal coordinates. Size: (computation_dimension, num_nodes).
-        real(real64), allocatable :: coordinates(:, :)
-        !> Global ID for each node in this subdomain.
-        integer(int32), allocatable :: node_global_ids(:)
-    contains
-        procedure, public, pass(self) :: initialize => initialize_node_manager
-        procedure, public, pass(self) :: display => display_node_manager
-    end type type_node_manager
-
-    !>
-    !> Manages all data related to volume elements in the domain.
-    !>
-    type :: type_element_manager
-        !> Pointer to the parent domain object.
-        type(type_domain), pointer, private :: parent => null()
-        !> Number of elements in this subdomain.
-        integer(int32) :: num_elements = 0
-        !> Finite element type ID for each element.
-        integer(int32), allocatable :: fe_types(:)
-        !> Material ID for each element.
-        integer(int32), allocatable :: fe_material_ids(:)
-        !> Manager for FE type-specific operations.
-        type(type_fe_manager) :: fe_manager
-        !> Connectivity data for all elements.
-        type(type_csr_index) :: connectivity
-        !> Coloring information for parallel element processing.
-        type(type_coloring) :: colors
-    contains
-        procedure, public, pass(self) :: initialize => initialize_element_manager
-        procedure, public, pass(self) :: display => display_element_manager
-    end type type_element_manager
+    ! !>
+    ! !> Manages all data related to volume elements in the domain.
+    ! !>
+    ! type :: type_element_manager
+    !     !> Pointer to the parent domain object.
+    !     type(type_domain), pointer, private :: parent => null()
+    !     !> Number of elements in this subdomain.
+    !     integer(int32) :: num_elements = 0
+    !     !> Finite element type ID for each element.
+    !     integer(int32), allocatable :: fe_types(:)
+    !     !> Material ID for each element.
+    !     integer(int32), allocatable :: fe_material_ids(:)
+    !     !> Manager for FE type-specific operations.
+    !     type(type_fe_manager) :: fe_manager
+    !     !> Connectivity data for all elements.
+    !     type(type_csr_index) :: connectivity
+    !     !> Coloring information for parallel element processing.
+    !     type(type_coloring) :: colors
+    ! contains
+    !     procedure, public, pass(self) :: initialize => initialize_element_manager
+    !     ! procedure, public, pass(self) :: display => display_element_manager
+    ! end type type_element_manager
 
     !>
     !> The main container for all simulation domain data.
@@ -154,15 +113,15 @@ module domain_manager
         !> Manages the degree of freedom layout.
         type(type_dof_map) :: dof_map
         !> Manages all nodal data.
-        type(type_node_manager) :: nodes
+        type(type_nodes_manager) :: nodes
         !> Manages all element data.
-        type(type_element_manager) :: elements
+        type(type_elements_manager) :: elements
+        !> Manages all boundary condition data.
+        type(type_boundaries_manager) :: boundaries
         !> Node adjacency information for all nodes in the domain.
         type(type_node_adjacency) :: node_adjacency
         !> Element-to-node adjacency information.
         type(type_map_node_to_element) :: element_adjacency
-        !> Manages all boundary condition data.
-        type(type_boundary_manager) :: boundaries
         !> Indicates whether the domain is associated with a parent.
         logical, private :: is_associated = .false.
     contains
@@ -191,7 +150,7 @@ module domain_manager
         procedure, private, pass(self) :: lerp_3d_domain
         generic, public :: lerp => lerp_1d_domain, lerp_2d_domain, lerp_3d_domain
         procedure, public, pass(self) :: dlerp => dlerp_domain
-        procedure, public, pass(self) :: display => display_domain
+        ! procedure, public, pass(self) :: display => display_domain
     end type type_domain
 
 contains
@@ -267,74 +226,54 @@ contains
         end select
     end subroutine set_basic_info_and_dof_map
 
-    !> Initializes the node manager by reading data from the input object.
-    subroutine initialize_node_manager(self, input)
-        implicit none
-        class(type_node_manager), intent(inout) :: self
-        type(type_input), intent(in) :: input
+    ! !> Initializes the element manager by reading and organizing element data.
+    ! subroutine initialize_element_manager(self, input)
+    !     implicit none
+    !     class(type_element_manager), intent(inout) :: self
+    !     type(type_input), intent(in) :: input
+    !     integer(int32) :: i, ind, num_total_cells, num_total_connectivity
 
-        self%num_nodes = input%geometry%vtk%num_points
+    !     num_total_cells = input%geometry%vtk%num_total_cells
 
-        if (allocated(self%coordinates)) deallocate (self%coordinates)
-        allocate (self%coordinates(3, self%num_nodes))
+    !     self%num_elements = 0
+    !     num_total_connectivity = 0
+    !     do i = 1, num_total_cells
+    !         if (input%geometry%vtk%cells(i)%get_dimension() == self%parent%computation_dimension) then
+    !             self%num_elements = self%num_elements + 1
+    !             num_total_connectivity = num_total_connectivity + input%geometry%vtk%cells(i)%num_nodes_in_cell
+    !         end if
+    !     end do
 
-        self%coordinates(1, :) = input%geometry%vtk%points%x(1:self%num_nodes)
-        self%coordinates(2, :) = input%geometry%vtk%points%y(1:self%num_nodes)
-        self%coordinates(3, :) = input%geometry%vtk%points%z(1:self%num_nodes)
+    !     if (allocated(self%fe_types)) deallocate (self%fe_types)
+    !     if (allocated(self%fe_material_ids)) deallocate (self%fe_material_ids)
+    !     if (allocated(self%connectivity%ind)) deallocate (self%connectivity%ind)
+    !     if (allocated(self%connectivity%val)) deallocate (self%connectivity%val)
 
-        if (allocated(self%node_global_ids)) deallocate (self%node_global_ids)
-        call allocate_array(self%node_global_ids, self%num_nodes)
-        self%node_global_ids(:) = input%geometry%vtk%global_node_ids(1:self%num_nodes)
-    end subroutine initialize_node_manager
+    !     if (self%num_elements > 0) then
+    !         call allocate_array(self%fe_types, self%num_elements)
+    !         call allocate_array(self%fe_material_ids, self%num_elements)
+    !         call allocate_array(self%connectivity%ind, self%num_elements + 1)
+    !         call allocate_array(self%connectivity%val, num_total_connectivity)
+    !     end if
 
-    !> Initializes the element manager by reading and organizing element data.
-    subroutine initialize_element_manager(self, input)
-        implicit none
-        class(type_element_manager), intent(inout) :: self
-        type(type_input), intent(in) :: input
-        integer(int32) :: i, ind, num_total_cells, num_total_connectivity
+    !     if (self%num_elements > 0) then
+    !         self%connectivity%ind(1) = 1
+    !         ind = 0
+    !         do i = 1, num_total_cells
+    !             if (input%geometry%vtk%cells(i)%get_dimension() == self%parent%computation_dimension) then
+    !                 ind = ind + 1
+    !                 self%fe_types(ind) = input%geometry%vtk%cells(i)%cell_type
+    !                 self%fe_material_ids(ind) = input%geometry%vtk%cells(i)%cell_entity_id
+    !                 self%connectivity%ind(ind + 1) = self%connectivity%ind(ind) + input%geometry%vtk%cells(i)%num_nodes_in_cell
+    !                 self%connectivity%val(self%connectivity%ind(ind):self%connectivity%ind(ind + 1) - 1) = &
+    !                     input%geometry%vtk%cells(i)%connectivity(1:input%geometry%vtk%cells(i)%num_nodes_in_cell)
+    !             end if
+    !         end do
+    !     end if
 
-        num_total_cells = input%geometry%vtk%num_total_cells
-
-        self%num_elements = 0
-        num_total_connectivity = 0
-        do i = 1, num_total_cells
-            if (input%geometry%vtk%cells(i)%get_dimension() == self%parent%computation_dimension) then
-                self%num_elements = self%num_elements + 1
-                num_total_connectivity = num_total_connectivity + input%geometry%vtk%cells(i)%num_nodes_in_cell
-            end if
-        end do
-
-        if (allocated(self%fe_types)) deallocate (self%fe_types)
-        if (allocated(self%fe_material_ids)) deallocate (self%fe_material_ids)
-        if (allocated(self%connectivity%ind)) deallocate (self%connectivity%ind)
-        if (allocated(self%connectivity%val)) deallocate (self%connectivity%val)
-
-        if (self%num_elements > 0) then
-            call allocate_array(self%fe_types, self%num_elements)
-            call allocate_array(self%fe_material_ids, self%num_elements)
-            call allocate_array(self%connectivity%ind, self%num_elements + 1)
-            call allocate_array(self%connectivity%val, num_total_connectivity)
-        end if
-
-        if (self%num_elements > 0) then
-            self%connectivity%ind(1) = 1
-            ind = 0
-            do i = 1, num_total_cells
-                if (input%geometry%vtk%cells(i)%get_dimension() == self%parent%computation_dimension) then
-                    ind = ind + 1
-                    self%fe_types(ind) = input%geometry%vtk%cells(i)%cell_type
-                    self%fe_material_ids(ind) = input%geometry%vtk%cells(i)%cell_entity_id
-                    self%connectivity%ind(ind + 1) = self%connectivity%ind(ind) + input%geometry%vtk%cells(i)%num_nodes_in_cell
-                    self%connectivity%val(self%connectivity%ind(ind):self%connectivity%ind(ind + 1) - 1) = &
-                        input%geometry%vtk%cells(i)%connectivity(1:input%geometry%vtk%cells(i)%num_nodes_in_cell)
-                end if
-            end do
-        end if
-
-        call self%fe_manager%initialize(input%basic%geometry_settings%integration_order, self%num_elements, self%fe_types)
-        call self%colors%initialize(input)
-    end subroutine initialize_element_manager
+    !     call self%fe_manager%initialize(input%basic%geometry_settings%integration_order, self%num_elements, self%fe_types)
+    !     call self%colors%initialize(input)
+    ! end subroutine initialize_element_manager
 
     !> Initializes the boundary manager by processing BCs for all active physics.
     subroutine initialize_boundary_manager(self, input, controls)
@@ -904,27 +843,6 @@ contains
         call self%elements%display()
         call self%boundaries%display()
     end subroutine display_domain
-
-
-
-    subroutine display_node_manager(self)
-        implicit none
-        class(type_node_manager), intent(in) :: self
-        write (*, '(A)') '### Node Manager'
-        write (*, '(A)')
-        write (*, '(A, I0)') '  - **Number of Nodes**: ', self%num_nodes
-        write (*, '(A)')
-    end subroutine display_node_manager
-
-    subroutine display_element_manager(self)
-        implicit none
-        class(type_element_manager), intent(in) :: self
-        write (*, '(A)') '### Element Manager'
-        write (*, '(A)')
-        write (*, '(A, I0)') '  - **Number of Elements**: ', self%num_elements
-        call self%connectivity%display('Volume Elements')
-        write (*, '(A)')
-    end subroutine display_element_manager
 
     subroutine display_boundary_manager(self)
         implicit none

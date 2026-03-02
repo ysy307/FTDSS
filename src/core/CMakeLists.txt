@@ -97,6 +97,9 @@ target_sources(SOLVER_CORE PRIVATE
     types/config/conditions/config_boundary.F90
     types/config/conditions/config_initial.F90
     types/config/conditions/config_conditions.F90
+    types/config/domain/config_nodes.F90
+    types/config/domain/config_multicoloring.F90
+    types/config/domain/config_domain.F90
     types/config/physics/config_physics_base.F90
     types/config/physics/config_swcc.F90
     types/config/physics/config_gcc.F90

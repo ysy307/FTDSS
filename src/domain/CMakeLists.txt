@@ -48,7 +48,14 @@ target_sources(SOLVER_DOMAIN
         multicoloring/multicoloring.F90
 
         # ====================================================
-        # 4. Domain Service Layer
+        # 4. Domain Components
+        # ====================================================
+        components/domain_nodes.F90
+        components/domain_elements.F90
+        components/domain_boundaries.F90
+
+        # ====================================================
+        # 5. Domain Service Layer
         # ====================================================
         domain_manager.F90
         domain.F90

@@ -49,6 +49,7 @@ target_sources(SOLVER_INPUT
     translator/translator_basic.F90
     translator/translator_conditions.F90
     translator/translator_output.F90
+    translator/translator_geometry.F90
 
     # ----------------------------
     # Entry point

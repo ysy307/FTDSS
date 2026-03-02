@@ -8,14 +8,14 @@ module domain_fe_manager
 
     !> Manager type for handling multiple FE objects
     type :: type_fe_manager
-        private
         !> List of wrapper objects holding FE instances
-        type(holder_fes), allocatable :: fe_list(:)
+        type(holder_fes), private, allocatable :: fe_list(:)
         !> Map from FE IDs to indices in fe_list
-        integer(int32), allocatable :: fe_map(:)
+        integer(int32), private, allocatable :: fe_map(:)
     contains
         procedure, pass(self), public :: initialize => initialize_fe_manager
-        procedure, pass(self), public :: get_fe
+        procedure, pass(self), public :: destroy => destroy_fe_manager
+        procedure, pass(self), public :: get_fe => get_fe_fe_manager
     end type type_fe_manager
 
 contains
@@ -55,8 +55,26 @@ contains
 
     end subroutine initialize_fe_manager
 
+    !> Destroy all FE objects and deallocate memory associated with the FE manager
+    subroutine destroy_fe_manager(self)
+        implicit none
+        class(type_fe_manager), intent(inout) :: self
+        integer(int32) :: i
+
+        if (allocated(self%fe_list)) then
+            do i = 1, size(self%fe_list)
+                if (allocated(self%fe_list(i)%fe)) then
+                    call self%fe_list(i)%fe%destroy()
+                end if
+            end do
+            deallocate (self%fe_list)
+        end if
+
+        call deallocate_array(self%fe_map)
+    end subroutine destroy_fe_manager
+
     !> Get a pointer to the FE object corresponding to a given ID
-    function get_fe(self, fe_id) result(fe)
+    function get_fe_fe_manager(self, fe_id) result(fe)
         implicit none
         !> The FE manager object
         class(type_fe_manager), intent(in), target :: self
@@ -65,18 +83,7 @@ contains
         !> Pointer to the requested FE object
         class(abst_fe), pointer :: fe
 
-#ifdef USE_DEBUG
-        ! if (.not. associated(self%fe_list(self%fe_map(fe_id)%fe))) then
-        !     error stop "Error: FE ID not found in FE manager."
-        ! end if
-
-        ! if (fe_id < 1 .or. fe_id > maxval(self%fe_map)) then
-        !     print *, self%fe_map
-        !     error stop "Error: FE ID mapping out of bounds."
-        ! end if
-#endif
-
         fe => self%fe_list(self%fe_map(fe_id))%fe
-    end function get_fe
+    end function get_fe_fe_manager
 
 end module domain_fe_manager

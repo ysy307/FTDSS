@@ -17,6 +17,8 @@ module io_input_translator
         procedure, private, pass(self) :: execute_basic_iteration
         procedure, private, pass(self) :: execute_basic_parallel_openmp
         procedure, private, pass(self) :: execute_basic_control_manager
+        procedure, private, pass(self) :: execute_geometry_domain_nodes
+        procedure, private, pass(self) :: execute_geometry_domain_elements
         procedure, private, pass(self) :: execute_output_field
         generic, public :: execute => execute_condition_boundary, &
             execute_condition_initial, &
@@ -28,6 +30,8 @@ module io_input_translator
             execute_basic_iteration, &
             execute_basic_parallel_openmp, &
             execute_basic_control_manager, &
+            execute_geometry_domain_nodes, &
+            execute_geometry_domain_elements, &
             execute_output_field
     end type type_input_translator
 
@@ -116,6 +120,22 @@ module io_input_translator
             class(type_config_control_manager), intent(inout) :: config
 
         end subroutine execute_basic_control_manager
+
+        module subroutine execute_geometry_domain_nodes(self, input, config)
+            implicit none
+            class(type_input_translator), intent(in) :: self
+            class(type_input), intent(in) :: input
+            class(type_config_nodes), intent(inout) :: config
+
+        end subroutine execute_geometry_domain_nodes
+        module subroutine execute_geometry_domain_elements(self, input, config_elements, config_multicoloring)
+            implicit none
+            class(type_input_translator), intent(in) :: self
+            class(type_input), intent(in) :: input
+            class(type_config_elements), intent(inout) :: config_elements
+            class(type_config_multicoloring), intent(inout) :: config_multicoloring
+
+        end subroutine execute_geometry_domain_elements
 
         module subroutine execute_output_field(self, input, config)
             implicit none
