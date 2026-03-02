@@ -11,8 +11,6 @@ module components_domain_boundaries
     !> Represents a single, unique boundary condition applied to a set of geometric entities.
     !>
     type :: type_boundary_patch
-        !> The integer ID representing the type of boundary condition (e.g., Dirichlet, Neumann).
-        integer(int32) :: type_id = -1
         !> The number of elements (sides) this boundary condition applies to.
         integer(int32) :: num_fe = 0
         !> Array of finite element type IDs for each element in this BC set.
@@ -41,12 +39,10 @@ module components_domain_boundaries
     !> Top-level manager for all boundary conditions across all physics types.
     !>
     type :: type_boundaries_manager
-        ! !> Pointer to the parent domain object.
-        ! type(type_domain), pointer, private :: parent => null()
         !> Array of BC managers, one for each physics type.
         type(type_physics_bc_manager) :: physics(PHYSICS_TYPES%NUM_ID)
     contains
-        ! procedure, public, pass(self) :: initialize => initialize_boundary_manager
+        procedure, public, pass(self) :: initialize => initialize_boundary_manager
         ! procedure, private, pass(self) :: process_single_physics_bcs
         ! procedure, private, pass(self) :: filter_active_bcs
         ! procedure, private, pass(self) :: create_entity_id_to_group_map
@@ -55,5 +51,13 @@ module components_domain_boundaries
         ! procedure, private, pass(self) :: create_bc_instances
         ! procedure, public, pass(self) :: display => display_boundary_manager
     end type type_boundaries_manager
+contains
+
+    !> Initialize the boundary manager with input data and FE manager
+    subroutine initialize_boundary_manager(self)
+        implicit none
+        class(type_boundaries_manager), intent(inout) :: self
+
+    end subroutine initialize_boundary_manager
 
 end module components_domain_boundaries

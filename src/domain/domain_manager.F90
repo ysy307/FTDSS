@@ -6,6 +6,7 @@ module domain_manager
     use :: mpi_f08
     use :: stdlib_logger
     use :: stdlib_strings, only:strip
+    use :: stdlib_optval, only:optval
     use :: module_core
     ! use :: module_input, only:type_input, input_translator
     ! use :: module_control, only:type_control
@@ -21,80 +22,6 @@ module domain_manager
     private
 
     public :: type_domain
-
-    !>
-    !> Represents a single, unique boundary condition applied to a set of geometric entities.
-    !>
-    type :: type_boundary_patch
-        !> The integer ID representing the type of boundary condition (e.g., Dirichlet, Neumann).
-        integer(int32) :: type_id = -1
-        !> The number of elements (sides) this boundary condition applies to.
-        integer(int32) :: num_elements = 0
-        !> Array of finite element type IDs for each element in this BC set.
-        integer(int32), allocatable :: element_types(:)
-        !> Manager for FE type-specific operations (shape functions, etc.).
-        type(type_fe_manager) :: fe_manager
-        !> Connectivity data for the elements in this BC set.
-        type(type_csr_index) :: connectivity
-        !> The polymorphic boundary condition logic.
-        class(abst_bc), allocatable :: condition
-    contains
-        ! procedure, public, pass(self) :: display => display_boundary_patch
-    end type type_boundary_patch
-
-    !>
-    !> Manages all boundary conditions for a single physics type.
-    !>
-    type :: type_physics_bc_manager
-        !> The number of unique boundary conditions for this physics.
-        integer(int32) :: num_bcs = 0
-        !> Array of unique boundary condition sets.
-        type(type_boundary_patch), allocatable :: bcs(:)
-    contains
-        ! procedure, public, pass(self) :: display => display_physics_bc_manager
-    end type type_physics_bc_manager
-
-    !>
-    !> Top-level manager for all boundary conditions across all physics types.
-    !>
-    type :: type_boundary_manager
-        !> Pointer to the parent domain object.
-        type(type_domain), pointer, private :: parent => null()
-        !> Array of BC managers, one for each physics type.
-        type(type_physics_bc_manager) :: physics(PHYSICS_TYPES%NUM_ID)
-    contains
-        procedure, public, pass(self) :: initialize => initialize_boundary_manager
-        procedure, private, pass(self) :: process_single_physics_bcs
-        procedure, private, pass(self) :: filter_active_bcs
-        procedure, private, pass(self) :: create_entity_id_to_group_map
-        procedure, private, pass(self) :: measure_and_allocate_bc_geometry
-        procedure, private, pass(self) :: store_bc_geometry
-        procedure, private, pass(self) :: create_bc_instances
-        ! procedure, public, pass(self) :: display => display_boundary_manager
-    end type type_boundary_manager
-
-    ! !>
-    ! !> Manages all data related to volume elements in the domain.
-    ! !>
-    ! type :: type_element_manager
-    !     !> Pointer to the parent domain object.
-    !     type(type_domain), pointer, private :: parent => null()
-    !     !> Number of elements in this subdomain.
-    !     integer(int32) :: num_elements = 0
-    !     !> Finite element type ID for each element.
-    !     integer(int32), allocatable :: fe_types(:)
-    !     !> Material ID for each element.
-    !     integer(int32), allocatable :: fe_material_ids(:)
-    !     !> Manager for FE type-specific operations.
-    !     type(type_fe_manager) :: fe_manager
-    !     !> Connectivity data for all elements.
-    !     type(type_csr_index) :: connectivity
-    !     !> Coloring information for parallel element processing.
-    !     type(type_coloring) :: colors
-    ! contains
-    !     procedure, public, pass(self) :: initialize => initialize_element_manager
-    !     ! procedure, public, pass(self) :: display => display_element_manager
-    ! end type type_element_manager
 
     !>
     !> The main container for all simulation domain data.
@@ -126,8 +53,8 @@ module domain_manager
         logical, private :: is_associated = .false.
     contains
         procedure, public, pass(self) :: initialize => initialize_type_domain
-        procedure, private, pass(self) :: associate_parent
-        procedure, private, pass(self) :: set_basic_info_and_dof_map
+        ! procedure, private, pass(self) :: associate_parent
+        ! procedure, private, pass(self) :: set_basic_info_and_dof_map
         procedure, public, pass(self) :: get_num_nodes => get_num_nodes_domain
         procedure, public, pass(self) :: get_num_elements => get_num_elements_domain
         procedure, public, pass(self) :: get_num_dofs_per_node => get_num_dofs_per_node_domain
@@ -156,75 +83,73 @@ module domain_manager
 contains
 
     !> Initializes the entire domain object and its components.
-    subroutine initialize_type_domain(self, input, controls)
+    subroutine initialize_type_domain(self, config_nodes, config_elements, config_multicoloring)
         implicit none
         class(type_domain), intent(inout) :: self
-        type(type_input), intent(in) :: input
-        type(type_control), intent(in) :: controls
+        type(type_config_nodes), intent(in) :: config_nodes
+        type(type_config_elements), intent(in) :: config_elements
+        type(type_config_multicoloring), intent(in) :: config_multicoloring
 
-        if (.not. self%is_associated) call self%associate_parent(self%nodes, self%elements, self%boundaries)
-        call self%set_basic_info_and_dof_map(input)
-
-        call self%nodes%initialize(input)
-        call self%elements%initialize(input)
-        call self%node_adjacency%initialize(self%nodes%num_nodes, self%elements%connectivity%ind, self%elements%connectivity%val)
+        call self%nodes%initialize(config_nodes)
+        call self%elements%initialize(config_elements, config_multicoloring)
+        call self%node_adjacency%initialize(self%nodes%num_nodes, self%elements%connectivity%row_ptr, self%elements%connectivity%col_ind)
         call self%element_adjacency%initialize(self%nodes%num_nodes, self%elements%num_elements, &
-                                               self%elements%connectivity%ind, self%elements%connectivity%val)
-        call self%boundaries%initialize(input, controls)
+                                               self%elements%connectivity%row_ptr, self%elements%connectivity%col_ind)
+        ! call self%boundaries%initialize(input, controls)
     end subroutine initialize_type_domain
 
-    !> Associates child manager components with this parent domain object.
-    subroutine associate_parent(self, node, element, boundary)
-        implicit none
-        class(type_domain), intent(inout), target :: self
-        class(type_node_manager), intent(inout) :: node
-        class(type_element_manager), intent(inout) :: element
-        class(type_boundary_manager), intent(inout) :: boundary
+    ! !> Associates child manager components with this parent domain object.
+    ! subroutine associate_parent(self, node, element, boundary)
+    !     implicit none
+    !     class(type_domain), intent(inout), target :: self
+    !     class(type_node_manager), intent(inout) :: node
+    !     class(type_element_manager), intent(inout) :: element
+    !     class(type_boundary_manager), intent(inout) :: boundary
 
-        node%parent => self
-        element%parent => self
-        boundary%parent => self
-        self%is_associated = .true.
-    end subroutine associate_parent
+    !     node%parent => self
+    !     element%parent => self
+    !     boundary%parent => self
+    !     self%is_associated = .true.
+    ! end subroutine associate_parent
 
-    !> Sets basic simulation info and configures the DOF map based on input settings.
-    subroutine set_basic_info_and_dof_map(self, input)
-        implicit none
-        class(type_domain), intent(inout) :: self
-        type(type_input), intent(in) :: input
-        integer(int32) :: current_dof_index
+    ! !> Sets basic simulation info and configures the DOF map based on input settings.
+    ! subroutine set_basic_info_and_dof_map(self, input)
+    !     implicit none
+    !     class(type_domain), intent(inout) :: self
+    !     type(type_input), intent(in) :: input
+    !     integer(int32) :: current_dof_index
 
-        call MPI_Comm_rank(MPI_COMM_WORLD, self%my_rank)
-        call MPI_Comm_size(MPI_COMM_WORLD, self%num_procs)
-        self%computation_dimension = input%basic%simulation_settings%calculate_dimension
-        self%computation_type = input%basic%simulation_settings%calculate_type
+    !     call MPI_Comm_rank(MPI_COMM_WORLD, self%my_rank)
+    !     call MPI_Comm_size(MPI_COMM_WORLD, self%num_procs)
+    !     self%computation_dimension = input%basic%simulation_settings%calculate_dimension
+    !     self%computation_type = input%basic%simulation_settings%calculate_type
 
-        self%dof_map%num_dof_of_physics(PHYSICS_TYPE_THERMAL) = 1
-        self%dof_map%num_dof_of_physics(PHYSICS_TYPE_HYDRAULIC) = 1
-        self%dof_map%num_dof_of_physics(PHYSICS_TYPE_MECHANICAL) = self%computation_dimension
+    !     self%dof_map%num_dof_of_physics(PHYSICS_TYPE_THERMAL) = 1
+    !     self%dof_map%num_dof_of_physics(PHYSICS_TYPE_HYDRAULIC) = 1
+    !     self%dof_map%num_dof_of_physics(PHYSICS_TYPE_MECHANICAL) = self%computation_dimension
 
-        current_dof_index = 1
-        if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_THERMAL)) then
-            self%dof_map%start_dof_index(PHYSICS_TYPE_THERMAL) = current_dof_index
-            current_dof_index = current_dof_index + self%dof_map%num_dof_of_physics(PHYSICS_TYPE_THERMAL)
-        end if
-        if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_HYDRAULIC)) then
-            self%dof_map%start_dof_index(PHYSICS_TYPE_HYDRAULIC) = current_dof_index
-            current_dof_index = current_dof_index + self%dof_map%num_dof_of_physics(PHYSICS_TYPE_HYDRAULIC)
-        end if
-        if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_MECHANICAL)) then
-            self%dof_map%start_dof_index(PHYSICS_TYPE_MECHANICAL) = current_dof_index
-            current_dof_index = current_dof_index + self%dof_map%num_dof_of_physics(PHYSICS_TYPE_MECHANICAL)
-        end if
-        self%dof_map%num_dof_per_node = current_dof_index - 1
+    !     current_dof_index = 1
+    !     if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_THERMAL)) then
+    !         self%dof_map%start_dof_index(PHYSICS_TYPE_THERMAL) = current_dof_index
+    !         current_dof_index = current_dof_index + self%dof_map%num_dof_of_physics(PHYSICS_TYPE_THERMAL)
+    !     end if
+    !     if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_HYDRAULIC)) then
+    !         self%dof_map%start_dof_index(PHYSICS_TYPE_HYDRAULIC) = current_dof_index
+    !         current_dof_index = current_dof_index + self%dof_map%num_dof_of_physics(PHYSICS_TYPE_HYDRAULIC)
+    !     end if
+    !     if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_MECHANICAL)) then
+    !         self%dof_map%start_dof_index(PHYSICS_TYPE_MECHANICAL) = current_dof_index
+    !         current_dof_index = current_dof_index + self%dof_map%num_dof_of_physics(PHYSICS_TYPE_MECHANICAL)
+    !     end if
+    !     self%dof_map%num_dof_per_node = current_dof_index - 1
 
-        select case (input%basic%analysis_controls%coupling_mode)
-        case (COUPLING_MODE_STAGGERED)
-            self%coupling_mode = COUPLING_MODE_STAGGERED
-        case (COUPLING_MODE_MONOLITHIC)
-            self%coupling_mode = COUPLING_MODE_MONOLITHIC
-        end select
-    end subroutine set_basic_info_and_dof_map
+    !     select case (input%basic%analysis_controls%coupling_mode)
+    !     case (COUPLING_MODE_STAGGERED)
+    !         self%coupling_mode = COUPLING_MODE_STAGGERED
+    !     case (COUPLING_MODE_MONOLITHIC)
+    !         self%coupling_mode = COUPLING_MODE_MONOLITHIC
+    !     end select
+    ! end subroutine set_basic_info_and_dof_map
 
     ! !> Initializes the element manager by reading and organizing element data.
     ! subroutine initialize_element_manager(self, input)
@@ -275,285 +200,285 @@ contains
     !     call self%colors%initialize(input)
     ! end subroutine initialize_element_manager
 
-    !> Initializes the boundary manager by processing BCs for all active physics.
-    subroutine initialize_boundary_manager(self, input, controls)
-        implicit none
-        class(type_boundary_manager), intent(inout) :: self
-        type(type_input), intent(in) :: input
-        type(type_control), intent(in) :: controls
+    ! !> Initializes the boundary manager by processing BCs for all active physics.
+    ! subroutine initialize_boundary_manager(self, input, controls)
+    !     implicit none
+    !     class(type_boundary_manager), intent(inout) :: self
+    !     type(type_input), intent(in) :: input
+    !     type(type_control), intent(in) :: controls
 
-        if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_THERMAL)) then
-            call self%process_single_physics_bcs(PHYSICS_TYPE_THERMAL, input, controls)
-        end if
-        if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_HYDRAULIC)) then
-            call self%process_single_physics_bcs(PHYSICS_TYPE_HYDRAULIC, input, controls)
-        end if
-        if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_MECHANICAL)) then
-            call self%process_single_physics_bcs(PHYSICS_TYPE_MECHANICAL, input, controls)
-        end if
-    end subroutine initialize_boundary_manager
+    !     if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_THERMAL)) then
+    !         call self%process_single_physics_bcs(PHYSICS_TYPE_THERMAL, input, controls)
+    !     end if
+    !     if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_HYDRAULIC)) then
+    !         call self%process_single_physics_bcs(PHYSICS_TYPE_HYDRAULIC, input, controls)
+    !     end if
+    !     if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_MECHANICAL)) then
+    !         call self%process_single_physics_bcs(PHYSICS_TYPE_MECHANICAL, input, controls)
+    !     end if
+    ! end subroutine initialize_boundary_manager
 
-    ! --------------------------------------------------------------------------
-    ! Refactored Boundary Condition Processing
-    ! --------------------------------------------------------------------------
+    ! ! --------------------------------------------------------------------------
+    ! ! Refactored Boundary Condition Processing
+    ! ! --------------------------------------------------------------------------
 
-    !> Processes and groups all boundary conditions for a single physics type.
-    subroutine process_single_physics_bcs(self, physics_type_id, input, controls)
-        implicit none
-        class(type_boundary_manager), intent(inout) :: self
-        integer(int32), intent(in) :: physics_type_id
-        type(type_input), intent(in) :: input
-        type(type_control), intent(in) :: controls
+    ! !> Processes and groups all boundary conditions for a single physics type.
+    ! subroutine process_single_physics_bcs(self, physics_type_id, input, controls)
+    !     implicit none
+    !     class(type_boundary_manager), intent(inout) :: self
+    !     integer(int32), intent(in) :: physics_type_id
+    !     type(type_input), intent(in) :: input
+    !     type(type_control), intent(in) :: controls
 
-        integer(int32) :: target_dimension, num_groups
-        integer(int32), allocatable :: bc_idx_list(:)
-        integer(int32), allocatable :: entity_id_to_group_idx_map(:)
-        integer(int32), allocatable :: group_to_cell_types(:)
+    !     integer(int32) :: target_dimension, num_groups
+    !     integer(int32), allocatable :: bc_idx_list(:)
+    !     integer(int32), allocatable :: entity_id_to_group_idx_map(:)
+    !     integer(int32), allocatable :: group_to_cell_types(:)
 
-        target_dimension = self%parent%computation_dimension - 1
-        if (target_dimension < 1) return
+    !     target_dimension = self%parent%computation_dimension - 1
+    !     if (target_dimension < 1) return
 
-        ! Step 1: Filter active BCs
-        call self%filter_active_bcs(physics_type_id, input, target_dimension, bc_idx_list)
-        if (.not. allocated(bc_idx_list)) return
+    !     ! Step 1: Filter active BCs
+    !     call self%filter_active_bcs(physics_type_id, input, target_dimension, bc_idx_list)
+    !     if (.not. allocated(bc_idx_list)) return
 
-        ! Step 2: Create map
-        num_groups = size(bc_idx_list)
-        self%physics(physics_type_id)%num_bcs = num_groups
+    !     ! Step 2: Create map
+    !     num_groups = size(bc_idx_list)
+    !     self%physics(physics_type_id)%num_bcs = num_groups
 
-        if (allocated(self%physics(physics_type_id)%bcs)) deallocate (self%physics(physics_type_id)%bcs)
-        allocate (self%physics(physics_type_id)%bcs(num_groups))
+    !     if (allocated(self%physics(physics_type_id)%bcs)) deallocate (self%physics(physics_type_id)%bcs)
+    !     allocate (self%physics(physics_type_id)%bcs(num_groups))
 
-        call self%create_entity_id_to_group_map(input, bc_idx_list, entity_id_to_group_idx_map)
+    !     call self%create_entity_id_to_group_map(input, bc_idx_list, entity_id_to_group_idx_map)
 
-        ! Step 3 & 4: Measure and Store
-        call self%measure_and_allocate_bc_geometry(input, target_dimension, entity_id_to_group_idx_map, &
-                                                   self%physics(physics_type_id)%bcs)
-        call self%store_bc_geometry(input, target_dimension, entity_id_to_group_idx_map, &
-                                    self%physics(physics_type_id)%bcs, group_to_cell_types)
+    !     ! Step 3 & 4: Measure and Store
+    !     call self%measure_and_allocate_bc_geometry(input, target_dimension, entity_id_to_group_idx_map, &
+    !                                                self%physics(physics_type_id)%bcs)
+    !     call self%store_bc_geometry(input, target_dimension, entity_id_to_group_idx_map, &
+    !                                 self%physics(physics_type_id)%bcs, group_to_cell_types)
 
-        ! Step 5: Create instances
-        call self%create_bc_instances(physics_type_id, input, controls, bc_idx_list, group_to_cell_types, &
-                                      self%physics(physics_type_id)%bcs)
+    !     ! Step 5: Create instances
+    !     call self%create_bc_instances(physics_type_id, input, controls, bc_idx_list, group_to_cell_types, &
+    !                                   self%physics(physics_type_id)%bcs)
 
-        ! Cleanup
-        if (allocated(entity_id_to_group_idx_map)) call deallocate_array(entity_id_to_group_idx_map)
-        if (allocated(bc_idx_list)) call deallocate_array(bc_idx_list)
-        if (allocated(group_to_cell_types)) call deallocate_array(group_to_cell_types)
-    end subroutine process_single_physics_bcs
+    !     ! Cleanup
+    !     if (allocated(entity_id_to_group_idx_map)) call deallocate_array(entity_id_to_group_idx_map)
+    !     if (allocated(bc_idx_list)) call deallocate_array(bc_idx_list)
+    !     if (allocated(group_to_cell_types)) call deallocate_array(group_to_cell_types)
+    ! end subroutine process_single_physics_bcs
 
-    !> Step 1: Filters boundary conditions.
-    subroutine filter_active_bcs(self, physics_type_id, input, target_dimension, bc_idx_list)
-        implicit none
-        class(type_boundary_manager), intent(in) :: self
-        integer(int32), intent(in) :: physics_type_id
-        type(type_input), intent(in) :: input
-        integer(int32), intent(in) :: target_dimension
-        integer(int32), allocatable, intent(inout) :: bc_idx_list(:)
+    ! !> Step 1: Filters boundary conditions.
+    ! subroutine filter_active_bcs(self, physics_type_id, input, target_dimension, bc_idx_list)
+    !     implicit none
+    !     class(type_boundary_manager), intent(in) :: self
+    !     integer(int32), intent(in) :: physics_type_id
+    !     type(type_input), intent(in) :: input
+    !     integer(int32), intent(in) :: target_dimension
+    !     integer(int32), allocatable, intent(inout) :: bc_idx_list(:)
 
-        integer(int32) :: i, num_active_bcs
-        integer(int32), allocatable :: active_region_id(:)
-        logical :: is_bc_active
+    !     integer(int32) :: i, num_active_bcs
+    !     integer(int32), allocatable :: active_region_id(:)
+    !     logical :: is_bc_active
 
-        if (allocated(bc_idx_list)) deallocate (bc_idx_list)
+    !     if (allocated(bc_idx_list)) deallocate (bc_idx_list)
 
-        call input%geometry%vtk%get_active_region_info(active_region_id, target_dimension)
-        if (.not. allocated(active_region_id)) return
+    !     call input%geometry%vtk%get_active_region_info(active_region_id, target_dimension)
+    !     if (.not. allocated(active_region_id)) return
 
-        num_active_bcs = 0
-        do i = 1, input%conditions%num_boundaries
-            is_bc_active = is_boundary_condition_active(i, physics_type_id, input, active_region_id)
-            if (is_bc_active) then
-                num_active_bcs = num_active_bcs + 1
-            end if
-        end do
+    !     num_active_bcs = 0
+    !     do i = 1, input%conditions%num_boundaries
+    !         is_bc_active = is_boundary_condition_active(i, physics_type_id, input, active_region_id)
+    !         if (is_bc_active) then
+    !             num_active_bcs = num_active_bcs + 1
+    !         end if
+    !     end do
 
-        if (num_active_bcs > 0) then
-            allocate (bc_idx_list(num_active_bcs))
-            num_active_bcs = 0
-            do i = 1, input%conditions%num_boundaries
-                is_bc_active = is_boundary_condition_active(i, physics_type_id, input, active_region_id)
-                if (is_bc_active) then
-                    num_active_bcs = num_active_bcs + 1
-                    bc_idx_list(num_active_bcs) = i
-                end if
-            end do
-        end if
+    !     if (num_active_bcs > 0) then
+    !         allocate (bc_idx_list(num_active_bcs))
+    !         num_active_bcs = 0
+    !         do i = 1, input%conditions%num_boundaries
+    !             is_bc_active = is_boundary_condition_active(i, physics_type_id, input, active_region_id)
+    !             if (is_bc_active) then
+    !                 num_active_bcs = num_active_bcs + 1
+    !                 bc_idx_list(num_active_bcs) = i
+    !             end if
+    !         end do
+    !     end if
 
-        call deallocate_array(active_region_id)
-    end subroutine filter_active_bcs
+    !     call deallocate_array(active_region_id)
+    ! end subroutine filter_active_bcs
 
-    !> Step 2: Creates a mapping.
-    subroutine create_entity_id_to_group_map(self, input, bc_idx_list, entity_map)
-        implicit none
-        class(type_boundary_manager), intent(in) :: self
-        type(type_input), intent(in) :: input
-        integer(int32), intent(in) :: bc_idx_list(:)
-        integer(int32), allocatable, intent(inout) :: entity_map(:)
+    ! !> Step 2: Creates a mapping.
+    ! subroutine create_entity_id_to_group_map(self, input, bc_idx_list, entity_map)
+    !     implicit none
+    !     class(type_boundary_manager), intent(in) :: self
+    !     type(type_input), intent(in) :: input
+    !     integer(int32), intent(in) :: bc_idx_list(:)
+    !     integer(int32), allocatable, intent(inout) :: entity_map(:)
 
-        integer(int32) :: i, max_id, bc_id
+    !     integer(int32) :: i, max_id, bc_id
 
-        if (allocated(entity_map)) deallocate (entity_map)
+    !     if (allocated(entity_map)) deallocate (entity_map)
 
-        max_id = maxval(input%conditions%boundary_conditions(:)%ID)
-        call allocate_array(entity_map, max_id)
-        entity_map = 0
-        do i = 1, size(bc_idx_list)
-            bc_id = input%conditions%boundary_conditions(bc_idx_list(i))%ID
-            entity_map(bc_id) = i
-        end do
-    end subroutine create_entity_id_to_group_map
+    !     max_id = maxval(input%conditions%boundary_conditions(:)%ID)
+    !     call allocate_array(entity_map, max_id)
+    !     entity_map = 0
+    !     do i = 1, size(bc_idx_list)
+    !         bc_id = input%conditions%boundary_conditions(bc_idx_list(i))%ID
+    !         entity_map(bc_id) = i
+    !     end do
+    ! end subroutine create_entity_id_to_group_map
 
-    !> Step 3: Measures connectivity size.
-    subroutine measure_and_allocate_bc_geometry(self, input, target_dimension, entity_map, bcs)
-        implicit none
-        class(type_boundary_manager), intent(in) :: self
-        type(type_input), intent(in) :: input
-        integer(int32), intent(in) :: target_dimension
-        integer(int32), intent(in) :: entity_map(:)
-        class(type_boundary_patch), intent(inout) :: bcs(:)
+    ! !> Step 3: Measures connectivity size.
+    ! subroutine measure_and_allocate_bc_geometry(self, input, target_dimension, entity_map, bcs)
+    !     implicit none
+    !     class(type_boundary_manager), intent(in) :: self
+    !     type(type_input), intent(in) :: input
+    !     integer(int32), intent(in) :: target_dimension
+    !     integer(int32), intent(in) :: entity_map(:)
+    !     class(type_boundary_patch), intent(inout) :: bcs(:)
 
-        integer(int32) :: i, cell_entity_id, group_idx, num_total_cells
-        integer(int32), allocatable :: total_conn_per_group(:)
+    !     integer(int32) :: i, cell_entity_id, group_idx, num_total_cells
+    !     integer(int32), allocatable :: total_conn_per_group(:)
 
-        call allocate_array(total_conn_per_group, size(bcs))
-        total_conn_per_group = 0
+    !     call allocate_array(total_conn_per_group, size(bcs))
+    !     total_conn_per_group = 0
 
-        num_total_cells = input%geometry%vtk%num_total_cells
-        do i = 1, num_total_cells
-            if (input%geometry%vtk%cells(i)%cell_dimension == target_dimension) then
-                cell_entity_id = input%geometry%vtk%cells(i)%cell_entity_id
-                if (cell_entity_id > size(entity_map)) cycle
-                if (entity_map(cell_entity_id) == 0) cycle
+    !     num_total_cells = input%geometry%vtk%num_total_cells
+    !     do i = 1, num_total_cells
+    !         if (input%geometry%vtk%cells(i)%cell_dimension == target_dimension) then
+    !             cell_entity_id = input%geometry%vtk%cells(i)%cell_entity_id
+    !             if (cell_entity_id > size(entity_map)) cycle
+    !             if (entity_map(cell_entity_id) == 0) cycle
 
-                group_idx = entity_map(cell_entity_id)
-                bcs(group_idx)%num_elements = bcs(group_idx)%num_elements + 1
-                total_conn_per_group(group_idx) = total_conn_per_group(group_idx) &
-                                                  + input%geometry%vtk%cells(i)%num_nodes_in_cell
-            end if
-        end do
+    !             group_idx = entity_map(cell_entity_id)
+    !             bcs(group_idx)%num_elements = bcs(group_idx)%num_elements + 1
+    !             total_conn_per_group(group_idx) = total_conn_per_group(group_idx) &
+    !                                               + input%geometry%vtk%cells(i)%num_nodes_in_cell
+    !         end if
+    !     end do
 
-        do i = 1, size(bcs)
-            if (bcs(i)%num_elements > 0) then
-                if (allocated(bcs(i)%element_types)) deallocate (bcs(i)%element_types)
-                if (allocated(bcs(i)%connectivity%ind)) deallocate (bcs(i)%connectivity%ind)
-                if (allocated(bcs(i)%connectivity%val)) deallocate (bcs(i)%connectivity%val)
+    !     do i = 1, size(bcs)
+    !         if (bcs(i)%num_elements > 0) then
+    !             if (allocated(bcs(i)%element_types)) deallocate (bcs(i)%element_types)
+    !             if (allocated(bcs(i)%connectivity%ind)) deallocate (bcs(i)%connectivity%ind)
+    !             if (allocated(bcs(i)%connectivity%val)) deallocate (bcs(i)%connectivity%val)
 
-                call allocate_array(bcs(i)%element_types, bcs(i)%num_elements)
-                call allocate_array(bcs(i)%connectivity%ind, bcs(i)%num_elements + 1)
-                call allocate_array(bcs(i)%connectivity%val, total_conn_per_group(i))
-                bcs(i)%connectivity%ind(1) = 1
-            end if
-        end do
+    !             call allocate_array(bcs(i)%element_types, bcs(i)%num_elements)
+    !             call allocate_array(bcs(i)%connectivity%ind, bcs(i)%num_elements + 1)
+    !             call allocate_array(bcs(i)%connectivity%val, total_conn_per_group(i))
+    !             bcs(i)%connectivity%ind(1) = 1
+    !         end if
+    !     end do
 
-        call deallocate_array(total_conn_per_group)
-    end subroutine measure_and_allocate_bc_geometry
+    !     call deallocate_array(total_conn_per_group)
+    ! end subroutine measure_and_allocate_bc_geometry
 
-    !> Step 4: Stores connectivity.
-    subroutine store_bc_geometry(self, input, target_dimension, entity_map, bcs, group_cell_types)
-        implicit none
-        class(type_boundary_manager), intent(in) :: self
-        type(type_input), intent(in) :: input
-        integer(int32), intent(in) :: target_dimension
-        integer(int32), intent(in) :: entity_map(:)
-        class(type_boundary_patch), intent(inout) :: bcs(:)
-        integer(int32), allocatable, intent(inout) :: group_cell_types(:)
+    ! !> Step 4: Stores connectivity.
+    ! subroutine store_bc_geometry(self, input, target_dimension, entity_map, bcs, group_cell_types)
+    !     implicit none
+    !     class(type_boundary_manager), intent(in) :: self
+    !     type(type_input), intent(in) :: input
+    !     integer(int32), intent(in) :: target_dimension
+    !     integer(int32), intent(in) :: entity_map(:)
+    !     class(type_boundary_patch), intent(inout) :: bcs(:)
+    !     integer(int32), allocatable, intent(inout) :: group_cell_types(:)
 
-        integer(int32) :: i, cell_entity_id, group_idx, num_nodes, num_total_cells
-        integer(int32), allocatable :: current_elem_indices(:)
+    !     integer(int32) :: i, cell_entity_id, group_idx, num_nodes, num_total_cells
+    !     integer(int32), allocatable :: current_elem_indices(:)
 
-        if (allocated(group_cell_types)) deallocate (group_cell_types)
+    !     if (allocated(group_cell_types)) deallocate (group_cell_types)
 
-        allocate (current_elem_indices(size(bcs)), group_cell_types(size(bcs)))
-        current_elem_indices = 0
-        group_cell_types = -1
+    !     allocate (current_elem_indices(size(bcs)), group_cell_types(size(bcs)))
+    !     current_elem_indices = 0
+    !     group_cell_types = -1
 
-        num_total_cells = input%geometry%vtk%num_total_cells
-        do i = 1, num_total_cells
-            if (input%geometry%vtk%cells(i)%cell_dimension == target_dimension) then
-                cell_entity_id = input%geometry%vtk%cells(i)%cell_entity_id
-                if (cell_entity_id > size(entity_map)) cycle
-                if (entity_map(cell_entity_id) == 0) cycle
+    !     num_total_cells = input%geometry%vtk%num_total_cells
+    !     do i = 1, num_total_cells
+    !         if (input%geometry%vtk%cells(i)%cell_dimension == target_dimension) then
+    !             cell_entity_id = input%geometry%vtk%cells(i)%cell_entity_id
+    !             if (cell_entity_id > size(entity_map)) cycle
+    !             if (entity_map(cell_entity_id) == 0) cycle
 
-                group_idx = entity_map(cell_entity_id)
-                current_elem_indices(group_idx) = current_elem_indices(group_idx) + 1
-                num_nodes = input%geometry%vtk%cells(i)%num_nodes_in_cell
+    !             group_idx = entity_map(cell_entity_id)
+    !             current_elem_indices(group_idx) = current_elem_indices(group_idx) + 1
+    !             num_nodes = input%geometry%vtk%cells(i)%num_nodes_in_cell
 
-                bcs(group_idx)%element_types(current_elem_indices(group_idx)) = input%geometry%vtk%cells(i)%cell_type
-                bcs(group_idx)%connectivity%ind(current_elem_indices(group_idx) + 1) = &
-                    bcs(group_idx)%connectivity%ind(current_elem_indices(group_idx)) + num_nodes
-                bcs(group_idx)%connectivity%val( &
-                    bcs(group_idx)%connectivity%ind(current_elem_indices(group_idx)): &
-                    bcs(group_idx)%connectivity%ind(current_elem_indices(group_idx) + 1) - 1) = &
-                    input%geometry%vtk%cells(i)%connectivity(1:num_nodes)
+    !             bcs(group_idx)%element_types(current_elem_indices(group_idx)) = input%geometry%vtk%cells(i)%cell_type
+    !             bcs(group_idx)%connectivity%ind(current_elem_indices(group_idx) + 1) = &
+    !                 bcs(group_idx)%connectivity%ind(current_elem_indices(group_idx)) + num_nodes
+    !             bcs(group_idx)%connectivity%val( &
+    !                 bcs(group_idx)%connectivity%ind(current_elem_indices(group_idx)): &
+    !                 bcs(group_idx)%connectivity%ind(current_elem_indices(group_idx) + 1) - 1) = &
+    !                 input%geometry%vtk%cells(i)%connectivity(1:num_nodes)
 
-                if (group_cell_types(group_idx) < 0) group_cell_types(group_idx) = input%geometry%vtk%cells(i)%cell_type
-            end if
-        end do
-        call deallocate_array(current_elem_indices)
-    end subroutine store_bc_geometry
+    !             if (group_cell_types(group_idx) < 0) group_cell_types(group_idx) = input%geometry%vtk%cells(i)%cell_type
+    !         end if
+    !     end do
+    !     call deallocate_array(current_elem_indices)
+    ! end subroutine store_bc_geometry
 
-    !> Step 5: Creates instances of the polymorphic boundary condition objects.
-    subroutine create_bc_instances(self, physics_type_id, input, controls, bc_idx_list, group_cell_types, bcs)
-        implicit none
-        class(type_boundary_manager), intent(in) :: self
-        integer(int32), intent(in) :: physics_type_id
-        type(type_input), intent(in) :: input
-        type(type_control), intent(in) :: controls
-        integer(int32), intent(in) :: bc_idx_list(:), group_cell_types(:)
-        class(type_boundary_patch), intent(inout) :: bcs(:)
+    ! !> Step 5: Creates instances of the polymorphic boundary condition objects.
+    ! subroutine create_bc_instances(self, physics_type_id, input, controls, bc_idx_list, group_cell_types, bcs)
+    !     implicit none
+    !     class(type_boundary_manager), intent(in) :: self
+    !     integer(int32), intent(in) :: physics_type_id
+    !     type(type_input), intent(in) :: input
+    !     type(type_control), intent(in) :: controls
+    !     integer(int32), intent(in) :: bc_idx_list(:), group_cell_types(:)
+    !     class(type_boundary_patch), intent(inout) :: bcs(:)
 
-        integer(int32) :: i, original_input_idx, bc_type, bc_id
+    !     integer(int32) :: i, original_input_idx, bc_type, bc_id
 
-        type(type_config_bc) :: config
+    !     type(type_config_bc) :: config
 
-        do i = 1, size(bcs)
-            original_input_idx = bc_idx_list(i)
+    !     do i = 1, size(bcs)
+    !         original_input_idx = bc_idx_list(i)
 
-            ! bc_id = input%conditions%boundary_conditions(original_input_idx)%ID
-            bcs(i)%type_id = bc_type
+    !         ! bc_id = input%conditions%boundary_conditions(original_input_idx)%ID
+    !         bcs(i)%type_id = bc_type
 
-            select case (physics_type_id)
-            case (PHYSICS_TYPE_THERMAL)
-                call input_translator%execute(input, original_input_idx, PHYSICS_TYPES%THERMAL, config)
-                bcs(i)%condition = create_boundary_conditions(config)
-            case (PHYSICS_TYPE_HYDRAULIC)
-                call input_translator%execute(input, original_input_idx, PHYSICS_TYPES%HYDRAULIC, config)
-                bcs(i)%condition = create_boundary_conditions(config)
-            end select
+    !         select case (physics_type_id)
+    !         case (PHYSICS_TYPE_THERMAL)
+    !             call input_translator%execute(input, original_input_idx, PHYSICS_TYPES%THERMAL, config)
+    !             bcs(i)%condition = create_boundary_conditions(config)
+    !         case (PHYSICS_TYPE_HYDRAULIC)
+    !             call input_translator%execute(input, original_input_idx, PHYSICS_TYPES%HYDRAULIC, config)
+    !             bcs(i)%condition = create_boundary_conditions(config)
+    !         end select
 
-            call bcs(i)%fe_manager%initialize(input%basic%geometry_settings%integration_order, 1, group_cell_types)
-        end do
-    end subroutine create_bc_instances
+    !         call bcs(i)%fe_manager%initialize(input%basic%geometry_settings%integration_order, 1, group_cell_types)
+    !     end do
+    ! end subroutine create_bc_instances
 
-    ! --------------------------------------------------------------------------
-    ! Helper Functions for BC Processing
-    ! --------------------------------------------------------------------------
+    ! ! --------------------------------------------------------------------------
+    ! ! Helper Functions for BC Processing
+    ! ! --------------------------------------------------------------------------
 
-    !> Checks if a given boundary condition is active for the current physics and region.
-    pure function is_boundary_condition_active(idx, physics_type_id, input, active_region_id) result(is_active)
-        implicit none
-        integer(int32), intent(in) :: idx, physics_type_id
-        type(type_input), intent(in) :: input
-        integer(int32), intent(in) :: active_region_id(:)
-        logical :: is_active
+    ! !> Checks if a given boundary condition is active for the current physics and region.
+    ! pure function is_boundary_condition_active(idx, physics_type_id, input, active_region_id) result(is_active)
+    !     implicit none
+    !     integer(int32), intent(in) :: idx, physics_type_id
+    !     type(type_input), intent(in) :: input
+    !     integer(int32), intent(in) :: active_region_id(:)
+    !     logical :: is_active
 
-        is_active = .false.
-        select case (physics_type_id)
-        case (PHYSICS_TYPE_THERMAL)
-            if (input%conditions%boundary_conditions(idx)%physics(PHYSICS_TYPE_THERMAL)%is_active .and. &
-                any(active_region_id == input%conditions%boundary_conditions(idx)%ID)) then
-                is_active = .true.
-            end if
-        case (PHYSICS_TYPE_HYDRAULIC)
-            if (input%conditions%boundary_conditions(idx)%physics(PHYSICS_TYPE_HYDRAULIC)%is_active .and. &
-                any(active_region_id == input%conditions%boundary_conditions(idx)%ID)) then
-                is_active = .true.
-            end if
-        case (PHYSICS_TYPE_MECHANICAL)
-            ! Not implemented
-        end select
-    end function is_boundary_condition_active
+    !     is_active = .false.
+    !     select case (physics_type_id)
+    !     case (PHYSICS_TYPE_THERMAL)
+    !         if (input%conditions%boundary_conditions(idx)%physics(PHYSICS_TYPE_THERMAL)%is_active .and. &
+    !             any(active_region_id == input%conditions%boundary_conditions(idx)%ID)) then
+    !             is_active = .true.
+    !         end if
+    !     case (PHYSICS_TYPE_HYDRAULIC)
+    !         if (input%conditions%boundary_conditions(idx)%physics(PHYSICS_TYPE_HYDRAULIC)%is_active .and. &
+    !             any(active_region_id == input%conditions%boundary_conditions(idx)%ID)) then
+    !             is_active = .true.
+    !         end if
+    !     case (PHYSICS_TYPE_MECHANICAL)
+    !         ! Not implemented
+    !     end select
+    ! end function is_boundary_condition_active
 
     ! --------------------------------------------------------------------------
     ! Getter Functions
@@ -618,13 +543,18 @@ contains
     subroutine get_node_adjacency_domain(self, matrix_type, row, col)
         implicit none
         class(type_domain), intent(in), target :: self
-        integer(int32), intent(in) :: matrix_type
-        integer(int32), allocatable, intent(inout) :: row(:), col(:)
+        type(type_constant_id), intent(in) :: matrix_type
+        integer(int32), allocatable, intent(inout) :: row(:)
+        integer(int32), allocatable, intent(inout) :: col(:)
 
-        select case (matrix_type)
-        case (MATRIX_COO)
+        if (.not. MATRIX_TYPES%is_valid(matrix_type)) then
+            return
+        end if
+
+        select case (matrix_type%ID)
+        case (MATRIX_TYPES%COO%ID)
             call self%node_adjacency%get_coo(row, col)
-        case (MATRIX_CSR)
+        case (MATRIX_TYPES%CSR%ID)
             call self%node_adjacency%get_csr(row, col)
         end select
     end subroutine get_node_adjacency_domain
@@ -655,15 +585,15 @@ contains
 
         integer(int32) :: istart, iend
 
-        if (element_id < 1 .or. element_id > self%elements%num_elements) then
+        if (value_in_range(element_id, 1, self%elements%num_elements)) then
             connectivity => null()
             return
         end if
 
-        istart = self%elements%connectivity%ind(element_id)
-        iend = self%elements%connectivity%ind(element_id + 1) - 1
+        istart = self%elements%connectivity%row_ptr(element_id)
+        iend = self%elements%connectivity%row_ptr(element_id + 1) - 1
 
-        connectivity => self%elements%connectivity%val(istart:iend)
+        connectivity => self%elements%connectivity%col_ind(istart:iend)
 
     end subroutine get_element_connectivity_domain
 
@@ -826,74 +756,83 @@ contains
     ! Display Procedures for Debugging
     ! --------------------------------------------------------------------------
 
-    subroutine display_domain(self)
+    subroutine display_domain(self, unit_in)
         implicit none
         class(type_domain), intent(in) :: self
+        integer(int32), intent(in), optional :: unit_in
 
-        write (*, '(A)') '##  Domain Information'
-        write (*, '(A)') '| Property                | Value |'
-        write (*, '(A)') '|:------------------------|:------|'
-        write (*, '(A, I0, 2A)') '| MPI Rank / Procs        | ', self%my_rank, ' / '//achar(48 + self%num_procs), '|'
-        write (*, '(A, I0, 2A)') '| Computation Dimension   | ', self%computation_dimension, 'D', '|'
-        write (*, '(A, I0, A)') '| Coupling Mode           | ', self%coupling_mode, '|'
-        write (*, '(A)')
+        integer(int32) :: unit
 
-        call self%dof_map%display()
-        call self%nodes%display()
-        call self%elements%display()
-        call self%boundaries%display()
+        unit = optval(unit_in, output_unit)
+
+        write (unit, '(A)') '##  Domain Information'
+        write (unit, '(A)') '| Property                | Value |'
+        write (unit, '(A)') '|:------------------------|:------|'
+#ifdef USE_MPI
+        write (unit, '(A, I0, 2A)') '| MPI Rank / Procs        | ', self%my_rank, ' / '//achar(48 + self%num_procs), '|'
+#else
+        write (unit, '(A, A)') '| MPI Rank / Procs        | N/A |'
+#endif
+        write (unit, '(A, I0, 2A)') '| Computation Dimension   | ', self%computation_dimension, 'D', '|'
+        write (unit, '(A, I0, A)') '| Coupling Mode           | ', self%coupling_mode, '|'
+        write (unit, '(A)')
+
+        ! call self%dof_map%display(unit)
+        ! call self%nodes%display(unit)
+        ! call self%elements%display(unit)
+        ! call self%boundaries%display()
     end subroutine display_domain
 
-    subroutine display_boundary_manager(self)
-        implicit none
-        class(type_boundary_manager), intent(in) :: self
-        integer(int32) :: i
-        character(len=20) :: physics_name
+    ! subroutine display_boundary_manager(self)
+    !     implicit none
+    !     class(type_boundary_manager), intent(in) :: self
+    !     integer(int32) :: i
+    !     character(len=20) :: physics_name
 
-        write (*, '(A)') '### Boundary Manager'
-        do i = 1, PHYSICS_TYPES%NUM_ID
-            if (self%physics(i)%num_bcs > 0) then
-                select case (i)
-                case (PHYSICS_TYPE_THERMAL); physics_name = 'Thermal'
-                case (PHYSICS_TYPE_HYDRAULIC); physics_name = 'Hydraulic'
-                case (PHYSICS_TYPE_MECHANICAL); physics_name = 'Mechanical'
-                end select
-                write (*, '(A, A, A)') '  - **Physics**: ', strip(physics_name)
-                call self%physics(i)%display()
-            end if
-        end do
-        write (*, '(A)')
-    end subroutine display_boundary_manager
+    !     write (*, '(A)') '### Boundary Manager'
+    !     do i = 1, PHYSICS_TYPES%NUM_ID
+    !         if (self%physics(i)%num_bcs > 0) then
+    !             select case (i)
+    !             case (PHYSICS_TYPE_THERMAL); physics_name = 'Thermal'
+    !             case (PHYSICS_TYPE_HYDRAULIC); physics_name = 'Hydraulic'
+    !             case (PHYSICS_TYPE_MECHANICAL); physics_name = 'Mechanical'
+    !             end select
+    !             write (*, '(A, A, A)') '  - **Physics**: ', strip(physics_name)
+    !             call self%physics(i)%display()
+    !         end if
+    !     end do
+    !     write (*, '(A)')
+    ! end subroutine display_boundary_manager
 
-    subroutine display_physics_bc_manager(self)
-        implicit none
-        class(type_physics_bc_manager), intent(in) :: self
-        integer(int32) :: i
-        write (*, '(A, I0, A)') '    - **Number of BCs**: ', self%num_bcs
-        do i = 1, self%num_bcs
-            write (*, '(A, I0, A)') '    - **BC Group**: ', i
-            call self%bcs(i)%display()
-        end do
-    end subroutine display_physics_bc_manager
+    ! subroutine display_physics_bc_manager(self)
+    !     implicit none
+    !     class(type_physics_bc_manager), intent(in) :: self
+    !     integer(int32) :: i
+    !     write (*, '(A, I0, A)') '    - **Number of BCs**: ', self%num_bcs
+    !     do i = 1, self%num_bcs
+    !         write (*, '(A, I0, A)') '    - **BC Group**: ', i
+    !         call self%bcs(i)%display()
+    !     end do
+    ! end subroutine display_physics_bc_manager
 
-    subroutine display_boundary_patch(self)
-        implicit none
-        class(type_boundary_patch), intent(in) :: self
-        write (*, '(A, I0)') '        - **Type ID**: ', self%type_id
-        write (*, '(A, I0)') '        - **Num Elements**: ', self%num_elements
-        call self%connectivity%display('BC Elements')
-    end subroutine display_boundary_patch
+    ! subroutine display_boundary_patch(self)
+    !     implicit none
+    !     class(type_boundary_patch), intent(in) :: self
+    !     write (*, '(A, I0)') '        - **Type ID**: ', self%type_id
+    !     write (*, '(A, I0)') '        - **Num Elements**: ', self%num_elements
+    !     call self%connectivity%display('BC Elements')
+    ! end subroutine display_boundary_patch
 
-    subroutine display_connectivity(self, title)
-        implicit none
-        class(type_csr_index), intent(in) :: self
-        character(len=*), intent(in) :: title
-        write (*, '(A,A,A)') '        - **Connectivity (', strip(title), ')**:'
-        if (allocated(self%ind)) then
-            write (*, '(A, I0, A, I0, A)') '          - Ind Size: ', size(self%ind), ', Val Size: ', size(self%val)
-        else
-            write (*, '(A)') '          - Not allocated'
-        end if
-    end subroutine display_connectivity
+    ! subroutine display_connectivity(self, title)
+    !     implicit none
+    !     class(type_csr_index), intent(in) :: self
+    !     character(len=*), intent(in) :: title
+    !     write (*, '(A,A,A)') '        - **Connectivity (', strip(title), ')**:'
+    !     if (allocated(self%ind)) then
+    !         write (*, '(A, I0, A, I0, A)') '          - Ind Size: ', size(self%ind), ', Val Size: ', size(self%val)
+    !     else
+    !         write (*, '(A)') '          - Not allocated'
+    !     end if
+    ! end subroutine display_connectivity
 
 end module domain_manager

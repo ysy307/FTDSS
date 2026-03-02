@@ -19,7 +19,7 @@ module domain_fe_manager
     end type type_fe_manager
 
 contains
-!> Initialize the FE manager with specified input, number of FEs, and target IDs
+    !> Initialize the FE manager with specified input, number of FEs, and target IDs
     subroutine initialize_fe_manager(self, integration_order, num_fe, target_ids)
         implicit none
         !> The FE manager object to initialize
