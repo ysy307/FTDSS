@@ -1,7 +1,7 @@
 module constitutive_materials_manager
     use :: iso_fortran_env, only:int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
-    use :: module_core, only:type_config_constitutive, type_state
+    use :: module_core, only:type_config_constitutive, type_state, type_state_thc
     use :: materials_base
     use :: materials_density
     use :: materials_specific_heat
@@ -11,7 +11,6 @@ module constitutive_materials_manager
     private
 
     public :: type_material_manager
-    public :: type_thc_dispersivity
 
     type :: type_material_manager
         private
@@ -20,19 +19,38 @@ module constitutive_materials_manager
         type(holder_vhcs) :: vhc
         type(holder_thcs) :: thc
     contains
+        ! ---- Lifecycle ----
+        ! initialize, destroy, reset, etc.
         procedure, public :: initialize
+
+        ! ---- Mutator ----
+        ! set_XXX, increment_XXX, update_XXX, etc.
+
+        ! ---- Algorithm / Operation ----
+        ! compute_XXX, check_XXX, solve_XXX, etc.
         procedure, public :: calc_density
-        procedure, public :: get_density_solid
-        procedure, public :: get_specific_heat_solid
         procedure, public :: calc_density_water_derivatives
         procedure, public :: calc_density_ice_derivatives
         procedure, public :: calc_density_vapor_derivatives
         procedure, public :: calc_specific_heat
-        procedure, private :: calc_thermal_conductivity_nondispersivity
-        procedure, private :: calc_thermal_conductivity_dispersivity
         generic, public :: calc_thermal_conductivity => calc_thermal_conductivity_nondispersivity, &
             calc_thermal_conductivity_dispersivity
+        procedure, private :: calc_thermal_conductivity_nondispersivity
+        procedure, private :: calc_thermal_conductivity_dispersivity
         procedure, public :: calc_vol_heat_capacity
+
+        ! ---- Inquiry ----
+        ! is_XXX, has_XXX, should_XXX, etc.
+
+        ! ---- Getter ----
+        ! get_XXX, etc.
+        procedure, public :: get_density_solid
+        procedure, public :: get_specific_heat_solid
+
+        ! ---- Meta / Utility ----
+        ! display, to_string, etc.
+
+        ! ---- Operator ----
     end type type_material_manager
 
 contains
@@ -183,7 +201,7 @@ contains
         implicit none
         class(type_material_manager), intent(in) :: self
         type(type_state), intent(in) :: state
-        type(type_thc_dispersivity), intent(inout) :: lambda
+        type(type_state_thc), intent(inout) :: lambda
 
         call self%thc%p%calc(state, lambda)
 

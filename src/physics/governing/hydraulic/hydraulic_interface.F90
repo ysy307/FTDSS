@@ -3,8 +3,8 @@ module governing_hydraulic
     use :: module_core
     use :: module_control, only:type_control
     use :: module_input, only:type_input
-    use :: module_physics, g => gravity_acceleration
     use :: module_linalg
+    use :: module_constitutive, g => gravity_acceleration
     use :: governing_base, only:type_assemble_workspace
     implicit none
     private
@@ -15,7 +15,7 @@ module governing_hydraulic
         private
         integer(int32) :: computation_type
         integer(int32) :: computation_dimension
-        type(type_physics_manager) :: physics
+        type(type_constitutive_manager) :: physics
     contains
         procedure, pass(self), public :: initialize => initialize_type_hydraulic
         procedure, pass(self), public :: destroy => destroy_type_hydraulic

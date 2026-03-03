@@ -3,7 +3,7 @@ module constitutive_manager
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core
     use :: constitutive_base, only:type_iapws_wrapper
-    use :: constitutive_materials_manager, only:type_material_manager, type_thc_dispersivity
+    use :: constitutive_materials_manager, only:type_material_manager
     use :: constitutive_models_manager, only:type_models_manager
     implicit none
     private
@@ -348,7 +348,7 @@ contains
         class(type_constitutive_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(in) :: state
-        type(type_thc_dispersivity), intent(inout) :: thermal_conductivity
+        type(type_state_thc), intent(inout) :: thermal_conductivity
 
         call self%materials(self%materials_id_map(material_id))%calc_thermal_conductivity(state, thermal_conductivity)
 

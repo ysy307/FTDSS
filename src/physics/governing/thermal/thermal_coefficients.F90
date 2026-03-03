@@ -305,7 +305,7 @@ contains
         integer(int32), intent(in) :: material_id
         type(type_state), intent(inout) :: state
         real(real64), intent(inout) :: D_TT(:, :)
-        type(type_thc_dispersivity) :: lambda
+        type(type_state_thc) :: lambda
 
         call self%physics%calc_thermal_conductivity(material_id, state, lambda)
 

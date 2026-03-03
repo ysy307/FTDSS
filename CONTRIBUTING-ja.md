@@ -130,15 +130,15 @@
 
 ### 6.2. メソッドの分類と定義
 
-| カテゴリ           | 役割                               | 引数 (`self`)      | 戻り値             | 命名例                             |
+| カテゴリ            | 役割                               | 引数 (`self`)      | 戻り値             | 命名例                             |
 |--------------------|------------------------------------|--------------------|--------------------|------------------------------------|
-| **Lifecycle**      | インスタンスの生成・破棄・再初期化 | `intent(inout)`    | なし               | `initialize`, `destroy`, `reset`   |
-| **Mutator**        | 内部状態（成分）の変更             | `intent(inout)`    | なし               | `set_*`, `increment_*`, `update_*` |
-| **Algorithm**      | 主要な計算処理・演算の実行         | `intent(inout/in)` | 任意               | `compute_*`, `check_*`, `solve_*`  |
-| **Inquiry**        | 内部状態の論理判定（副作用なし）   | `intent(in)`       | `logical`          | `is_*`, `has_*`, `should_*`        |
-| **Getter**         | 内部データの参照（副作用なし）     | `intent(in)`       | 値 または ポインタ | `get_*`                            |
-| **Meta / Utility** | デバッグ・情報取得・文字列整形     | `intent(in)`       | 任意               | `display`, `to_string`             |
-| **Operator**       | 演算子のオーバーロード             | `intent(inout/in)` | 任意               | `operator(+)`, `assignment(=)`     |
+| **Lifecycle**      | インスタンスの生成・破棄・再初期化    | `intent(inout)`    | なし               | `initialize`, `destroy`, `reset`   |
+| **Mutator**        | 内部状態（成分）の変更               | `intent(inout)`    | なし               | `set_*`, `increment_*`, `update_*` |
+| **Algorithm**      | 主要な計算処理・演算の実行           | `intent(inout/in)` | 任意               | `compute_*`, `check_*`, `solve_*`  |
+| **Inquiry**        | 内部状態の論理判定（副作用なし）      | `intent(in)`       | `logical`          | `is_*`, `has_*`, `should_*`        |
+| **Getter**         | 内部データの参照（副作用なし）        | `intent(in)`       | 値 または ポインタ | `get_*`                            |
+| **Meta / Utility** | デバッグ・情報取得・文字列整形        | `intent(in)`       | 任意               | `display`, `to_string`             |
+| **Operator**       | 演算子のオーバーロード               | `intent(inout/in)` | 任意               | `operator(+)`, `assignment(=)`     |
 
 ---
 

@@ -125,6 +125,7 @@ target_sources(SOLVER_CORE PRIVATE
     types/physics/meteorology.F90
     types/physics/solar.F90
     types/physics/state.F90
+    types/physics/state_thc.F90
     # Topology
     types/topology/connectivity.F90
     types/topology/graph.F90

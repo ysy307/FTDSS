@@ -82,6 +82,8 @@ module core_types
         type_variable
     use :: types_physics_state, only: &
         type_state
+    use :: types_physics_state_thc, only: &
+        type_state_thc
     use :: types_physics_meteorology, only: &
         type_meteorology, &
         type_meteorology_data

@@ -16,15 +16,34 @@ module materials_base
         real(real64) :: material3 = 0.0d0 !! like a ice
         real(real64) :: material4 = 0.0d0 !! like a gas
     contains
+        ! ---- Lifecycle ----
+        ! initialize, destroy, reset, etc.
         procedure, pass(self), public :: initialize => initialize_abst_material
-        procedure, pass(self), public :: get_phi => get_material_phi
-        procedure, pass(self), public :: get_solid => get_solid_abst_material
+
+        ! ---- Mutator ----
+        ! set_XXX, increment_XXX, update_XXX, etc.
+
+        ! ---- Algorithm / Operation ----
+        ! compute_XXX, check_XXX, solve_XXX, etc.
         procedure, pass(self), public :: calc_water_density => calc_water_density_abst_material
         procedure, pass(self), public :: calc_ice_density => calc_ice_density_abst_material
         procedure, pass(self), public :: calc_vapor_density => calc_vapor_density_abst_material
         procedure, pass(self), public :: calc_water_cp => calc_water_cp_abst_material
         procedure, pass(self), public :: calc_ice_cp => calc_ice_cp_abst_material
         procedure, pass(self), public :: calc_vapor_cp => calc_vapor_cp_abst_material
+
+        ! ---- Inquiry ----
+        ! is_XXX, has_XXX, should_XXX, etc.
+
+        ! ---- Getter ----
+        ! get_XXX, etc.
+        procedure, pass(self), public :: get_phi => get_material_phi
+        procedure, pass(self), public :: get_solid => get_solid_abst_material
+
+        ! ---- Meta / Utility ----
+        ! display, to_string, etc.
+
+        ! ---- Operator ----
     end type abst_material
 
 contains

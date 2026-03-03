@@ -56,19 +56,6 @@ contains
 
     end subroutine initialize_holder_thcs
 
-    module subroutine reset_thc_dispersivity(self)
-        implicit none
-        class(type_thc_dispersivity), intent(inout) :: self
-
-        self%lambda_xx = 0.0d0
-        self%lambda_yy = 0.0d0
-        self%lambda_zz = 0.0d0
-        self%lambda_xy = 0.0d0
-        self%lambda_yz = 0.0d0
-        self%lambda_zx = 0.0d0
-
-    end subroutine reset_thc_dispersivity
-
     module subroutine calc_thc_2(lambda_soil, phi_soil, &
                                  lambda_water, phi_water, lambda)
         implicit none
@@ -148,7 +135,7 @@ contains
         real(real64), intent(in) :: q_x
         real(real64), intent(in) :: q_y
         real(real64), intent(in) :: q_z
-        type(type_thc_dispersivity), intent(inout) :: lambda
+        type(type_state_thc), intent(inout) :: lambda
 
         real(real64) :: lambda_L, lambda_T
         real(real64) :: q_norm, inv_q_norm

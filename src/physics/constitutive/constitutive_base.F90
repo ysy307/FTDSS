@@ -1,5 +1,6 @@
-!> @brief 物理計算のための抽象型とインターフェース定義モジュール
-!> @details 状態変数(State)と具体的なIAPWS物質モデル(水・氷)を接続し、物性値を計算します。
+!> Base module for constitutive modeling
+!>
+!> Connects state variables to thermodynamic property models (e.g., IAPWS).
 module constitutive_base
     use, intrinsic :: iso_fortran_env
     use :: iapws, only:type_iapws97, type_iapws06
@@ -14,107 +15,132 @@ module constitutive_base
     public :: abst_constitutive
     public :: type_iapws_wrapper
 
-    !> @brief 物理計算の抽象基底クラス
-    !> @details 水、氷、水蒸気の熱力学的物性値の参照・計算を管理します。
+    !> Abstract base type for constitutive models
     type, abstract :: abst_constitutive
-        !> IAPWS-97 水物性計算オブジェクトへのポインタ
+        !> Pointer to IAPWS-97 water model
         type(type_iapws97), pointer :: water
-        !> IAPWS-06 氷物性計算オブジェクトへのポインタ
+        !> Pointer to IAPWS-06 ice model
         type(type_iapws06), pointer :: ice
-        !> 初期化済みフラグ
+        !> Initialization status flag
         logical :: initialized = .false.
     contains
-        !-----------------------------------------------------------------------
-        ! Helper Procedures (Converters)
-        !-----------------------------------------------------------------------
-        !> 摂氏温度をケルビンに変換
+        ! ---- Algorithm / Operation ----
+        !> Shift temperature to absolute scale
         procedure, pass(self), public :: shift_temperature_absolute => shift_temperature_absolute_abst_constitutive
-        !> ゲージ圧を絶対圧に変換
+        !> Shift pressure to absolute scale
         procedure, pass(self), public :: shift_pressure_absolute => shift_pressure_absolute_abst_constitutive
-
-        !-----------------------------------------------------------------------
-        ! Liquid Water Properties
-        !-----------------------------------------------------------------------
-        !> 液体の水密度を計算
+        !> Calculate liquid water density
         procedure, pass(self), public :: calc_rho_water => calc_rho_water_abst_constitutive
-        !> 水密度の温度微分を計算
+        !> Calculate temperature derivative of water density
         procedure, pass(self), public :: calc_drho_water_dT => calc_drho_water_dT_abst_constitutive
-        !> 水密度の圧力微分を計算
+        !> Calculate pressure derivative of water density
         procedure, pass(self), public :: calc_drho_water_dP => calc_drho_water_dP_abst_constitutive
-        !> 液体の水の定圧比熱を計算
+        !> Calculate specific heat capacity of water
         procedure, pass(self), public :: calc_cp_water => calc_cp_water_abst_constitutive
-
-        !-----------------------------------------------------------------------
-        ! Ice Properties
-        !-----------------------------------------------------------------------
-        !> 氷密度を計算
+        !> Calculate ice density
         procedure, pass(self), public :: calc_rho_ice => calc_rho_ice_abst_constitutive
-        !> 氷密度の温度微分を計算
+        !> Calculate temperature derivative of ice density
         procedure, pass(self), public :: calc_drho_ice_dT => calc_drho_ice_dT_abst_constitutive
-        !> 氷密度の圧力微分を計算
+        !> Calculate pressure derivative of ice density
         procedure, pass(self), public :: calc_drho_ice_dP => calc_drho_ice_dP_abst_constitutive
-        !> 氷の定圧比熱を計算
+        !> Calculate specific heat capacity of ice
         procedure, pass(self), public :: calc_cp_ice => calc_cp_ice_abst_constitutive
-
-        !-----------------------------------------------------------------------
-        ! Vapor Properties
-        !-----------------------------------------------------------------------
-        !> 相対湿度に基づき水蒸気密度を計算
+        !> Calculate vapor density based on relative humidity
         procedure, pass(self), public :: calc_rho_vapor => calc_rho_vapor_abst_constitutive
-        !> 水蒸気密度の温度微分を計算
+        !> Calculate temperature derivative of vapor density
         procedure, pass(self), public :: calc_drho_vapor_dT => calc_drho_vapor_dT_abst_constitutive
-        !> 水蒸気密度の圧力微分を計算
+        !> Calculate pressure derivative of vapor density
         procedure, pass(self), public :: calc_drho_vapor_dP => calc_drho_vapor_dP_abst_constitutive
-        !> 飽和水蒸気密度を計算
+        !> Calculate saturation vapor density
         procedure, pass(self), public :: calc_rho_vapor_saturation => calc_rho_vapor_saturation_abst_constitutive
-        !> 飽和水蒸気密度の温度微分を計算
+        !> Calculate temperature derivative of saturation vapor density
         procedure, pass(self), public :: calc_drho_vapor_saturation_dT => calc_drho_vapor_saturation_dT_abst_constitutive
-        !> 飽和水蒸気密度の圧力微分を計算
+        !> Calculate pressure derivative of saturation vapor density
         procedure, pass(self), public :: calc_drho_vapor_saturation_dP => calc_drho_vapor_saturation_dP_abst_constitutive
-        !> 水蒸気の定圧比熱(飽和状態)を計算
+        !> Calculate specific heat capacity of vapor
         procedure, pass(self), public :: calc_cp_vapor => calc_cp_vapor_abst_constitutive
 
-        !-----------------------------------------------------------------------
-        ! Private Helpers
-        !-----------------------------------------------------------------------
-        !> 状態変数から絶対温度と絶対圧力を一括取得する内部ヘルパー
+        ! ---- Inquiry ----
+        !> Check if the model is initialized
+        procedure, pass(self), public :: is_initialized => is_initialized_abst_constitutive
+
+        ! ---- Getter ----
+        !> Retrieve absolute temperature and pressure from state
         procedure, pass(self), private :: get_thermo_state_TP
-        !> 状態変数から絶対温度のみを取得する内部ヘルパー
+        !> Retrieve absolute temperature from state
         procedure, pass(self), private :: get_thermo_state_T
 
-        !>
-        procedure, pass(self), public :: is_initialized => is_initialized_abst_constitutive
     end type abst_constitutive
 
+    !> Concrete implementation using IAPWS models
     type, extends(abst_constitutive) :: type_iapws_wrapper
     contains
-        !> @brief IAPWS物質モデルの初期化
+        ! ---- Lifecycle ----
+        !> Initialize the IAPWS wrapper
         procedure, public :: initialize => initialize_iapws_wrapper
     end type type_iapws_wrapper
 
 contains
 
-    !===========================================================================
-    ! Helper Procedures
-    !===========================================================================
-
-    !> @brief 摂氏温度をケルビンに変換します。
+    !> Shift temperature from Celsius to Kelvin
+    !>
+    !> Mathematical definition:
+    !> - \( T = T_C + 273.15 \)
+    !>
+    !> Assumptions:
+    !> - None
+    !>
+    !> Numerical guarantee:
+    !> - Exact conversion
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine shift_temperature_absolute_abst_constitutive(self, temperature_degree, temperature_K)
         implicit none
+        !> Constitutive model object
         class(abst_constitutive), intent(in) :: self
-        real(real64), intent(in) :: temperature_degree !< 摂氏温度 [C]
-        real(real64), intent(inout) :: temperature_K !< 絶対温度 [K]
+        !> Temperature in Celsius
+        !> Not modified
+        real(real64), intent(in) :: temperature_degree
+        !> Temperature in Kelvin
+        !> Overwritten on exit
+        real(real64), intent(inout) :: temperature_K
 
         temperature_K = temperature_degree + TtoK
     end subroutine shift_temperature_absolute_abst_constitutive
 
-    !> @brief ゲージ圧を絶対圧に変換します。
-    !> @details 負圧(不飽和)の場合は大気圧を返します。
+    !> Shift pressure from gauge to absolute
+    !>
+    !> Mathematical definition:
+    !> - \( P = P_{atm} + P_{gauge} \) if \( P_{gauge} \ge 0 \)
+    !> - \( P = P_{atm} \) if \( P_{gauge} < 0 \)
+    !>
+    !> Assumptions:
+    !> - Negative gauge pressure implies atmospheric conditions
+    !>
+    !> Numerical guarantee:
+    !> - Exact conversion bounded by \( P_{atm} \)
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine shift_pressure_absolute_abst_constitutive(self, pressure_gauge, pressure_absolute)
         implicit none
+        !> Constitutive model object
         class(abst_constitutive), intent(in) :: self
-        real(real64), intent(in) :: pressure_gauge !< ゲージ圧 [Pa]
-        real(real64), intent(inout) :: pressure_absolute !< 絶対圧 [Pa]
+        !> Gauge pressure in Pascals
+        !> Not modified
+        real(real64), intent(in) :: pressure_gauge
+        !> Absolute pressure in Pascals
+        !> Overwritten on exit
+        real(real64), intent(inout) :: pressure_absolute
 
         if (pressure_gauge < 0.0d0) then
             pressure_absolute = P_atm
@@ -123,12 +149,36 @@ contains
         end if
     end subroutine shift_pressure_absolute_abst_constitutive
 
-    !> @brief Stateオブジェクトから絶対温度[K]と絶対圧力[Pa]を取得する内部ヘルパー
+    !> Get thermodynamic temperature and pressure
+    !>
+    !> Mathematical definition:
+    !> - Extracts temperature and pressure from state object and converts to absolute
+    !>
+    !> Assumptions:
+    !> - Fallback values used if state variables are not set
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine get_thermo_state_TP(self, state, T_K, P_abs)
         implicit none
+        !> Constitutive model object
         class(abst_constitutive), intent(in) :: self
+        !> Thermodynamic state
+        !> Not modified
         type(type_state), intent(in) :: state
-        real(real64), intent(inout) :: T_K, P_abs
+        !> Temperature in Kelvin
+        !> Overwritten on exit
+        real(real64), intent(inout) :: T_K
+        !> Absolute pressure in Pascals
+        !> Overwritten on exit
+        real(real64), intent(inout) :: P_abs
 
         real(real64) :: temp_c, press_g
         logical :: is_set
@@ -145,14 +195,34 @@ contains
         else
             P_abs = P_atm
         end if
-
     end subroutine get_thermo_state_TP
 
-    !> @brief Stateオブジェクトから絶対温度[K]のみを取得する内部ヘルパー
+    !> Get thermodynamic temperature
+    !>
+    !> Mathematical definition:
+    !> - Extracts temperature from state object and converts to absolute
+    !>
+    !> Assumptions:
+    !> - Fallback value used if state variable is not set
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine get_thermo_state_T(self, state, T_K)
         implicit none
+        !> Constitutive model object
         class(abst_constitutive), intent(in) :: self
+        !> Thermodynamic state
+        !> Not modified
         type(type_state), intent(in) :: state
+        !> Temperature in Kelvin
+        !> Overwritten on exit
         real(real64), intent(inout) :: T_K
 
         real(real64) :: temp_c
@@ -166,16 +236,34 @@ contains
         end if
     end subroutine get_thermo_state_T
 
-    !===========================================================================
-    ! Liquid Water Implementation
-    !===========================================================================
-
-    !> @brief IAPWS-97を用いて液体の水密度を計算します。
+    !> Calculate liquid water density
+    !>
+    !> Mathematical definition:
+    !> - Uses IAPWS-97 formulation
+    !>
+    !> Assumptions:
+    !> - Limits calculation to temperatures above freezing point
+    !>
+    !> Numerical guarantee:
+    !> - Defined by IAPWS-97 standard
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine calc_rho_water_abst_constitutive(self, state, density)
         implicit none
+        !> Constitutive model object
         class(abst_constitutive), intent(in) :: self
+        !> Thermodynamic state
+        !> Not modified
         type(type_state), intent(in) :: state
+        !> Density
+        !> Overwritten on exit
         real(real64), intent(inout) :: density
+
         real(real64) :: T_K, P_abs
 
         call self%get_thermo_state_TP(state, T_K, P_abs)
@@ -186,12 +274,34 @@ contains
         call self%water%calc_rho(T_K, P_abs, density)
     end subroutine calc_rho_water_abst_constitutive
 
-    !> @brief 水密度の温度微分 (dRho/dT) を計算します。
+    !> Calculate temperature derivative of water density
+    !>
+    !> Mathematical definition:
+    !> - \(\frac{\partial \rho}{\partial T}\)
+    !>
+    !> Assumptions:
+    !> - Limits calculation to temperatures above freezing point
+    !>
+    !> Numerical guarantee:
+    !> - Defined by IAPWS-97 standard
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine calc_drho_water_dT_abst_constitutive(self, state, deriv_density)
         implicit none
+        !> Constitutive model object
         class(abst_constitutive), intent(in) :: self
+        !> Thermodynamic state
+        !> Not modified
         type(type_state), intent(in) :: state
+        !> Density derivative w.r.t temperature
+        !> Overwritten on exit
         real(real64), intent(inout) :: deriv_density
+
         real(real64) :: T_K, P_abs
 
         call self%get_thermo_state_TP(state, T_K, P_abs)
@@ -202,12 +312,34 @@ contains
         call self%water%calc_drho_dT(T_K, P_abs, deriv_density)
     end subroutine calc_drho_water_dT_abst_constitutive
 
-    !> @brief 水密度の圧力微分 (dRho/dP) を計算します。
+    !> Calculate pressure derivative of water density
+    !>
+    !> Mathematical definition:
+    !> - \(\frac{\partial \rho}{\partial P}\)
+    !>
+    !> Assumptions:
+    !> - Limits calculation to temperatures above freezing point
+    !>
+    !> Numerical guarantee:
+    !> - Defined by IAPWS-97 standard
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine calc_drho_water_dP_abst_constitutive(self, state, deriv_density)
         implicit none
+        !> Constitutive model object
         class(abst_constitutive), intent(in) :: self
+        !> Thermodynamic state
+        !> Not modified
         type(type_state), intent(in) :: state
+        !> Density derivative w.r.t pressure
+        !> Overwritten on exit
         real(real64), intent(inout) :: deriv_density
+
         real(real64) :: T_K, P_abs
 
         call self%get_thermo_state_TP(state, T_K, P_abs)
@@ -218,84 +350,206 @@ contains
         call self%water%calc_drho_dP(T_K, P_abs, deriv_density)
     end subroutine calc_drho_water_dP_abst_constitutive
 
-    !> @brief 液体の水の定圧比熱 (Cp) を計算します。
+    !> Calculate specific heat capacity of water
+    !>
+    !> Mathematical definition:
+    !> - Uses IAPWS-97 formulation
+    !>
+    !> Assumptions:
+    !> - Limits calculation to temperatures above freezing point
+    !>
+    !> Numerical guarantee:
+    !> - Defined by IAPWS-97 standard
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine calc_cp_water_abst_constitutive(self, state, cp)
         implicit none
+        !> Constitutive model object
         class(abst_constitutive), intent(in) :: self
+        !> Thermodynamic state
+        !> Not modified
         type(type_state), intent(in) :: state
+        !> Specific heat capacity
+        !> Overwritten on exit
         real(real64), intent(inout) :: cp
+
         real(real64) :: T_K, P_abs
 
         call self%get_thermo_state_TP(state, T_K, P_abs)
         if (T_K < 273.15d0) then
-            cp = 4181.3d0 ! 約定値 (水の比熱 4.1813 kJ/kg-K)
+            cp = 4181.3d0
             return
         end if
         call self%water%calc_cp(T_K, P_abs, cp)
     end subroutine calc_cp_water_abst_constitutive
 
-    !===========================================================================
-    ! Ice Implementation
-    !===========================================================================
-
-    !> @brief IAPWS-06を用いて氷密度を計算します。
+    !> Calculate ice density
+    !>
+    !> Mathematical definition:
+    !> - Uses IAPWS-06 formulation
+    !>
+    !> Assumptions:
+    !> - None
+    !>
+    !> Numerical guarantee:
+    !> - Defined by IAPWS-06 standard
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine calc_rho_ice_abst_constitutive(self, state, density)
         implicit none
+        !> Constitutive model object
         class(abst_constitutive), intent(in) :: self
+        !> Thermodynamic state
+        !> Not modified
         type(type_state), intent(in) :: state
+        !> Density
+        !> Overwritten on exit
         real(real64), intent(inout) :: density
+
         real(real64) :: T_K, P_abs
 
         call self%get_thermo_state_TP(state, T_K, P_abs)
         call self%ice%calc_rho(T_K, P_abs, density)
     end subroutine calc_rho_ice_abst_constitutive
 
-    !> @brief 氷密度の温度微分 (dRho/dT) を計算します。
+    !> Calculate temperature derivative of ice density
+    !>
+    !> Mathematical definition:
+    !> - \(\frac{\partial \rho}{\partial T}\)
+    !>
+    !> Assumptions:
+    !> - None
+    !>
+    !> Numerical guarantee:
+    !> - Defined by IAPWS-06 standard
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine calc_drho_ice_dT_abst_constitutive(self, state, deriv_density)
         implicit none
+        !> Constitutive model object
         class(abst_constitutive), intent(in) :: self
+        !> Thermodynamic state
+        !> Not modified
         type(type_state), intent(in) :: state
+        !> Density derivative w.r.t temperature
+        !> Overwritten on exit
         real(real64), intent(inout) :: deriv_density
+
         real(real64) :: T_K, P_abs
 
         call self%get_thermo_state_TP(state, T_K, P_abs)
         call self%ice%calc_drho_dT(T_K, P_abs, deriv_density)
     end subroutine calc_drho_ice_dT_abst_constitutive
 
-    !> @brief 氷密度の圧力微分 (dRho/dP) を計算します。
+    !> Calculate pressure derivative of ice density
+    !>
+    !> Mathematical definition:
+    !> - \(\frac{\partial \rho}{\partial P}\)
+    !>
+    !> Assumptions:
+    !> - None
+    !>
+    !> Numerical guarantee:
+    !> - Defined by IAPWS-06 standard
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine calc_drho_ice_dP_abst_constitutive(self, state, deriv_density)
         implicit none
+        !> Constitutive model object
         class(abst_constitutive), intent(in) :: self
+        !> Thermodynamic state
+        !> Not modified
         type(type_state), intent(in) :: state
+        !> Density derivative w.r.t pressure
+        !> Overwritten on exit
         real(real64), intent(inout) :: deriv_density
+
         real(real64) :: T_K, P_abs
 
         call self%get_thermo_state_TP(state, T_K, P_abs)
         call self%ice%calc_drho_dP(T_K, P_abs, deriv_density)
     end subroutine calc_drho_ice_dP_abst_constitutive
 
-    !> @brief 氷の定圧比熱 (Cp) を計算します。
+    !> Calculate specific heat capacity of ice
+    !>
+    !> Mathematical definition:
+    !> - Uses IAPWS-06 formulation
+    !>
+    !> Assumptions:
+    !> - None
+    !>
+    !> Numerical guarantee:
+    !> - Defined by IAPWS-06 standard
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine calc_cp_ice_abst_constitutive(self, state, cp)
         implicit none
+        !> Constitutive model object
         class(abst_constitutive), intent(in) :: self
+        !> Thermodynamic state
+        !> Not modified
         type(type_state), intent(in) :: state
+        !> Specific heat capacity
+        !> Overwritten on exit
         real(real64), intent(inout) :: cp
+
         real(real64) :: T_K, P_abs
 
         call self%get_thermo_state_TP(state, T_K, P_abs)
         call self%ice%calc_cp(T_K, P_abs, cp)
     end subroutine calc_cp_ice_abst_constitutive
 
-    !===========================================================================
-    ! Vapor Implementation
-    !===========================================================================
-
-    !> @brief 相対湿度と飽和密度に基づき蒸気密度を計算します。
-    !> @details 数値計算上の問題を避けるため、最小蒸気密度(min_vapor_density)を下限とします。
+    !> Calculate vapor density
+    !>
+    !> Mathematical definition:
+    !> - \(\rho_v = \max(\rho_{sat}(T) \cdot RH, \rho_{min})\)
+    !>
+    !> Assumptions:
+    !> - Density is bounded by minimum vapor density
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine calc_rho_vapor_abst_constitutive(self, state, density)
         implicit none
+        !> Constitutive model object
         class(abst_constitutive), intent(in) :: self
+        !> Thermodynamic state
+        !> Not modified
         type(type_state), intent(in) :: state
+        !> Density
+        !> Overwritten on exit
         real(real64), intent(inout) :: density
 
         real(real64) :: T_K, relative_humidity
@@ -307,12 +561,32 @@ contains
         density = max(density * relative_humidity, min_vapor_density)
     end subroutine calc_rho_vapor_abst_constitutive
 
-    !> @brief 蒸気密度の温度微分 (dRho_v/dT) を計算します。
-    !> @details d(Rho_sat * RH)/dT = dRho_sat/dT * RH (RHは定数と仮定)
+    !> Calculate temperature derivative of vapor density
+    !>
+    !> Mathematical definition:
+    !> - \(\frac{\partial \rho_v}{\partial T} = \frac{\partial \rho_{sat}}{\partial T} \cdot RH\)
+    !>
+    !> Assumptions:
+    !> - Relative humidity is constant with respect to temperature
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine calc_drho_vapor_dT_abst_constitutive(self, state, deriv_density)
         implicit none
+        !> Constitutive model object
         class(abst_constitutive), intent(in) :: self
+        !> Thermodynamic state
+        !> Not modified
         type(type_state), intent(in) :: state
+        !> Density derivative w.r.t temperature
+        !> Overwritten on exit
         real(real64), intent(inout) :: deriv_density
 
         real(real64) :: T_K, relative_humidity, drho_sat_dT
@@ -325,85 +599,231 @@ contains
         deriv_density = drho_sat_dT * relative_humidity
     end subroutine calc_drho_vapor_dT_abst_constitutive
 
-    !> @brief 蒸気密度の圧力微分 (dRho_v/dP) を計算します。
-    !> @details 飽和密度が温度のみに依存するモデルの場合、圧力微分は 0 となります。
+    !> Calculate pressure derivative of vapor density
+    !>
+    !> Mathematical definition:
+    !> - \(\frac{\partial \rho_v}{\partial P} = 0\)
+    !>
+    !> Assumptions:
+    !> - Saturation density depends only on temperature
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine calc_drho_vapor_dP_abst_constitutive(self, state, deriv_density)
         implicit none
+        !> Constitutive model object
         class(abst_constitutive), intent(in) :: self
+        !> Thermodynamic state
+        !> Not modified
         type(type_state), intent(in) :: state
+        !> Density derivative w.r.t pressure
+        !> Overwritten on exit
         real(real64), intent(inout) :: deriv_density
 
-        ! IAPWS-97の飽和密度は温度依存のみであるため、
-        ! 圧力に対する直接的な変化はないとみなす (RH一定条件下)
         deriv_density = 0.0d0
     end subroutine calc_drho_vapor_dP_abst_constitutive
 
-    !> @brief 飽和水蒸気密度を計算します。
+    !> Calculate saturation vapor density
+    !>
+    !> Mathematical definition:
+    !> - Uses IAPWS-97 formulation
+    !>
+    !> Assumptions:
+    !> - None
+    !>
+    !> Numerical guarantee:
+    !> - Defined by IAPWS-97 standard
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine calc_rho_vapor_saturation_abst_constitutive(self, state, density)
         implicit none
+        !> Constitutive model object
         class(abst_constitutive), intent(in) :: self
+        !> Thermodynamic state
+        !> Not modified
         type(type_state), intent(in) :: state
+        !> Density
+        !> Overwritten on exit
         real(real64), intent(inout) :: density
+
         real(real64) :: T_K
 
         call self%get_thermo_state_T(state, T_K)
         call self%water%calc_saturation_density(T_K, density)
     end subroutine calc_rho_vapor_saturation_abst_constitutive
 
-    !> @brief 飽和水蒸気密度の温度微分を計算します。
+    !> Calculate temperature derivative of saturation vapor density
+    !>
+    !> Mathematical definition:
+    !> - \(\frac{\partial \rho_{sat}}{\partial T}\)
+    !>
+    !> Assumptions:
+    !> - None
+    !>
+    !> Numerical guarantee:
+    !> - Defined by IAPWS-97 standard
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine calc_drho_vapor_saturation_dT_abst_constitutive(self, state, deriv_density)
         implicit none
+        !> Constitutive model object
         class(abst_constitutive), intent(in) :: self
+        !> Thermodynamic state
+        !> Not modified
         type(type_state), intent(in) :: state
+        !> Density derivative w.r.t temperature
+        !> Overwritten on exit
         real(real64), intent(inout) :: deriv_density
+
         real(real64) :: T_K
 
         call self%get_thermo_state_T(state, T_K)
         call self%water%calc_saturation_drho_dT(T_K, deriv_density)
     end subroutine calc_drho_vapor_saturation_dT_abst_constitutive
 
-    !> @brief 飽和水蒸気密度の圧力微分を計算します。
+    !> Calculate pressure derivative of saturation vapor density
+    !>
+    !> Mathematical definition:
+    !> - \(\frac{\partial \rho_{sat}}{\partial P}\)
+    !>
+    !> Assumptions:
+    !> - None
+    !>
+    !> Numerical guarantee:
+    !> - Defined by IAPWS-97 standard
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine calc_drho_vapor_saturation_dP_abst_constitutive(self, state, deriv_density)
         implicit none
+        !> Constitutive model object
         class(abst_constitutive), intent(in) :: self
+        !> Thermodynamic state
+        !> Not modified
         type(type_state), intent(in) :: state
+        !> Density derivative w.r.t pressure
+        !> Overwritten on exit
         real(real64), intent(inout) :: deriv_density
+
         real(real64) :: T_K
 
         call self%get_thermo_state_T(state, T_K)
         call self%water%calc_saturation_drho_dP(T_K, deriv_density)
     end subroutine calc_drho_vapor_saturation_dP_abst_constitutive
 
-    !> @brief 蒸気の定圧比熱 (Cp) を飽和状態で計算します。
+    !> Calculate specific heat capacity of vapor
+    !>
+    !> Mathematical definition:
+    !> - Uses IAPWS-97 formulation for saturation state
+    !>
+    !> Assumptions:
+    !> - Vapor is at saturation pressure
+    !>
+    !> Numerical guarantee:
+    !> - Defined by IAPWS-97 standard
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine calc_cp_vapor_abst_constitutive(self, state, cp)
         implicit none
+        !> Constitutive model object
         class(abst_constitutive), intent(in) :: self
+        !> Thermodynamic state
+        !> Not modified
         type(type_state), intent(in) :: state
+        !> Specific heat capacity
+        !> Overwritten on exit
         real(real64), intent(inout) :: cp
+
         real(real64) :: T_K
 
         call self%get_thermo_state_T(state, T_K)
         call self%water%calc_saturation_cp(T_K, cp)
     end subroutine calc_cp_vapor_abst_constitutive
 
-    !> @brief IAPWS物質モデルの初期化を行います。
+    !> Initialize the IAPWS wrapper
+    !>
+    !> Mathematical definition:
+    !> - Associates pointers with IAPWS models
+    !>
+    !> Assumptions:
+    !> - Provided models are valid targets
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine initialize_iapws_wrapper(self, water_model, ice_model)
         implicit none
+        !> IAPWS wrapper object
         class(type_iapws_wrapper), intent(inout) :: self
+        !> IAPWS-97 water model
+        !> Not modified
         type(type_iapws97), intent(in), target :: water_model
+        !> IAPWS-06 ice model
+        !> Not modified
         type(type_iapws06), intent(in), target :: ice_model
 
         self%water => water_model
         self%ice => ice_model
     end subroutine initialize_iapws_wrapper
 
+    !> Check if the constitutive model is initialized
+    !>
+    !> Mathematical definition:
+    !> - Returns the internal initialized flag
+    !>
+    !> Assumptions:
+    !> - None
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     function is_initialized_abst_constitutive(self) result(initialized)
         implicit none
+        !> Constitutive model object
+        !> Not modified
         class(abst_constitutive), intent(in) :: self
+        !> Initialization status
         logical :: initialized
 
         initialized = self%initialized
-
     end function is_initialized_abst_constitutive
 
 end module constitutive_base

@@ -3,7 +3,7 @@ module governing_thermal
     use :: module_core
     use :: module_control, only:type_control
     use :: module_input, only:type_input
-    use :: module_physics, only:type_physics_manager, type_wrf_params, type_hcf_params, type_thc_dispersivity
+    use :: module_constitutive, only:type_constitutive_manager
     use :: module_linalg
     use :: governing_base, only:type_assemble_workspace
     implicit none
@@ -19,7 +19,7 @@ module governing_thermal
         private
         integer(int32) :: computation_type
         integer(int32) :: computation_dimension
-        type(type_physics_manager) :: physics
+        type(type_constitutive_manager) :: physics
     contains
         procedure, pass(self), public :: initialize => initialize_type_thermal
         procedure, pass(self), public :: destroy => destroy_type_thermal
@@ -101,13 +101,14 @@ module governing_thermal
             integer(int32), intent(in), optional :: scheme_opt
 
         end subroutine compute_mass_term_thermal
+        
         module subroutine compute_diffusion_term_thermal(self, material_id, state, D_TT)
             implicit none
             class(type_thermal), intent(in) :: self
             integer(int32), intent(in) :: material_id
             type(type_state), intent(inout) :: state
             real(real64), intent(inout) :: D_TT(:, :)
-            type(type_thc_dispersivity) :: lambda
+            type(type_state_thc) :: lambda
 
         end subroutine compute_diffusion_term_thermal
 
@@ -192,4 +193,4 @@ module governing_thermal
 
 contains
 
-end module governing_thermal_
+end module governing_thermal
