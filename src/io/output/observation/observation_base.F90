@@ -3,13 +3,11 @@ submodule(io_output_observation) output_observation_base
 
 contains
 
-    module subroutine initialize_type_output_observation(self, input, domain, dir_output, variable_type)
+    module subroutine initialize_type_output_observation(self, dir_output, config)
         implicit none
         class(type_output_observation), intent(inout) :: self
-        type(type_input), intent(in) :: input
-        type(type_domain), intent(inout) :: domain
         character(*), intent(in) :: dir_output
-        type(type_constant_id), intent(in) :: variable_type
+        type(type_config_observation), intent(in) :: config
 
         integer(int32) :: i
         integer(int32) :: iostat
@@ -32,7 +30,7 @@ contains
             return
         end if
 
-        self%num_observations = input%output_settings%history_output%num_observations
+        self%num_observations = config%num_observations
 
         if (allocated(self%observation_points)) deallocate (self%observation_points)
         allocate (self%observation_points(self%num_observations))
@@ -43,7 +41,7 @@ contains
                 allocate (type_observation_point_node :: self%observation_points(i)%point)
                 select type (p => self%observation_points(i)%point)
                 type is (type_observation_point_node)
-                    call p%initialize(input%output_settings%history_output%node_ids(i))
+                    call p%initialize(config%observation_geometries(i))
                 end select
             end do
         case (OUTPUT_OBSERVATION_TYPES%COORDINATES%ID)
@@ -51,59 +49,59 @@ contains
                 allocate (type_observation_point_coordinate :: self%observation_points(i)%point)
                 select type (p => self%observation_points(i)%point)
                 type is (type_observation_point_coordinate)
-                    ! call p%initialize(input%output_settings%history_output%coordinates(i), &
-                    !     input%output_settings%history_output%fe_ids(i), &
-                    !     input%output_settings%history_output%normalized_coordinates(i), &
-                    !     domain%get_fe(input%output_settings%history_output%fe_ids(i)), &
-                    !     input%output_settings%history_output%connectivities(i))
+                    call p%initialize(config%observation_geometries(i))
                 end select
             end do
         end select
 
-        select case (variable_type%ID)
-        case (OUTPUT_VARIABLE_TYPES%TEMPERATURE%ID)
-            self%settings(variable_type%ID)%do_output = .true.
-            self%settings(variable_type%ID)%variable_unit = "deg C"
-            self%settings(variable_type%ID)%file_name = strip(dir_output)//"obsf_T."//strip(file_format%NAME)
-            self%settings(variable_type%ID)%io_unit = open (strip(self%settings(variable_type%ID)%file_name), "wt", iostat=iostat)
-            if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable_type%ID)%file_name)
-        case (OUTPUT_VARIABLE_TYPES%WATER_CONTENT%ID)
-            self%settings(variable_type%ID)%do_output = .true.
-            self%settings(variable_type%ID)%variable_unit = "-"
-            self%settings(variable_type%ID)%file_name = strip(dir_output)//"obsf_Si."//strip(file_format%NAME)
-            self%settings(variable_type%ID)%io_unit = open (strip(self%settings(variable_type%ID)%file_name), "wt", iostat=iostat)
-            if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable_type%ID)%file_name)
-        case (OUTPUT_VARIABLE_TYPES%THERMAL_CONDUCTIVITY%ID)
-            self%settings(variable_type%ID)%do_output = .true.
-            self%settings(variable_type%ID)%variable_unit = "W/m/K"
-            self%settings(variable_type%ID)%file_name = strip(dir_output)//"obsf_TC."//strip(file_format%NAME)
-            self%settings(variable_type%ID)%io_unit = open (strip(self%settings(variable_type%ID)%file_name), "wt", iostat=iostat)
-            if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable_type%ID)%file_name)
-        case (OUTPUT_VARIABLE_TYPES%VOLUMETRIC_HEAT_CAPACITY%ID)
-            self%settings(variable_type%ID)%do_output = .true.
-            self%settings(variable_type%ID)%variable_unit = "J/m3/K"
-            self%settings(variable_type%ID)%file_name = strip(dir_output)//"obsf_C."//strip(file_format%NAME)
-            self%settings(variable_type%ID)%io_unit = open (strip(self%settings(variable_type%ID)%file_name), "wt", iostat=iostat)
-            if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable_type%ID)%file_name)
-        case (OUTPUT_VARIABLE_TYPES%PRESSURE%ID)
-            self%settings(variable_type%ID)%do_output = .true.
-            self%settings(variable_type%ID)%variable_unit = "m"
-            self%settings(variable_type%ID)%file_name = strip(dir_output)//"obsf_P."//strip(file_format%NAME)
-            self%settings(variable_type%ID)%io_unit = open (strip(self%settings(variable_type%ID)%file_name), "wt", iostat=iostat)
-            if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable_type%ID)%file_name)
-        case (OUTPUT_VARIABLE_TYPES%WATER_FLUX%ID)
-            self%settings(variable_type%ID)%do_output = .true.
-            self%settings(variable_type%ID)%variable_unit = "m/s"
-            self%settings(variable_type%ID)%file_name = strip(dir_output)//"obsf_Flux."//strip(file_format%NAME)
-            self%settings(variable_type%ID)%io_unit = open (strip(self%settings(variable_type%ID)%file_name), "wt", iostat=iostat)
-            if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable_type%ID)%file_name)
-        case (OUTPUT_VARIABLE_TYPES%HYDRAULIC_CONDUCTIVITY%ID)
-            self%settings(variable_type%ID)%do_output = .true.
-            self%settings(variable_type%ID)%variable_unit = "m/s"
-            self%settings(variable_type%ID)%file_name = strip(dir_output)//"obsf_K."//strip(file_format%NAME)
-            self%settings(variable_type%ID)%io_unit = open (strip(self%settings(variable_type%ID)%file_name), "wt", iostat=iostat)
-            if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable_type%ID)%file_name)
-        end select
+        do i = 1, size(config%output_variables)
+            associate (variable => config%output_variables(i))
+                select case (variable%ID)
+                case (OUTPUT_VARIABLE_TYPES%TEMPERATURE%ID)
+                    self%settings(variable%ID)%do_output = .true.
+                    self%settings(variable%ID)%variable_unit = "deg C"
+                    self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_T."//strip(file_format%NAME)
+                    self%settings(variable%ID)%io_unit = open (strip(self%settings(variable%ID)%file_name), "wt", iostat=iostat)
+                    if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable%ID)%file_name)
+                case (OUTPUT_VARIABLE_TYPES%WATER_CONTENT%ID)
+                    self%settings(variable%ID)%do_output = .true.
+                    self%settings(variable%ID)%variable_unit = "-"
+                    self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_Si."//strip(file_format%NAME)
+                    self%settings(variable%ID)%io_unit = open (strip(self%settings(variable%ID)%file_name), "wt", iostat=iostat)
+                    if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable%ID)%file_name)
+                case (OUTPUT_VARIABLE_TYPES%THERMAL_CONDUCTIVITY%ID)
+                    self%settings(variable%ID)%do_output = .true.
+                    self%settings(variable%ID)%variable_unit = "W/m/K"
+                    self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_TC."//strip(file_format%NAME)
+                    self%settings(variable%ID)%io_unit = open (strip(self%settings(variable%ID)%file_name), "wt", iostat=iostat)
+                    if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable%ID)%file_name)
+                case (OUTPUT_VARIABLE_TYPES%VOLUMETRIC_HEAT_CAPACITY%ID)
+                    self%settings(variable%ID)%do_output = .true.
+                    self%settings(variable%ID)%variable_unit = "J/m3/K"
+                    self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_C."//strip(file_format%NAME)
+                    self%settings(variable%ID)%io_unit = open (strip(self%settings(variable%ID)%file_name), "wt", iostat=iostat)
+                    if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable%ID)%file_name)
+                case (OUTPUT_VARIABLE_TYPES%PRESSURE%ID)
+                    self%settings(variable%ID)%do_output = .true.
+                    self%settings(variable%ID)%variable_unit = "m"
+                    self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_P."//strip(file_format%NAME)
+                    self%settings(variable%ID)%io_unit = open (strip(self%settings(variable%ID)%file_name), "wt", iostat=iostat)
+                    if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable%ID)%file_name)
+                case (OUTPUT_VARIABLE_TYPES%WATER_FLUX%ID)
+                    self%settings(variable%ID)%do_output = .true.
+                    self%settings(variable%ID)%variable_unit = "m/s"
+                    self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_Flux."//strip(file_format%NAME)
+                    self%settings(variable%ID)%io_unit = open (strip(self%settings(variable%ID)%file_name), "wt", iostat=iostat)
+                    if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable%ID)%file_name)
+                case (OUTPUT_VARIABLE_TYPES%HYDRAULIC_CONDUCTIVITY%ID)
+                    self%settings(variable%ID)%do_output = .true.
+                    self%settings(variable%ID)%variable_unit = "m/s"
+                    self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_K."//strip(file_format%NAME)
+                    self%settings(variable%ID)%io_unit = open (strip(self%settings(variable%ID)%file_name), "wt", iostat=iostat)
+                    if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable%ID)%file_name)
+                end select
+            end associate
+        end do
 
         ! --- デリミタとフォーマット文字列の設定 ---
         select case (file_format%ID)

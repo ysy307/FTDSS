@@ -88,6 +88,7 @@ module domain_manager
         procedure, public, pass(self) :: get_num_colors => get_num_colors_domain
         procedure, public, pass(self) :: get_colored_elements => get_colored_elements_domain
         procedure, public, pass(self) :: get_total_dofs => get_total_dofs_domain
+        procedure, public, pass(self) :: get_config => get_config_domain
 
         ! ---- Meta / Utility ----
         ! display, to_string, etc.
@@ -428,6 +429,22 @@ contains
         end do
 
     end subroutine find_element_domain
+
+    subroutine get_config_domain(self, config)
+        implicit none
+        class(type_domain), intent(in) :: self
+        type(type_config_observation_geometry), intent(inout) :: config
+
+        integer(int32), pointer, contiguous, dimension(:) :: p_conn => null()
+        class(abst_fe), pointer :: fe => null()
+
+        call self%find_element(config%coordinate, config%coordinate_normalized, config%fe_id)
+        call self%get_fe(config%fe_id, fe)
+        config%fe => fe
+        call self%get_fe_connectivity(config%fe_id, p_conn)
+        call allocate_copy(config%connectivity, p_conn)
+
+    end subroutine get_config_domain
 
     ! --------------------------------------------------------------------------
     ! Display Procedures for Debugging

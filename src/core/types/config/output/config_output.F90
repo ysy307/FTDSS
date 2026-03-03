@@ -1,10 +1,13 @@
 module types_config_output
     use, intrinsic :: iso_fortran_env
     use :: types_config_base, only:abst_config
+    use :: types_config_observation, only:type_config_observation, type_config_observation_geometry
     implicit none
     private
 
     public :: type_config_output
+    public :: type_config_observation
+    public :: type_config_observation_geometry
 
     type, extends(abst_config) :: type_config_output
         logical, allocatable :: is_output_enabled(:)

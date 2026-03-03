@@ -2,6 +2,7 @@ module types_config_base
     use, intrinsic :: iso_fortran_env
     use :: core_constants, only:type_constant_id, type_constant_value, ERROR_CODES
     use :: core_validation, only:raise_error
+    use :: types_geometry_coordinate, only:type_coordinate_dp
     use :: types_geometry_coordinate_array, only:type_coordinate_array_dp
     use :: types_topology_connectivity, only:type_csr_index
     implicit none
@@ -29,15 +30,19 @@ module types_config_base
         procedure, private, pass(self) :: set_character_3d
 
         procedure, private, pass(self) :: set_constant_id
+        procedure, private, pass(self) :: set_constant_ids
         procedure, private, pass(self) :: set_constant_value
+        procedure, private, pass(self) :: set_constant_values
         procedure, private, pass(self) :: set_coordinate_array_dp
         procedure, private, pass(self) :: set_csr_index
+        procedure, private, pass(self) :: set_coordinate_dp
         generic :: set => &
             set_int32, set_int32_1d, set_int32_2d, set_int32_3d, &
             set_real64, set_real64_1d, set_real64_2d, set_real64_3d, &
             set_logical, set_logical_1d, set_logical_2d, set_logical_3d, &
             set_character, set_character_1d, set_character_2d, set_character_3d, &
-            set_constant_id, set_constant_value, set_coordinate_array_dp, set_csr_index
+            set_constant_id, set_constant_ids, set_constant_value, set_constant_values, &
+            set_coordinate_array_dp, set_csr_index, set_coordinate_dp
 
         procedure(abst_copy_config), public, pass(self), deferred :: copy
         procedure(abst_reset_config), public, pass(self), deferred :: reset
@@ -280,6 +285,16 @@ contains
         member = value
     end subroutine set_constant_id
 
+    subroutine set_constant_ids(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        type(type_constant_id), intent(inout), allocatable :: member(:)
+        type(type_constant_id), intent(in) :: value(:)
+
+        if (allocated(member)) deallocate (member)
+        allocate (member, source=value)
+    end subroutine set_constant_ids
+
     subroutine set_constant_value(self, member, value)
         implicit none
         class(abst_config), intent(in) :: self
@@ -288,6 +303,16 @@ contains
 
         member = value
     end subroutine set_constant_value
+
+    subroutine set_constant_values(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        type(type_constant_value), intent(inout), allocatable :: member(:)
+        type(type_constant_value), intent(in) :: value(:)
+
+        if (allocated(member)) deallocate (member)
+        allocate (member, source=value)
+    end subroutine set_constant_values
 
     subroutine set_coordinate_array_dp(self, member, value)
         implicit none
@@ -306,5 +331,14 @@ contains
 
         call member%copy(value)
     end subroutine set_csr_index
+
+    subroutine set_coordinate_dp(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        type(type_coordinate_dp), intent(inout) :: member
+        type(type_coordinate_dp), intent(in) :: value
+
+        member = value
+    end subroutine set_coordinate_dp
 
 end module types_config_base

@@ -46,7 +46,9 @@ module core_types
         type_config_colored_elements, &
         type_config_nodes
     use :: types_config_output, only: &
-        type_config_output
+        type_config_output, &
+        type_config_observation, &
+        type_config_observation_geometry
 
     !-----------------------------------------------------------------
     ! Discretization - DOF mapping types

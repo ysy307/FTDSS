@@ -3,13 +3,14 @@ submodule(io_output_observation) output_observation_point
 
 contains
 
-    module subroutine initialize_observation_point_node(self, node_id)
+    module subroutine initialize_observation_point_node(self, config)
         implicit none
         class(type_observation_point_node), intent(inout) :: self
-        integer(int32), intent(in) :: node_id
+        type(type_config_observation_geometry), intent(in) :: config
 
         self%point_type = OUTPUT_OBSERVATION_TYPES%NODE_IDS
-        self%node_id = node_id
+
+        self%node_id = config%node_id
     end subroutine initialize_observation_point_node
 
     module subroutine extract_value_node(self, nodal_values, value)
@@ -25,22 +26,23 @@ contains
         end if
     end subroutine extract_value_node
 
-    module subroutine initialize_observation_point_coordinate(self, coordinate, fe_id, coordinate_normalized, fe, connectivity)
+    module subroutine initialize_observation_point_coordinate(self, config)
         implicit none
         class(type_observation_point_coordinate), intent(inout) :: self
-        type(type_coordinate_dp), intent(in) :: coordinate
-        integer(int32), intent(in) :: fe_id
-        type(type_coordinate_dp), intent(in) :: coordinate_normalized
-        class(abst_fe), intent(in), pointer :: fe
-        integer(int32), intent(in) :: connectivity(:)
+        type(type_config_observation_geometry), intent(in) :: config
 
         self%point_type = OUTPUT_OBSERVATION_TYPES%COORDINATES
 
-        self%coordinate = coordinate
-        self%fe_id = fe_id
-        self%coordinate_normalized = coordinate_normalized
-        self%fe => fe
-        self%connectivity = connectivity
+        self%coordinate = config%coordinate
+        self%fe_id = config%fe_id
+        self%coordinate_normalized = config%coordinate_normalized
+        select type (fe => config%fe)
+        type is (abst_fe)
+            self%fe => fe
+        class default
+            self%fe => null()
+        end select
+        call allocate_array(self%connectivity, config%connectivity)
     end subroutine initialize_observation_point_coordinate
 
     module subroutine extract_value_coordinate(self, nodal_values, value)

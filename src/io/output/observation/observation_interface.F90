@@ -3,9 +3,7 @@ module io_output_observation
     use :: stdlib_strings, only:to_string, strip
     use :: stdlib_io, only:open
     use :: module_core
-    use :: module_input
-    use :: module_domain
-    use :: module_control
+    use :: module_domain, only:abst_fe
 
     implicit none
     private
@@ -16,10 +14,20 @@ module io_output_observation
     type, abstract :: abst_observation_point
         type(type_constant_id), private :: point_type = OUTPUT_OBSERVATION_TYPES%NONE
     contains
+        procedure(abst_initialize_observation_point), public, pass(self), deferred :: initialize
         procedure(abst_extract_value), public, pass(self), deferred :: extract_value
     end type abst_observation_point
 
     abstract interface
+        !> Evaluates the field data at this specific observation point
+        subroutine abst_initialize_observation_point(self, config)
+            import :: abst_observation_point, type_config_observation_geometry
+            implicit none
+            class(abst_observation_point), intent(inout) :: self
+            type(type_config_observation_geometry), intent(in) :: config
+
+        end subroutine abst_initialize_observation_point
+
         !> Evaluates the field data at this specific observation point
         subroutine abst_extract_value(self, nodal_values, value)
             import :: abst_observation_point, real64
@@ -39,10 +47,11 @@ module io_output_observation
     end type type_observation_point_node
 
     interface
-        module subroutine initialize_observation_point_node(self, node_id)
+        module subroutine initialize_observation_point_node(self, config)
             implicit none
             class(type_observation_point_node), intent(inout) :: self
-            integer(int32), intent(in) :: node_id
+            type(type_config_observation_geometry), intent(in) :: config
+
         end subroutine initialize_observation_point_node
 
         module subroutine extract_value_node(self, nodal_values, value)
@@ -66,14 +75,11 @@ module io_output_observation
     end type type_observation_point_coordinate
 
     interface
-        module subroutine initialize_observation_point_coordinate(self, coordinate, fe_id, coordinate_normalized, fe, connectivity)
+        module subroutine initialize_observation_point_coordinate(self, config)
             implicit none
             class(type_observation_point_coordinate), intent(inout) :: self
-            type(type_coordinate_dp), intent(in) :: coordinate
-            integer(int32), intent(in) :: fe_id
-            type(type_coordinate_dp), intent(in) :: coordinate_normalized
-            class(abst_fe), intent(in), pointer :: fe
-            integer(int32), intent(in) :: connectivity(:)
+            type(type_config_observation_geometry), intent(in) :: config
+
         end subroutine initialize_observation_point_coordinate
 
         module subroutine extract_value_coordinate(self, nodal_values, value)
@@ -129,19 +135,17 @@ module io_output_observation
     end type type_output_observation
 
     interface
-        module subroutine initialize_type_output_observation(self, input, domain, dir_output, variable_type)
+        module subroutine initialize_type_output_observation(self, dir_output, config)
             implicit none
             class(type_output_observation), intent(inout) :: self
-            type(type_input), intent(in) :: input
-            type(type_domain), intent(inout) :: domain
             character(*), intent(in) :: dir_output
-            type(type_constant_id), intent(in) :: variable_type
+            type(type_config_observation), intent(in) :: config
         end subroutine initialize_type_output_observation
 
         module subroutine destroy_type_output_observation(self)
             implicit none
             class(type_output_observation), intent(inout) :: self
-            
+
         end subroutine destroy_type_output_observation
 
         module subroutine write_observation_header(self, output_variable_type, output_time_unit)
