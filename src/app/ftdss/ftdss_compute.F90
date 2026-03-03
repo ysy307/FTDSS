@@ -1,42 +1,65 @@
+!> Implementation overview
+!>
+!> Algorithm:
+!> - Volume-weighted smoothing of element-wise state variables to nodes
+!> - Solving the global linear system
+!> - L2 projection (lumped mass) for nodal gradient calculations
+!> - Evaluation of water and vapor fluxes based on Darcy's law
 submodule(app_ftdss) ftdss_compute
     implicit none
 contains
-    ! --------------------------------------------------------------------------
-    ! 処理: 要素ごとの状態量を節点値へスムージング（体積平均）する
-    ! --------------------------------------------------------------------------
+
+    !> Smooth element-wise state variables to nodal values
+    !>
+    !> Mathematical definition:
+    !> - Computes volume-weighted average of state variables at each node
+    !>
+    !> Assumptions:
+    !> - Element adjacency lists and volumes are precomputed
+    !>
+    !> Numerical guarantee:
+    !> - Preserves total volume conceptually via weighted sum
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(N_\mathrm{threads})\)
+    !> - Arithmetic: \(O(N_\mathrm{nodes} \times N_\mathrm{neighbors})\)
+    !>
+    !> Failure behavior:
+    !> - Assigns zero if isolated node is encountered
     module subroutine update_variables_ftdss(self)
         implicit none
+        !> Main application object
         class(type_ftdss), intent(inout) :: self
 
         integer(int32) :: i_node, i_elem, j
         integer(int32) :: num_nodes, num_neighbors, material_id
         integer(int32), pointer, contiguous :: element_list(:)
 
-        ! [修正] 並列化対応: スレッドごとの状態量ワーク変数
-        ! PRIVATE変数にすると内部ポインタの初期化(SAVE属性)問題が出る恐れがあるため配列で管理
+        ! Thread-local state variables for parallelization
+        ! Managed as an array to avoid pointer initialization issues with SAVE attribute in PRIVATE variables
         type(type_state), allocatable :: states(:)
 
-        ! 値の一時保管用
+        ! Temporary storage for elemental values
         real(real64) :: elem_qw, elem_qi, elem_qa, elem_qv
         real(real64) :: elem_vol
 
-        ! 累積計算用 (Volume Weighted Sum)
+        ! Accumulators for volume-weighted sum
         real(real64) :: sum_vol
         real(real64) :: sum_qw_vol, sum_qi_vol, sum_qa_vol, sum_qv_vol
 
-        ! OpenMP用
+        ! OpenMP variables
         integer(int32) :: num_threads, tid
 
         call self%control%profiler_start(PROFILER_TYPES%SETUP)
-        
+
         call self%domain%get_num_nodes(num_nodes)
 
-        ! [修正] スレッド数分のワーク領域を確保
+        ! Allocate work arrays for the maximum number of threads
         num_threads = omp_get_max_threads()
-        allocate(states(num_threads))
+        allocate (states(num_threads))
 
         ! ----------------------------------------------------------------------
-        ! 節点ループ (並列化)
+        ! Nodal loop (Parallelized)
         ! ----------------------------------------------------------------------
         !$OMP PARALLEL DEFAULT(NONE) &
         !$OMP SHARED(self, num_nodes, states) &
@@ -44,80 +67,97 @@ contains
         !$OMP         elem_vol, material_id, elem_qw, elem_qi, elem_qa, elem_qv, &
         !$OMP         sum_vol, sum_qw_vol, sum_qi_vol, sum_qa_vol, sum_qv_vol, &
         !$OMP         tid)
-            
-            ! スレッドID取得 (1始まり)
-            tid = omp_get_thread_num() + 1
-            
-            ! ポインタ変数は念のため初期化
-            nullify(element_list)
 
-            !$OMP DO SCHEDULE(STATIC)
-            do i_node = 1, num_nodes
+        ! Get thread ID (1-based)
+        tid = omp_get_thread_num() + 1
 
-                ! 1. 隣接要素リストの取得
-                call self%domain%element_adjacency%get_list(i_node, element_list)
+        ! Initialize pointer variable for safety
+        nullify (element_list)
 
-                ! 初期化
-                sum_vol = 0.0d0
-                sum_qw_vol = 0.0d0
-                sum_qi_vol = 0.0d0
-                sum_qa_vol = 0.0d0
-                sum_qv_vol = 0.0d0
+        !$OMP DO
+        do i_node = 1, num_nodes
 
-                if (associated(element_list)) then
-                    num_neighbors = size(element_list)
+            ! 1. Retrieve adjacent element list
+            call self%domain%element_adjacency%get_list(i_node, element_list)
 
-                    ! 2. 隣接要素ループ
-                    do j = 1, num_neighbors
-                        i_elem = element_list(j)
+            ! Initialize accumulators
+            sum_vol = 0.0d0
+            sum_qw_vol = 0.0d0
+            sum_qi_vol = 0.0d0
+            sum_qa_vol = 0.0d0
+            sum_qv_vol = 0.0d0
 
-                        ! 要素体積の取得 (これが抜けると重み付けできません)
-                        call self%domain%calc_measure(i_elem, elem_vol)
+            if (associated(element_list)) then
+                num_neighbors = size(element_list)
 
-                        ! 状態変数の更新と取得 (スレッド固有の states(tid) を使用)
-                        call self%domain%get_material_id(i_elem, material_id)
-                        call self%set_state(i_node, i_elem, states(tid))
+                ! 2. Loop over adjacent elements
+                do j = 1, num_neighbors
+                    i_elem = element_list(j)
 
-                        ! Stateから各相の体積含水率などを取得
-                        call states(tid)%get(water_content=elem_qw, ice_content=elem_qi, &
-                                       air_content=elem_qa, vapor_content=elem_qv)
-                        
-                        ! 重み付き加算
-                        sum_vol = sum_vol + elem_vol
-                        sum_qw_vol = sum_qw_vol + (elem_qw * elem_vol)
-                        sum_qi_vol = sum_qi_vol + (elem_qi * elem_vol)
-                        sum_qa_vol = sum_qa_vol + (elem_qa * elem_vol)
-                        sum_qv_vol = sum_qv_vol + (elem_qv * elem_vol)
-                    end do
-                end if
+                    ! Get element volume for weighting
+                    call self%domain%calc_measure(i_elem, elem_vol)
 
-                ! 3. 正規化して節点へ格納 (setterはスレッドセーフと仮定: i_nodeが異なるため)
-                if (abs(sum_vol) > epsilon(1.0d0)) then
-                    call self%Qw%set_current(i_node, sum_qw_vol / sum_vol)
-                    call self%Qi%set_current(i_node, sum_qi_vol / sum_vol)
-                    call self%Qa%set_current(i_node, sum_qa_vol / sum_vol)
-                    call self%Qv%set_current(i_node, sum_qv_vol / sum_vol)
-                else
-                    ! 孤立節点等の処理
-                    call self%Qw%set_current(i_node, 0.0d0)
-                    call self%Qi%set_current(i_node, 0.0d0)
-                    call self%Qa%set_current(i_node, 0.0d0)
-                    call self%Qv%set_current(i_node, 0.0d0)
-                end if
+                    ! Update and retrieve state variables using thread-specific state
+                    call self%domain%get_material_id(i_elem, material_id)
+                    call self%set_state(i_node, i_elem, states(tid))
 
-            end do
-            !$OMP END DO
+                    ! Retrieve volumetric contents for each phase from the state
+                    call states(tid)%get(water_content=elem_qw, ice_content=elem_qi, &
+                                         air_content=elem_qa, vapor_content=elem_qv)
+
+                    ! Weighted addition
+                    sum_vol = sum_vol + elem_vol
+                    sum_qw_vol = sum_qw_vol + (elem_qw * elem_vol)
+                    sum_qi_vol = sum_qi_vol + (elem_qi * elem_vol)
+                    sum_qa_vol = sum_qa_vol + (elem_qa * elem_vol)
+                    sum_qv_vol = sum_qv_vol + (elem_qv * elem_vol)
+                end do
+            end if
+
+            ! 3. Normalize and store at node (assumes setter is thread-safe for different i_node)
+            if (abs(sum_vol) > epsilon(1.0d0)) then
+                call self%Qw%set_current(i_node, sum_qw_vol / sum_vol)
+                call self%Qi%set_current(i_node, sum_qi_vol / sum_vol)
+                call self%Qa%set_current(i_node, sum_qa_vol / sum_vol)
+                call self%Qv%set_current(i_node, sum_qv_vol / sum_vol)
+            else
+                ! Handle isolated nodes
+                call self%Qw%set_current(i_node, 0.0d0)
+                call self%Qi%set_current(i_node, 0.0d0)
+                call self%Qa%set_current(i_node, 0.0d0)
+                call self%Qv%set_current(i_node, 0.0d0)
+            end if
+
+        end do
+        !$OMP END DO
 
         !$OMP END PARALLEL
 
-        if (allocated(states)) deallocate(states)
+        if (allocated(states)) deallocate (states)
 
         call self%control%profiler_stop(PROFILER_TYPES%SETUP)
 
     end subroutine update_variables_ftdss
 
+    !> Solve the global linear system
+    !>
+    !> Mathematical definition:
+    !> - Solves \( \mathbf{K} \Delta \mathbf{u} = \mathbf{F} \)
+    !>
+    !> Assumptions:
+    !> - Matrix and vectors are properly assembled
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Depends on the chosen solver
+    !>
+    !> Failure behavior:
+    !> - Halts execution if solver fails
     module subroutine solve_ftdss(self)
         implicit none
+        !> Main application object
         class(type_ftdss), intent(inout) :: self
 
         class(abst_matrix), pointer :: K_ptr => null()
@@ -141,25 +181,44 @@ contains
 
     end subroutine solve_ftdss
 
+    !> Calculate nodal gradient of a scalar field
     !>
-    !> 節点上の物理量勾配を計算する（L2射影 / Lumped Mass法）
+    !> Mathematical definition:
+    !> - Uses L2 projection with a lumped mass approach
     !>
+    !> Assumptions:
+    !> - Nodal values are provided for the entire domain
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(N_{nodes})\)
+    !> - Arithmetic: \(O(N_{elems} \times N_{gauss})\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     module subroutine calc_gradient_ftdss(self, values_vec, grad)
         implicit none
+        !> Main application object
         class(type_ftdss), intent(inout) :: self
+        !> Scalar field nodal values
+        !> Not modified
         real(real64), intent(in) :: values_vec(:)
+        !> Calculated nodal gradient vector
+        !> Overwritten on exit
         type(type_coordinate_array_dp), intent(inout) :: grad
 
         class(abst_fe), pointer :: fe
         integer(int32), dimension(:), pointer, contiguous :: p_conn
 
-        ! 要素データ用配列
+        ! Element data arrays
         real(real64), allocatable :: elem_u(:)
         real(real64), allocatable :: node_coords(:, :)
         real(real64), allocatable :: psi(:)
         real(real64), allocatable :: dpsi_dx(:, :)
 
-        ! FE情報キャッシュ用
+        ! FE information cache
         real(real64), pointer, contiguous, dimension(:) :: fe_weights
         type(type_coordinate_dp), pointer, contiguous, dimension(:) :: fe_gauss_pts
 
@@ -184,13 +243,10 @@ contains
         allocate (nodal_vol(num_total_nodes))
         nodal_vol(:) = 0.0d0
 
-        ! 作業用配列の再確保 (allocatableは自動再割り当てされる場合もあるが明示的に管理)
+        ! Reallocate working arrays explicitly
         if (allocated(elem_u)) deallocate (elem_u)
         if (allocated(psi)) deallocate (psi)
         if (allocated(dpsi_dx)) deallocate (dpsi_dx)
-        ! node_coordsは get_fe_coordinate 内で handle されるためここでは deallocate しない方が安全だが、
-        ! エラー回避のために明示的に ensure することも可能。
-        ! ここでは元のコードの意図通り get_fe_coordinate に任せる。
 
         allocate (elem_u(20))
         allocate (psi(20))
@@ -208,13 +264,14 @@ contains
 
             elem_u(1:n_nodes_elem) = values_vec(p_conn(1:n_nodes_elem))
 
-            ! 座標取得 (allocatable引数)
+            ! Retrieve coordinates (allocatable argument)
             call self%domain%get_fe_coordinate(i, node_coords)
 
             do p = 1, n_gauss
                 r = fe_gauss_pts(p)
 
-                call fe%calc_shape_function(r, node_coords, psi=psi(1:n_nodes_elem), dpsi_dx=dpsi_dx(:, 1:n_nodes_elem), determinant_jacobian=det_j)
+                call fe%calc_shape_function(r, node_coords, psi=psi(1:n_nodes_elem), &
+                                            dpsi_dx=dpsi_dx(:, 1:n_nodes_elem), determinant_jacobian=det_j)
                 w_vol = fe_weights(p) * det_j
 
                 gauss_grad = 0.0d0
@@ -259,8 +316,25 @@ contains
 
     end subroutine calc_gradient_ftdss
 
+    !> Calculate temperature gradient
+    !>
+    !> Mathematical definition:
+    !> - Calls the generalized gradient calculation for temperature
+    !>
+    !> Assumptions:
+    !> - Thermal physics is active
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Dominates by the general gradient calculation
+    !>
+    !> Failure behavior:
+    !> - Returns silently if thermal physics is inactive
     module subroutine calc_gradient_temperature_ftdss(self)
         implicit none
+        !> Main application object
         class(type_ftdss), intent(inout) :: self
 
         real(real64), pointer, contiguous, dimension(:) :: temperature => null()
@@ -278,8 +352,25 @@ contains
 
     end subroutine calc_gradient_temperature_ftdss
 
+    !> Calculate pressure gradient
+    !>
+    !> Mathematical definition:
+    !> - Calls the generalized gradient calculation for pressure
+    !>
+    !> Assumptions:
+    !> - Hydraulic physics is active
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Dominates by the general gradient calculation
+    !>
+    !> Failure behavior:
+    !> - Returns silently if hydraulic physics is inactive
     module subroutine calc_gradient_pressure_ftdss(self)
         implicit none
+        !> Main application object
         class(type_ftdss), intent(inout) :: self
 
         real(real64), pointer, contiguous, dimension(:) :: pressure => null()
@@ -298,12 +389,41 @@ contains
 
     end subroutine calc_gradient_pressure_ftdss
 
+    !> Calculate liquid water flux vector
+    !>
+    !> Mathematical definition:
+    !> - \( \mathbf{q}_w = -K_\mathrm{wT} \nabla T - K_\mathrm{wP} \nabla P - K_\mathrm{wP} \rho_w g \nabla z \)
+    !>
+    !> Assumptions:
+    !> - Z-axis is aligned vertically with gravity
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     module subroutine calc_water_flux_ftdss(self, material_id, state, grad_T, grad_P, water_flux)
         implicit none
+        !> Main application object
         class(type_ftdss), intent(inout) :: self
+        !> Material identifier
+        !> Not modified
         integer(int32), intent(in) :: material_id
+        !> Thermodynamic state
+        !> Not modified
         type(type_state), intent(in) :: state
-        type(type_coordinate_dp), intent(in) :: grad_T, grad_P
+        !> Temperature gradient
+        !> Not modified
+        type(type_coordinate_dp), intent(in) :: grad_T
+        !> Pressure gradient
+        !> Not modified
+        type(type_coordinate_dp), intent(in) :: grad_P
+        !> Liquid water flux vector
+        !> Overwritten on exit
         type(type_coordinate_dp), intent(inout) :: water_flux
 
         integer(int32) :: computation_type
@@ -316,13 +436,13 @@ contains
         call self%hydraulic%calc_K_wT(material_id, state, K_wT)
         call self%hydraulic%calc_K_wP(material_id, state, K_wP)
 
-        ! --- 重力項の計算 ---
-        ! K_wP は K/(rho*g) なので，重力項(透水係数 K そのもの)を復元する
+        ! --- Gravity term calculation ---
+        ! K_wP is defined as K / (rho * g), so we restore the hydraulic conductivity K
         ! gravity_term = K = K_wP * rho * g
         call self%thermal%calc_density_water(state, rho_w)
         gravity_term = K_wP * rho_w * g
 
-        ! --- 流束の計算 (Darcy則: q = -K_wT*grad_T - K_wP*grad_P - K*grad_z) ---
+        ! --- Flux calculation (Darcy's law: q = -K_wT*grad_T - K_wP*grad_P - K*grad_z) ---
         select case (computation_type)
         case (COMP_TYPES%XY_2D%ID)
             water_flux%x = -K_wT * grad_T%x - K_wP * grad_P%x
@@ -331,21 +451,50 @@ contains
         case (COMP_TYPES%XZ_2D%ID)
             water_flux%x = -K_wT * grad_T%x - K_wP * grad_P%x
             water_flux%y = 0.0d0
-            water_flux%z = -K_wT * grad_T%z - K_wP * grad_P%z - gravity_term ! Zを鋴直と仮定
+            water_flux%z = -K_wT * grad_T%z - K_wP * grad_P%z - gravity_term ! Assuming Z is vertical
         case (COMP_TYPES%XYZ_3D%ID)
             water_flux%x = -K_wT * grad_T%x - K_wP * grad_P%x
             water_flux%y = -K_wT * grad_T%y - K_wP * grad_P%y
-            water_flux%z = -K_wT * grad_T%z - K_wP * grad_P%z - gravity_term ! Zを鉛直と仮定
+            water_flux%z = -K_wT * grad_T%z - K_wP * grad_P%z - gravity_term ! Assuming Z is vertical
         end select
 
     end subroutine calc_water_flux_ftdss
 
+    !> Calculate water vapor flux vector
+    !>
+    !> Mathematical definition:
+    !> - \( \mathbf{q}_v = -K_\mathrm{vT} \nabla T - K_\mathrm{vP} \nabla P \)
+    !>
+    !> Assumptions:
+    !> - Vapor transport neglects gravity terms
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     module subroutine calc_vapor_flux_ftdss(self, material_id, state, grad_T, grad_P, water_flux)
         implicit none
+        !> Main application object
         class(type_ftdss), intent(inout) :: self
+        !> Material identifier
+        !> Not modified
         integer(int32), intent(in) :: material_id
+        !> Thermodynamic state
+        !> Not modified
         type(type_state), intent(in) :: state
-        type(type_coordinate_dp), intent(in) :: grad_T, grad_P
+        !> Temperature gradient
+        !> Not modified
+        type(type_coordinate_dp), intent(in) :: grad_T
+        !> Pressure gradient
+        !> Not modified
+        type(type_coordinate_dp), intent(in) :: grad_P
+        !> Vapor flux vector
+        !> Overwritten on exit
         type(type_coordinate_dp), intent(inout) :: water_flux
 
         integer(int32) :: computation_type

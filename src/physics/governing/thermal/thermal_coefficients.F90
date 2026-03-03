@@ -1,20 +1,30 @@
+!> Implementation overview
+!>
+!> Algorithm:
+!> - Calculates thermal coefficients and governing equation terms
+!> - Assembles enthalpy, transient, mass, diffusion, advection, and latent terms
 submodule(governing_thermal) thermal_coefficients
     implicit none
 
 contains
 
+    !> Calculate enthalpy (internal energy) density per unit volume
     !>
-    !> @brief 単位体積あたりのエンタルピー(内部エネルギー)密度 U [J/m3] を計算する
-    !> @note  これは状態方程式 U = f(T, phi, ...) です。
-    !>
+    !> Mathematical definition:
+    !> - Equation of state: \( U = f(T, \phi, \dots) \)
     module subroutine calc_enthalpy_density_thermal(self, material_id, state, U)
         implicit none
+        !> Thermal governing equation object
         class(type_thermal), intent(in) :: self
+        !> Material identifier
         integer(int32), intent(in) :: material_id
+        !> Thermodynamic state
         type(type_state), intent(in) :: state
+        !> Enthalpy density \( U \) [J/m3]
+        !> Overwritten on exit
         real(real64), intent(inout) :: U
 
-        ! ローカル変数
+        ! Local variables
         real(real64) :: temperature
         real(real64) :: porosity, Qw, Qi, Qv
         real(real64) :: rho_s, rho_w, rho_i
@@ -58,7 +68,8 @@ contains
         ! Vapor phase (Include Latent Heat of Vaporization)
         if (Qv > 0.0d0) then
             if (.not. has_rho_w) then
-                call self%physics%calc_density_water(state, rho_w) ! 通常、蒸気の基準密度は液相
+                ! Reference density for vapor is typically liquid phase
+                call self%physics%calc_density_water(state, rho_w)
                 has_rho_w = .true.
             end if
             call self%physics%calc_specific_heat_vapor(state, c_v)
@@ -69,37 +80,62 @@ contains
     end subroutine calc_enthalpy_density_thermal
 
     ! --------------------------------------------------------------------------
-    ! Helper Wrappers ()
+    ! Helper Wrappers
     ! --------------------------------------------------------------------------
+
+    !> Wrapper to calculate water density
     module subroutine calc_density_water_thermal(self, state, rho_water)
         implicit none
+        !> Thermal governing equation object
         class(type_thermal), intent(in) :: self
+        !> Thermodynamic state
         type(type_state), intent(in) :: state
+        !> Water density
+        !> Overwritten on exit
         real(real64), intent(inout) :: rho_water
+
         call self%physics%calc_density_water(state, rho_water)
     end subroutine calc_density_water_thermal
 
+    !> Wrapper to calculate ice density
     module subroutine calc_density_ice_thermal(self, state, rho_ice)
         implicit none
+        !> Thermal governing equation object
         class(type_thermal), intent(in) :: self
+        !> Thermodynamic state
         type(type_state), intent(in) :: state
+        !> Ice density
+        !> Overwritten on exit
         real(real64), intent(inout) :: rho_ice
+
         call self%physics%calc_density_ice(state, rho_ice)
     end subroutine calc_density_ice_thermal
 
+    !> Wrapper to calculate saturation vapor density
     module subroutine calc_density_vapor_saturation_thermal(self, state, rho_vapor_sat)
         implicit none
+        !> Thermal governing equation object
         class(type_thermal), intent(in) :: self
+        !> Thermodynamic state
         type(type_state), intent(in) :: state
+        !> Saturation vapor density
+        !> Overwritten on exit
         real(real64), intent(inout) :: rho_vapor_sat
+
         call self%physics%calc_density_vapor_saturation(state, rho_vapor_sat)
     end subroutine calc_density_vapor_saturation_thermal
 
+    !> Wrapper to update water phases
     module subroutine update_water_phases_thermal(self, material_id, state)
         implicit none
+        !> Thermal governing equation object
         class(type_thermal), intent(in) :: self
+        !> Material identifier
         integer(int32), intent(in) :: material_id
+        !> Thermodynamic state
+        !> Overwritten on exit
         type(type_state), intent(inout) :: state
+
         call self%physics%update_water_phases(material_id, state)
     end subroutine update_water_phases_thermal
 
@@ -107,18 +143,23 @@ contains
     ! Transient / Mass Terms (Refactored for NR & Picard)
     ! ==========================================================================
 
+    !> Calculate time derivative term (Residual): \( \frac{dU}{dt} \)
     !>
-    !> @brief 時間微分項(Residul)を計算する: dU/dt
-    !> @details
-    !>   NR法の残差計算に使用します。
-    !>   Res_transient = dU_dt = sum(bdf_coeffs(j) * U(t_{n+1-j}))
-    !>
+    !> Mathematical definition:
+    !> - Used for residual calculation in Newton-Raphson method
+    !> - \( Res_{transient} = \frac{dU}{dt} = \sum bdf\_coeffs_j U(t_{n+1-j}) \)
     module subroutine compute_transient_term_thermal(self, material_id, state, bdf_coeffs, dU_dt)
         implicit none
+        !> Thermal governing equation object
         class(type_thermal), intent(in) :: self
+        !> Material identifier
         integer(int32), intent(in) :: material_id
+        !> Thermodynamic state
         type(type_state), intent(in) :: state
+        !> BDF coefficients for time integration
         real(real64), intent(in) :: bdf_coeffs(:)
+        !> Time derivative of enthalpy density
+        !> Overwritten on exit
         real(real64), intent(inout) :: dU_dt
 
         type(type_state) :: local_state
@@ -138,8 +179,8 @@ contains
         if (.not. associated(porosity_history)) return
         n_hist = min(size(bdf_coeffs), size(temperature_history), size(pressure_history), size(porosity_history))
         do j = 1, n_hist
-            ! 履歴データから状態を復元してエンタルピーを再計算
-            ! Note: 計算コスト削減のため、本来はUの履歴をstateに持たせることが望ましい
+            ! Reconstruct state from history data and recalculate enthalpy
+            ! Note: To reduce computational cost, it is preferable to store U history in state
             call local_state%temperature%set(temperature_history(j))
             call local_state%pressure%set(pressure_history(j))
             call local_state%porosity%set(porosity_history(j))
@@ -151,19 +192,23 @@ contains
 
     end subroutine compute_transient_term_thermal
 
+    !> Calculate heat capacity coefficient \( C_{TT} = \frac{dU}{dT} \)
     !>
-    !> @brief 熱容量係数 C_TT = dU/dT (または Delta U / Delta T) を計算する
-    !> @details
-    !>   NR法のヤコビアン、またはPicard法の質量行列に使用します。
-    !>   dTが小さい、または scheme_opt=TANGENT 指定時は接線熱容量。
-    !>   dTが大きい、または scheme_opt=SECANT 指定時は割線熱容量(有効熱容量)。
-    !>
+    !> Mathematical definition:
+    !> - Used for Jacobian in NR method or mass matrix in Picard method
+    !> - Applies Tangent scheme for small \( dT \) or SECANT scheme for large \( dT \)
     module subroutine compute_mass_term_thermal(self, material_id, state, C_TT, scheme_opt)
         implicit none
+        !> Thermal governing equation object
         class(type_thermal), intent(in) :: self
+        !> Material identifier
         integer(int32), intent(in) :: material_id
+        !> Thermodynamic state
         type(type_state), intent(in) :: state
+        !> Heat capacity coefficient
+        !> Overwritten on exit
         real(real64), intent(inout) :: C_TT
+        !> Optional scheme selector (TANGENT or SECANT)
         integer(int32), intent(in), optional :: scheme_opt
 
         real(real64) :: temperature
@@ -171,19 +216,19 @@ contains
         real(real64), pointer, contiguous, dimension(:) :: pressure_history
         real(real64), pointer, contiguous, dimension(:) :: porosity_history
 
-        ! Tangent用
+        ! Tangent variables
         real(real64) :: porosity, Qw, Qi, Qv
         real(real64) :: rho_s, rho_w, rho_i
         real(real64) :: c_s, c_w, c_i, c_v
         real(real64) :: dQi_dT, dQv_dT, Lf, Lv
         logical :: has_rho_w
 
-        ! Secant用
+        ! Secant variables
         real(real64) :: C_TT_current, C_TT_old, dT
         type(type_state) :: temp_state
         integer(int32) :: use_scheme
 
-        ! デフォルトの挙動決定（指定がなければ自動判定）
+        ! Determine default behavior
         call state%get(temperature=temperature, temperature_history=temperature_history, &
                        pressure_history=pressure_history, porosity_history=porosity_history)
 
@@ -209,7 +254,7 @@ contains
         if (present(scheme_opt)) then
             use_scheme = scheme_opt
         else
-            ! 従来ロジック: 温度変化が大きければSecantで安定化、小さければTangent
+            ! Legacy logic: stabilize with Secant if temperature change is large, otherwise use Tangent
             if (abs(dT) > 1.0d-6) then
                 use_scheme = SCHEME_SECANT
             else
@@ -242,7 +287,7 @@ contains
             call self%update_water_phases(material_id, temp_state)
             call self%calc_enthalpy_density(material_id, temp_state, C_TT_old)
 
-            ! ゼロ除算防止
+            ! Prevent division by zero
             dT = sign(max(abs(dT), 1.0d-8), dT)
             C_TT = (C_TT_current - C_TT_old) / dT
 
@@ -290,7 +335,7 @@ contains
             end if
         end if
 
-        ! 物理的に負の熱容量はありえないためクリップ
+        ! Clip negative heat capacity as it is physically invalid
         C_TT = max(C_TT, 0.0d0)
 
     end subroutine compute_mass_term_thermal
@@ -299,12 +344,23 @@ contains
     ! Flux Terms (Diffusion / Advection / Latent Source)
     ! ==========================================================================
 
+    !> Calculate diffusion term matrix
+    !>
+    !> Mathematical definition:
+    !> - Assembles thermal conductivity tensor based on spatial dimensions
     module subroutine compute_diffusion_term_thermal(self, material_id, state, D_TT)
         implicit none
+        !> Thermal governing equation object
         class(type_thermal), intent(in) :: self
+        !> Material identifier
         integer(int32), intent(in) :: material_id
+        !> Thermodynamic state
+        !> Overwritten on exit
         type(type_state), intent(inout) :: state
+        !> Diffusion matrix components
+        !> Overwritten on exit
         real(real64), intent(inout) :: D_TT(:, :)
+
         type(type_state_thc) :: lambda
 
         call self%physics%calc_thermal_conductivity(material_id, state, lambda)
@@ -334,11 +390,21 @@ contains
         end select
     end subroutine compute_diffusion_term_thermal
 
+    !> Calculate advective term vector
+    !>
+    !> Mathematical definition:
+    !> - Computes thermal advection driven by water and vapor fluxes
     module subroutine compute_advective_term_thermal(self, material_id, state, V_TT)
         implicit none
+        !> Thermal governing equation object
         class(type_thermal), intent(in) :: self
+        !> Material identifier
         integer(int32), intent(in) :: material_id
+        !> Thermodynamic state
+        !> Overwritten on exit
         type(type_state), intent(inout) :: state
+        !> Advective velocity vector
+        !> Overwritten on exit
         real(real64), intent(inout) :: V_TT(:)
 
         type(type_coordinate_dp), pointer :: water_flux, vapor_flux
@@ -349,7 +415,7 @@ contains
 
         V_TT(:) = 0.0d0
         flux_norm1 = abs(water_flux%x) + abs(water_flux%y) + abs(water_flux%z) + &
-                 abs(vapor_flux%x) + abs(vapor_flux%y) + abs(vapor_flux%z)
+                     abs(vapor_flux%x) + abs(vapor_flux%y) + abs(vapor_flux%z)
         if (flux_norm1 <= epsilon(1.0d0)) return
 
         call self%physics%calc_density_water(state, rho_w)
@@ -370,11 +436,21 @@ contains
         end select
     end subroutine compute_advective_term_thermal
 
+    !> Calculate latent heat source term
+    !>
+    !> Mathematical definition:
+    !> - \( L_{TT} = \rho_w L_v K_{vT} \)
     module subroutine compute_latent_term_thermal(self, material_id, state, L_TT)
         implicit none
+        !> Thermal governing equation object
         class(type_thermal), intent(in) :: self
+        !> Material identifier
         integer(int32), intent(in) :: material_id
+        !> Thermodynamic state
+        !> Overwritten on exit
         type(type_state), intent(inout) :: state
+        !> Latent heat term
+        !> Overwritten on exit
         real(real64), intent(inout) :: L_TT
 
         real(real64) :: rho_w, L_v, K_vT
@@ -384,21 +460,24 @@ contains
         L_TT = rho_w * L_v * K_vT
     end subroutine compute_latent_term_thermal
 
+    !> Calculate history term at integration points
     !>
-    !> @brief 積分点における履歴項（History Term）を計算する
-    !> @details
-    !>   Picard法などで方程式を C(T) * dT/dt + ... = 0 と線形化する場合に使用します。
-    !>   History = C_TT * sum_{k=2}^{order} ( alpha_k * T_{n+1-k} )
-    !>
-    !>   @warning NR法で「エンタルピー法」として残差を構成する場合（compute_transient_termを使用する場合）、
-    !>            この項は使用しないでください。重複してカウントすることになります。
-    !>
+    !> Mathematical definition:
+    !> - Used for linearization in methods like Picard
+    !> - \( History = C_{TT} \sum_{k=2}^{order} \alpha_k T_{n+1-k} \)
+    !> - Warning: Do not use when constructing residuals using the enthalpy method with NR
     module subroutine compute_history_term_thermal(self, material_id, state, bdf_coeffs, history_term)
         implicit none
+        !> Thermal governing equation object
         class(type_thermal), intent(in) :: self
+        !> Material identifier
         integer(int32), intent(in) :: material_id
+        !> Thermodynamic state
         type(type_state), intent(in) :: state
+        !> BDF coefficients for time integration
         real(real64), intent(in) :: bdf_coeffs(:)
+        !> History term value
+        !> Overwritten on exit
         real(real64), intent(inout) :: history_term
 
         real(real64), pointer, contiguous, dimension(:) :: temperature_history
@@ -408,13 +487,13 @@ contains
 
         call state%get(temperature_history=temperature_history)
 
-        ! 熱容量の計算（Picard法では一般に現在の反復温度でのSecant等を用いる）
+        ! Calculate heat capacity (Picard generally uses Secant at the current iteration temperature)
         call self%compute_mass_term(material_id, state, C_TT)
 
         T_hist_sum = 0.0d0
         n_steps = size(bdf_coeffs)
 
-        ! alpha_0 (current) は除外して、過去の項のみを合計
+        ! Exclude alpha_0 (current) and sum only past terms
         do j = 2, n_steps
             if (j > size(temperature_history)) exit
             T_hist_sum = T_hist_sum + bdf_coeffs(j) * temperature_history(j)
