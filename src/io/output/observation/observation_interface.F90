@@ -132,6 +132,7 @@ module io_output_observation
         procedure, public, pass(self) :: destroy => destroy_type_output_observation
         procedure, public, pass(self) :: write_header => write_observation_header
         procedure, public, pass(self) :: write_line => write_observation_line
+        procedure, public, pass(self) :: output_history => output_history_output_observation
     end type type_output_observation
 
     interface
@@ -164,6 +165,15 @@ module io_output_observation
             real(real64), intent(in) :: output_values(:)
 
         end subroutine write_observation_line
+
+        module subroutine output_history_output_observation(self, time, temperature, pressure)
+            implicit none
+            class(type_output_observation), intent(inout) :: self
+            real(real64), intent(in) :: time
+            real(real64), intent(in), optional :: temperature(:)
+            real(real64), intent(in), optional :: pressure(:)
+
+        end subroutine output_history_output_observation
     end interface
 
 end module io_output_observation

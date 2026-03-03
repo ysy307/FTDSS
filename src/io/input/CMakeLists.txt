@@ -1,5 +1,5 @@
 # ============================================================
-# Input Library (single static archive)
+# Input Library
 # ============================================================
 add_library(SOLVER_INPUT STATIC)
 

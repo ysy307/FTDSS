@@ -12,6 +12,10 @@ module types_config_base
 
     type, abstract :: abst_config
     contains
+        procedure, private, pass(self) :: set_int8
+        procedure, private, pass(self) :: set_int8_1d
+        procedure, private, pass(self) :: set_int8_2d
+        procedure, private, pass(self) :: set_int8_3d
         procedure, private, pass(self) :: set_int32
         procedure, private, pass(self) :: set_int32_1d
         procedure, private, pass(self) :: set_int32_2d
@@ -37,6 +41,7 @@ module types_config_base
         procedure, private, pass(self) :: set_csr_index
         procedure, private, pass(self) :: set_coordinate_dp
         generic :: set => &
+            set_int8, set_int8_1d, set_int8_2d, set_int8_3d, &
             set_int32, set_int32_1d, set_int32_2d, set_int32_3d, &
             set_real64, set_real64_1d, set_real64_2d, set_real64_3d, &
             set_logical, set_logical_1d, set_logical_2d, set_logical_3d, &
@@ -64,6 +69,57 @@ module types_config_base
     end interface
 
 contains
+
+    subroutine set_int8(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        integer(int8), intent(inout) :: member
+        integer(int8), intent(in) :: value
+
+        member = value
+    end subroutine set_int8
+
+    subroutine set_int8_1d(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        integer(int8), allocatable, intent(inout) :: member(:)
+        integer(int8), allocatable, intent(in) :: value(:)
+
+        if (.not. allocated(value)) then
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="types_config_base:set_int8_1d")
+        end if
+
+        if (allocated(member)) deallocate (member)
+        allocate (member, source=value)
+    end subroutine set_int8_1d
+
+    subroutine set_int8_2d(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        integer(int8), allocatable, intent(inout) :: member(:, :)
+        integer(int8), allocatable, intent(in) :: value(:, :)
+
+        if (.not. allocated(value)) then
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="types_config_base:set_int8_2d")
+        end if
+
+        if (allocated(member)) deallocate (member)
+        allocate (member, source=value)
+    end subroutine set_int8_2d
+
+    subroutine set_int8_3d(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        integer(int8), allocatable, intent(inout) :: member(:, :, :)
+        integer(int8), allocatable, intent(in) :: value(:, :, :)
+
+        if (.not. allocated(value)) then
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="types_config_base:set_int8_3d")
+        end if
+
+        if (allocated(member)) deallocate (member)
+        allocate (member, source=value)
+    end subroutine set_int8_3d
 
     subroutine set_int32(self, member, value)
         implicit none

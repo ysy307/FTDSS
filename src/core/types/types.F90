@@ -48,7 +48,8 @@ module core_types
     use :: types_config_output, only: &
         type_config_output, &
         type_config_observation, &
-        type_config_observation_geometry
+        type_config_observation_geometry, &
+        type_config_overall
 
     !-----------------------------------------------------------------
     ! Discretization - DOF mapping types

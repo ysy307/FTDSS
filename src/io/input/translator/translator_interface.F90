@@ -1,5 +1,6 @@
 module io_input_translator
     use, intrinsic :: iso_fortran_env
+    use :: stdlib_strings, only:to_string, strip
     use :: module_core
     use :: io_input, only:type_input
     implicit none
@@ -19,8 +20,10 @@ module io_input_translator
             execute_basic_control_manager, &
             execute_geometry_domain_nodes, &
             execute_geometry_domain_elements, &
+            execute_geometry_domain_boundaries, &
             execute_output_field, &
-            execute_output_observation
+            execute_output_observation, &
+            execute_output_overall
         procedure, private, pass(self) :: execute_condition_boundary
         procedure, private, pass(self) :: execute_condition_initial
         procedure, private, pass(self) :: execute_condition_acceleration
@@ -33,8 +36,10 @@ module io_input_translator
         procedure, private, pass(self) :: execute_basic_control_manager
         procedure, private, pass(self) :: execute_geometry_domain_nodes
         procedure, private, pass(self) :: execute_geometry_domain_elements
+        procedure, private, pass(self) :: execute_geometry_domain_boundaries
         procedure, private, pass(self) :: execute_output_field
         procedure, private, pass(self) :: execute_output_observation
+        procedure, private, pass(self) :: execute_output_overall
 
     end type type_input_translator
 
@@ -164,6 +169,14 @@ module io_input_translator
             class(type_config_observation), intent(inout) :: config
 
         end subroutine execute_output_observation
+
+        module subroutine execute_output_overall(self, input, config)
+            implicit none
+            class(type_input_translator), intent(in) :: self
+            class(type_input), intent(in) :: input
+            class(type_config_overall), intent(inout) :: config
+
+        end subroutine execute_output_overall
     end interface
 
 ! contains

@@ -5,43 +5,46 @@ module io_output_manager
     use :: stdlib_io, only:open
     use :: vtk_fortran, only:vtk_file
     use :: module_core
-    use :: module_input
     use :: module_domain
-    use :: module_control
 
-    use :: io_output_overall, only:type_output_overall
+    use :: io_output_overall, only: &
+        abst_output_overall, &
+        type_output_overall_vtk, &
+        type_output_overall_vtu
     use :: io_output_observation, only:type_output_observation
     use :: io_output_logging, only:type_output_log
 
     implicit none
     private
 
-    public :: type_output
+    public :: type_output_manager
 
     !---------------------------------------------------------------------------
     ! type_output
     !---------------------------------------------------------------------------
-    type :: type_output
+    type :: type_output_manager
         logical, private, allocatable :: active(:)
 
-        type(type_output_observation), private, allocatable :: observations(:)
-        type(type_output_overall), private :: overall
+        type(type_output_observation), private, allocatable :: observation
+        class(abst_output_overall), private, allocatable :: overall
         type(type_output_log), private :: log
 
     contains
-        procedure, pass(self), public :: initialize => initialize_type_output
-        procedure, pass(self), public :: output_fields
-        procedure, pass(self), public :: output_history
-        procedure, pass(self), public :: get_log_io_unit
-        procedure, pass(self), public :: output_system_log
-    end type type_output
+        procedure, pass(self), public :: initialize => initialize_type_output_manager
+        procedure, pass(self), public :: output_fields => output_fields_output_manager
+        procedure, pass(self), public :: output_history => output_history_output_manager
+        procedure, pass(self), public :: output_system_log => output_system_log_output_manager
+        procedure, pass(self), public :: get_log_io_unit => get_log_io_unit_output_manager
+    end type type_output_manager
 
 contains
 
-    subroutine initialize_type_output(self, config_output)
+    subroutine initialize_type_output_manager(self, config_output, config_observation, config_overall)
         implicit none
-        class(type_output), intent(inout) :: self
+        class(type_output_manager), intent(inout) :: self
         type(type_config_output), intent(in) :: config_output
+        type(type_config_observation), intent(in) :: config_observation
+        type(type_config_overall), intent(in) :: config_overall
 
         integer(int32) :: i
         character(:), allocatable :: project_path_env
@@ -61,74 +64,65 @@ contains
 
         call allocate_array(self%active, source=config_output%is_output_enabled)
 
-        ! if (allocated(self%observations)) deallocate (self%observations)
-        ! allocate (self%observations(size(input%output_settings%history_output%variable_names)))
-        ! do i = 1, size(input%output_settings%history_output%variable_names)
-        !     ! [修正] coordinate 引数を削除, domain を渡す
-        !     call self%observations(i)%initialize(input, dir_output, &
-        !                                          input%output_settings%history_output%variable_names(i))
-        !     call self%observations(i)%write_header(input%output_settings%history_output%output_time_unit)
-        ! end do
+        call self%observation%initialize(dir_output, config_observation)
 
-        ! ! [修正] control を渡し, coordinate を削除
-        ! call self%overall%initialize(input, control, dir_output_field)
-    end subroutine initialize_type_output
+        select case (config_overall%file_format%ID)
+        case (FILE_FORMATS%VTK%ID)
+            allocate (type_output_overall_vtk :: self%overall)
+        case (FILE_FORMATS%VTU%ID)
+            allocate (type_output_overall_vtu :: self%overall)
+        end select
+        call self%overall%initialize(dir_output_field, config_overall)
 
-    subroutine output_fields(self, file_counts, porosity, temperature, si, pressure, water_flux)
+        call self%log%initialize(dir_output)
+    end subroutine initialize_type_output_manager
+
+    subroutine output_fields_output_manager(self, file_counts, temperature, water_content, ice_content, &
+                                            vapor_content, pressure, water_flux)
         implicit none
-        class(type_output), intent(inout) :: self
+        class(type_output_manager), intent(inout) :: self
         integer(int32), intent(in) :: file_counts
-        real(real64), intent(in), optional :: porosity(:)
         real(real64), intent(in), optional :: temperature(:)
-        real(real64), intent(in), optional :: si(:)
+        real(real64), intent(in), optional :: water_content(:)
+        real(real64), intent(in), optional :: ice_content(:)
+        real(real64), intent(in), optional :: vapor_content(:)
         real(real64), intent(in), optional :: pressure(:)
         type(type_coordinate_array_dp), intent(in), optional :: water_flux
 
-        if (.not. self%overall%should_output()) return
-
         call self%overall%write_fields(file_counts=file_counts, &
-                                       porosity=porosity, &
                                        temperature=temperature, &
-                                       si=si, &
+                                       water_content=water_content, &
+                                       ice_content=ice_content, &
+                                       vapor_content=vapor_content, &
                                        pressure=pressure, &
                                        water_flux=water_flux)
-    end subroutine output_fields
+    end subroutine output_fields_output_manager
 
-    subroutine output_history(self, time, porosity, temperature, pressure)
+    subroutine output_history_output_manager(self, time, temperature, pressure)
         implicit none
-        class(type_output), intent(inout) :: self
+        class(type_output_manager), intent(inout) :: self
         real(real64), intent(in) :: time
-        real(real64), intent(in), optional :: porosity(:)
         real(real64), intent(in), optional :: temperature(:)
         real(real64), intent(in), optional :: pressure(:)
 
-        real(real64) :: obsValues(3 * size(self%observations))
-        integer(int32) :: iObs
+        call self%observation%output_history(time=time, &
+                                             temperature=temperature, &
+                                             pressure=pressure)
+    end subroutine output_history_output_manager
 
-        do iObs = 1, size(self%observations)
-            if (.not. self%observations(iObs)%should_output()) cycle
-            call self%observations(iObs)%extract_value(obs_values=obsValues, &
-                                                       nodal_temperature=temperature, &
-                                                       nodal_porosity=porosity, &
-                                                       nodal_pw=pressure, &
-                                                       domain=domain)
-            call self%observations(iObs)%write_line(time=time, values=obsValues)
-        end do
-    end subroutine output_history
-
-    subroutine get_log_io_unit(self, io_unit)
+    subroutine get_log_io_unit_output_manager(self, io_unit)
         implicit none
-        class(type_output), intent(in) :: self
+        class(type_output_manager), intent(in) :: self
         integer(int32), intent(inout) :: io_unit
 
         call self%log%get_io_unit(io_unit)
-    end subroutine get_log_io_unit
+    end subroutine get_log_io_unit_output_manager
 
-    subroutine output_system_log(self)
+    subroutine output_system_log_output_manager(self)
         implicit none
-        class(type_output), intent(inout) :: self
+        class(type_output_manager), intent(inout) :: self
 
         call self%log%output_system_log()
-    end subroutine output_system_log
+    end subroutine output_system_log_output_manager
 
 end module io_output_manager

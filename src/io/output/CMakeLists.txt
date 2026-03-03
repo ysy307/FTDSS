@@ -1,5 +1,5 @@
 # ============================================================
-# Output Library (single static archive)
+# Output Library
 # ============================================================
 add_library(SOLVER_OUTPUT STATIC)
 
@@ -14,7 +14,6 @@ target_sources(SOLVER_OUTPUT PRIVATE
     observation/observation_base.F90
     observation/observation_point.F90
     overall/overall_interface.F90
-    overall/overall_base.F90
     overall/overall_vtk.F90
     overall/overall_vtu.F90
     output_manager.F90
@@ -33,9 +32,7 @@ target_include_directories(SOLVER_OUTPUT PUBLIC
 # ------------------------------------------------------------
 target_link_libraries(SOLVER_OUTPUT PUBLIC
     SOLVER::CORE
-    SOLVER::INPUT
     SOLVER::DOMAIN
-    SOLVER::CONTROL
 )
 
 enable_build_flags(SOLVER_OUTPUT)

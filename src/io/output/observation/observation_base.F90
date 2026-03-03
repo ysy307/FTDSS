@@ -11,19 +11,8 @@ contains
 
         integer(int32) :: i
         integer(int32) :: iostat
-        !     integer(int32) :: iObs, iElem, num_elements
-        !     integer(int32) :: elem_id, comp_dim, calc_type
-        !     type(type_coordinate_dp) :: cartesian, normalized
-        !     logical :: inside
-
-        !     class(abst_fe), pointer :: fe
-        !     integer(int32), pointer, contiguous :: conn(:)
-        !     real(real64), allocatable :: ele_coords(:, :)
 
         type(type_constant_value) :: file_format
-
-        !     ! --- 設定の取得 ---
-        ! self%variable_type = input%output_settings%history_output%observation_type
 
         if (self%observation_type == OUTPUT_OBSERVATION_TYPES%NONE) then
             self%settings(:)%do_output = .false.
@@ -231,5 +220,42 @@ contains
             write (output_settings%io_unit, output_settings%fmt_line) time, output_values(1:self%num_observations)
         end associate
     end subroutine write_observation_line
+
+    module subroutine output_history_output_observation(self, time, temperature, pressure)
+        implicit none
+        class(type_output_observation), intent(inout) :: self
+        real(real64), intent(in) :: time
+        real(real64), intent(in), optional :: temperature(:)
+        real(real64), intent(in), optional :: pressure(:)
+
+        real(real64), allocatable :: obs_values(:)
+        integer(int32) :: i
+
+        if (self%num_observations <= 0) return
+
+        allocate (obs_values(self%num_observations))
+
+        ! Process temperature
+        if (present(temperature)) then
+            if (self%settings(OUTPUT_VARIABLE_TYPES%TEMPERATURE%ID)%do_output) then
+                do i = 1, self%num_observations
+                    call self%observation_points(i)%extract_value(temperature, obs_values(i))
+                end do
+                call self%write_line(OUTPUT_VARIABLE_TYPES%TEMPERATURE, time, obs_values)
+            end if
+        end if
+
+        ! Process pressure
+        if (present(pressure)) then
+            if (self%settings(OUTPUT_VARIABLE_TYPES%PRESSURE%ID)%do_output) then
+                do i = 1, self%num_observations
+                    call self%observation_points(i)%extract_value(pressure, obs_values(i))
+                end do
+                call self%write_line(OUTPUT_VARIABLE_TYPES%PRESSURE, time, obs_values)
+            end if
+        end if
+
+        deallocate (obs_values)
+    end subroutine output_history_output_observation
 
 end submodule output_observation_base

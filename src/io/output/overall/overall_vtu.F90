@@ -2,63 +2,40 @@ submodule(io_output_overall) output_overall_vtu
     implicit none
 
 contains
-    module subroutine initialize_output_overall_vtu(self, input)
+    module subroutine initialize_type_output_overall_vtu(self, dir_output, config)
         implicit none
-        class(type_output_overall), intent(inout) :: self
-        type(type_input), intent(in) :: input
+        class(type_output_overall_vtu), intent(inout) :: self
+        character(*), intent(in) :: dir_output
+        type(type_config_overall), intent(in) :: config
 
-        integer(int32) :: i, j
-        integer(int32) :: total_connectivity_size, current_offset, start_index
+        self%dir_output_field = dir_output
+        self%file_format = config%file_format
+        self%format_output_file = config%format_output_file
 
-        self%vtk%num_points = input%geometry%vtk%num_points
-        self%vtk%num_cells = input%geometry%vtk%num_total_cells
-        call self%vtk%coordinate%initialize(self%vtk%num_points)
-        self%vtk%coordinate = input%geometry%vtk%POINTS
-
-        call allocate_array(self%vtk%offsets, self%vtk%num_cells)
-        call allocate_array(self%vtk%cell_types, self%vtk%num_cells)
-
-        current_offset = 0
-        do i = 1, self%vtk%num_cells
-            self%vtk%cell_types(i) = input%geometry%vtk%CELLS(i)%cell_type
-            current_offset = current_offset + input%geometry%vtk%CELLS(i)%num_nodes_in_cell
-            self%vtk%offsets(i) = current_offset
-        end do
-
-        if (self%vtk%num_cells > 0) then
-            total_connectivity_size = self%vtk%offsets(self%vtk%num_cells)
-        else
-            total_connectivity_size = 0
+        if (allocated(self%variables)) deallocate (self%variables)
+        if (allocated(config%output_variables)) then
+            allocate (self%variables(size(config%output_variables)))
+            self%variables = config%output_variables
         end if
-        call allocate_array(self%VTK%connectivities, total_connectivity_size)
 
-        do i = 1, self%vtk%num_cells
-            if (i == 1) then
-                start_index = 0
-            else
-                start_index = self%vtk%offsets(i - 1)
-            end if
+        self%num_points = config%num_points
+        self%num_cells = config%num_cells
+        self%coordinate = config%coordinate
+        call allocate_array(self%connectivities, source=config%connectivities)
+        call allocate_array(self%offsets, source=config%offsets)
+        call allocate_array(self%cell_types, source=config%cell_types)
 
-            do j = 1, input%geometry%vtk%CELLS(i)%num_nodes_in_cell
-                self%VTK%connectivities(start_index + j) = input%geometry%vtk%CELLS(i)%connectivity(j) - 1
-            end do
-        end do
+    end subroutine initialize_type_output_overall_vtu
 
-        if (associated(self%write_fields)) nullify (self%write_fields)
-        self%write_fields => output_overall_vtu_fields
-
-        if (associated(self%write_cell)) nullify (self%write_cell)
-        self%write_cell => output_overall_vtu_cell
-
-    end subroutine initialize_output_overall_vtu
-
-    subroutine output_overall_vtu_fields(self, file_counts, porosity, temperature, si, pressure, water_flux)
+    module subroutine write_fields_vtu(self, file_counts, temperature, water_content, &
+                                       ice_content, vapor_content, pressure, water_flux)
         implicit none
-        class(type_output_overall), intent(inout) :: self
+        class(type_output_overall_vtu), intent(inout) :: self
         integer(int32), intent(in) :: file_counts
-        real(real64), intent(in), optional :: porosity(:)
         real(real64), intent(in), optional :: temperature(:)
-        real(real64), intent(in), optional :: si(:)
+        real(real64), intent(in), optional :: water_content(:)
+        real(real64), intent(in), optional :: ice_content(:)
+        real(real64), intent(in), optional :: vapor_content(:)
         real(real64), intent(in), optional :: pressure(:)
         type(type_coordinate_array_dp), intent(in), optional :: water_flux
 
@@ -68,38 +45,41 @@ contains
         integer(int32) :: i
         character(256) :: output_name
 
-        write (output_name, self%format_output) trim(self%dir_output_field), "Out_", file_counts, self%file_extension
+        write (output_name, self%format_output_file) &
+            strip(self%dir_output_field), "Out_", file_counts, ".", to_lower(strip(self%file_format%NAME))
 
-        status = vtu%initialize(format='binary', filename=trim(output_name), mesh_topology='UnstructuredGrid')
+        status = vtu%initialize(format='binary', filename=strip(output_name), mesh_topology='UnstructuredGrid')
 
-        status = vtu%xml_writer%write_piece(np=self%vtk%num_points, nc=self%vtk%num_cells)
-        status = vtu%xml_writer%write_geo(np=self%vtk%num_points, &
-                                          nc=self%vtk%num_cells, &
-                                          x=self%vtk%coordinate%x, &
-                                          y=self%vtk%coordinate%y, &
-                                          z=self%vtk%coordinate%z)
-        status = vtu%xml_writer%write_connectivity(nc=self%vtk%num_cells, &
-                                                   connectivity=self%VTK%connectivities, &
-                                                   offset=self%vtk%offsets, &
-                                                   cell_type=self%vtk%cell_types)
+        status = vtu%xml_writer%write_piece(np=self%num_points, nc=self%num_cells)
+        status = vtu%xml_writer%write_geo(np=self%num_points, &
+                                          nc=self%num_cells, &
+                                          x=self%coordinate%x, &
+                                          y=self%coordinate%y, &
+                                          z=self%coordinate%z)
+        status = vtu%xml_writer%write_connectivity(nc=self%num_cells, &
+                                                   connectivity=self%connectivities, &
+                                                   offset=self%offsets, &
+                                                   cell_type=self%cell_types)
 
         status = vtu%xml_writer%write_dataarray(location='node', action='open')
-        do i = 1, size(self%variable_names)
-            select case (self%variable_names(i))
-            case ("temperature")
+        do i = 1, size(self%variables)
+            select case (self%variables(i)%ID)
+            case (OUTPUT_VARIABLE_TYPES%TEMPERATURE%ID)
                 if (present(temperature)) status = vtu%xml_writer%write_dataarray(data_name='Temperature', x=temperature)
-            case ("ice_saturation")
-                if (present(si)) status = vtu%xml_writer%write_dataarray(data_name='Si', x=si)
-            case ("thermal_conductivity")
+            case (OUTPUT_VARIABLE_TYPES%WATER_CONTENT%ID)
+                if (present(water_content)) status = vtu%xml_writer%write_dataarray(data_name='WaterContent', x=water_content)
+                if (present(ice_content)) status = vtu%xml_writer%write_dataarray(data_name='IceContent', x=ice_content)
+                if (present(vapor_content)) status = vtu%xml_writer%write_dataarray(data_name='VaporContent', x=vapor_content)
+            case (OUTPUT_VARIABLE_TYPES%THERMAL_CONDUCTIVITY%ID)
                 print *, "Warning: 'thermal_conductivity' is not implemented in VTK output."
-            case ("volumetric_heat_capacity")
+            case (OUTPUT_VARIABLE_TYPES%VOLUMETRIC_HEAT_CAPACITY%ID)
                 print *, "Warning: 'volumetric_heat_capacity' is not implemented in VTK output."
-            case ("pressure")
+            case (OUTPUT_VARIABLE_TYPES%PRESSURE%ID)
                 if (present(pressure)) status = vtu%xml_writer%write_dataarray(data_name='Pressure', x=pressure)
-            case ("water_flux")
+            case (OUTPUT_VARIABLE_TYPES%WATER_FLUX%ID)
                 if (present(water_flux)) status = vtu%xml_writer%write_dataarray(data_name='waterFlux', &
                                                                                  x=water_flux%x, y=water_flux%y, z=water_flux%z)
-            case ("hydraulic_conductivity")
+            case (OUTPUT_VARIABLE_TYPES%HYDRAULIC_CONDUCTIVITY%ID)
                 print *, "Warning: 'hydraulic_conductivity' is not implemented in VTK output."
             end select
         end do
@@ -108,11 +88,11 @@ contains
 
         status = vtu%finalize()
 
-    end subroutine output_overall_vtu_fields
+    end subroutine write_fields_vtu
 
-    subroutine output_overall_vtu_cell(self, file_name, variable_name, variable)
+    module subroutine write_cell_vtu(self, file_name, variable_name, variable)
         implicit none
-        class(type_output_overall), intent(inout) :: self
+        class(type_output_overall_vtu), intent(inout) :: self
         character(*), intent(in) :: file_name
         character(*), intent(in) :: variable_name
         integer(int32), intent(in) :: variable(:)
@@ -120,19 +100,23 @@ contains
         type(vtk_file) :: vtu
         integer(int32) :: status
 
-        status = vtu%initialize(format='binary', filename=trim(self%dir_output_field)//trim(file_name)//trim(self%file_extension), &
-                                mesh_topology='UnstructuredGrid')
+        character(256) :: output_name
 
-        status = vtu%xml_writer%write_piece(np=self%vtk%num_points, nc=self%vtk%num_cells)
-        status = vtu%xml_writer%write_geo(np=self%vtk%num_points, &
-                                          nc=self%vtk%num_cells, &
-                                          x=self%vtk%coordinate%x, &
-                                          y=self%vtk%coordinate%y, &
-                                          z=self%vtk%coordinate%z)
-        status = vtu%xml_writer%write_connectivity(nc=self%vtk%num_cells, &
-                                                   connectivity=self%VTK%connectivities, &
-                                                   offset=self%vtk%offsets, &
-                                                   cell_type=self%vtk%cell_types)
+        write (output_name, self%format_output_file) &
+            strip(self%dir_output_field), trim(file_name), ".", to_lower(strip(self%file_format%NAME))
+
+        status = vtu%initialize(format='binary', filename=strip(output_name), mesh_topology='UnstructuredGrid')
+
+        status = vtu%xml_writer%write_piece(np=self%num_points, nc=self%num_cells)
+        status = vtu%xml_writer%write_geo(np=self%num_points, &
+                                          nc=self%num_cells, &
+                                          x=self%coordinate%x, &
+                                          y=self%coordinate%y, &
+                                          z=self%coordinate%z)
+        status = vtu%xml_writer%write_connectivity(nc=self%num_cells, &
+                                                   connectivity=self%connectivities, &
+                                                   offset=self%offsets, &
+                                                   cell_type=self%cell_types)
 
         status = vtu%xml_writer%write_dataarray(location='cell', action='open')
         status = vtu%xml_writer%write_dataarray(data_name=variable_name, x=variable)
@@ -141,6 +125,6 @@ contains
 
         status = vtu%finalize()
 
-    end subroutine output_overall_vtu_cell
+    end subroutine write_cell_vtu
 
 end submodule output_overall_vtu

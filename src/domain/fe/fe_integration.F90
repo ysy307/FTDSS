@@ -1,11 +1,6 @@
 module domain_fe_integration
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core
-    ! use :: core_allocate, only:allocate_array
-    ! use :: core_deallocate, only:deallocate_array
-    ! ! use :: core_types_coordinate, only:type_coordinate_dp
-    ! use :: core_types_coordinate, only:type_coordinate_dp
-    ! use :: core_constants
     implicit none
     private
 
