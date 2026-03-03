@@ -6,7 +6,7 @@ module app_ftdss
     use :: stdlib_optval, only:optval
     use :: stdlib_logger
     use :: module_core
-    use :: module_input, only:type_input
+    use :: module_input, only:type_input, input_translator
     use :: module_output, only:type_output_manager
 
     use :: module_control, only:type_control

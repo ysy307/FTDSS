@@ -46,7 +46,7 @@ contains
         self%initialized = .false.
     end subroutine destory_acceleration_aitken
 
-    module subroutine compute_acceleration_aitken(self, physics_type, iter, du, vec)
+    module subroutine compute_relaxation_acceleration_aitken(self, physics_type, iter, du, vec)
         implicit none
         !> Aitken acceleration object
         class(type_acceleration_aitken), intent(inout) :: self
@@ -93,7 +93,7 @@ contains
         vec(:) = vec(:) + omega * du(:)
 
         self%du_raw(:, pid) = du(:)
-    end subroutine compute_acceleration_aitken
+    end subroutine compute_relaxation_acceleration_aitken
 
     module subroutine reset_acceleration_aitken(self)
         implicit none
@@ -104,5 +104,53 @@ contains
         self%relaxation_factor(:) = 1.0d0
         self%previous_relaxation_factor(:) = 0.0d0
     end subroutine reset_acceleration_aitken
+
+    module pure function reach_minimum_relaxation_aitken(self, physics_type) result(reached)
+        implicit none
+        !> Aitken acceleration object
+        class(type_acceleration_aitken), intent(in) :: self
+        !> Identifier for the physics type
+        type(type_constant_id), intent(in) :: physics_type
+        !> Flag indicating if minimum relaxation is reached
+        logical :: reached
+
+        reached = self%relaxation_factor(physics_type%ID) <= self%min_relaxation
+    end function reach_minimum_relaxation_aitken
+
+    module pure function reach_maximum_relaxation_aitken(self, physics_type) result(reached)
+        implicit none
+        !> Aitken acceleration object
+        class(type_acceleration_aitken), intent(in) :: self
+        !> Identifier for the physics type
+        type(type_constant_id), intent(in) :: physics_type
+        !> Flag indicating if maximum relaxation is reached
+        logical :: reached
+
+        reached = self%relaxation_factor(physics_type%ID) >= self%max_relaxation
+    end function reach_maximum_relaxation_aitken
+
+    module subroutine get_current_relaxation_aitken(self, physics_type, relaxation)
+        implicit none
+        !> Aitken acceleration object
+        class(type_acceleration_aitken), intent(in) :: self
+        !> Identifier for the physics type
+        type(type_constant_id), intent(in) :: physics_type
+        !> Current relaxation factor
+        real(real64), intent(inout) :: relaxation
+
+        relaxation = self%relaxation_factor(physics_type%ID)
+    end subroutine get_current_relaxation_aitken
+
+    module subroutine get_previous_relaxation_aitken(self, physics_type, relaxation)
+        implicit none
+        !> Aitken acceleration object
+        class(type_acceleration_aitken), intent(in) :: self
+        !> Identifier for the physics type
+        type(type_constant_id), intent(in) :: physics_type
+        !> Previous relaxation factor
+        real(real64), intent(inout) :: relaxation
+
+        relaxation = self%previous_relaxation_factor(physics_type%ID)
+    end subroutine get_previous_relaxation_aitken
 
 end submodule acceleration_aitken

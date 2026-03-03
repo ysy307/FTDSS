@@ -54,8 +54,20 @@ contains
                     if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable%ID)%file_name)
                 case (OUTPUT_VARIABLE_TYPES%WATER_CONTENT%ID)
                     self%settings(variable%ID)%do_output = .true.
-                    self%settings(variable%ID)%variable_unit = "-"
-                    self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_Si."//strip(file_format%NAME)
+                    self%settings(variable%ID)%variable_unit = "m3/m3"
+                    self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_Qi."//strip(file_format%NAME)
+                    self%settings(variable%ID)%io_unit = open (strip(self%settings(variable%ID)%file_name), "wt", iostat=iostat)
+                    if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable%ID)%file_name)
+                case (OUTPUT_VARIABLE_TYPES%ICE_CONTENT%ID)
+                    self%settings(variable%ID)%do_output = .true.
+                    self%settings(variable%ID)%variable_unit = "m3/m3"
+                    self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_Qi."//strip(file_format%NAME)
+                    self%settings(variable%ID)%io_unit = open (strip(self%settings(variable%ID)%file_name), "wt", iostat=iostat)
+                    if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable%ID)%file_name)
+                case (OUTPUT_VARIABLE_TYPES%VAPOR_CONTENT%ID)
+                    self%settings(variable%ID)%do_output = .true.
+                    self%settings(variable%ID)%variable_unit = "m3/m3"
+                    self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_Qv."//strip(file_format%NAME)
                     self%settings(variable%ID)%io_unit = open (strip(self%settings(variable%ID)%file_name), "wt", iostat=iostat)
                     if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable%ID)%file_name)
                 case (OUTPUT_VARIABLE_TYPES%THERMAL_CONDUCTIVITY%ID)
@@ -221,11 +233,15 @@ contains
         end associate
     end subroutine write_observation_line
 
-    module subroutine output_history_output_observation(self, time, temperature, pressure)
+    module subroutine output_history_output_observation(self, time, temperature, water_content, ice_content, &
+                                                        vapor_content, pressure)
         implicit none
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(in) :: time
         real(real64), intent(in), optional :: temperature(:)
+        real(real64), intent(in), optional :: water_content(:)
+        real(real64), intent(in), optional :: ice_content(:)
+        real(real64), intent(in), optional :: vapor_content(:)
         real(real64), intent(in), optional :: pressure(:)
 
         real(real64), allocatable :: obs_values(:)
@@ -254,6 +270,38 @@ contains
                 call self%write_line(OUTPUT_VARIABLE_TYPES%PRESSURE, time, obs_values)
             end if
         end if
+
+        ! Process water content
+        if (present(water_content)) then
+            if (self%settings(OUTPUT_VARIABLE_TYPES%WATER_CONTENT%ID)%do_output) then
+                do i = 1, self%num_observations
+                    call self%observation_points(i)%extract_value(water_content, obs_values(i))
+                end do
+                call self%write_line(OUTPUT_VARIABLE_TYPES%WATER_CONTENT, time, obs_values)
+            end if
+        end if
+
+        ! Process ice content
+        if (present(ice_content)) then
+            if (self%settings(OUTPUT_VARIABLE_TYPES%ICE_CONTENT%ID)%do_output) then
+                do i = 1, self%num_observations
+                    call self%observation_points(i)%extract_value(ice_content, obs_values(i))
+                end do
+                call self%write_line(OUTPUT_VARIABLE_TYPES%ICE_CONTENT, time, obs_values)
+            end if
+        end if
+
+        ! Process vapor content
+        if (present(vapor_content)) then
+            if (self%settings(OUTPUT_VARIABLE_TYPES%VAPOR_CONTENT%ID)%do_output) then
+                do i = 1, self%num_observations
+                    call self%observation_points(i)%extract_value(vapor_content, obs_values(i))
+                end do
+                call self%write_line(OUTPUT_VARIABLE_TYPES%VAPOR_CONTENT, time, obs_values)
+            end if
+        end if
+
+
 
         deallocate (obs_values)
     end subroutine output_history_output_observation

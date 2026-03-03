@@ -5,7 +5,7 @@ contains
         implicit none
         class(type_input_translator), intent(in) :: self
         class(type_input), intent(in) :: input
-        class(type_config_nodes), intent(inout) :: config
+        type(type_config_nodes), intent(inout) :: config
 
         config%num_nodes = input%geometry%vtk%num_points
 
@@ -27,7 +27,7 @@ contains
         class(type_vtk_cell), intent(in) :: vtk_cells(:)
         integer(int32), intent(in) :: target_indices(:)
         integer(int32), intent(in) :: integration_order
-        class(type_config_elements), intent(inout) :: config
+        type(type_config_elements), intent(inout) :: config
 
         integer(int32) :: i, idx, num_conn
 
@@ -61,8 +61,8 @@ contains
         implicit none
         class(type_input_translator), intent(in) :: self
         class(type_input), intent(in) :: input
-        class(type_config_elements), intent(inout) :: config_elements
-        class(type_config_multicoloring), intent(inout) :: config_multicoloring
+        type(type_config_elements), intent(inout) :: config_elements
+        type(type_config_multicoloring), intent(inout) :: config_multicoloring
 
         integer(int32) :: i, ind, cell_color
         integer(int32) :: num_total_cells, comp_dim, num_target_cells
@@ -153,7 +153,7 @@ contains
         implicit none
         class(type_input_translator), intent(in) :: self
         class(type_input), intent(in) :: input
-        class(type_config_elements), intent(inout), allocatable :: config_elements(:)
+        type(type_config_elements), intent(inout), allocatable :: config_elements(:)
 
         integer(int32) :: i, j, ind, num_total_cells, bnd_dim
         integer(int32), allocatable :: temp_bnd_ids(:), unique_bnd_ids(:)

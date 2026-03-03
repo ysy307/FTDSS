@@ -82,7 +82,9 @@ contains
                 if (present(temperature)) call self%output_field(unit, "Temperature", temperature)
             case (OUTPUT_VARIABLE_TYPES%WATER_CONTENT%ID)
                 if (present(water_content)) call self%output_field(unit, "WaterContent", water_content)
+            case (OUTPUT_VARIABLE_TYPES%ICE_CONTENT%ID)
                 if (present(ice_content)) call self%output_field(unit, "IceContent", ice_content)
+            case (OUTPUT_VARIABLE_TYPES%VAPOR_CONTENT%ID)
                 if (present(vapor_content)) call self%output_field(unit, "VaporContent", vapor_content)
             case (OUTPUT_VARIABLE_TYPES%THERMAL_CONDUCTIVITY%ID)
                 print *, "Warning: 'thermal_conductivity' is not implemented in VTK output."

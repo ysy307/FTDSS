@@ -36,11 +36,24 @@ module core_control_manager
         ! ---- Mutator ----
         procedure, public, pass(self) :: update => update_controls
         procedure, public, pass(self) :: update_output => update_output_control
-
+        ! - iteration
+        procedure, public, pass(self) :: reset_iteration => reset_iteration_control
+        procedure, public, pass(self) :: increment_nonlinear => increment_nonlinear_control
+        procedure, public, pass(self) :: increment_total => increment_total_control
+        procedure, public, pass(self) :: set_nonlinear_solver => set_nonlinear_solver_control
+        procedure, public, pass(self) :: set_converged => set_converged_control
+        procedure, public, pass(self) :: set_diverged => set_diverged_control
+        ! - acceleration
+        procedure, public, pass(self) :: reset_acceleration => reset_acceleration_control
         ! ---- Algorithm / Operation ----
+        ! - profiler
         procedure, public, pass(self) :: profiler_start => profiler_start_control
         procedure, public, pass(self) :: profiler_stop => profiler_stop_control
         procedure, public, pass(self) :: profiler_record => profiler_record_control
+        ! - iteration
+        procedure, public, pass(self) :: check_convergence => check_convergence_control
+        ! - acceleration
+        procedure, public, pass(self) :: compute_relaxation => compute_relaxation_control
 
         ! ---- Inquiry ----
         procedure, public, pass(self) :: is_physics_active => is_physics_active_control
@@ -50,21 +63,41 @@ module core_control_manager
         procedure, public, pass(self) :: is_end_time => is_end_time_control
         procedure, public, pass(self) :: is_output_triggered => is_output_triggered_control
         ! - iteration
+        procedure, public, pass(self) :: is_diverged => is_diverged_control
+        procedure, public, pass(self) :: is_converged => is_converged_control
         procedure, public, pass(self) :: is_compute_newton => is_compute_newton_control
         procedure, public, pass(self) :: is_compute_picard => is_compute_picard_control
         procedure, public, pass(self) :: is_compute_none => is_compute_none_control
         procedure, public, pass(self) :: is_newton => is_newton_control
         procedure, public, pass(self) :: is_picard => is_picard_control
         procedure, public, pass(self) :: is_none => is_none_control
+        procedure, public, pass(self) :: should_continue => should_continue_control
+        ! - acceleration
+        procedure, public, pass(self) :: reach_minimum_relaxation => reach_minimum_relaxation_control
+        procedure, public, pass(self) :: reach_maximum_relaxation => reach_maximum_relaxation_control
 
         ! ---- Getter ----
         procedure, public, pass(self) :: get_coupling_mode => get_coupling_mode_control
         procedure, public, pass(self) :: get_output_time => get_output_time_control
         procedure, public, pass(self) :: get_output_step => get_output_step_control
         procedure, public, pass(self) :: get_bdf_coeffs => get_bdf_coeffs_control
+        ! - iteration
+        procedure, public, pass(self) :: get_nonlinear_solver => get_nonlinear_solver_control
+        procedure, public, pass(self) :: get_nonlinear_iter => get_nonlinear_iter_control
+        procedure, public, pass(self) :: get_total_iter => get_total_iter_control
+        procedure, public, pass(self) :: get_max_iterations => get_max_iterations_control
+        procedure, public, pass(self) :: get_update_frequency => get_update_frequency_control
+        procedure, public, pass(self) :: get_current_norm => get_current_norm_control
+        procedure, public, pass(self) :: get_tolerances => get_tolerances_control
+        ! - time
+        procedure, public, pass(self) :: get_time => get_time_control
+        ! - acceleration
+        procedure, public, pass(self) :: get_current_relaxation => get_current_relaxation_control
+        procedure, public, pass(self) :: get_previous_relaxation => get_previous_relaxation_control
 
         ! ---- Meta / Utility ----
-        procedure, public, pass(self) :: display => display_controls
+        procedure, public, pass(self) :: display => display_control
+        procedure, public, pass(self) :: display_profiler => display_profiler_control
 
     end type type_control
 
@@ -201,11 +234,15 @@ contains
     subroutine get_bdf_coeffs_control(self, bdf_order, bdf_coeffs)
         implicit none
         class(type_control), intent(in) :: self
-        integer(int32), intent(inout) :: bdf_order
-        real(real64), intent(inout), pointer, contiguous, dimension(:) :: bdf_coeffs
+        integer(int32), intent(inout), optional :: bdf_order
+        real(real64), intent(inout), pointer, contiguous, dimension(:), optional :: bdf_coeffs
 
-        call self%time%get_bdf_order(bdf_order)
-        call self%time%get_bdf_coeffs(bdf_coeffs)
+        if (present(bdf_order)) then
+            call self%time%get_bdf_order(bdf_order)
+        end if
+        if (present(bdf_coeffs)) then
+            call self%time%get_bdf_coeffs(bdf_coeffs)
+        end if
 
     end subroutine get_bdf_coeffs_control
 
@@ -289,7 +326,7 @@ contains
 
     end subroutine reset_controls
 
-    subroutine display_controls(self, unit_in)
+    subroutine display_control(self, unit_in)
         implicit none
         class(type_control), intent(in) :: self
         integer(int32), intent(in), optional :: unit_in
@@ -326,7 +363,7 @@ contains
         ! write (*, '(a)') "## Time Settings"
         ! call self%time%display()
 
-    end subroutine display_controls
+    end subroutine display_control
 
     pure function is_end_time_control(self) result(is_end_time)
         implicit none
@@ -471,4 +508,237 @@ contains
         call self%profiler%record(label)
 
     end subroutine profiler_record_control
+
+    subroutine get_time_control(self, time)
+        implicit none
+        class(type_control), intent(in) :: self
+        real(real64), intent(inout) :: time
+
+        call self%time%get_time(time)
+
+    end subroutine get_time_control
+
+    subroutine display_profiler_control(self, unit_in)
+        implicit none
+        class(type_control), intent(in) :: self
+        integer(int32), intent(in), optional :: unit_in
+
+        call self%profiler%display(unit_in)
+
+    end subroutine display_profiler_control
+
+    pure function is_diverged_control(self) result(is_diverged)
+        implicit none
+        class(type_control), intent(in) :: self
+        logical :: is_diverged
+
+        is_diverged = self%iteration%is_diverged()
+
+    end function is_diverged_control
+
+    pure function is_converged_control(self) result(is_converged)
+        implicit none
+        class(type_control), intent(in) :: self
+        logical :: is_converged
+
+        is_converged = self%iteration%is_converged()
+
+    end function is_converged_control
+
+    pure function should_continue_control(self) result(should_continue)
+        implicit none
+        class(type_control), intent(in) :: self
+        logical :: should_continue
+
+        should_continue = self%iteration%should_continue()
+
+    end function should_continue_control
+
+    subroutine check_convergence_control(self, physics_type, residual_vector, update_vector)
+        implicit none
+        class(type_control), intent(inout) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        real(real64), intent(in), optional :: residual_vector(:)
+        real(real64), intent(in), optional :: update_vector(:)
+
+        call self%iteration%check_convergence(physics_type, residual_vector, update_vector)
+
+    end subroutine check_convergence_control
+
+    subroutine get_nonlinear_solver_control(self, nonlinear_solver_type)
+        implicit none
+        class(type_control), intent(in), target :: self
+        type(type_constant_id), intent(inout), pointer :: nonlinear_solver_type
+
+        call self%iteration%get_nonlinear_solver(nonlinear_solver_type)
+
+    end subroutine get_nonlinear_solver_control
+
+    subroutine get_nonlinear_iter_control(self, nonlinear_iter)
+        implicit none
+        class(type_control), intent(in) :: self
+        integer(int32), intent(inout) :: nonlinear_iter
+
+        call self%iteration%get_nonlinear_iter(nonlinear_iter)
+    end subroutine get_nonlinear_iter_control
+
+    subroutine get_total_iter_control(self, total_iter)
+        implicit none
+        class(type_control), intent(in) :: self
+        integer(int32), intent(inout) :: total_iter
+
+        call self%iteration%get_total_iter(total_iter)
+    end subroutine get_total_iter_control
+
+    subroutine get_max_iterations_control(self, max_iterations)
+        implicit none
+        class(type_control), intent(in) :: self
+        integer(int32), intent(inout) :: max_iterations
+
+        call self%iteration%get_max_iterations(max_iterations)
+    end subroutine get_max_iterations_control
+
+    subroutine get_update_frequency_control(self, update_frequency)
+        implicit none
+        class(type_control), intent(in) :: self
+        integer(int32), intent(inout) :: update_frequency
+
+        call self%iteration%get_update_frequency(update_frequency)
+    end subroutine get_update_frequency_control
+
+    subroutine get_current_norm_control(self, physics_type, criteria_type, norm_type, current_norm)
+        implicit none
+        class(type_control), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        type(type_constant_id), intent(in) :: criteria_type
+        type(type_constant_id), intent(in) :: norm_type
+        real(real64), intent(inout) :: current_norm
+
+        call self%iteration%get_current_norm(physics_type, criteria_type, norm_type, current_norm)
+    end subroutine get_current_norm_control
+
+    subroutine get_tolerances_control(self, physics_type, absolute_tolerance, relative_tolerance)
+        implicit none
+        class(type_control), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        real(real64), intent(inout), optional :: absolute_tolerance
+        real(real64), intent(inout), optional :: relative_tolerance
+
+        call self%iteration%get_tolerances(physics_type, absolute_tolerance, relative_tolerance)
+    end subroutine get_tolerances_control
+
+    subroutine reset_iteration_control(self)
+        implicit none
+        class(type_control), intent(inout) :: self
+
+        call self%iteration%reset()
+
+    end subroutine reset_iteration_control
+
+    subroutine increment_nonlinear_control(self)
+        implicit none
+        class(type_control), intent(inout) :: self
+
+        call self%iteration%increment_nonlinear()
+
+    end subroutine increment_nonlinear_control
+
+    subroutine increment_total_control(self)
+        implicit none
+        class(type_control), intent(inout) :: self
+
+        call self%iteration%increment_total()
+    end subroutine increment_total_control
+
+    subroutine set_nonlinear_solver_control(self, nonlinear_solver_type)
+        implicit none
+        class(type_control), intent(inout) :: self
+        type(type_constant_id), intent(in) :: nonlinear_solver_type
+
+        call self%iteration%set_nonlinear_solver(nonlinear_solver_type)
+    end subroutine set_nonlinear_solver_control
+
+    subroutine set_converged_control(self, physics_type, converged)
+        implicit none
+        class(type_control), intent(inout) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        logical, intent(in) :: converged
+
+        call self%iteration%set_converged(physics_type, converged)
+    end subroutine set_converged_control
+
+    subroutine set_diverged_control(self, physics_type, diverged)
+        implicit none
+        class(type_control), intent(inout) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        logical, intent(in) :: diverged
+
+        call self%iteration%set_diverged(physics_type, diverged)
+
+    end subroutine set_diverged_control
+
+    subroutine reset_acceleration_control(self)
+        implicit none
+        class(type_control), intent(inout) :: self
+
+        if (allocated(self%acceleration)) then
+            call self%acceleration%reset()
+        end if
+
+    end subroutine reset_acceleration_control
+
+    subroutine compute_relaxation_control(self, physics_type, iter, du, vec)
+        implicit none
+        !> Aitken acceleration object
+        class(type_control), intent(inout) :: self
+        !> Identifier for the physics type
+        type(type_constant_id), intent(in) :: physics_type
+        !> Current iteration number
+        integer(int32), intent(in) :: iter
+        !> Increment vector \(\Delta u_k\)
+        real(real64), intent(in) :: du(:)
+        !> State vector \(u_k\) on entry
+        !> Overwritten by updated vector \(u_{k+1}\) on exit
+        real(real64), intent(inout) :: vec(:)
+
+        call self%acceleration%compute_relaxation(physics_type, iter, du, vec)
+
+    end subroutine compute_relaxation_control
+
+    pure function reach_minimum_relaxation_control(self, physics_type) result(reached)
+        implicit none
+        class(type_control), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        logical :: reached
+
+        reached = self%acceleration%reach_minimum_relaxation(physics_type)
+    end function reach_minimum_relaxation_control
+
+    pure function reach_maximum_relaxation_control(self, physics_type) result(reached)
+        implicit none
+        class(type_control), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        logical :: reached
+
+        reached = self%acceleration%reach_maximum_relaxation(physics_type)
+    end function reach_maximum_relaxation_control
+
+    subroutine get_current_relaxation_control(self, physics_type, relaxation)
+        implicit none
+        class(type_control), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        real(real64), intent(inout) :: relaxation
+
+        call self%acceleration%get_current_relaxation(physics_type, relaxation)
+    end subroutine get_current_relaxation_control
+
+    subroutine get_previous_relaxation_control(self, physics_type, relaxation)
+        implicit none
+        class(type_control), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        real(real64), intent(inout) :: relaxation
+
+        call self%acceleration%get_previous_relaxation(physics_type, relaxation)
+    end subroutine get_previous_relaxation_control
+
 end module core_control_manager

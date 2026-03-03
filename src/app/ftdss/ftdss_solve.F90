@@ -12,15 +12,15 @@ contains
 
         ! 1. 反復管理のリセット
         !    reset() は設定が NONE の場合に計算用も NONE にする可能性があります．
-        call self%control%iteration%reset()
+        call self%control%reset_iteration()
 
         ! [重要] 計算用ソルバーは常に PICARD か NEWTON でなければなりません．
         ! 設定が NONE (線形) の場合でも，離散化定式化としては Picard を使用するため，
         ! ここで明示的に PICARD をセットして reset の状態を上書きします．
-        call self%control%iteration%set_nonlinear_solver(NONLINEAR_SOLVER%PICARD)
+        call self%control%set_nonlinear_solver(NONLINEAR_SOLVER%PICARD)
 
-        call self%control%iteration%increment_total()
-        call self%control%aitken%reset()
+        call self%control%increment_total()
+        call self%control%reset_acceleration()
 
         ! 2. 前ステップの値の保存 (Previous <- Current)
         call self%porosity%get_previous(u)
@@ -54,8 +54,8 @@ contains
 
         integer(int32) :: iter
 
-        call self%control%iteration%increment_nonlinear()
-        call self%control%iteration%get_nonlinear_iter(iter)
+        call self%control%increment_nonlinear()
+        call self%control%get_nonlinear_iter(iter)
 
         if (iter == 1) then
             prescribe_bc = .true.
@@ -102,19 +102,18 @@ contains
 
             if (has_nan(residual) .or. has_nan(increment)) then
                 write (*, *) "Error: NaN detected in thermal variables during convergence check."
-                call self%control%iteration%set_diverged(PHYSICS_TYPES%THERMAL, diverged)
+                call self%control%set_diverged(PHYSICS_TYPES%THERMAL, diverged)
             else
                 ! 設定がNONEの場合は iteration モジュール内で即時 True が返されるため問題なし
-                call self%control%iteration%check_convergence(PHYSICS_TYPES%THERMAL, residual, increment)
+                call self%control%check_convergence(PHYSICS_TYPES%THERMAL, residual, increment)
             end if
 
             ! Aitken緩和チェック
-            ! 計算用がPicard であっても，設定が NONE の場合は緩和計算(reflect側)が行われない(omega=1.0)ため，
-            ! ここでのチェックは不要(かつ誤検知の元)なのでスキップする．
+
             if (is_compute_picard .and. .not. is_config_none) then
-                if (self%control%aitken%reach_min_relaxation(PHYSICS_TYPES%THERMAL)) then
+                if (self%control%reach_minimum_relaxation(PHYSICS_TYPES%THERMAL)) then
                     write (*, *) "Warning: Relaxation factor too small. Stagnation detected."
-                    call self%control%iteration%set_diverged(PHYSICS_TYPES%THERMAL, diverged)
+                    call self%control%set_diverged(PHYSICS_TYPES%THERMAL, diverged)
                 end if
             end if
         end if
@@ -128,15 +127,15 @@ contains
 
             if (has_nan(residual) .or. has_nan(increment)) then
                 write (*, *) "Error: NaN detected in hydraulic variables during convergence check."
-                call self%control%iteration%set_diverged(PHYSICS_TYPES%HYDRAULIC, diverged)
+                call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, diverged)
             else
-                call self%control%iteration%check_convergence(PHYSICS_TYPES%HYDRAULIC, residual, increment)
+                call self%control%check_convergence(PHYSICS_TYPES%HYDRAULIC, residual, increment)
             end if
 
             if (is_compute_picard .and. .not. is_config_none) then
-                if (self%control%aitken%reach_min_relaxation(PHYSICS_TYPES%HYDRAULIC)) then
+                if (self%control%reach_minimum_relaxation(PHYSICS_TYPES%HYDRAULIC)) then
                     write (*, *) "Warning: Relaxation factor too small. Stagnation detected."
-                    call self%control%iteration%set_diverged(PHYSICS_TYPES%HYDRAULIC, diverged)
+                    call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, diverged)
                 end if
             end if
         end if
@@ -145,16 +144,17 @@ contains
         ! 2. Hybrid法 切り替え判定
         !    設定が NONE (線形) の場合は切り替えを行わない
         ! ----------------------------------------------------------------------
-        call self%control%iteration%get_nonlinear_iter(iter)
+        call self%control%get_nonlinear_iter(iter)
 
-        if (iter > 1 .and. .not. self%control%iteration%has_diverged()) then
+        if (iter > 1 .and. .not. self%control%is_diverged()) then
             if (is_compute_picard .and. .not. is_config_none) then
                 should_switch = .true.
 
                 ! Thermal Residual Check
                 if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
                     current_norm = 0.0d0
-                    call self%control%iteration%get_current_residual_norm(PHYSICS_TYPES%THERMAL, NORM_TYPES%LINF, current_norm)
+                    call self%control%get_current_norm(PHYSICS_TYPES%THERMAL, NONLINEAR_NORM_CRITERIA%RESIDUAL, &
+                                                       NORM_TYPES%LINF, current_norm)
                     ! [Debug output skipped]
                     if (current_norm > switch_norm(PHYSICS_TYPES%THERMAL%ID)) then
                         should_switch = .false.
@@ -164,7 +164,8 @@ contains
                 ! Hydraulic Residual Check
                 if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
                     current_norm = 0.0d0
-                    call self%control%iteration%get_current_residual_norm(PHYSICS_TYPES%HYDRAULIC, NORM_TYPES%LINF, current_norm)
+                    call self%control%get_current_norm(PHYSICS_TYPES%HYDRAULIC, NONLINEAR_NORM_CRITERIA%RESIDUAL, &
+                                                       NORM_TYPES%LINF, current_norm)
                     if (current_norm > switch_norm(PHYSICS_TYPES%HYDRAULIC%ID)) then
                         should_switch = .false.
                     end if
@@ -172,7 +173,7 @@ contains
 
                 if (should_switch) then
                     write (*, '("   -> Residual small enough. Switching to Newton-Raphson.")')
-                    call self%control%iteration%set_nonlinear_solver(NONLINEAR_SOLVER%NEWTON)
+                    call self%control%set_nonlinear_solver(NONLINEAR_SOLVER%NEWTON)
                 end if
             end if
         end if
@@ -194,7 +195,7 @@ contains
         call self%solve_time_step_initial_setup()
 
         ! 2. 非線形反復ループ
-        nonlinear: do while (self%control%iteration%should_continue())
+        nonlinear: do while (self%control%should_continue())
 
             ! 2.1 セットアップ (iter更新)
             call self%solve_time_step_setup(prescribe_bc)
@@ -218,11 +219,11 @@ contains
 
             ! [追加] 設定(Static)が NONE の場合は，1回の計算でループを強制終了する
             ! 計算用変数が PICARD であっても，ここで抜けることで線形計算を実現する
-            if (self%control%iteration%is_none()) exit nonlinear
+            if (self%control%is_none()) exit nonlinear
 
         end do nonlinear
 
-        is_step_converged = self%control%iteration%has_converged()
+        is_step_converged = self%control%is_converged()
     end subroutine solve_time_step_ftdss
 
     module subroutine run_ftdss(self)

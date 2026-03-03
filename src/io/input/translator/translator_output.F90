@@ -6,75 +6,80 @@ contains
         implicit none
         class(type_input_translator), intent(in) :: self
         class(type_input), intent(in) :: input
-        class(type_config_output_manager), intent(inout) :: config
+        type(type_config_output_manager), intent(inout) :: config
 
-        select type (config)
-        type is (type_config_output_manager)
-            associate (output => input%output_settings%field_output)
-                config%interval_val = output%output_interval_step
-                config%interval_unit = TIME_UNITS%to_object(output%output_interval_unit)
-                config%output_unit = TIME_UNITS%to_object(output%output_time_unit)
-                config%file_format = FILE_FORMATS%to_object(output%file_format)
-            end associate
-        end select
+        associate (output => input%output_settings%field_output)
+            config%interval_val = output%output_interval_step
+            config%interval_unit = TIME_UNITS%to_object(output%output_interval_unit)
+            config%output_unit = TIME_UNITS%to_object(output%output_time_unit)
+            config%file_format = FILE_FORMATS%to_object(output%file_format)
+        end associate
 
     end subroutine execute_output_field
+
+    module subroutine execute_output_base(self, input, config)
+        implicit none
+        class(type_input_translator), intent(in) :: self
+        class(type_input), intent(in) :: input
+        type(type_config_output), intent(inout) :: config
+
+        call allocate_array(config%is_output_enabled, source=input%basic%analysis_controls%is_active)
+
+    end subroutine execute_output_base
 
     module subroutine execute_output_observation(self, input, config)
         implicit none
         class(type_input_translator), intent(in) :: self
         class(type_input), intent(in) :: input
-        class(type_config_observation), intent(inout) :: config
+        type(type_config_observation), intent(inout) :: config
 
         integer(int32) :: i
 
-        select type (config)
-        type is (type_config_observation)
-            associate (observation => input%output_settings%history_output)
+        associate (observation => input%output_settings%history_output)
 
-                config%file_format = FILE_FORMATS%to_object(observation%file_format)
-                config%point_type = OUTPUT_OBSERVATION_TYPES%to_object(observation%observation_type)
-                config%num_observations = observation%num_observations
+            config%file_format = FILE_FORMATS%to_object(observation%file_format)
+            config%point_type = OUTPUT_OBSERVATION_TYPES%to_object(observation%observation_type)
+            config%num_observations = observation%num_observations
 
-                ! Translate output variables
-                if (allocated(observation%variable_names)) then
-                    if (allocated(config%output_variables)) deallocate (config%output_variables)
-                    allocate (config%output_variables(size(observation%variable_names)))
-                    do i = 1, size(observation%variable_names)
-                        config%output_variables(i) = OUTPUT_VARIABLE_TYPES%to_object(observation%variable_names(i))
+            ! Translate output variables
+            if (allocated(observation%variable_names)) then
+                if (allocated(config%output_variables)) deallocate (config%output_variables)
+                allocate (config%output_variables(size(observation%variable_names)))
+                do i = 1, size(observation%variable_names)
+                    config%output_variables(i) = OUTPUT_VARIABLE_TYPES%to_object(observation%variable_names(i))
+                end do
+            end if
+
+            ! Translate observation geometries
+            if (allocated(config%observation_geometries)) deallocate (config%observation_geometries)
+
+            select case (config%point_type%ID)
+            case (OUTPUT_OBSERVATION_TYPES%NODE_IDS%ID)
+                if (allocated(observation%node_ids)) then
+                    allocate (config%observation_geometries(size(observation%node_ids)))
+                    do i = 1, size(observation%node_ids)
+                        config%observation_geometries(i)%node_id = observation%node_ids(i)
                     end do
                 end if
 
-                ! Translate observation geometries
-                if (allocated(config%observation_geometries)) deallocate (config%observation_geometries)
+            case (OUTPUT_OBSERVATION_TYPES%COORDINATES%ID)
+                if (allocated(observation%coordinates)) then
+                    allocate (config%observation_geometries(size(observation%coordinates)))
+                    do i = 1, size(observation%coordinates)
+                        config%observation_geometries(i)%coordinate = observation%coordinates(i)
+                    end do
+                end if
+            end select
 
-                select case (config%point_type%ID)
-                case (OUTPUT_OBSERVATION_TYPES%NODE_IDS%ID)
-                    if (allocated(observation%node_ids)) then
-                        allocate (config%observation_geometries(size(observation%node_ids)))
-                        do i = 1, size(observation%node_ids)
-                            config%observation_geometries(i)%node_id = observation%node_ids(i)
-                        end do
-                    end if
+        end associate
 
-                case (OUTPUT_OBSERVATION_TYPES%COORDINATES%ID)
-                    if (allocated(observation%coordinates)) then
-                        allocate (config%observation_geometries(size(observation%coordinates)))
-                        do i = 1, size(observation%coordinates)
-                            config%observation_geometries(i)%coordinate = observation%coordinates(i)
-                        end do
-                    end if
-                end select
-
-            end associate
-        end select
     end subroutine execute_output_observation
 
     module subroutine execute_output_overall(self, input, config)
         implicit none
         class(type_input_translator), intent(in) :: self
         class(type_input), intent(in) :: input
-        class(type_config_overall), intent(inout) :: config
+        type(type_config_overall), intent(inout) :: config
 
         integer(int32) :: i, j, idx, total
         real(real64) :: simulation_period_second
@@ -83,69 +88,65 @@ contains
         character(:), allocatable :: format_count
         type(type_constant_value) :: time_unit
 
-        select type (config)
-        type is (type_config_overall)
-            associate (field_output => input%output_settings%field_output)
-                config%file_format = FILE_FORMATS%to_object(field_output%file_format)
+        associate (field_output => input%output_settings%field_output)
+            config%file_format = FILE_FORMATS%to_object(field_output%file_format)
 
-                if (allocated(field_output%variable_names)) then
-                    if (allocated(config%output_variables)) deallocate (config%output_variables)
-                    allocate (config%output_variables(size(field_output%variable_names)))
-                    do i = 1, size(field_output%variable_names)
-                        config%output_variables(i) = OUTPUT_VARIABLE_TYPES%to_object(field_output%variable_names(i))
-                    end do
-                end if
-            end associate
-
-            associate (overall => input%geometry%vtk)
-                config%num_points = overall%num_points
-                config%num_cells = overall%num_total_cells
-                config%coordinate = overall%POINTS
-
-                call allocate_array(config%offsets, overall%num_total_cells)
-                call allocate_array(config%cell_types, overall%num_total_cells)
-
-                do i = 1, overall%num_total_cells
-                    config%offsets(i) = overall%CELLS(i)%num_nodes_in_cell
-                    config%cell_types(i) = overall%CELLS(i)%cell_type
+            if (allocated(field_output%variable_names)) then
+                if (allocated(config%output_variables)) deallocate (config%output_variables)
+                allocate (config%output_variables(size(field_output%variable_names)))
+                do i = 1, size(field_output%variable_names)
+                    config%output_variables(i) = OUTPUT_VARIABLE_TYPES%to_object(field_output%variable_names(i))
                 end do
-                total = sum(config%offsets(:))
+            end if
+        end associate
 
-                call allocate_array(config%connectivities, total)
-                idx = 0
-                do i = 1, overall%num_total_cells
-                    do j = 1, overall%CELLS(i)%num_nodes_in_cell
-                        idx = idx + 1
-                        config%connectivities(idx) = overall%CELLS(i)%connectivity(j) - 1
-                    end do
+        associate (overall => input%geometry%vtk)
+            config%num_points = overall%num_points
+            config%num_cells = overall%num_total_cells
+            config%coordinate = overall%POINTS
+
+            call allocate_array(config%offsets, overall%num_total_cells)
+            call allocate_array(config%cell_types, overall%num_total_cells)
+
+            do i = 1, overall%num_total_cells
+                config%offsets(i) = overall%CELLS(i)%num_nodes_in_cell
+                config%cell_types(i) = overall%CELLS(i)%cell_type
+            end do
+            total = sum(config%offsets(:))
+
+            call allocate_array(config%connectivities, total)
+            idx = 0
+            do i = 1, overall%num_total_cells
+                do j = 1, overall%CELLS(i)%num_nodes_in_cell
+                    idx = idx + 1
+                    config%connectivities(idx) = overall%CELLS(i)%connectivity(j) - 1
                 end do
-            end associate
+            end do
+        end associate
 
-            ! --- シミュレーション期間を秒単位に変換 ---
-            time_unit = TIME_UNITS%to_object(input%conditions%time_control%simulation_period%unit)
+        ! --- シミュレーション期間を秒単位に変換 ---
+        time_unit = TIME_UNITS%to_object(input%conditions%time_control%simulation_period%unit)
 
-            simulation_period_second = (input%conditions%time_control%simulation_period%end &
-                                        - input%conditions%time_control%simulation_period%start) * time_unit%value
+        simulation_period_second = (input%conditions%time_control%simulation_period%end &
+                                    - input%conditions%time_control%simulation_period%start) * time_unit%value
 
-            ! --- 出力インターバルを秒単位に変換 ---
-            if (input%output_settings%field_output%output_interval_step > 0.0d0) then
-                time_unit = TIME_UNITS%to_object(input%output_settings%field_output%output_interval_unit)
+        ! --- 出力インターバルを秒単位に変換 ---
+        if (input%output_settings%field_output%output_interval_step > 0.0d0) then
+            time_unit = TIME_UNITS%to_object(input%output_settings%field_output%output_interval_unit)
 
-                output_step_second = input%output_settings%field_output%output_interval_step * time_unit%value
+            output_step_second = input%output_settings%field_output%output_interval_step * time_unit%value
 
-                if (output_step_second > 0.0d0) then
-                    max_file_counts_digit = int(log10(simulation_period_second / output_step_second), kind=int32) + 1
-                else
-                    max_file_counts_digit = 1
-                end if
-
-                if (max_file_counts_digit < 1) max_file_counts_digit = 1
-
-                format_count = "i"//strip(to_string(max_file_counts_digit))//"."//strip(to_string(max_file_counts_digit))
-                config%format_output_file = "(2a,"//format_count//",2a)"
+            if (output_step_second > 0.0d0) then
+                max_file_counts_digit = int(log10(simulation_period_second / output_step_second), kind=int32) + 1
+            else
+                max_file_counts_digit = 1
             end if
 
-        end select
+            if (max_file_counts_digit < 1) max_file_counts_digit = 1
+
+            format_count = "i"//strip(to_string(max_file_counts_digit))//"."//strip(to_string(max_file_counts_digit))
+            config%format_output_file = "(2a,"//format_count//",2a)"
+        end if
 
     end subroutine execute_output_overall
 

@@ -23,6 +23,7 @@ module io_input_translator
             execute_geometry_domain_elements, &
             execute_geometry_domain_boundaries, &
             execute_output_field, &
+            execute_output_base, &
             execute_output_observation, &
             execute_output_overall
         procedure, private, pass(self) :: execute_condition_boundary
@@ -40,6 +41,7 @@ module io_input_translator
         procedure, private, pass(self) :: execute_geometry_domain_elements
         procedure, private, pass(self) :: execute_geometry_domain_boundaries
         procedure, private, pass(self) :: execute_output_field
+        procedure, private, pass(self) :: execute_output_base
         procedure, private, pass(self) :: execute_output_observation
         procedure, private, pass(self) :: execute_output_overall
 
@@ -54,7 +56,7 @@ module io_input_translator
             class(type_input), intent(in) :: input
             integer(int32), intent(in) :: index
             type(type_constant_id), intent(in) :: target_physics
-            class(type_config_bc), intent(inout) :: config
+            type(type_config_bc), intent(inout) :: config
         end subroutine execute_condition_boundary
 
         module subroutine execute_condition_initial(self, input, ic_target, config)
@@ -62,7 +64,7 @@ module io_input_translator
             class(type_input_translator), intent(in) :: self
             class(type_input), intent(in) :: input
             type(type_constant_id), intent(in) :: ic_target
-            class(type_config_ic), intent(inout) :: config
+            type(type_config_ic), intent(inout) :: config
 
         end subroutine execute_condition_initial
 
@@ -70,7 +72,7 @@ module io_input_translator
             implicit none
             class(type_input_translator), intent(in) :: self
             class(type_input), intent(in) :: input
-            class(type_config_acceleration), intent(inout) :: config
+            type(type_config_acceleration), intent(inout) :: config
 
         end subroutine execute_condition_acceleration
 
@@ -78,7 +80,7 @@ module io_input_translator
             implicit none
             class(type_input_translator), intent(in) :: self
             class(type_input), intent(in) :: input
-            class(type_config_time), intent(inout) :: config
+            type(type_config_time), intent(inout) :: config
 
         end subroutine execute_condition_time
 
@@ -86,17 +88,17 @@ module io_input_translator
             implicit none
             class(type_input_translator), intent(in) :: self
             class(type_input), intent(in) :: input
-            class(type_config_time_ats), intent(inout) :: config
+            type(type_config_time_ats), intent(inout) :: config
 
         end subroutine execute_condition_time_ats
 
-        module subroutine execute_basic_properties(self, input, material_id, target_property,config)
+        module subroutine execute_basic_properties(self, input, material_id, target_property, config)
             implicit none
             class(type_input_translator), intent(in) :: self
             class(type_input), intent(in) :: input
             integer(int32), intent(in) :: material_id
             type(type_constant_id), intent(in) :: target_property
-            class(type_config_constitutive), intent(inout) :: config
+            type(type_config_constitutive), intent(inout) :: config
 
         end subroutine execute_basic_properties
 
@@ -113,7 +115,7 @@ module io_input_translator
             class(type_input_translator), intent(in) :: self
             class(type_input), intent(in) :: input
             integer(int32), intent(in) :: material_id
-            class(type_config_gcc), intent(inout) :: config
+            type(type_config_gcc), intent(inout) :: config
 
         end subroutine execute_basic_gcc
 
@@ -121,7 +123,7 @@ module io_input_translator
             implicit none
             class(type_input_translator), intent(in) :: self
             class(type_input), intent(in) :: input
-            class(type_config_iteration), intent(inout) :: config
+            type(type_config_iteration), intent(inout) :: config
 
         end subroutine execute_basic_iteration
 
@@ -129,7 +131,7 @@ module io_input_translator
             implicit none
             class(type_input_translator), intent(in) :: self
             class(type_input), intent(in) :: input
-            class(type_config_parallel_openmp), intent(inout) :: config
+            type(type_config_parallel_openmp), intent(inout) :: config
 
         end subroutine execute_basic_parallel_openmp
 
@@ -137,7 +139,7 @@ module io_input_translator
             implicit none
             class(type_input_translator), intent(in) :: self
             class(type_input), intent(in) :: input
-            class(type_config_control_manager), intent(inout) :: config
+            type(type_config_control_manager), intent(inout) :: config
 
         end subroutine execute_basic_control_manager
 
@@ -145,7 +147,7 @@ module io_input_translator
             implicit none
             class(type_input_translator), intent(in) :: self
             class(type_input), intent(in) :: input
-            class(type_config_nodes), intent(inout) :: config
+            type(type_config_nodes), intent(inout) :: config
 
         end subroutine execute_geometry_domain_nodes
 
@@ -153,8 +155,8 @@ module io_input_translator
             implicit none
             class(type_input_translator), intent(in) :: self
             class(type_input), intent(in) :: input
-            class(type_config_elements), intent(inout) :: config_elements
-            class(type_config_multicoloring), intent(inout) :: config_multicoloring
+            type(type_config_elements), intent(inout) :: config_elements
+            type(type_config_multicoloring), intent(inout) :: config_multicoloring
 
         end subroutine execute_geometry_domain_elements
 
@@ -162,7 +164,7 @@ module io_input_translator
             implicit none
             class(type_input_translator), intent(in) :: self
             class(type_input), intent(in) :: input
-            class(type_config_elements), intent(inout), allocatable :: config_elements(:)
+            type(type_config_elements), intent(inout), allocatable :: config_elements(:)
 
         end subroutine execute_geometry_domain_boundaries
 
@@ -170,15 +172,23 @@ module io_input_translator
             implicit none
             class(type_input_translator), intent(in) :: self
             class(type_input), intent(in) :: input
-            class(type_config_output_manager), intent(inout) :: config
+            type(type_config_output_manager), intent(inout) :: config
 
         end subroutine execute_output_field
+
+        module subroutine execute_output_base(self, input, config)
+            implicit none
+            class(type_input_translator), intent(in) :: self
+            class(type_input), intent(in) :: input
+            type(type_config_output), intent(inout) :: config
+
+        end subroutine execute_output_base
 
         module subroutine execute_output_observation(self, input, config)
             implicit none
             class(type_input_translator), intent(in) :: self
             class(type_input), intent(in) :: input
-            class(type_config_observation), intent(inout) :: config
+            type(type_config_observation), intent(inout) :: config
 
         end subroutine execute_output_observation
 
@@ -186,7 +196,7 @@ module io_input_translator
             implicit none
             class(type_input_translator), intent(in) :: self
             class(type_input), intent(in) :: input
-            class(type_config_overall), intent(inout) :: config
+            type(type_config_overall), intent(inout) :: config
 
         end subroutine execute_output_overall
     end interface

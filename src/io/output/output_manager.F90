@@ -98,15 +98,22 @@ contains
                                        water_flux=water_flux)
     end subroutine output_fields_output_manager
 
-    subroutine output_history_output_manager(self, time, temperature, pressure)
+    subroutine output_history_output_manager(self, time, temperature, water_content, ice_content, &
+                                             vapor_content, pressure)
         implicit none
         class(type_output_manager), intent(inout) :: self
         real(real64), intent(in) :: time
         real(real64), intent(in), optional :: temperature(:)
+        real(real64), intent(in), optional :: water_content(:)
+        real(real64), intent(in), optional :: ice_content(:)
+        real(real64), intent(in), optional :: vapor_content(:)
         real(real64), intent(in), optional :: pressure(:)
 
         call self%observation%output_history(time=time, &
                                              temperature=temperature, &
+                                             water_content=water_content, &
+                                             ice_content=ice_content, &
+                                             vapor_content=vapor_content, &
                                              pressure=pressure)
     end subroutine output_history_output_manager
 

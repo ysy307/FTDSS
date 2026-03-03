@@ -68,7 +68,9 @@ contains
                 if (present(temperature)) status = vtu%xml_writer%write_dataarray(data_name='Temperature', x=temperature)
             case (OUTPUT_VARIABLE_TYPES%WATER_CONTENT%ID)
                 if (present(water_content)) status = vtu%xml_writer%write_dataarray(data_name='WaterContent', x=water_content)
+            case (OUTPUT_VARIABLE_TYPES%ICE_CONTENT%ID)
                 if (present(ice_content)) status = vtu%xml_writer%write_dataarray(data_name='IceContent', x=ice_content)
+            case (OUTPUT_VARIABLE_TYPES%VAPOR_CONTENT%ID)
                 if (present(vapor_content)) status = vtu%xml_writer%write_dataarray(data_name='VaporContent', x=vapor_content)
             case (OUTPUT_VARIABLE_TYPES%THERMAL_CONDUCTIVITY%ID)
                 print *, "Warning: 'thermal_conductivity' is not implemented in VTK output."

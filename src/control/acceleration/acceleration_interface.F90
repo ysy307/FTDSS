@@ -1,7 +1,7 @@
 module control_acceleration
     use, intrinsic :: iso_fortran_env
     use :: module_core
-    use :: module_linalg, only: vector_dot
+    use :: module_linalg, only:vector_dot
     implicit none
     private
 
@@ -17,8 +17,12 @@ module control_acceleration
     contains
         procedure(abst_initialize_acceleration), public, pass(self), deferred :: initialize
         procedure(abst_destory_acceleration), public, pass(self), deferred :: destory
-        procedure(abst_compute_acceleration), public, pass(self), deferred :: compute
+        procedure(abst_compute_relaxatino_acceleration), public, pass(self), deferred :: compute_relaxation
         procedure(abst_reset_acceleration), public, pass(self), deferred :: reset
+        procedure(abst_reach_minimum_relaxation), public, pass(self), deferred :: reach_minimum_relaxation
+        procedure(abst_reach_maximum_relaxation), public, pass(self), deferred :: reach_maximum_relaxation
+        procedure(abst_get_current_relaxation), public, pass(self), deferred :: get_current_relaxation
+        procedure(abst_get_previous_relaxation), public, pass(self), deferred :: get_previous_relaxation
     end type
 
     abstract interface
@@ -90,7 +94,7 @@ module control_acceleration
         !>
         !> Failure behavior:
         !> - Returns without error
-        subroutine abst_compute_acceleration(self, physics_type, iter, du, vec)
+        subroutine abst_compute_relaxatino_acceleration(self, physics_type, iter, du, vec)
             import :: abst_acceleration, type_constant_id, int32, real64
             implicit none
             !> Acceleration object
@@ -106,7 +110,7 @@ module control_acceleration
             !> State vector \(u_k\) on entry
             !> Overwritten by updated vector \(u_{k+1}\) on exit
             real(real64), intent(inout) :: vec(:)
-        end subroutine abst_compute_acceleration
+        end subroutine abst_compute_relaxatino_acceleration
 
         !> Reset internal states for a new step
         !>
@@ -131,6 +135,98 @@ module control_acceleration
             !> Acceleration object
             class(abst_acceleration), intent(inout) :: self
         end subroutine abst_reset_acceleration
+
+        !> Check if minimum relaxation factor is reached
+        !> Mathematical definition:
+        !> - Checks if current relaxation factor is less than or equal to minimum
+        !> Assumptions:
+        !> - None
+        !> Numerical guarantee:
+        !> - No theoretical error bound available
+        !> Computational complexity:
+        !> - Memory: \(O(1)\)
+        !> - Arithmetic: \(O(1)\)
+        !> Failure behavior:
+        !> - Returns .true. if minimum relaxation is reached, .false. otherwise
+        pure function abst_reach_minimum_relaxation(self, physics_type) result(reached)
+            import :: abst_acceleration, type_constant_id
+            implicit none
+            !> Acceleration object
+            class(abst_acceleration), intent(in) :: self
+            !> Identifier for the physics type
+            type(type_constant_id), intent(in) :: physics_type
+            !> Flag indicating if minimum relaxation is reached
+            logical :: reached
+        end function abst_reach_minimum_relaxation
+
+        !> Check if maximum relaxation factor is reached
+        !> Mathematical definition:
+        !> - Checks if current relaxation factor is greater than or equal to maximum
+        !> Assumptions:
+        !> - None
+        !> Numerical guarantee:
+        !> - No theoretical error bound available
+        !> Computational complexity:
+        !> - Memory: \(O(1)\)
+        !> - Arithmetic: \(O(1)\)
+        !> Failure behavior:
+        !> - Returns .true. if maximum relaxation is reached, .false. otherwise
+        pure function abst_reach_maximum_relaxation(self, physics_type) result(reached)
+            import :: abst_acceleration, type_constant_id
+            implicit none
+            !> Acceleration object
+            class(abst_acceleration), intent(in) :: self
+            !> Identifier for the physics type
+            type(type_constant_id), intent(in) :: physics_type
+            !> Flag indicating if maximum relaxation is reached
+            logical :: reached
+        end function abst_reach_maximum_relaxation
+
+        !> Get the current relaxation factor
+        !> Mathematical definition:
+        !> - Returns the current relaxation factor for the given physics type
+        !> Assumptions:
+        !> - None
+        !> Numerical guarantee:
+        !> - No theoretical error bound available
+        !> Computational complexity:
+        !> - Memory: \(O(1)\)
+        !> - Arithmetic: \(O(1)\)
+        !> Failure behavior:
+        !> - Returns the current relaxation factor, or a default value if not initialized
+        subroutine abst_get_current_relaxation(self, physics_type, relaxation)
+            import :: abst_acceleration, type_constant_id, real64
+            implicit none
+            !> Acceleration object
+            class(abst_acceleration), intent(in) :: self
+            !> Identifier for the physics type
+            type(type_constant_id), intent(in) :: physics_type
+            !> Current relaxation factor
+            real(real64), intent(inout) :: relaxation
+        end subroutine abst_get_current_relaxation
+
+        !> Get the previous relaxation factor
+        !> Mathematical definition:
+        !> - Returns the previous relaxation factor for the given physics type
+        !> Assumptions:
+        !> - None
+        !> Numerical guarantee:
+        !> - No theoretical error bound available
+        !> Computational complexity:
+        !> - Memory: \(O(1)\)
+        !> - Arithmetic: \(O(1)\)
+        !> Failure behavior:
+        !> - Returns the previous relaxation factor, or a default value if not initialized
+        subroutine abst_get_previous_relaxation(self, physics_type, relaxation)
+            import :: abst_acceleration, type_constant_id, real64
+            implicit none
+            !> Acceleration object
+            class(abst_acceleration), intent(in) :: self
+            !> Identifier for the physics type
+            type(type_constant_id), intent(in) :: physics_type
+            !> Previous relaxation factor
+            real(real64), intent(inout) :: relaxation
+        end subroutine abst_get_previous_relaxation
     end interface
 
     !> Aitken relaxation method for nonlinear iterations
@@ -148,8 +244,12 @@ module control_acceleration
     contains
         procedure, public, pass(self) :: initialize => initialize_acceleration_aitken
         procedure, public, pass(self) :: destory => destory_acceleration_aitken
-        procedure, public, pass(self) :: compute => compute_acceleration_aitken
+        procedure, public, pass(self) :: compute_relaxation => compute_relaxation_acceleration_aitken
         procedure, public, pass(self) :: reset => reset_acceleration_aitken
+        procedure, public, pass(self) :: reach_minimum_relaxation => reach_minimum_relaxation_aitken
+        procedure, public, pass(self) :: reach_maximum_relaxation => reach_maximum_relaxation_aitken
+        procedure, public, pass(self) :: get_current_relaxation => get_current_relaxation_aitken
+        procedure, public, pass(self) :: get_previous_relaxation => get_previous_relaxation_aitken
     end type type_acceleration_aitken
 
     interface
@@ -170,7 +270,7 @@ module control_acceleration
         end subroutine destory_acceleration_aitken
 
         !> Compute Aitken acceleration
-        module subroutine compute_acceleration_aitken(self, physics_type, iter, du, vec)
+        module subroutine compute_relaxation_acceleration_aitken(self, physics_type, iter, du, vec)
             implicit none
             !> Aitken acceleration object
             class(type_acceleration_aitken), intent(inout) :: self
@@ -183,7 +283,7 @@ module control_acceleration
             !> State vector \(u_k\) on entry
             !> Overwritten by updated vector \(u_{k+1}\) on exit
             real(real64), intent(inout) :: vec(:)
-        end subroutine compute_acceleration_aitken
+        end subroutine compute_relaxation_acceleration_aitken
 
         !> Reset Aitken acceleration
         module subroutine reset_acceleration_aitken(self)
@@ -191,6 +291,46 @@ module control_acceleration
             !> Aitken acceleration object
             class(type_acceleration_aitken), intent(inout) :: self
         end subroutine reset_acceleration_aitken
+
+        module pure function reach_minimum_relaxation_aitken(self, physics_type) result(reached)
+            implicit none
+            !> Aitken acceleration object
+            class(type_acceleration_aitken), intent(in) :: self
+            !> Identifier for the physics type
+            type(type_constant_id), intent(in) :: physics_type
+            !> Flag indicating if minimum relaxation is reached
+            logical :: reached
+        end function reach_minimum_relaxation_aitken
+
+        module pure function reach_maximum_relaxation_aitken(self, physics_type) result(reached)
+            implicit none
+            !> Aitken acceleration object
+            class(type_acceleration_aitken), intent(in) :: self
+            !> Identifier for the physics type
+            type(type_constant_id), intent(in) :: physics_type
+            !> Flag indicating if maximum relaxation is reached
+            logical :: reached
+        end function reach_maximum_relaxation_aitken
+
+        module subroutine get_current_relaxation_aitken(self, physics_type, relaxation)
+            implicit none
+            !> Aitken acceleration object
+            class(type_acceleration_aitken), intent(in) :: self
+            !> Identifier for the physics type
+            type(type_constant_id), intent(in) :: physics_type
+            !> Current relaxation factor
+            real(real64), intent(inout) :: relaxation
+        end subroutine get_current_relaxation_aitken
+
+        module subroutine get_previous_relaxation_aitken(self, physics_type, relaxation)
+            implicit none
+            !> Aitken acceleration object
+            class(type_acceleration_aitken), intent(in) :: self
+            !> Identifier for the physics type
+            type(type_constant_id), intent(in) :: physics_type
+            !> Previous relaxation factor
+            real(real64), intent(inout) :: relaxation
+        end subroutine get_previous_relaxation_aitken
     end interface
 
 end module control_acceleration
