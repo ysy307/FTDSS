@@ -9,7 +9,6 @@ module types_config_observation
     public :: type_config_observation
 
     type, extends(abst_config) :: type_config_observation_geometry
-        type(type_constant_id) :: point_type = OUTPUT_OBSERVATION_TYPES%NONE
         integer(int32) :: node_id
         type(type_coordinate_dp) :: coordinate
         integer(int32) :: fe_id
@@ -23,6 +22,7 @@ module types_config_observation
 
     type, extends(abst_config) :: type_config_observation
         type(type_constant_id) :: point_type = OUTPUT_OBSERVATION_TYPES%NONE
+        type(type_constant_id) :: file_format = FILE_FORMATS%NONE
         type(type_constant_id), allocatable :: output_variables(:)
         integer(int32) :: num_observations
         type(type_config_observation_geometry), allocatable :: observation_geometries(:)
@@ -40,7 +40,6 @@ contains
 
         select type (source)
         type is (type_config_observation_geometry)
-            call self%set(self%point_type, source%point_type)
             call self%set(self%node_id, source%node_id)
             call self%set(self%coordinate, source%coordinate)
             call self%set(self%fe_id, source%fe_id)
@@ -56,7 +55,7 @@ contains
         implicit none
         class(type_config_observation_geometry), intent(inout) :: self
 
-        self%point_type = OUTPUT_OBSERVATION_TYPES%NONE
+        ! self%point_type = OUTPUT_OBSERVATION_TYPES%NONE
         self%node_id = 0
         self%coordinate = type_coordinate_dp(0.0d0, 0.0d0, 0.0d0)
         self%fe_id = 0
@@ -77,7 +76,7 @@ contains
         type is (type_config_observation)
             call self%set(self%point_type, source%point_type)
             self%num_observations = source%num_observations
-
+            call self%set(self%file_format, source%file_format)
             call self%set(self%output_variables, source%output_variables)
 
             if (allocated(source%observation_geometries)) then
@@ -106,6 +105,7 @@ contains
         integer(int32) :: i
 
         self%point_type = OUTPUT_OBSERVATION_TYPES%NONE
+        self%file_format = FILE_FORMATS%NONE
         self%num_observations = 0
 
         call deallocate_array(self%output_variables)
