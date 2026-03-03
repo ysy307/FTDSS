@@ -14,6 +14,7 @@ module io_output_observation
 
     !> Abstract base representing a single observation location
     type, abstract :: abst_observation_point
+        type(type_constant_id), private :: point_type = OUTPUT_OBSERVATION_TYPES%NONE
     contains
         procedure(abst_extract_value), public, pass(self), deferred :: extract_value
     end type abst_observation_point
@@ -27,6 +28,29 @@ module io_output_observation
             real(real64), intent(in) :: nodal_values(:)
             real(real64), intent(inout) :: value
         end subroutine abst_extract_value
+    end interface
+
+    !> Observation point defined by a specific mesh node ID
+    type, extends(abst_observation_point) :: type_observation_point_node
+        integer(int32) :: node_id
+    contains
+        procedure, pass(self) :: initialize => initialize_observation_point_node
+        procedure, pass(self) :: extract_value => extract_value_node
+    end type type_observation_point_node
+
+    interface
+        module subroutine initialize_observation_point_node(self, node_id)
+            implicit none
+            class(type_observation_point_node), intent(inout) :: self
+            integer(int32), intent(in) :: node_id
+        end subroutine initialize_observation_point_node
+
+        module subroutine extract_value_node(self, nodal_values, value)
+            implicit none
+            class(type_observation_point_node), intent(in) :: self
+            real(real64), intent(in) :: nodal_values(:)
+            real(real64), intent(inout) :: value
+        end subroutine extract_value_node
     end interface
 
     !> Observation point defined by spatial coordinates
@@ -60,44 +84,37 @@ module io_output_observation
         end subroutine extract_value_coordinate
     end interface
 
-    !> Observation point defined by a specific mesh node ID
-    type, extends(abst_observation_point) :: type_observation_point_node
-        integer(int32) :: node_id
-    contains
-        procedure, pass(self) :: initialize => initialize_observation_point_node
-        procedure, pass(self) :: extract_value => extract_value_node
-    end type type_observation_point_node
-
-    interface
-        module subroutine initialize_observation_point_node(self, node_id)
-            implicit none
-            class(type_observation_point_node), intent(inout) :: self
-            integer(int32), intent(in) :: node_id
-        end subroutine initialize_observation_point_node
-
-        module subroutine extract_value_node(self, nodal_values, value)
-            implicit none
-            class(type_observation_point_node), intent(in) :: self
-            real(real64), intent(in) :: nodal_values(:)
-            real(real64), intent(inout) :: value
-        end subroutine extract_value_node
-    end interface
-
     !> Wrapper to hold an array of polymorphic observation points
     type :: holder_observation_point
         class(abst_observation_point), allocatable :: point
+    contains
+        procedure, public, pass(self) :: extract_value => extract_value_holder_observation_point
     end type holder_observation_point
 
-    !> Manager for file output and iterating over observation points
-    type :: type_output_observation
+    interface
+        module subroutine extract_value_holder_observation_point(self, nodal_values, value)
+            implicit none
+            class(holder_observation_point), intent(in) :: self
+            real(real64), intent(in) :: nodal_values(:)
+            real(real64), intent(inout) :: value
+
+        end subroutine extract_value_holder_observation_point
+    end interface
+
+    type :: type_output_observation_settings
         logical :: do_output
-        type(type_constant_id), private :: variable_type
+        type(type_constant_id) :: variable_type
+        character(:), private, allocatable :: variable_name
         character(:), private, allocatable :: variable_unit
         character(:), private, allocatable :: file_name
         character(:), private, allocatable :: delimiter
         character(:), private, allocatable :: fmt_line
         integer(int32), private :: io_unit
+    end type type_output_observation_settings
 
+    !> Manager for file output and iterating over observation points
+    type :: type_output_observation
+        type(type_output_observation_settings), private :: settings(OUTPUT_VARIABLE_TYPES%NUM_ID)
         type(type_constant_id), private :: observation_type = OUTPUT_OBSERVATION_TYPES%NONE
         integer(int32), private :: num_observations
 
@@ -106,8 +123,7 @@ module io_output_observation
 
     contains
         procedure, public, pass(self) :: initialize => initialize_type_output_observation
-        procedure, public, pass(self) :: should_output => should_output_overall
-
+        procedure, public, pass(self) :: destroy => destroy_type_output_observation
         procedure, public, pass(self) :: write_header => write_observation_header
         procedure, public, pass(self) :: write_line => write_observation_line
     end type type_output_observation
@@ -122,23 +138,27 @@ module io_output_observation
             type(type_constant_id), intent(in) :: variable_type
         end subroutine initialize_type_output_observation
 
-        module pure function should_output_overall(self) result(should_output)
-            implicit none
-            class(type_output_observation), intent(in) :: self
-            logical :: should_output
-        end function should_output_overall
-
-        module subroutine write_observation_header(self, output_time_unit)
+        module subroutine destroy_type_output_observation(self)
             implicit none
             class(type_output_observation), intent(inout) :: self
+            
+        end subroutine destroy_type_output_observation
+
+        module subroutine write_observation_header(self, output_variable_type, output_time_unit)
+            implicit none
+            class(type_output_observation), intent(inout) :: self
+            type(type_constant_id), intent(in) :: output_variable_type
             type(type_constant_id), intent(in) :: output_time_unit
+
         end subroutine write_observation_header
 
-        module subroutine write_observation_line(self, time, values)
+        module subroutine write_observation_line(self, output_variable_type, time, output_values)
             implicit none
             class(type_output_observation), intent(in) :: self
+            type(type_constant_id), intent(in) :: output_variable_type
             real(real64), intent(in) :: time
-            real(real64), intent(in) :: values(:)
+            real(real64), intent(in) :: output_values(:)
+
         end subroutine write_observation_line
     end interface
 

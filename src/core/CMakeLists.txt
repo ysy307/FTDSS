@@ -36,6 +36,7 @@ fypp_F90("" "${CORE_VALIDATION_FYPP}" CORE_VALIDATION_GENERATED)
 
 target_sources(SOLVER_CORE PRIVATE
     validation/error.F90
+    validation/check_io.F90
     validation/validation.F90
     ${CORE_VALIDATION_GENERATED}
 )
@@ -129,7 +130,7 @@ target_sources(SOLVER_CORE PRIVATE
     types/utils/datetime.F90
     # Core
     types/types.F90
-    
+
     ${CORE_TYPES_GENERATED}
 )
 
@@ -188,7 +189,7 @@ target_sources(SOLVER_CORE PRIVATE
 # 生成モジュール用
 target_include_directories(SOLVER_CORE
     PUBLIC
-        ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 # C++ standard
@@ -202,10 +203,10 @@ set_target_properties(SOLVER_CORE PROPERTIES
 
 target_link_libraries(SOLVER_CORE
     PUBLIC
-        VTK::IOXML
-        VTK::CommonCore
-        VTK::CommonDataModel
-        VTK::IOLegacy
+    VTK::IOXML
+    VTK::CommonCore
+    VTK::CommonDataModel
+    VTK::IOLegacy
 )
 
 # ============================================================

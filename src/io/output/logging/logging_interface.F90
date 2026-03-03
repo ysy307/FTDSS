@@ -1,6 +1,8 @@
 module io_output_logging
     use, intrinsic :: iso_fortran_env, only: int32, real64
-!$  use :: omp_lib
+#ifdef _OPENMP
+    use :: omp_lib
+#endif
     use :: stdlib_strings, only:to_string, strip
     use :: stdlib_io, only:open
     use :: module_core

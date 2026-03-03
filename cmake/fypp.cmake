@@ -25,10 +25,10 @@ function(preprocess preproc preprocopts srcext trgext srcfiles trgfiles)
         add_custom_command(
             OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${trgfile}
             COMMAND ${preproc}
-                    ${preprocopts}
-                    -I${FYPP_INCLUDE_DIR}
-                    ${CMAKE_CURRENT_SOURCE_DIR}/${srcfile}
-                    ${CMAKE_CURRENT_BINARY_DIR}/${trgfile}
+            ${preprocopts}
+            -I${FYPP_INCLUDE_DIR}
+            ${CMAKE_CURRENT_SOURCE_DIR}/${srcfile}
+            ${CMAKE_CURRENT_BINARY_DIR}/${trgfile}
             MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${srcfile}
             DEPENDS ${FYPP_INCLUDE_FILES}
         )

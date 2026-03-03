@@ -12,6 +12,7 @@ contains
         type(type_constant_id), intent(in) :: variable_type
 
         integer(int32) :: i
+        integer(int32) :: iostat
         !     integer(int32) :: iObs, iElem, num_elements
         !     integer(int32) :: elem_id, comp_dim, calc_type
         !     type(type_coordinate_dp) :: cartesian, normalized
@@ -26,24 +27,10 @@ contains
         !     ! --- 設定の取得 ---
         ! self%variable_type = input%output_settings%history_output%observation_type
 
-        if (self%variable_type == OUTPUT_OBSERVATION_TYPES%NONE) then
-            self%do_output = .false.
+        if (self%observation_type == OUTPUT_OBSERVATION_TYPES%NONE) then
+            self%settings(:)%do_output = .false.
             return
-        else
-            self%do_output = .true.
         end if
-
-        ! --- デリミタとフォーマット文字列の設定 ---
-        select case (file_format%ID)
-        case (FILE_FORMATS%CSV%ID)
-            self%delimiter = ","
-        case (FILE_FORMATS%DAT%ID)
-            self%delimiter = "  "
-        case default
-            self%delimiter = "  "
-        end select
-
-        self%fmt_line = '(*(es22.15,:,"'//self%delimiter//'"))'
 
         self%num_observations = input%output_settings%history_output%num_observations
 
@@ -71,225 +58,180 @@ contains
                     !     input%output_settings%history_output%connectivities(i))
                 end select
             end do
-            !         call self%coordinate%initialize(self%self%num_observations)
-            !         do iObs = 1, self%self%num_observations
-            !             self%coordinate%x(iObs) = input%output_settings%history_output%coordinates(iObs)%x
-            !             self%coordinate%y(iObs) = input%output_settings%history_output%coordinates(iObs)%y
-            !             self%coordinate%z(iObs) = input%output_settings%history_output%coordinates(iObs)%z
-            !         end do
-
-            !         ! 要素ID保存用配列の確保
-            !         if (allocated(self%element_ids)) deallocate (self%element_ids)
-            !         allocate (self%element_ids(self%self%num_observations))
-            !         self%element_ids = -1
-
-            !         if (allocated(self%coordinate_normalized)) deallocate (self%coordinate_normalized)
-            !         allocate (self%coordinate_normalized(self%self%num_observations))
-
-            !         ! --- 座標探索ロジック ---
-            !         call domain%get_num_fe(num_elements)
-            !         call domain%get_computation_dimension(comp_dim)
-            !         calc_type = input%basic%simulation_settings%calculate_type
-
-            !         do iObs = 1, self%self%num_observations
-            !             ! 観測点座標セット (探索点)
-            !             if (comp_dim == 2) then
-            !                 if (calc_type == 1) then ! XY (2D)
-            !                     call cartesian%set(self%coordinate%x(iObs), self%coordinate%y(iObs), 0.0d0)
-            !                 else ! XZ (2D)
-            !                     ! XZ平面の場合、Y成分にZ座標を入れて2D探索を行う (domain側の格納形式に合わせる)
-            !                     call cartesian%set(self%coordinate%x(iObs), self%coordinate%z(iObs), 0.0d0)
-            !                 end if
-            !             else ! 3D
-            !                 call cartesian%set(self%coordinate%x(iObs), self%coordinate%y(iObs), self%coordinate%z(iObs))
-            !             end if
-
-            !             do iElem = 1, num_elements
-            !                 call domain%get_fe(iElem, fe)
-            !                 if (.not. associated(fe)) cycle
-            !                 call domain%get_fe_connectivity(iElem, conn)
-            !                 if (.not. associated(conn)) cycle
-            !                 call domain%get_fe_coordinate(iElem, ele_coords)
-
-            !                 ! 包含判定
-            !                 call fe%is_inside(cartesian, normalized, ele_coords, inside)
-
-            !                 if (inside) then
-            !                     self%element_ids(iObs) = iElem
-            !                     self%coordinate_normalized(iObs) = normalized
-            !                     exit
-            !                 end if
-            !             end do
-
-            !             ! デバッグ用: 見つからない場合の警告
-            !             if (self%element_ids(iObs) == -1) then
-            !                 print *, "Warning: Observation point ", iObs, " is outside the domain."
-            !             end if
-            !         end do
         end select
 
-        select case (self%variable_type%ID)
+        select case (variable_type%ID)
         case (OUTPUT_VARIABLE_TYPES%TEMPERATURE%ID)
-            self%variable_unit = "deg C"
-            self%file_name = strip(dir_output)//"obsf_T."//strip(file_format%NAME)
-            self%io_unit = 99999999
+            self%settings(variable_type%ID)%do_output = .true.
+            self%settings(variable_type%ID)%variable_unit = "deg C"
+            self%settings(variable_type%ID)%file_name = strip(dir_output)//"obsf_T."//strip(file_format%NAME)
+            self%settings(variable_type%ID)%io_unit = open (strip(self%settings(variable_type%ID)%file_name), "wt", iostat=iostat)
+            if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable_type%ID)%file_name)
         case (OUTPUT_VARIABLE_TYPES%WATER_CONTENT%ID)
-            self%variable_unit = "-"
-            self%file_name = strip(dir_output)//"obsf_Si."//strip(file_format%NAME)
-            self%io_unit = 99999999
+            self%settings(variable_type%ID)%do_output = .true.
+            self%settings(variable_type%ID)%variable_unit = "-"
+            self%settings(variable_type%ID)%file_name = strip(dir_output)//"obsf_Si."//strip(file_format%NAME)
+            self%settings(variable_type%ID)%io_unit = open (strip(self%settings(variable_type%ID)%file_name), "wt", iostat=iostat)
+            if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable_type%ID)%file_name)
         case (OUTPUT_VARIABLE_TYPES%THERMAL_CONDUCTIVITY%ID)
-            self%variable_unit = "W/m/K"
-            self%file_name = strip(dir_output)//"obsf_TC."//strip(file_format%NAME)
-            self%io_unit = 99999999
+            self%settings(variable_type%ID)%do_output = .true.
+            self%settings(variable_type%ID)%variable_unit = "W/m/K"
+            self%settings(variable_type%ID)%file_name = strip(dir_output)//"obsf_TC."//strip(file_format%NAME)
+            self%settings(variable_type%ID)%io_unit = open (strip(self%settings(variable_type%ID)%file_name), "wt", iostat=iostat)
+            if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable_type%ID)%file_name)
         case (OUTPUT_VARIABLE_TYPES%VOLUMETRIC_HEAT_CAPACITY%ID)
-            self%variable_unit = "J/m3/K"
-            self%file_name = strip(dir_output)//"obsf_C."//strip(file_format%NAME)
-            self%io_unit = 99999999
+            self%settings(variable_type%ID)%do_output = .true.
+            self%settings(variable_type%ID)%variable_unit = "J/m3/K"
+            self%settings(variable_type%ID)%file_name = strip(dir_output)//"obsf_C."//strip(file_format%NAME)
+            self%settings(variable_type%ID)%io_unit = open (strip(self%settings(variable_type%ID)%file_name), "wt", iostat=iostat)
+            if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable_type%ID)%file_name)
         case (OUTPUT_VARIABLE_TYPES%PRESSURE%ID)
-            self%variable_unit = "m"
-            self%file_name = strip(dir_output)//"obsf_P."//strip(file_format%NAME)
-            self%io_unit = 99999999
+            self%settings(variable_type%ID)%do_output = .true.
+            self%settings(variable_type%ID)%variable_unit = "m"
+            self%settings(variable_type%ID)%file_name = strip(dir_output)//"obsf_P."//strip(file_format%NAME)
+            self%settings(variable_type%ID)%io_unit = open (strip(self%settings(variable_type%ID)%file_name), "wt", iostat=iostat)
+            if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable_type%ID)%file_name)
         case (OUTPUT_VARIABLE_TYPES%WATER_FLUX%ID)
-            self%variable_unit = "m/s"
-            self%file_name = strip(dir_output)//"obsf_Flux."//strip(file_format%NAME)
-            self%io_unit = 99999999
+            self%settings(variable_type%ID)%do_output = .true.
+            self%settings(variable_type%ID)%variable_unit = "m/s"
+            self%settings(variable_type%ID)%file_name = strip(dir_output)//"obsf_Flux."//strip(file_format%NAME)
+            self%settings(variable_type%ID)%io_unit = open (strip(self%settings(variable_type%ID)%file_name), "wt", iostat=iostat)
+            if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable_type%ID)%file_name)
         case (OUTPUT_VARIABLE_TYPES%HYDRAULIC_CONDUCTIVITY%ID)
-            self%variable_unit = "m/s"
-            self%file_name = strip(dir_output)//"obsf_K."//strip(file_format%NAME)
-            self%io_unit = 99999999
+            self%settings(variable_type%ID)%do_output = .true.
+            self%settings(variable_type%ID)%variable_unit = "m/s"
+            self%settings(variable_type%ID)%file_name = strip(dir_output)//"obsf_K."//strip(file_format%NAME)
+            self%settings(variable_type%ID)%io_unit = open (strip(self%settings(variable_type%ID)%file_name), "wt", iostat=iostat)
+            if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable_type%ID)%file_name)
         end select
+
+        ! --- デリミタとフォーマット文字列の設定 ---
+        select case (file_format%ID)
+        case (FILE_FORMATS%CSV%ID)
+            do i = 1, OUTPUT_VARIABLE_TYPES%NUM_ID
+                if (self%settings(i)%do_output) then
+                    self%settings(i)%delimiter = ","
+                end if
+            end do
+        case (FILE_FORMATS%DAT%ID)
+            do i = 1, OUTPUT_VARIABLE_TYPES%NUM_ID
+                if (self%settings(i)%do_output) then
+                    self%settings(i)%delimiter = "  "
+                end if
+            end do
+        case default
+            do i = 1, OUTPUT_VARIABLE_TYPES%NUM_ID
+                if (self%settings(i)%do_output) then
+                    self%settings(i)%delimiter = "  "
+                end if
+            end do
+        end select
+
+        do i = 1, OUTPUT_VARIABLE_TYPES%NUM_ID
+            if (self%settings(i)%do_output) then
+                ! [修正] フォーマット文字列を変数ごとに設定
+                self%settings(i)%fmt_line = '(*(es22.15,:,"'//self%settings(i)%delimiter//'"))'
+            end if
+        end do
 
     end subroutine initialize_type_output_observation
+
+    module subroutine destroy_type_output_observation(self)
+        implicit none
+        class(type_output_observation), intent(inout) :: self
+
+        integer(int32) :: i
+
+        do i = 1, OUTPUT_VARIABLE_TYPES%NUM_ID
+            if (self%settings(i)%do_output) then
+                close (self%settings(i)%io_unit)
+            end if
+        end do
+
+    end subroutine destroy_type_output_observation
 
     ! ==============================================================================
     ! Writer Subroutines
     ! ==============================================================================
 
-    module subroutine write_observation_header(self, output_time_unit)
+    module subroutine write_observation_header(self, output_variable_type, output_time_unit)
         implicit none
         class(type_output_observation), intent(inout) :: self
+        type(type_constant_id), intent(in) :: output_variable_type
         type(type_constant_id), intent(in) :: output_time_unit
 
         integer(int32) :: i
 
-        if (.not. self%do_output) return
+        associate (output_settings => self%settings(output_variable_type%ID))
+            if (.not. output_settings%do_output) return
+            if (.not. check_unit_writable(output_settings%io_unit)) then
+                call raise_error(ERROR_CODES%WRITE_FILE_FAILED, output_settings%file_name)
+            end if
 
-        open (newunit=self%io_unit, file=strip(self%file_name), status='replace', action='write')
+            write (output_settings%io_unit, '(a)') "# "//trim(output_settings%variable_type%NAME)//" time variation"
+            write (output_settings%io_unit, '(a)') "#"
 
-        write (self%io_unit, '(a)') "# "//trim(self%variable_type%NAME)//" time variation"
-        write (self%io_unit, '(a)') "#"
+            ! --- 観測点の情報出力（ポリモーフィズムを利用） ---
+            select case (self%observation_type%ID)
+            case (OUTPUT_OBSERVATION_TYPES%NODE_IDS%ID)
+                write (output_settings%io_unit, '(a)') "# Observation Node ID"
+                do i = 1, self%num_observations
+                    select type (p => self%observation_points(i)%point)
+                    type is (type_observation_point_node)
+                        write (output_settings%io_unit, '(a,i0,a,1x,i0)') "# Node ID ", i, ":", p%node_id
+                    end select
+                end do
 
-        ! --- 観測点の情報出力（ポリモーフィズムを利用） ---
-        select case (self%observation_type%ID)
-        case (OUTPUT_OBSERVATION_TYPES%NODE_IDS%ID)
-            write (self%io_unit, '(a)') "# Observation Node ID"
-            do i = 1, self%num_observations
-                select type (p => self%observation_points(i)%point)
-                type is (type_observation_point_node)
-                    write (self%io_unit, '(a,i0,a,1x,i0)') "# Node ID ", i, ":", p%node_id
-                end select
-            end do
+            case (OUTPUT_OBSERVATION_TYPES%COORDINATES%ID)
+                write (output_settings%io_unit, '(a)') "# Observation Coordinate (x,y,z)"
+                do i = 1, self%num_observations
+                    select type (p => self%observation_points(i)%point)
+                    type is (type_observation_point_coordinate)
+                        write (output_settings%io_unit, '(a,1x,i0,a,3(1x,es18.11,a),a,i0)') &
+                            "#    Point", i, ": (", &
+                            p%coordinate%x, ",", &
+                            p%coordinate%y, ",", &
+                            p%coordinate%z, ")", &
+                            " => Element ID: ", p%fe_id
+                    end select
+                end do
+            end select
 
-        case (OUTPUT_OBSERVATION_TYPES%COORDINATES%ID)
-            write (self%io_unit, '(a)') "# Observation Coordinate (x,y,z)"
-            do i = 1, self%num_observations
-                select type (p => self%observation_points(i)%point)
-                type is (type_observation_point_coordinate)
-                    write (self%io_unit, '(a,1x,i0,a,3(1x,es18.11,a),a,i0)') &
-                        "#    Point", i, ": (", &
-                        p%coordinate%x, ",", &
-                        p%coordinate%y, ",", &
-                        p%coordinate%z, ")", &
-                        " => Element ID: ", p%fe_id
-                end select
-            end do
-        end select
+            write (output_settings%io_unit, '(a)') "#"
+            write (output_settings%io_unit, '(a)') "# Output Unit: Time ["//trim(output_time_unit%NAME)//"], " &
+                //trim(output_settings%variable_type%NAME)//" ["//trim(output_settings%variable_unit)//"]"
+            write (output_settings%io_unit, '(a)') "#"
 
-        write (self%io_unit, '(a)') "#"
-        write (self%io_unit, '(a)') "# Output Unit: Time ["//trim(output_time_unit%NAME)//"], " &
-            //trim(self%variable_type%NAME)//" ["//trim(self%variable_unit)//"]"
-        write (self%io_unit, '(a)') "#"
+            ! --- ヘッダー行の出力 ---
+            select case (output_settings%variable_type%ID)
+            case (OUTPUT_VARIABLE_TYPES%WATER_FLUX%ID)
+                write (output_settings%io_unit, '(a,'//to_string(self%num_observations)//'("'//output_settings%delimiter//'"))') &
+                    "Time", (("Obs"//to_string(i)//"_x", "Obs"//to_string(i)//"_y", "Obs"//to_string(i)//"_z"), &
+                             i=1, self%num_observations / 3)
+            case default
+                write (output_settings%io_unit, '(a,'//to_string(self%num_observations)//'("'//output_settings%delimiter//'"))') &
+                    "Time", ("Obs"//to_string(i), i=1, self%num_observations)
+            end select
 
-        ! --- ヘッダー行の出力 ---
-        select case (self%variable_type%ID)
-        case (OUTPUT_VARIABLE_TYPES%WATER_FLUX%ID)
-            write (self%io_unit, '(a,'//to_string(self%num_observations)//'("'//self%delimiter//'",a))') &
-                "Time", (("Obs"//to_string(i)//"_x", "Obs"//to_string(i)//"_y", "Obs"//to_string(i)//"_z"), &
-                         i=1, self%num_observations / 3)
-        case default
-            write (self%io_unit, '(a,'//to_string(self%num_observations)//'("'//self%delimiter//'",a))') &
-                "Time", ("Obs"//to_string(i), i=1, self%num_observations)
-        end select
+        end associate
 
     end subroutine write_observation_header
 
-    module subroutine write_observation_line(self, time, values)
+    module subroutine write_observation_line(self, output_variable_type, time, output_values)
         implicit none
         class(type_output_observation), intent(in) :: self
+        type(type_constant_id), intent(in) :: output_variable_type
         real(real64), intent(in) :: time
-        real(real64), intent(in) :: values(:)
+        real(real64), intent(in) :: output_values(:)
 
-        write (self%io_unit, self%fmt_line) time, values(1:self%num_observations)
+        associate (output_settings => self%settings(output_variable_type%ID))
+            if (.not. output_settings%do_output) return
+            if (.not. check_unit_writable(output_settings%io_unit)) then
+                call raise_error(ERROR_CODES%WRITE_FILE_FAILED, output_settings%file_name)
+            end if
+
+            write (output_settings%io_unit, output_settings%fmt_line) time, output_values(1:self%num_observations)
+        end associate
     end subroutine write_observation_line
-
-    module pure function should_output_overall(self) result(should_output)
-        implicit none
-        class(type_output_observation), intent(in) :: self
-        logical :: should_output
-
-        should_output = self%do_output
-
-    end function should_output_overall
-
-    module subroutine initialize_observation_point_coordinate(self, coordinate, fe_id, coordinate_normalized, fe, connectivity)
-        implicit none
-        class(type_observation_point_coordinate), intent(inout) :: self
-        type(type_coordinate_dp), intent(in) :: coordinate
-        integer(int32), intent(in) :: fe_id
-        type(type_coordinate_dp), intent(in) :: coordinate_normalized
-        class(abst_fe), intent(in), pointer :: fe
-        integer(int32), intent(in) :: connectivity(:)
-
-        self%coordinate = coordinate
-        self%fe_id = fe_id
-        self%coordinate_normalized = coordinate_normalized
-        self%fe => fe
-        self%connectivity = connectivity
-    end subroutine initialize_observation_point_coordinate
-
-    module subroutine extract_value_coordinate(self, nodal_values, value)
-        implicit none
-        class(type_observation_point_coordinate), intent(in) :: self
-        real(real64), intent(in) :: nodal_values(:)
-        real(real64), intent(inout) :: value
-
-        value = 0.0d0
-
-        if (associated(self%fe) .and. allocated(self%connectivity)) then
-            call self%fe%lerp(self%coordinate_normalized, nodal_values(self%connectivity), value)
-        end if
-
-    end subroutine extract_value_coordinate
-
-    module subroutine initialize_observation_point_node(self, node_id)
-        implicit none
-        class(type_observation_point_node), intent(inout) :: self
-        integer(int32), intent(in) :: node_id
-
-        self%node_id = node_id
-    end subroutine initialize_observation_point_node
-
-    module subroutine extract_value_node(self, nodal_values, value)
-        implicit none
-        class(type_observation_point_node), intent(in) :: self
-        real(real64), intent(in) :: nodal_values(:)
-        real(real64), intent(inout) :: value
-
-        if (value_in_range(self%node_id, 1, size(nodal_values))) then
-            value = nodal_values(self%node_id)
-        else
-            value = 0.0d0
-        end if
-    end subroutine extract_value_node
 
 end submodule output_observation_base

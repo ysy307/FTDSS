@@ -6,8 +6,7 @@ add_library(SOLVER_INPUT STATIC)
 # ------------------------------------------------------------
 # Sources
 # ------------------------------------------------------------
-target_sources(SOLVER_INPUT
-    PRIVATE
+target_sources(SOLVER_INPUT PRIVATE
     # ----------------------------
     # Reader layer
     # ----------------------------
@@ -60,18 +59,15 @@ target_sources(SOLVER_INPUT
 # ------------------------------------------------------------
 # Fortran module output directory
 # ------------------------------------------------------------
-target_include_directories(SOLVER_INPUT
-    PUBLIC
-        ${CMAKE_CURRENT_BINARY_DIR}
+target_include_directories(SOLVER_INPUT PUBLIC
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 # ------------------------------------------------------------
 # Dependencies
 # ------------------------------------------------------------
-target_link_libraries(SOLVER_INPUT
-    PUBLIC
-        SOLVER::CORE
-        # Solver::Physics
+target_link_libraries(SOLVER_INPUT PUBLIC
+    SOLVER::CORE
 )
 
 # ------------------------------------------------------------

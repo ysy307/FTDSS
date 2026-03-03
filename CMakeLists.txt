@@ -7,8 +7,8 @@ project(FTDSS LANGUAGES Fortran C CXX)
 
 option(BUILD_TESTING "Build the testing tree" OFF)
 option(ENABLE_OPENMP "Enable OpenMP support" ON)
-option(ENABLE_MKL    "Enable MKL support" ON)
-option(ENABLE_MPI    "Enable MPI support" ON)
+option(ENABLE_MKL "Enable MKL support" ON)
+option(ENABLE_MPI "Enable MPI support" ON)
 
 # 出力先ディレクトリを統一
 set(CMAKE_Fortran_MODULE_DIRECTORY ${PROJECT_BINARY_DIR}/.mod)
@@ -40,9 +40,9 @@ include(fypp OPTIONAL)
 add_subdirectory(src/core)
 add_subdirectory(src/numerical)
 add_subdirectory(src/control)
-add_subdirectory(src/domain) 
-add_subdirectory(src/io)      
-add_subdirectory(src/physics)   
+add_subdirectory(src/domain)
+add_subdirectory(src/io)
+add_subdirectory(src/physics)
 add_subdirectory(src/app/ftdss)
 # ====================================================================
 # 4. Executable
@@ -56,13 +56,13 @@ target_link_libraries(ftdss PRIVATE SOLVER::FTDSS)
 
 if(ENABLE_MPI AND MPI_Fortran_FOUND)
     target_link_libraries(ftdss PRIVATE MPI::MPI_Fortran)
-    add_custom_target(run 
+    add_custom_target(run
         COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} 4 $<TARGET_FILE:ftdss>
         DEPENDS ftdss
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     )
 else()
-    add_custom_target(run 
+    add_custom_target(run
         COMMAND ${CMAKE_COMMAND} -E env OMP_NUM_THREADS=4 $<TARGET_FILE:ftdss>
         DEPENDS ftdss
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}

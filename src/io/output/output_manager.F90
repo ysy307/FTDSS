@@ -1,6 +1,5 @@
 module io_output_manager
     use, intrinsic :: iso_fortran_env
-    use, intrinsic :: iso_c_binding, only: c_int64_t, c_ptr, c_f_pointer, c_char, c_null_char, c_associated
     use :: omp_lib
     use :: stdlib_strings, only:to_string, strip
     use :: stdlib_io, only:open
@@ -19,9 +18,9 @@ module io_output_manager
 
     public :: type_output
 
-    ! !---------------------------------------------------------------------------
-    ! ! type_output
-    ! !---------------------------------------------------------------------------
+    !---------------------------------------------------------------------------
+    ! type_output
+    !---------------------------------------------------------------------------
     type :: type_output
         logical, private, allocatable :: active(:)
 
@@ -95,11 +94,10 @@ contains
                                        water_flux=water_flux)
     end subroutine output_fields
 
-    subroutine output_history(self, time, domain, porosity, temperature, pressure)
+    subroutine output_history(self, time, porosity, temperature, pressure)
         implicit none
         class(type_output), intent(inout) :: self
         real(real64), intent(in) :: time
-        type(type_domain), intent(inout), optional :: domain
         real(real64), intent(in), optional :: porosity(:)
         real(real64), intent(in), optional :: temperature(:)
         real(real64), intent(in), optional :: pressure(:)
@@ -109,11 +107,11 @@ contains
 
         do iObs = 1, size(self%observations)
             if (.not. self%observations(iObs)%should_output()) cycle
-            call self%observations(iObs)%get_values(obs_values=obsValues, &
-                                                    nodal_temperature=temperature, &
-                                                    nodal_porosity=porosity, &
-                                                    nodal_pw=pressure, &
-                                                    domain=domain)
+            call self%observations(iObs)%extract_value(obs_values=obsValues, &
+                                                       nodal_temperature=temperature, &
+                                                       nodal_porosity=porosity, &
+                                                       nodal_pw=pressure, &
+                                                       domain=domain)
             call self%observations(iObs)%write_line(time=time, values=obsValues)
         end do
     end subroutine output_history

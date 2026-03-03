@@ -91,31 +91,31 @@ function(enable_build_flags target)
         # ---------------------------------------------------------
         # Fortran Compile Options
         # ---------------------------------------------------------
-# Intel / IntelLLVM (Fortran)
+        # Intel / IntelLLVM (Fortran)
         if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel|IntelLLVM")
-            target_compile_options(${target} ${KEYWORD} 
+            target_compile_options(${target} ${KEYWORD}
                 # Common for Intel (Standard, Preprocessor, Traceback)
                 $<$<COMPILE_LANGUAGE:Fortran>:-stand f18 -fpp -traceback -fpscomp logicals -extend-source>
 
                 # Release: Fortran Only
                 $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Release>>:-O3 -xHost>
-                
+
                 # Debug: Fortran Only 
                 # -check all: 全チェック
                 # -fpe0: 浮動小数点例外(NaN等)で即停止
                 # -ftrapuv: 未初期化変数を変な値で埋める
                 $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Debug>>:-g -check all -fpe0 -ftrapuv>
             )
-        
-        # GNU (Fortran)
+
+            # GNU (Fortran)
         elseif(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
-            target_compile_options(${target} ${KEYWORD} 
+            target_compile_options(${target} ${KEYWORD}
                 # Common for GNU (Standard, Preprocessor)
                 $<$<COMPILE_LANGUAGE:Fortran>:-std=f2018 -cpp -flogical-argument=0/1>
 
                 # Release: Fortran Only
                 $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Release>>:-O3 -march=native>
-                
+
                 # Debug: Fortran Only
                 # -fbacktrace: 行番号を表示
                 # -fcheck=all: 全チェック（配列外参照など）
