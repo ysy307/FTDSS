@@ -7,7 +7,6 @@ add_library(SOLVER_GOVERNING STATIC)
 # Sources
 # ------------------------------------------------------------
 target_sources(SOLVER_GOVERNING PRIVATE
-
     # ====================================================
     # 1. Boundary Conditions
     # ====================================================
@@ -15,7 +14,6 @@ target_sources(SOLVER_GOVERNING PRIVATE
     condition/boundary/boundary_base.F90
     condition/boundary/boundary_manager.F90
     condition/boundary/boundary.F90
-
     # ====================================================
     # 2. Initial Conditions
     # ====================================================
@@ -23,12 +21,10 @@ target_sources(SOLVER_GOVERNING PRIVATE
     condition/initial/initial_uniform.F90
     condition/initial/initial_manager.F90
     condition/initial/initial.F90
-
     # ====================================================
     # 3. Common Base
     # ====================================================
     governing_base.F90
-
     # ====================================================
     # 4. Thermal
     # ====================================================
@@ -36,7 +32,6 @@ target_sources(SOLVER_GOVERNING PRIVATE
     thermal/thermal_base.F90
     thermal/thermal_matrix.F90
     thermal/thermal_coefficients.F90
-
     # ====================================================
     # 5. Hydraulic
     # ====================================================
@@ -44,11 +39,16 @@ target_sources(SOLVER_GOVERNING PRIVATE
     hydraulic/hydraulic_base.F90
     hydraulic/hydraulic_matrix.F90
     hydraulic/hydraulic_coefficients.F90
-
     # ====================================================
     # 6. Atmosphere
     # ====================================================
     atmosphere/atmosphere.F90
+    # ====================================================
+    # \
+    # ====================================================
+    governing.F90
+
+
 )
 
 # ------------------------------------------------------------

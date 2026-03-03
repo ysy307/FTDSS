@@ -1,8 +1,8 @@
-module module_astmosphere
+module governing_atmosphere
     use :: iso_fortran_env
     implicit none
     private
     
 contains
     
-end module module_astmosphere
+end module governing_atmosphere

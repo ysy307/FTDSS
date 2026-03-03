@@ -1,4 +1,4 @@
-submodule(main_ftdss) ftdss_compute
+submodule(app_ftdss) ftdss_compute
     implicit none
 contains
     ! --------------------------------------------------------------------------

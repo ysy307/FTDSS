@@ -1,4 +1,4 @@
-module main_ftdss
+module app_ftdss
     use, intrinsic :: iso_fortran_env
 !$  use :: omp_lib
     use :: mpi_f08
@@ -7,20 +7,17 @@ module main_ftdss
     use :: stdlib_logger
     use :: module_core
     use :: module_input, only:type_input
-    use :: module_output, only:type_output
+    use :: module_output, only:type_output_manager
 
     use :: module_control, only:type_control
     use :: module_domain, only:type_domain, abst_fe
     use :: module_boundary, only:abst_bc, type_bc_dirichlet
     use :: module_initial, only:type_ic_manager
-    use :: module_field, only:type_jacobian_matrix, type_residual_vector
-    use :: module_physics, only:g => gravity_acceleration
+    use :: module_system, only:type_jacobian_matrix, type_residual_vector
+    use :: module_constitutive, only:g => gravity_acceleration
     use :: module_linalg
 
-    use :: module_thermal, only:type_thermal
-    use :: module_hydraulic, only:type_hydraulic
-    use :: main_base, only:type_assemble_workspace
-
+    use :: module_governing, only:type_thermal, type_hydraulic, type_assemble_workspace
     use :: module_solver
     implicit none
 
@@ -45,8 +42,8 @@ module main_ftdss
 
         class(abst_solver), allocatable :: solver
 
-        type(type_control) :: controls
-        type(type_output) :: output
+        type(type_control) :: control
+        type(type_output_manager) :: output
 
     contains
         procedure, public, pass(self) :: initialize => initialize_type_ftdss
@@ -350,4 +347,4 @@ module main_ftdss
 
     end interface
 
-end module main_ftdss
+end module app_ftdss

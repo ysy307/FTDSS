@@ -1,4 +1,4 @@
-submodule(main_ftdss) ftdss_assemble
+submodule(app_ftdss) ftdss_assemble
     implicit none
 
 contains

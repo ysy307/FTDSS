@@ -1,4 +1,4 @@
-submodule(main_ftdss) ftdss_boundary
+submodule(app_ftdss) ftdss_boundary
     implicit none
 contains
 

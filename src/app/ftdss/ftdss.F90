@@ -1,5 +1,5 @@
 module module_ftdss
-    use :: main_ftdss, only:type_ftdss
+    use :: app_ftdss, only:type_ftdss
     implicit none
     private
 
