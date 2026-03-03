@@ -2,7 +2,7 @@ module governing_hydraulic
     use, intrinsic :: iso_fortran_env
     use :: module_core
     use :: module_control, only:type_control
-    use :: module_input, only:type_input
+    use :: module_input, only:type_input, input_translator
     use :: module_linalg
     use :: module_constitutive, g => gravity_acceleration
     use :: governing_base, only:type_assemble_workspace
@@ -55,30 +55,30 @@ module governing_hydraulic
         end subroutine destroy_type_hydraulic
 
         ! --- Assembly Interfaces ---
-        module subroutine assemble_local_hydraulic(self, controls, workspace, K_HH, K_HT, F_H)
+        module subroutine assemble_local_hydraulic(self, control, workspace, K_HH, K_HT, F_H)
             implicit none
             class(type_hydraulic), intent(in) :: self
-            type(type_control), intent(in) :: controls
+            type(type_control), intent(in) :: control
             type(type_assemble_workspace), intent(inout) :: workspace
             type(type_matrix_dense), intent(inout), optional :: K_HH
             type(type_matrix_dense), intent(inout), optional :: K_HT
             type(type_vector_dp), intent(inout), optional :: F_H
         end subroutine assemble_local_hydraulic
 
-        module subroutine assemble_local_newton_hydraulic(self, controls, workspace, K_HH, K_HT, F_H)
+        module subroutine assemble_local_newton_hydraulic(self, control, workspace, K_HH, K_HT, F_H)
             implicit none
             class(type_hydraulic), intent(in) :: self
-            type(type_control), intent(in) :: controls
+            type(type_control), intent(in) :: control
             type(type_assemble_workspace), intent(inout) :: workspace
             type(type_matrix_dense), intent(inout), optional :: K_HH
             type(type_matrix_dense), intent(inout), optional :: K_HT
             type(type_vector_dp), intent(inout), optional :: F_H
         end subroutine assemble_local_newton_hydraulic
 
-        module subroutine assemble_local_picard_hydraulic(self, controls, workspace, K_HH, K_HT, F_H)
+        module subroutine assemble_local_picard_hydraulic(self, control, workspace, K_HH, K_HT, F_H)
             implicit none
             class(type_hydraulic), intent(in) :: self
-            type(type_control), intent(in) :: controls
+            type(type_control), intent(in) :: control
             type(type_assemble_workspace), intent(inout) :: workspace
             type(type_matrix_dense), intent(inout), optional :: K_HH
             type(type_matrix_dense), intent(inout), optional :: K_HT

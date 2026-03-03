@@ -3,19 +3,19 @@ submodule(governing_thermal) thermal_matrix
 contains
 
     !> @brief 局所（要素）行列と残差ベクトルのアセンブルを行う
-    module subroutine assemble_local_thermal(self, controls, workspace, K_TT, K_TH, F_T)
+    module subroutine assemble_local_thermal(self, control, workspace, K_TT, K_TH, F_T)
         implicit none
         class(type_thermal), intent(in) :: self
-        type(type_control), intent(in) :: controls
+        type(type_control), intent(in) :: control
         type(type_assemble_workspace), intent(inout) :: workspace
         type(type_matrix_dense), intent(inout), optional :: K_TT
         type(type_matrix_dense), intent(inout), optional :: K_TH
         type(type_vector_dp), intent(inout), optional :: F_T
 
-        if (controls%iteration%is_compute_newton()) then
-            call self%assemble_local_newton(controls, workspace, K_TT, K_TH, F_T)
-        else if (controls%iteration%is_compute_picard()) then
-            call self%assemble_local_picard(controls, workspace, K_TT, K_TH, F_T)
+        if (control%is_compute_newton()) then
+            call self%assemble_local_newton(control, workspace, K_TT, K_TH, F_T)
+        else if (control%is_compute_picard()) then
+            call self%assemble_local_picard(control, workspace, K_TT, K_TH, F_T)
         end if
 
     end subroutine assemble_local_thermal
@@ -24,10 +24,10 @@ contains
     ! Newton-Raphson Assembly (Tangent Stiffness & Enthalpy Residual)
     ! ==========================================================================
     !> @brief Newton-Raphson法による接線剛性行列と残差ベクトルの計算
-    module subroutine assemble_local_newton_thermal(self, controls, workspace, K_TT, K_TH, F_T)
+    module subroutine assemble_local_newton_thermal(self, control, workspace, K_TT, K_TH, F_T)
         implicit none
         class(type_thermal), intent(in) :: self
-        type(type_control), intent(in) :: controls
+        type(type_control), intent(in) :: control
         type(type_assemble_workspace), intent(inout) :: workspace
         type(type_matrix_dense), intent(inout), optional :: K_TT
         type(type_matrix_dense), intent(inout), optional :: K_TH
@@ -67,7 +67,7 @@ contains
             ! Jacobian += bdf0 * MassMatrix
             do j = 1, workspace%num_fe_nodes
                 do i = 1, workspace%num_fe_nodes
-                    call K_TT%set(OP_ADD, i, j, bdf0 * workspace%work_matrix(i, j))
+                    call K_TT%set(MATRIX_OPS%ADD, i, j, bdf0 * workspace%work_matrix(i, j))
                 end do
             end do
         end if
@@ -79,7 +79,7 @@ contains
             call workspace%compute_R1(workspace%work_d_dt, workspace%work_vec)
 
             do i = 1, workspace%num_fe_nodes
-                call F_T%set(OP_ADD, i, -workspace%work_vec(i))
+                call F_T%set(MATRIX_OPS%ADD, i, -workspace%work_vec(i))
             end do
         end if
 
@@ -91,7 +91,7 @@ contains
             ! Jacobian += StiffnessMatrix
             do j = 1, workspace%num_fe_nodes
                 do i = 1, workspace%num_fe_nodes
-                    call K_TT%set(OP_ADD, i, j, workspace%work_matrix(i, j))
+                    call K_TT%set(MATRIX_OPS%ADD, i, j, workspace%work_matrix(i, j))
                 end do
             end do
         end if
@@ -103,7 +103,7 @@ contains
             call matvec(workspace%work_matrix, workspace%T_node, workspace%work_vec, ierr)
 
             do i = 1, workspace%num_fe_nodes
-                call F_T%set(OP_ADD, i, -workspace%work_vec(i))
+                call F_T%set(VECTOR_OPS%ADD, i, -workspace%work_vec(i))
             end do
         end if
 
@@ -113,10 +113,10 @@ contains
     ! Picard Assembly (Secant Stiffness & Linearized Residual)
     ! ==========================================================================
     !> @brief 修正Picard法による線形化行列と右辺ベクトルの計算
-    module subroutine assemble_local_picard_thermal(self, controls, workspace, K_TT, K_TH, F_T)
+    module subroutine assemble_local_picard_thermal(self, control, workspace, K_TT, K_TH, F_T)
         implicit none
         class(type_thermal), intent(in) :: self
-        type(type_control), intent(in) :: controls
+        type(type_control), intent(in) :: control
         type(type_assemble_workspace), intent(inout) :: workspace
         type(type_matrix_dense), intent(inout), optional :: K_TT
         type(type_matrix_dense), intent(inout), optional :: K_TH
@@ -164,7 +164,7 @@ contains
         if (present(K_TT)) then
             do i = 1, workspace%num_fe_nodes
                 do j = 1, workspace%num_fe_nodes
-                    call K_TT%set(OP_ADD, i, j, bdf0 * workspace%work_matrix(i, j))
+                    call K_TT%set(MATRIX_OPS%ADD, i, j, bdf0 * workspace%work_matrix(i, j))
                 end do
             end do
         end if
@@ -178,7 +178,7 @@ contains
         if (present(K_TT)) then
             do i = 1, workspace%num_fe_nodes
                 do j = 1, workspace%num_fe_nodes
-                    call K_TT%set(OP_ADD, i, j, workspace%work_matrix(i, j))
+                    call K_TT%set(MATRIX_OPS%ADD, i, j, workspace%work_matrix(i, j))
                 end do
             end do
         end if
@@ -207,7 +207,7 @@ contains
                 val_T = -local_vec_transient(i) ! 厳密なエンタルピー変化
                 val_T = val_T - local_vec_diff_flux(i) ! 現在の拡散流出
 
-                call F_T%set(OP_ADD, i, val_T)
+                call F_T%set(VECTOR_OPS%ADD, i, val_T)
             end do
         end if
 

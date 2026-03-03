@@ -1,6 +1,8 @@
 module control_time_profiler
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
+#ifdef _OPENMP
     use :: omp_lib
+#endif
     use :: stdlib_strings, only:strip, to_string
     use :: module_core
     implicit none

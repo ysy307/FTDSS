@@ -13,6 +13,7 @@ module io_input_translator
             execute_condition_acceleration, &
             execute_condition_time, &
             execute_condition_time_ats, &
+            execute_basic_properties, &
             execute_basic_swcc, &
             execute_basic_gcc, &
             execute_basic_iteration, &
@@ -29,6 +30,7 @@ module io_input_translator
         procedure, private, pass(self) :: execute_condition_acceleration
         procedure, private, pass(self) :: execute_condition_time
         procedure, private, pass(self) :: execute_condition_time_ats
+        procedure, private, pass(self) :: execute_basic_properties
         procedure, private, pass(self) :: execute_basic_swcc
         procedure, private, pass(self) :: execute_basic_gcc
         procedure, private, pass(self) :: execute_basic_iteration
@@ -87,6 +89,16 @@ module io_input_translator
             class(type_config_time_ats), intent(inout) :: config
 
         end subroutine execute_condition_time_ats
+
+        module subroutine execute_basic_properties(self, input, material_id, target_property,config)
+            implicit none
+            class(type_input_translator), intent(in) :: self
+            class(type_input), intent(in) :: input
+            integer(int32), intent(in) :: material_id
+            type(type_constant_id), intent(in) :: target_property
+            class(type_config_constitutive), intent(inout) :: config
+
+        end subroutine execute_basic_properties
 
         module subroutine execute_basic_swcc(self, input, material_id, config)
             implicit none

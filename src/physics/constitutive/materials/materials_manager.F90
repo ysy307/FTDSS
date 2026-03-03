@@ -21,7 +21,7 @@ module constitutive_materials_manager
     contains
         ! ---- Lifecycle ----
         ! initialize, destroy, reset, etc.
-        procedure, public :: initialize
+        procedure, public :: initialize => initialize_type_material_manager
 
         ! ---- Mutator ----
         ! set_XXX, increment_XXX, update_XXX, etc.
@@ -55,14 +55,14 @@ module constitutive_materials_manager
 
 contains
 
-    subroutine initialize(self, material_id, den_info, sph_info, vhc_info, thc_info, water, ice)
+    subroutine initialize_type_material_manager(self, material_id, config_den, config_sph, config_vhc, config_thc, water, ice)
         implicit none
         class(type_material_manager), intent(inout) :: self
         integer(int32), intent(in) :: material_id
-        type(type_config_constitutive), intent(in), optional :: den_info
-        type(type_config_constitutive), intent(in), optional :: sph_info
-        type(type_config_constitutive), intent(in), optional :: vhc_info
-        type(type_config_constitutive), intent(in), optional :: thc_info
+        type(type_config_constitutive), intent(in), optional :: config_den
+        type(type_config_constitutive), intent(in), optional :: config_sph
+        type(type_config_constitutive), intent(in), optional :: config_vhc
+        type(type_config_constitutive), intent(in), optional :: config_thc
 
         type(type_iapws97), intent(in), optional, target :: water
         type(type_iapws06), intent(in), optional, target :: ice
@@ -75,31 +75,31 @@ contains
             is_present_iapws = .true.
         end if
 
-        if (present(den_info)) then
+        if (present(config_den)) then
             if (.not. is_present_iapws) then
-                error stop "Error in material_manager%initialize: water and ice must be provided when den_info is provided."
+                error stop "Error in material_manager%initialize: water and ice must be provided when config_den is provided."
             end if
-            call self%den%initialize(material_id, den_info, water, ice)
+            call self%den%initialize(material_id, config_den, water, ice)
         end if
-        if (present(sph_info)) then
+        if (present(config_sph)) then
             if (.not. is_present_iapws) then
-                error stop "Error in material_manager%initialize: water and ice must be provided when sph_info is provided."
+                error stop "Error in material_manager%initialize: water and ice must be provided when config_sph is provided."
             end if
-            call self%sph%initialize(material_id, sph_info, water, ice)
+            call self%sph%initialize(material_id, config_sph, water, ice)
         end if
-        if (present(vhc_info)) then
+        if (present(config_vhc)) then
             if (.not. is_present_iapws) then
-                error stop "Error in material_manager%initialize: water and ice must be provided when vhc_info is provided."
+                error stop "Error in material_manager%initialize: water and ice must be provided when config_vhc is provided."
             end if
-            call self%vhc%initialize(material_id, vhc_info, water, ice)
+            call self%vhc%initialize(material_id, config_vhc, water, ice)
         end if
-        if (present(thc_info)) then
+        if (present(config_thc)) then
             if (.not. is_present_iapws) then
-                error stop "Error in material_manager%initialize: water and ice must be provided when thc_info is provided."
+                error stop "Error in material_manager%initialize: water and ice must be provided when config_thc is provided."
             end if
-            call self%thc%initialize(material_id, thc_info, water, ice)
+            call self%thc%initialize(material_id, config_thc, water, ice)
         end if
-    end subroutine initialize
+    end subroutine initialize_type_material_manager
 
     subroutine calc_density(self, state, density)
         implicit none

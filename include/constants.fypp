@@ -459,6 +459,23 @@
         'id_range' : [0, 4] &
     }
 
+    #:set CONSTITUTIVE_PROPERTIES = { &
+        'type_name' : 'type_constitutive_properties', &
+        'obj_name'  : 'CONSTITUTIVE_PROPERTIES', &
+        'category'  : 'CONSTITUTIVE_PROPERTY', &
+        'suffix'    : 'constitutive_property', &
+        'description': 'Constitutive properties', &
+        'items'     : [ &
+            ('NONE', 0, 'none'), &
+            ('DENSITY', 1, 'density'), &
+            ('SPECIFIC_HEAT', 2, 'specific_heat'), &
+            ('VOLUMETRIC_HEAT_CAPACITY', 3, 'volumetric_heat_capacity'), &
+            ('THERMAL_CONDUCTIVITY', 4, 'thermal_conductivity'), &
+        ], &
+        'num' : 5, &
+        'id_range' : [0, 4] &
+    }
+
 
     #:set FE_TYPES = { &
         'type_name' : 'type_fe_types', &
@@ -737,6 +754,7 @@
         OUTPUT_OBSERVATION_TYPES, &
         OUTPUT_VARIABLE_TYPES, &
         VECTOR_NORM_CRITERIA, &
+        CONSTITUTIVE_PROPERTIES, &
         PROFILER_TYPES &
     ]
 

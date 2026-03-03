@@ -21,17 +21,16 @@ contains
         type(type_solver_settings) :: solver_info
         type(type_preconditioner_settings) :: pc_info
 
-        profiler_labels = [character(len=10) :: "IO", "Setup", "Assemble", "Solve", "Total"]
-        call self%controls%profiler%initialize(profiler_labels)
-        call self%controls%profiler%record(TIME_RECORDS%START%ID)
-        call self%controls%profiler%start("Total")
+        call self%control%initialize()
+        call self%control%profiler_record(TIME_RECORDS%START)
+        call self%control%profiler_start(PROFILER_TYPES%TOTAL)
 
         ! call setup_handler()
 
-        call self%controls%profiler%start("IO")
+        call self%control%profiler_start(PROFILER_TYPES%IO)
         call input%initialize()
-        call self%controls%profiler%stop("IO")
-        call self%controls%initialize(input)
+        call self%control%profiler_stop(PROFILER_TYPES%IO)
+        call self%control%initialize(input)
         call ic%initialize(input)
 
         if (input%output_settings%standard_output%print_progress) then
@@ -111,17 +110,17 @@ contains
         real(real64), pointer, contiguous, dimension(:) :: pressure
         real(real64), pointer, contiguous, dimension(:) :: ice_content
 
-        call self%controls%profiler%start("IO")
+        call self%control%profiler_start(PROFILER_TYPES%IO)
 
         nullify (porosity)
         nullify (temperature)
         nullify (pressure)
         nullify (ice_content)
 
-        call self%controls%time%get_time(current_time)
+        call self%control%time%get_time(current_time)
 
-        if (self%controls%is_output_triggered(OUTPUT_TYPES%FIELD, current_time)) then
-            call self%controls%get_output_step_control(OUTPUT_TYPES%FIELD, iter)
+        if (self%control%is_output_triggered(OUTPUT_TYPES%FIELD, current_time)) then
+            call self%control%get_output_step_control(OUTPUT_TYPES%FIELD, iter)
             call self%porosity%get_previous(porosity)
             if (self%is_active_thermal()) then
                 call self%temperature%get_previous(temperature)
@@ -132,7 +131,7 @@ contains
             call self%Qi%get_previous(ice_content)
             call self%output%output_fields(iter, self%domain, porosity, &
                                            temperature, ice_content, pressure)
-            call self%controls%update_output(OUTPUT_TYPES%FIELD, current_time)
+            call self%control%update_output(OUTPUT_TYPES%FIELD, current_time)
 
             nullify (porosity)
             nullify (temperature)
@@ -140,7 +139,7 @@ contains
             nullify (ice_content)
         end if
 
-        call self%controls%profiler%stop("IO")
+        call self%control%profiler_stop(PROFILER_TYPES%IO)
     end subroutine output_fields_ftdss
 
     module subroutine output_history_ftdss(self)
@@ -152,15 +151,15 @@ contains
         real(real64), pointer, contiguous, dimension(:) :: temperature
         real(real64), pointer, contiguous, dimension(:) :: pressure
 
-        call self%controls%profiler%start("IO")
+        call self%control%profiler_start(PROFILER_TYPES%IO)
 
         nullify (porosity)
         nullify (temperature)
         nullify (pressure)
 
-        call self%controls%time%get_time(current_time)
+        call self%control%time%get_time(current_time)
 
-        if (self%controls%is_output_triggered(OUTPUT_TYPES%HISTORY, current_time)) then
+        if (self%control%is_output_triggered(OUTPUT_TYPES%HISTORY, current_time)) then
             call self%porosity%get_previous(porosity)
             if (self%is_active_thermal()) then
                 call self%temperature%get_previous(temperature)
@@ -168,17 +167,17 @@ contains
             if (self%is_active_hydraulic()) then
                 call self%pressure%get_previous(pressure)
             end if
-            call self%controls%get_output_time(OUTPUT_TYPES%HISTORY, current_time, current_time_converted)
+            call self%control%get_output_time(OUTPUT_TYPES%HISTORY, current_time, current_time_converted)
             call self%output%output_history(current_time_converted, self%domain, porosity, &
                                             temperature, pressure)
-            call self%controls%update_output(OUTPUT_TYPES%HISTORY, current_time)
+            call self%control%update_output(OUTPUT_TYPES%HISTORY, current_time)
 
             nullify (porosity)
             nullify (temperature)
             nullify (pressure)
         end if
 
-        call self%controls%profiler%stop("IO")
+        call self%control%profiler_stop(PROFILER_TYPES%IO)
     end subroutine output_history_ftdss
 
     module subroutine get_variable_increment_ftdss(self, variable_id, variable)
@@ -207,7 +206,7 @@ contains
             return
         end if
 
-        if (self%controls%is_physics_active(variable_id)) then
+        if (self%control%is_physics_active(variable_id)) then
             call self%domain%get_num_nodes(num_nodes)
             call self%domain%get_num_dofs_per_node(num_dofs_per_node)
             call self%domain%get_target_dof(variable_id%ID, target_dof)
@@ -252,7 +251,7 @@ contains
             return
         end if
 
-        if (self%controls%is_physics_active(variable_id)) then
+        if (self%control%is_physics_active(variable_id)) then
             call self%domain%get_num_nodes(num_nodes)
             call self%domain%get_num_dofs_per_node(num_dofs_per_node)
             call self%domain%get_target_dof(variable_id%ID, target_dof)
@@ -291,10 +290,10 @@ contains
 
         call state%reset()
 
-        call self%controls%time%get_bdf_order(bdf_order)
+        call self%control%time%get_bdf_order(bdf_order)
 
         ! --- 基本変数と履歴の取得 (ここは常に実行) ---
-        if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
+        if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             call self%temperature%get_current(node_id, temperature)
             call self%temperature%get_current_gradient(node_id, grad_T)
             call self%temperature%get_history(node_id, temperature_history)
@@ -302,7 +301,7 @@ contains
                            grad_T=grad_T, &
                            temperature_history=temperature_history(1:bdf_order + 1))
         end if
-        if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
+        if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
             call self%pressure%get_current(node_id, pressure)
             call self%pressure%get_current_gradient(node_id, grad_P)
             call self%pressure%get_history(node_id, pressure_history)
@@ -339,7 +338,7 @@ contains
 
         ! 2. 流束計算 (advectionやdiffusionで使用)
         !    Stateに入っている勾配(grad_T, grad_P)を使用
-        if (self%controls%is_target(PHYSICS_TYPES%HYDRAULIC, material_id)) then
+        if (self%control%is_target(PHYSICS_TYPES%HYDRAULIC, material_id)) then
             call state%grad_T%get(grad_T)
             call state%grad_P%get(grad_P)
             call self%calc_water_flux(material_id, state, grad_T, grad_P, water_flux)
@@ -356,7 +355,7 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
-        call self%controls%profiler%start("Setup")
+        call self%control%profiler_start(PROFILER_TYPES%SETUP)
 
         if (self%is_active_thermal()) then
             call self%temperature%advance()
@@ -372,7 +371,7 @@ contains
         call self%Qa%advance()
         call self%Qv%advance()
 
-        call self%controls%profiler%stop("Setup")
+        call self%control%profiler_stop(PROFILER_TYPES%SETUP)
     end subroutine shift_ftdss
 
     module subroutine reflect_variables_ftdss(self)
@@ -388,17 +387,17 @@ contains
         real(real64) :: relaxation_factor
         logical :: is_none
 
-        call self%controls%profiler%start("Setup")
+        call self%control%profiler_start(PROFILER_TYPES%SETUP)
 
         nullify (current)
         nullify (bdf_coeffs)
 
-        call self%controls%iteration%get_nonlinear_iter(iter)
+        call self%control%iteration%get_nonlinear_iter(iter)
 
-        call self%controls%time%get_bdf_coeffs(bdf_coeffs)
-        call self%controls%time%get_bdf_order(bdf_order)
+        call self%control%time%get_bdf_coeffs(bdf_coeffs)
+        call self%control%time%get_bdf_order(bdf_order)
 
-        is_none = self%controls%iteration%is_none()
+        is_none = self%control%iteration%is_none()
 
         if (self%is_active_thermal()) then
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du)
@@ -406,9 +405,9 @@ contains
             if (associated(current)) then
                 if (.not. is_none) then
                     if (iter > 1) then
-                        call self%controls%aitken%compute_relaxation(PHYSICS_TYPES%THERMAL, du)
+                        call self%control%aitken%compute_relaxation(PHYSICS_TYPES%THERMAL, du)
                     end if
-                    call self%controls%aitken%get_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
+                    call self%control%aitken%get_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
                     write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
                 else
                     relaxation_factor = 1.0d0
@@ -416,7 +415,7 @@ contains
                 current(:) = current(:) + relaxation_factor * du(:)
                 call self%temperature%set_delta(relaxation_factor * du(:))
                 if (.not. is_none) then
-                    call self%controls%aitken%set_du(PHYSICS_TYPES%THERMAL, du)
+                    call self%control%aitken%set_du(PHYSICS_TYPES%THERMAL, du)
                 end if
             end if
 
@@ -432,9 +431,9 @@ contains
             if (associated(current)) then
                 if (.not. is_none) then
                     if (iter > 1) then
-                        call self%controls%aitken%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, du)
+                        call self%control%aitken%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, du)
                     end if
-                    call self%controls%aitken%get_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
+                    call self%control%aitken%get_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
                     write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
                 else
                     relaxation_factor = 1.0d0
@@ -442,7 +441,7 @@ contains
                 current(:) = current(:) + relaxation_factor * du(:)
                 call self%pressure%set_delta(relaxation_factor * du(:))
                 if (.not. is_none) then
-                    call self%controls%aitken%set_du(PHYSICS_TYPES%HYDRAULIC, du)
+                    call self%control%aitken%set_du(PHYSICS_TYPES%HYDRAULIC, du)
                 end if
             end if
 
@@ -452,7 +451,7 @@ contains
             call deallocate_array(du)
         end if
 
-        call self%controls%profiler%stop("Setup")
+        call self%control%profiler_stop(PROFILER_TYPES%SETUP)
 
     end subroutine reflect_variables_ftdss
 
@@ -460,7 +459,7 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
 
-        call self%controls%iteration%reset()
+        call self%control%iteration%reset()
 
     end subroutine reset_ftdss
 
@@ -469,7 +468,7 @@ contains
         class(type_ftdss), intent(in) :: self
         logical :: is_active
 
-        is_active = self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)
+        is_active = self%control%is_physics_active(PHYSICS_TYPES%THERMAL)
 
     end function is_active_thermal_ftdss
 
@@ -478,7 +477,7 @@ contains
         class(type_ftdss), intent(in) :: self
         logical :: is_active
 
-        is_active = self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)
+        is_active = self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)
 
     end function is_active_hydraulic_ftdss
 
@@ -492,12 +491,12 @@ contains
 #endif
 
         ! --- Stop and Record Profiler ---
-        call self%controls%profiler%stop("Total")
-        call self%controls%profiler%record(TIME_RECORDS%END%ID)
+        call self%control%profiler_stop(PROFILER_TYPES%TOTAL)
+        call self%control%profiler_record(TIME_RECORDS%END%ID)
 
         call self%output%output_system_log()
         call self%output%get_log_io_unit(log_io_unit)
-        call self%controls%profiler%display(log_io_unit)
+        call self%control%profiler%display(log_io_unit)
 
 #ifdef _MPI
         call MPI_Finalize(ierr)

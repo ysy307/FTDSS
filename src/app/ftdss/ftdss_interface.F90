@@ -1,6 +1,6 @@
 module app_ftdss
     use, intrinsic :: iso_fortran_env
-!$  use :: omp_lib
+    use :: omp_lib
     use :: mpi_f08
 
     use :: stdlib_optval, only:optval

@@ -38,6 +38,9 @@ module core_control_manager
         procedure, public, pass(self) :: update_output => update_output_control
 
         ! ---- Algorithm / Operation ----
+        procedure, public, pass(self) :: profiler_start => profiler_start_control
+        procedure, public, pass(self) :: profiler_stop => profiler_stop_control
+        procedure, public, pass(self) :: profiler_record => profiler_record_control
 
         ! ---- Inquiry ----
         procedure, public, pass(self) :: is_physics_active => is_physics_active_control
@@ -46,6 +49,13 @@ module core_control_manager
         procedure, public, pass(self) :: is_staggered => is_staggered_control
         procedure, public, pass(self) :: is_end_time => is_end_time_control
         procedure, public, pass(self) :: is_output_triggered => is_output_triggered_control
+        ! - iteration
+        procedure, public, pass(self) :: is_compute_newton => is_compute_newton_control
+        procedure, public, pass(self) :: is_compute_picard => is_compute_picard_control
+        procedure, public, pass(self) :: is_compute_none => is_compute_none_control
+        procedure, public, pass(self) :: is_newton => is_newton_control
+        procedure, public, pass(self) :: is_picard => is_picard_control
+        procedure, public, pass(self) :: is_none => is_none_control
 
         ! ---- Getter ----
         procedure, public, pass(self) :: get_coupling_mode => get_coupling_mode_control
@@ -217,6 +227,60 @@ contains
 
     end function is_staggered_control
 
+    pure function is_compute_newton_control(self) result(is_compute_newton)
+        implicit none
+        class(type_control), intent(in) :: self
+        logical :: is_compute_newton
+
+        is_compute_newton = self%iteration%is_compute_newton()
+
+    end function is_compute_newton_control
+
+    pure function is_compute_picard_control(self) result(is_compute_picard)
+        implicit none
+        class(type_control), intent(in) :: self
+        logical :: is_compute_picard
+
+        is_compute_picard = self%iteration%is_compute_picard()
+
+    end function is_compute_picard_control
+
+    pure function is_compute_none_control(self) result(is_compute_none)
+        implicit none
+        class(type_control), intent(in) :: self
+        logical :: is_compute_none
+
+        is_compute_none = self%iteration%is_compute_none()
+
+    end function is_compute_none_control
+
+    pure function is_newton_control(self) result(is_newton)
+        implicit none
+        class(type_control), intent(in) :: self
+        logical :: is_newton
+
+        is_newton = self%iteration%is_newton()
+
+    end function is_newton_control
+
+    pure function is_picard_control(self) result(is_picard)
+        implicit none
+        class(type_control), intent(in) :: self
+        logical :: is_picard
+
+        is_picard = self%iteration%is_picard()
+
+    end function is_picard_control
+
+    pure function is_none_control(self) result(is_none)
+        implicit none
+        class(type_control), intent(in) :: self
+        logical :: is_none
+
+        is_none = self%iteration%is_none()
+
+    end function is_none_control
+
     subroutine reset_controls(self)
         implicit none
         class(type_control), intent(inout) :: self
@@ -378,4 +442,33 @@ contains
         end select
 
     end subroutine update_output_control
+
+    subroutine profiler_start_control(self, label)
+        implicit none
+        !> Profiler manager object
+        class(type_control), intent(inout) :: self
+        !> Identifier for the profiler record
+        type(type_constant_id), intent(in) :: label
+
+        call self%profiler%start(label)
+
+    end subroutine profiler_start_control
+
+    subroutine profiler_stop_control(self, label)
+        implicit none
+        class(type_control), intent(inout) :: self
+        type(type_constant_id), intent(in) :: label
+
+        call self%profiler%stop(label)
+
+    end subroutine profiler_stop_control
+
+    subroutine profiler_record_control(self, label)
+        implicit none
+        class(type_control), intent(inout) :: self
+        type(type_constant_id), intent(in) :: label
+
+        call self%profiler%record(label)
+
+    end subroutine profiler_record_control
 end module core_control_manager

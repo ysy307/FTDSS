@@ -22,7 +22,7 @@ module constitutive_manager
         integer(int32), allocatable :: materials_id_map(:)
         integer(int32) :: num_materials
     contains
-        procedure, public :: initialize => initialize_physics_manager
+        procedure, public :: initialize => initialize_constitutive_manager
         procedure, private :: set_map => set_map_materials
 
         procedure, public :: calc_density
@@ -61,16 +61,16 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     ! Initialization
     !-------------------------------------------------------------------------------------------------------------------------------
-    subroutine initialize_physics_manager(self, unique_material_ids, density_info, &
-                                          specific_heat_info, heat_capacity_info, thermal_conductivity_info, &
-                                          configs_wrf, configs_hcf, configs_gcc)
+    subroutine initialize_constitutive_manager(self, unique_material_ids, configs_density, &
+                                               configs_specific_heat, configs_heat_capacity, configs_thermal_conductivity, &
+                                               configs_wrf, configs_hcf, configs_gcc)
         implicit none
         class(type_constitutive_manager), intent(inout) :: self
         integer(int32), intent(in) :: unique_material_ids(:)
-        type(type_config_constitutive), intent(in), optional :: density_info(:)
-        type(type_config_constitutive), intent(in), optional :: specific_heat_info(:)
-        type(type_config_constitutive), intent(in), optional :: heat_capacity_info(:)
-        type(type_config_constitutive), intent(in), optional :: thermal_conductivity_info(:)
+        type(type_config_constitutive), intent(in), optional :: configs_density(:)
+        type(type_config_constitutive), intent(in), optional :: configs_specific_heat(:)
+        type(type_config_constitutive), intent(in), optional :: configs_heat_capacity(:)
+        type(type_config_constitutive), intent(in), optional :: configs_thermal_conductivity(:)
         type(type_config_wrf), intent(in), optional :: configs_wrf(:)
         type(type_config_hcf), intent(in), optional :: configs_hcf(:)
         type(type_config_gcc), intent(in), optional :: configs_gcc(:)
@@ -93,41 +93,41 @@ contains
         end if
 
         ! Density
-        if (present(density_info)) then
+        if (present(configs_density)) then
             do model_idx = 1, self%num_materials
                 current_material_id = unique_material_ids(model_idx)
                 call self%materials(model_idx)%initialize(material_id=current_material_id, &
-                                                          den_info=density_info(model_idx), &
+                                                          config_den=configs_density(model_idx), &
                                                           water=self%water, ice=self%ice)
             end do
         end if
 
         ! Specific Heat
-        if (present(specific_heat_info)) then
+        if (present(configs_specific_heat)) then
             do model_idx = 1, self%num_materials
                 current_material_id = unique_material_ids(model_idx)
                 call self%materials(model_idx)%initialize(material_id=current_material_id, &
-                                                          sph_info=specific_heat_info(model_idx), &
+                                                          config_sph=configs_specific_heat(model_idx), &
                                                           water=self%water, ice=self%ice)
             end do
         end if
 
         ! Volumetric Heat Capacity
-        if (present(heat_capacity_info)) then
+        if (present(configs_heat_capacity)) then
             do model_idx = 1, self%num_materials
                 current_material_id = unique_material_ids(model_idx)
                 call self%materials(model_idx)%initialize(material_id=current_material_id, &
-                                                          vhc_info=heat_capacity_info(model_idx), &
+                                                          config_vhc=configs_heat_capacity(model_idx), &
                                                           water=self%water, ice=self%ice)
             end do
         end if
 
         ! Thermal Conductivity
-        if (present(thermal_conductivity_info)) then
+        if (present(configs_thermal_conductivity)) then
             do model_idx = 1, self%num_materials
                 current_material_id = unique_material_ids(model_idx)
                 call self%materials(model_idx)%initialize(material_id=current_material_id, &
-                                                          thc_info=thermal_conductivity_info(model_idx), &
+                                                          config_thc=configs_thermal_conductivity(model_idx), &
                                                           water=self%water, ice=self%ice)
             end do
         end if
@@ -143,7 +143,7 @@ contains
         end if
 
         ! HCF Model
-        if ( present(configs_hcf)) then
+        if (present(configs_hcf)) then
             do model_idx = 1, self%num_materials
                 current_material_id = unique_material_ids(model_idx)
                 call self%models(model_idx)%initialize(material_id=current_material_id, &
@@ -162,7 +162,7 @@ contains
             end do
         end if
 
-    end subroutine initialize_physics_manager
+    end subroutine initialize_constitutive_manager
 
     subroutine set_map_materials(self, unique_material_ids)
         implicit none

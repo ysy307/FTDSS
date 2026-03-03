@@ -27,7 +27,7 @@ contains
         ! OpenMP用
         integer(int32) :: num_threads, tid
 
-        call self%controls%profiler%start("Setup")
+        call self%control%profiler_start(PROFILER_TYPES%SETUP)
         
         call self%domain%get_num_nodes(num_nodes)
 
@@ -112,7 +112,7 @@ contains
 
         if (allocated(states)) deallocate(states)
 
-        call self%controls%profiler%stop("Setup")
+        call self%control%profiler_stop(PROFILER_TYPES%SETUP)
 
     end subroutine update_variables_ftdss
 
@@ -124,7 +124,7 @@ contains
         type(type_vector_dp), pointer :: F_ptr => null()
         type(type_vector_dp), pointer :: du_ptr => null()
 
-        call self%controls%profiler%start("Solve")
+        call self%control%profiler_start(PROFILER_TYPES%SOLVE)
 
         K_ptr => self%K%get_matrix()
         F_ptr => self%F%get_vector()
@@ -137,7 +137,7 @@ contains
         nullify (F_ptr)
         nullify (du_ptr)
 
-        call self%controls%profiler%stop("Solve")
+        call self%control%profiler_stop(PROFILER_TYPES%SOLVE)
 
     end subroutine solve_ftdss
 
@@ -174,7 +174,7 @@ contains
         integer(int32) :: n_nodes_elem, n_gauss
         integer(int32) :: i, p, k, d, global_nid
 
-        call self%domain%get_num_elements(num_elements)
+        call self%domain%get_num_fe(num_elements)
         call self%domain%get_num_nodes(num_total_nodes)
         call self%domain%get_computation_dimension(dim)
 
@@ -188,17 +188,17 @@ contains
         if (allocated(elem_u)) deallocate (elem_u)
         if (allocated(psi)) deallocate (psi)
         if (allocated(dpsi_dx)) deallocate (dpsi_dx)
-        ! node_coordsは get_element_coordinate 内で handle されるためここでは deallocate しない方が安全だが、
+        ! node_coordsは get_fe_coordinate 内で handle されるためここでは deallocate しない方が安全だが、
         ! エラー回避のために明示的に ensure することも可能。
-        ! ここでは元のコードの意図通り get_element_coordinate に任せる。
+        ! ここでは元のコードの意図通り get_fe_coordinate に任せる。
 
         allocate (elem_u(20))
         allocate (psi(20))
         allocate (dpsi_dx(dim, 20))
 
         do i = 1, num_elements
-            call self%domain%get_element(i, fe)
-            call self%domain%get_element_connectivity(i, p_conn)
+            call self%domain%get_fe(i, fe)
+            call self%domain%get_fe_connectivity(i, p_conn)
 
             call fe%get_num_nodes(n_nodes_elem)
             call fe%get_num_gauss(n_gauss)
@@ -209,7 +209,7 @@ contains
             elem_u(1:n_nodes_elem) = values_vec(p_conn(1:n_nodes_elem))
 
             ! 座標取得 (allocatable引数)
-            call self%domain%get_element_coordinate(i, node_coords)
+            call self%domain%get_fe_coordinate(i, node_coords)
 
             do p = 1, n_gauss
                 r = fe_gauss_pts(p)
@@ -266,7 +266,7 @@ contains
         real(real64), pointer, contiguous, dimension(:) :: temperature => null()
         type(type_coordinate_array_dp), pointer :: grad_T
 
-        if (.not. self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) return
+        if (.not. self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) return
 
         call self%temperature%get_current(temperature)
         call self%temperature%get_current_gradient(grad_T)
@@ -285,7 +285,7 @@ contains
         real(real64), pointer, contiguous, dimension(:) :: pressure => null()
         type(type_coordinate_array_dp), pointer :: grad_P
 
-        if (.not. self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) return
+        if (.not. self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) return
 
         call self%pressure%get_current(pressure)
         call self%pressure%get_current_gradient(grad_P)

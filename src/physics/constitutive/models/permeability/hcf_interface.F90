@@ -19,55 +19,6 @@ module models_hcf
     public :: type_hcf_impedance_viscosity
     public :: type_hcf_base_impedance_viscosity
 
-    ! type :: type_config_hcf
-    !     integer(int32) :: unit_id
-    !     integer(int32) :: model_number
-    !     integer(int32) :: hcf_model_number
-    !     integer(int32) :: water_viscosity_model
-    !     real(real64) :: k_s
-    !     real(real64) :: theta_r
-    !     real(real64) :: theta_s
-    !     real(real64) :: alpha1
-    !     real(real64) :: n1
-    !     real(real64) :: m1
-    !     real(real64) :: h_crit
-    !     real(real64) :: alpha2
-    !     real(real64) :: n2
-    !     real(real64) :: m2
-    !     real(real64) :: w1
-    !     real(real64) :: w2
-    !     real(real64) :: l
-    !     real(real64) :: omega
-    !     real(real64) :: gain_factor
-    ! contains
-    !     procedure, pass(self), public :: reset => reset_config_hcf
-    !     procedure, pass(self), public :: copy => copy_config_hcf
-    !     procedure, pass(self), public :: convert => convert_config_hcf
-    ! end type type_config_hcf
-
-    ! interface
-    !     module subroutine reset_config_hcf(self)
-    !         implicit none
-    !         class(type_config_hcf), intent(inout) :: self
-
-    !     end subroutine reset_config_hcf
-
-    !     module subroutine copy_config_hcf(self, source)
-    !         implicit none
-    !         class(type_config_hcf), intent(inout) :: self
-    !         type(type_config_hcf), intent(in) :: source
-
-    !     end subroutine copy_config_hcf
-
-    !     module subroutine convert_config_hcf(self, unit_id, factor)
-    !         implicit none
-    !         class(type_config_hcf), intent(inout) :: self
-    !         integer(int32), intent(in) :: unit_id
-    !         real(real64), intent(in), optional :: factor
-
-    !     end subroutine convert_config_hcf
-    ! end interface
-
     type :: holder_hcfs
         class(abst_hcf), allocatable :: p
     contains

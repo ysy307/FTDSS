@@ -2,6 +2,101 @@ submodule(io_input_translator) translator_basic
     implicit none
 contains
 
+    module subroutine execute_basic_properties(self, input, material_id, target_property, config)
+        implicit none
+        class(type_input_translator), intent(in) :: self
+        class(type_input), intent(in) :: input
+        integer(int32), intent(in) :: material_id
+        type(type_constant_id), intent(in) :: target_property
+        class(type_config_constitutive), intent(inout) :: config
+
+        if (material_id < 1 .or. material_id > input%basic%num_materials) then
+            error stop "Input Error: material_id is out of range."
+        end if
+
+        select type (config)
+        type is (type_config_constitutive)
+            associate (material => input%basic%materials(material_id))
+                select case (target_property%ID)
+                case (CONSTITUTIVE_PROPERTIES%DENSITY%ID)
+                    config%material_id = material_id
+                    config%num_phases = material%phase
+                    if (allocated(material%density%value)) then
+                        config%solid = material%density%value(1)
+                        if (material%phase >= 2 .and. size(material%density%value) >= 2) then
+                            config%water = material%density%value(2)
+                        end if
+                        if (material%phase >= 3 .and. size(material%density%value) >= 3) then
+                            config%ice = material%density%value(3)
+                        end if
+                        if (material%phase >= 4 .and. size(material%density%value) >= 4) then
+                            config%vapor = material%density%value(4)
+                        end if
+                    end if
+                case (CONSTITUTIVE_PROPERTIES%SPECIFIC_HEAT%ID)
+                    config%material_id = material_id
+                    config%num_phases = material%phase
+                    if (allocated(material%specific_heat%value)) then
+                        config%solid = material%specific_heat%value(1)
+                        if (material%phase >= 2 .and. size(material%specific_heat%value) >= 2) then
+                            config%water = material%specific_heat%value(2)
+                        end if
+                        if (material%phase >= 3 .and. size(material%specific_heat%value) >= 3) then
+                            config%ice = material%specific_heat%value(3)
+                        end if
+                        if (material%phase >= 4 .and. size(material%specific_heat%value) >= 4) then
+                            config%vapor = material%specific_heat%value(4)
+                        end if
+                    end if
+                case (CONSTITUTIVE_PROPERTIES%VOLUMETRIC_HEAT_CAPACITY%ID)
+                    config%material_id = material_id
+                    config%num_phases = material%phase
+                    if (allocated(material%volumetric_heat_capacity%value)) then
+                        config%solid = material%volumetric_heat_capacity%value(1)
+                        if (material%phase >= 2 .and. size(material%volumetric_heat_capacity%value) >= 2) then
+                            config%water = material%volumetric_heat_capacity%value(2)
+                        end if
+                        if (material%phase >= 3 .and. size(material%volumetric_heat_capacity%value) >= 3) then
+                            config%ice = material%volumetric_heat_capacity%value(3)
+                        end if
+                        if (material%phase >= 4 .and. size(material%volumetric_heat_capacity%value) >= 4) then
+                            config%vapor = material%volumetric_heat_capacity%value(4)
+                            if (allocated(material%volumetric_heat_capacity%params)) then
+                                call allocate_array(config%params, source=material%volumetric_heat_capacity%params)
+                            end if
+                        end if
+                    end if
+                case (CONSTITUTIVE_PROPERTIES%THERMAL_CONDUCTIVITY%ID)
+                    config%material_id = material_id
+                    config%num_phases = material%phase
+                    if (allocated(material%thermal_conductivity%value)) then
+                        config%solid = material%thermal_conductivity%value(1)
+                        if (material%phase >= 2 .and. size(material%thermal_conductivity%value) >= 2) then
+                            config%water = material%thermal_conductivity%value(2)
+                        end if
+                        if (material%phase >= 3 .and. size(material%thermal_conductivity%value) >= 3) then
+                            config%ice = material%thermal_conductivity%value(3)
+                        end if
+                        if (material%phase >= 4 .and. size(material%thermal_conductivity%value) >= 4) then
+                            config%vapor = material%thermal_conductivity%value(4)
+                            if (allocated(material%thermal_conductivity%params)) then
+                                call allocate_array(config%params, source=material%thermal_conductivity%params)
+                            end if
+                        end if
+                    end if
+
+                    if (material%thermal_conductivity%is_dispersed .and. &
+                        allocated(material%thermal_conductivity%dispersivity)) then
+                        call allocate_array(config%dispersivity, source=material%thermal_conductivity%dispersivity)
+                    end if
+                case default
+                    error stop "execute_basic_properties: unsupported target property for type_config_constitutive."
+                end select
+            end associate
+        end select
+
+    end subroutine execute_basic_properties
+
     module subroutine execute_basic_swcc(self, input, material_id, config)
         implicit none
         class(type_input_translator), intent(in) :: self

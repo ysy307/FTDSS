@@ -22,7 +22,7 @@ contains
         integer(int32) :: num_colors, num_elements_in_color
         integer(int32), pointer, contiguous, dimension(:) :: elements_list
 
-        call self%controls%profiler%start("Assemble")
+        call self%control%profiler_start(PROFILER_TYPES%ASSEMBLE)
 
         nullify (p_connectivity)
         nullify (elements_list)
@@ -62,7 +62,7 @@ contains
                 call self%assemble_local(workspace, local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
                                          local_F_T, local_F_H)
 
-                call self%domain%get_element_connectivity(elem_id, p_connectivity)
+                call self%domain%get_fe_connectivity(elem_id, p_connectivity)
 
                 call self%K%add(thermal_dof, thermal_dof, p_connectivity, local_K_TT)
 
@@ -79,7 +79,7 @@ contains
 
         end do
 
-        call self%controls%profiler%stop("Assemble")
+        call self%control%profiler_stop(PROFILER_TYPES%ASSEMBLE)
 
     end subroutine assemble_ftdss
 
@@ -99,7 +99,8 @@ contains
         integer(int32), pointer, contiguous, dimension(:) :: connectivity
 
         integer(int32) :: material_id
-        integer(int32) :: computation_type
+        type(type_constant_id), pointer :: computation_type
+        ! integer(int32) :: computation_type
         integer(int32) :: num_nodes
 
         integer(int32) :: i
@@ -109,15 +110,15 @@ contains
 
         ! 要素情報の取得
         call self%domain%get_material_id(element_id, material_id)
-        call self%domain%get_element(element_id, fe)
-        call self%domain%get_element_connectivity(element_id, connectivity)
+        call self%domain%get_fe(element_id, fe)
+        call self%domain%get_fe_connectivity(element_id, connectivity)
         call self%domain%get_computation_type(computation_type)
         
         ! ここで渡される coordinates が allocated でサイズが同じなら再利用される(domain側実装)
-        call self%domain%get_element_coordinate(element_id, coordinates)
+        call self%domain%get_fe_coordinate(element_id, coordinates)
 
         ! ワークスペースの初期化 (座標のコピー含む)
-        call workspace%initialize(fe, material_id, element_id, computation_type, coordinates, self%controls)
+        call workspace%initialize(fe, material_id, element_id, computation_type%ID, coordinates, self%control)
 
         ! ---------------------------------------------------------------------
         ! 1. 節点状態の取得 (物理計算スキップ)
@@ -207,7 +208,7 @@ contains
         type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
         type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
 
-        call self%thermal%assemble_local(controls=self%controls, workspace=workspace, &
+        call self%thermal%assemble_local(control=self%control, workspace=workspace, &
                                          K_TT=local_K_TT, K_TH=local_K_TH, F_T=local_F_T)
 
     end subroutine assemble_local_ftdss
