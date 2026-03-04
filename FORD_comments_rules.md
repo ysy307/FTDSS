@@ -104,5 +104,3 @@
 * Keep comments concise and purpose-focused.
 
 ---
-
-Would you like me to generate a template file based on these rules?

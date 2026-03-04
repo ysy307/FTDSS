@@ -15,7 +15,7 @@ contains
 
         logical :: prescribe_essential
 
-        call self%controls%time%get_time(current_time)
+        call self%control%get_time(current_time)
 
         if (.not. present(prescribed)) then
             prescribe_essential = .true.
@@ -27,11 +27,11 @@ contains
         ! Step 0: Prescribe Dirichlet Values (Update Field Variables directly)
         ! ----------------------------------------------------------------------
         if (prescribe_essential) then
-            if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
+            if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
                 call self%prescribe_essential_bc_generic(PHYSICS_TYPES%THERMAL, current_time, self%temperature)
             end if
 
-            if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
+            if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
                 call self%prescribe_essential_bc_generic(PHYSICS_TYPES%HYDRAULIC, current_time, self%pressure)
             end if
         end if
@@ -39,13 +39,13 @@ contains
         ! ----------------------------------------------------------------------
         ! Step 1: Apply Natural BCs (Neumann, Robin, etc.)
         ! ----------------------------------------------------------------------
-        if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
+        if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPES%THERMAL%ID)
             call self%apply_natural_bc_generic(PHYSICS_TYPES%THERMAL, current_time, &
                                                self%temperature, dof_offset)
         end if
 
-        if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
+        if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
             dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPES%HYDRAULIC%ID)
             call self%apply_natural_bc_generic(PHYSICS_TYPES%HYDRAULIC, current_time, &
                                                self%pressure, dof_offset)
@@ -54,13 +54,13 @@ contains
         ! ----------------------------------------------------------------------
         ! Step 2: Apply Essential BCs (Dirichlet Constraints)
         ! ----------------------------------------------------------------------
-        if (self%controls%is_physics_active(PHYSICS_TYPES%THERMAL)) then
+        if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPES%THERMAL%ID)
             call self%apply_essential_bc_generic(PHYSICS_TYPES%THERMAL, current_time, &
                                                  self%temperature, dof_offset)
         end if
 
-        if (self%controls%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
+        if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
             dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPES%HYDRAULIC%ID)
             call self%apply_essential_bc_generic(PHYSICS_TYPES%HYDRAULIC, current_time, &
                                                  self%pressure, dof_offset)

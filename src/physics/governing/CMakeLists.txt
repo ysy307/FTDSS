@@ -10,8 +10,10 @@ target_sources(SOLVER_GOVERNING PRIVATE
     # ====================================================
     # 1. Boundary Conditions
     # ====================================================
+    condition/boundary/boundary_data_interface.F90
+    condition/boundary/boundary_data_providers.F90
     condition/boundary/boundary_interface.F90
-    condition/boundary/boundary_base.F90
+    condition/boundary/boundary_strategies.F90
     condition/boundary/boundary_manager.F90
     condition/boundary/boundary.F90
     # ====================================================
