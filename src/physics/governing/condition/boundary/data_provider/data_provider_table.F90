@@ -6,18 +6,75 @@ contains
         implicit none
         class(type_bc_data_table), intent(inout) :: self
         type(type_config_bc), intent(in) :: config_bc
+
+        if (allocated(self%time_points)) deallocate (self%time_points)
+        if (allocated(self%table_values)) deallocate (self%table_values)
+
+        allocate (self%time_points(size(config_bc%time_points)))
+        self%time_points = config_bc%time_points
+
+        ! config_bc%values が (変数数, 時系列数) の2次元配列である前提
+        allocate (self%table_values(size(config_bc%values, 1), size(config_bc%values, 2)))
+        self%table_values = config_bc%values
+
+        self%current_idx = 1
     end subroutine initialize_type_bc_data_table
 
     module subroutine destroy_type_bc_data_table(self)
         implicit none
         class(type_bc_data_table), intent(inout) :: self
+
+        if (allocated(self%time_points)) deallocate (self%time_points)
+        if (allocated(self%table_values)) deallocate (self%table_values)
+        self%current_idx = 1
     end subroutine destroy_type_bc_data_table
 
     module subroutine get_data_bc_data_table(self, current_time, output_value)
         implicit none
-        class(type_bc_data_table), intent(in) :: self
+        class(type_bc_data_table), intent(inout) :: self
         real(real64), intent(in) :: current_time
         class(abst_bc_dto), intent(inout) :: output_value
+
+        real(real64) :: coef
+        integer(int32) :: idx, num_vars
+        real(real64), allocatable :: current_values(:)
+
+        call output_value%reset() ! DTOの値を初期化
+
+        ! 1. 補間係数とインデックスの取得
+        call self%calc_time_coefficient(current_time, coef, idx)
+
+        ! 2. 現在時刻における補間値の計算
+        num_vars = size(self%table_values, 1)
+        call allocate_array(current_values, num_vars)
+
+        if (idx < size(self%time_points)) then
+            current_values(1:num_vars) = self%table_values(:, idx) + &
+                                         coef * (self%table_values(:, idx + 1) - self%table_values(:, idx))
+        else
+            current_values(1:num_vars) = self%table_values(:, size(self%time_points))
+        end if
+
+        ! 3. DTOへのマッピング
+        select type (dto => output_value)
+        type is (type_bc_data_scalar)
+            dto%prescribed_value = current_values(1)
+
+        type is (type_bc_data_robin)
+            dto%transfer_coeff = current_values(1)
+            dto%environment_value = current_values(2)
+
+        type is (type_bc_data_hydraulic)
+            dto%potential_flux = current_values(1)
+            dto%limit_min = current_values(2)
+            dto%limit_max = current_values(3)
+        type is (type_bc_data_cauchy)
+            dto%prescribed_value = current_values(1)
+            dto%flux_value = current_values(2)
+            dto%flux_derivative = current_values(3)
+        end select
+
+        call deallocate_array(current_values)
     end subroutine get_data_bc_data_table
 
     module subroutine calc_time_coefficient_bc_data_table(self, current_time, coef, idx)

@@ -60,7 +60,7 @@ module condition_boundary_data_provider
         subroutine abst_get_data(self, current_time, output_value)
             import :: abst_bc_data, abst_bc_dto, real64
             implicit none
-            class(abst_bc_data), intent(in) :: self
+            class(abst_bc_data), intent(inout) :: self
             !> Current simulation time [s].
             real(real64), intent(in) :: current_time
             !> Calculated boundary values.
@@ -99,7 +99,7 @@ module condition_boundary_data_provider
 
         module subroutine get_data_bc_data_constant(self, current_time, output_value)
             implicit none
-            class(type_bc_data_constant), intent(in) :: self
+            class(type_bc_data_constant), intent(inout) :: self
             real(real64), intent(in) :: current_time
             class(abst_bc_dto), intent(inout) :: output_value
 
@@ -137,7 +137,7 @@ module condition_boundary_data_provider
 
         module subroutine get_data_bc_data_table(self, current_time, output_value)
             implicit none
-            class(type_bc_data_table), intent(in) :: self
+            class(type_bc_data_table), intent(inout) :: self
             real(real64), intent(in) :: current_time
             class(abst_bc_dto), intent(inout) :: output_value
 
@@ -176,7 +176,7 @@ module condition_boundary_data_provider
 
         module subroutine get_data_bc_data_dynamic(self, current_time, output_value)
             implicit none
-            class(type_bc_data_dynamic), intent(in) :: self
+            class(type_bc_data_dynamic), intent(inout) :: self
             real(real64), intent(in) :: current_time
             class(abst_bc_dto), intent(inout) :: output_value
 

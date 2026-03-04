@@ -35,23 +35,23 @@ module condition_boundary_strategy
     end type abst_bc
 
     abstract interface
-        subroutine abst_calc_flux_and_derivative(self, current_time, u_curr, q_flux, dq_du)
+        subroutine abst_calc_flux_and_derivative(self, current_time, u_curr, flux_value, flux_derivative)
             import :: abst_bc, real64
             implicit none
-            class(abst_bc), intent(in) :: self
+            class(abst_bc), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(in) :: u_curr
-            real(real64), intent(inout) :: q_flux
-            real(real64), intent(inout) :: dq_du
+            real(real64), intent(inout) :: flux_value
+            real(real64), intent(inout) :: flux_derivative
         end subroutine abst_calc_flux_and_derivative
 
-        subroutine abst_calc_dirichlet_value(self, current_time, u_curr, val_fixed, is_active)
+        subroutine abst_calc_dirichlet_value(self, current_time, u_curr, prescribed_value, is_active)
             import :: abst_bc, real64
             implicit none
-            class(abst_bc), intent(in) :: self
+            class(abst_bc), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(in) :: u_curr
-            real(real64), intent(inout) :: val_fixed
+            real(real64), intent(inout) :: prescribed_value
             logical, intent(inout) :: is_active
         end subroutine abst_calc_dirichlet_value
     end interface
@@ -92,21 +92,21 @@ module condition_boundary_strategy
     end type type_bc_dirichlet
 
     interface
-        module subroutine calc_flux_dirichlet_bc(self, current_time, u_curr, q_flux, dq_du)
+        module subroutine calc_flux_dirichlet_bc(self, current_time, u_curr, flux_value, flux_derivative)
             implicit none
-            class(type_bc_dirichlet), intent(in) :: self
+            class(type_bc_dirichlet), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(in) :: u_curr
-            real(real64), intent(inout) :: q_flux
-            real(real64), intent(inout) :: dq_du
+            real(real64), intent(inout) :: flux_value
+            real(real64), intent(inout) :: flux_derivative
         end subroutine calc_flux_dirichlet_bc
 
-        module subroutine calc_dirichlet_dirichlet_bc(self, current_time, u_curr, val_fixed, is_active)
+        module subroutine calc_dirichlet_dirichlet_bc(self, current_time, u_curr, prescribed_value, is_active)
             implicit none
-            class(type_bc_dirichlet), intent(in) :: self
+            class(type_bc_dirichlet), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(in) :: u_curr
-            real(real64), intent(inout) :: val_fixed
+            real(real64), intent(inout) :: prescribed_value
             logical, intent(inout) :: is_active
         end subroutine calc_dirichlet_dirichlet_bc
     end interface
@@ -119,21 +119,21 @@ module condition_boundary_strategy
     end type type_bc_neumann
 
     interface
-        module subroutine calc_flux_neumann_bc(self, current_time, u_curr, q_flux, dq_du)
+        module subroutine calc_flux_neumann_bc(self, current_time, u_curr, flux_value, flux_derivative)
             implicit none
-            class(type_bc_neumann), intent(in) :: self
+            class(type_bc_neumann), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(in) :: u_curr
-            real(real64), intent(inout) :: q_flux
-            real(real64), intent(inout) :: dq_du
+            real(real64), intent(inout) :: flux_value
+            real(real64), intent(inout) :: flux_derivative
         end subroutine calc_flux_neumann_bc
 
-        module subroutine calc_dirichlet_neumann_bc(self, current_time, u_curr, val_fixed, is_active)
+        module subroutine calc_dirichlet_neumann_bc(self, current_time, u_curr, prescribed_value, is_active)
             implicit none
-            class(type_bc_neumann), intent(in) :: self
+            class(type_bc_neumann), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(in) :: u_curr
-            real(real64), intent(inout) :: val_fixed
+            real(real64), intent(inout) :: prescribed_value
             logical, intent(inout) :: is_active
         end subroutine calc_dirichlet_neumann_bc
     end interface
@@ -146,21 +146,21 @@ module condition_boundary_strategy
     end type type_bc_robin
 
     interface
-        module subroutine calc_flux_robin_bc(self, current_time, u_curr, q_flux, dq_du)
+        module subroutine calc_flux_robin_bc(self, current_time, u_curr, flux_value, flux_derivative)
             implicit none
-            class(type_bc_robin), intent(in) :: self
+            class(type_bc_robin), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(in) :: u_curr
-            real(real64), intent(inout) :: q_flux
-            real(real64), intent(inout) :: dq_du
+            real(real64), intent(inout) :: flux_value
+            real(real64), intent(inout) :: flux_derivative
         end subroutine calc_flux_robin_bc
 
-        module subroutine calc_dirichlet_robin_bc(self, current_time, u_curr, val_fixed, is_active)
+        module subroutine calc_dirichlet_robin_bc(self, current_time, u_curr, prescribed_value, is_active)
             implicit none
-            class(type_bc_robin), intent(in) :: self
+            class(type_bc_robin), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(in) :: u_curr
-            real(real64), intent(inout) :: val_fixed
+            real(real64), intent(inout) :: prescribed_value
             logical, intent(inout) :: is_active
         end subroutine calc_dirichlet_robin_bc
     end interface
@@ -173,21 +173,21 @@ module condition_boundary_strategy
     end type type_bc_cauchy
 
     interface
-        module subroutine calc_flux_cauchy_bc(self, current_time, u_curr, q_flux, dq_du)
+        module subroutine calc_flux_cauchy_bc(self, current_time, u_curr, flux_value, flux_derivative)
             implicit none
-            class(type_bc_cauchy), intent(in) :: self
+            class(type_bc_cauchy), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(in) :: u_curr
-            real(real64), intent(inout) :: q_flux
-            real(real64), intent(inout) :: dq_du
+            real(real64), intent(inout) :: flux_value
+            real(real64), intent(inout) :: flux_derivative
         end subroutine calc_flux_cauchy_bc
 
-        module subroutine calc_dirichlet_cauchy_bc(self, current_time, u_curr, val_fixed, is_active)
+        module subroutine calc_dirichlet_cauchy_bc(self, current_time, u_curr, prescribed_value, is_active)
             implicit none
-            class(type_bc_cauchy), intent(in) :: self
+            class(type_bc_cauchy), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(in) :: u_curr
-            real(real64), intent(inout) :: val_fixed
+            real(real64), intent(inout) :: prescribed_value
             logical, intent(inout) :: is_active
         end subroutine calc_dirichlet_cauchy_bc
     end interface
