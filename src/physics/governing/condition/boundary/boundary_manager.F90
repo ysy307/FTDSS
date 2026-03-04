@@ -4,7 +4,7 @@ module conditions_boundary_manager
     use :: module_core
     use :: module_input
     use :: module_control
-    use :: conditions_boundary ! 汎用BC型定義
+    use :: condition_boundary_strategy
     implicit none
     private
 

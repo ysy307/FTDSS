@@ -18,10 +18,14 @@ contains
         implicit none
         class(abst_bc), intent(inout) :: self
 
-        ! if (allocated(self%data_provider)) then
-        !     call self%data_provider%destroy()
-        !     deallocate(self%data_provider)
-        ! end if
+        self%physics_type = type_constant_id("", "", -1)
+        self%bc_kind = type_constant_id("", "", -1)
+
+        if (allocated(self%data_provider)) then
+            call self%data_provider%destroy()
+            deallocate (self%data_provider)
+        end if
+
         self%is_initialized = .false.
     end subroutine destroy_bc
 
@@ -30,6 +34,12 @@ contains
         class(abst_bc), intent(inout) :: self
         type(type_constant_id), intent(in) :: bc_kind
 
+        if (.not. THERMAL_BC_TYPES%is_valid(bc_kind) .and. &
+            .not. HYDRAULIC_BC_TYPES%is_valid(bc_kind)) then
+            error stop "Invalid BC kind: "//trim(bc_kind%name) ! TODO: call raise_error with appropriate error codes
+            ! call raise_error(ERROR_CODES%INVALILD_TYPES "Invalid BC kind: "//trim(bc_kind%name))
+        end if
+
         self%bc_kind = bc_kind
     end subroutine set_bc_kind_abst_bc
 
@@ -37,7 +47,7 @@ contains
         implicit none
         class(abst_bc), intent(in), target :: self
         type(type_constant_id), intent(inout), pointer :: bc_kind
-        
+
         bc_kind => self%bc_kind
     end subroutine get_bc_kind_abst_bc
 

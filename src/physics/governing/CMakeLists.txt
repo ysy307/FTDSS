@@ -10,10 +10,16 @@ target_sources(SOLVER_GOVERNING PRIVATE
     # ====================================================
     # 1. Boundary Conditions
     # ====================================================
-    condition/boundary/boundary_data_interface.F90
-    condition/boundary/boundary_data_providers.F90
-    condition/boundary/boundary_interface.F90
-    condition/boundary/boundary_strategies.F90
+    condition/boundary/boundary_dto.F90
+    condition/boundary/data_provider/data_provider_interface.F90
+    condition/boundary/data_provider/data_provider_constant.F90
+    condition/boundary/data_provider/data_provider_table.F90
+    condition/boundary/data_provider/data_provider_dynamic.F90
+    condition/boundary/strategy/strategy_interface.F90
+    condition/boundary/strategy/strategy_dirichlet.F90
+    condition/boundary/strategy/strategy_neumann.F90
+    condition/boundary/strategy/strategy_robin.F90
+    condition/boundary/strategy/strategy_cauchy.F90
     condition/boundary/boundary_manager.F90
     condition/boundary/boundary.F90
     # ====================================================
