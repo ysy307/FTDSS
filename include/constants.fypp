@@ -458,6 +458,22 @@
         'num' : 5, &
         'id_range' : [0, 4] &
     }
+    
+    #:set BC_DATA_PROVIDER_TYPES = { &
+        'type_name' : 'type_bc_data_providers', &
+        'obj_name'  : 'BC_DATA_PROVIDERS', &
+        'category'  : 'BC_DATA_PROVIDER', &
+        'suffix'    : 'bc_data_provider', &
+        'description': 'Boundary condition data provider types', &
+        'items'     : [ &
+            ('NONE',     0, 'none'), &
+            ('CONSTANT', 1, 'constant'), &
+            ('TABLE',    2, 'table'), &
+            ('DYNAMIC',  3, 'dynamic'), &
+        ], &
+        'num' : 4, &
+        'id_range' : [0, 3] &
+    }
 
     #:set CONSTITUTIVE_PROPERTIES = { &
         'type_name' : 'type_constitutive_properties', &
@@ -757,7 +773,8 @@
         OUTPUT_VARIABLE_TYPES, &
         VECTOR_NORM_CRITERIA, &
         CONSTITUTIVE_PROPERTIES, &
-        PROFILER_TYPES &
+        PROFILER_TYPES, &
+        BC_DATA_PROVIDER_TYPES &
     ]
 
 

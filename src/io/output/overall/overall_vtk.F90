@@ -160,7 +160,7 @@ contains
         character(*), intent(in) :: data_name
         real(real64), intent(in) :: x(:)
 
-        write (unit, '(3a)') "SCALARS ", trim(adjustl(data_name)), " double 1"
+        write (unit, '(3a)') "SCALARS ", strip(data_name), " double 1"
         write (unit, '(a)') "LOOKUP_TABLE default"
         write (unit, '(es22.15)') x(:)
         write (unit, '(a)') ""
@@ -174,7 +174,7 @@ contains
         character(*), intent(in) :: data_name
         integer(int32), intent(in) :: x(:)
 
-        write (unit, '(3a)') "SCALARS ", trim(adjustl(data_name)), " int 1"
+        write (unit, '(3a)') "SCALARS ", strip(data_name), " int 1"
         write (unit, '(a)') "LOOKUP_TABLE default"
         write (unit, '(i0)') x(:)
         write (unit, '(a)') ""
@@ -190,7 +190,7 @@ contains
 
         integer(int32) :: i
 
-        write (unit, '(3a)') "VECTORS ", trim(adjustl(data_name)), " double"
+        write (unit, '(3a)') "VECTORS ", strip(data_name), " double"
         do i = 1, size(x)
             write (unit, '(3(es22.15,1x))') x(i), y(i), z(i)
         end do
@@ -207,7 +207,7 @@ contains
 
         integer(int32) :: i
 
-        write (unit, '(3a)') "VECTORS ", trim(adjustl(data_name)), " double"
+        write (unit, '(3a)') "VECTORS ", strip(data_name), " double"
         do i = 1, size(x)
             write (unit, '(3(i0,1x))') x(i), y(i), z(i)
         end do
@@ -222,7 +222,7 @@ contains
         character(*), intent(in) :: data_name
         real(real64), intent(in) :: x(:)
 
-        write (unit, '(3a)') "SCALARS ", trim(adjustl(data_name)), " double 1"
+        write (unit, '(3a)') "SCALARS ", strip(data_name), " double 1"
         write (unit, '(a)') "LOOKUP_TABLE default"
         write (unit, '(es22.15)') x(:)
         write (unit, '(a)') ""
@@ -236,7 +236,7 @@ contains
         character(*), intent(in) :: data_name
         integer(int32), intent(in) :: x(:)
 
-        write (unit, '(3a)') "SCALARS ", trim(adjustl(data_name)), " double 1"
+        write (unit, '(3a)') "SCALARS ", strip(data_name), " double 1"
         write (unit, '(a)') "LOOKUP_TABLE default"
         write (unit, '(i0)') x(:)
         write (unit, '(a)') ""

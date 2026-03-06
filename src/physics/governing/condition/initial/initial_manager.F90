@@ -41,15 +41,15 @@ contains
 
             select case (configs(i)%ic_kind%ID)
             case (IC_METHODS%UNIFORM%ID)
-                allocate (type_ic_uniform :: self%ic(i)%ic)
+                allocate (type_ic_uniform :: self%ic(i)%p)
                 ! case (IC_METHOD_LAPLACE)
-                !     allocate (type_ic_laplace :: self%ic(i)%ic)
+                !     allocate (type_ic_laplace :: self%ic(i)%p)
             case default
                 ! Future: Handle IC_METHOD_FROM_FILE or others
             end select
 
-            if (allocated(self%ic(i)%ic)) then
-                call self%ic(i)%ic%initialize(configs(i))
+            if (allocated(self%ic(i)%p)) then
+                call self%ic(i)%p%initialize(configs(i))
             end if
         end do
 
@@ -67,7 +67,7 @@ contains
             return
         end if
 
-        call self%ic(initial_target_id%ID)%ic%apply(variable)
+        call self%ic(initial_target_id%ID)%p%apply(variable)
 
     end subroutine apply_ic_manager
 

@@ -103,7 +103,7 @@ module core_constants_error
         character(*), intent(in) :: name
         type(type_constant_error) :: res
 
-        select case (trim(name))
+        select case (strip(name))
         #:for item in ERROR_CODES['items']
         case ("${item[0]}$")
             res = self%${item[0]}$

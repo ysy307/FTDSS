@@ -11,7 +11,7 @@ module condition_initial
     public :: holder_ics
 
     type :: holder_ics
-        class(abst_ic), allocatable :: ic
+        class(abst_ic), allocatable :: p
     end type holder_ics
 
     type, abstract :: abst_ic

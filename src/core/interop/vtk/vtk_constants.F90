@@ -727,7 +727,7 @@ contains
         case ("BezierPyramid")
             cell_type = VTK_BEZIER_PYRAMID
         case default
-            print *, "Error: Unknown VTK cell name ", trim(cell_name)
+            print *, "Error: Unknown VTK cell name ", strip(cell_name)
             stop
         end select
     end function get_cell_type
@@ -743,7 +743,7 @@ contains
 
         if (.not. self%is_initialized) call self%initialize()
 
-        cell_type = self%get_cell_type(trim(adjustl(cell_name)))
+        cell_type = self%get_cell_type(strip(cell_name))
         num_nodes_in_cell = self%cell(cell_type)%num_nodes_in_cell
         cell_dimension = self%cell(cell_type)%cell_dimension
         cell_order = self%cell(cell_type)%cell_order

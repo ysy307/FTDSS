@@ -57,7 +57,7 @@ contains
 
         self%handle = vtu_initialize(c_file_name, ierr)
         if (.not. c_associated(self%handle) .or. ierr /= 0) then
-            call global_logger%log_error("C++ VTU Reader failed to initialize for file: "//trim(c_file_name))
+            call global_logger%log_error("C++ VTU Reader failed to initialize for file: "//strip(c_file_name))
             call global_logger%log_error("Error code: "//to_string(ierr))
             stop "VTU Initialization Failed"
         end if

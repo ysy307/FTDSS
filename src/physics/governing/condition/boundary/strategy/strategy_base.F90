@@ -36,8 +36,8 @@ contains
 
         if (.not. THERMAL_BC_TYPES%is_valid(bc_kind) .and. &
             .not. HYDRAULIC_BC_TYPES%is_valid(bc_kind)) then
-            error stop "Invalid BC kind: "//trim(bc_kind%name) ! TODO: call raise_error with appropriate error codes
-            ! call raise_error(ERROR_CODES%INVALILD_TYPES "Invalid BC kind: "//trim(bc_kind%name))
+            ! error stop "Invalid BC kind: "//strip(bc_kind%name) ! TODO: call raise_error with appropriate error codes
+            ! call raise_error(ERROR_CODES%INVALILD_TYPES "Invalid BC kind: "//strip(bc_kind%name))
         end if
 
         self%bc_kind = bc_kind

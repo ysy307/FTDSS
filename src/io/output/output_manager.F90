@@ -57,9 +57,9 @@ contains
 
         call get_env_string(PROJECT_ENV, project_path_env)
         call modify_path_format(project_path_env)
-        dir_output = trim(adjustl(project_path_env))//"Output/"
+        dir_output = strip(project_path_env)//"Output/"
         call setup_directory(dir_output, output_extentions)
-        dir_output_field = trim(adjustl(project_path_env))//"Output/Files/"
+        dir_output_field = strip(project_path_env)//"Output/Files/"
         call setup_directory(dir_output_field, output_file_extentions)
 
         call allocate_array(self%active, source=config_output%is_output_enabled)

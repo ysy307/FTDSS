@@ -7,11 +7,16 @@ module condition_boundary_strategy
     implicit none
     private
 
+    public :: holder_bcs
     public :: abst_bc
     public :: type_bc_dirichlet
     public :: type_bc_neumann
     public :: type_bc_robin
     public :: type_bc_cauchy
+
+    type :: holder_bcs
+        class(abst_bc), allocatable :: p
+    end type holder_bcs
 
     ! ==========================================================================
     ! Abstract Boundary Condition Strategy

@@ -167,7 +167,7 @@ contains
                 call raise_error(ERROR_CODES%WRITE_FILE_FAILED, output_settings%file_name)
             end if
 
-            write (output_settings%io_unit, '(a)') "# "//trim(output_settings%variable_type%NAME)//" time variation"
+            write (output_settings%io_unit, '(a)') "# "//strip(output_settings%variable_type%NAME)//" time variation"
             write (output_settings%io_unit, '(a)') "#"
 
             ! --- 観測点の情報出力（ポリモーフィズムを利用） ---
@@ -197,8 +197,8 @@ contains
             end select
 
             write (output_settings%io_unit, '(a)') "#"
-            write (output_settings%io_unit, '(a)') "# Output Unit: Time ["//trim(output_time_unit%NAME)//"], " &
-                //trim(output_settings%variable_type%NAME)//" ["//trim(output_settings%variable_unit)//"]"
+            write (output_settings%io_unit, '(a)') "# Output Unit: Time ["//strip(output_time_unit%NAME)//"], " &
+                //strip(output_settings%variable_type%NAME)//" ["//strip(output_settings%variable_unit)//"]"
             write (output_settings%io_unit, '(a)') "#"
 
             ! --- ヘッダー行の出力 ---

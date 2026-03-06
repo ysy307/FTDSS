@@ -105,7 +105,7 @@ contains
         character(256) :: output_name
 
         write (output_name, self%format_output_file) &
-            strip(self%dir_output_field), trim(file_name), ".", to_lower(strip(self%file_format%NAME))
+            strip(self%dir_output_field), strip(file_name), ".", to_lower(strip(self%file_format%NAME))
 
         status = vtu%initialize(format='binary', filename=strip(output_name), mesh_topology='UnstructuredGrid')
 

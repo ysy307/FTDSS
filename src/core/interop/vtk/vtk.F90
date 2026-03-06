@@ -203,7 +203,7 @@ contains
 
         if (c_associated(self%handle)) then
 
-            select case (trim(adjustl(self%reader_type)))
+            select case (strip(self%reader_type))
             case ("vtk")
                 call vtk_finalize(self%handle)
             case ("vtu")
