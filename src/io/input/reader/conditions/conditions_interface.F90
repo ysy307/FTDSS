@@ -61,15 +61,30 @@ module io_input_conditions
         real(real64) :: time
         character(:), allocatable :: time_iso
         real(real64) :: value
+        real(real64), allocatable :: values(:)
     end type type_boundary_local_time_dependent
 
     type :: type_boundary_local
         logical :: is_active = .false.
         character(:), allocatable :: bc_type
+        character(:), allocatable :: bc_value_type
         integer(int32) :: num_time_points
         type(type_boundary_local_time_dependent), allocatable :: values(:)
-        
+    contains
+        procedure, public, pass(self) :: read => read_conditions_bc_local
     end type type_boundary_local
+
+    interface
+        module subroutine read_conditions_bc_local(self, json, buffer_in, end_index, physics_type)
+            implicit none
+            class(type_boundary_local), intent(inout) :: self
+            type(json_file), intent(inout) :: json
+            character(*), intent(in) :: buffer_in(:)
+            integer(int32), intent(in) :: end_index
+            type(type_constant_id), intent(in) :: physics_type
+
+        end subroutine read_conditions_bc_local
+    end interface
 
     type :: type_boundary_conditions
         class(type_conditions), pointer :: parent => null()
@@ -121,7 +136,7 @@ module io_input_conditions
     contains
         procedure, pass(self), public :: initialize => initialize_type_conditions
         procedure, pass(self), private :: read_time_controls => read_conditions_time_controls
-        procedure, pass(self), private :: read_boundary_conditions => read_conditions_boundary_conditions
+        procedure, pass(self), private :: read_boundary_conditions => read_conditions_bc
         procedure, pass(self), private :: read_initial_conditions => read_conditions_initial_conditions
         procedure, pass(self), public :: display => display_conditions
     end type type_conditions
@@ -139,11 +154,12 @@ module io_input_conditions
             type(json_file), intent(inout) :: json
         end subroutine read_conditions_time_controls
 
-        module subroutine read_conditions_boundary_conditions(self, json)
+        module subroutine read_conditions_bc(self, json)
             implicit none
             class(type_conditions), intent(inout) :: self
             type(json_file), intent(inout) :: json
-        end subroutine read_conditions_boundary_conditions
+
+        end subroutine read_conditions_bc
 
         module subroutine read_conditions_initial_conditions(self, json)
             implicit none

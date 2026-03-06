@@ -9,7 +9,7 @@
             "unit": "second",
             "initial_step": 300.0,
             "min_step": 1.0,
-            "max_step": 300000.0            
+            "max_step": 300000.0
         },
         "adaptive_stepping": {
             "is_active": true,
@@ -29,9 +29,9 @@
             "thermal": {
                 "type": "dirichlet",
                 "is_uniform": true,
+                "value_type": "constant",
                 "values": [
-                    {"time": 0.0, "value": -20.0},
-                    {"time": 1.0, "value": -20.0}
+                    -20.0
                 ]
             },
             "hydraulic": {
@@ -47,7 +47,17 @@
                 "type": "adiabatic"
             },
             "hydraulic": {
-                "type": "impermeable"
+                "type": "impermeable",
+                "values": [
+                    {
+                        "time": 0.0,
+                        "value": -20.0
+                    },
+                    {
+                        "time": 1.0,
+                        "value": -20.0
+                    }
+                ]
             }
         }
     ],
