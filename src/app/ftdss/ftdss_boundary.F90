@@ -10,28 +10,24 @@ contains
         implicit none
         class(type_ftdss), intent(inout) :: self
         logical, intent(in), optional :: prescribed
+
         real(real64) :: current_time
         integer(int32) :: dof_offset
-
         logical :: prescribe_essential
 
         call self%control%get_time(current_time)
 
-        if (.not. present(prescribed)) then
-            prescribe_essential = .true.
-        else
-            prescribe_essential = prescribed
-        end if
+        prescribe_essential = optval(prescribed, .true.)
 
         ! ----------------------------------------------------------------------
         ! Step 0: Prescribe Dirichlet Values (Update Field Variables directly)
         ! ----------------------------------------------------------------------
         if (prescribe_essential) then
-            if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
+            if (self%is_active_thermal()) then
                 call self%prescribe_essential_bc_generic(PHYSICS_TYPES%THERMAL, current_time, self%temperature)
             end if
 
-            if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
+            if (self%is_active_hydraulic()) then
                 call self%prescribe_essential_bc_generic(PHYSICS_TYPES%HYDRAULIC, current_time, self%pressure)
             end if
         end if
@@ -39,14 +35,14 @@ contains
         ! ----------------------------------------------------------------------
         ! Step 1: Apply Natural BCs (Neumann, Robin, etc.)
         ! ----------------------------------------------------------------------
-        if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
-            dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPES%THERMAL%ID)
+        if (self%is_active_thermal()) then
+            call self%domain%get_start_dof_index(PHYSICS_TYPES%THERMAL, dof_offset)
             call self%apply_natural_bc_generic(PHYSICS_TYPES%THERMAL, current_time, &
                                                self%temperature, dof_offset)
         end if
 
-        if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
-            dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPES%HYDRAULIC%ID)
+        if (self%is_active_hydraulic()) then
+            call self%domain%get_start_dof_index(PHYSICS_TYPES%HYDRAULIC, dof_offset)
             call self%apply_natural_bc_generic(PHYSICS_TYPES%HYDRAULIC, current_time, &
                                                self%pressure, dof_offset)
         end if
@@ -54,14 +50,14 @@ contains
         ! ----------------------------------------------------------------------
         ! Step 2: Apply Essential BCs (Dirichlet Constraints)
         ! ----------------------------------------------------------------------
-        if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
-            dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPES%THERMAL%ID)
+        if (self%is_active_thermal()) then
+            call self%domain%get_start_dof_index(PHYSICS_TYPES%THERMAL, dof_offset)
             call self%apply_essential_bc_generic(PHYSICS_TYPES%THERMAL, current_time, &
                                                  self%temperature, dof_offset)
         end if
 
-        if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
-            dof_offset = self%domain%dof_map%start_dof_index(PHYSICS_TYPES%HYDRAULIC%ID)
+        if (self%is_active_hydraulic()) then
+            call self%domain%get_start_dof_index(PHYSICS_TYPES%HYDRAULIC, dof_offset)
             call self%apply_essential_bc_generic(PHYSICS_TYPES%HYDRAULIC, current_time, &
                                                  self%pressure, dof_offset)
         end if
@@ -78,32 +74,36 @@ contains
         real(real64), intent(in) :: current_time
         type(type_variable), intent(inout) :: variable
 
-        integer(int32) :: i_patch, i, glob_node_id
-        real(real64) :: val_fixed
-        logical :: is_active
-        class(abst_bc), pointer :: bc_obj
+        integer(int32) :: i_patch, num_boundaries
+        integer(int32) :: i, glob_node_id
+        real(real64) :: val_curr
+        type(type_bc_result) :: bc_result
+        type(type_boundary_patch), pointer :: bc_patch
 
-        associate (bc_manager => self%domain%boundaries%physics(physics_type%ID))
-            do i_patch = 1, bc_manager%num_bcs
-                bc_obj => bc_manager%bcs(i_patch)%condition
+        if (.not. PHYSICS_TYPES%is_valid(physics_type)) return
 
-                call bc_obj%get_dirichlet_value(current_time, val_fixed, is_active)
-                if (.not. is_active) cycle
+        call self%bc(physics_type%ID)%get_num_boundaries(num_boundaries)
 
-                associate (patch => bc_manager%bcs(i_patch))
-                    do i = 1, size(patch%connectivity%val)
-                        glob_node_id = patch%connectivity%val(i)
-                        ! 現在の変数値をBC値に上書き
-                        call variable%set_current(glob_node_id, val_fixed)
-                        ! 以前の変数値もBC値に上書き
-                        call variable%set_previous(glob_node_id, val_fixed)
-                    end do
-                end associate
-            end do
-        end associate
+        do i_patch = 1, num_boundaries
+            call self%domain%get_bc_patch(i_patch, bc_patch)
+
+            if (allocated(bc_patch%connectivity%col_ind)) then
+                do i = 1, size(bc_patch%connectivity%col_ind)
+                    glob_node_id = bc_patch%connectivity%col_ind(i)
+
+                    call variable%get_current(glob_node_id, val_curr)
+                    call self%bc(physics_type%ID)%evaluate(i_patch, current_time, val_curr, bc_result)
+
+                    if (bc_result%is_dirichlet) then
+                        call variable%set_current(glob_node_id, bc_result%prescribed_value)
+                        call variable%set_previous(glob_node_id, bc_result%prescribed_value)
+                    end if
+                end do
+            end if
+        end do
     end subroutine prescribe_essential_bc_generic
 
-    !>
+!>
     !> Generic routine to integrate and assemble Natural BCs (Fluxes).
     !>
     module subroutine apply_natural_bc_generic(self, physics_type, current_time, variable, dof_offset)
@@ -114,91 +114,90 @@ contains
         type(type_variable), intent(in) :: variable
         integer(int32), intent(in) :: dof_offset
 
-        integer(int32) :: i_patch, i_elem, k_gp
-        integer(int32) :: num_nodes_loc
+        integer(int32) :: i_patch, num_boundaries
+        integer(int32) :: i_elem, k_gp
+        integer(int32) :: num_nodes_loc, n_dim
         integer(int32) :: i, j
         integer(int32) :: num_gp
+        integer(int32) :: start_idx, end_idx
 
         real(real64) :: u_curr, q_flux, dq_du, w_vol, det_j
-
         real(real64), allocatable :: psi(:)
-        real(real64), allocatable :: dpsi_dx(:, :)
         real(real64), allocatable :: node_coords(:, :)
-        real(real64), pointer, contiguous, dimension(:) :: fe_weights
-        type(type_coordinate_dp), pointer, contiguous, dimension(:) :: fe_gauss_pts
+        real(real64), pointer, contiguous, dimension(:) :: fe_weights => null()
+        type(type_coordinate_dp), pointer, contiguous, dimension(:) :: fe_gauss_pts => null()
         type(type_coordinate_dp) :: r
-
         real(real64) :: val
+        integer(int32), allocatable :: connectivity(:)
 
-        integer(int32), pointer, contiguous, dimension(:) :: connectivity
-        class(abst_bc), pointer :: bc_obj
-        class(abst_fe), pointer :: fe
+        class(abst_fe), pointer :: fe => null()
+        type(type_bc_result) :: bc_result
+        type(type_boundary_patch), pointer :: bc_patch => null()
 
-        associate (bc_manager => self%domain%boundaries%physics(physics_type%ID))
-            do i_patch = 1, bc_manager%num_bcs
-                bc_obj => bc_manager%bcs(i_patch)%condition
+        if (.not. PHYSICS_TYPES%is_valid(physics_type)) return
 
-                select type (bc_obj)
-                type is (type_bc_dirichlet)
-                    cycle
-                end select
+        call self%bc(physics_type%ID)%get_num_boundaries(num_boundaries)
 
-                associate (patch => bc_manager%bcs(i_patch))
-                    ! パッチ内の全ての境界要素についてFEタイプは同一と仮定して代表を取得 (index=1)
-                    fe => patch%fe_manager%get_fe(1)
+        do i_patch = 1, num_boundaries
+            call self%domain%get_bc_patch(i_patch, bc_patch)
 
-                    do i_elem = 1, patch%num_elements
+            call self%bc(physics_type%ID)%evaluate(i_patch, current_time, 0.0d0, bc_result)
+            if (bc_result%is_dirichlet) cycle
 
-                        ! コネクティビティ取得
-                        call self%domain%get_element_connectivity( &
-                            patch%connectivity%val(patch%connectivity%ind(i_elem)), connectivity)
+            if (bc_patch%num_fe > 0) then
+                do i_elem = 1, bc_patch%num_fe
+                    ! 要素ごとに対応するFEオブジェクトを取得する
+                    fe => bc_patch%fe_manager%get_fe(i_elem)
 
-                        if (.not. associated(connectivity)) cycle
-                        num_nodes_loc = size(connectivity)
+                    start_idx = bc_patch%connectivity%row_ptr(i_elem)
+                    end_idx = bc_patch%connectivity%row_ptr(i_elem + 1) - 1
+                    num_nodes_loc = end_idx - start_idx + 1
 
-                        ! 座標取得 (境界要素に対応するノード群)
-                        if (allocated(node_coords)) deallocate (node_coords)
-                        allocate (node_coords(self%domain%computation_dimension, num_nodes_loc))
-                        node_coords = self%domain%nodes%coordinates(:, connectivity)
+                    if (allocated(connectivity)) deallocate (connectivity)
+                    allocate (connectivity(num_nodes_loc))
+                    connectivity = bc_patch%connectivity%col_ind(start_idx:end_idx)
 
-                        ! ガウス積分情報
-                        call fe%get_num_gauss(num_gp)
-                        call fe%get_weight(fe_weights)
-                        call fe%get_gauss(fe_gauss_pts)
+                    call self%domain%nodes%get_dimension(n_dim)
+                    if (allocated(node_coords)) deallocate (node_coords)
+                    allocate (node_coords(n_dim, num_nodes_loc))
 
-                        if (allocated(psi)) deallocate (psi)
-                        allocate (psi(num_nodes_loc))
+                    call self%domain%nodes%get_coordinate(connectivity, node_coords)
 
-                        do k_gp = 1, num_gp
-                            r = fe_gauss_pts(k_gp)
-                            call fe%calc_shape_function(r, node_coords, psi=psi, determinant_jacobian=det_j)
-                            w_vol = fe_weights(k_gp) * det_j
+                    call fe%get_num_gauss(num_gp)
+                    call fe%get_weight(fe_weights)
+                    call fe%get_gauss(fe_gauss_pts)
 
-                            u_curr = 0.0d0
-                            do i = 1, num_nodes_loc
-                                call variable%get_current(connectivity(i), val)
-                                u_curr = u_curr + psi(i) * val
-                            end do
+                    if (allocated(psi)) deallocate (psi)
+                    allocate (psi(num_nodes_loc))
 
-                            call bc_obj%get_flux_and_derivative(current_time, u_curr, q_flux, dq_du)
+                    do k_gp = 1, num_gp
+                        r = fe_gauss_pts(k_gp)
+                        call fe%calc_shape_function(r, node_coords, psi=psi, determinant_jacobian=det_j)
+                        w_vol = fe_weights(k_gp) * det_j
 
-                            do i = 1, num_nodes_loc
-                                ! Residual: add(row_dof, global_node_index, value)
-                                call self%F%add(dof_offset, connectivity(i), psi(i) * q_flux * w_vol)
+                        u_curr = 0.0d0
+                        do i = 1, num_nodes_loc
+                            call variable%get_current(connectivity(i), val)
+                            u_curr = u_curr + psi(i) * val
+                        end do
 
-                                do j = 1, num_nodes_loc
-                                    ! Jacobian: add(row_dof, col_dof, row_node, col_node, value)
-                                    call self%K%add(dof_offset, dof_offset, &
-                                                    connectivity(i), connectivity(j), &
-                                                    psi(i) * dq_du * psi(j) * w_vol)
-                                end do
+                        call self%bc(physics_type%ID)%evaluate(i_patch, current_time, u_curr, bc_result)
+                        q_flux = bc_result%flux_value
+                        dq_du = bc_result%flux_derivative
+
+                        do i = 1, num_nodes_loc
+                            call self%F%add(dof_offset, connectivity(i), psi(i) * q_flux * w_vol)
+
+                            do j = 1, num_nodes_loc
+                                call self%K%add(dof_offset, dof_offset, &
+                                                connectivity(i), connectivity(j), &
+                                                psi(i) * dq_du * psi(j) * w_vol)
                             end do
                         end do
                     end do
-                end associate
-            end do
-        end associate
-
+                end do
+            end if
+        end do
     end subroutine apply_natural_bc_generic
 
     !>
@@ -206,47 +205,42 @@ contains
     !>
     module subroutine apply_essential_bc_generic(self, physics_type, current_time, variable, dof_offset)
         implicit none
-        !> Instance of FTDSS solver
         class(type_ftdss), intent(inout), target :: self
-        !> Physics type identifier in PHYSICS_TYPES
         type(type_constant_id), intent(in) :: physics_type
-        !> Current simulation time in seconds
         real(real64), intent(in) :: current_time
-        !> Field variable to apply BCs to
         type(type_variable), intent(in) :: variable
-        !> Degree of freedom offset for the physics type
         integer(int32), intent(in) :: dof_offset
 
-        integer(int32) :: i_patch, i, glob_node_id
-        real(real64) :: val_fixed, val_curr
-        logical :: is_active
-        class(abst_bc), pointer :: bc_object
+        integer(int32) :: i_patch, num_boundaries
+        integer(int32) :: i, glob_node_id
+        type(type_bc_result) :: bc_result
+        type(type_boundary_patch), pointer :: bc_patch
 
         if (.not. PHYSICS_TYPES%is_valid(physics_type)) return
 
-        associate (bc_manager => self%domain%boundaries%physics(physics_type%ID))
-            do i_patch = 1, bc_manager%num_bcs
-                bc_object => bc_manager%bcs(i_patch)%condition
+        call self%bc(physics_type%ID)%get_num_boundaries(num_boundaries)
 
-                call bc_object%get_dirichlet_value(current_time, val_fixed, is_active)
-                if (.not. is_active) cycle
+        do i_patch = 1, num_boundaries
+            call self%domain%get_bc_patch(i_patch, bc_patch)
 
-                associate (patch => bc_manager%bcs(i_patch))
-                    do i = 1, size(patch%connectivity%val)
-                        glob_node_id = patch%connectivity%val(i)
+            call self%bc(physics_type%ID)%evaluate(i_patch, current_time, 0.0d0, bc_result)
 
-                        ! 1. Zero out the row of the Jacobian matrix
-                        call self%K%zero(glob_node_id, dof_offset)
-                        !    Set diagonal element to 1.0
-                        call self%K%set(dof_offset, dof_offset, glob_node_id, glob_node_id, 1.0d0)
+            if (.not. bc_result%is_dirichlet) cycle
 
-                        ! 2. Set Residual/Force vector
-                        call self%F%set(dof_offset, glob_node_id, 0.0d0)
-                    end do
-                end associate
-            end do
-        end associate
+            if (allocated(bc_patch%connectivity%col_ind)) then
+                do i = 1, size(bc_patch%connectivity%col_ind)
+                    glob_node_id = bc_patch%connectivity%col_ind(i)
 
+                    ! 1. Zero out the row of the Jacobian matrix
+                    call self%K%zero(glob_node_id, dof_offset)
+                    ! Set diagonal element to 1.0
+                    call self%K%set(dof_offset, dof_offset, glob_node_id, glob_node_id, 1.0d0)
+
+                    ! 2. Set Residual/Force vector
+                    call self%F%set(dof_offset, glob_node_id, 0.0d0)
+                end do
+            end if
+        end do
     end subroutine apply_essential_bc_generic
 
 end submodule ftdss_boundary

@@ -41,6 +41,8 @@ contains
         type(type_config_observation) :: config_observation
         type(type_config_overall) :: config_overall
 
+        type(type_config_bc), allocatable :: config_bcs(:)
+
         call self%control%initialize()
         call self%control%profiler_record(TIME_RECORDS%START)
         call self%control%profiler_start(PROFILER_TYPES%TOTAL)
@@ -63,6 +65,18 @@ contains
         call self%control%initialize(config_control_manager, config_iteration, config_time, config_time_ats, &
                                      config_output_field, config_output_history, &
                                      config_acceleration, config_parallel_openmp)
+
+        if (self%is_active_thermal()) then
+            call input_translator%execute(input, PHYSICS_TYPES%THERMAL, config_bcs)
+            call self%bc(PHYSICS_TYPES%THERMAL%ID)%initialize(config_bcs)
+        end if
+        deallocate (config_bcs)
+
+        if (self%is_active_hydraulic()) then
+            call input_translator%execute(input, PHYSICS_TYPES%HYDRAULIC, config_bcs)
+            call self%bc(PHYSICS_TYPES%HYDRAULIC%ID)%initialize(config_bcs)
+        end if
+        deallocate (config_bcs)
 
         call input_translator%execute(input, IC_TARGETS%POROSITY, configs_ic(IC_TARGETS%POROSITY%ID))
         call input_translator%execute(input, IC_TARGETS%THERMAL, configs_ic(IC_TARGETS%THERMAL%ID))
@@ -531,7 +545,7 @@ contains
 
     end function is_active_hydraulic_ftdss
 
-    module subroutine finalize_type_ftdss(self)
+    module subroutine destory_type_ftdss(self)
         implicit none
         class(type_ftdss), intent(inout) :: self
 
@@ -552,5 +566,5 @@ contains
         call MPI_Finalize(ierr)
 #endif
 
-    end subroutine finalize_type_ftdss
+    end subroutine destory_type_ftdss
 end submodule ftdss_base

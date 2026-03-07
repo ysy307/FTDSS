@@ -14,11 +14,15 @@ module boundary_manager
     end type holder_bc_strategy
 
     type :: type_bc_manager
+        integer(int32), private :: num_boundaries = 0
         type(holder_bc_strategy), allocatable, private :: strategies(:)
     contains
         procedure, public, pass(self) :: initialize => initialize_bc_manager
         procedure, public, pass(self) :: destroy => destroy_bc_manager
-        procedure, public, pass(self) :: evaluate => evaluate_bc_manager
+        generic :: evaluate => evaluate_bc, evaluate_bcs
+        procedure, public, pass(self) :: evaluate_bc => evaluate_bc_manager
+        procedure, public, pass(self) :: evaluate_bcs => evaluate_bcs_manager
+        procedure, public, pass(self) :: get_num_boundaries => get_num_boundaries_bc_manager
     end type type_bc_manager
 
 contains
@@ -29,11 +33,10 @@ contains
         type(type_config_bc), intent(in) :: configs(:)
 
         integer(int32) :: i
-        integer(int32) :: num_bcs
 
-        num_bcs = size(configs)
+        self%num_boundaries = size(configs)
 
-        do i = 1, num_bcs
+        do i = 1, self%num_boundaries
             self%strategies(i)%p = create_bc_strategy(configs(i))
         end do
 
@@ -70,5 +73,38 @@ contains
             call result%initialize()
         end if
     end subroutine evaluate_bc_manager
+
+    subroutine evaluate_bcs_manager(self, bc_id, current_time, u_curr, results)
+        implicit none
+        class(type_bc_manager), intent(in) :: self
+        integer(int32), intent(in) :: bc_id
+        real(real64), intent(in) :: current_time
+        real(real64), intent(in) :: u_curr(:)
+        type(type_bc_result), intent(inout) :: results(:)
+
+        integer(int32) :: i
+
+        if (size(u_curr) /= size(results)) then
+            error stop "Size of u_curr and results must be the same in evaluate_bc_manager."
+        end if
+
+        if (bc_id > 0 .and. bc_id <= size(self%strategies)) then
+            do i = 1, size(u_curr)
+                call self%strategies(bc_id)%p%evaluate(current_time, u_curr(i), results(i))
+            end do
+        else
+            do i = 1, size(u_curr)
+                call results(i)%initialize()
+            end do
+        end if
+    end subroutine evaluate_bcs_manager
+
+    pure subroutine get_num_boundaries_bc_manager(self, num_boundaries)
+        implicit none
+        class(type_bc_manager), intent(in) :: self
+        integer(int32), intent(inout) :: num_boundaries
+
+        num_boundaries = self%num_boundaries
+    end subroutine get_num_boundaries_bc_manager
 
 end module boundary_manager

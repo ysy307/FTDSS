@@ -50,13 +50,12 @@ module io_input_translator
     type(type_input_translator), parameter, public :: input_translator = type_input_translator()
 
     interface
-        module subroutine execute_condition_boundary(self, input, index, target_physics, config)
+        module subroutine execute_condition_boundary(self, input, target_physics, configs)
             implicit none
             class(type_input_translator), intent(in) :: self
             class(type_input), intent(in) :: input
-            integer(int32), intent(in) :: index
             type(type_constant_id), intent(in) :: target_physics
-            type(type_config_bc), intent(inout) :: config
+            type(type_config_bc), intent(inout), allocatable :: configs(:)
         end subroutine execute_condition_boundary
 
         module subroutine execute_condition_initial(self, input, ic_target, config)

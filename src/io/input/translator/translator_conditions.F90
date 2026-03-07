@@ -2,57 +2,62 @@ submodule(io_input_translator) translator_conditions
     implicit none
 contains
 
-    module subroutine execute_condition_boundary(self, input, index, target_physics, config)
+    module subroutine execute_condition_boundary(self, input, target_physics, configs)
         implicit none
         class(type_input_translator), intent(in) :: self
         class(type_input), intent(in) :: input
-        integer(int32), intent(in) :: index
         type(type_constant_id), intent(in) :: target_physics
-        type(type_config_bc), intent(inout) :: config
+        type(type_config_bc), intent(inout), allocatable :: configs(:)
 
-        integer(int32) :: i
+        integer(int32) :: i, j
+        integer(int32) :: index
 
-        config%boundary_id = input%conditions%boundary_conditions(index)%id
+        allocate (configs(input%conditions%num_boundaries))
 
-        associate (physics_data => input%conditions%boundary_conditions(index)%physics(target_physics%ID))
+        do index = 1, input%conditions%num_boundaries
+            configs(index)%boundary_id = input%conditions%boundary_conditions(index)%id
 
-            if (.not. physics_data%is_active) return
+            associate (physics_data => input%conditions%boundary_conditions(index)%physics(target_physics%ID))
 
-            config%physics_type = target_physics
-            config%num_time_points = physics_data%num_time_points
+                if (.not. physics_data%is_active) return
 
-            select case (target_physics%ID)
-            case (PHYSICS_TYPES%THERMAL%ID)
-                config%bc_kind = THERMAL_BC_TYPES%to_object(physics_data%bc_type)
-            case (PHYSICS_TYPES%HYDRAULIC%ID)
-                config%bc_kind = HYDRAULIC_BC_TYPES%to_object(physics_data%bc_type)
-            end select
+                configs(index)%physics_type = target_physics
+                configs(index)%num_time_points = physics_data%num_time_points
 
-            config%bc_data_kind = BC_DATA_PROVIDERS%to_object(physics_data%bc_value_type)
+                select case (target_physics%ID)
+                case (PHYSICS_TYPES%THERMAL%ID)
+                    configs(index)%bc_kind = THERMAL_BC_TYPES%to_object(physics_data%bc_type)
+                case (PHYSICS_TYPES%HYDRAULIC%ID)
+                    configs(index)%bc_kind = HYDRAULIC_BC_TYPES%to_object(physics_data%bc_type)
+                end select
 
-            select case (config%bc_kind%ID)
-            case (THERMAL_BC_TYPES%DIRICHLET%ID,  THERMAL_BC_TYPES%FLUX%ID, &
-                  HYDRAULIC_BC_TYPES%DIRICHLET%ID, HYDRAULIC_BC_TYPES%FLUX%ID)
-                config%num_variables = 1
-                call allocate_array(config%time_points, config%num_time_points)
-                call allocate_array(config%values, config%num_variables, config%num_time_points)
+                configs(index)%bc_data_kind = BC_DATA_PROVIDERS%to_object(physics_data%bc_value_type)
 
-                do i = 1, config%num_time_points
-                    config%time_points(i) = physics_data%values(i)%time
-                    config%values(1, i) = physics_data%values(i)%value
-                end do
+                select case (configs(index)%bc_kind%ID)
+                case (THERMAL_BC_TYPES%DIRICHLET%ID, THERMAL_BC_TYPES%FLUX%ID, &
+                      HYDRAULIC_BC_TYPES%DIRICHLET%ID, HYDRAULIC_BC_TYPES%FLUX%ID)
+                    configs(index)%num_variables = 1
+                    call allocate_array(configs(index)%time_points, configs(index)%num_time_points)
+                    call allocate_array(configs(index)%values, configs(index)%num_variables, configs(index)%num_time_points)
 
-            case (THERMAL_BC_TYPES%ROBIN%ID, THERMAL_BC_TYPES%CONVECTIVE%ID, THERMAL_BC_TYPES%RADIATION%ID)
-                config%num_variables = 2
-                call allocate_array(config%time_points, config%num_time_points)
-                call allocate_array(config%values, config%num_variables, config%num_time_points)
+                    do i = 1, configs(index)%num_time_points
+                        configs(index)%time_points(i) = physics_data%values(i)%time
+                        configs(index)%values(1, i) = physics_data%values(i)%value
+                    end do
 
-                ! Assign values for 2 variables here
-            case default
-                config%num_variables = 0
-            end select
+                case (THERMAL_BC_TYPES%ROBIN%ID, THERMAL_BC_TYPES%CONVECTIVE%ID, THERMAL_BC_TYPES%RADIATION%ID)
+                    configs(index)%num_variables = 2
+                    call allocate_array(configs(index)%time_points, configs(index)%num_time_points)
+                    call allocate_array(configs(index)%values, configs(index)%num_variables, configs(index)%num_time_points)
 
-        end associate
+                    ! Assign values for 2 variables here
+                case default
+                    configs(index)%num_variables = 0
+                end select
+
+            end associate
+
+        end do
 
     end subroutine execute_condition_boundary
 

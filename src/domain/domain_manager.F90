@@ -14,7 +14,7 @@ module domain_manager
     use :: domain_adjacency, only:type_node_adjacency, type_map_node_to_element
     use :: components_domain_nodes, only:type_nodes_manager
     use :: components_domain_elements, only:type_elements_manager
-    use :: components_domain_boundaries, only:type_boundaries_manager
+    use :: components_domain_boundaries, only:type_boundaries_manager, type_boundary_patch
 
     implicit none
     private
@@ -82,12 +82,14 @@ module domain_manager
         procedure, public, pass(self) :: get_fe_connectivity => get_fe_connectivity_domain
         procedure, public, pass(self) :: get_fe_coordinate => get_fe_coordinate_domain
         procedure, public, pass(self) :: get_num_dof_per_node => get_num_dof_per_node_domain
+        procedure, public, pass(self) :: get_start_dof_index => get_start_dof_index_domain
         procedure, public, pass(self) :: get_node_adjacency => get_node_adjacency_domain
         procedure, public, pass(self) :: get_target_dof => get_target_dof_domain
         procedure, public, pass(self) :: get_material_id => get_material_id_domain
         procedure, public, pass(self) :: get_num_colors => get_num_colors_domain
         procedure, public, pass(self) :: get_colored_elements => get_colored_elements_domain
         procedure, public, pass(self) :: get_total_dofs => get_total_dofs_domain
+        procedure, public, pass(self) :: get_bc_patch => get_bc_patch_domain
         procedure, public, pass(self) :: get_config => get_config_domain
 
         ! ---- Meta / Utility ----
@@ -191,7 +193,7 @@ contains
         class(type_domain), intent(in) :: self
         integer(int32), intent(inout) :: num_dofs_per_node
 
-        call self%dof_map%get_num_dof_per_node(num_dofs_per_node)
+        call self%dof_map%get_num_dofs_per_node(num_dofs_per_node)
     end subroutine get_num_dof_per_node_domain
 
     subroutine get_total_dofs_domain(self, total_dofs)
@@ -203,7 +205,7 @@ contains
         integer(int32) :: num_dofs_per_node
 
         call self%nodes%get_num_nodes(num_nodes)
-        call self%dof_map%get_num_dof_per_node(num_dofs_per_node)
+        call self%dof_map%get_num_dofs_per_node(num_dofs_per_node)
 
         total_dofs = num_nodes * num_dofs_per_node
     end subroutine get_total_dofs_domain
@@ -269,7 +271,7 @@ contains
         type(type_constant_id), intent(in) :: physics_type
         integer(int32), intent(inout) :: target_dof
 
-        call self%dof_map%get_num_dof_of_physics(physics_type, target_dof)
+        call self%dof_map%get_num_dofs_of_physics(physics_type, target_dof)
 
     end subroutine get_target_dof_domain
 
@@ -299,6 +301,25 @@ contains
 
         call self%elements%colors%get_colored_elements(color_id, num_fe, elements)
     end subroutine get_colored_elements_domain
+
+    subroutine get_start_dof_index_domain(self, physics_id, start_dof_index)
+        implicit none
+        class(type_domain), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_id
+        integer(int32), intent(inout) :: start_dof_index
+
+        call self%dof_map%get_start_dof_index(physics_id, start_dof_index)
+
+    end subroutine get_start_dof_index_domain
+
+    subroutine get_bc_patch_domain(self, patch_id, boundary_patch)
+        implicit none
+        class(type_domain), intent(in), target :: self
+        integer(int32), intent(in) :: patch_id
+        type(type_boundary_patch), intent(inout), pointer :: boundary_patch
+
+        call self%boundaries%get_bc_patch(patch_id, boundary_patch)
+    end subroutine get_bc_patch_domain
 
     subroutine calc_measure_domain(self, element_id, measure)
         implicit none
@@ -442,7 +463,7 @@ contains
         call self%get_fe(config%fe_id, fe)
         config%fe => fe
         call self%get_fe_connectivity(config%fe_id, p_conn)
-        call allocate_copy(config%connectivity, p_conn)
+        call allocate_array(config%connectivity, p_conn)
 
     end subroutine get_config_domain
 

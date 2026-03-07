@@ -2,7 +2,6 @@
 module domain_multicoloring
     use, intrinsic :: iso_fortran_env
     use :: module_core
-    ! use :: module_input, only: type_input
     implicit none
     private
 

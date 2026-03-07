@@ -71,7 +71,7 @@ contains
             end do
             !$OMP END DO
             
-            call self%assemble_finalize(workspace, local_K_TT, local_K_TH, &
+            call self%assemble_destory(workspace, local_K_TT, local_K_TH, &
                                         local_K_HH, local_K_HT, local_F_T, local_F_H)
             if (allocated(elem_coords)) deallocate(elem_coords)
             
@@ -213,7 +213,7 @@ contains
 
     end subroutine assemble_local_ftdss
 
-    module subroutine assemble_finalize_ftdss(self, workspace, local_K_TT, local_K_TH, &
+    module subroutine assemble_destory_ftdss(self, workspace, local_K_TT, local_K_TH, &
                                               local_K_HH, local_K_HT, local_F_T, local_F_H)
         implicit none
         class(type_ftdss), intent(inout) :: self
@@ -229,6 +229,6 @@ contains
         if (present(local_K_HT)) call local_K_HT%destroy()
         if (present(local_F_T)) call local_F_T%destroy()
         if (present(local_F_H)) call local_F_H%destroy()
-    end subroutine assemble_finalize_ftdss
+    end subroutine assemble_destory_ftdss
 
 end submodule ftdss_assemble

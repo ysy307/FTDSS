@@ -10,14 +10,14 @@ module app_ftdss
     use :: module_output, only:type_output_manager
 
     use :: module_control, only:type_control
-    use :: module_domain, only:type_domain, abst_fe
-    use :: module_boundary, only:abst_bc, type_bc_dirichlet
+    use :: module_domain
+    ! use :: module_boundary, only:
     use :: module_initial, only:type_ic_manager
     use :: module_system, only:type_jacobian_matrix, type_residual_vector
     use :: module_constitutive, only:g => gravity_acceleration
     use :: module_linalg
 
-    use :: module_governing, only:type_thermal, type_hydraulic, type_assemble_workspace
+    use :: module_governing
     use :: module_solver
     implicit none
 
@@ -40,14 +40,35 @@ module app_ftdss
         type(type_thermal) :: thermal
         type(type_hydraulic) :: hydraulic
 
+        type(type_bc_manager) :: bc(PHYSICS_TYPES%NUM_ID)
+
         class(abst_solver), allocatable :: solver
 
         type(type_control) :: control
         type(type_output_manager) :: output
 
     contains
+        ! ---- Lifecycle ----
+        ! initialize, destroy, reset, etc.
         procedure, public, pass(self) :: initialize => initialize_type_ftdss
-        procedure, public, pass(self) :: finalize => finalize_type_ftdss
+        procedure, public, pass(self) :: destory => destory_type_ftdss
+
+        ! ---- Mutator ----
+        ! set_XXX, increment_XXX, update_XXX, etc.
+
+        ! ---- Algorithm / Operation ----
+        ! compute_XXX, check_XXX, solve_XXX, etc.
+
+        ! ---- Inquiry ----
+        ! is_XXX, has_XXX, should_XXX, etc.
+
+        ! ---- Getter ----
+        ! get_XXX, etc.
+
+        ! ---- Meta / Utility ----
+        ! display, to_string, etc.
+
+        ! ---- Operator ----
 
         procedure, public, pass(self) :: shift => shift_ftdss
 
@@ -76,7 +97,7 @@ module app_ftdss
         procedure, public, pass(self) :: assemble_local => assemble_local_ftdss
         procedure, public, pass(self) :: assemble => assemble_ftdss
         procedure, private, pass(self) :: assemble_initialize => assemble_initialize_ftdss
-        procedure, private, pass(self) :: assemble_finalize => assemble_finalize_ftdss
+        procedure, private, pass(self) :: assemble_destory => assemble_destory_ftdss
 
         procedure, private, pass(self) :: get_variable_increment => get_variable_increment_ftdss
         procedure, private, pass(self) :: get_variable_residual => get_variable_residual_ftdss
@@ -243,15 +264,15 @@ module app_ftdss
             real(real64), allocatable, intent(inout) :: coordinates(:, :)
         end subroutine assemble_initialize_ftdss
 
-        module subroutine assemble_finalize_ftdss(self, workspace, local_K_TT, local_K_TH, &
-                                                  local_K_HH, local_K_HT, local_F_T, local_F_H)
+        module subroutine assemble_destory_ftdss(self, workspace, local_K_TT, local_K_TH, &
+                                                 local_K_HH, local_K_HT, local_F_T, local_F_H)
             implicit none
             class(type_ftdss), intent(inout) :: self
             type(type_assemble_workspace), intent(inout) :: workspace
             type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
             type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
 
-        end subroutine assemble_finalize_ftdss
+        end subroutine assemble_destory_ftdss
 
         module subroutine get_variable_increment_ftdss(self, variable_id, variable)
             implicit none
@@ -325,11 +346,11 @@ module app_ftdss
 
         end subroutine run_ftdss
 
-        module subroutine finalize_type_ftdss(self)
+        module subroutine destory_type_ftdss(self)
             implicit none
             class(type_ftdss), intent(inout) :: self
 
-        end subroutine finalize_type_ftdss
+        end subroutine destory_type_ftdss
 
         module function is_active_thermal_ftdss(self) result(is_active)
             implicit none
