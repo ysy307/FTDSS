@@ -63,6 +63,21 @@
         'id_range' : [1, 5] &
     }
 
+    #:set SOLVER_BC_TYPES = { &
+        'type_name'  : 'type_solver_bc_types', &
+        'obj_name'   : 'SOLVER_BC_TYPES', &
+        'category'   : 'SOLVER_BC', &
+        'suffix'     : 'solver_bc_type', &
+        'description': 'Solver boundary condition types', &
+        'items'      : [ &
+            ('DIRICHLET', 1, 'dirichlet'),&
+            ('FLUX',      2, 'flux'),&
+            ('ROBIN',     3, 'robin') &
+        ], &
+        'num' : 3, &
+        'id_range' : [1, 3] &
+    }
+
     #:set THERMAL_BC_TYPES = { &
         'type_name'  : 'type_thermal_bc_types', &
         'obj_name'   : 'THERMAL_BC_TYPES', &
@@ -79,21 +94,6 @@
         ], &
         'num' : 6, &
         'id_range' : [101, 106] &
-    }
-
-    #:set SOLVER_BC_TYPES = { &
-        'type_name'  : 'type_solver_bc_types', &
-        'obj_name'   : 'SOLVER_BC_TYPES', &
-        'category'   : 'SOLVER_BC', &
-        'suffix'     : 'solver_bc_type', &
-        'description': 'Solver boundary condition types', &
-        'items'      : [ &
-            ('DIRICHLET', 1, 'dirichlet'),&
-            ('FLUX',      2, 'flux'),&
-            ('ROBIN',     3, 'robin') &
-        ], &
-        'num' : 3, &
-        'id_range' : [1, 3] &
     }
 
     #:set HYDRAULIC_BC_TYPES = { &

@@ -31,8 +31,8 @@ contains
             config%bc_data_kind = BC_DATA_PROVIDERS%to_object(physics_data%bc_value_type)
 
             select case (config%bc_kind%ID)
-            case (THERMAL_BC_TYPES%DIRICHLET%ID, THERMAL_BC_TYPES%NEUMANN%ID, THERMAL_BC_TYPES%FLUX%ID, &
-                  HYDRAULIC_BC_TYPES%DIRICHLET%ID, HYDRAULIC_BC_TYPES%NEUMANN%ID, HYDRAULIC_BC_TYPES%FLUX%ID)
+            case (THERMAL_BC_TYPES%DIRICHLET%ID,  THERMAL_BC_TYPES%FLUX%ID, &
+                  HYDRAULIC_BC_TYPES%DIRICHLET%ID, HYDRAULIC_BC_TYPES%FLUX%ID)
                 config%num_variables = 1
                 call allocate_array(config%time_points, config%num_time_points)
                 call allocate_array(config%values, config%num_variables, config%num_time_points)

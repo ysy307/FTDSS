@@ -161,8 +161,8 @@ contains
             allocate (self%values(self%num_time_points))
 
             select case (bc_kind%ID)
-            case (THERMAL_BC_TYPES%DIRICHLET%ID, THERMAL_BC_TYPES%NEUMANN%ID, THERMAL_BC_TYPES%FLUX%ID, &
-                  HYDRAULIC_BC_TYPES%DIRICHLET%ID, HYDRAULIC_BC_TYPES%NEUMANN%ID, HYDRAULIC_BC_TYPES%FLUX%ID)
+            case (THERMAL_BC_TYPES%DIRICHLET%ID, THERMAL_BC_TYPES%FLUX%ID, &
+                  HYDRAULIC_BC_TYPES%DIRICHLET%ID, HYDRAULIC_BC_TYPES%FLUX%ID)
                 idx = idx + 1
                 do i = 1, self%num_time_points
                     local_buffer(idx) = values//"("//to_string(i)//")"

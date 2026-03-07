@@ -41,7 +41,8 @@ contains
     !> - If the key is missing and `default_value` is provided, the target is set to the default.
     !> - If the key is missing and `is_required` is true, it raises an error.
     !> - If the value is found, it is validated against `valid_range` and `valid_list` (if provided).
-    subroutine get_json_integer32(json, key, target_var, found, is_required, default_value, valid_range, valid_list)
+    subroutine get_json_integer32(json, key, target_var, found, is_required, &
+                                  default_value, valid_range, valid_list)
         implicit none
         !> JSON file object
         class(json_file), intent(inout) :: json
@@ -100,7 +101,8 @@ contains
     !> - If the key is missing and `default_value` is provided, the target is set to the default.
     !> - If the key is missing and `is_required` is true, it raises an error.
     !> - If the value is found, it is validated against `valid_range` (if provided).
-    subroutine get_json_real64(json, key, target_var, found, is_required, default_value, valid_range)
+    subroutine get_json_real64(json, key, target_var, found, is_required, &
+                               default_value, valid_range)
         implicit none
         !> JSON file object
         class(json_file), intent(inout) :: json
@@ -150,7 +152,8 @@ contains
     !> This routine extracts a logical value associated with the specified key.
     !> - If the key is missing and `default_value` is provided, the target is set to the default.
     !> - If the key is missing and `is_required` is true, it raises an error.
-    subroutine get_json_logical(json, key, target_var, found, is_required, default_value)
+    subroutine get_json_logical(json, key, target_var, found, is_required, &
+                                default_value)
         implicit none
         !> JSON file object
         class(json_file), intent(inout) :: json
@@ -191,7 +194,8 @@ contains
     !> - If the key is missing and `default_value` is provided, the target is set to the default.
     !> - If the key is missing and `is_required` is true, it raises an error.
     !> - If the value is found, it is validated against `valid_list` (if provided).
-    subroutine get_json_string(json, key, target_var, found, is_required, default_value, valid_list)
+    subroutine get_json_string(json, key, target_var, found, is_required, &
+                               default_value, valid_list)
         implicit none
         !> JSON file object
         class(json_file), intent(inout) :: json
@@ -252,7 +256,8 @@ contains
     !> - Raises an error if `is_required` is true and the key is missing.
     !> - Validates the array size against `array_size` if provided.
     !> - Validates all elements against `valid_range` and `valid_list` if provided.
-    subroutine get_json_integer32_array(json, key, target_var, found, is_required, default_value, valid_range, valid_list, array_size)
+    subroutine get_json_integer32_array(json, key, target_var, found, is_required, &
+                                        default_value, valid_range, valid_list, array_size)
         implicit none
         !> JSON file object
         class(json_file), intent(inout) :: json
@@ -323,7 +328,8 @@ contains
     !> - Raises an error if `is_required` is true and the key is missing.
     !> - Validates the array size against `array_size` if provided.
     !> - Validates all elements against `valid_range` and `valid_list` if provided.
-    subroutine get_json_real64_array(json, key, target_var, found, is_required, default_value, valid_range, valid_list, array_size)
+    subroutine get_json_real64_array(json, key, target_var, found, is_required, &
+                                     default_value, valid_range, valid_list, array_size)
         implicit none
         !> JSON file object
         class(json_file), intent(inout) :: json
@@ -394,7 +400,8 @@ contains
     !> - Raises an error if `is_required` is true and the key is missing.
     !> - Validates the array size against `array_size` if provided.
     !> - Validates all elements against `valid_list` if provided.
-    subroutine get_json_string_array(json, key, target_var, found, is_required, default_value, valid_list, array_size)
+    subroutine get_json_string_array(json, key, target_var, found, is_required, &
+                                     default_value, valid_list, array_size)
         implicit none
         !> JSON file object
         class(json_file), intent(inout) :: json
