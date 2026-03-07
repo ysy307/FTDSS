@@ -3,6 +3,7 @@ module types_config_conditions_boundary
     use :: core_memory, only:allocate_array, deallocate_array
     use :: core_constants, only:type_constant_id
     use :: types_config_base, only:abst_config
+    use :: types_utils_datetime, only:type_datetime
     implicit none
     private
 
@@ -17,7 +18,9 @@ module types_config_conditions_boundary
         !> 境界条件の種類
         !> ディリクレ，ノイマンなど
         type(type_constant_id) :: bc_kind = type_constant_id("", "", -1)
+        type(type_constant_id) :: bc_data_kind = type_constant_id("", "", -1)
 
+        type(type_datetime), allocatable :: datetime_points(:)
         real(real64), allocatable :: time_points(:)
         real(real64), allocatable :: values(:, :) ! (成分, 時間)
 
@@ -43,11 +46,12 @@ contains
             call self%set(self%boundary_id, source%boundary_id)
             call self%set(self%physics_type, source%physics_type)
             call self%set(self%bc_kind, source%bc_kind)
-            
+            call self%set(self%bc_data_kind, source%bc_data_kind)
 
             call self%set(self%num_time_points, source%num_time_points)
             call self%set(self%num_variables, source%num_variables)
-
+            
+            call self%set(self%datetime_points, source%datetime_points)
             call self%set(self%time_points, source%time_points)
             call self%set(self%values, source%values)
         class default
@@ -62,7 +66,9 @@ contains
         self%boundary_id = -1
         self%physics_type = type_constant_id("", "", -1)
         self%bc_kind = type_constant_id("", "", -1)
-
+        self%bc_data_kind = type_constant_id("", "", -1)
+        
+        if (allocated(self%datetime_points)) deallocate (self%datetime_points)
         if (allocated(self%time_points)) deallocate (self%time_points)
         if (allocated(self%values)) deallocate (self%values)
 

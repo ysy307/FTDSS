@@ -10,7 +10,6 @@ target_sources(SOLVER_GOVERNING PRIVATE
     # ====================================================
     # 1. Boundary Conditions
     # ====================================================
-    condition/boundary/boundary_dto.F90
     condition/boundary/data_provider/data_provider_interface.F90
     condition/boundary/data_provider/data_provider_constant.F90
     condition/boundary/data_provider/data_provider_table.F90

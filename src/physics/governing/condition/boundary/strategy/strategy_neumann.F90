@@ -1,42 +1,26 @@
-!> Implementation of Neumann (fixed flux) boundary strategy.
 submodule(condition_boundary_strategy) strategy_neumann
     implicit none
 contains
 
-    !> Calculates the residual flux and Jacobian derivative for Neumann boundaries.
-    !! Mathematical definition:
-    !! \[ q = q_{prescribed}(t), \quad \frac{\partial q}{\partial u} = 0 \]
-    !! Computational complexity: O(1)
-    module subroutine calc_flux_neumann_bc(self, current_time, u_curr, flux_value, flux_derivative)
+    module subroutine evaluate_neumann_bc(self, current_time, u_curr, result)
         implicit none
-        class(type_bc_neumann), intent(inout) :: self
+        class(type_bc_neumann), intent(in) :: self
         real(real64), intent(in) :: current_time
         real(real64), intent(in) :: u_curr
-        real(real64), intent(inout) :: flux_value
-        real(real64), intent(inout) :: flux_derivative
+        type(type_bc_result), intent(inout) :: result
 
-        type(type_bc_data_scalar) :: bc_data
+        real(real64), allocatable :: values(:)
 
-        ! プロバイダから Scalar 用のデータを引き出す
-        call self%data_provider%get_data(current_time, bc_data)
+        call self%provider%get_data(current_time, values)
 
-        flux_value = bc_data%prescribed_value
-        flux_derivative = 0.0d0
-    end subroutine calc_flux_neumann_bc
+        result%is_dirichlet = .false.
+        result%prescribed_value = 0.0d0
+        result%flux_derivative = 0.0d0
 
-    !> Determines if the node should be treated as Dirichlet.
-    !! Always returns false for pure Neumann conditions.
-    !! Computational complexity: O(1)
-    module subroutine calc_dirichlet_neumann_bc(self, current_time, u_curr, prescribed_value, is_active)
-        implicit none
-        class(type_bc_neumann), intent(inout) :: self
-        real(real64), intent(in) :: current_time
-        real(real64), intent(in) :: u_curr
-        real(real64), intent(inout) :: prescribed_value
-        logical, intent(inout) :: is_active
-
-        prescribed_value = 0.0d0
-        is_active = .false.
-    end subroutine calc_dirichlet_neumann_bc
+        if (allocated(values)) then
+            if (size(values) >= 1) result%flux_value = values(1)
+            deallocate(values)
+        end if
+    end subroutine evaluate_neumann_bc
 
 end submodule strategy_neumann

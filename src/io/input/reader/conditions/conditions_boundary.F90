@@ -135,21 +135,6 @@ contains
         case (PHYSICS_TYPES%HYDRAULIC%ID)
             bc_kind = HYDRAULIC_BC_TYPES%to_object(self%bc_type)
         end select
-        ! if (bc_kind == THERMAL_BC_TYPES%DIRICHLET .or. &
-        !     bc_kind == THERMAL_BC_TYPES%NEUMANN .or. &
-        !     bc_kind == THERMAL_BC_TYPES%FLUX .or. &
-        !     bc_kind == HYDRAULIC_BC_TYPES%DIRICHLET .or. &
-        !     bc_kind == HYDRAULIC_BC_TYPES%NEUMANN .or. &
-        !     bc_kind == HYDRAULIC_BC_TYPES%FLUX) then
-
-        !     ! self%state%num_variables = 1
-        ! elseif (bc_kind == THERMAL_BC_TYPES%ROBIN .or. &
-        !         bc_kind == THERMAL_BC_TYPES%CONVECTIVE .or. &
-        !         bc_kind == THERMAL_BC_TYPES%RADIATION) then
-        !     ! self%state%num_variables = 2
-        ! else
-        !     ! self%state%num_variables = 0
-        ! end if
 
         local_buffer(idx) = value_type
         call get_json_value(json, join(local_buffer(1:idx)), self%bc_value_type, is_required=.true.)
@@ -158,23 +143,26 @@ contains
         if (allocated(self%values)) deallocate (self%values)
         select case (bc_value_type%ID)
         case (BC_DATA_PROVIDERS%CONSTANT%ID)
-            allocate (self%values(1))
+            self%num_time_points = 1
+            allocate (self%values(self%num_time_points))
+
             idx = idx + 1
             local_buffer(idx) = values
-            call get_json_value(json, join(local_buffer(1:idx)), self%values(1)%value, is_required=.true.)
+            call get_json_value(json, join(local_buffer(1:idx)), self%values(1)%values, is_required=.true.)
+
         case (BC_DATA_PROVIDERS%TABLE%ID)
+            idx = idx + 1
+            local_buffer(idx) = values
+            call json%info(join(local_buffer(1:idx)), found=found, n_children=self%num_time_points)
+            if (.not. found .or. self%num_time_points <= 0) then
+                call raise_error(ERROR_CODES%VAR_INVALID, opt=join(local_buffer(1:idx)))
+            end if
+
+            allocate (self%values(self%num_time_points))
+
             select case (bc_kind%ID)
             case (THERMAL_BC_TYPES%DIRICHLET%ID, THERMAL_BC_TYPES%NEUMANN%ID, THERMAL_BC_TYPES%FLUX%ID, &
                   HYDRAULIC_BC_TYPES%DIRICHLET%ID, HYDRAULIC_BC_TYPES%NEUMANN%ID, HYDRAULIC_BC_TYPES%FLUX%ID)
-                idx = idx + 1
-                local_buffer(idx) = values
-                call json%info(join(local_buffer(1:idx)), found=found, n_children=self%num_time_points)
-                if (.not. found .or. self%num_time_points <= 0) then
-                    call raise_error(ERROR_CODES%VAR_INVALID, opt=join(local_buffer(1:idx)))
-                end if
-
-                allocate (self%values(self%num_time_points))
-
                 idx = idx + 1
                 do i = 1, self%num_time_points
                     local_buffer(idx) = values//"("//to_string(i)//")"
@@ -192,10 +180,24 @@ contains
                     call get_json_value(json, join(local_buffer(1:idx)), self%values(i)%value, is_required=.true.)
                     idx = idx - 1
                 end do
-
             case (THERMAL_BC_TYPES%ROBIN%ID, THERMAL_BC_TYPES%CONVECTIVE%ID, THERMAL_BC_TYPES%RADIATION%ID)
-                ! TODO : 2変数のテーブルデータの読み込み
-                ! self%state%num_variables = 2
+                idx = idx + 1
+                do i = 1, self%num_time_points
+                    local_buffer(idx) = values//"("//to_string(i)//")"
+                    idx = idx + 1
+                    local_buffer(idx) = "time"
+                    call get_json_value(json, join(local_buffer(1:idx)), self%values(i)%time, &
+                                        found=found_time_real, is_required=.false.)
+                    call get_json_value(json, join(local_buffer(1:idx)), self%values(i)%time_iso, &
+                                        found=found_time_string, is_required=.false.)
+                    if (found_time_real .or. found_time_string) then
+                        call raise_error(ERROR_CODES%VAR_INVALID, opt=join(local_buffer(1:idx)))
+                    end if
+
+                    local_buffer(idx) = "value"
+                    call get_json_value(json, join(local_buffer(1:idx)), self%values(i)%values, is_required=.true.)
+                    idx = idx - 1
+                end do
             end select
         end select
 

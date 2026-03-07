@@ -51,8 +51,9 @@ contains
                                          max_iter, return_insertion) result(idx)
             integer(${k}$), intent(in) :: value
             integer(${k}$), intent(in) :: array(:)
-            ! インデックス用の型も idx_k に合わせて変更
-            integer(${idx_k}$), intent(in), optional :: start_index, end_index, max_iter
+            integer(${idx_k}$), intent(in), optional :: start_index
+            integer(${idx_k}$), intent(in), optional :: end_index
+            integer(${idx_k}$), intent(in), optional :: max_iter
             logical, intent(in), optional :: return_insertion
             integer(${idx_k}$) :: idx
 

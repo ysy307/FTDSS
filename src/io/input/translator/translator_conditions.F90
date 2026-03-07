@@ -21,18 +21,29 @@ contains
             config%physics_type = target_physics
             config%num_time_points = physics_data%num_time_points
 
-            if (target_physics == PHYSICS_TYPES%THERMAL) then
+            select case (target_physics%ID)
+            case (PHYSICS_TYPES%THERMAL%ID)
                 config%bc_kind = THERMAL_BC_TYPES%to_object(physics_data%bc_type)
-            else if (target_physics == PHYSICS_TYPES%HYDRAULIC) then
+            case (PHYSICS_TYPES%HYDRAULIC%ID)
                 config%bc_kind = HYDRAULIC_BC_TYPES%to_object(physics_data%bc_type)
-            end if
+            end select
 
-            if (config%bc_kind == THERMAL_BC_TYPES%DIRICHLET .or. &
-                config%bc_kind == THERMAL_BC_TYPES%NEUMANN .or. &
-                config%bc_kind == THERMAL_BC_TYPES%FLUX .or. &
-                config%bc_kind == HYDRAULIC_BC_TYPES%DIRICHLET .or. &
-                config%bc_kind == HYDRAULIC_BC_TYPES%NEUMANN .or. &
-                config%bc_kind == HYDRAULIC_BC_TYPES%FLUX) then
+            config%bc_data_kind = BC_DATA_PROVIDERS%to_object(physics_data%bc_value_type)
+
+            select case (config%bc_kind%ID)
+            case (THERMAL_BC_TYPES%DIRICHLET%ID, THERMAL_BC_TYPES%NEUMANN%ID, THERMAL_BC_TYPES%FLUX%ID, &
+                  HYDRAULIC_BC_TYPES%DIRICHLET%ID, HYDRAULIC_BC_TYPES%NEUMANN%ID, HYDRAULIC_BC_TYPES%FLUX%ID)
+                config%num_variables = 1
+
+                call allocate_array(config%time_points, config%num_time_points)
+                call allocate_array(config%values, config%num_variables, config%num_time_points)
+
+                ! if (config%bc_kind == THERMAL_BC_TYPES%DIRICHLET .or. &
+                !     config%bc_kind == THERMAL_BC_TYPES%NEUMANN .or. &
+                !     config%bc_kind == THERMAL_BC_TYPES%FLUX .or. &
+                !     config%bc_kind == HYDRAULIC_BC_TYPES%DIRICHLET .or. &
+                !     config%bc_kind == HYDRAULIC_BC_TYPES%NEUMANN .or. &
+                !     config%bc_kind == HYDRAULIC_BC_TYPES%FLUX) then
 
                 config%num_variables = 1
                 call allocate_array(config%time_points, config%num_time_points)
@@ -43,18 +54,19 @@ contains
                     config%values(1, i) = physics_data%values(i)%value
                 end do
 
-            else if (config%bc_kind == THERMAL_BC_TYPES%ROBIN .or. &
-                     config%bc_kind == THERMAL_BC_TYPES%CONVECTIVE .or. &
-                     config%bc_kind == THERMAL_BC_TYPES%RADIATION) then
+            case (THERMAL_BC_TYPES%ROBIN%ID, THERMAL_BC_TYPES%CONVECTIVE%ID, THERMAL_BC_TYPES%RADIATION%ID)
+                ! else if (config%bc_kind == THERMAL_BC_TYPES%ROBIN .or. &
+                !          config%bc_kind == THERMAL_BC_TYPES%CONVECTIVE .or. &
+                !          config%bc_kind == THERMAL_BC_TYPES%RADIATION) then
 
                 config%num_variables = 2
                 call allocate_array(config%time_points, config%num_time_points)
                 call allocate_array(config%values, config%num_variables, config%num_time_points)
 
                 ! Assign values for 2 variables here
-            else
+            case default
                 config%num_variables = 0
-            end if
+            end select
 
         end associate
 

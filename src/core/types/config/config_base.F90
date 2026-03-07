@@ -5,6 +5,8 @@ module types_config_base
     use :: types_geometry_coordinate, only:type_coordinate_dp
     use :: types_geometry_coordinate_array, only:type_coordinate_array_dp
     use :: types_topology_connectivity, only:type_csr_index
+    use :: types_utils_datetime, only:type_datetime
+
     implicit none
     private
 
@@ -40,6 +42,8 @@ module types_config_base
         procedure, private, pass(self) :: set_coordinate_array_dp
         procedure, private, pass(self) :: set_csr_index
         procedure, private, pass(self) :: set_coordinate_dp
+        procedure, private, pass(self) :: set_datetime
+        procedure, private, pass(self) :: set_datetimes
         generic :: set => &
             set_int8, set_int8_1d, set_int8_2d, set_int8_3d, &
             set_int32, set_int32_1d, set_int32_2d, set_int32_3d, &
@@ -47,7 +51,7 @@ module types_config_base
             set_logical, set_logical_1d, set_logical_2d, set_logical_3d, &
             set_character, set_character_1d, set_character_2d, set_character_3d, &
             set_constant_id, set_constant_ids, set_constant_value, set_constant_values, &
-            set_coordinate_array_dp, set_csr_index, set_coordinate_dp
+            set_coordinate_array_dp, set_csr_index, set_coordinate_dp, set_datetime, set_datetimes
 
         procedure(abst_copy_config), public, pass(self), deferred :: copy
         procedure(abst_reset_config), public, pass(self), deferred :: reset
@@ -396,5 +400,24 @@ contains
 
         member = value
     end subroutine set_coordinate_dp
+
+    subroutine set_datetime(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        type(type_datetime), intent(inout) :: member
+        type(type_datetime), intent(in) :: value
+
+        member = value
+    end subroutine set_datetime
+
+    subroutine set_datetimes(self, member, value)
+        implicit none
+        class(abst_config), intent(in) :: self
+        type(type_datetime), intent(inout),allocatable :: member(:)
+        type(type_datetime), intent(in) :: value(:)
+
+        if (allocated(member)) deallocate (member)
+        allocate (member, source=value)
+    end subroutine set_datetimes
 
 end module types_config_base
