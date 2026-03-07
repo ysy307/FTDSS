@@ -1,4 +1,4 @@
-submodule(condition_boundary_data_provider) data_provider_constant
+submodule(boundary_data_provider) data_provider_constant
     implicit none
 contains
 
@@ -23,17 +23,14 @@ contains
         self%data_kind = type_constant_id("", "", -1)
     end subroutine destroy_type_bc_data_constant
 
-    module subroutine get_data_bc_data_constant(self, current_time, values)
+    module pure subroutine get_data_bc_data_constant(self, current_time, values)
         implicit none
-        class(type_bc_data_constant), intent(in) :: self
+        class(type_bc_data_constant), intent(inout) :: self
         real(real64), intent(in) :: current_time
-        real(real64), intent(inout), allocatable :: values(:)
+        real(real64), intent(inout) :: values(3)
 
-        if (allocated(values)) deallocate (values)
-        if (allocated(self%constant_values)) then
-            allocate (values(size(self%constant_values)))
-            values = self%constant_values
-        end if
+        values(1:3) = self%constant_values(1:3)
+
     end subroutine get_data_bc_data_constant
 
 end submodule data_provider_constant

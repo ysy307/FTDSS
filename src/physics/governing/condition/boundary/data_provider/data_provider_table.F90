@@ -1,4 +1,4 @@
-submodule(condition_boundary_data_provider) data_provider_table
+submodule(boundary_data_provider) data_provider_table
     implicit none
 contains
 
@@ -10,6 +10,8 @@ contains
 
         call allocate_array(self%time_points, source=config%time_points)
         call allocate_array(self%table_values, source=config%values)
+
+        self%current_idx = 0
 
         self%data_kind = BC_DATA_PROVIDERS%TABLE
     end subroutine initialize_type_bc_data_table
@@ -23,22 +25,21 @@ contains
         self%data_kind = type_constant_id("", "", -1)
     end subroutine destroy_type_bc_data_table
 
-    module subroutine get_data_bc_data_table(self, current_time, values)
+    module pure subroutine get_data_bc_data_table(self, current_time, values)
         implicit none
-        class(type_bc_data_table), intent(in) :: self
+        class(type_bc_data_table), intent(inout) :: self
         real(real64), intent(in) :: current_time
-        real(real64), allocatable, intent(inout) :: values(:)
+        real(real64), intent(inout) :: values(3)
 
         real(real64) :: coef
         integer(int32) :: idx, num_vars
 
+        values(:) = 0.0d0
         if (.not. allocated(self%time_points) .or. .not. allocated(self%table_values)) return
 
         call self%calc_time_coefficient(current_time, coef, idx)
 
         num_vars = size(self%table_values, 1)
-        if (allocated(values)) deallocate (values)
-        allocate (values(num_vars))
 
         if (idx < size(self%time_points)) then
             values(1:num_vars) = self%table_values(:, idx) + &
@@ -48,14 +49,14 @@ contains
         end if
     end subroutine get_data_bc_data_table
 
-    module subroutine calc_time_coefficient_bc_data_table(self, current_time, coef, idx)
+    module pure subroutine calc_time_coefficient_bc_data_table(self, current_time, coef, idx)
         implicit none
-        class(type_bc_data_table), intent(in) :: self
+        class(type_bc_data_table), intent(inout) :: self
         real(real64), intent(in) :: current_time
         real(real64), intent(inout) :: coef
         integer(int32), intent(inout) :: idx
 
-        integer(int32) :: n, low, high, mid
+        integer(int32) :: n
 
         if (.not. allocated(self%time_points)) then
             coef = 0.0d0
@@ -64,37 +65,38 @@ contains
         end if
 
         n = size(self%time_points)
-
         if (n < 2 .or. current_time <= self%time_points(1)) then
             coef = 0.0d0
             idx = 1
+            self%current_idx = 1
             return
         end if
-
         if (current_time >= self%time_points(n)) then
             coef = 0.0d0
             idx = n
+            self%current_idx = n
             return
         end if
 
-        low = 1
-        high = n
-        do while (high - low > 1)
-            mid = (low + high) / 2
-            if (current_time >= self%time_points(mid)) then
-                low = mid
-            else
-                high = mid
-            end if
-        end do
-        idx = low
+        ! Use cached index for forward marching
+        idx = max(1, self%current_idx - 1)
 
-        if (self%time_points(idx + 1) - self%time_points(idx) > epsilon(1.0d0)) then
-            coef = (current_time - self%time_points(idx)) / &
-                   (self%time_points(idx + 1) - self%time_points(idx))
-        else
-            coef = 0.0d0
+        ! Linear search forward (assuming monotonic time advancement)
+        do while (idx < n .and. current_time >= self%time_points(idx + 1))
+            idx = idx + 1
+        end do
+
+        ! Fallback if time goes backward
+        if (current_time < self%time_points(idx)) then
+            idx = 1
+            do while (idx < n .and. current_time >= self%time_points(idx + 1))
+                idx = idx + 1
+            end do
         end if
+
+        self%current_idx = idx
+        coef = (current_time - self%time_points(idx)) / &
+               (self%time_points(idx + 1) - self%time_points(idx))
     end subroutine calc_time_coefficient_bc_data_table
 
 end submodule data_provider_table

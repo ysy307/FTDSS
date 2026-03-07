@@ -1,4 +1,4 @@
-module condition_boundary_data_provider
+module boundary_data_provider
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core
     implicit none
@@ -32,12 +32,12 @@ module condition_boundary_data_provider
             class(abst_bc_data), intent(inout) :: self
         end subroutine abst_destroy_bc_data
 
-        subroutine abst_get_data(self, current_time, values)
+        pure subroutine abst_get_data(self, current_time, values)
             import :: abst_bc_data, real64
             implicit none
-            class(abst_bc_data), intent(in) :: self
+            class(abst_bc_data), intent(inout) :: self
             real(real64), intent(in) :: current_time
-            real(real64), allocatable, intent(inout) :: values(:)
+            real(real64), intent(inout) :: values(3)
         end subroutine abst_get_data
     end interface
 
@@ -61,6 +61,7 @@ module condition_boundary_data_provider
     type, extends(abst_bc_data) :: type_bc_data_table
         real(real64), allocatable, private :: time_points(:)
         real(real64), allocatable, private :: table_values(:, :)
+        integer(int32), private :: current_idx
     contains
         procedure, public, pass(self) :: initialize => initialize_type_bc_data_table
         procedure, public, pass(self) :: destroy => destroy_type_bc_data_table
@@ -80,11 +81,11 @@ module condition_boundary_data_provider
             class(type_bc_data_constant), intent(inout) :: self
         end subroutine destroy_type_bc_data_constant
 
-        module subroutine get_data_bc_data_constant(self, current_time, values)
+        module pure subroutine get_data_bc_data_constant(self, current_time, values)
             implicit none
-            class(type_bc_data_constant), intent(in) :: self
+            class(type_bc_data_constant), intent(inout) :: self
             real(real64), intent(in) :: current_time
-            real(real64), intent(inout) , allocatable:: values(:)
+            real(real64), intent(inout) :: values(3)
         end subroutine get_data_bc_data_constant
 
         module subroutine initialize_type_bc_data_dynamic(self, config)
@@ -98,11 +99,11 @@ module condition_boundary_data_provider
             class(type_bc_data_dynamic), intent(inout) :: self
         end subroutine destroy_type_bc_data_dynamic
 
-        module subroutine get_data_bc_data_dynamic(self, current_time, values)
+        module pure subroutine get_data_bc_data_dynamic(self, current_time, values)
             implicit none
-            class(type_bc_data_dynamic), intent(in) :: self
+            class(type_bc_data_dynamic), intent(inout) :: self
             real(real64), intent(in) :: current_time
-            real(real64), allocatable, intent(inout) :: values(:)
+            real(real64), intent(inout) :: values(3)
         end subroutine get_data_bc_data_dynamic
 
         module subroutine update_buffer_bc_data_dynamic(self, new_values)
@@ -122,16 +123,16 @@ module condition_boundary_data_provider
             class(type_bc_data_table), intent(inout) :: self
         end subroutine destroy_type_bc_data_table
 
-        module subroutine get_data_bc_data_table(self, current_time, values)
+        module pure subroutine get_data_bc_data_table(self, current_time, values)
             implicit none
-            class(type_bc_data_table), intent(in) :: self
+            class(type_bc_data_table), intent(inout) :: self
             real(real64), intent(in) :: current_time
-            real(real64), allocatable, intent(inout) :: values(:)
+            real(real64), intent(inout) :: values(3)
         end subroutine get_data_bc_data_table
 
-        module subroutine calc_time_coefficient_bc_data_table(self, current_time, coef, idx)
+        module pure subroutine calc_time_coefficient_bc_data_table(self, current_time, coef, idx)
             implicit none
-            class(type_bc_data_table), intent(in) :: self
+            class(type_bc_data_table), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(inout) :: coef
             integer(int32), intent(inout) :: idx
@@ -141,9 +142,9 @@ module condition_boundary_data_provider
 contains
     subroutine get_data_kind_abst_bc_data(self, data_kind)
         implicit none
-        class(abst_bc_data), intent(in), target :: self
-        type(type_constant_id), intent(inout), pointer :: data_kind
+        class(abst_bc_data), intent(in) :: self
+        type(type_constant_id), intent(inout) :: data_kind
 
-        data_kind => self%data_kind
+        data_kind = self%data_kind
     end subroutine get_data_kind_abst_bc_data
-end module condition_boundary_data_provider
+end module boundary_data_provider

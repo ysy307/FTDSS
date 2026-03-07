@@ -1,67 +1,37 @@
-submodule(condition_boundary_strategy) strategy_base
+submodule(boundary_strategy) strategy_base
     implicit none
 contains
 
-  module  subroutine associate_provider_bc(self, provider)
+    module pure subroutine initialize_type_bc_result(self)
         implicit none
-        class(abst_bc), intent(inout) :: self
-        class(abst_bc_data), pointer, intent(in) :: provider
-        self%provider => provider
-    end subroutine associate_provider_bc
+        class(type_bc_result), intent(inout) :: self
+
+        self%is_dirichlet = .false.
+        self%prescribed_value = 0.0d0
+        self%flux_value = 0.0d0
+        self%flux_derivative = 0.0d0
+    end subroutine initialize_type_bc_result
+
+    module subroutine initialize_abst_bc(self, physics_type, config)
+        implicit none
+        class(abst_bc), intent(inout), target :: self
+        type(type_constant_id), intent(in) :: physics_type
+        type(type_config_bc), intent(in) :: config
+
+        self%physics_type = physics_type
+        self%bc_kind = config%bc_kind
+
+        self%provider = create_bc_data_provider(config)
+    end subroutine initialize_abst_bc
 
     module subroutine destroy_abst_bc(self)
         implicit none
         class(abst_bc), intent(inout) :: self
-        nullify (self%provider)
+
+        if (allocated(self%provider)) then
+            call self%provider%destroy()
+            deallocate (self%provider)
+        end if
     end subroutine destroy_abst_bc
-
-!     module subroutine initialize_bc(self, config_bc)
-!         implicit none
-!         class(abst_bc), intent(inout) :: self
-!         type(type_config_bc), intent(in) :: config_bc
-
-!         self%physics_type = config_bc%physics_type
-!         self%bc_kind = config_bc%bc_kind
-
-!         ! Initialization logic for data_provider will be implemented by Manager
-!         self%is_initialized = .true.
-!     end subroutine initialize_bc
-
-!     module subroutine destroy_bc(self)
-!         implicit none
-!         class(abst_bc), intent(inout) :: self
-
-!         self%physics_type = type_constant_id("", "", -1)
-!         self%bc_kind = type_constant_id("", "", -1)
-
-!         if (allocated(self%data_provider)) then
-!             call self%data_provider%destroy()
-!             deallocate (self%data_provider)
-!         end if
-
-!         self%is_initialized = .false.
-!     end subroutine destroy_bc
-
-!     module subroutine set_bc_kind_abst_bc(self, bc_kind)
-!         implicit none
-!         class(abst_bc), intent(inout) :: self
-!         type(type_constant_id), intent(in) :: bc_kind
-
-!         if (.not. THERMAL_BC_TYPES%is_valid(bc_kind) .and. &
-!             .not. HYDRAULIC_BC_TYPES%is_valid(bc_kind)) then
-!             ! error stop "Invalid BC kind: "//strip(bc_kind%name) ! TODO: call raise_error with appropriate error codes
-!             ! call raise_error(ERROR_CODES%INVALILD_TYPES "Invalid BC kind: "//strip(bc_kind%name))
-!         end if
-
-!         self%bc_kind = bc_kind
-!     end subroutine set_bc_kind_abst_bc
-
-!     module subroutine get_bc_kind_abst_bc(self, bc_kind)
-!         implicit none
-!         class(abst_bc), intent(in), target :: self
-!         type(type_constant_id), intent(inout), pointer :: bc_kind
-
-!         bc_kind => self%bc_kind
-!     end subroutine get_bc_kind_abst_bc
 
 end submodule strategy_base

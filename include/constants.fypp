@@ -71,17 +71,29 @@
         'description': 'Thermal boundary condition types', &
         'items'      : [ &
             ('DIRICHLET',   101, 'dirichlet'), &
-            ('NEUMANN',     102, 'neumann'), &
-            ('FLUX',        103, 'flux'), &
-            ('ROBIN',       104, 'robin'), &
-            ('CONVECTIVE',  105, 'convective'), &
-            ('RADIATION',   106, 'radiation'), &
-            ('ADIABATIC',   107, 'adiabatic'), &
-            ('FREE',        108, 'free'), &
-            ('ATMOSPHERIC', 109, 'atmospheric') &
+            ('FLUX',        102, 'flux'), &
+            ('ROBIN',       103, 'robin'), &
+            ('CONVECTIVE',  104, 'convective'), &
+            ('RADIATION',   105, 'radiation'), &
+            ('ATMOSPHERIC', 106, 'atmospheric') &
         ], &
-        'num' : 9, &
-        'id_range' : [101, 109] &
+        'num' : 6, &
+        'id_range' : [101, 106] &
+    }
+
+    #:set SOLVER_BC_TYPES = { &
+        'type_name'  : 'type_solver_bc_types', &
+        'obj_name'   : 'SOLVER_BC_TYPES', &
+        'category'   : 'SOLVER_BC', &
+        'suffix'     : 'solver_bc_type', &
+        'description': 'Solver boundary condition types', &
+        'items'      : [ &
+            ('DIRICHLET', 1, 'dirichlet'),&
+            ('FLUX',      2, 'flux'),&
+            ('ROBIN',     3, 'robin') &
+        ], &
+        'num' : 3, &
+        'id_range' : [1, 3] &
     }
 
     #:set HYDRAULIC_BC_TYPES = { &
@@ -92,14 +104,13 @@
         'description': 'Hydraulic boundary condition types', &
         'items'      : [ &
             ('DIRICHLET',   201, 'dirichlet'), &
-            ('NEUMANN',     202, 'neumann'), &
-            ('FLUX',        203, 'flux'), &
-            ('IMPERMEABLE', 204, 'impermeable'), &
-            ('SEEPAGE',     205, 'seepage'), &
-            ('ATMOSPHERIC', 206, 'atmospheric') &
+            ('FLUX',        202, 'flux'), &
+            ('ROBIN',       203, 'robin'), &
+            ('SEEPAGE',     204, 'seepage'), &
+            ('ATMOSPHERIC', 205, 'atmospheric') &
         ], &
-        'num' : 6, &
-        'id_range' : [201, 206] &
+        'num' : 5, &
+        'id_range' : [201, 205] &
     }
 
     #:set IC_TARGETS = { &

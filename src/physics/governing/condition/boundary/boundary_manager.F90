@@ -1,8 +1,9 @@
-module conditions_boundary_manager
+module boundary_manager
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core
-    use :: condition_boundary_strategy
-    use :: condition_boundary_data_provider
+    use :: boundary_data_provider
+    use :: boundary_strategy
+    use :: boundary_strategy_factory
     implicit none
     private
 
@@ -12,13 +13,8 @@ module conditions_boundary_manager
         class(abst_bc), allocatable :: p
     end type holder_bc_strategy
 
-    type :: holder_bc_provider
-        class(abst_bc_data), allocatable :: p
-    end type holder_bc_provider
-
     type :: type_bc_manager
         type(holder_bc_strategy), allocatable, private :: strategies(:)
-        type(holder_bc_provider), allocatable, private :: providers(:)
     contains
         procedure, public, pass(self) :: initialize => initialize_bc_manager
         procedure, public, pass(self) :: destroy => destroy_bc_manager
@@ -31,11 +27,18 @@ contains
         implicit none
         class(type_bc_manager), intent(inout) :: self
         type(type_config_bc), intent(in) :: configs(:)
-        
-        ! Data initialization will be implemented by the user.
-        ! Allocate self%strategies and self%providers here,
-        ! and call inject_provider.
+
+        integer(int32) :: i
+        integer(int32) :: num_bcs
+
+        num_bcs = size(configs)
+
+        do i = 1, num_bcs
+            self%strategies(i)%p = create_bc_strategy(configs(i))
+        end do
+
     end subroutine initialize_bc_manager
+
 
     subroutine destroy_bc_manager(self)
         implicit none
@@ -46,21 +49,12 @@ contains
             do i = 1, size(self%strategies)
                 if (allocated(self%strategies(i)%p)) then
                     call self%strategies(i)%p%destroy()
-                    deallocate(self%strategies(i)%p)
+                    deallocate (self%strategies(i)%p)
                 end if
             end do
-            deallocate(self%strategies)
+            deallocate (self%strategies)
         end if
 
-        if (allocated(self%providers)) then
-            do i = 1, size(self%providers)
-                if (allocated(self%providers(i)%p)) then
-                    call self%providers(i)%p%destroy()
-                    deallocate(self%providers(i)%p)
-                end if
-            end do
-            deallocate(self%providers)
-        end if
     end subroutine destroy_bc_manager
 
     subroutine evaluate_bc_manager(self, bc_id, current_time, u_curr, result)
@@ -81,4 +75,4 @@ contains
         end if
     end subroutine evaluate_bc_manager
 
-end module conditions_boundary_manager
+end module boundary_manager

@@ -1,4 +1,4 @@
-submodule(condition_boundary_data_provider) data_provider_dynamic
+submodule(boundary_data_provider) data_provider_dynamic
     implicit none
 contains
 
@@ -23,20 +23,17 @@ contains
         implicit none
         class(type_bc_data_dynamic), intent(inout) :: self
         real(real64), intent(in) :: new_values(:)
+
         self%current_buffer = new_values
     end subroutine update_buffer_bc_data_dynamic
 
-    module subroutine get_data_bc_data_dynamic(self, current_time, values)
+    module pure subroutine get_data_bc_data_dynamic(self, current_time, values)
         implicit none
-        class(type_bc_data_dynamic), intent(in) :: self
+        class(type_bc_data_dynamic), intent(inout) :: self
         real(real64), intent(in) :: current_time
-        real(real64), allocatable, intent(inout) :: values(:)
+        real(real64), intent(inout) :: values(3)
 
-        if (allocated(values)) deallocate (values)
-        if (allocated(self%current_buffer)) then
-            allocate (values(size(self%current_buffer)))
-            values = self%current_buffer
-        end if
+        values(1:3) = self%current_buffer(1:3)
     end subroutine get_data_bc_data_dynamic
 
 end submodule data_provider_dynamic

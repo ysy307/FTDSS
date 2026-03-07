@@ -34,18 +34,6 @@ contains
             case (THERMAL_BC_TYPES%DIRICHLET%ID, THERMAL_BC_TYPES%NEUMANN%ID, THERMAL_BC_TYPES%FLUX%ID, &
                   HYDRAULIC_BC_TYPES%DIRICHLET%ID, HYDRAULIC_BC_TYPES%NEUMANN%ID, HYDRAULIC_BC_TYPES%FLUX%ID)
                 config%num_variables = 1
-
-                call allocate_array(config%time_points, config%num_time_points)
-                call allocate_array(config%values, config%num_variables, config%num_time_points)
-
-                ! if (config%bc_kind == THERMAL_BC_TYPES%DIRICHLET .or. &
-                !     config%bc_kind == THERMAL_BC_TYPES%NEUMANN .or. &
-                !     config%bc_kind == THERMAL_BC_TYPES%FLUX .or. &
-                !     config%bc_kind == HYDRAULIC_BC_TYPES%DIRICHLET .or. &
-                !     config%bc_kind == HYDRAULIC_BC_TYPES%NEUMANN .or. &
-                !     config%bc_kind == HYDRAULIC_BC_TYPES%FLUX) then
-
-                config%num_variables = 1
                 call allocate_array(config%time_points, config%num_time_points)
                 call allocate_array(config%values, config%num_variables, config%num_time_points)
 
@@ -55,10 +43,6 @@ contains
                 end do
 
             case (THERMAL_BC_TYPES%ROBIN%ID, THERMAL_BC_TYPES%CONVECTIVE%ID, THERMAL_BC_TYPES%RADIATION%ID)
-                ! else if (config%bc_kind == THERMAL_BC_TYPES%ROBIN .or. &
-                !          config%bc_kind == THERMAL_BC_TYPES%CONVECTIVE .or. &
-                !          config%bc_kind == THERMAL_BC_TYPES%RADIATION) then
-
                 config%num_variables = 2
                 call allocate_array(config%time_points, config%num_time_points)
                 call allocate_array(config%values, config%num_variables, config%num_time_points)
