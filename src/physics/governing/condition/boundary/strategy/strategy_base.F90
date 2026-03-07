@@ -2,7 +2,7 @@ submodule(boundary_strategy) strategy_base
     implicit none
 contains
 
-    module pure subroutine initialize_type_bc_result(self)
+    module pure elemental subroutine initialize_type_bc_result(self)
         implicit none
         class(type_bc_result), intent(inout) :: self
 

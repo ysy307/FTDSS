@@ -6,7 +6,6 @@ contains
         implicit none
         class(type_bc_data_dynamic), intent(inout) :: self
         type(type_config_bc), intent(in) :: config
-        ! User implements initialization
 
         self%data_kind = BC_DATA_PROVIDERS%DYNAMIC
     end subroutine initialize_type_bc_data_dynamic
@@ -19,13 +18,13 @@ contains
         self%data_kind = type_constant_id("", "", -1)
     end subroutine destroy_type_bc_data_dynamic
 
-    module subroutine update_buffer_bc_data_dynamic(self, new_values)
+    module subroutine update_data_bc_data_dynamic(self, new_values)
         implicit none
         class(type_bc_data_dynamic), intent(inout) :: self
         real(real64), intent(in) :: new_values(:)
 
         self%current_buffer = new_values
-    end subroutine update_buffer_bc_data_dynamic
+    end subroutine update_data_bc_data_dynamic
 
     module pure subroutine get_data_bc_data_dynamic(self, current_time, values)
         implicit none

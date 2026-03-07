@@ -6,13 +6,20 @@ contains
         implicit none
         class(type_bc_data_constant), intent(inout) :: self
         type(type_config_bc), intent(in) :: config
-        ! User implements initialization
 
         call allocate_array(self%constant_values, config%num_variables)
         self%constant_values = config%values(:, 1) ! Assuming the first time
 
         self%data_kind = BC_DATA_PROVIDERS%CONSTANT
     end subroutine initialize_type_bc_data_constant
+
+    module subroutine update_data_constant(self, new_values)
+        implicit none
+        class(type_bc_data_constant), intent(inout) :: self
+        real(real64), intent(in) :: new_values(:)
+
+        return
+    end subroutine update_data_constant
 
     module subroutine destroy_type_bc_data_constant(self)
         implicit none

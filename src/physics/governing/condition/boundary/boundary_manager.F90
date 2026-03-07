@@ -39,7 +39,6 @@ contains
 
     end subroutine initialize_bc_manager
 
-
     subroutine destroy_bc_manager(self)
         implicit none
         class(type_bc_manager), intent(inout) :: self
@@ -68,10 +67,7 @@ contains
         if (bc_id > 0 .and. bc_id <= size(self%strategies)) then
             call self%strategies(bc_id)%p%evaluate(current_time, u_curr, result)
         else
-            result%is_dirichlet = .false.
-            result%prescribed_value = 0.0d0
-            result%flux_value = 0.0d0
-            result%flux_derivative = 0.0d0
+            call result%initialize()
         end if
     end subroutine evaluate_bc_manager
 

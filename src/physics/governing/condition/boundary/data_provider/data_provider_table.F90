@@ -6,7 +6,6 @@ contains
         implicit none
         class(type_bc_data_table), intent(inout) :: self
         type(type_config_bc), intent(in) :: config
-        ! User implements initialization
 
         call allocate_array(self%time_points, source=config%time_points)
         call allocate_array(self%table_values, source=config%values)
@@ -25,6 +24,14 @@ contains
         self%data_kind = type_constant_id("", "", -1)
     end subroutine destroy_type_bc_data_table
 
+    module subroutine update_data_table(self, new_values)
+        implicit none
+        class(type_bc_data_table), intent(inout) :: self
+        real(real64), intent(in) :: new_values(:)
+
+        return
+    end subroutine update_data_table
+
     module pure subroutine get_data_bc_data_table(self, current_time, values)
         implicit none
         class(type_bc_data_table), intent(inout) :: self
@@ -39,7 +46,7 @@ contains
 
         call self%calc_time_coefficient(current_time, coef, idx)
 
-        num_vars = size(self%table_values, 1)
+        num_vars = min(3, size(self%table_values, 1))
 
         if (idx < size(self%time_points)) then
             values(1:num_vars) = self%table_values(:, idx) + &

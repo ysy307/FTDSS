@@ -16,6 +16,7 @@ module boundary_data_provider
         procedure(abst_destroy_bc_data), public, pass(self), deferred :: destroy
         procedure(abst_get_data), public, pass(self), deferred :: get_data
         procedure, public, pass(self) :: get_data_kind => get_data_kind_abst_bc_data
+        procedure(abst_update_data), public, pass(self), deferred :: update_data
     end type abst_bc_data
 
     abstract interface
@@ -39,6 +40,13 @@ module boundary_data_provider
             real(real64), intent(in) :: current_time
             real(real64), intent(inout) :: values(3)
         end subroutine abst_get_data
+
+        subroutine abst_update_data(self, new_values)
+            import :: abst_bc_data, real64
+            implicit none
+            class(abst_bc_data), intent(inout) :: self
+            real(real64), intent(in) :: new_values(:)
+        end subroutine abst_update_data
     end interface
 
     type, extends(abst_bc_data) :: type_bc_data_constant
@@ -47,6 +55,7 @@ module boundary_data_provider
         procedure, public, pass(self) :: initialize => initialize_type_bc_data_constant
         procedure, public, pass(self) :: destroy => destroy_type_bc_data_constant
         procedure, public, pass(self) :: get_data => get_data_bc_data_constant
+        procedure, public, pass(self) :: update_data => update_data_constant
     end type type_bc_data_constant
 
     type, extends(abst_bc_data) :: type_bc_data_dynamic
@@ -55,7 +64,7 @@ module boundary_data_provider
         procedure, public, pass(self) :: initialize => initialize_type_bc_data_dynamic
         procedure, public, pass(self) :: destroy => destroy_type_bc_data_dynamic
         procedure, public, pass(self) :: get_data => get_data_bc_data_dynamic
-        procedure, public, pass(self) :: update_buffer => update_buffer_bc_data_dynamic
+        procedure, public, pass(self) :: update_data => update_data_bc_data_dynamic
     end type type_bc_data_dynamic
 
     type, extends(abst_bc_data) :: type_bc_data_table
@@ -67,6 +76,7 @@ module boundary_data_provider
         procedure, public, pass(self) :: destroy => destroy_type_bc_data_table
         procedure, public, pass(self) :: get_data => get_data_bc_data_table
         procedure, private, pass(self) :: calc_time_coefficient => calc_time_coefficient_bc_data_table
+        procedure, public, pass(self) :: update_data => update_data_table
     end type type_bc_data_table
 
     interface
@@ -88,6 +98,12 @@ module boundary_data_provider
             real(real64), intent(inout) :: values(3)
         end subroutine get_data_bc_data_constant
 
+        module subroutine update_data_constant(self, new_values)
+            implicit none
+            class(type_bc_data_constant), intent(inout) :: self
+            real(real64), intent(in) :: new_values(:)
+        end subroutine update_data_constant
+
         module subroutine initialize_type_bc_data_dynamic(self, config)
             implicit none
             class(type_bc_data_dynamic), intent(inout) :: self
@@ -106,11 +122,11 @@ module boundary_data_provider
             real(real64), intent(inout) :: values(3)
         end subroutine get_data_bc_data_dynamic
 
-        module subroutine update_buffer_bc_data_dynamic(self, new_values)
+        module subroutine update_data_bc_data_dynamic(self, new_values)
             implicit none
             class(type_bc_data_dynamic), intent(inout) :: self
             real(real64), intent(in) :: new_values(:)
-        end subroutine update_buffer_bc_data_dynamic
+        end subroutine update_data_bc_data_dynamic
 
         module subroutine initialize_type_bc_data_table(self, config)
             implicit none
@@ -137,6 +153,12 @@ module boundary_data_provider
             real(real64), intent(inout) :: coef
             integer(int32), intent(inout) :: idx
         end subroutine calc_time_coefficient_bc_data_table
+
+        module subroutine update_data_table(self, new_values)
+            implicit none
+            class(type_bc_data_table), intent(inout) :: self
+            real(real64), intent(in) :: new_values(:)
+        end subroutine update_data_table
     end interface
 
 contains

@@ -1,5 +1,5 @@
 module boundary_strategy_factory
-    use, intrinsic :: iso_fortran_env, only: int32, real64
+    use, intrinsic :: iso_fortran_env
     use :: module_core
     use :: boundary_strategy
     implicit none
