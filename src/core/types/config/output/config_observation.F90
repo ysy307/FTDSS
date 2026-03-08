@@ -1,5 +1,6 @@
 module types_config_observation
     use, intrinsic :: iso_fortran_env
+    use :: core_memory
     use :: core_constants
     use :: types_config_base, only:abst_config
     use :: types_geometry_coordinate, only:type_coordinate_dp
@@ -81,7 +82,7 @@ contains
 
             if (allocated(source%observation_geometries)) then
                 if (allocated(self%observation_geometries)) then
-                    call deallocate_array(self%observation_geometries)
+                    deallocate(self%observation_geometries)
                 end if
                 allocate (self%observation_geometries(size(source%observation_geometries)))
                 do i = 1, size(source%observation_geometries)
@@ -89,7 +90,7 @@ contains
                 end do
             else
                 if (allocated(self%observation_geometries)) then
-                    call deallocate_array(self%observation_geometries)
+                    deallocate(self%observation_geometries)
                 end if
             end if
 
@@ -108,13 +109,13 @@ contains
         self%file_format = FILE_FORMATS%NONE
         self%num_observations = 0
 
-        call deallocate_array(self%output_variables)
+        if (allocated(self%output_variables)) deallocate(self%output_variables)
 
         if (allocated(self%observation_geometries)) then
             do i = 1, size(self%observation_geometries)
                 call self%observation_geometries(i)%reset()
             end do
-            call deallocate_array(self%observation_geometries)
+            deallocate(self%observation_geometries)
         end if
 
     end subroutine reset_config_observation

@@ -24,7 +24,7 @@
         {
             "id": 2,
             "calculate_thermal": true,
-            "calculate_hydraulic": true,
+            "calculate_hydraulic": false,
             "calculate_mechanical": false,
             "thermal": {
                 "type": "dirichlet",
@@ -34,13 +34,17 @@
                 ]
             },
             "hydraulic": {
-                "type": "impermeable"
+                "type": "flux",
+                "value_type": "constant",
+                "values": [
+                    0.0
+                ]
             }
         },
         {
             "id": 3,
             "calculate_thermal": true,
-            "calculate_hydraulic": true,
+            "calculate_hydraulic": false,
             "calculate_mechanical": false,
             "thermal": {
                 "type": "flux",
@@ -50,17 +54,10 @@
                 ]
             },
             "hydraulic": {
-                "type": "impermeable",
-                "value_type": "table",
+                "type": "flux",
+                "value_type": "constant",
                 "values": [
-                    {
-                        "time": 0.0,
-                        "value": -20.0
-                    },
-                    {
-                        "time": 1.0,
-                        "value": -20.0
-                    }
+                    0.0
                 ]
             }
         }

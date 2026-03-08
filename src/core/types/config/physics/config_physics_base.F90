@@ -7,6 +7,10 @@ module types_config_physics_base
 
     public :: abst_config_physics_model
     public :: abst_config_physics_material
+    public :: copy_config_physics_model
+    public :: reset_config_physics_model
+    public :: copy_config_physics_material
+    public :: reset_config_physics_material
 
     type, abstract, extends(abst_config) :: abst_config_physics_model
         integer(int32) :: material_id = 0

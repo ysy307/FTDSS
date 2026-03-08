@@ -1,5 +1,6 @@
 module types_config_overall
     use, intrinsic :: iso_fortran_env
+    use :: core_memory
     use :: core_constants
     use :: types_config_base, only:abst_config
     use :: types_geometry_coordinate_array, only:type_coordinate_array_dp
@@ -52,7 +53,7 @@ contains
         class(type_config_overall), intent(inout) :: self
 
         self%file_format = FILE_FORMATS%NONE
-        call deallocate_array(self%output_variables)
+        if (allocated(self%output_variables)) deallocate(self%output_variables)
         self%format_output_file = ""
 
         self%num_points = 0

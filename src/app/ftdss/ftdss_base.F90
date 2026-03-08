@@ -53,6 +53,7 @@ contains
         call input%initialize()
         call self%control%profiler_stop(PROFILER_TYPES%IO)
 
+
         call input_translator%execute(input, config_control_manager)
         call input_translator%execute(input, config_iteration)
         call input_translator%execute(input, config_time)
@@ -69,14 +70,14 @@ contains
         if (self%is_active_thermal()) then
             call input_translator%execute(input, PHYSICS_TYPES%THERMAL, config_bcs)
             call self%bc(PHYSICS_TYPES%THERMAL%ID)%initialize(config_bcs)
+            if (allocated(config_bcs)) deallocate (config_bcs)
         end if
-        deallocate (config_bcs)
 
         if (self%is_active_hydraulic()) then
             call input_translator%execute(input, PHYSICS_TYPES%HYDRAULIC, config_bcs)
             call self%bc(PHYSICS_TYPES%HYDRAULIC%ID)%initialize(config_bcs)
+            if (allocated(config_bcs)) deallocate (config_bcs)
         end if
-        deallocate (config_bcs)
 
         call input_translator%execute(input, IC_TARGETS%POROSITY, configs_ic(IC_TARGETS%POROSITY%ID))
         call input_translator%execute(input, IC_TARGETS%THERMAL, configs_ic(IC_TARGETS%THERMAL%ID))
@@ -99,6 +100,7 @@ contains
         call input_translator%execute(input, config_boundary_elements)
         call self%domain%initialize(config_nodes, config_elements, config_multicoloring, config_boundary_elements)
         call self%domain%get_total_dofs(num_total_dofs)
+        call self%domain%get_num_nodes(num_nodes)
 
         call self%K%initialize(self%domain)
         call self%F%initialize(self%domain)
@@ -545,7 +547,7 @@ contains
 
     end function is_active_hydraulic_ftdss
 
-    module subroutine destory_type_ftdss(self)
+    module subroutine destroy_type_ftdss(self)
         implicit none
         class(type_ftdss), intent(inout) :: self
 
@@ -566,5 +568,5 @@ contains
         call MPI_Finalize(ierr)
 #endif
 
-    end subroutine destory_type_ftdss
+    end subroutine destroy_type_ftdss
 end submodule ftdss_base

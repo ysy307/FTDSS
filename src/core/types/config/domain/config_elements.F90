@@ -1,5 +1,6 @@
 module types_config_elements
     use, intrinsic :: iso_fortran_env
+    use :: core_memory
     use :: core_constants, only:type_constant_id
     use :: types_topology_connectivity, only:type_csr_index
     use :: types_geometry_coordinate_array, only:type_coordinate_array_dp
@@ -33,6 +34,8 @@ module types_config_elements
         integer(int32), allocatable :: fe_material_ids(:)
         integer(int32) :: integration_order
         type(type_csr_index) :: connectivity
+        !> Mesh entity ID this element group corresponds to (used for BC remapping).
+        integer(int32) :: entity_id = 0
     contains
         procedure, public, pass(self) :: copy => copy_config_elements
         procedure, public, pass(self) :: reset => reset_config_elements
@@ -53,6 +56,7 @@ contains
             call self%set(self%fe_material_ids, source%fe_material_ids)
             call self%set(self%integration_order, source%integration_order)
             call self%set(self%connectivity, source%connectivity)
+            call self%set(self%entity_id, source%entity_id)
         end select
     end subroutine copy_config_elements
 
@@ -65,6 +69,7 @@ contains
         call deallocate_array(self%fe_material_ids)
         self%integration_order = 0
         call self%connectivity%destroy()
+        self%entity_id = 0
     end subroutine reset_config_elements
 
     subroutine copy_config_colored_elements(self, source)

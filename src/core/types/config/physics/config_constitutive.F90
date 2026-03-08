@@ -1,8 +1,9 @@
 module types_config_physics_constitutive
     use, intrinsic :: iso_fortran_env
+    use :: core_memory
     use :: core_constants, only:type_constant_id
     use :: types_config_base, only:abst_config
-    use :: types_config_physics_base, only:abst_config_physics_material
+    use :: types_config_physics_base, only:abst_config_physics_material, copy_config_physics_material, reset_config_physics_material
     implicit none
     private
 
@@ -16,12 +17,12 @@ module types_config_physics_constitutive
         real(real64), allocatable :: dispersivity(:)
         real(real64), allocatable :: params(:)
     contains
-        procedure, pass(self), public :: copy => copy_config_constitutives
+        procedure, pass(self), public :: copy => copy_config_constitutive
         procedure, pass(self), public :: reset => reset_config_constitutive
     end type type_config_constitutive
 
 contains
-    subroutine copy_config_constitutives(self, source)
+    subroutine copy_config_constitutive(self, source)
         implicit none
         class(type_config_constitutive), intent(inout) :: self
         class(abst_config), intent(in) :: source
@@ -36,7 +37,7 @@ contains
             call self%set(self%dispersivity, source%dispersivity)
             call self%set(self%params, source%params)
         end select
-    end subroutine copy_config_constitutives
+    end subroutine copy_config_constitutive
 
     subroutine reset_config_constitutive(self)
         implicit none

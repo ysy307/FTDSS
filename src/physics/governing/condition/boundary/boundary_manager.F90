@@ -16,6 +16,8 @@ module boundary_manager
     type :: type_bc_manager
         integer(int32), private :: num_boundaries = 0
         type(holder_bc_strategy), allocatable, private :: strategies(:)
+        !> JSON boundary_id for each strategy (same order as strategies(:)).
+        integer(int32), allocatable, private :: boundary_ids(:)
     contains
         procedure, public, pass(self) :: initialize => initialize_bc_manager
         procedure, public, pass(self) :: destroy => destroy_bc_manager
@@ -23,6 +25,7 @@ module boundary_manager
         procedure, public, pass(self) :: evaluate_bc => evaluate_bc_manager
         procedure, public, pass(self) :: evaluate_bcs => evaluate_bcs_manager
         procedure, public, pass(self) :: get_num_boundaries => get_num_boundaries_bc_manager
+        procedure, public, pass(self) :: get_bc_index => get_bc_index_bc_manager
     end type type_bc_manager
 
 contains
@@ -36,9 +39,20 @@ contains
 
         self%num_boundaries = size(configs)
 
-        do i = 1, self%num_boundaries
-            self%strategies(i)%p = create_bc_strategy(configs(i))
-        end do
+        ! 既存の配列があれば解放する
+        if (allocated(self%strategies)) deallocate (self%strategies)
+        if (allocated(self%boundary_ids)) deallocate (self%boundary_ids)
+
+        ! 要素数が1以上の場合のみメモリを確保して代入する
+        if (self%num_boundaries > 0) then
+            allocate (self%strategies(self%num_boundaries))
+            allocate (self%boundary_ids(self%num_boundaries))
+
+            do i = 1, self%num_boundaries
+                self%strategies(i)%p = create_bc_strategy(configs(i))
+                self%boundary_ids(i) = configs(i)%boundary_id
+            end do
+        end if
 
     end subroutine initialize_bc_manager
 
@@ -56,6 +70,7 @@ contains
             end do
             deallocate (self%strategies)
         end if
+        if (allocated(self%boundary_ids)) deallocate (self%boundary_ids)
 
     end subroutine destroy_bc_manager
 
@@ -106,5 +121,26 @@ contains
 
         num_boundaries = self%num_boundaries
     end subroutine get_num_boundaries_bc_manager
+
+    !> Returns the positional strategy index whose boundary_id matches entity_id.
+    !> Returns -1 if no match is found.
+    pure subroutine get_bc_index_bc_manager(self, entity_id, bc_index)
+        implicit none
+        class(type_bc_manager), intent(in) :: self
+        integer(int32), intent(in) :: entity_id
+        integer(int32), intent(out) :: bc_index
+
+        integer(int32) :: i
+
+        bc_index = -1
+        if (.not. allocated(self%boundary_ids)) return
+
+        do i = 1, self%num_boundaries
+            if (self%boundary_ids(i) == entity_id) then
+                bc_index = i
+                return
+            end if
+        end do
+    end subroutine get_bc_index_bc_manager
 
 end module boundary_manager

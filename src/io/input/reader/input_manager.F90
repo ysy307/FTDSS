@@ -46,13 +46,20 @@ contains
 
         character(*), parameter :: PROJECT_ENV = "FTDSS_PROJECT_PATH"
 
+        integer(int32) :: status
         integer(int32) :: ierr, myrank
         integer(int32) :: error_flag = 0
         integer(int32) :: input_path_length
 
         call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
 
-        call get_env_string(PROJECT_ENV, project_path_env)
+        call get_env_string(PROJECT_ENV, project_path_env, status)
+        if (status /= 0) then
+            if (myrank == 0) then
+                print *, "FATAL ERROR: Environment variable '"//PROJECT_ENV//"' is not set or is empty. Aborting."
+            end if
+            call MPI_Abort(MPI_COMM_WORLD, 1, ierr)
+        end if
         call modify_path_format(project_path_env)
 
         if (myrank == 0) then

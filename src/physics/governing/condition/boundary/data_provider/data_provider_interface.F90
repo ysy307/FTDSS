@@ -10,7 +10,8 @@ module boundary_data_provider
     public :: type_bc_data_table
 
     type, abstract :: abst_bc_data
-        type(type_constant_id) :: data_kind = type_constant_id("", "", -1)
+        type(type_constant_id), private :: data_kind = type_constant_id("", "", -1)
+        integer(int32), private :: data_size
     contains
         procedure(abst_initialize_bc_data), public, pass(self), deferred :: initialize
         procedure(abst_destroy_bc_data), public, pass(self), deferred :: destroy

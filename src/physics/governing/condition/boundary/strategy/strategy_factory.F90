@@ -50,6 +50,8 @@ contains
         case (HYDRAULIC_BC_TYPES%SEEPAGE%ID)
             allocate (type_bc_seepage :: bc)
             physics_type = PHYSICS_TYPES%HYDRAULIC
+        case default
+            error stop "create_bc_strategy: unknown bc_kind%ID. Check that boundary is active for the target physics."
         end select
 
         call bc%initialize(physics_type, config)

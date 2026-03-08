@@ -55,6 +55,7 @@ module components_domain_elements
 
 contains
     !> Initializes the element manager by reading and organizing element data.
+!> Initializes the element manager by reading and organizing element data.
     subroutine initialize_elements_manager(self, config_elements, config_multicoloring)
         implicit none
         class(type_elements_manager), intent(inout) :: self
@@ -64,6 +65,15 @@ contains
         self%num_fe = config_elements%num_elements
         call allocate_array(self%fe_types, source=config_elements%fe_types)
         call allocate_array(self%fe_material_ids, source=config_elements%fe_material_ids)
+
+        ! 【追加】接続情報 (connectivity) のコピーが抜けていたため追加
+        if (allocated(config_elements%connectivity%row_ptr) .and. &
+            allocated(config_elements%connectivity%col_ind)) then
+            call self%connectivity%initialize(size(config_elements%connectivity%row_ptr), &
+                                              size(config_elements%connectivity%col_ind))
+            self%connectivity%row_ptr = config_elements%connectivity%row_ptr
+            self%connectivity%col_ind = config_elements%connectivity%col_ind
+        end if
 
         call self%fe_manager%initialize(config_elements%integration_order, self%num_fe, self%fe_types)
         call self%colors%initialize(config_multicoloring)

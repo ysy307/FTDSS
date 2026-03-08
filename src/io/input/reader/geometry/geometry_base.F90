@@ -18,11 +18,13 @@ contains
 
             ! 1. 初期条件から、ファイルから読み込むべきフィールド名のリストを取得する
             !    (内部で basic の解析フラグをチェック)
+            ! (内部で basic の解析フラグをチェック)
             fields_to_read = self%collect_fields_from_conditions()
 
             fullpath = trim(p%input_path)//trim(p%basic%geometry_settings%file_name)
 
-            if (allocated(fields_to_read)) then
+            ! 【修正】allocated ではなく、配列サイズが0より大きいかで判定する
+            if (size(fields_to_read) > 0) then
                 if (ends_with(p%basic%geometry_settings%file_name, '.vtk')) then
                     call self%vtk%initialize_vtk( &
                         file_name=strip(fullpath), &
@@ -48,12 +50,12 @@ contains
                         rank_key=strip(p%basic%geometry_settings%rank_key), &
                         color_key=strip(p%basic%geometry_settings%color_key), &
                         point_field_names=fields_to_read)
-
                 end if
 
                 ! 読み込んだフィールド名を後で参照できるように保存
                 allocate (self%point_data_names, source=fields_to_read)
-                deallocate (fields_to_read)
+                ! 【削除】ここにあった deallocate (fields_to_read) は最後に移動
+
             else
                 if (ends_with(p%basic%geometry_settings%file_name, '.vtk')) then
                     call self%vtk%initialize_vtk( &
@@ -79,8 +81,10 @@ contains
                         rank_key=strip(p%basic%geometry_settings%rank_key), &
                         color_key=strip(p%basic%geometry_settings%color_key))
                 end if
-
             end if
+
+            ! 【追加】一律でここで解放する
+            if (allocated(fields_to_read)) deallocate (fields_to_read)
 
         end select
 
@@ -136,6 +140,9 @@ contains
             if (num_fields > 0) then
                 allocate (character(len=256) :: field_list(num_fields))
                 field_list = temp_list(1:num_fields)
+            else
+                ! 【ここを追加】見つからなかった場合も、サイズ0で確保して返す
+                allocate (character(len=256) :: field_list(0))
             end if
         end select
     end function collect_fields_from_conditions

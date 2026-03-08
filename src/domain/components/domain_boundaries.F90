@@ -23,6 +23,8 @@ module components_domain_boundaries
         type(type_fe_manager) :: fe_manager
         !> Connectivity data for the elements in this BC set.
         type(type_csr_index) :: connectivity
+        !> Mesh entity ID this patch corresponds to (used to look up the BC strategy).
+        integer(int32) :: entity_id = 0
     contains
         ! ---- Lifecycle ----
         procedure, public, pass(self) :: initialize => initialize_type_boundary_patch
@@ -56,6 +58,7 @@ module components_domain_boundaries
 
         ! ---- Getter ----
         procedure, public, pass(self) :: get_bc_patch => get_bc_patch_boundary_manager
+        procedure, public, pass(self) :: get_num_bcs => get_num_bcs_boundary_manager
 
         ! ---- Meta / Utility ----
         ! display, to_string, etc.
@@ -70,8 +73,17 @@ contains
         type(type_config_elements), intent(in) :: config_elements
 
         self%num_fe = config_elements%num_elements
+        self%entity_id = config_elements%entity_id
         call allocate_array(self%fe_types, source=config_elements%fe_types)
         call allocate_array(self%fe_material_ids, source=config_elements%fe_material_ids)
+
+        if (allocated(config_elements%connectivity%row_ptr) .and. &
+            allocated(config_elements%connectivity%col_ind)) then
+            call self%connectivity%initialize(size(config_elements%connectivity%row_ptr), &
+                                              size(config_elements%connectivity%col_ind))
+            self%connectivity%row_ptr = config_elements%connectivity%row_ptr
+            self%connectivity%col_ind = config_elements%connectivity%col_ind
+        end if
 
         call self%fe_manager%initialize(config_elements%integration_order, self%num_fe, self%fe_types)
 
@@ -152,6 +164,14 @@ contains
             error stop "Invalid BC ID in get_bc_patch_boundary_manager"
         end if
     end subroutine get_bc_patch_boundary_manager
+
+    pure subroutine get_num_bcs_boundary_manager(self, num_bcs)
+        implicit none
+        class(type_boundaries_manager), intent(in) :: self
+        integer(int32), intent(inout) :: num_bcs
+
+        num_bcs = self%num_bcs
+    end subroutine get_num_bcs_boundary_manager
 
     subroutine display_boundary_manager(self, unit_in)
         implicit none

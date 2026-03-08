@@ -147,7 +147,7 @@ contains
         write (unit, '(a)') ""
 
         write (unit, '(a,i0)') "CELL_DATA ", self%num_cells
-        call write_cell(unit, variable_name, variable)
+        call self%output_cell(unit, variable_name, variable)
 
         close (unit)
 

@@ -1,6 +1,7 @@
 module control_parallel_openmp
     use, intrinsic :: iso_fortran_env
     use :: stdlib_strings, only:strip
+    use :: stdlib_ascii, only:to_lower
     use :: omp_lib
     use :: module_core
     implicit none
@@ -17,7 +18,7 @@ contains
             call omp_set_num_threads(config%num_threads)
             ! Always chunk_size is set to 0, which means the implementation will choose an appropriate chunk size 
             ! based on the system and workload characteristics.
-            select case (strip(config%schedule))
+            select case (strip(to_lower(config%schedule)))
             case ("auto")
                 call omp_set_schedule(omp_sched_auto, 0)
             case ("dynamic")
@@ -28,11 +29,6 @@ contains
                 call omp_set_schedule(omp_sched_static, 0)
             end select
             call omp_set_max_active_levels(config%max_active_levels)
-            if (config%max_active_levels > 1) then
-                call omp_set_nested(.true.)
-            else
-                call omp_set_nested(.false.)
-            end if
         end if
 
     end subroutine initialize_openmp

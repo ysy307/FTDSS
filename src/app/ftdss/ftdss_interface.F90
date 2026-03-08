@@ -51,7 +51,7 @@ module app_ftdss
         ! ---- Lifecycle ----
         ! initialize, destroy, reset, etc.
         procedure, public, pass(self) :: initialize => initialize_type_ftdss
-        procedure, public, pass(self) :: destory => destory_type_ftdss
+        procedure, public, pass(self) :: destroy => destroy_type_ftdss
 
         ! ---- Mutator ----
         ! set_XXX, increment_XXX, update_XXX, etc.
@@ -97,7 +97,7 @@ module app_ftdss
         procedure, public, pass(self) :: assemble_local => assemble_local_ftdss
         procedure, public, pass(self) :: assemble => assemble_ftdss
         procedure, private, pass(self) :: assemble_initialize => assemble_initialize_ftdss
-        procedure, private, pass(self) :: assemble_destory => assemble_destory_ftdss
+        procedure, private, pass(self) :: assemble_destroy => assemble_destroy_ftdss
 
         procedure, private, pass(self) :: get_variable_increment => get_variable_increment_ftdss
         procedure, private, pass(self) :: get_variable_residual => get_variable_residual_ftdss
@@ -264,7 +264,7 @@ module app_ftdss
             real(real64), allocatable, intent(inout) :: coordinates(:, :)
         end subroutine assemble_initialize_ftdss
 
-        module subroutine assemble_destory_ftdss(self, workspace, local_K_TT, local_K_TH, &
+        module subroutine assemble_destroy_ftdss(self, workspace, local_K_TT, local_K_TH, &
                                                  local_K_HH, local_K_HT, local_F_T, local_F_H)
             implicit none
             class(type_ftdss), intent(inout) :: self
@@ -272,7 +272,7 @@ module app_ftdss
             type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
             type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
 
-        end subroutine assemble_destory_ftdss
+        end subroutine assemble_destroy_ftdss
 
         module subroutine get_variable_increment_ftdss(self, variable_id, variable)
             implicit none
@@ -346,11 +346,11 @@ module app_ftdss
 
         end subroutine run_ftdss
 
-        module subroutine destory_type_ftdss(self)
+        module subroutine destroy_type_ftdss(self)
             implicit none
             class(type_ftdss), intent(inout) :: self
 
-        end subroutine destory_type_ftdss
+        end subroutine destroy_type_ftdss
 
         module function is_active_thermal_ftdss(self) result(is_active)
             implicit none

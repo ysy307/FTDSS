@@ -90,6 +90,7 @@ module domain_manager
         procedure, public, pass(self) :: get_colored_elements => get_colored_elements_domain
         procedure, public, pass(self) :: get_total_dofs => get_total_dofs_domain
         procedure, public, pass(self) :: get_bc_patch => get_bc_patch_domain
+        procedure, public, pass(self) :: get_num_bc_patches => get_num_bc_patches_domain
         procedure, public, pass(self) :: get_config => get_config_domain
 
         ! ---- Meta / Utility ----
@@ -117,11 +118,15 @@ contains
         call self%nodes%get_num_nodes(num_nodes)
 
         call self%elements%initialize(config_elements, config_multicoloring)
-        call self%node_adjacency%initialize(num_nodes, self%elements%connectivity%row_ptr, &
-                                            self%elements%connectivity%col_ind)
-        call self%element_adjacency%initialize(num_nodes, self%elements%num_fe, &
-                                               self%elements%connectivity%row_ptr, self%elements%connectivity%col_ind)
-        call self%boundaries%initialize(config_boundary_elements)
+        if (num_nodes > 0 .and. self%elements%num_fe > 0) then
+            call self%node_adjacency%initialize(num_nodes, self%elements%connectivity%row_ptr, &
+                                                self%elements%connectivity%col_ind)
+            call self%element_adjacency%initialize(num_nodes, self%elements%num_fe, &
+                                                   self%elements%connectivity%row_ptr, self%elements%connectivity%col_ind)
+        end if
+        if (size(config_boundary_elements) > 0) then
+            call self%boundaries%initialize(config_boundary_elements)
+        end if
     end subroutine initialize_type_domain
 
     ! --------------------------------------------------------------------------
@@ -320,6 +325,14 @@ contains
 
         call self%boundaries%get_bc_patch(patch_id, boundary_patch)
     end subroutine get_bc_patch_domain
+
+    subroutine get_num_bc_patches_domain(self, num_patches)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32), intent(inout) :: num_patches
+
+        call self%boundaries%get_num_bcs(num_patches)
+    end subroutine get_num_bc_patches_domain
 
     subroutine calc_measure_domain(self, element_id, measure)
         implicit none

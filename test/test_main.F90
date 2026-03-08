@@ -30,7 +30,7 @@ contains
 
         call ftdss%initialize()
         call ftdss%run()
-        call ftdss%finalize()
+        call ftdss%destroy()
 
     end subroutine run_test_ftdss
 

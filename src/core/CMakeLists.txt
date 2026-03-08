@@ -102,9 +102,9 @@ target_sources(SOLVER_CORE PRIVATE
     types/config/domain/config_elements.F90
     types/config/domain/config_domain.F90
     types/config/physics/config_physics_base.F90
+    types/config/physics/config_constitutive.F90
     types/config/physics/config_swcc.F90
     types/config/physics/config_gcc.F90
-    types/config/physics/config_constitutive.F90
     types/config/physics/config_physics.F90
     types/config/control/config_acceleration.F90
     types/config/control/config_output_manager.F90

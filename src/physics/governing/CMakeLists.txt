@@ -16,6 +16,7 @@ target_sources(SOLVER_GOVERNING PRIVATE
     condition/boundary/data_provider/data_provider_dynamic.F90
     condition/boundary/data_provider/data_provider_factory.F90
     condition/boundary/strategy/strategy_interface.F90
+    condition/boundary/strategy/strategy_base.F90
     condition/boundary/strategy/strategy_dirichlet.F90
     condition/boundary/strategy/strategy_flux.F90
     condition/boundary/strategy/strategy_robin.F90

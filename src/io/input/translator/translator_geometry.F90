@@ -218,6 +218,7 @@ contains
 
             call build_config_elements(input%geometry%vtk%cells, target_indices, &
                                        input%basic%geometry_settings%integration_order, config_elements(j))
+            config_elements(j)%entity_id = unique_bnd_ids(j)
 
             call deallocate_array(target_indices)
         end do

@@ -11,7 +11,7 @@ contains
         type(type_matrix_dense) :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
         type(type_vector_dp) :: local_F_T, local_F_H
         type(type_assemble_workspace) :: workspace
-        
+
         ! 【修正1】座標用のバッファ変数を定義（allocatableで自動管理させる）
         real(real64), allocatable :: elem_coords(:, :)
 
@@ -70,11 +70,11 @@ contains
 
             end do
             !$OMP END DO
-            
-            call self%assemble_destory(workspace, local_K_TT, local_K_TH, &
-                                        local_K_HH, local_K_HT, local_F_T, local_F_H)
-            if (allocated(elem_coords)) deallocate(elem_coords)
-            
+
+            call self%assemble_destroy(workspace, local_K_TT, local_K_TH, &
+                                       local_K_HH, local_K_HT, local_F_T, local_F_H)
+            if (allocated(elem_coords)) deallocate (elem_coords)
+
             !$OMP END PARALLEL
 
         end do
@@ -87,7 +87,7 @@ contains
                                                 local_K_HH, local_K_HT, local_F_T, local_F_H, &
                                                 coordinates)
         implicit none
-    
+
         class(type_ftdss), intent(inout) :: self
         integer(int32), intent(in) :: element_id
         type(type_assemble_workspace), intent(inout) :: workspace
@@ -113,7 +113,7 @@ contains
         call self%domain%get_fe(element_id, fe)
         call self%domain%get_fe_connectivity(element_id, connectivity)
         call self%domain%get_computation_type(computation_type)
-        
+
         ! ここで渡される coordinates が allocated でサイズが同じなら再利用される(domain側実装)
         call self%domain%get_fe_coordinate(element_id, coordinates)
 
@@ -201,7 +201,7 @@ contains
 
     module subroutine assemble_local_ftdss(self, workspace, local_K_TT, local_K_TH, &
                                            local_K_HH, local_K_HT, local_F_T, local_F_H)
- 
+
         implicit none
         class(type_ftdss), intent(inout) :: self
         type(type_assemble_workspace), intent(inout) :: workspace
@@ -213,8 +213,8 @@ contains
 
     end subroutine assemble_local_ftdss
 
-    module subroutine assemble_destory_ftdss(self, workspace, local_K_TT, local_K_TH, &
-                                              local_K_HH, local_K_HT, local_F_T, local_F_H)
+    module subroutine assemble_destroy_ftdss(self, workspace, local_K_TT, local_K_TH, &
+                                             local_K_HH, local_K_HT, local_F_T, local_F_H)
         implicit none
         class(type_ftdss), intent(inout) :: self
         type(type_assemble_workspace), intent(inout) :: workspace
@@ -229,6 +229,6 @@ contains
         if (present(local_K_HT)) call local_K_HT%destroy()
         if (present(local_F_T)) call local_F_T%destroy()
         if (present(local_F_H)) call local_F_H%destroy()
-    end subroutine assemble_destory_ftdss
+    end subroutine assemble_destroy_ftdss
 
 end submodule ftdss_assemble

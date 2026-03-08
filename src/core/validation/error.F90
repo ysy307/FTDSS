@@ -70,7 +70,8 @@ contains
         end if
 
         ! 4. STOP Execution
-        error stop strip(full_msg)
+        error stop err%ID
+        ! error stop strip(full_msg)
 
     end subroutine raise_error
 

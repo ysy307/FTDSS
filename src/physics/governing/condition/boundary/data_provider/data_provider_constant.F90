@@ -8,7 +8,8 @@ contains
         type(type_config_bc), intent(in) :: config
 
         call allocate_array(self%constant_values, config%num_variables)
-        self%constant_values = config%values(:, 1) ! Assuming the first time
+        self%constant_values = config%values(1:config%num_variables, 1) ! Assuming the first time
+        self%data_size = config%num_variables
 
         self%data_kind = BC_DATA_PROVIDERS%CONSTANT
     end subroutine initialize_type_bc_data_constant
@@ -36,7 +37,7 @@ contains
         real(real64), intent(in) :: current_time
         real(real64), intent(inout) :: values(3)
 
-        values(1:3) = self%constant_values(1:3)
+        values(1:self%data_size) = self%constant_values(1:self%data_size)
 
     end subroutine get_data_bc_data_constant
 

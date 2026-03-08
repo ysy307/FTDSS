@@ -7,6 +7,8 @@ module io_output_manager
     use :: module_core
     use :: module_domain
 
+    use :: io_output_base, only: &
+        setup_directory
     use :: io_output_overall, only: &
         abst_output_overall, &
         type_output_overall_vtk, &

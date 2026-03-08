@@ -9,54 +9,69 @@ contains
         type(type_constant_id), intent(in) :: target_physics
         type(type_config_bc), intent(inout), allocatable :: configs(:)
 
-        integer(int32) :: i, j
-        integer(int32) :: index
+        integer(int32) :: i
+        integer(int32) :: index, num_active
 
-        allocate (configs(input%conditions%num_boundaries))
-
+        ! --- Pass 1: アクティブな境界の個数を数える ---
+        num_active = 0
         do index = 1, input%conditions%num_boundaries
-            configs(index)%boundary_id = input%conditions%boundary_conditions(index)%id
+            associate (physics_data => input%conditions%boundary_conditions(index)%physics(target_physics%ID))
+                if (physics_data%is_active) num_active = num_active + 1
+            end associate
+        end do
 
+        ! アクティブな境界の個数だけ確保（コンパクト配列）
+        if (allocated(configs)) deallocate (configs)
+        allocate (configs(num_active))
+
+        if (num_active == 0) return
+
+        ! --- Pass 2: アクティブな境界のみを変換して格納 ---
+        num_active = 0
+        do index = 1, input%conditions%num_boundaries
             associate (physics_data => input%conditions%boundary_conditions(index)%physics(target_physics%ID))
 
-                if (.not. physics_data%is_active) return
+                if (.not. physics_data%is_active) cycle
 
-                configs(index)%physics_type = target_physics
-                configs(index)%num_time_points = physics_data%num_time_points
+                num_active = num_active + 1
+
+                ! メッシュの entity_id と対応させるための JSON id を保持
+                configs(num_active)%boundary_id = input%conditions%boundary_conditions(index)%id
+                configs(num_active)%physics_type = target_physics
+                configs(num_active)%num_time_points = physics_data%num_time_points
 
                 select case (target_physics%ID)
                 case (PHYSICS_TYPES%THERMAL%ID)
-                    configs(index)%bc_kind = THERMAL_BC_TYPES%to_object(physics_data%bc_type)
+                    configs(num_active)%bc_kind = THERMAL_BC_TYPES%to_object(physics_data%bc_type)
                 case (PHYSICS_TYPES%HYDRAULIC%ID)
-                    configs(index)%bc_kind = HYDRAULIC_BC_TYPES%to_object(physics_data%bc_type)
+                    configs(num_active)%bc_kind = HYDRAULIC_BC_TYPES%to_object(physics_data%bc_type)
                 end select
 
-                configs(index)%bc_data_kind = BC_DATA_PROVIDERS%to_object(physics_data%bc_value_type)
+                configs(num_active)%bc_data_kind = BC_DATA_PROVIDERS%to_object(physics_data%bc_value_type)
 
-                select case (configs(index)%bc_kind%ID)
+                select case (configs(num_active)%bc_kind%ID)
                 case (THERMAL_BC_TYPES%DIRICHLET%ID, THERMAL_BC_TYPES%FLUX%ID, &
                       HYDRAULIC_BC_TYPES%DIRICHLET%ID, HYDRAULIC_BC_TYPES%FLUX%ID)
-                    configs(index)%num_variables = 1
-                    call allocate_array(configs(index)%time_points, configs(index)%num_time_points)
-                    call allocate_array(configs(index)%values, configs(index)%num_variables, configs(index)%num_time_points)
+                    configs(num_active)%num_variables = 1
+                    call allocate_array(configs(num_active)%time_points, configs(num_active)%num_time_points)
+                    call allocate_array(configs(num_active)%values, configs(num_active)%num_variables, configs(num_active)%num_time_points)
 
-                    do i = 1, configs(index)%num_time_points
-                        configs(index)%time_points(i) = physics_data%values(i)%time
-                        configs(index)%values(1, i) = physics_data%values(i)%value
+                    do i = 1, configs(num_active)%num_time_points
+                        configs(num_active)%time_points(i) = physics_data%values(i)%time
+                        configs(num_active)%values(1, i) = physics_data%values(i)%value
                     end do
 
                 case (THERMAL_BC_TYPES%ROBIN%ID, THERMAL_BC_TYPES%CONVECTIVE%ID, THERMAL_BC_TYPES%RADIATION%ID)
-                    configs(index)%num_variables = 2
-                    call allocate_array(configs(index)%time_points, configs(index)%num_time_points)
-                    call allocate_array(configs(index)%values, configs(index)%num_variables, configs(index)%num_time_points)
+                    configs(num_active)%num_variables = 2
+                    call allocate_array(configs(num_active)%time_points, configs(num_active)%num_time_points)
+                    call allocate_array(configs(num_active)%values, configs(num_active)%num_variables, configs(num_active)%num_time_points)
 
                     ! Assign values for 2 variables here
                 case default
-                    configs(index)%num_variables = 0
+                    configs(num_active)%num_variables = 0
                 end select
 
             end associate
-
         end do
 
     end subroutine execute_condition_boundary
@@ -80,6 +95,8 @@ contains
             else
                 config%active = input%basic%analysis_controls%is_active(ic_target%ID)
             end if
+            if (.not. config%active) return
+            
             config%ic_kind = IC_METHODS%to_object(condition_data%type)
             if (config%ic_kind == IC_METHODS%UNIFORM) then
                 config%value = condition_data%value

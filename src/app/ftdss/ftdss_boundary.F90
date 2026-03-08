@@ -74,25 +74,30 @@ contains
         real(real64), intent(in) :: current_time
         type(type_variable), intent(inout) :: variable
 
-        integer(int32) :: i_patch, num_boundaries
+        integer(int32) :: i_patch, num_patches
         integer(int32) :: i, glob_node_id
+        integer(int32) :: entity_id, bc_idx
         real(real64) :: val_curr
         type(type_bc_result) :: bc_result
         type(type_boundary_patch), pointer :: bc_patch
 
         if (.not. PHYSICS_TYPES%is_valid(physics_type)) return
 
-        call self%bc(physics_type%ID)%get_num_boundaries(num_boundaries)
+        call self%domain%get_num_bc_patches(num_patches)
 
-        do i_patch = 1, num_boundaries
+        do i_patch = 1, num_patches
             call self%domain%get_bc_patch(i_patch, bc_patch)
+
+            entity_id = bc_patch%entity_id
+            call self%bc(physics_type%ID)%get_bc_index(entity_id, bc_idx)
+            if (bc_idx < 0) cycle
 
             if (allocated(bc_patch%connectivity%col_ind)) then
                 do i = 1, size(bc_patch%connectivity%col_ind)
                     glob_node_id = bc_patch%connectivity%col_ind(i)
 
                     call variable%get_current(glob_node_id, val_curr)
-                    call self%bc(physics_type%ID)%evaluate(i_patch, current_time, val_curr, bc_result)
+                    call self%bc(physics_type%ID)%evaluate(bc_idx, current_time, val_curr, bc_result)
 
                     if (bc_result%is_dirichlet) then
                         call variable%set_current(glob_node_id, bc_result%prescribed_value)
@@ -114,12 +119,13 @@ contains
         type(type_variable), intent(in) :: variable
         integer(int32), intent(in) :: dof_offset
 
-        integer(int32) :: i_patch, num_boundaries
+        integer(int32) :: i_patch, num_patches
         integer(int32) :: i_elem, k_gp
         integer(int32) :: num_nodes_loc, n_dim
         integer(int32) :: i, j
         integer(int32) :: num_gp
         integer(int32) :: start_idx, end_idx
+        integer(int32) :: entity_id, bc_idx
 
         real(real64) :: u_curr, q_flux, dq_du, w_vol, det_j
         real(real64), allocatable :: psi(:)
@@ -136,12 +142,16 @@ contains
 
         if (.not. PHYSICS_TYPES%is_valid(physics_type)) return
 
-        call self%bc(physics_type%ID)%get_num_boundaries(num_boundaries)
+        call self%domain%get_num_bc_patches(num_patches)
 
-        do i_patch = 1, num_boundaries
+        do i_patch = 1, num_patches
             call self%domain%get_bc_patch(i_patch, bc_patch)
 
-            call self%bc(physics_type%ID)%evaluate(i_patch, current_time, 0.0d0, bc_result)
+            entity_id = bc_patch%entity_id
+            call self%bc(physics_type%ID)%get_bc_index(entity_id, bc_idx)
+            if (bc_idx < 0) cycle
+
+            call self%bc(physics_type%ID)%evaluate(bc_idx, current_time, 0.0d0, bc_result)
             if (bc_result%is_dirichlet) cycle
 
             if (bc_patch%num_fe > 0) then
@@ -181,7 +191,7 @@ contains
                             u_curr = u_curr + psi(i) * val
                         end do
 
-                        call self%bc(physics_type%ID)%evaluate(i_patch, current_time, u_curr, bc_result)
+                        call self%bc(physics_type%ID)%evaluate(bc_idx, current_time, u_curr, bc_result)
                         q_flux = bc_result%flux_value
                         dq_du = bc_result%flux_derivative
 
@@ -211,19 +221,24 @@ contains
         type(type_variable), intent(in) :: variable
         integer(int32), intent(in) :: dof_offset
 
-        integer(int32) :: i_patch, num_boundaries
+        integer(int32) :: i_patch, num_patches
         integer(int32) :: i, glob_node_id
+        integer(int32) :: entity_id, bc_idx
         type(type_bc_result) :: bc_result
         type(type_boundary_patch), pointer :: bc_patch
 
         if (.not. PHYSICS_TYPES%is_valid(physics_type)) return
 
-        call self%bc(physics_type%ID)%get_num_boundaries(num_boundaries)
+        call self%domain%get_num_bc_patches(num_patches)
 
-        do i_patch = 1, num_boundaries
+        do i_patch = 1, num_patches
             call self%domain%get_bc_patch(i_patch, bc_patch)
 
-            call self%bc(physics_type%ID)%evaluate(i_patch, current_time, 0.0d0, bc_result)
+            entity_id = bc_patch%entity_id
+            call self%bc(physics_type%ID)%get_bc_index(entity_id, bc_idx)
+            if (bc_idx < 0) cycle
+
+            call self%bc(physics_type%ID)%evaluate(bc_idx, current_time, 0.0d0, bc_result)
 
             if (.not. bc_result%is_dirichlet) cycle
 
