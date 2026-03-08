@@ -117,7 +117,7 @@ contains
     function get_data_vector(self) result(data_ptr)
         implicit none
         class(type_residual_vector), intent(in), target :: self
-        real(real64), pointer, contiguous, dimension(:) :: data_ptr
+        real(real64), pointer, dimension(:) :: data_ptr
 
         data_ptr => self%data%get_data()
     end function get_data_vector

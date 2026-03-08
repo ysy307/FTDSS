@@ -163,6 +163,9 @@ contains
         class(abst_matrix), pointer :: K_ptr => null()
         type(type_vector_dp), pointer :: F_ptr => null()
         type(type_vector_dp), pointer :: du_ptr => null()
+        real(real64), pointer :: f_data(:) => null()
+        real(real64), pointer :: du_data(:) => null()
+        real(real64) :: rhs_norm
 
         call self%control%profiler_start(PROFILER_TYPES%SOLVE)
 
@@ -170,12 +173,33 @@ contains
         F_ptr => self%F%get_vector()
         du_ptr => self%du%get_vector()
 
+        f_data => F_ptr%get_data()
+        if (.not. associated(f_data)) then
+            call self%F%initialize(self%domain)
+            F_ptr => self%F%get_vector()
+            f_data => F_ptr%get_data()
+        end if
+
+        du_data => du_ptr%get_data()
+        if (.not. associated(du_data)) then
+            call self%du%initialize(self%domain)
+            du_ptr => self%du%get_vector()
+            du_data => du_ptr%get_data()
+        end if
+
+        rhs_norm = vector_norm2(F_ptr)
+        if (rhs_norm <= tiny(1.0d0)) then
+            write (*, '(A,ES13.5)') 'Warning: RHS norm is near zero before linear solve. ||F||2=', rhs_norm
+        end if
+
         call self%solver%solve(K_ptr, F_ptr, du_ptr)
         call self%solver%check()
 
         nullify (K_ptr)
         nullify (F_ptr)
         nullify (du_ptr)
+        nullify (f_data)
+        nullify (du_data)
 
         call self%control%profiler_stop(PROFILER_TYPES%SOLVE)
 
@@ -426,12 +450,13 @@ contains
         !> Overwritten on exit
         type(type_coordinate_dp), intent(inout) :: water_flux
 
-        integer(int32) :: computation_type
+        type(type_constant_id), pointer :: computation_type
 
         real(real64) :: K_wT, K_wP
         real(real64) :: rho_w, gravity_term
 
-        call self%domain%get_computation_dimension(computation_type)
+        nullify (computation_type)
+        call self%domain%get_computation_type(computation_type)
 
         call self%hydraulic%calc_K_wT(material_id, state, K_wT)
         call self%hydraulic%calc_K_wP(material_id, state, K_wP)
@@ -443,7 +468,7 @@ contains
         gravity_term = K_wP * rho_w * g
 
         ! --- Flux calculation (Darcy's law: q = -K_wT*grad_T - K_wP*grad_P - K*grad_z) ---
-        select case (computation_type)
+        select case (computation_type%ID)
         case (COMP_TYPES%XY_2D%ID)
             water_flux%x = -K_wT * grad_T%x - K_wP * grad_P%x
             water_flux%y = -K_wT * grad_T%y - K_wP * grad_P%y
@@ -497,16 +522,17 @@ contains
         !> Overwritten on exit
         type(type_coordinate_dp), intent(inout) :: water_flux
 
-        integer(int32) :: computation_type
+        type(type_constant_id), pointer :: computation_type
 
         real(real64) :: K_vT, K_vP
 
-        call self%domain%get_computation_dimension(computation_type)
+        nullify (computation_type)
+        call self%domain%get_computation_type(computation_type)
 
         call self%hydraulic%calc_K_vT(material_id, state, K_vT)
         call self%hydraulic%calc_K_vP(material_id, state, K_vP)
 
-        select case (computation_type)
+        select case (computation_type%ID)
         case (COMP_TYPES%XY_2D%ID)
             water_flux%x = -K_vT * grad_T%x - K_vP * grad_P%x
             water_flux%y = -K_vT * grad_T%y - K_vP * grad_P%y

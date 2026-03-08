@@ -409,6 +409,7 @@ contains
         end if
 
         self%delta = val
+        self%values(:, self%head_idx) = self%values(:, self%head_idx) + val
     end subroutine set_delta_array_variable
 
     subroutine compute_time_derivative_variable(self, bdf_coeffs, bdf_order)

@@ -107,7 +107,7 @@ contains
         write (output_name, self%format_output_file) &
             strip(self%dir_output_field), strip(file_name), ".", to_lower(strip(self%file_format%NAME))
 
-        status = vtu%initialize(format='binary', filename=strip(output_name), mesh_topology='UnstructuredGrid')
+        status = vtu%initialize(format='bina', filename=strip(output_name), mesh_topology='UnstructuredGrid')
 
         status = vtu%xml_writer%write_piece(np=self%num_points, nc=self%num_cells)
         status = vtu%xml_writer%write_geo(np=self%num_points, &

@@ -243,6 +243,10 @@ contains
                 write (unit, '(2a)') strip(self%name), ": Solver occures NOT_IMPLEMENTED."
             end select
         end if
+
+            if (self%status == SOLVER_STATUS%BREAKDOWN%ID) then
+                error stop "Solver BREAKDOWN detected. Program is stopped. Please specify next improvement."
+            end if
     end subroutine check_solver
 
     subroutine display_residual_history_solver(self, unit_display)

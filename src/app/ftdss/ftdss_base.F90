@@ -12,6 +12,7 @@ contains
         integer(int32) :: max_bdf_order
         integer(int32), allocatable :: active_region_ids(:)
         integer(int32) :: num_nodes
+        integer(int32) :: i
         character(len=10), allocatable :: profiler_labels(:)
         real(real64) :: current_time
         integer(int32) :: computation_dimension
@@ -69,6 +70,7 @@ contains
 
         if (self%is_active_thermal()) then
             call input_translator%execute(input, PHYSICS_TYPES%THERMAL, config_bcs)
+            print*,size(config_bcs)
             call self%bc(PHYSICS_TYPES%THERMAL%ID)%initialize(config_bcs)
             if (allocated(config_bcs)) deallocate (config_bcs)
         end if
@@ -98,7 +100,9 @@ contains
         call input_translator%execute(input, config_nodes)
         call input_translator%execute(input, config_elements, config_multicoloring)
         call input_translator%execute(input, config_boundary_elements)
-        call self%domain%initialize(config_nodes, config_elements, config_multicoloring, config_boundary_elements)
+        call self%domain%initialize(config_nodes, config_elements, config_multicoloring, config_boundary_elements, &
+                input%basic%simulation_settings%calculate_type, config_control_manager%coupling_mode, &
+                config_control_manager%compute_active)
         call self%domain%get_total_dofs(num_total_dofs)
         call self%domain%get_num_nodes(num_nodes)
 
@@ -148,6 +152,14 @@ contains
         call input_translator%execute(input, config_output)
         call input_translator%execute(input, config_observation)
         call input_translator%execute(input, config_overall)
+
+        if (config_observation%point_type == OUTPUT_OBSERVATION_TYPES%COORDINATES) then
+            if (allocated(config_observation%observation_geometries)) then
+                do i = 1, size(config_observation%observation_geometries)
+                    call self%domain%get_config(config_observation%observation_geometries(i))
+                end do
+            end if
+        end if
 
         call self%output%initialize(config_output, config_observation, config_overall)
         call self%output_fields()
@@ -265,7 +277,7 @@ contains
         type(type_constant_id), intent(in) :: variable_id
         real(real64), intent(inout), allocatable :: variable(:)
 
-        real(real64), pointer, contiguous, dimension(:) :: du
+        real(real64), pointer, dimension(:) :: du
 
         integer(int32) :: target_dof
         integer(int32) :: num_nodes, num_dofs_per_node
@@ -310,7 +322,7 @@ contains
         type(type_constant_id), intent(in) :: variable_id
         real(real64), intent(inout), allocatable :: variable(:)
 
-        real(real64), pointer, contiguous, dimension(:) :: F
+        real(real64), pointer, dimension(:) :: F
 
         integer(int32) :: target_dof
         integer(int32) :: num_nodes, num_dofs_per_node
@@ -481,14 +493,18 @@ contains
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du)
             call self%temperature%get_current(current)
             if (associated(current)) then
-                if (.not. is_none) then
-                    call self%control%compute_relaxation(PHYSICS_TYPES%THERMAL, iter, du, current)
-                    call self%control%get_current_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
-                    write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
+                if (allocated(du) .and. size(du) > 0) then
+                    if (.not. is_none) then
+                        call self%control%compute_relaxation(PHYSICS_TYPES%THERMAL, iter, du, current)
+                        call self%control%get_current_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
+                        write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
+                    else
+                        relaxation_factor = 1.0d0
+                    end if
+                    call self%temperature%set_delta(relaxation_factor * du(:))
                 else
-                    relaxation_factor = 1.0d0
+                    call self%temperature%set_delta(0.0d0 * current)
                 end if
-                call self%temperature%set_delta(relaxation_factor * du(:))
             end if
 
             call self%calc_gradient_temperature()
@@ -501,14 +517,18 @@ contains
             call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, du)
             call self%pressure%get_current(current)
             if (associated(current)) then
-                if (.not. is_none) then
-                    call self%control%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, iter, du, current)
-                    call self%control%get_current_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
-                    write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
+                if (allocated(du) .and. size(du) > 0) then
+                    if (.not. is_none) then
+                        call self%control%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, iter, du, current)
+                        call self%control%get_current_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
+                        write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
+                    else
+                        relaxation_factor = 1.0d0
+                    end if
+                    call self%pressure%set_delta(relaxation_factor * du(:))
                 else
-                    relaxation_factor = 1.0d0
+                    call self%pressure%set_delta(0.0d0 * current)
                 end if
-                call self%pressure%set_delta(relaxation_factor * du(:))
             end if
 
             call self%calc_gradient_pressure()

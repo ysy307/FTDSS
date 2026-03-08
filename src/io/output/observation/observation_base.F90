@@ -12,10 +12,13 @@ contains
         integer(int32) :: i
         integer(int32) :: iostat
 
-        type(type_constant_value) :: file_format
+        type(type_constant_id) :: file_format
+
+        self%settings(:)%do_output = .false.
+        self%observation_type = config%point_type
+        file_format = config%file_format
 
         if (self%observation_type == OUTPUT_OBSERVATION_TYPES%NONE) then
-            self%settings(:)%do_output = .false.
             return
         end if
 
@@ -48,54 +51,63 @@ contains
                 select case (variable%ID)
                 case (OUTPUT_VARIABLE_TYPES%TEMPERATURE%ID)
                     self%settings(variable%ID)%do_output = .true.
+                    self%settings(variable%ID)%variable_type = variable
                     self%settings(variable%ID)%variable_unit = "deg C"
                     self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_T."//strip(file_format%NAME)
                     self%settings(variable%ID)%io_unit = open (strip(self%settings(variable%ID)%file_name), "wt", iostat=iostat)
                     if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable%ID)%file_name)
                 case (OUTPUT_VARIABLE_TYPES%WATER_CONTENT%ID)
                     self%settings(variable%ID)%do_output = .true.
+                    self%settings(variable%ID)%variable_type = variable
                     self%settings(variable%ID)%variable_unit = "m3/m3"
-                    self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_Qi."//strip(file_format%NAME)
+                    self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_Qw."//strip(file_format%NAME)
                     self%settings(variable%ID)%io_unit = open (strip(self%settings(variable%ID)%file_name), "wt", iostat=iostat)
                     if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable%ID)%file_name)
                 case (OUTPUT_VARIABLE_TYPES%ICE_CONTENT%ID)
                     self%settings(variable%ID)%do_output = .true.
+                    self%settings(variable%ID)%variable_type = variable
                     self%settings(variable%ID)%variable_unit = "m3/m3"
                     self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_Qi."//strip(file_format%NAME)
                     self%settings(variable%ID)%io_unit = open (strip(self%settings(variable%ID)%file_name), "wt", iostat=iostat)
                     if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable%ID)%file_name)
                 case (OUTPUT_VARIABLE_TYPES%VAPOR_CONTENT%ID)
                     self%settings(variable%ID)%do_output = .true.
+                    self%settings(variable%ID)%variable_type = variable
                     self%settings(variable%ID)%variable_unit = "m3/m3"
                     self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_Qv."//strip(file_format%NAME)
                     self%settings(variable%ID)%io_unit = open (strip(self%settings(variable%ID)%file_name), "wt", iostat=iostat)
                     if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable%ID)%file_name)
                 case (OUTPUT_VARIABLE_TYPES%THERMAL_CONDUCTIVITY%ID)
                     self%settings(variable%ID)%do_output = .true.
+                    self%settings(variable%ID)%variable_type = variable
                     self%settings(variable%ID)%variable_unit = "W/m/K"
                     self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_TC."//strip(file_format%NAME)
                     self%settings(variable%ID)%io_unit = open (strip(self%settings(variable%ID)%file_name), "wt", iostat=iostat)
                     if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable%ID)%file_name)
                 case (OUTPUT_VARIABLE_TYPES%VOLUMETRIC_HEAT_CAPACITY%ID)
                     self%settings(variable%ID)%do_output = .true.
+                    self%settings(variable%ID)%variable_type = variable
                     self%settings(variable%ID)%variable_unit = "J/m3/K"
                     self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_C."//strip(file_format%NAME)
                     self%settings(variable%ID)%io_unit = open (strip(self%settings(variable%ID)%file_name), "wt", iostat=iostat)
                     if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable%ID)%file_name)
                 case (OUTPUT_VARIABLE_TYPES%PRESSURE%ID)
                     self%settings(variable%ID)%do_output = .true.
+                    self%settings(variable%ID)%variable_type = variable
                     self%settings(variable%ID)%variable_unit = "m"
                     self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_P."//strip(file_format%NAME)
                     self%settings(variable%ID)%io_unit = open (strip(self%settings(variable%ID)%file_name), "wt", iostat=iostat)
                     if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable%ID)%file_name)
                 case (OUTPUT_VARIABLE_TYPES%WATER_FLUX%ID)
                     self%settings(variable%ID)%do_output = .true.
+                    self%settings(variable%ID)%variable_type = variable
                     self%settings(variable%ID)%variable_unit = "m/s"
                     self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_Flux."//strip(file_format%NAME)
                     self%settings(variable%ID)%io_unit = open (strip(self%settings(variable%ID)%file_name), "wt", iostat=iostat)
                     if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable%ID)%file_name)
                 case (OUTPUT_VARIABLE_TYPES%HYDRAULIC_CONDUCTIVITY%ID)
                     self%settings(variable%ID)%do_output = .true.
+                    self%settings(variable%ID)%variable_type = variable
                     self%settings(variable%ID)%variable_unit = "m/s"
                     self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_K."//strip(file_format%NAME)
                     self%settings(variable%ID)%io_unit = open (strip(self%settings(variable%ID)%file_name), "wt", iostat=iostat)
@@ -133,6 +145,12 @@ contains
             end if
         end do
 
+        do i = 1, OUTPUT_VARIABLE_TYPES%NUM_ID
+            if (self%settings(i)%do_output) then
+                call self%write_header(self%settings(i)%variable_type, config%output_time_unit_name)
+            end if
+        end do
+
     end subroutine initialize_type_output_observation
 
     module subroutine destroy_type_output_observation(self)
@@ -153,13 +171,14 @@ contains
     ! Writer Subroutines
     ! ==============================================================================
 
-    module subroutine write_observation_header(self, output_variable_type, output_time_unit)
+    module subroutine write_observation_header(self, output_variable_type, output_time_unit_name)
         implicit none
         class(type_output_observation), intent(inout) :: self
         type(type_constant_id), intent(in) :: output_variable_type
-        type(type_constant_id), intent(in) :: output_time_unit
+        character(*), intent(in) :: output_time_unit_name
 
         integer(int32) :: i
+        character(4096) :: header_line
 
         associate (output_settings => self%settings(output_variable_type%ID))
             if (.not. output_settings%do_output) return
@@ -197,20 +216,25 @@ contains
             end select
 
             write (output_settings%io_unit, '(a)') "#"
-            write (output_settings%io_unit, '(a)') "# Output Unit: Time ["//strip(output_time_unit%NAME)//"], " &
+            write (output_settings%io_unit, '(a)') "# Output Unit: Time ["//strip(output_time_unit_name)//"], " &
                 //strip(output_settings%variable_type%NAME)//" ["//strip(output_settings%variable_unit)//"]"
             write (output_settings%io_unit, '(a)') "#"
 
-            ! --- ヘッダー行の出力 ---
+            ! Build the header line explicitly so the format always matches the item count.
+            header_line = "Time"
             select case (output_settings%variable_type%ID)
             case (OUTPUT_VARIABLE_TYPES%WATER_FLUX%ID)
-                write (output_settings%io_unit, '(a,'//to_string(self%num_observations)//'("'//output_settings%delimiter//'"))') &
-                    "Time", (("Obs"//to_string(i)//"_x", "Obs"//to_string(i)//"_y", "Obs"//to_string(i)//"_z"), &
-                             i=1, self%num_observations / 3)
+                do i = 1, self%num_observations / 3
+                    header_line = trim(header_line)//output_settings%delimiter//"Obs"//to_string(i)//"_x" &
+                                  //output_settings%delimiter//"Obs"//to_string(i)//"_y" &
+                                  //output_settings%delimiter//"Obs"//to_string(i)//"_z"
+                end do
             case default
-                write (output_settings%io_unit, '(a,'//to_string(self%num_observations)//'("'//output_settings%delimiter//'"))') &
-                    "Time", ("Obs"//to_string(i), i=1, self%num_observations)
+                do i = 1, self%num_observations
+                    header_line = trim(header_line)//output_settings%delimiter//"Obs"//to_string(i)
+                end do
             end select
+            write (output_settings%io_unit, '(a)') trim(header_line)
 
         end associate
 

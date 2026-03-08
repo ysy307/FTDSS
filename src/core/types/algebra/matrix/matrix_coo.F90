@@ -99,7 +99,7 @@ contains
         ! Compute the diagonal entries
         do i = 1, self%nnz
             if (self%row(i) == self%col(i)) then
-                call diagonal%set(MATRIX_OPS%INS, self%row(i), self%val(i))
+                call diagonal%set(VECTOR_OPS%INS, self%row(i), self%val(i))
             end if
         end do
 

@@ -97,7 +97,7 @@ contains
             row_end = self%ptr(i + 1) - 1
             do j = row_start, row_end
                 if (self%ind(j) == i) then
-                    call diagonal%set(MATRIX_OPS%INS, i, self%val(j))
+                    call diagonal%set(VECTOR_OPS%INS, i, self%val(j))
                     exit
                 end if
             end do

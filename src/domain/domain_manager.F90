@@ -30,11 +30,11 @@ module domain_manager
         !> Total number of MPI processes.
         integer(int32) :: num_procs = -1
         !> The spatial dimension of the computation (e.g., 2 for 2D, 3 for 3D).
-        integer(int32) :: computation_dimension
+        integer(int32) :: computation_dimension = 0
         !> The type of computation (e.g., 1 for XY-plane, 2 for XZ-plane, 3 for 3D).
-        type(type_constant_id) :: computation_type
+        type(type_constant_id) :: computation_type = type_constant_id("COMP_TYPE", "unknown", -1)
         !> The type of coupling (e.g., staggered or monolithic).
-        type(type_constant_id) :: coupling_mode
+        type(type_constant_id) :: coupling_mode = type_constant_id("COUPLING_MODE", "unknown", -1)
         !> Manages the degree of freedom layout.
         type(type_dof_map) :: dof_map
         !> Manages all nodal data.
@@ -104,20 +104,73 @@ module domain_manager
 contains
 
     !> Initializes the entire domain object and its components.
-    subroutine initialize_type_domain(self, config_nodes, config_elements, config_multicoloring, config_boundary_elements)
+    subroutine initialize_type_domain(self, config_nodes, config_elements, config_multicoloring, config_boundary_elements, &
+                                      computation_type, coupling_mode, active_dofs)
         implicit none
         class(type_domain), intent(inout) :: self
         type(type_config_nodes), intent(in) :: config_nodes
         type(type_config_elements), intent(in) :: config_elements
         type(type_config_multicoloring), intent(in) :: config_multicoloring
         type(type_config_elements), intent(in) :: config_boundary_elements(:)
+        integer(int32), intent(in), optional :: computation_type
+        type(type_constant_id), intent(in), optional :: coupling_mode
+        logical, intent(in), optional :: active_dofs(:)
 
-        integer(int32) :: num_nodes
+        integer(int32) :: num_nodes, ncopy
+        logical :: active_dofs_local(PHYSICS_TYPES%NUM_ID)
+        class(abst_fe), pointer :: fe
+
+        nullify (fe)
+
+        self%computation_dimension = 0
+        self%computation_type = type_constant_id("COMP_TYPE", "unknown", -1)
+        self%coupling_mode = type_constant_id("COUPLING_MODE", "unknown", -1)
+        active_dofs_local = .false.
+
+        if (present(computation_type)) then
+            self%computation_type = COMP_TYPES%to_object(computation_type)
+            select case (computation_type)
+            case (1:2)
+                self%computation_dimension = 2
+            case (3)
+                self%computation_dimension = 3
+            end select
+        end if
+
+        if (present(coupling_mode)) then
+            self%coupling_mode = coupling_mode
+        end if
+
+        if (present(active_dofs)) then
+            ncopy = min(size(active_dofs_local), size(active_dofs))
+            active_dofs_local(1:ncopy) = active_dofs(1:ncopy)
+        else
+            ! Fallback to thermal-only to avoid an invalid zero-DOF domain.
+            active_dofs_local(PHYSICS_TYPES%THERMAL%ID) = .true.
+        end if
+        call self%dof_map%initialize(active_dofs_local)
 
         call self%nodes%initialize(config_nodes)
         call self%nodes%get_num_nodes(num_nodes)
 
         call self%elements%initialize(config_elements, config_multicoloring)
+
+        if (self%computation_dimension == 0 .and. self%elements%num_fe > 0) then
+            call self%elements%get_fe(1, fe)
+            if (associated(fe)) call fe%get_dimension(self%computation_dimension)
+        end if
+
+        if (.not. COMP_TYPES%is_valid(self%computation_type)) then
+            select case (self%computation_dimension)
+            case (2)
+                self%computation_type = COMP_TYPES%XY_2D
+            case (3)
+                self%computation_type = COMP_TYPES%XYZ_3D
+            case default
+                self%computation_type = type_constant_id("COMP_TYPE", "unknown", -1)
+            end select
+        end if
+
         if (num_nodes > 0 .and. self%elements%num_fe > 0) then
             call self%node_adjacency%initialize(num_nodes, self%elements%connectivity%row_ptr, &
                                                 self%elements%connectivity%col_ind)

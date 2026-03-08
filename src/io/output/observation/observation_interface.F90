@@ -149,11 +149,11 @@ module io_output_observation
 
         end subroutine destroy_type_output_observation
 
-        module subroutine write_observation_header(self, output_variable_type, output_time_unit)
+        module subroutine write_observation_header(self, output_variable_type, output_time_unit_name)
             implicit none
             class(type_output_observation), intent(inout) :: self
             type(type_constant_id), intent(in) :: output_variable_type
-            type(type_constant_id), intent(in) :: output_time_unit
+            character(*), intent(in) :: output_time_unit_name
 
         end subroutine write_observation_header
 

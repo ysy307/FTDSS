@@ -59,6 +59,7 @@ find_package(fortran_stdlib REQUIRED)
 
 # --- json-fortran ---
 find_package(jsonfortran-intelllvm REQUIRED)
+find_package(X11 REQUIRED)
 
 # --- VTK (C++本体) ---
 find_package(VTK REQUIRED COMPONENTS CommonCore CommonDataModel IOLegacy IOXML)
@@ -178,6 +179,7 @@ function(enable_thirdparty target)
     # 【重要】VTK本体(C++)も同時にリンクする
     target_link_libraries(${target} PUBLIC
         VTK::VTKFortran
+        X11::X11
         VTK::CommonCore VTK::CommonDataModel VTK::IOLegacy VTK::IOXML
         fortran_stdlib::fortran_stdlib
         jsonfortran-intelllvm::jsonfortran-static

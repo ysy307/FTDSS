@@ -100,7 +100,11 @@ contains
             call self%get_variable_residual(PHYSICS_TYPES%THERMAL, residual)
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, increment)
 
-            if (has_nan(residual) .or. has_nan(increment)) then
+            if (.not. allocated(residual) .or. .not. allocated(increment) .or. &
+                size(residual) == 0 .or. size(increment) == 0) then
+                write (*, *) "Error: Thermal residual/increment is unavailable during convergence check."
+                call self%control%set_diverged(PHYSICS_TYPES%THERMAL, diverged)
+            else if (has_nan(residual) .or. has_nan(increment)) then
                 write (*, *) "Error: NaN detected in thermal variables during convergence check."
                 call self%control%set_diverged(PHYSICS_TYPES%THERMAL, diverged)
             else
@@ -125,7 +129,11 @@ contains
             call self%get_variable_residual(PHYSICS_TYPES%HYDRAULIC, residual)
             call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, increment)
 
-            if (has_nan(residual) .or. has_nan(increment)) then
+            if (.not. allocated(residual) .or. .not. allocated(increment) .or. &
+                size(residual) == 0 .or. size(increment) == 0) then
+                write (*, *) "Error: Hydraulic residual/increment is unavailable during convergence check."
+                call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, diverged)
+            else if (has_nan(residual) .or. has_nan(increment)) then
                 write (*, *) "Error: NaN detected in hydraulic variables during convergence check."
                 call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, diverged)
             else

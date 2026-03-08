@@ -108,13 +108,13 @@ contains
 
         integer(int32) :: type_id
 
-        if (value_in_range(elem_id, 1, self%num_fe)) then
-            element => null()
+        if (.not. value_in_range(elem_id, 1, self%num_fe)) then
+            nullify (element)
             return
         end if
 
         type_id = self%fe_types(elem_id)
-        element => self%fe_manager%get_fe(type_id)
+        call self%fe_manager%get_fe(type_id, element)
 
     end subroutine get_fe_elements_manager
 
@@ -126,7 +126,7 @@ contains
 
         integer(int32) :: istart, iend
 
-        if (value_in_range(element_id, 1, self%num_fe)) then
+        if (.not. value_in_range(element_id, 1, self%num_fe)) then
             connectivity => null()
             return
         end if

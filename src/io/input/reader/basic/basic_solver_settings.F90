@@ -194,8 +194,8 @@ contains
         implicit none
         class(type_input_basic), intent(inout) :: self
         type(json_file), intent(inout) :: json
-        integer(int32) :: target_id
         character(256) :: buffer(3)
+        character(256) :: legacy_buffer(2)
 
         buffer(1) = solver_settings
         buffer(2) = linear_solver
@@ -212,6 +212,29 @@ contains
         buffer(3) = tolerance
         call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%tolerance, &
                             is_required=.true., default_value=1.0d-6, valid_range=[0.0d0, huge(0.0d0)])
+
+        ! Backward compatibility: also accept legacy top-level "linear_solver".
+        legacy_buffer(1) = linear_solver
+
+        legacy_buffer(2) = solver_type
+        call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%solver_type, &
+                    is_required=.false., default_value=self%solver_settings%linear_solver%solver_type, &
+                    valid_range=[1, 20])
+
+        legacy_buffer(2) = preconditioner_type
+        call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%preconditioner_type, &
+                    is_required=.false., default_value=self%solver_settings%linear_solver%preconditioner_type, &
+                    valid_range=[1, 10])
+
+        legacy_buffer(2) = max_iterations
+        call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%max_iterations, &
+                    is_required=.false., default_value=self%solver_settings%linear_solver%max_iterations, &
+                    valid_range=[1, huge(1)])
+
+        legacy_buffer(2) = tolerance
+        call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%tolerance, &
+                    is_required=.false., default_value=self%solver_settings%linear_solver%tolerance, &
+                    valid_range=[0.0d0, huge(0.0d0)])
 
     end subroutine read_solver_settings_linear
 

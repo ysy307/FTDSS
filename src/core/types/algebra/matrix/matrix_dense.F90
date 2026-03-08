@@ -69,7 +69,7 @@ contains
 
         if (allocated(self%val)) then
             do i = 1, self%num_rows
-                call diagonal%set(MATRIX_OPS%INS, i, self%val(i, i))
+                call diagonal%set(VECTOR_OPS%INS, i, self%val(i, i))
             end do
         end if
 

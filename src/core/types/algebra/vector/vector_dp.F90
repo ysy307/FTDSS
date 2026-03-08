@@ -69,9 +69,13 @@ contains
     module function get_data_vector_dp(self) result(data)
         implicit none
         class(type_vector_dp), intent(in), target :: self
-        real(real64), pointer, contiguous, dimension(:) :: data
+        real(real64), pointer, dimension(:) :: data
 
-        data => self%val
+        if (allocated(self%val)) then
+            data => self%val
+        else
+            nullify (data)
+        end if
     end function get_data_vector_dp
 
     module pure function get_status_vector_dp(self) result(status)

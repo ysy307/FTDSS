@@ -40,6 +40,7 @@ contains
             config%file_format = FILE_FORMATS%to_object(observation%file_format)
             config%point_type = OUTPUT_OBSERVATION_TYPES%to_object(observation%observation_type)
             config%num_observations = observation%num_observations
+            call config%set(config%output_time_unit_name, observation%output_time_unit)
 
             ! Translate output variables
             if (allocated(observation%variable_names)) then

@@ -24,6 +24,7 @@ module types_config_observation
     type, extends(abst_config) :: type_config_observation
         type(type_constant_id) :: point_type = OUTPUT_OBSERVATION_TYPES%NONE
         type(type_constant_id) :: file_format = FILE_FORMATS%NONE
+        character(:), allocatable :: output_time_unit_name
         type(type_constant_id), allocatable :: output_variables(:)
         integer(int32) :: num_observations
         type(type_config_observation_geometry), allocatable :: observation_geometries(:)
@@ -78,6 +79,7 @@ contains
             call self%set(self%point_type, source%point_type)
             self%num_observations = source%num_observations
             call self%set(self%file_format, source%file_format)
+            call self%set(self%output_time_unit_name, source%output_time_unit_name)
             call self%set(self%output_variables, source%output_variables)
 
             if (allocated(source%observation_geometries)) then
@@ -107,6 +109,7 @@ contains
 
         self%point_type = OUTPUT_OBSERVATION_TYPES%NONE
         self%file_format = FILE_FORMATS%NONE
+        if (allocated(self%output_time_unit_name)) deallocate(self%output_time_unit_name)
         self%num_observations = 0
 
         if (allocated(self%output_variables)) deallocate(self%output_variables)

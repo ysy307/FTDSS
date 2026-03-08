@@ -74,16 +74,21 @@ contains
     end subroutine destroy_fe_manager
 
     !> Get a pointer to the FE object corresponding to a given ID
-    function get_fe_fe_manager(self, fe_id) result(fe)
+    subroutine get_fe_fe_manager(self, fe_id, fe)
         implicit none
         !> The FE manager object
         class(type_fe_manager), intent(in), target :: self
         !> The ID of the FE object
         integer(int32), intent(in) :: fe_id
         !> Pointer to the requested FE object
-        class(abst_fe), pointer :: fe
+        class(abst_fe), intent(inout), pointer :: fe
+
+        nullify (fe)
+
+        if (fe_id < 1 .or. fe_id > size(self%fe_map)) return
+        if (self%fe_map(fe_id) == 0) return
 
         fe => self%fe_list(self%fe_map(fe_id))%fe
-    end function get_fe_fe_manager
+    end subroutine get_fe_fe_manager
 
 end module domain_fe_manager

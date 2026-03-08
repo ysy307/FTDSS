@@ -157,7 +157,7 @@ contains
             if (bc_patch%num_fe > 0) then
                 do i_elem = 1, bc_patch%num_fe
                     ! 要素ごとに対応するFEオブジェクトを取得する
-                    fe => bc_patch%fe_manager%get_fe(i_elem)
+                    call bc_patch%fe_manager%get_fe(i_elem, fe)
 
                     start_idx = bc_patch%connectivity%row_ptr(i_elem)
                     end_idx = bc_patch%connectivity%row_ptr(i_elem + 1) - 1
@@ -224,12 +224,15 @@ contains
         integer(int32) :: i_patch, num_patches
         integer(int32) :: i, glob_node_id
         integer(int32) :: entity_id, bc_idx
+        integer(int32) :: num_matched_patches, num_dirichlet_nodes
         type(type_bc_result) :: bc_result
         type(type_boundary_patch), pointer :: bc_patch
 
         if (.not. PHYSICS_TYPES%is_valid(physics_type)) return
 
         call self%domain%get_num_bc_patches(num_patches)
+        num_matched_patches = 0
+        num_dirichlet_nodes = 0
 
         do i_patch = 1, num_patches
             call self%domain%get_bc_patch(i_patch, bc_patch)
@@ -237,6 +240,7 @@ contains
             entity_id = bc_patch%entity_id
             call self%bc(physics_type%ID)%get_bc_index(entity_id, bc_idx)
             if (bc_idx < 0) cycle
+            num_matched_patches = num_matched_patches + 1
 
             call self%bc(physics_type%ID)%evaluate(bc_idx, current_time, 0.0d0, bc_result)
 
@@ -253,9 +257,20 @@ contains
 
                     ! 2. Set Residual/Force vector
                     call self%F%set(dof_offset, glob_node_id, 0.0d0)
+                    num_dirichlet_nodes = num_dirichlet_nodes + 1
                 end do
             end if
         end do
+
+        if (num_matched_patches == 0) then
+            write (*, '(A,1X,A)') 'Error: No boundary patch matched boundary_conditions IDs for physics:', trim(physics_type%name)
+            error stop 'Boundary condition ID mismatch between mesh entity IDs and Conditions.json IDs.'
+        end if
+
+        if (num_dirichlet_nodes == 0) then
+            write (*, '(A,1X,A)') 'Error: No Dirichlet nodes were constrained for physics:', trim(physics_type%name)
+            error stop 'No essential BC applied. The linear system may be singular.'
+        end if
     end subroutine apply_essential_bc_generic
 
 end submodule ftdss_boundary

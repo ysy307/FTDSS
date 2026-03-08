@@ -112,7 +112,7 @@ contains
                         do m = 1, self%num_block_cols
                             if (k == m) then
                                 ! Access val(row_in_block, col_in_block, block_index)
-                                call diagonal%set(MATRIX_OPS%INS, (i - 1) * self%num_block_rows + k, self%val(k, m, j))
+                                call diagonal%set(VECTOR_OPS%INS, (i - 1) * self%num_block_rows + k, self%val(k, m, j))
                             end if
                         end do
                     end do

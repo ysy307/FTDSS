@@ -37,7 +37,7 @@ contains
         self%fe_id = config%fe_id
         self%coordinate_normalized = config%coordinate_normalized
         select type (fe => config%fe)
-        type is (abst_fe)
+        class is (abst_fe)
             self%fe => fe
         class default
             self%fe => null()

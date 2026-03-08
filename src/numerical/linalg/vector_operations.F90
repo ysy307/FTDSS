@@ -1655,7 +1655,7 @@ contains
         !> The source vector (right-hand side).
         class(type_vector_dp), intent(in) :: rhs
 
-        real(real64), dimension(:), pointer :: ptr_rhs
+        real(real64), dimension(:), pointer, contiguous :: ptr_rhs
 
         if (.not. rhs%is_initialized()) then
             error stop "ERROR in assign_vector_dp: RHS vector is not initialized."
@@ -1675,7 +1675,7 @@ contains
         !> The source vector (right-hand side).
         class(type_vector_int), intent(in) :: rhs
 
-        integer(int32), dimension(:), pointer :: ptr_rhs
+        integer(int32), dimension(:), pointer, contiguous :: ptr_rhs
 
         if (.not. rhs%is_initialized()) then
             error stop "ERROR in assign_vector_int: RHS vector is not initialized."
@@ -1694,7 +1694,7 @@ contains
         !> The output vector y to store the result.
         class(type_vector_dp), intent(inout) :: y
 
-        real(real64), dimension(:), pointer :: ptr_x, ptr_y
+        real(real64), dimension(:), pointer, contiguous :: ptr_x, ptr_y
 
         ptr_x => x%get_data()
         ptr_y => y%get_data()
@@ -1713,7 +1713,7 @@ contains
         !> The output vector y to store the result.
         class(type_vector_int), intent(inout) :: y
 
-        integer(int32), dimension(:), pointer :: ptr_x, ptr_y
+        integer(int32), dimension(:), pointer, contiguous :: ptr_x, ptr_y
 
         ptr_x => x%get_data()
         ptr_y => y%get_data()
@@ -1732,7 +1732,7 @@ contains
         !> The output vector y to store the result.
         class(type_vector_dp), intent(inout) :: y
 
-        real(real64), dimension(:), pointer :: ptr_x, ptr_y
+        real(real64), dimension(:), pointer, contiguous :: ptr_x, ptr_y
 
         ptr_x => x%get_data()
         ptr_y => y%get_data()
@@ -1751,7 +1751,7 @@ contains
         !> The output vector y to store the result.
         class(type_vector_int), intent(inout) :: y
 
-        integer(int32), dimension(:), pointer :: ptr_x, ptr_y
+        integer(int32), dimension(:), pointer, contiguous :: ptr_x, ptr_y
 
         ptr_x => x%get_data()
         ptr_y => y%get_data()
@@ -1778,6 +1778,14 @@ contains
         ptr_y => y%get_data()
         ptr_z => z%get_data()
 
+        if (.not. associated(ptr_x) .or. .not. associated(ptr_y)) then
+            error stop "axpyz_vector_dp: input vector data is not initialized"
+        end if
+        if (.not. associated(ptr_z)) then
+            call z%initialize(size(ptr_y))
+            ptr_z => z%get_data()
+        end if
+
 #ifdef USE_DEBUG
         call check_match_length(ptr_x, ptr_y, 'axpyz_vector_dp')
         call check_match_length(ptr_x, ptr_z, 'axpyz_vector_dp')
@@ -1801,6 +1809,14 @@ contains
         ptr_x => x%get_data()
         ptr_y => y%get_data()
         ptr_z => z%get_data()
+
+        if (.not. associated(ptr_x) .or. .not. associated(ptr_y)) then
+            error stop "axpyz_vector_int: input vector data is not initialized"
+        end if
+        if (.not. associated(ptr_z)) then
+            call z%initialize(size(ptr_y))
+            ptr_z => z%get_data()
+        end if
 
 #ifdef USE_DEBUG
         call check_match_length(ptr_x, ptr_y, 'axpyz_vector_int')
@@ -1843,7 +1859,7 @@ contains
         !> The input/output vector x to be modified.
         class(type_vector_dp), intent(inout) :: x
 
-        real(real64), dimension(:), pointer :: ptr_x
+        real(real64), dimension(:), pointer, contiguous :: ptr_x
 
         ptr_x => x%get_data()
 
@@ -1856,7 +1872,7 @@ contains
         !> The input/output vector x to be modified.
         class(type_vector_int), intent(inout) :: x
 
-        integer(int32), dimension(:), pointer :: ptr_x
+        integer(int32), dimension(:), pointer, contiguous :: ptr_x
 
         ptr_x => x%get_data()
 
@@ -1869,7 +1885,7 @@ contains
         !> The input/output vector x to be modified.
         class(type_vector_dp), intent(inout) :: x
 
-        real(real64), dimension(:), pointer :: ptr_x
+        real(real64), dimension(:), pointer, contiguous :: ptr_x
         real(real64), parameter :: epsilon = 1.0d-20
 
         ptr_x => x%get_data()
@@ -1887,7 +1903,7 @@ contains
         !> The input/output vector x to be modified.
         class(type_vector_int), intent(inout) :: x
 
-        integer(int32), dimension(:), pointer :: ptr_x
+        integer(int32), dimension(:), pointer, contiguous :: ptr_x
 
         ptr_x => x%get_data()
 
@@ -1906,7 +1922,7 @@ contains
         !> The input/output vector x to be shifted.
         class(type_vector_dp), intent(inout) :: x
 
-        real(real64), dimension(:), pointer :: ptr_x
+        real(real64), dimension(:), pointer, contiguous :: ptr_x
 
         ptr_x => x%get_data()
 
@@ -1921,7 +1937,7 @@ contains
         !> The input/output vector x to be shifted.
         class(type_vector_int), intent(inout) :: x
 
-        integer(int32), dimension(:), pointer :: ptr_x
+        integer(int32), dimension(:), pointer, contiguous :: ptr_x
 
         ptr_x => x%get_data()
 

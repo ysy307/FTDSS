@@ -27,7 +27,7 @@ module io_output_manager
     type :: type_output_manager
         logical, private, allocatable :: active(:)
 
-        type(type_output_observation), private, allocatable :: observation
+        type(type_output_observation), private :: observation
         class(abst_output_overall), private, allocatable :: overall
         type(type_output_log), private :: log
 
