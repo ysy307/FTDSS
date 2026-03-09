@@ -9,9 +9,14 @@ program test_main
 
     integer(int32) :: ierr
     integer(int32) :: myrank
+#ifdef _MPI
+    logical :: mpi_is_initialized
+    logical :: mpi_is_finalized
+#endif
 
 #ifdef _MPI
-    call MPI_Init(ierr)
+    call MPI_Initialized(mpi_is_initialized, ierr)
+    if (.not. mpi_is_initialized) call MPI_Init(ierr)
     call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
 #endif
 
@@ -19,7 +24,9 @@ program test_main
     call run_test_ftdss()
 
 #ifdef _MPI
-    call MPI_Finalize(ierr)
+    call MPI_Initialized(mpi_is_initialized, ierr)
+    call MPI_Finalized(mpi_is_finalized, ierr)
+    if (mpi_is_initialized .and. (.not. mpi_is_finalized)) call MPI_Finalize(ierr)
 #endif
 
 contains

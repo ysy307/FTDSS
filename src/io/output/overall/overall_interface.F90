@@ -1,9 +1,9 @@
 module io_output_overall
     use, intrinsic :: iso_fortran_env
+    use, intrinsic :: iso_c_binding, only: c_int, c_double
     use :: stdlib_strings, only:to_string, strip
     use :: stdlib_ascii, only:to_lower
     use :: stdlib_io, only:open
-    use :: vtk_fortran, only:vtk_file
     use :: module_core
     implicit none
     private
@@ -57,6 +57,10 @@ module io_output_overall
 
     type, extends(abst_output_overall) :: type_output_overall_vtu
         private
+        real(c_double), allocatable :: points_xyz(:, :)
+        integer(c_int), allocatable :: connectivity_c(:)
+        integer(c_int), allocatable :: offsets_vtk(:)
+        integer(c_int), allocatable :: cell_types_c(:)
     contains
         procedure, public, pass(self) :: initialize => initialize_type_output_overall_vtu
         procedure, public, pass(self) :: write_fields => write_fields_vtu

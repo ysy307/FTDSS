@@ -164,11 +164,16 @@ target_sources(SOLVER_CORE PRIVATE
     # --- VTK (C++) ---
     interop/vtk/reader_vtk.cpp
     interop/vtk/reader_vtu.cpp
+    interop/vtk/writer_vtk.cpp
+    interop/vtk/writer_vtu.cpp
     interop/vtk/c_wrapper.cpp
 
     # --- VTK (Fortran) ---
     interop/vtk/vtk_wrapper.F90
     interop/vtk/vtu_wrapper.F90
+    interop/vtk/vtk_writer_base.F90
+    interop/vtk/vtk_writer_wrapper.F90
+    interop/vtk/vtu_writer_wrapper.F90
     interop/vtk/vtk_constants.F90
     interop/vtk/vtk_initialize.F90
     interop/vtk/vtu_initialize.F90

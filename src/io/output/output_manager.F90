@@ -3,7 +3,6 @@ module io_output_manager
     use :: omp_lib
     use :: stdlib_strings, only:to_string, strip
     use :: stdlib_io, only:open
-    use :: vtk_fortran, only:vtk_file
     use :: module_core
     use :: module_domain
 

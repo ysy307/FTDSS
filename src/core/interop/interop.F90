@@ -19,6 +19,8 @@ module core_interop
         type_vtk_cell
     use :: core_vtk_vtk_constants, only: &
         vtk_constants
+    use :: core_vtk_vtu_writer_wrapper, only: &
+        type_vtu_writer
     implicit none
     public
 
