@@ -76,13 +76,13 @@ contains
             strip(self%dir_output_field), "Out_", file_counts, ".", to_lower(strip(self%file_format%NAME))
 
         call writer%initialize(strip(output_name))
-        call writer%write_mesh(              &
+        call writer%write_mesh( &
             int(self%num_points, kind=c_int), &
-            self%points_xyz,                  &
-            int(self%num_cells, kind=c_int),  &
+            self%points_xyz, &
+            int(self%num_cells, kind=c_int), &
             int(size(self%connectivity_c), kind=c_int), &
-            self%connectivity_c,              &
-            self%offsets_vtk,                 &
+            self%connectivity_c, &
+            self%offsets_vtk, &
             self%cell_types_c)
 
         do i = 1, size(self%variables)
@@ -192,13 +192,13 @@ contains
             strip(self%dir_output_field), strip(file_name), ".", to_lower(strip(self%file_format%NAME))
 
         call writer%initialize(strip(output_name))
-        call writer%write_mesh(              &
+        call writer%write_mesh( &
             int(self%num_points, kind=c_int), &
-            self%points_xyz,                  &
-            int(self%num_cells, kind=c_int),  &
+            self%points_xyz, &
+            int(self%num_cells, kind=c_int), &
             int(size(self%connectivity_c), kind=c_int), &
-            self%connectivity_c,              &
-            self%offsets_vtk,                 &
+            self%connectivity_c, &
+            self%offsets_vtk, &
             self%cell_types_c)
 
         allocate (cell_scalar(self%num_cells))

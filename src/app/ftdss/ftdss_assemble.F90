@@ -17,7 +17,7 @@ contains
 
         integer(int32) :: i_color, i_elem, elem_id
         integer(int32), pointer, contiguous, dimension(:) :: p_connectivity
-        integer(int32) :: thermal_dof, hydraulic_dof
+        integer(int32) :: thermal_dof
 
         integer(int32) :: num_colors, num_elements_in_color
         integer(int32), pointer, contiguous, dimension(:) :: elements_list
@@ -32,52 +32,50 @@ contains
 
         call self%domain%get_num_colors(num_colors)
         call self%domain%get_target_dof(PHYSICS_TYPES%THERMAL, thermal_dof)
-        call self%domain%get_target_dof(PHYSICS_TYPES%HYDRAULIC, hydraulic_dof)
+
+        !$OMP PARALLEL DEFAULT(NONE) &
+        !$OMP SHARED(self, num_colors, elements_list, num_elements_in_color, thermal_dof) &
+        !$OMP PRIVATE(i_color, i_elem, elem_id, p_connectivity, workspace, &
+        !$OMP         local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
+        !$OMP         local_F_T, local_F_H, elem_coords)
 
         do i_color = 1, num_colors
 
+            !$OMP SINGLE
             call self%domain%get_colored_elements(i_color, num_elements_in_color, elements_list)
+            !$OMP END SINGLE
+            !$OMP BARRIER
 
-            if (num_elements_in_color <= 0) cycle
+            if (num_elements_in_color > 0) then
+                !$OMP DO SCHEDULE(STATIC)
+                do i_elem = 1, num_elements_in_color
 
-            !$OMP PARALLEL DEFAULT(NONE) &
-            !$OMP SHARED(self, elements_list, num_elements_in_color, &
-            !$OMP        thermal_dof) &
-            !$OMP PRIVATE(i_elem, elem_id, p_connectivity, &
-            !$OMP         workspace, &
-            !$OMP         local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
-            !$OMP         local_F_T, local_F_H, &
-            !$OMP         elem_coords)
+                    elem_id = elements_list(i_elem)
+                    call self%assemble_initialize(element_id=elem_id, workspace=workspace, &
+                                                  local_K_TT=local_K_TT, local_K_TH=local_K_TH, &
+                                                  local_K_HH=local_K_HH, local_K_HT=local_K_HT, &
+                                                  local_F_T=local_F_T, local_F_H=local_F_H, &
+                                                  coordinates=elem_coords, connectivity=p_connectivity)
 
-            !$OMP DO SCHEDULE(STATIC)
-            do i_elem = 1, num_elements_in_color
+                    call self%assemble_local(workspace, local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
+                                             local_F_T, local_F_H)
 
-                elem_id = elements_list(i_elem)
-                call self%assemble_initialize(element_id=elem_id, workspace=workspace, &
-                                              local_K_TT=local_K_TT, local_K_TH=local_K_TH, &
-                                              local_K_HH=local_K_HH, local_K_HT=local_K_HT, &
-                                              local_F_T=local_F_T, local_F_H=local_F_H, &
-                                              coordinates=elem_coords)
+                    call self%K%add(thermal_dof, thermal_dof, p_connectivity, local_K_TT)
+                    call self%F%add(thermal_dof, p_connectivity, local_F_T)
 
-                call self%assemble_local(workspace, local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
-                                         local_F_T, local_F_H)
+                end do
+                !$OMP END DO
+            end if
 
-                call self%domain%get_fe_connectivity(elem_id, p_connectivity)
-
-                call self%K%add(thermal_dof, thermal_dof, p_connectivity, local_K_TT)
-
-                call self%F%add(thermal_dof, p_connectivity, local_F_T)
-
-            end do
-            !$OMP END DO
-
-            call self%assemble_destroy(workspace, local_K_TT, local_K_TH, &
-                                       local_K_HH, local_K_HT, local_F_T, local_F_H)
-            if (allocated(elem_coords)) deallocate (elem_coords)
-
-            !$OMP END PARALLEL
+            !$OMP BARRIER
 
         end do
+
+        call self%assemble_destroy(workspace, local_K_TT, local_K_TH, &
+                                   local_K_HH, local_K_HT, local_F_T, local_F_H)
+        if (allocated(elem_coords)) deallocate (elem_coords)
+
+        !$OMP END PARALLEL
 
         call self%control%profiler_stop(PROFILER_TYPES%ASSEMBLE)
 
@@ -85,7 +83,7 @@ contains
 
     module subroutine assemble_initialize_ftdss(self, element_id, workspace, local_K_TT, local_K_TH, &
                                                 local_K_HH, local_K_HT, local_F_T, local_F_H, &
-                                                coordinates)
+                                                coordinates, connectivity)
         implicit none
 
         class(type_ftdss), intent(inout) :: self
@@ -94,9 +92,10 @@ contains
         type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
         type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
         real(real64), allocatable, intent(inout) :: coordinates(:, :)
+        integer(int32), pointer, contiguous, intent(inout), optional :: connectivity(:)
 
         class(abst_fe), pointer :: fe
-        integer(int32), pointer, contiguous, dimension(:) :: connectivity
+        integer(int32), pointer, contiguous, dimension(:) :: connectivity_local
 
         integer(int32) :: material_id
         type(type_constant_id), pointer :: computation_type
@@ -106,12 +105,12 @@ contains
         integer(int32) :: i
 
         nullify (fe)
-        nullify (connectivity)
+        nullify (connectivity_local)
 
         ! 要素情報の取得
         call self%domain%get_material_id(element_id, material_id)
         call self%domain%get_fe(element_id, fe)
-        call self%domain%get_fe_connectivity(element_id, connectivity)
+        call self%domain%get_fe_connectivity(element_id, connectivity_local)
         call self%domain%get_computation_type(computation_type)
 
         ! ここで渡される coordinates が allocated でサイズが同じなら再利用される(domain側実装)
@@ -125,9 +124,7 @@ contains
         ! ---------------------------------------------------------------------
         ! calc_physics=.false. を渡すことで、節点での重い物理計算(相変化等)を回避します。
         ! ここでは T, P, Phi およびそれらの履歴と勾配のみが workspace%state にロードされます。
-        do i = 1, size(connectivity)
-            call self%set_state(connectivity(i), element_id, workspace%state(i), calc_physics=.false.)
-        end do
+        call self%set_states_from_connectivity(connectivity_local, element_id, workspace%state, calc_physics=.false.)
 
         ! ---------------------------------------------------------------------
         ! 2. 状態変数の補間
@@ -140,9 +137,7 @@ contains
         ! ---------------------------------------------------------------------
         ! 補間された T_gp, P_gp を用いて、その場での相状態、物性値、流束を一括計算します。
         ! これにより、非線形性の強い物性値も積分点で正しく評価されます。
-        do i = 1, workspace%num_fe_gauss
-            call self%update_physical_properties(material_id, workspace%state_gp(i))
-        end do
+        call self%update_physical_properties_bulk(material_id, workspace%state_gp)
 
         ! (注: workspace%coordinates = coordinates は initialize 内で行われているため削除)
 
@@ -158,6 +153,10 @@ contains
 
         if (present(local_F_T)) call check_initialize_vector(local_F_T, num_nodes)
         if (present(local_F_H)) call check_initialize_vector(local_F_H, num_nodes)
+
+        if (present(connectivity)) then
+            connectivity => connectivity_local
+        end if
 
     end subroutine assemble_initialize_ftdss
 

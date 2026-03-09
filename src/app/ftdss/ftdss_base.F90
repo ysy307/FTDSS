@@ -54,7 +54,6 @@ contains
         call input%initialize()
         call self%control%profiler_stop(PROFILER_TYPES%IO)
 
-
         call input_translator%execute(input, config_control_manager)
         call input_translator%execute(input, config_iteration)
         call input_translator%execute(input, config_time)
@@ -70,7 +69,6 @@ contains
 
         if (self%is_active_thermal()) then
             call input_translator%execute(input, PHYSICS_TYPES%THERMAL, config_bcs)
-            print*,size(config_bcs)
             call self%bc(PHYSICS_TYPES%THERMAL%ID)%initialize(config_bcs)
             if (allocated(config_bcs)) deallocate (config_bcs)
         end if
@@ -101,8 +99,8 @@ contains
         call input_translator%execute(input, config_elements, config_multicoloring)
         call input_translator%execute(input, config_boundary_elements)
         call self%domain%initialize(config_nodes, config_elements, config_multicoloring, config_boundary_elements, &
-                input%basic%simulation_settings%calculate_type, config_control_manager%coupling_mode, &
-                config_control_manager%compute_active)
+                                    input%basic%simulation_settings%calculate_type, config_control_manager%coupling_mode, &
+                                    config_control_manager%compute_active)
         call self%domain%get_total_dofs(num_total_dofs)
         call self%domain%get_num_nodes(num_nodes)
 
@@ -414,6 +412,79 @@ contains
 
     end subroutine set_state_ftdss
 
+    module subroutine set_states_from_connectivity_ftdss(self, connectivity, element_id, states, calc_physics)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+        integer(int32), intent(in) :: connectivity(:)
+        integer(int32), intent(in) :: element_id
+        type(type_state), intent(inout) :: states(:)
+        logical, intent(in), optional :: calc_physics
+
+        integer(int32) :: i, node_id
+        integer(int32) :: material_id
+        integer(int32) :: bdf_order
+        real(real64), pointer, contiguous :: T_current(:), P_current(:), phi_current(:)
+        type(type_coordinate_array_dp), pointer :: grad_T_array, grad_P_array
+        type(type_coordinate_dp) :: grad_T, grad_P
+        real(real64) :: temperature_history(8), pressure_history(8), porosity_history(8)
+        logical :: do_calc
+
+        nullify (T_current)
+        nullify (P_current)
+        nullify (phi_current)
+        nullify (grad_T_array)
+        nullify (grad_P_array)
+
+        if (size(states) /= size(connectivity)) then
+            error stop 'set_states_from_connectivity_ftdss: size(states) /= size(connectivity)'
+        end if
+
+        do_calc = .true.
+        if (present(calc_physics)) do_calc = calc_physics
+
+        call self%control%get_bdf_coeffs(bdf_order=bdf_order)
+
+        if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
+            call self%temperature%get_current(T_current)
+            call self%temperature%get_current_gradient(grad_T_array)
+        end if
+        if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
+            call self%pressure%get_current(P_current)
+            call self%pressure%get_current_gradient(grad_P_array)
+        end if
+        call self%porosity%get_current(phi_current)
+
+        do i = 1, size(connectivity)
+            node_id = connectivity(i)
+            call states(i)%reset()
+
+            if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
+                call grad_T%set(grad_T_array%x(node_id), grad_T_array%y(node_id), grad_T_array%z(node_id))
+                call self%temperature%get_history(node_id, temperature_history)
+                call states(i)%set(temperature=T_current(node_id), &
+                                   grad_T=grad_T, &
+                                   temperature_history=temperature_history(1:bdf_order + 1))
+            end if
+
+            if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
+                call grad_P%set(grad_P_array%x(node_id), grad_P_array%y(node_id), grad_P_array%z(node_id))
+                call self%pressure%get_history(node_id, pressure_history)
+                call states(i)%set(pressure=P_current(node_id), &
+                                   grad_P=grad_P, &
+                                   pressure_history=pressure_history(1:bdf_order + 1))
+            end if
+
+            call self%porosity%get_history(node_id, porosity_history)
+            call states(i)%set(porosity=phi_current(node_id), &
+                               porosity_history=porosity_history(1:bdf_order + 1))
+        end do
+
+        if (do_calc) then
+            call self%domain%get_material_id(element_id, material_id)
+            call self%update_physical_properties_bulk(material_id, states)
+        end if
+    end subroutine set_states_from_connectivity_ftdss
+
     ! [追加] 任意のStateに対して全物理量(相・流束)を更新する
     module subroutine update_physical_properties_ftdss(self, material_id, state)
         implicit none
@@ -441,6 +512,19 @@ contains
 
         call state%set(water_flux=water_flux, vapor_flux=vapor_flux)
     end subroutine update_physical_properties_ftdss
+
+    module subroutine update_physical_properties_bulk_ftdss(self, material_id, states)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(inout) :: states(:)
+
+        integer(int32) :: i
+
+        do i = 1, size(states)
+            call self%update_physical_properties(material_id, states(i))
+        end do
+    end subroutine update_physical_properties_bulk_ftdss
 
     module subroutine shift_ftdss(self)
         implicit none

@@ -157,7 +157,9 @@ contains
         type(type_matrix_dense), intent(in) :: local_data
 
         integer(int32) :: i, j, num_local_nodes
-        real(real64) :: val
+        integer(int32) :: row_node, ptr_start, ptr_end, block_index
+        integer(int32), pointer :: ptr(:), ind(:)
+        real(real64), pointer :: val_bsr(:, :, :)
         real(real64), pointer, dimension(:, :) :: dense_val
 
         if (.not. allocated(self%matrix)) return
@@ -165,16 +167,34 @@ contains
         num_local_nodes = size(global_connectivity)
         dense_val => local_data%get_val()
 
-        ! ローカル密行列の各成分をBSR行列に加算
-        ! Note: BSRへの値セットはブロック単位で行われるため、
-        ! ここでは各ノードペアに対して set_value_block を呼び出す。
-        do i = 1, num_local_nodes
-            do j = 1, num_local_nodes
-                call self%matrix%set(MATRIX_OPS%ADD, &
-                                     global_connectivity(i), global_connectivity(j), &
-                                     row_dof, col_dof, dense_val(i, j))
+        select type (matrix => self%matrix)
+        type is (type_matrix_bsr)
+            ptr => matrix%get_ptr()
+            ind => matrix%get_ind()
+            val_bsr => matrix%get_val()
+
+            do i = 1, num_local_nodes
+                row_node = global_connectivity(i)
+                ptr_start = ptr(row_node)
+                ptr_end = ptr(row_node + 1) - 1
+
+                do j = 1, num_local_nodes
+                    block_index = binary_find(global_connectivity(j), ind, ptr_start, ptr_end)
+                    if (block_index > 0) then
+                        val_bsr(row_dof, col_dof, block_index) = &
+                            val_bsr(row_dof, col_dof, block_index) + dense_val(i, j)
+                    end if
+                end do
             end do
-        end do
+        class default
+            do i = 1, num_local_nodes
+                do j = 1, num_local_nodes
+                    call self%matrix%set(MATRIX_OPS%ADD, &
+                                         global_connectivity(i), global_connectivity(j), &
+                                         row_dof, col_dof, dense_val(i, j))
+                end do
+            end do
+        end select
     end subroutine add_local_jacobian_matrix
 
     ! -------------------------------------------------------------------

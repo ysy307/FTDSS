@@ -33,11 +33,18 @@ contains
         type(type_matrix_dense), intent(inout), optional :: K_TH
         type(type_vector_dp), intent(inout), optional :: F_T
 
-        integer(int32) :: i, j
+        integer(int32) :: i
         integer(int32) :: ierr
         real(real64) :: bdf0
+        real(real64), pointer :: K_TT_val(:, :)
+        real(real64), pointer :: F_T_val(:)
 
         bdf0 = workspace%bdf_coeffs(1)
+        nullify (K_TT_val)
+        nullify (F_T_val)
+
+        if (present(K_TT)) K_TT_val => K_TT%get_val()
+        if (present(F_T)) F_T_val => F_T%get_data()
 
         ! 1. 積分点ループ (状態量・係数計算)
         workspace%work_C(:) = 0.0d0
@@ -63,48 +70,42 @@ contains
         ! compute_K1: ∫ N^T * C * N dV を work_matrix に格納
         call workspace%compute_K1(workspace%work_C, workspace%work_matrix)
 
-        if (present(K_TT)) then
+        if (associated(K_TT_val)) then
             ! Jacobian += bdf0 * MassMatrix
-            do j = 1, workspace%num_fe_nodes
-                do i = 1, workspace%num_fe_nodes
-                    call K_TT%set(MATRIX_OPS%ADD, i, j, bdf0 * workspace%work_matrix(i, j))
-                end do
-            end do
+            K_TT_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) = &
+                K_TT_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) + &
+                bdf0 * workspace%work_matrix(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes)
         end if
 
         ! 3. 過渡項残差（Transient Residual）の寄与
-        if (present(F_T)) then
+        if (associated(F_T_val)) then
             workspace%work_vec(:) = 0.0d0
             ! compute_R1: ∫ N^T * scalar dV (ここでは scalar = dH/dt)
             call workspace%compute_R1(workspace%work_d_dt, workspace%work_vec)
 
-            do i = 1, workspace%num_fe_nodes
-                call F_T%set(MATRIX_OPS%ADD, i, -workspace%work_vec(i))
-            end do
+            F_T_val(1:workspace%num_fe_nodes) = F_T_val(1:workspace%num_fe_nodes) - &
+                                                workspace%work_vec(1:workspace%num_fe_nodes)
         end if
 
         ! 4. 拡散項（Diffusion Term）の寄与
         ! compute_K2: ∫ ∇N^T * D * ∇N dV を work_matrix に格納
         call workspace%compute_K2(workspace%work_D, workspace%work_matrix)
 
-        if (present(K_TT)) then
+        if (associated(K_TT_val)) then
             ! Jacobian += StiffnessMatrix
-            do j = 1, workspace%num_fe_nodes
-                do i = 1, workspace%num_fe_nodes
-                    call K_TT%set(MATRIX_OPS%ADD, i, j, workspace%work_matrix(i, j))
-                end do
-            end do
+            K_TT_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) = &
+                K_TT_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) + &
+                workspace%work_matrix(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes)
         end if
 
         ! 5. 内部力残差（Internal Force Residual）の寄与
-        if (present(F_T)) then
+        if (associated(F_T_val)) then
             workspace%work_vec(:) = 0.0d0
             ! F_int = K * T_node (work_matrix は現在 K2 の結果を保持している)
             call matvec(workspace%work_matrix, workspace%T_node, workspace%work_vec, ierr)
 
-            do i = 1, workspace%num_fe_nodes
-                call F_T%set(VECTOR_OPS%ADD, i, -workspace%work_vec(i))
-            end do
+            F_T_val(1:workspace%num_fe_nodes) = F_T_val(1:workspace%num_fe_nodes) - &
+                                                workspace%work_vec(1:workspace%num_fe_nodes)
         end if
 
     end subroutine assemble_local_newton_thermal
@@ -122,8 +123,11 @@ contains
         type(type_matrix_dense), intent(inout), optional :: K_TH
         type(type_vector_dp), intent(inout), optional :: F_T
 
-        integer(int32) :: i, j
+        integer(int32) :: i
+        integer(int32) :: ierr
         real(real64) :: val_T, bdf0
+        real(real64), pointer :: K_TT_val(:, :)
+        real(real64), pointer :: F_T_val(:)
 
         ! 作業用ベクトル
         real(real64) :: local_vec_transient(workspace%num_fe_nodes) ! エンタルピー時間変化項
@@ -138,6 +142,11 @@ contains
         local_vec_diff_flux(:) = 0.0d0
 
         bdf0 = workspace%bdf_coeffs(1)
+        nullify (K_TT_val)
+        nullify (F_T_val)
+
+        if (present(K_TT)) K_TT_val => K_TT%get_val()
+        if (present(F_T)) F_T_val => F_T%get_data()
 
         ! ----------------------------------------------------------------------
         ! 1. 積分点ループ
@@ -161,12 +170,10 @@ contains
         !    Picard行列として安定性を重視し，C_app (or C_vol) を使用
         ! ----------------------------------------------------------------------
         call workspace%compute_K1(workspace%work_C, workspace%work_matrix)
-        if (present(K_TT)) then
-            do i = 1, workspace%num_fe_nodes
-                do j = 1, workspace%num_fe_nodes
-                    call K_TT%set(MATRIX_OPS%ADD, i, j, bdf0 * workspace%work_matrix(i, j))
-                end do
-            end do
+        if (associated(K_TT_val)) then
+            K_TT_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) = &
+                K_TT_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) + &
+                bdf0 * workspace%work_matrix(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes)
         end if
 
         ! ----------------------------------------------------------------------
@@ -175,28 +182,21 @@ contains
         call workspace%compute_K2(workspace%work_D, workspace%work_matrix)
 
         ! 行列 K_TT への加算
-        if (present(K_TT)) then
-            do i = 1, workspace%num_fe_nodes
-                do j = 1, workspace%num_fe_nodes
-                    call K_TT%set(MATRIX_OPS%ADD, i, j, workspace%work_matrix(i, j))
-                end do
-            end do
+        if (associated(K_TT_val)) then
+            K_TT_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) = &
+                K_TT_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) + &
+                workspace%work_matrix(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes)
         end if
 
         ! 拡散項の「現在のフラックス」だけは K*T で計算してOK
         ! (D(T) * grad T なので，行列積と物理的意味が一致するため)
-        do i = 1, workspace%num_fe_nodes
-            do j = 1, workspace%num_fe_nodes
-                local_vec_diff_flux(i) = local_vec_diff_flux(i) + &
-                                         workspace%work_matrix(i, j) * workspace%T_node(j)
-            end do
-        end do
+        call matvec(workspace%work_matrix, workspace%T_node, local_vec_diff_flux, ierr)
 
         ! ----------------------------------------------------------------------
         ! 4. 残差ベクトル (Residual) の構築
         !    R = F_ext - ( dH/dt + K*T )
         ! ----------------------------------------------------------------------
-        if (present(F_T)) then
+        if (associated(F_T_val)) then
             ! エンタルピー項 (dH/dt) の積分 -> local_vec_transient
             call workspace%compute_R1(workspace%work_d_dt, local_vec_transient)
 
@@ -207,7 +207,7 @@ contains
                 val_T = -local_vec_transient(i) ! 厳密なエンタルピー変化
                 val_T = val_T - local_vec_diff_flux(i) ! 現在の拡散流出
 
-                call F_T%set(VECTOR_OPS%ADD, i, val_T)
+                F_T_val(i) = F_T_val(i) + val_T
             end do
         end if
 

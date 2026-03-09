@@ -214,14 +214,12 @@ contains
         type(type_vector_dp), intent(in) :: values
 
         real(real64), pointer, dimension(:) :: vals_data
-        integer(int32) :: i
 
         vals_data => values%get_data()
 
-        ! ループ処理で値を加算
-        do i = 1, size(global_indices)
-            call self%data%set(VECTOR_OPS%ADD, global_indices(i), vals_data(i), row_block=row_dof)
-        end do
+        if (.not. associated(vals_data)) return
+
+        call self%data%set(VECTOR_OPS%ADD, global_indices, vals_data, row_block=row_dof)
     end subroutine add_values_from_vector_residual_vector
 
     ! -------------------------------------------------------------------

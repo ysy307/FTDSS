@@ -22,17 +22,6 @@ include(Toolchain OPTIONAL)
 include(fypp OPTIONAL)
 
 # ====================================================================
-# 2. Dependencies
-# ====================================================================
-# if(ENABLE_MPI)
-#     find_package(MPI REQUIRED)
-# endif()
-
-# if(ENABLE_OPENMP)
-#     find_package(OpenMP REQUIRED)
-# endif()
-
-# ====================================================================
 # 3. Source Tree (Libraries)
 # ====================================================================
 # 各サブディレクトリ内の CMakeLists.txt で target_link_libraries() を用い，

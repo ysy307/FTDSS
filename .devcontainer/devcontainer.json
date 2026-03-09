@@ -17,6 +17,8 @@
         "--privileged",
         "--cap-add=SYS_ADMIN",
         "--cap-add=SYS_PTRACE",
+        "--security-opt",
+        "seccomp=unconfined",
         "-v",
         "/sys/kernel/debug:/sys/kernel/debug"
     ],

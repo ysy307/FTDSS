@@ -433,7 +433,7 @@ contains
 
         integer(int32) :: i, out_unit
         character(:), allocatable :: str_start, str_end
-        real(real64) :: sum_total_time, percentage
+        real(real64) :: percentage, total_reference
         logical :: is_opened
         character(20) :: write_action
 
@@ -469,23 +469,32 @@ contains
 
         if (allocated(self%timers)) then
             if (size(self%timers) > 0) then
-                sum_total_time = sum(self%timers%total_time)
+                total_reference = self%timers(PROFILER_TYPES%TOTAL%ID)%total_time
+                if (total_reference <= 1.0d-12) total_reference = sum(self%timers%total_time)
 
-                write (out_unit, '(a)') "| Section            | Time (s)   | Calls | Percentage |"
-                write (out_unit, '(a)') "|:-------------------|:----------:|:-----:|:----------:|"
+                write (out_unit, '(a)') "| Section      | Time (s)   | Calls | %     |"
+                write (out_unit, '(a)') "|:-------------|:----------:|:-----:|:-----:|"
 
                 do i = 1, size(self%timers)
+                    if (self%timers(i)%label%ID == PROFILER_TYPES%TOTAL%ID) cycle
+
                     percentage = 0.0d0
-                    if (sum_total_time > 1.0d-12) then
-                        percentage = (self%timers(i)%total_time / sum_total_time) * 100.0d0
+                    if (total_reference > 1.0d-12) then
+                        percentage = (self%timers(i)%total_time / total_reference) * 100.0d0
                     end if
 
-                    write (out_unit, '("| ", a20, " | ", es10.3, " | ", i5, " | ", f6.1, "%    |")') &
+                    write (out_unit, '("| ", a12, " | ", es10.3, " | ", i5, " | ", f5.1, " |")') &
                         self%timers(i)%label%NAME, &
                         self%timers(i)%total_time, &
                         self%timers(i)%num_calls, &
                         percentage
                 end do
+
+                write (out_unit, '(a)') "|--------------|------------|-------|-------|"
+                write (out_unit, '("| ", a12, " | ", es10.3, " | ", i5, " |   -   |")') &
+                    self%timers(PROFILER_TYPES%TOTAL%ID)%label%NAME, &
+                    self%timers(PROFILER_TYPES%TOTAL%ID)%total_time, &
+                    self%timers(PROFILER_TYPES%TOTAL%ID)%num_calls
             else
                 write (out_unit, '(a)') "(No sections recorded)"
             end if

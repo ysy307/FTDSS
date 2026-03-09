@@ -67,13 +67,13 @@ find_package(VTK REQUIRED COMPONENTS CommonCore CommonDataModel IOLegacy IOXML)
 # --- IAPWS ---
 find_package(IAPWS REQUIRED)
 
-# --- VTKFortran (ラッパー静的ライブラリ) ---
-if(NOT TARGET VTK::VTKFortran)
-    add_library(VTK::VTKFortran STATIC IMPORTED GLOBAL)
-    set_target_properties(VTK::VTKFortran PROPERTIES
-        IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/third_party/.local/lib/libvtkfortran.a"
-    )
-endif()
+# # --- VTKFortran (ラッパー静的ライブラリ) ---
+# if(NOT TARGET VTK::VTKFortran)
+#     add_library(VTK::VTKFortran STATIC IMPORTED GLOBAL)
+#     set_target_properties(VTK::VTKFortran PROPERTIES
+#         IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/third_party/.local/lib/libvtkfortran.a"
+#     )
+# endif()
 
 # =========================================================================
 # 関数定義: enable_build_flags
@@ -169,7 +169,7 @@ endfunction()
 function(enable_thirdparty target)
     # インクルードパス
     target_include_directories(${target} PUBLIC
-        ${PROJECT_SOURCE_DIR}/third_party/.local/include/VTKFortran
+        # ${PROJECT_SOURCE_DIR}/third_party/.local/include/VTKFortran
         $<TARGET_PROPERTY:fortran_stdlib::fortran_stdlib,INTERFACE_INCLUDE_DIRECTORIES>
         $<TARGET_PROPERTY:jsonfortran-intelllvm::jsonfortran-static,INTERFACE_INCLUDE_DIRECTORIES>
         $<TARGET_PROPERTY:IAPWS::IAPWS,INTERFACE_INCLUDE_DIRECTORIES>
@@ -178,7 +178,7 @@ function(enable_thirdparty target)
     # ライブラリリンク
     # 【重要】VTK本体(C++)も同時にリンクする
     target_link_libraries(${target} PUBLIC
-        VTK::VTKFortran
+        # VTK::VTKFortran
         X11::X11
         VTK::CommonCore VTK::CommonDataModel VTK::IOLegacy VTK::IOXML
         fortran_stdlib::fortran_stdlib

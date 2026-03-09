@@ -89,7 +89,9 @@ module app_ftdss
         procedure, public, pass(self) :: solve => solve_ftdss
 
         procedure, public, pass(self) :: set_state => set_state_ftdss
+        procedure, private, pass(self) :: set_states_from_connectivity => set_states_from_connectivity_ftdss
         procedure, public, pass(self) :: update_physical_properties => update_physical_properties_ftdss
+        procedure, private, pass(self) :: update_physical_properties_bulk => update_physical_properties_bulk_ftdss
 
         procedure, public, pass(self) :: reflect_variables => reflect_variables_ftdss
 
@@ -177,12 +179,28 @@ module app_ftdss
             logical, intent(in), optional :: calc_physics
         end subroutine set_state_ftdss
 
+        module subroutine set_states_from_connectivity_ftdss(self, connectivity, element_id, states, calc_physics)
+            implicit none
+            class(type_ftdss), intent(inout) :: self
+            integer(int32), intent(in) :: connectivity(:)
+            integer(int32), intent(in) :: element_id
+            type(type_state), intent(inout) :: states(:)
+            logical, intent(in), optional :: calc_physics
+        end subroutine set_states_from_connectivity_ftdss
+
         module subroutine update_physical_properties_ftdss(self, material_id, state)
             implicit none
             class(type_ftdss), intent(inout) :: self
             integer(int32), intent(in) :: material_id
             type(type_state), intent(inout) :: state
         end subroutine update_physical_properties_ftdss
+
+        module subroutine update_physical_properties_bulk_ftdss(self, material_id, states)
+            implicit none
+            class(type_ftdss), intent(inout) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(inout) :: states(:)
+        end subroutine update_physical_properties_bulk_ftdss
 
         module subroutine shift_ftdss(self)
             implicit none
@@ -253,7 +271,7 @@ module app_ftdss
         end subroutine assemble_local_ftdss
         module subroutine assemble_initialize_ftdss(self, element_id, workspace, local_K_TT, local_K_TH, &
                                                     local_K_HH, local_K_HT, local_F_T, local_F_H, &
-                                                    coordinates)
+                                                    coordinates, connectivity)
             implicit none
 
             class(type_ftdss), intent(inout) :: self
@@ -262,6 +280,7 @@ module app_ftdss
             type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
             type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
             real(real64), allocatable, intent(inout) :: coordinates(:, :)
+            integer(int32), pointer, contiguous, intent(inout), optional :: connectivity(:)
         end subroutine assemble_initialize_ftdss
 
         module subroutine assemble_destroy_ftdss(self, workspace, local_K_TT, local_K_TH, &
