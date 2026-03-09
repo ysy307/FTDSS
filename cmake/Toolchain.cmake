@@ -99,7 +99,7 @@ function(enable_build_flags target)
                 $<$<COMPILE_LANGUAGE:Fortran>:-stand f18 -fpp -traceback -fpscomp logicals -extend-source>
 
                 # Release: Fortran Only
-                $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Release>>:-O3 -xHost>
+                $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Release>>:-O3 -xHost -g>
 
                 # Debug: Fortran Only 
                 # -check all: 全チェック

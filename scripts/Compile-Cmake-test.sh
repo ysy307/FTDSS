@@ -9,7 +9,7 @@ trap '/usr/bin/python3 /workspaces/FTDSS/scripts/check_log.py' EXIT
 
 cmake -S . -B CMakeBuild \
     -DBUILD_TESTING=ON \
-    -DCMAKE_BUILD_TYPE=Debug \
+    -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_Fortran_COMPILER=mpiifx \
     -DCMAKE_C_COMPILER=mpiicx \
     -DCMAKE_CXX_COMPILER=mpiicpx \

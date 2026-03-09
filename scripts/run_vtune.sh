@@ -1,52 +1,71 @@
 #!/bin/zsh
 set -e
+set -o pipefail
+
+echo "--- Start VTune Profiling Script ---"
 
 # =========================
 # Settings
 # =========================
-# プロジェクトパスの設定
 export FTDSS_PROJECT_PATH="/workspaces/FTDSS/project/1Domain-Square2nd-modified"
+VTUNE_DIR="/workspaces/FTDSS/log/vtune"
 
-VTUNE_DIR="${FTDSS_PROJECT_PATH}/log/vtune"
-
-# ディレクトリが存在しない場合のみ作成
 if [[ ! -d "$VTUNE_DIR" ]]; then
     mkdir -p "$VTUNE_DIR"
 fi
 
 export TMPDIR="$VTUNE_DIR"
 
-# ptrace_scopeの設定
 if [[ -f /proc/sys/kernel/yama/ptrace_scope ]]; then
-    echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope >/dev/null
+    echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope >/dev/null || true
 fi
+
+# =========================
+# Determine Result Directory
+# =========================
+echo "Determining result directory..."
+NEXT_IDX=0
+while [[ -n $(find "$VTUNE_DIR" -maxdepth 1 -name "r$(printf "%03d" $NEXT_IDX)hs*") ]]; do
+    NEXT_IDX=$((NEXT_IDX + 1))
+done
+RESULT_BASE="r$(printf "%03d" $NEXT_IDX)hs"
+RESULT_DIR="${VTUNE_DIR}/${RESULT_BASE}"
+
+echo "Target Result Directory: $RESULT_DIR"
 
 # =========================
 # Run VTune
 # =========================
-# -- を使用して引数を明確に分離
+echo "Running VTune..."
+set +e
+# Execute mpirun inside vtune to preserve environment variables
 vtune -collect hotspots \
     -knob sampling-mode=sw \
-    -result-dir "${VTUNE_DIR}/r@@@hs" \
-    -- ./bin/test_main
+    -result-dir "$RESULT_DIR" \
+    -- mpirun -genv FTDSS_PROJECT_PATH="$FTDSS_PROJECT_PATH" -n 1 ./bin/test_main
+set -e
 
-# 最新の結果ディレクトリを取得
-LATEST_DIR=$(ls -td ${VTUNE_DIR}/r*hs | head -n 1)
+LATEST_DIR=$(find "$VTUNE_DIR" -maxdepth 1 -type d -name "${RESULT_BASE}*" | head -n 1)
+
+if [[ -z "$LATEST_DIR" || ! -d "$LATEST_DIR" ]]; then
+    echo "Error: VTune result directory was not created."
+    exit 1
+fi
+
+echo "Actual Result Directory: $LATEST_DIR"
 
 # =========================
 # Export CSV Reports
 # =========================
-# レポート生成。失敗しても処理を継続
+echo "Exporting CSV reports..."
 vtune -report hotspots \
     -result-dir "$LATEST_DIR" \
-    -columns="CPU Time,CPU Time:Self,Function,Source File" \
     -format csv \
     -report-output "${LATEST_DIR}_report.csv" || true
 
 vtune -report hotspots \
     -result-dir "$LATEST_DIR" \
     -group-by source-line \
-    -columns="Source File,Source Line,CPU Time,CPU Time:Effective Time,CPU Time:Spin Time,CPU Time:Spin Time:Imbalance or Serial Spinning,CPU Time:Spin Time:Lock Contention,CPU Time:Spin Time:Other,CPU Time:Overhead Time" \
     -format csv \
     -report-output "${LATEST_DIR}_source_line.csv" || true
 
@@ -58,6 +77,7 @@ vtune -report summary \
 # =========================
 # Markdown Summary Generation
 # =========================
+echo "Generating Markdown report..."
 REPORT="${LATEST_DIR}_report.csv"
 SRC="${LATEST_DIR}_source_line.csv"
 TOP="${LATEST_DIR}_summary.csv"
@@ -70,11 +90,9 @@ OUT_MD="${LATEST_DIR}_summary.md"
     echo ""
 
     if [[ -f "$REPORT" ]]; then
-        echo "## Top Functions (CPU Time)"
+        echo "## Top Functions"
         echo ""
-        echo "| CPU Time | Self | Function | File |"
-        echo "|---|---|---|---|"
-        tail -n +2 "$REPORT" | sort -t, -k1 -nr | head -n 20 | awk -F, '{printf("| %.3f | %.3f | %s | %s |\n",$1,$2,$3,$4)}'
+        tail -n +2 "$REPORT" | head -n 20
         echo ""
     fi
 
@@ -91,22 +109,9 @@ OUT_MD="${LATEST_DIR}_summary.md"
     if [[ -f "$TOP" ]]; then
         echo "## Top-Down Summary"
         echo ""
-        head -n 15 "$TOP" | awk -F, '
-        NR==1{
-            printf("|")
-            for(i=1;i<=NF;i++) printf(" %s |",$i)
-            printf("\n|")
-            for(i=1;i<=NF;i++) printf("---|")
-            printf("\n")
-            next
-        }
-        {
-            printf("|")
-            for(i=1;i<=NF;i++) printf(" %s |",$i)
-            printf("\n")
-        }
-        '
+        head -n 15 "$TOP"
     fi
 } > "$OUT_MD"
 
 echo "Markdown report written to: $OUT_MD"
+echo "--- Done ---"

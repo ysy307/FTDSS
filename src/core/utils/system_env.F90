@@ -1,6 +1,3 @@
-!>
-!> Provides a routine to read environment variables in an MPI-safe way.
-!>
 module core_system_env
 #ifdef _MPI
     use :: mpi_f08
@@ -12,19 +9,10 @@ module core_system_env
 
 contains
 
-    !>
-    !> Gets the value of a specified environment variable as a string.
-    !> In an MPI environment, rank 0 reads the variable, which is then broadcast
-    !> to all other ranks to ensure consistency.
-    !>
     subroutine get_env_string(env_var_name, value, status)
         implicit none
-        !> The name of the environment variable to retrieve.
         character(len=*), intent(in) :: env_var_name
-        !> The retrieved value of the environment variable. An empty string is
-        !> returned if the variable is not set or is empty.
         character(len=:), allocatable, intent(inout) :: value
-        !> Status code: 0 if successful, non-zero otherwise.
         integer(int32), intent(inout), optional :: status
 
         character(len=2048) :: buffer
@@ -37,24 +25,28 @@ contains
 #endif
         if (allocated(value)) deallocate (value)
 
+        ! Initialize variables
+        buffer = ''
+        stat = 0
+
         ! Rank 0 reads the environment variable
 #ifdef _MPI
         if (my_rank == 0) then
 #endif
             call get_environment_variable(env_var_name, buffer, status=stat)
-            if (stat /= 0) then
-                buffer = ''
-                if (present(status)) status = stat
-                return
-            end if
+            if (stat /= 0) buffer = ''
 #ifdef _MPI
         end if
 
-        ! Broadcast the result to all ranks
+        ! Broadcast status and buffer to all ranks
+        call MPI_Bcast(stat, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
         call MPI_Bcast(buffer, len(buffer), MPI_CHARACTER, 0, MPI_COMM_WORLD, ierr)
 #endif
 
-        ! Trim the result and allocate the output string to the correct length
+        ! Set optional status uniformly across all ranks
+        if (present(status)) status = stat
+
+        ! Trim the result and allocate the output string
         if (len_trim(buffer) > 0) then
             nulpos = scan(buffer, achar(0))
             if (nulpos > 0) then
