@@ -67,14 +67,6 @@ find_package(VTK REQUIRED COMPONENTS CommonCore CommonDataModel IOLegacy IOXML)
 # --- IAPWS ---
 find_package(IAPWS REQUIRED)
 
-# # --- VTKFortran (ラッパー静的ライブラリ) ---
-# if(NOT TARGET VTK::VTKFortran)
-#     add_library(VTK::VTKFortran STATIC IMPORTED GLOBAL)
-#     set_target_properties(VTK::VTKFortran PROPERTIES
-#         IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/third_party/.local/lib/libvtkfortran.a"
-#     )
-# endif()
-
 # =========================================================================
 # 関数定義: enable_build_flags
 #  - コンパイルオプション設定 (Fortran/C++分離)
@@ -102,10 +94,7 @@ function(enable_build_flags target)
                 $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Release>>:-O3 -xHost -g>
 
                 # Debug: Fortran Only 
-                # -check all: 全チェック
-                # -fpe0: 浮動小数点例外(NaN等)で即停止
-                # -ftrapuv: 未初期化変数を変な値で埋める
-                $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Debug>>:-g -check all -fpe0 -ftrapuv>
+                $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Debug>>:-O0 -g -check all -fpe0 -ftrapuv -init=snan -init=arrays -warn all -warn errors -implicitnone -fstack-protector-all>
             )
 
             # GNU (Fortran)
@@ -169,16 +158,13 @@ endfunction()
 function(enable_thirdparty target)
     # インクルードパス
     target_include_directories(${target} PUBLIC
-        # ${PROJECT_SOURCE_DIR}/third_party/.local/include/VTKFortran
         $<TARGET_PROPERTY:fortran_stdlib::fortran_stdlib,INTERFACE_INCLUDE_DIRECTORIES>
         $<TARGET_PROPERTY:jsonfortran-intelllvm::jsonfortran-static,INTERFACE_INCLUDE_DIRECTORIES>
         $<TARGET_PROPERTY:IAPWS::IAPWS,INTERFACE_INCLUDE_DIRECTORIES>
     )
 
     # ライブラリリンク
-    # 【重要】VTK本体(C++)も同時にリンクする
     target_link_libraries(${target} PUBLIC
-        # VTK::VTKFortran
         X11::X11
         VTK::CommonCore VTK::CommonDataModel VTK::IOLegacy VTK::IOXML
         fortran_stdlib::fortran_stdlib
