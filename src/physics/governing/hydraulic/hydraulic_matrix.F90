@@ -129,10 +129,12 @@ contains
         type(type_matrix_dense), intent(inout), optional :: K_HT
         type(type_vector_dp), intent(inout), optional :: F_H
 
-        integer(int32) :: i, j
+        integer(int32) :: i, j, n_nodes
         real(real64) :: bdf0
-        real(real64) :: local_vec_res(workspace%num_fe_nodes)
+        real(real64), allocatable :: local_vec_res(:)
 
+        n_nodes = workspace%num_fe_nodes
+        allocate (local_vec_res(n_nodes))
         bdf0 = workspace%bdf_coeffs(1)
 
         workspace%work_C(:) = 0.0d0
@@ -197,6 +199,8 @@ contains
                 call F_H%set(VECTOR_OPS%ADD, i, -local_vec_res(i))
             end do
         end if
+
+        if (allocated(local_vec_res)) deallocate (local_vec_res)
 
     end subroutine assemble_local_picard_hydraulic
 

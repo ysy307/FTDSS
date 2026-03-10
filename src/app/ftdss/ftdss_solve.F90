@@ -79,13 +79,17 @@ contains
         real(real64), allocatable :: residual(:)
         real(real64), allocatable :: increment(:)
         real(real64) :: current_norm
-        real(real64) :: switch_norm(PHYSICS_TYPES%NUM_ID) = [1.0d-2, 1.0d-4, 1.0d-4] ! [温度, 圧力] 切り替え閾値
-        logical :: should_switch = .true.
+        real(real64) :: switch_norm(PHYSICS_TYPES%NUM_ID)
+        logical :: should_switch
         logical, parameter :: diverged = .true.
 
         logical :: is_compute_newton, is_compute_picard, is_config_none
 
         nullify (current_value)
+
+        ! Explicit initialization (avoid implicit SAVE from initializer expression)
+        switch_norm(:) = [1.0d-2, 1.0d-4, 1.0d-4]
+        should_switch = .true.
 
         ! 計算用(Dynamic)の状態を取得
         is_compute_newton = self%control%is_compute_newton()

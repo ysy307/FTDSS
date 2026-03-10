@@ -494,15 +494,22 @@ contains
 
         type(type_coordinate_dp) :: water_flux, vapor_flux
         type(type_coordinate_dp), pointer :: grad_T, grad_P
+        type(type_coordinate_dp), target :: zero_grad
 
-        ! 1. 相変化計算 (Ice/Water Content)
+        nullify (grad_T)
+        nullify (grad_P)
+        call zero_grad%set(0.0d0, 0.0d0, 0.0d0)
+
+        ! 1. Phase change calculation (Ice/Water Content)
         call self%thermal%update_water_phases(material_id, state)
 
-        ! 2. 流束計算 (advectionやdiffusionで使用)
-        !    Stateに入っている勾配(grad_T, grad_P)を使用
+        ! 2. Flux calculation (used in advection and diffusion)
         if (self%control%is_target(PHYSICS_TYPES%HYDRAULIC, material_id)) then
             call state%grad_T%get(grad_T)
             call state%grad_P%get(grad_P)
+            ! Guard against null pointer when gradient is not set
+            if (.not. associated(grad_T)) grad_T => zero_grad
+            if (.not. associated(grad_P)) grad_P => zero_grad
             call self%calc_water_flux(material_id, state, grad_T, grad_P, water_flux)
             call self%calc_vapor_flux(material_id, state, grad_T, grad_P, vapor_flux)
         else

@@ -16,6 +16,15 @@ contains
         real(real64) :: dP_ice_dP_water
         real(real64) :: dQw_dP, dQi_dP, dQv_dP
 
+        ! Initialize derivative variables to zero
+        ! (derivative routines are not yet implemented; prevents undefined behavior)
+        dQw_dP = 0.0d0
+        dQi_dP = 0.0d0
+        dQv_dP = 0.0d0
+        drho_w_dP = 0.0d0
+        drho_ice_dP = 0.0d0
+        dP_ice_dP_water = 0.0d0
+
         ! Get derivatives (assuming state is already updated)
         call state%water_content%get(Qw)
         call state%ice_content%get(Qi)
@@ -188,11 +197,17 @@ contains
         real(real64) :: Uj
         integer(int32) :: j, n
 
+        nullify (temperature_history)
+        nullify (pressure_history)
+
         call state%temperature_history%get(temperature_history)
         call state%pressure_history%get(pressure_history)
 
-        n = size(bdf_coeffs)
         drho_dt = 0.0d0
+        if (.not. associated(temperature_history)) return
+        if (.not. associated(pressure_history)) return
+
+        n = min(size(bdf_coeffs), size(temperature_history), size(pressure_history))
         call local_state%copy(state)
 
         do j = 1, n

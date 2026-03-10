@@ -256,6 +256,13 @@ contains
         integer(int32) :: num_elements, num_total_nodes, dim
         integer(int32) :: n_nodes_elem, n_gauss
         integer(int32) :: i, p, k, d, global_nid
+        real(real64) :: grad_component
+
+        ! Initialize all pointers to null
+        nullify (fe)
+        nullify (p_conn)
+        nullify (fe_weights)
+        nullify (fe_gauss_pts)
 
         call self%domain%get_num_fe(num_elements)
         call self%domain%get_num_nodes(num_total_nodes)
@@ -300,7 +307,12 @@ contains
 
                 gauss_grad = 0.0d0
                 do d = 1, dim
-                    gauss_grad(d) = vector_dot(elem_u(1:n_nodes_elem), dpsi_dx(d, 1:n_nodes_elem))
+                    ! Explicit dot product to avoid non-contiguous array slice temporaries
+                    grad_component = 0.0d0
+                    do k = 1, n_nodes_elem
+                        grad_component = grad_component + elem_u(k) * dpsi_dx(d, k)
+                    end do
+                    gauss_grad(d) = grad_component
                 end do
 
                 do k = 1, n_nodes_elem
@@ -364,6 +376,8 @@ contains
         real(real64), pointer, contiguous, dimension(:) :: temperature => null()
         type(type_coordinate_array_dp), pointer :: grad_T
 
+        nullify (grad_T)
+
         if (.not. self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) return
 
         call self%temperature%get_current(temperature)
@@ -399,6 +413,8 @@ contains
 
         real(real64), pointer, contiguous, dimension(:) :: pressure => null()
         type(type_coordinate_array_dp), pointer :: grad_P
+
+        nullify (grad_P)
 
         if (.not. self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) return
 

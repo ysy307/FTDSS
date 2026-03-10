@@ -275,9 +275,7 @@ contains
         !> The computed 1-norm.
         real(real64) :: norm_value
 
-#ifdef USE_DEBUG
         if (.not. is_mkl_initialized) call initialize_mkl_backend()
-#endif
         norm_value = compute_norm_1_backend(x)
     end function norm_1_native
 
@@ -292,9 +290,7 @@ contains
 
         real(real64), dimension(:), pointer :: vec_data
 
-#ifdef USE_DEBUG
         if (.not. is_mkl_initialized) call initialize_mkl_backend()
-#endif
         vec_data => x%get_data()
         norm_value = norm_1_native(vec_data)
     end function norm_1_vector_dp
@@ -309,9 +305,7 @@ contains
         !> The computed 2-norm.
         real(real64) :: norm_value
 
-#ifdef USE_DEBUG
         if (.not. is_mkl_initialized) call initialize_mkl_backend()
-#endif
         norm_value = compute_norm_2_backend(x)
     end function norm_2_native
 
@@ -326,9 +320,7 @@ contains
 
         real(real64), dimension(:), pointer :: vec_data
 
-#ifdef USE_DEBUG
         if (.not. is_mkl_initialized) call initialize_mkl_backend()
-#endif
         vec_data => x%get_data()
         norm_value = norm_2_native(vec_data)
     end function norm_2_vector_dp
@@ -343,9 +335,7 @@ contains
         !> The computed infinity-norm.
         real(real64) :: norm_value
 
-#ifdef USE_DEBUG
         if (.not. is_mkl_initialized) call initialize_mkl_backend()
-#endif
         norm_value = compute_norm_inf_backend(x)
     end function norm_inf_native
 
@@ -360,9 +350,7 @@ contains
 
         real(real64), dimension(:), pointer :: vec_data
 
-#ifdef USE_DEBUG
         if (.not. is_mkl_initialized) call initialize_mkl_backend()
-#endif
         vec_data => x%get_data()
         norm_value = norm_inf_native(vec_data)
     end function norm_inf_vector_dp
@@ -381,8 +369,8 @@ contains
 
 #ifdef USE_DEBUG
         call check_match_length(x, y, 'dot')
-        if (.not. is_mkl_initialized) call initialize_mkl_backend()
 #endif
+        if (.not. is_mkl_initialized) call initialize_mkl_backend()
         product = compute_dot_product_backend(x, y)
     end function dot_native
 
@@ -404,9 +392,7 @@ contains
 
         call check_match_length(vec_data_x, vec_data_y, 'dot_vector_dp')
 
-#ifdef USE_DEBUG
         if (.not. is_mkl_initialized) call initialize_mkl_backend()
-#endif
         product = dot_native(vec_data_x, vec_data_y)
     end function dot_vector_dp
 

@@ -129,9 +129,14 @@ contains
         real(real64), pointer :: K_TT_val(:, :)
         real(real64), pointer :: F_T_val(:)
 
-        ! 作業用ベクトル
-        real(real64) :: local_vec_transient(workspace%num_fe_nodes) ! エンタルピー時間変化項
-        real(real64) :: local_vec_diff_flux(workspace%num_fe_nodes) ! 拡散フラックス (K*T)
+        ! Allocatable work vectors to avoid automatic arrays with member-dependent size
+        real(real64), allocatable :: local_vec_transient(:)
+        real(real64), allocatable :: local_vec_diff_flux(:)
+        integer(int32) :: n_nodes
+
+        n_nodes = workspace%num_fe_nodes
+        allocate (local_vec_transient(n_nodes))
+        allocate (local_vec_diff_flux(n_nodes))
 
         ! 初期化
         workspace%work_C(:) = 0.0d0
@@ -210,6 +215,9 @@ contains
                 F_T_val(i) = F_T_val(i) + val_T
             end do
         end if
+
+        if (allocated(local_vec_transient)) deallocate (local_vec_transient)
+        if (allocated(local_vec_diff_flux)) deallocate (local_vec_diff_flux)
 
     end subroutine assemble_local_picard_thermal
 
