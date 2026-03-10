@@ -229,7 +229,7 @@ contains
         end if
 
         !==================================================
-        ! GCC モデルの処理
+        ! GCC model processing
         !==================================================
 
         associate (material => input%basic%materials(material_id)%phase_change%equilibrium_model)
@@ -351,12 +351,12 @@ contains
         max_region_id = maxval(config%unique_material_ids)
 
         ! -------------------------
-        ! 物理有効フラグ
+        ! Physics active flags
         ! -------------------------
         call allocate_array(config%compute_active, source=input%basic%analysis_controls%is_active)
 
         ! -------------------------
-        ! 材料別フラグ設定
+        ! Per-material flag configuration
         ! -------------------------
         call allocate_array(config%physics_active, PHYSICS_TYPES%NUM_ID, num_unique_regions)
         config%physics_active(:, :) = .false.
@@ -374,7 +374,7 @@ contains
         end do
 
         ! -------------------------
-        ! カップリングモードの設定
+        ! Coupling mode configuration
         ! -------------------------
         config%coupling_mode = COUPLING_MODES%to_object(input%basic%analysis_controls%coupling_mode)
 

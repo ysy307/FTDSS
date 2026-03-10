@@ -32,7 +32,7 @@ contains
         self%initialized = .true.
     end subroutine initialize_acceleration_aitken
 
-    module subroutine destory_acceleration_aitken(self)
+    module subroutine destroy_acceleration_aitken(self)
         implicit none
         !> Aitken acceleration object
         class(type_acceleration_aitken), intent(inout) :: self
@@ -44,7 +44,7 @@ contains
         self%relaxation_factor(:) = 0.0d0
         self%previous_relaxation_factor(:) = 0.0d0
         self%initialized = .false.
-    end subroutine destory_acceleration_aitken
+    end subroutine destroy_acceleration_aitken
 
     module subroutine compute_relaxation_acceleration_aitken(self, physics_type, iter, du, vec)
         implicit none

@@ -1,4 +1,4 @@
-module types_physics_state_thc
+module core_types_physics_state_thc
     use, intrinsic :: iso_fortran_env, only: real64, int32
     implicit none
     private
@@ -30,4 +30,4 @@ contains
         self%lambda_zx = 0.0d0
     end subroutine reset_thc_dispersivity
 
-end module types_physics_state_thc
+end module core_types_physics_state_thc

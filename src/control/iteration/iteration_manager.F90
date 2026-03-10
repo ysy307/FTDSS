@@ -10,21 +10,21 @@ module control_iteration_manager
     public :: type_iteration
 
     !>
-    !> 反復管理クラス
+    !> Iteration manager
     !>
     type :: type_iteration
-        ! --- カウンタ ---
+        ! --- Counters ---
         integer(int32), private :: total_iter = 0
         integer(int32), private :: nonlinear_iter = 0
 
-        ! --- 状態フラグ ---
-        ! 物理量ごとに収束状態を保持する (Thermal, Hydro, etc.)
+        ! --- State flags ---
+        ! Holds convergence state per physics type (Thermal, Hydro, etc.)
         logical, private :: converged(PHYSICS_TYPES%NUM_ID) = .true.
         logical, private :: diverged(PHYSICS_TYPES%NUM_ID) = .false.
 
-        ! --- 設定 ---
-        ! nonlinear_solver_type: 入力設定に基づく静的な設定 (NONE/PICARD/NEWTON)
-        ! compute_nonlinear_solver_type: 計算中に使用される動的なソルバータイプ
+        ! --- Settings ---
+        ! nonlinear_solver_type: static setting from input config (NONE/PICARD/NEWTON)
+        ! compute_nonlinear_solver_type: dynamic solver type used during computation
         type(type_constant_id), private :: nonlinear_solver_type = NONLINEAR_SOLVER%PICARD
         type(type_constant_id), private :: compute_nonlinear_solver_type = NONLINEAR_SOLVER%PICARD
 
@@ -123,7 +123,7 @@ contains
         class(type_iteration), intent(inout) :: self
         type(type_constant_id), intent(in) :: nonlinear_solver_type
 
-        ! 計算中に動的に切り替わるソルバータイプを設定する
+        ! Set the dynamic solver type that changes during computation
         self%compute_nonlinear_solver_type = nonlinear_solver_type
     end subroutine set_nonlinear_solver_iteration
 
@@ -174,7 +174,7 @@ contains
 
         is_ok = self%settings%check_convergence(physics_type, self%nonlinear_iter, residual_vector, update_vector)
 
-        ! Managerは結果を受け取って自身の状態を更新するのみ
+        ! Update convergence/divergence state from the check result
         call self%set_converged(physics_type, is_ok)
         call self%set_diverged(physics_type, .not. is_ok)
     end subroutine check_convergence_iteration
@@ -275,7 +275,7 @@ contains
         class(type_iteration), intent(in), target :: self
         type(type_constant_id), intent(inout), pointer :: nonlinear_solver_type
 
-        ! 離散化ルーチンが参照すべき「現在の」ソルバータイプを返す
+        ! Return the current solver type for discretization routines
         nonlinear_solver_type => self%compute_nonlinear_solver_type
     end subroutine get_nonlinear_solver_iteration
 

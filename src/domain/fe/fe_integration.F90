@@ -21,7 +21,7 @@ module domain_fe_integration
         procedure, public, pass(self) :: initialize => initialize_type_gauss_integration_rule
         procedure, public, pass(self) :: destroy => destroy_type_gauss_integration_rule
 
-        ! 内部メモリ管理用
+        ! Internal memory management
         procedure, private, pass(self) :: initial_setup => initial_setup_gauss_integration_rule
         procedure, private, pass(self) :: compute_triangle_rule => compute_triangle_rule_gauss_integration
         procedure, private, pass(self) :: compute_quad_rule => compute_quad_rule_gauss_integration
@@ -31,7 +31,7 @@ module domain_fe_integration
 contains
 
     !>
-    !> 指定されたセルタイプと積分次数に応じたガウス積分ルールを初期化する
+    !> Initializes the Gauss integration rule for the given cell type and integration order.
     !>
     subroutine initialize_type_gauss_integration_rule(self, cell_type, integration_order)
         implicit none
@@ -39,13 +39,13 @@ contains
         integer(int32), intent(in) :: cell_type
         integer(int32), intent(in) :: integration_order
 
-        ! 既存のデータがあれば破棄してリセット
+        ! Destroy and reset any existing data
         call self%destroy()
 
-        ! 要求次数を保存
+        ! Store the requested order
         self%order = integration_order
 
-        ! セルタイプに応じた計算ルーチンを呼び出し
+        ! Dispatch to the appropriate rule computation based on cell type
         if (FE_TYPE%TRIANGLE == cell_type) then
             call self%compute_triangle_rule(integration_order)
         else if (FE_TYPE%QUADRATIC_TRIANGLE == cell_type) then
@@ -68,7 +68,7 @@ contains
     end subroutine initialize_type_gauss_integration_rule
 
     !>
-    !> デストラクタ
+    !> Destructor: releases all allocated memory.
     !>
     subroutine destroy_type_gauss_integration_rule(self)
         implicit none
@@ -87,7 +87,7 @@ contains
     end subroutine destroy_type_gauss_integration_rule
 
     !>
-    !> 内部セットアップ：メモリ確保と初期化
+    !> Internal setup: allocate memory and initialize arrays.
     !>
     subroutine initial_setup_gauss_integration_rule(self, num_gauss)
         implicit none
@@ -108,11 +108,11 @@ contains
     end subroutine initial_setup_gauss_integration_rule
 
     !--------------------------------------------------------------------------
-    ! 計算ロジック
+    ! Computation Logic
     !--------------------------------------------------------------------------
 
     !>
-    !> 三角形要素用ルール
+    !> Integration rule for triangular elements.
     !>
     subroutine compute_triangle_rule_gauss_integration(self, order)
         implicit none
@@ -176,8 +176,8 @@ contains
     end subroutine compute_triangle_rule_gauss_integration
 
     !>
-    !> 四角形要素用ルール (1Dの直積)
-    !> 一次配列をallocateせず，逐次計算して格納する
+    !> Integration rule for quadrilateral elements (tensor product of 1D rules).
+    !> Computes points incrementally to avoid allocating a temporary 1D array.
     !>
     subroutine compute_quad_rule_gauss_integration(self, order)
         implicit none
@@ -193,11 +193,11 @@ contains
 
         k = 0
         do j = 1, n_1d
-            ! j方向の座標と重みを取得
+            ! Get coordinate and weight in j-direction
             call get_legendre_point(n_1d, j, w_j, p_j)
 
             do i = 1, n_1d
-                ! i方向の座標と重みを取得
+                ! Get coordinate and weight in i-direction
                 call get_legendre_point(n_1d, i, w_i, p_i)
 
                 k = k + 1
@@ -208,7 +208,7 @@ contains
     end subroutine compute_quad_rule_gauss_integration
 
     !>
-    !> 線分要素用ルール
+    !> Integration rule for line elements.
     !>
     subroutine compute_line_rule_gauss_integration(self, order)
         implicit none
@@ -230,8 +230,8 @@ contains
     end subroutine compute_line_rule_gauss_integration
 
     !>
-    !> 1次元ガウス・ルジャンドル求積法：指定されたインデックスの値を返す
-    !> 配列を返さずスカラを返すことでアロケーションを回避
+    !> Returns the weight and point for a 1D Gauss-Legendre quadrature rule at a given index.
+    !> Returns scalars instead of arrays to avoid allocation overhead.
     !>
     pure subroutine get_legendre_point(n, idx, w, p)
         implicit none

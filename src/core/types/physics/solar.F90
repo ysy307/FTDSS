@@ -1,9 +1,9 @@
 !> Module for calculating solar position, sunrise, and sunset.
 !>
 !> Calculations are based on NOAA approximation algorithms.
-module types_physics_solar
+module core_types_physics_solar
     use, intrinsic :: iso_fortran_env, only: real64, int32
-    use :: types_utils_datetime, only:type_datetime
+    use :: core_types_utils_datetime, only:type_datetime
     implicit none
     private
 
@@ -384,4 +384,4 @@ contains
         if (gmst < 0.0d0) gmst = gmst + 360.0d0
     end subroutine calc_gmst
 
-end module types_physics_solar
+end module core_types_physics_solar

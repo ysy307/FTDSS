@@ -1,7 +1,7 @@
 module types_algebra_matrix_factory
     use, intrinsic :: iso_fortran_env, only: int32
     use :: core_constants
-    use :: types_algebra_matrix
+    use :: core_types_algebra_matrix
     implicit none
     private
 

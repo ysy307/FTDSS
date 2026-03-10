@@ -1,7 +1,7 @@
 !> Base module for constitutive modeling
 !>
 !> Connects state variables to thermodynamic property models (e.g., IAPWS).
-module constitutive_base
+module physics_constitutive_base
     use, intrinsic :: iso_fortran_env
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core, only:type_state
@@ -826,4 +826,4 @@ contains
         initialized = self%initialized
     end function is_initialized_abst_constitutive
 
-end module constitutive_base
+end module physics_constitutive_base

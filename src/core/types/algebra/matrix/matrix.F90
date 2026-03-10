@@ -1,5 +1,5 @@
 module core_types_matrix
-    use :: types_algebra_matrix
+    use :: core_types_algebra_matrix
     use :: types_algebra_matrix_factory
     implicit none
     private

@@ -1,4 +1,4 @@
-module core_vtk_vtu_writer_wrapper
+module core_interop_vtu_writer_wrapper
     !> @brief ISO_C_BINDING interfaces and concrete Fortran type for the
     !>        VTK XML unstructured-grid writer.
     !>
@@ -22,7 +22,7 @@ module core_vtk_vtu_writer_wrapper
     !> temporary conversion arrays.
     use, intrinsic :: iso_c_binding
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: core_vtk_vtk_writer_base, only: abst_vtk_writer
+    use :: core_interop_vtk_writer_base, only: abst_vtk_writer
     implicit none
     private
 
@@ -415,4 +415,4 @@ contains
         end if
     end subroutine auto_destroy_type_vtu_writer
 
-end module core_vtk_vtu_writer_wrapper
+end module core_interop_vtu_writer_wrapper

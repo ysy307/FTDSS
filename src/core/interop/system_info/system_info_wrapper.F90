@@ -1,10 +1,10 @@
-module core_fortran_utils_system_info_wrapper
+module core_interop_system_info_wrapper
     use, intrinsic :: iso_fortran_env, only: int32
     use, intrinsic :: iso_c_binding, only: c_ptr, c_associated
     use :: stdlib_strings, only:to_string, strip
-    use :: core_c_utils_system_info, only:c_get_os, c_get_cpu_architecture
-    use :: core_c_utils, only:c_ptr_to_string
-    use :: core_system_env, only:get_env_string
+    use :: core_interop_system_info, only:c_get_os, c_get_cpu_architecture
+    use :: core_interop_utils, only:c_ptr_to_string
+    use :: core_utils_system_env, only:get_env_string
     implicit none
 
     private
@@ -182,10 +182,10 @@ contains
         character(:), allocatable :: os
         type(c_ptr) :: ptr
 
-        ! C 側 c_get_os() を呼び出し
+        ! Call C function to get the OS name
         ptr = c_get_os()
 
-        ! NULL ポインタなら "Unknown"、そうでなければ変換関数を使う
+        ! Return "Unknown OS" if the pointer is null, otherwise convert to Fortran string
         if (c_associated(ptr)) then
             os = c_ptr_to_string(ptr)
         else
@@ -199,10 +199,10 @@ contains
         character(:), allocatable :: architecture
         type(c_ptr) :: ptr
 
-        ! C 側 c_get_cpu_architecture() を呼び出し
+        ! Call C function to get the CPU architecture
         ptr = c_get_cpu_architecture()
 
-        ! NULL ポインタなら "Unknown"、そうでなければ変換関数を使う
+        ! Return "Unknown CPU Architecture" if the pointer is null, otherwise convert to Fortran string
         if (c_associated(ptr)) then
             architecture = c_ptr_to_string(ptr)
         else
@@ -246,4 +246,4 @@ contains
 
     end function get_openmp_version
 
-end module core_fortran_utils_system_info_wrapper
+end module core_interop_system_info_wrapper

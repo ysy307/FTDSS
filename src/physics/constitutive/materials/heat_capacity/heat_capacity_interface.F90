@@ -14,7 +14,7 @@ module materials_heat_capacity
     public :: type_vhc_3phase
     public :: type_vhc_4phase
 
-    ! --- ポリモーフィックなコンテナ ---
+    ! --- Polymorphic container ---
     type :: holder_vhcs
         class(abst_vhc), allocatable :: p
     contains

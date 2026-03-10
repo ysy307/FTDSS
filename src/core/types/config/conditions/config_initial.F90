@@ -2,7 +2,7 @@ module types_config_conditions_initial
     use, intrinsic :: iso_fortran_env
     use :: core_memory, only:allocate_array, deallocate_array
     use :: core_constants, only:type_constant_id
-    use :: types_config_base, only:abst_config
+    use :: core_types_config_base, only:abst_config
     implicit none
     private
 
@@ -10,12 +10,11 @@ module types_config_conditions_initial
 
     type, extends(abst_config) :: type_config_ic
         logical :: active = .false.
-        !> 対象とする現象の種類
-        !> 熱移動，水分移動など
+        !> Physics type (e.g. heat transfer, moisture transfer)
         type(type_constant_id) :: physics_type = type_constant_id("", "", -1)
-        !> 初期条件の種類
+        !> Initial condition type
         type(type_constant_id) :: ic_kind = type_constant_id("", "", -1)
-        !> 初期条件の値(uniformの場合)
+        !> Initial condition value (for uniform type)
         real(real64) :: value
     contains
 

@@ -368,7 +368,7 @@ contains
             !----------------------------------------
             ! 6. MatVec Test
             !----------------------------------------
-            ! 行列Aを初期状態に戻す
+            ! Reset matrix A to initial values
             do i = 1, N
                 do j = 1, N
                     call A%set(OP_INS, i, j, dble(i + j - 1))
@@ -380,7 +380,7 @@ contains
             call y%zero()
             call vb%set(OP_INS, [0.5d0, 2.0d0, 1.0d0])
 
-            ! 計算: y = A * vb
+            ! Compute: y = A * vb
             ! y1 = 1*0.5 + 2*2.0 + 3*1.0 = 0.5 + 4.0 + 3.0 = 7.5
             ! y2 = 2*0.5 + 3*2.0 + 4*1.0 = 1.0 + 6.0 + 4.0 = 11.0
             ! y3 = 3*0.5 + 4*2.0 + 5*1.0 = 1.5 + 8.0 + 5.0 = 14.5
@@ -423,7 +423,7 @@ contains
         write (unit, *) "--- Testing COO Arithmetic ---"
 
         !----------------------------------------
-        ! 1. COO行列作成
+        ! 1. Create COO matrix
         !----------------------------------------
         A = create_matrix(MATRIX_COO, N, row_idx_init, col_idx_init)
         do i = 1, nnz
@@ -518,7 +518,7 @@ contains
                 s70 = sqrt(70.0d0) ! sqrt(7)*sqrt(10)
                 s130 = sqrt(130.0d0) ! sqrt(10)*sqrt(13)
 
-                ! --- 行列 A の期待値 ---
+                ! --- Expected values of matrix A ---
                 ! 1. (1,1) 1.0 * 1.0 * 1.0
                 val_expected(1) = 1.0d0
                 ! 2. (1,2) 2.0 * 1.0 * 0.5
@@ -550,7 +550,7 @@ contains
                 ! 13. (5,5) 13.0 * (1/s13) * (1/s13)
                 val_expected(13) = 1.0d0
 
-                ! --- ベクトル b の期待値 ---
+                ! --- Expected values of vector b ---
                 ! init: [0.5, 2.0, 1.0, 1.5, 0.2]
                 ! calc: b[i] * S[i]
                 vb_expected(1) = 0.5d0 * 1.0d0 ! 0.5
@@ -613,7 +613,7 @@ contains
         write (unit, *) "--- Testing CSR Arithmetic ---"
 
         !----------------------------------------
-        ! 1. CSR行列作成
+        ! 1. Create CSR matrix
         !----------------------------------------
         A = create_matrix(MATRIX_CSR, N, row_idx_init, col_idx_init)
         do i = 1, N
@@ -712,7 +712,7 @@ contains
                 s70 = sqrt(70.0d0) ! sqrt(7)*sqrt(10)
                 s130 = sqrt(130.0d0) ! sqrt(10)*sqrt(13)
 
-                ! --- 行列 A の期待値 ---
+                ! --- Expected values of matrix A ---
                 ! 1. (1,1) 1.0 * 1.0 * 1.0
                 val_expected(1) = 1.0d0
                 ! 2. (1,2) 2.0 * 1.0 * 0.5
@@ -744,7 +744,7 @@ contains
                 ! 13. (5,5) 13.0 * (1/s13) * (1/s13)
                 val_expected(13) = 1.0d0
 
-                ! --- ベクトル b の期待値 ---
+                ! --- Expected values of vector b ---
                 ! init: [0.5, 2.0, 1.0, 1.5, 0.2]
                 ! calc: b[i] * S[i]
                 vb_expected(1) = 0.5d0 * 1.0d0 ! 0.5
@@ -794,9 +794,9 @@ contains
         implicit none
 
         class(abst_matrix), allocatable :: A, B, C
-        integer(int32), parameter :: nb = 5 ! ブロック数 (Nodes)
-        integer(int32), parameter :: bn = 3 ! ブロックサイズ (Block Size)
-        integer(int32), parameter :: N = nb * bn ! 全行列サイズ (15)
+        integer(int32), parameter :: nb = 5 ! Number of blocks (Nodes)
+        integer(int32), parameter :: bn = 3 ! Block size
+        integer(int32), parameter :: N = nb * bn ! Total matrix size (15)
         integer(int32) :: ierr, k
         integer(int32) :: bi, bj, col_blk
         real(real64) :: diff
@@ -807,21 +807,21 @@ contains
         real(real64), dimension(:, :, :), pointer :: A_data
         real(real64), dimension(:), pointer :: vb_data, y_data
 
-        ! スパースパターン (Block CSR structure)
+        ! Sparsity pattern (Block CSR structure)
         integer(int32), dimension(nb + 1) :: row_ptr_init = [1, 3, 6, 9, 12, 14]
         integer(int32), dimension(13) :: col_idx_init = [1, 2, 1, 2, 3, 2, 3, 4, 3, 4, 5, 4, 5]
 
         write (unit, '(A)') "--- Testing BSR Arithmetic (Block=3) ---"
 
         !----------------------------------------
-        ! 1. BSR行列作成
+        ! 1. Create BSR matrix
         !----------------------------------------
         A = create_matrix(MATRIX_BSR, nb, row_ptr_init, col_idx_init, bn)
         B = create_matrix(MATRIX_BSR, nb, row_ptr_init, col_idx_init, bn)
         C = create_matrix(MATRIX_BSR, nb, row_ptr_init, col_idx_init, bn)
 
-        ! 初期値セット (AXPY, XPAYテスト用)
-        ! 複雑な値を入れておく (位置によって値が変わる)
+        ! Set initial values (for AXPY, XPAY tests)
+        ! Fill with position-dependent values
         call A%zero()
         do k = 1, nb
             do ierr = row_ptr_init(k), row_ptr_init(k + 1) - 1
@@ -871,12 +871,12 @@ contains
         call vb%initialize(N)
 
         ! >>>>>>>>>> Jacobi Scaling Check <<<<<<<<<<
-        ! 検証ロジック:
+        ! Verification:
         !   Matrix A = All 2.0
         !   Vector v = All 0.5
         !   Result   = 2.0 * 0.5 = 1.0 (Expected)
 
-        ! 値を定数(2.0)にリセット
+        ! Reset values to constant (2.0)
         select type (A)
         type is (type_matrix_bsr)
             call A%set_all(OP_INS, 2.0d0)
@@ -884,7 +884,7 @@ contains
 
         call vb%set(OP_INS, 0.5d0)
 
-        ! 計算実行: A <- D^{-1} A (Scaling)
+        ! Execute scaling: A <- D^{-1} A
         call matrix_scale(A, vb, diag, OP_SCALE_JACOBI, ierr)
 
         select type (A)
@@ -900,12 +900,12 @@ contains
         end select
 
         ! >>>>>>>>>> Symmetric Scaling Check <<<<<<<<<<
-        ! 検証ロジック:
+        ! Verification:
         !   Matrix A = All 4.0
         !   Vector v = All 0.5
         !   Result   = 0.5 * 4.0 * 0.5 = 1.0 (Expected)
 
-        ! 値を定数(4.0)にリセット
+        ! Reset values to constant (4.0)
         select type (A)
         type is (type_matrix_bsr)
             call A%set_all(OP_INS, 4.0d0)
@@ -913,7 +913,7 @@ contains
 
         call vb%set(OP_INS, 0.5d0)
 
-        ! 計算実行: A <- D^{-1/2} A D^{-1/2}
+        ! Execute scaling: A <- D^{-1/2} A D^{-1/2}
         call matrix_scale(A, vb, diag, OP_SCALE_SYMM_DIAG, ierr)
 
         select type (A)
@@ -929,7 +929,7 @@ contains
         end select
 
         !----------------------------------------
-        ! 5. MatVec Test (変更なし)
+        ! 5. MatVec Test
         !----------------------------------------
         select type (A)
         type is (type_matrix_bsr)

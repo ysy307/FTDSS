@@ -1,4 +1,4 @@
-module components_domain_nodes
+module domain_components_nodes
     use, intrinsic :: iso_fortran_env
     use :: stdlib_optval, only:optval
     use :: module_core
@@ -126,4 +126,4 @@ contains
         write (unit, '(A)')
     end subroutine display_nodes_manager
 
-end module components_domain_nodes
+end module domain_components_nodes

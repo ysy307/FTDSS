@@ -75,7 +75,7 @@ module control_iteration_strategy
             class(type_iteration_strategy), intent(in) :: self
             real(real64), intent(in) :: current_norm
             real(real64), intent(in) :: previous_norm
-            logical, intent(out) :: is_stagnating
+            logical, intent(inout) :: is_stagnating
         end subroutine assess_convergence_trend_iteration_strategy
     end interface
 

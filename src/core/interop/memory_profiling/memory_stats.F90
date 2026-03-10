@@ -1,4 +1,4 @@
-module core_c_utils_memory_stats
+module core_interop_memory_stats
     use, intrinsic :: iso_c_binding, only: c_int64_t
     implicit none
     private
@@ -12,4 +12,4 @@ module core_c_utils_memory_stats
         end function c_get_rss_kb
     end interface
 
-end module core_c_utils_memory_stats
+end module core_interop_memory_stats

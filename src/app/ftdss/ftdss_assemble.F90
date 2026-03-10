@@ -12,7 +12,7 @@ contains
         type(type_vector_dp) :: local_F_T, local_F_H
         type(type_assemble_workspace) :: workspace
 
-        ! 【修正1】座標用のバッファ変数を定義（allocatableで自動管理させる）
+        ! Coordinate buffer (allocatable for automatic memory management)
         real(real64), allocatable :: elem_coords(:, :)
 
         integer(int32) :: i_color, i_elem, elem_id
@@ -107,42 +107,34 @@ contains
         nullify (fe)
         nullify (connectivity_local)
 
-        ! 要素情報の取得
         call self%domain%get_material_id(element_id, material_id)
         call self%domain%get_fe(element_id, fe)
         call self%domain%get_fe_connectivity(element_id, connectivity_local)
         call self%domain%get_computation_type(computation_type)
 
-        ! ここで渡される coordinates が allocated でサイズが同じなら再利用される(domain側実装)
+        ! Reuses coordinates buffer if already allocated with matching size
         call self%domain%get_fe_coordinate(element_id, coordinates)
 
-        ! ワークスペースの初期化 (座標のコピー含む)
         call workspace%initialize(fe, material_id, element_id, computation_type%ID, coordinates, self%control)
 
         ! ---------------------------------------------------------------------
-        ! 1. 節点状態の取得 (物理計算スキップ)
+        ! 1. Load nodal state (T, P, Phi, histories, gradients)
+        !    Skip expensive physics (phase change, etc.) via calc_physics=.false.
         ! ---------------------------------------------------------------------
-        ! calc_physics=.false. を渡すことで、節点での重い物理計算(相変化等)を回避します。
-        ! ここでは T, P, Phi およびそれらの履歴と勾配のみが workspace%state にロードされます。
         call self%set_states_from_connectivity(connectivity_local, element_id, workspace%state, calc_physics=.false.)
 
         ! ---------------------------------------------------------------------
-        ! 2. 状態変数の補間
+        ! 2. Interpolate nodal values to Gauss points
         ! ---------------------------------------------------------------------
-        ! 節点の T, P, Phi, grad_T, grad_P から、ガウス積分点の値を計算します。
         call workspace%lerp()
 
         ! ---------------------------------------------------------------------
-        ! 3. ガウス積分点での物理量更新 (高精度評価)
+        ! 3. Evaluate phase state, material properties, and fluxes at Gauss points
         ! ---------------------------------------------------------------------
-        ! 補間された T_gp, P_gp を用いて、その場での相状態、物性値、流束を一括計算します。
-        ! これにより、非線形性の強い物性値も積分点で正しく評価されます。
         call self%update_physical_properties_bulk(material_id, workspace%state_gp)
 
-        ! (注: workspace%coordinates = coordinates は initialize 内で行われているため削除)
-
         ! ---------------------------------------------------------------------
-        ! 4. 局所行列・ベクトルの初期化
+        ! 4. Initialize local matrices and vectors
         ! ---------------------------------------------------------------------
         call fe%get_num_nodes(num_nodes)
 

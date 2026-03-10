@@ -1,6 +1,6 @@
 module module_system
-    use :: system_jacobian_matrix
-    use :: system_residual_vector
+    use :: numerical_system_jacobian_matrix
+    use :: numerical_system_residual_vector
     implicit none
     private
 

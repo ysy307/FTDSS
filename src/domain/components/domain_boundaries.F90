@@ -1,4 +1,4 @@
-module components_domain_boundaries
+module domain_components_boundaries
     use, intrinsic :: iso_fortran_env
     use :: stdlib_optval, only:optval
     use :: module_core
@@ -192,4 +192,4 @@ contains
         end do
     end subroutine display_boundary_manager
 
-end module components_domain_boundaries
+end module domain_components_boundaries

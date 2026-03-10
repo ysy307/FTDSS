@@ -85,7 +85,6 @@ module app_ftdss
         procedure, private, pass(self) :: apply_natural_bc_generic
         procedure, private, pass(self) :: apply_essential_bc_generic
 
-        !> ソルバー呼び出しルーチン
         procedure, public, pass(self) :: solve => solve_ftdss
 
         procedure, public, pass(self) :: set_state => set_state_ftdss
@@ -106,7 +105,7 @@ module app_ftdss
 
         procedure, public, pass(self) :: reset => reset_ftdss
 
-        !> 1タイムステップ分の計算を行う（非線形反復ループを含む）
+        !> Solve a single time step including the nonlinear iteration loop
         procedure, public, pass(self) :: solve_time_step => solve_time_step_ftdss
         procedure, private, pass(self) :: solve_time_step_initial_setup => solve_time_step_initial_setup_ftdss
         procedure, private, pass(self) :: solve_time_step_setup => solve_time_step_setup_ftdss

@@ -1,4 +1,4 @@
-module control_ats
+module control_time_ats
     use, intrinsic :: iso_fortran_env
     use :: stdlib_optval, only:optval
     use :: module_core
@@ -117,4 +117,4 @@ contains
         if (retry_dt < self%dt_min) retry_dt = self%dt_min
     end subroutine calc_retry_dt
 
-end module control_ats
+end module control_time_ats

@@ -21,23 +21,22 @@ contains
         real(real64) :: term_numer, term_denom
 
         if (h < h_crit) then
-            ! 1. 通常の有効飽和度 Se(h) と Se(h_crit) を計算
-            !    (theta_s - theta_r) で割る前の値でも比を取れば同じなので、直接 (1+|ah|^n)^-m を使う
+            ! Compute Se(h) and Se(h_crit) directly as (1+|ah|^n)^-m
+            ! (dividing by (theta_s - theta_r) cancels in the ratio)
             Se = (1.0d0 + abs(alpha1 * h)**n1)**(-m1)
             Se_crit = (1.0d0 + abs(alpha1 * h_crit)**n1)**(-m1)
 
-            ! 2. Mualem積分の項 (分子: 現在のh)
+            ! Mualem integral numerator (at current h)
             !    Term = [ 1 - (1 - Se^(1/m))^m ]^2
             term_numer = 1.0d0 - Se**(1.0d0 / m1)
-            if (term_numer < 0.0d0) term_numer = 0.0d0 ! ガード
+            if (term_numer < 0.0d0) term_numer = 0.0d0
             numer = (1.0d0 - term_numer**m1)**2.0d0
 
-            ! 3. Mualem積分の項 (分母: h_crit での正規化用)
+            ! Mualem integral denominator (normalization at h_crit)
             term_denom = 1.0d0 - Se_crit**(1.0d0 / m1)
-            if (term_denom < 0.0d0) term_denom = 0.0d0 ! ガード
+            if (term_denom < 0.0d0) term_denom = 0.0d0
             denom = (1.0d0 - term_denom**m1)**2.0d0
 
-            ! 4. 結合 (Se/Se_crit)^l * (Numer/Denom)
             kr = (Se / Se_crit)**l * (numer / denom)
         else
             kr = 1.0d0

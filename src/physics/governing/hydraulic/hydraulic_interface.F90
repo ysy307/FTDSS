@@ -1,11 +1,11 @@
-module governing_hydraulic
+module physics_governing_hydraulic
     use, intrinsic :: iso_fortran_env
     use :: module_core
     use :: module_control, only:type_control
     use :: module_input, only:type_input, input_translator
     use :: module_linalg
     use :: module_constitutive, g => gravity_acceleration
-    use :: governing_base, only:type_assemble_workspace
+    use :: physics_governing_base, only:type_assemble_workspace
     implicit none
     private
 
@@ -175,4 +175,4 @@ contains
         implicit none
         class(type_hydraulic), intent(inout) :: self
     end subroutine destroy_type_hydraulic
-end module governing_hydraulic
+end module physics_governing_hydraulic

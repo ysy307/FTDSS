@@ -133,7 +133,7 @@ contains
         call self%thermal%initialize(input, active_region_ids)
         call self%hydraulic%initialize(input, active_region_ids)
 
-        ! ソルバーの初期化
+        ! Initialize solver
         associate (solver_settings => input%basic%solver_settings%linear_solver)
             call solver_info%set(solver_settings%solver_type, &
                                  num_total_dofs, &
@@ -144,7 +144,7 @@ contains
             call create_solver(self%solver, solver_info, pc_info, ierr)
         end associate
 
-        ! 初期化時にBCを適用（Dirichlet値をフィールドに設定）
+        ! Apply initial Dirichlet boundary conditions to field variables
         call self%apply_bc()
 
         call input_translator%execute(input, config_output)
@@ -363,7 +363,7 @@ contains
         integer(int32), intent(in) :: node_id
         integer(int32), intent(in) :: element_id
         type(type_state), intent(inout) :: state
-        logical, intent(in), optional :: calc_physics ! [追加]
+        logical, intent(in), optional :: calc_physics
 
         integer(int32) :: material_id
         integer(int32) :: bdf_order
@@ -373,7 +373,7 @@ contains
 
         logical :: do_calc
 
-        ! デフォルトは計算する（互換性維持のため）
+        ! Default: compute physics (for backward compatibility)
         do_calc = .true.
         if (present(calc_physics)) do_calc = calc_physics
 
@@ -381,7 +381,7 @@ contains
 
         call self%control%get_bdf_coeffs(bdf_order=bdf_order)
 
-        ! --- 基本変数と履歴の取得 (ここは常に実行) ---
+        ! Retrieve primary variables and their histories (always executed)
         if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             call self%temperature%get_current(node_id, temperature)
             call self%temperature%get_current_gradient(node_id, grad_T)
@@ -403,10 +403,9 @@ contains
         call state%set(porosity=porosity, &
                        porosity_history=porosity_history(1:bdf_order + 1))
 
-        ! --- [修正] 重い物理計算はフラグがTrueの時だけ実行 ---
+        ! Run expensive physics computations only when flagged
         if (do_calc) then
             call self%domain%get_material_id(element_id, material_id)
-            ! update_physical_properties に委譲
             call self%update_physical_properties(material_id, state)
         end if
 
@@ -485,7 +484,7 @@ contains
         end if
     end subroutine set_states_from_connectivity_ftdss
 
-    ! [追加] 任意のStateに対して全物理量(相・流束)を更新する
+    ! Update all physical quantities (phase, fluxes) for a given state
     module subroutine update_physical_properties_ftdss(self, material_id, state)
         implicit none
         class(type_ftdss), intent(inout) :: self

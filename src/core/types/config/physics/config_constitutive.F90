@@ -2,7 +2,7 @@ module types_config_physics_constitutive
     use, intrinsic :: iso_fortran_env
     use :: core_memory
     use :: core_constants, only:type_constant_id
-    use :: types_config_base, only:abst_config
+    use :: core_types_config_base, only:abst_config
     use :: types_config_physics_base, only:abst_config_physics_material, copy_config_physics_material, reset_config_physics_material
     implicit none
     private

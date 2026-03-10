@@ -1,11 +1,11 @@
-module types_config_base
+module core_types_config_base
     use, intrinsic :: iso_fortran_env
     use :: core_constants, only:type_constant_id, type_constant_value, ERROR_CODES
     use :: core_validation, only:raise_error
-    use :: types_geometry_coordinate, only:type_coordinate_dp
-    use :: types_geometry_coordinate_array, only:type_coordinate_array_dp
-    use :: types_topology_connectivity, only:type_csr_index
-    use :: types_utils_datetime, only:type_datetime
+    use :: core_types_geometry_coordinate, only:type_coordinate_dp
+    use :: core_types_geometry_coordinate_array, only:type_coordinate_array_dp
+    use :: core_types_topology_connectivity, only:type_csr_index
+    use :: core_types_utils_datetime, only:type_datetime
 
     implicit none
     private
@@ -90,7 +90,7 @@ contains
         integer(int8), allocatable, intent(in) :: value(:)
 
         if (.not. allocated(value)) then
-            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="types_config_base:set_int8_1d")
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_int8_1d")
         end if
 
         if (allocated(member)) deallocate (member)
@@ -104,7 +104,7 @@ contains
         integer(int8), allocatable, intent(in) :: value(:, :)
 
         if (.not. allocated(value)) then
-            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="types_config_base:set_int8_2d")
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_int8_2d")
         end if
 
         if (allocated(member)) deallocate (member)
@@ -118,7 +118,7 @@ contains
         integer(int8), allocatable, intent(in) :: value(:, :, :)
 
         if (.not. allocated(value)) then
-            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="types_config_base:set_int8_3d")
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_int8_3d")
         end if
 
         if (allocated(member)) deallocate (member)
@@ -141,7 +141,7 @@ contains
         integer(int32), allocatable, intent(in) :: value(:)
 
         if (.not. allocated(value)) then
-            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="types_config_base:set_int32_1d")
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_int32_1d")
         end if
 
         if (allocated(member)) deallocate (member)
@@ -155,7 +155,7 @@ contains
         integer(int32), allocatable, intent(in) :: value(:, :)
 
         if (.not. allocated(value)) then
-            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="types_config_base:set_int32_2d")
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_int32_2d")
         end if
 
         if (allocated(member)) deallocate (member)
@@ -169,7 +169,7 @@ contains
         integer(int32), allocatable, intent(in) :: value(:, :, :)
 
         if (.not. allocated(value)) then
-            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="types_config_base:set_int32_3d")
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_int32_3d")
         end if
 
         if (allocated(member)) deallocate (member)
@@ -194,7 +194,7 @@ contains
         real(real64), allocatable, intent(in) :: value(:)
 
         if (.not. allocated(value)) then
-            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="types_config_base:set_real64_1d")
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_real64_1d")
         end if
 
         if (allocated(member)) deallocate (member)
@@ -208,7 +208,7 @@ contains
         real(real64), allocatable, intent(in) :: value(:, :)
 
         if (.not. allocated(value)) then
-            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="types_config_base:set_real64_2d")
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_real64_2d")
         end if
 
         if (allocated(member)) deallocate (member)
@@ -222,7 +222,7 @@ contains
         real(real64), allocatable, intent(in) :: value(:, :, :)
 
         if (.not. allocated(value)) then
-            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="types_config_base:set_real64_3d")
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_real64_3d")
         end if
 
         if (allocated(member)) deallocate (member)
@@ -245,7 +245,7 @@ contains
         logical, allocatable, intent(in) :: value(:)
 
         if (.not. allocated(value)) then
-            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="types_config_base:set_logical_1d")
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_logical_1d")
         end if
 
         if (allocated(member)) deallocate (member)
@@ -259,7 +259,7 @@ contains
         logical, allocatable, intent(in) :: value(:, :)
 
         if (.not. allocated(value)) then
-            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="types_config_base:set_logical_2d")
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_logical_2d")
         end if
 
         if (allocated(member)) deallocate (member)
@@ -273,7 +273,7 @@ contains
         logical, allocatable, intent(in) :: value(:, :, :)
 
         if (.not. allocated(value)) then
-            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="types_config_base:set_logical_3d")
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_logical_3d")
         end if
 
         if (allocated(member)) deallocate (member)
@@ -287,7 +287,7 @@ contains
         character(:), allocatable, intent(in) :: value
 
         if (.not. allocated(value)) then
-            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="types_config_base:set_character")
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_character")
         end if
 
         if (allocated(member)) deallocate (member)
@@ -301,7 +301,7 @@ contains
         character(:), allocatable, intent(in) :: value(:)
 
         if (.not. allocated(value)) then
-            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="types_config_base:set_character_1d")
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_character_1d")
         end if
 
         if (allocated(member)) deallocate (member)
@@ -315,7 +315,7 @@ contains
         character(:), allocatable, intent(in) :: value(:, :)
 
         if (.not. allocated(value)) then
-            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="types_config_base:set_character_2d")
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_character_2d")
         end if
 
         if (allocated(member)) deallocate (member)
@@ -329,7 +329,7 @@ contains
         character(:), allocatable, intent(in) :: value(:, :, :)
 
         if (.not. allocated(value)) then
-            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="types_config_base:set_character_3d")
+            call raise_error(ERROR_CODES%NOT_ALLOCATED, opt="value", scope="core_types_config_base:set_character_3d")
         end if
 
         if (allocated(member)) deallocate (member)
@@ -420,4 +420,4 @@ contains
         allocate (member, source=value)
     end subroutine set_datetimes
 
-end module types_config_base
+end module core_types_config_base

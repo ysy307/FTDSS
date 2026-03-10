@@ -1,7 +1,7 @@
 !>
 !> Manages the computational domain, including mesh, boundary conditions, and parallel data.
 !>
-module domain_manager
+module domain_domain_manager
     use, intrinsic :: iso_fortran_env
     use :: mpi_f08
     use :: stdlib_logger
@@ -12,9 +12,9 @@ module domain_manager
     use :: module_fe, only:type_fe_manager, abst_fe
     use :: domain_multicoloring, only:type_coloring
     use :: domain_adjacency, only:type_node_adjacency, type_map_node_to_element
-    use :: components_domain_nodes, only:type_nodes_manager
-    use :: components_domain_elements, only:type_elements_manager
-    use :: components_domain_boundaries, only:type_boundaries_manager, type_boundary_patch
+    use :: domain_components_nodes, only:type_nodes_manager
+    use :: domain_components_elements, only:type_elements_manager
+    use :: domain_components_boundaries, only:type_boundaries_manager, type_boundary_patch
 
     implicit none
     private
@@ -486,7 +486,7 @@ contains
 
         found_fe_id = -1
 
-        ! 観測点座標セット (探索点)
+        ! Set search point coordinates based on computation type
         select case (self%computation_type%ID)
         case (COMP_TYPES%XY_2D%ID)
             call cartesian%set(coordinate%x, coordinate%y, 0.0d0)
@@ -505,7 +505,7 @@ contains
             if (.not. associated(conn)) cycle
             call self%get_fe_coordinate(i, element_coordinate)
             if (.not. allocated(element_coordinate)) cycle
-            !                 ! 包含判定
+            ! Containment check
             call fe%is_inside(cartesian, normalized, element_coordinate, inside)
 
             if (inside) then
@@ -564,4 +564,4 @@ contains
         call self%boundaries%display(unit)
     end subroutine display_domain
 
-end module domain_manager
+end module domain_domain_manager

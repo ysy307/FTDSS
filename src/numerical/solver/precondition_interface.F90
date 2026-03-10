@@ -1,5 +1,5 @@
 !> Defines abstract and concrete preconditioner types.
-module solver_preconditioner
+module numerical_solver_preconditioner
     use, intrinsic :: iso_fortran_env
     use :: module_core
     use :: module_linalg
@@ -400,4 +400,4 @@ contains
 
     end subroutine create_preconditioner
 
-end module solver_preconditioner
+end module numerical_solver_preconditioner

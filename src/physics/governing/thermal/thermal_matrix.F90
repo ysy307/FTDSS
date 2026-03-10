@@ -1,8 +1,8 @@
-submodule(governing_thermal) thermal_matrix
+submodule(physics_governing_thermal) thermal_matrix
     implicit none
 contains
 
-    !> @brief 局所（要素）行列と残差ベクトルのアセンブルを行う
+    !> @brief Assemble local (element) matrices and residual vectors
     module subroutine assemble_local_thermal(self, control, workspace, K_TT, K_TH, F_T)
         implicit none
         class(type_thermal), intent(in) :: self
@@ -23,7 +23,7 @@ contains
     ! ==========================================================================
     ! Newton-Raphson Assembly (Tangent Stiffness & Enthalpy Residual)
     ! ==========================================================================
-    !> @brief Newton-Raphson法による接線剛性行列と残差ベクトルの計算
+    !> @brief Compute tangent stiffness matrix and residual vector using Newton-Raphson method
     module subroutine assemble_local_newton_thermal(self, control, workspace, K_TT, K_TH, F_T)
         implicit none
         class(type_thermal), intent(in) :: self
@@ -46,28 +46,27 @@ contains
         if (present(K_TT)) K_TT_val => K_TT%get_val()
         if (present(F_T)) F_T_val => F_T%get_data()
 
-        ! 1. 積分点ループ (状態量・係数計算)
+        ! 1. Gauss point loop (state and coefficient evaluation)
         workspace%work_C(:) = 0.0d0
         workspace%work_D(:, :, :) = 0.0d0
         workspace%work_d_dt(:) = 0.0d0
 
         do i = 1, workspace%num_fe_gauss
-            ! (A) Mass Term: 接線熱容量 C_tan
+            ! (A) Mass Term: tangent heat capacity C_tan
             call self%compute_mass_term(workspace%material_id, workspace%state_gp(i), &
                                         workspace%work_C(i), scheme_opt=SCHEME_TANGENT)
 
-            ! (B) Diffusion Term: 熱伝導率 D (現在の温度で評価)
+            ! (B) Diffusion Term: thermal conductivity D (evaluated at current temperature)
             call self%compute_diffusion_term(workspace%material_id, workspace%state_gp(i), &
                                              workspace%work_D(:, :, i))
 
-            ! (C) Transient Residual: エンタルピー時間微分 dH/dt
+            ! (C) Transient Residual: enthalpy time derivative dH/dt
             call self%compute_transient_term(workspace%material_id, workspace%state_gp(i), &
                                              workspace%bdf_coeffs(1:workspace%bdf_order + 1), &
                                              workspace%work_d_dt(i))
         end do
 
-        ! 2. 質量項（Mass Term）の寄与
-        ! compute_K1: ∫ N^T * C * N dV を work_matrix に格納
+        ! 2. Mass term contribution
         call workspace%compute_K1(workspace%work_C, workspace%work_matrix)
 
         if (associated(K_TT_val)) then
@@ -77,18 +76,17 @@ contains
                 bdf0 * workspace%work_matrix(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes)
         end if
 
-        ! 3. 過渡項残差（Transient Residual）の寄与
+        ! 3. Transient residual contribution
         if (associated(F_T_val)) then
             workspace%work_vec(:) = 0.0d0
-            ! compute_R1: ∫ N^T * scalar dV (ここでは scalar = dH/dt)
+            ! compute_R1: integral of N^T * dH/dt dV
             call workspace%compute_R1(workspace%work_d_dt, workspace%work_vec)
 
             F_T_val(1:workspace%num_fe_nodes) = F_T_val(1:workspace%num_fe_nodes) - &
                                                 workspace%work_vec(1:workspace%num_fe_nodes)
         end if
 
-        ! 4. 拡散項（Diffusion Term）の寄与
-        ! compute_K2: ∫ ∇N^T * D * ∇N dV を work_matrix に格納
+        ! 4. Diffusion term contribution
         call workspace%compute_K2(workspace%work_D, workspace%work_matrix)
 
         if (associated(K_TT_val)) then
@@ -98,10 +96,10 @@ contains
                 workspace%work_matrix(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes)
         end if
 
-        ! 5. 内部力残差（Internal Force Residual）の寄与
+        ! 5. Internal force residual contribution
         if (associated(F_T_val)) then
             workspace%work_vec(:) = 0.0d0
-            ! F_int = K * T_node (work_matrix は現在 K2 の結果を保持している)
+            ! F_int = K * T_node (work_matrix currently holds the K2 result)
             call matvec(workspace%work_matrix, workspace%T_node, workspace%work_vec, ierr)
 
             F_T_val(1:workspace%num_fe_nodes) = F_T_val(1:workspace%num_fe_nodes) - &
@@ -113,7 +111,7 @@ contains
     ! ==========================================================================
     ! Picard Assembly (Secant Stiffness & Linearized Residual)
     ! ==========================================================================
-    !> @brief 修正Picard法による線形化行列と右辺ベクトルの計算
+    !> @brief Compute linearized matrix and RHS vector using modified Picard method
     module subroutine assemble_local_picard_thermal(self, control, workspace, K_TT, K_TH, F_T)
         implicit none
         class(type_thermal), intent(in) :: self
@@ -138,7 +136,7 @@ contains
         allocate (local_vec_transient(n_nodes))
         allocate (local_vec_diff_flux(n_nodes))
 
-        ! 初期化
+        ! Initialize work arrays
         workspace%work_C(:) = 0.0d0
         workspace%work_D(:, :, :) = 0.0d0
         workspace%work_d_dt(:) = 0.0d0
@@ -154,25 +152,25 @@ contains
         if (present(F_T)) F_T_val => F_T%get_data()
 
         ! ----------------------------------------------------------------------
-        ! 1. 積分点ループ
+        ! 1. Gauss point loop
         ! ----------------------------------------------------------------------
         do i = 1, workspace%num_fe_gauss
-            ! (A) 行列用: 瞬間熱容量 C (Picard用)
+            ! (A) Instantaneous heat capacity C (for Picard method)
             call self%compute_mass_term(workspace%material_id, workspace%state_gp(i), workspace%work_C(i))
 
-            ! (B) 行列用: 熱伝導率 D
+            ! (B) Thermal conductivity D
             call self%compute_diffusion_term(workspace%material_id, workspace%state_gp(i), workspace%work_D(:, :, i))
 
-            ! (C) [重要] 残差用: エンタルピー時間変化 dH/dt (Newtonと同じ厳密計算を使う)
-            !     compute_history_term ではなく compute_transient_term を使う
+            ! (C) [Important] Enthalpy time rate dH/dt for residual (exact computation, same as Newton)
+            !     Uses compute_transient_term, not compute_history_term
             call self%compute_transient_term(workspace%material_id, workspace%state_gp(i), &
                                              workspace%bdf_coeffs(1:workspace%bdf_order + 1), &
                                              workspace%work_d_dt(i))
         end do
 
         ! ----------------------------------------------------------------------
-        ! 2. 質量行列 (LHS) の構築 [変更なし]
-        !    Picard行列として安定性を重視し，C_app (or C_vol) を使用
+        ! 2. Mass matrix (LHS) construction
+        !    Uses C_app (or C_vol) for Picard matrix stability
         ! ----------------------------------------------------------------------
         call workspace%compute_K1(workspace%work_C, workspace%work_matrix)
         if (associated(K_TT_val)) then
@@ -182,35 +180,34 @@ contains
         end if
 
         ! ----------------------------------------------------------------------
-        ! 3. 拡散行列 (LHS) & 拡散フラックス (RHS一部) の構築
+        ! 3. Diffusion matrix (LHS) and diffusion flux (partial RHS) construction
         ! ----------------------------------------------------------------------
         call workspace%compute_K2(workspace%work_D, workspace%work_matrix)
 
-        ! 行列 K_TT への加算
+        ! Add to K_TT matrix
         if (associated(K_TT_val)) then
             K_TT_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) = &
                 K_TT_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) + &
                 workspace%work_matrix(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes)
         end if
 
-        ! 拡散項の「現在のフラックス」だけは K*T で計算してOK
-        ! (D(T) * grad T なので，行列積と物理的意味が一致するため)
+        ! Current diffusion flux is computed as K*T
+        ! (consistent since D(T)*grad(T) matches the matrix-vector product)
         call matvec(workspace%work_matrix, workspace%T_node, local_vec_diff_flux, ierr)
 
         ! ----------------------------------------------------------------------
-        ! 4. 残差ベクトル (Residual) の構築
+        ! 4. Residual vector construction
         !    R = F_ext - ( dH/dt + K*T )
         ! ----------------------------------------------------------------------
         if (associated(F_T_val)) then
-            ! エンタルピー項 (dH/dt) の積分 -> local_vec_transient
+            ! Integrate enthalpy term (dH/dt) into local_vec_transient
             call workspace%compute_R1(workspace%work_d_dt, local_vec_transient)
 
             do i = 1, workspace%num_fe_nodes
-                ! 残差 = - (過渡項 + 拡散項)
-                ! ※ F_ext があればさらに足す
+                ! Residual = -(transient term + diffusion term)
 
-                val_T = -local_vec_transient(i) ! 厳密なエンタルピー変化
-                val_T = val_T - local_vec_diff_flux(i) ! 現在の拡散流出
+                val_T = -local_vec_transient(i)
+                val_T = val_T - local_vec_diff_flux(i)
 
                 F_T_val(i) = F_T_val(i) + val_T
             end do

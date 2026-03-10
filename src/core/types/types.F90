@@ -18,7 +18,7 @@ module core_types
     !-----------------------------------------------------------------
     ! Config - Base, Conditions, Physics types
     !-----------------------------------------------------------------
-    use :: types_config_base, only: &
+    use :: core_types_config_base, only: &
         abst_config
     use :: types_config_conditions, only: &
         type_config_bc, &
@@ -54,25 +54,25 @@ module core_types
     !-----------------------------------------------------------------
     ! Discretization - DOF mapping types
     !-----------------------------------------------------------------
-    use :: types_discretization_dof_map, only: &
+    use :: core_types_discretization_dof_map, only: &
         type_dof_map
 
     !-----------------------------------------------------------------
     ! Geometry - Coordinate and Coordinate Array types
     !-----------------------------------------------------------------
-    use :: types_geometry_coordinate, only: &
+    use :: core_types_geometry_coordinate, only: &
         type_coordinate_dp, &
         type_coordinate_int
-    use :: types_geometry_coordinate_array, only: &
+    use :: core_types_geometry_coordinate_array, only: &
         type_coordinate_array_dp, &
         type_coordinate_array_int
 
     !-----------------------------------------------------------------
     ! topology - Graph and Connectivity types
     !-----------------------------------------------------------------
-    use :: types_topology_graph, only: &
+    use :: core_types_topology_graph, only: &
         type_graph
-    use :: types_topology_connectivity, only: &
+    use :: core_types_topology_connectivity, only: &
         type_csr_index
 
     !-----------------------------------------------------------------
@@ -80,20 +80,20 @@ module core_types
     !-----------------------------------------------------------------
     use :: types_physics_variable, only: &
         type_variable
-    use :: types_physics_state, only: &
+    use :: core_types_physics_state, only: &
         type_state
-    use :: types_physics_state_thc, only: &
+    use :: core_types_physics_state_thc, only: &
         type_state_thc
-    use :: types_physics_meteorology, only: &
+    use :: core_types_physics_meteorology, only: &
         type_meteorology, &
         type_meteorology_data
-    use :: types_physics_solar, only: &
+    use :: core_types_physics_solar, only: &
         type_solar_system
 
     !-----------------------------------------------------------------
     ! Utilites
     !-----------------------------------------------------------------
-    use :: types_utils_datetime, only: &
+    use :: core_types_utils_datetime, only: &
         type_datetime
     implicit none
     public

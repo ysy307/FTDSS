@@ -3,7 +3,7 @@
 !> Algorithm:
 !> - Calculates thermal coefficients and governing equation terms
 !> - Assembles enthalpy, transient, mass, diffusion, advection, and latent terms
-submodule(governing_thermal) thermal_coefficients
+submodule(physics_governing_thermal) thermal_coefficients
     implicit none
 
 contains

@@ -156,7 +156,7 @@ contains
 
             if (bc_patch%num_fe > 0) then
                 do i_elem = 1, bc_patch%num_fe
-                    ! 要素ごとに対応するFEオブジェクトを取得する
+                    ! Get the FE object for this boundary element
                     call bc_patch%fe_manager%get_fe(i_elem, fe)
 
                     start_idx = bc_patch%connectivity%row_ptr(i_elem)

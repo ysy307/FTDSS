@@ -1,4 +1,4 @@
-module core_check_io
+module core_validation_check_io
     use, intrinsic :: iso_fortran_env, only: int32
     implicit none
     private
@@ -20,4 +20,4 @@ contains
         can_write = (is_open .and. trim(write_status) == 'YES')
     end function check_unit_writable
 
-end module core_check_io
+end module core_validation_check_io

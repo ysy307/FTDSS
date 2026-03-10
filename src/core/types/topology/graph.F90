@@ -1,4 +1,4 @@
-module types_topology_graph
+module core_types_topology_graph
     use, intrinsic :: iso_fortran_env
     implicit none
     private
@@ -254,4 +254,4 @@ contains
         end subroutine quicksort
     end subroutine sort_int64
 
-end module types_topology_graph
+end module core_types_topology_graph

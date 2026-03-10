@@ -1,5 +1,5 @@
 module module_boundary
-    use :: boundary_manager, only: type_bc_manager
+    use :: physics_governing_boundary_manager, only: type_bc_manager
     use :: boundary_strategy, only: type_bc_result
     implicit none
     private

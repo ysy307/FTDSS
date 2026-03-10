@@ -2,7 +2,7 @@
 !>
 !> This module defines the base class for handling date and time.
 !> It provides methods to set, get, and format datetime information.
-module types_utils_datetime
+module core_types_utils_datetime
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: stdlib_optval, only:optval
     implicit none
@@ -289,4 +289,4 @@ contains
         tz = self%timezone_offset
     end subroutine get_datetime_components
 
-end module types_utils_datetime
+end module core_types_utils_datetime

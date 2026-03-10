@@ -2,7 +2,7 @@
 !> Module for error handling implementation
 !> Uses error constants defined in core_constants_error
 !>
-module core_error
+module core_validation_error
     use, intrinsic :: iso_fortran_env, only: int32
     use :: stdlib_strings, only:to_string, strip
     use :: core_constants, only:ERROR_CODES, type_constant_error
@@ -97,4 +97,4 @@ contains
         end if
     end function replace_placeholder
 
-end module core_error
+end module core_validation_error

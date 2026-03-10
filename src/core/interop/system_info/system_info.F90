@@ -2,7 +2,7 @@
 !> Provides direct Fortran interfaces to C functions for retrieving basic
 !> system information, such as the operating system and CPU architecture.
 !>
-module core_c_utils_system_info
+module core_interop_system_info
     use, intrinsic :: iso_c_binding, only: c_ptr
     implicit none
     private
@@ -35,4 +35,4 @@ module core_c_utils_system_info
     end interface
 contains
 
-end module core_c_utils_system_info
+end module core_interop_system_info

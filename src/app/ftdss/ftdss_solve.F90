@@ -10,19 +10,19 @@ contains
 
         nullify (u)
 
-        ! 1. 反復管理のリセット
-        !    reset() は設定が NONE の場合に計算用も NONE にする可能性があります．
+        ! Reset iteration control
+        ! reset() may set the compute solver to NONE when config is NONE.
         call self%control%reset_iteration()
 
-        ! [重要] 計算用ソルバーは常に PICARD か NEWTON でなければなりません．
-        ! 設定が NONE (線形) の場合でも，離散化定式化としては Picard を使用するため，
-        ! ここで明示的に PICARD をセットして reset の状態を上書きします．
+        ! [Important] Compute solver must always be PICARD or NEWTON.
+        ! Even for NONE (linear) config, Picard discretization is used,
+        ! so explicitly set PICARD here to override the reset state.
         call self%control%set_nonlinear_solver(NONLINEAR_SOLVER%PICARD)
 
         call self%control%increment_total()
         call self%control%reset_acceleration()
 
-        ! 2. 前ステップの値の保存 (Previous <- Current)
+        ! Save previous step values (Previous <- Current)
         call self%porosity%get_previous(u)
         if (associated(u)) then
             call self%porosity%set_current(u)
@@ -91,10 +91,10 @@ contains
         switch_norm(:) = [1.0d-2, 1.0d-4, 1.0d-4]
         should_switch = .true.
 
-        ! 計算用(Dynamic)の状態を取得
+        ! Get compute (dynamic) solver state
         is_compute_newton = self%control%is_compute_newton()
         is_compute_picard = self%control%is_compute_picard()
-        ! 設定(Static)がNONEかどうかも取得しておく
+        ! Check whether config (static) solver is NONE
         is_config_none = self%control%is_none()
 
         ! ----------------------------------------------------------------------
@@ -112,11 +112,11 @@ contains
                 write (*, *) "Error: NaN detected in thermal variables during convergence check."
                 call self%control%set_diverged(PHYSICS_TYPES%THERMAL, diverged)
             else
-                ! 設定がNONEの場合は iteration モジュール内で即時 True が返されるため問題なし
+                ! When config is NONE, the iteration module returns converged immediately
                 call self%control%check_convergence(PHYSICS_TYPES%THERMAL, residual, increment)
             end if
 
-            ! Aitken緩和チェック
+            ! Aitken relaxation check
 
             if (is_compute_picard .and. .not. is_config_none) then
                 if (self%control%reach_minimum_relaxation(PHYSICS_TYPES%THERMAL)) then
@@ -153,8 +153,8 @@ contains
         end if
 
         ! ----------------------------------------------------------------------
-        ! 2. Hybrid法 切り替え判定
-        !    設定が NONE (線形) の場合は切り替えを行わない
+        ! 2. Hybrid method switch decision
+        !    Skip when config is NONE (linear)
         ! ----------------------------------------------------------------------
         call self%control%get_nonlinear_iter(iter)
 
@@ -203,34 +203,31 @@ contains
 
         is_step_converged = .false.
 
-        ! 1. 初期化セットアップ (ここで計算用ソルバーは必ず PICARD に設定される)
+        ! Initial setup (compute solver is always set to PICARD here)
         call self%solve_time_step_initial_setup()
 
-        ! 2. 非線形反復ループ
+        ! Nonlinear iteration loop
         nonlinear: do while (self%control%should_continue())
 
-            ! 2.1 セットアップ (iter更新)
+            ! Setup (update iteration counter)
             call self%solve_time_step_setup(prescribe_bc)
 
-            ! 2.2 行列・残差のアセンブル (compute_type=PICARD なので正しく動作する)
+            ! Assemble matrices and residual (uses compute_type=PICARD)
             call self%assemble()
 
-            ! 2.3 境界条件の適用
+            ! Apply boundary conditions
             call self%apply_bc(prescribe_bc)
 
-            ! 2.4 線形ソルバー (K * u = F)
+            ! Linear solve (K * u = F)
             call self%solve()
 
-            ! 2.5 収束判定
-            !     設定が NONE なら常に is_converged = .true. となる
+            ! Convergence check; always converged when config is NONE
             call self%solve_time_step_check_convergence()
 
-            ! 2.6 解の更新
-            !     設定が NONE なら reflect 内で omega=1.0 となる(Aitken無効化)
+            ! Update solution; omega=1.0 (Aitken disabled) when config is NONE
             call self%reflect_variables()
 
-            ! [追加] 設定(Static)が NONE の場合は，1回の計算でループを強制終了する
-            ! 計算用変数が PICARD であっても，ここで抜けることで線形計算を実現する
+            ! Force exit after one iteration when config is NONE (linear solve)
             if (self%control%is_none()) exit nonlinear
 
         end do nonlinear
@@ -244,25 +241,22 @@ contains
 
         logical :: is_step_converged
 
-        ! 終了時刻までループ
+        ! Loop until end time
         time_loop: do while (.not. self%control%is_end_time())
-            ! 1. 計算実行 (t -> t+dt)
             call self%solve_time_step(is_step_converged)
 
-            ! 2. 先に時刻とATSを更新 (時刻が t+dt になる)
+            ! Update time and adaptive time stepping
             call self%control%update(is_step_converged)
 
             if (is_step_converged) then
-                ! [成功時]
-                ! 3. 物理量の履歴のみをシフトする
+                ! Shift variable history on convergence
                 call self%shift()
 
-                ! 4. 更新後の時刻で出力判定
                 call self%update_variables()
                 call self%output_fields()
                 call self%output_history()
             else
-                ! [失敗] やり直し処理
+                ! Retry with smaller dt
                 write (*, '("   [WARNING] Step Failed. Retrying with smaller dt...")')
                 call self%control%update(is_step_converged)
                 cycle time_loop

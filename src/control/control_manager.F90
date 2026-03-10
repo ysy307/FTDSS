@@ -1,4 +1,4 @@
-module core_control_manager
+module control_control_manager
     use, intrinsic :: iso_fortran_env
     use :: stdlib_strings, only:strip
     use :: stdlib_optval, only:optval
@@ -168,7 +168,7 @@ contains
     end subroutine initialize_type_control
 
     ! -----------------------------------------------------------------
-    ! 指定された物理現象と材料IDが計算対象かどうかを判定する
+    ! Check if the given physics type and material ID are active
     ! -----------------------------------------------------------------
     pure function is_target_control(self, target_physics, material_id) result(compute_active)
         implicit none
@@ -204,7 +204,7 @@ contains
 
     end function is_target_control
     !>
-    !> 指定された物理定数が計算対象かどうかを判定する
+    !> Check if the given physics type is active for computation
     pure function is_physics_active_control(self, physics_type) result(compute_active)
         implicit none
         !> Instance of control settings
@@ -379,23 +379,23 @@ contains
         logical, intent(in) :: success
         integer(int32) :: iter_count
         real(real64) :: t_target
-        real(real64) :: t_arrival ! 計算によって到達する時刻
+        real(real64) :: t_arrival ! Time that will be reached after this step
         real(real64) :: t_target_out
         real(real64) :: current_time_s, dt_s
 
-        ! 1. 反復回数の取得
+        ! 1. Get iteration count
         call self%iteration%get_nonlinear_iter(iter_count)
 
-        ! 2. 到達予測時刻 (t_new = t_old + dt)
-        !    成功していれば，この後 time%update で時刻がここまで進む
+        ! 2. Predicted arrival time (t_new = t_old + dt)
+        !    If successful, time%update will advance to this time
         call self%time%get_time(current_time_s)
         call self%time%get_dt(dt_s)
         t_arrival = current_time_s + dt_s
 
-        ! 3. ターゲット時刻の決定
+        ! 3. Determine the target time
         call self%time%get_end_time(t_target)
 
-        ! 到達時刻(300) を渡して，次のターゲット(600) を取得する
+        ! Pass arrival time to get the next target output time
         if (self%scheduler_field%is_active()) then
             call self%scheduler_field%get_next_target_time(t_arrival, t_target_out)
             t_target = min(t_target, t_target_out)
@@ -405,7 +405,7 @@ contains
             t_target = min(t_target, t_target_out)
         end if
 
-        ! 4. 更新実行 (t_target=600 なので，残り300に合わせて dt が制限される)
+        ! 4. Execute update (dt is limited to not exceed t_target)
         call self%time%update(success, iter_count, t_target)
 
     end subroutine update_controls
@@ -475,7 +475,7 @@ contains
         case (OUTPUT_TYPES%HISTORY%ID)
             call self%scheduler_history%update(current_time_seconds)
         case default
-            ! 何もしない
+            ! No action needed
         end select
 
     end subroutine update_output_control
@@ -741,4 +741,4 @@ contains
         call self%acceleration%get_previous_relaxation(physics_type, relaxation)
     end subroutine get_previous_relaxation_control
 
-end module core_control_manager
+end module control_control_manager

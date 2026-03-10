@@ -2,9 +2,9 @@ module types_config_elements
     use, intrinsic :: iso_fortran_env
     use :: core_memory
     use :: core_constants, only:type_constant_id
-    use :: types_topology_connectivity, only:type_csr_index
-    use :: types_geometry_coordinate_array, only:type_coordinate_array_dp
-    use :: types_config_base, only:abst_config
+    use :: core_types_topology_connectivity, only:type_csr_index
+    use :: core_types_geometry_coordinate_array, only:type_coordinate_array_dp
+    use :: core_types_config_base, only:abst_config
     implicit none
     private
 

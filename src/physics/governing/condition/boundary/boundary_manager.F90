@@ -1,4 +1,4 @@
-module boundary_manager
+module physics_governing_boundary_manager
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core
     use :: boundary_data_provider
@@ -39,11 +39,9 @@ contains
 
         self%num_boundaries = size(configs)
 
-        ! 既存の配列があれば解放する
         if (allocated(self%strategies)) deallocate (self%strategies)
         if (allocated(self%boundary_ids)) deallocate (self%boundary_ids)
 
-        ! 要素数が1以上の場合のみメモリを確保して代入する
         if (self%num_boundaries > 0) then
             allocate (self%strategies(self%num_boundaries))
             allocate (self%boundary_ids(self%num_boundaries))
@@ -128,7 +126,7 @@ contains
         implicit none
         class(type_bc_manager), intent(in) :: self
         integer(int32), intent(in) :: entity_id
-        integer(int32), intent(out) :: bc_index
+        integer(int32), intent(inout) :: bc_index
 
         integer(int32) :: i
 
@@ -143,4 +141,4 @@ contains
         end do
     end subroutine get_bc_index_bc_manager
 
-end module boundary_manager
+end module physics_governing_boundary_manager

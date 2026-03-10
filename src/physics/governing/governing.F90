@@ -1,9 +1,9 @@
 module module_governing
-    use :: governing_base, only: &
+    use :: physics_governing_base, only: &
         type_assemble_workspace
-    use :: governing_thermal, only: &
+    use :: physics_governing_thermal, only: &
         type_thermal
-    use :: governing_hydraulic, only: &
+    use :: physics_governing_hydraulic, only: &
         type_hydraulic
     use :: governing_atmosphere
     use :: module_boundary

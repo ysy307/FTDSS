@@ -1,5 +1,5 @@
 
-module core_vtk_vtk_constants
+module core_interop_vtk_constants
     use, intrinsic :: iso_fortran_env, only: int32
     use :: stdlib_strings
     implicit none
@@ -800,4 +800,4 @@ contains
         max_cell_id = self%max_cell_id
 
     end function get_max_cell_id
-end module core_vtk_vtk_constants
+end module core_interop_vtk_constants

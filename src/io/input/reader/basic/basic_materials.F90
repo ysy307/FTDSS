@@ -475,7 +475,7 @@ contains
         call display_material_basic(self)
 
         ! --- 2. Thermal Properties ---
-        !     構造体はフラットですが，表示は見やすく物理現象ごとにまとめます
+        !     The struct is flat, but display is grouped by physics type for readability
         if (self%is_active(PHYSICS_TYPES%THERMAL%ID)) then
             call display_material_thermal(self)
         end if
@@ -501,7 +501,7 @@ contains
             write (*, '(a, a)') "  Name                : ", trim(material%name)
         end if
         write (*, '(a, i0)') "  Phase Count         : ", material%phase
-        ! is_frozen 等のフラグが構造体にない場合は削除，ある場合は復活させてください
+        ! Remove this line if is_frozen flag is absent from the struct; restore if present
         ! write (*, '(a, g0)') "  Is Frozen           : ", material%is_frozen
 
         write (*, '(a, L1)') "  Calculate Thermal   : ", material%is_active(PHYSICS_TYPES%THERMAL%ID)
@@ -559,7 +559,7 @@ contains
 
         ! Phase Change
         write (*, '(a)') "    --- Phase Change ---"
-        ! 読み込みコードに合わせて equilibrium_model へのアクセスパスを調整
+        ! Adjust access path to equilibrium_model to match loading code
         write (*, '(a, L1)') "    Segregation         : ", material%phase_change%equilibrium_model%segregation
 
     end subroutine display_material_thermal
@@ -600,8 +600,8 @@ contains
         write (*, '(a, es12.4e2)') "      n1                : ", wcc%n1
         write (*, '(a, es12.4e2)') "      l                 : ", wcc%l
 
-        ! 以下は値が入っていない可能性があるため条件分岐等を検討しても良いですが
-        ! ここでは単純に表示します (0.0等が表示される想定)
+        ! The following values may be unset; conditionally displaying them could be
+        ! considered, but here we simply print them (expecting 0.0 for unset values)
         write (*, '(a, es12.4e2)') "      h_crit            : ", wcc%h_crit
         write (*, '(a, es12.4e2)') "      alpha2            : ", wcc%alpha2
         write (*, '(a, es12.4e2)') "      n2                : ", wcc%n2

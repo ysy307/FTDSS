@@ -4,7 +4,7 @@ module models_hcf
     use :: module_core
     use :: constitutive_constants, only:TtoK => celsius_to_kelvin, Mw => molar_mass_water, &
         Rg => universal_gas_constant, g => gravity_acceleration, rho_std => reference_water_density
-    use :: constitutive_base, only:abst_constitutive
+    use :: physics_constitutive_base, only:abst_constitutive
     implicit none
     private
 

@@ -70,10 +70,10 @@ contains
             if (.not. file_exists(self%input_path//"Output.json")) error_flag = 4
         end if
 
-        ! 2. ランク0のチェック結果(error_flag)を全員にブロードキャスト
+        ! 2. Broadcast rank 0's check result (error_flag) to all ranks
         call MPI_Bcast(error_flag, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
 
-        ! 3. もしエラーがあれば全員で停止
+        ! 3. Abort all ranks if an error was detected
         if (error_flag /= 0) then
             if (myrank == 0) then
                 print *, "FATAL ERROR: A required input file was not found. Aborting."

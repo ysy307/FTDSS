@@ -12,7 +12,7 @@ contains
         integer(int32) :: i
         integer(int32) :: index, num_active
 
-        ! --- Pass 1: アクティブな境界の個数を数える ---
+        ! --- Pass 1: Count active boundaries ---
         num_active = 0
         do index = 1, input%conditions%num_boundaries
             associate (physics_data => input%conditions%boundary_conditions(index)%physics(target_physics%ID))
@@ -20,13 +20,13 @@ contains
             end associate
         end do
 
-        ! アクティブな境界の個数だけ確保（コンパクト配列）
+        ! Allocate compact array for active boundaries only
         if (allocated(configs)) deallocate (configs)
         allocate (configs(num_active))
 
         if (num_active == 0) return
 
-        ! --- Pass 2: アクティブな境界のみを変換して格納 ---
+        ! --- Pass 2: Convert and store only active boundaries ---
         num_active = 0
         do index = 1, input%conditions%num_boundaries
             associate (physics_data => input%conditions%boundary_conditions(index)%physics(target_physics%ID))
@@ -35,7 +35,7 @@ contains
 
                 num_active = num_active + 1
 
-                ! メッシュの entity_id と対応させるための JSON id を保持
+                ! Store JSON id for mapping to mesh entity_id
                 configs(num_active)%boundary_id = input%conditions%boundary_conditions(index)%id
                 configs(num_active)%physics_type = target_physics
                 configs(num_active)%num_time_points = physics_data%num_time_points
@@ -53,8 +53,11 @@ contains
                 case (THERMAL_BC_TYPES%DIRICHLET%ID, THERMAL_BC_TYPES%FLUX%ID, &
                       HYDRAULIC_BC_TYPES%DIRICHLET%ID, HYDRAULIC_BC_TYPES%FLUX%ID)
                     configs(num_active)%num_variables = 1
-                    call allocate_array(configs(num_active)%time_points, configs(num_active)%num_time_points)
-                    call allocate_array(configs(num_active)%values, configs(num_active)%num_variables, configs(num_active)%num_time_points)
+                    call allocate_array(configs(num_active)%time_points, &
+                                        configs(num_active)%num_time_points)
+                    call allocate_array(configs(num_active)%values, &
+                                        configs(num_active)%num_variables, &
+                                        configs(num_active)%num_time_points)
 
                     do i = 1, configs(num_active)%num_time_points
                         configs(num_active)%time_points(i) = physics_data%values(i)%time
@@ -63,8 +66,11 @@ contains
 
                 case (THERMAL_BC_TYPES%ROBIN%ID, THERMAL_BC_TYPES%CONVECTIVE%ID, THERMAL_BC_TYPES%RADIATION%ID)
                     configs(num_active)%num_variables = 2
-                    call allocate_array(configs(num_active)%time_points, configs(num_active)%num_time_points)
-                    call allocate_array(configs(num_active)%values, configs(num_active)%num_variables, configs(num_active)%num_time_points)
+                    call allocate_array(configs(num_active)%time_points, &
+                                        configs(num_active)%num_time_points)
+                    call allocate_array(configs(num_active)%values, &
+                                        configs(num_active)%num_variables, &
+                                        configs(num_active)%num_time_points)
 
                     ! Assign values for 2 variables here
                 case default

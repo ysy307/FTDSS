@@ -1,4 +1,4 @@
-submodule(types_algebra_vector) algebra_vector_int
+submodule(core_types_algebra_vector) algebra_vector_int
     implicit none
 
 contains

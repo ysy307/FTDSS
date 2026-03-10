@@ -1,4 +1,4 @@
-module types_topology_connectivity
+module core_types_topology_connectivity
     use :: iso_fortran_env
     use :: stdlib_strings, only:strip
     use :: stdlib_optval, only:optval
@@ -89,4 +89,4 @@ contains
         end if
     end subroutine display_csr_index
 
-end module types_topology_connectivity
+end module core_types_topology_connectivity

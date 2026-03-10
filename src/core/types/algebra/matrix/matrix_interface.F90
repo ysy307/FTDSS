@@ -2,7 +2,7 @@
 !> Defines an abstract matrix type and concrete implementations for dense,
 !> COO (Coordinate), and CRS (Compressed Row Storage) sparse matrices.
 !>
-module types_algebra_matrix
+module core_types_algebra_matrix
     use, intrinsic :: iso_fortran_env
 !$  use :: omp_lib
     use :: stdlib_optval, only:optval
@@ -11,7 +11,7 @@ module types_algebra_matrix
     use :: core_deallocate, only:deallocate_array
     use :: core_findings, only:binary_find
     use :: core_check_range, only:value_in_range
-    use :: types_algebra_vector, only:type_vector_dp
+    use :: core_types_algebra_vector, only:type_vector_dp
     implicit none
     private
 
@@ -1070,4 +1070,4 @@ contains
 
     end subroutine check_matrix_status
 
-end module types_algebra_matrix
+end module core_types_algebra_matrix

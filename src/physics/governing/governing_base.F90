@@ -1,4 +1,4 @@
-module governing_base
+module physics_governing_base
     use, intrinsic :: iso_fortran_env
     use :: module_core
     use :: module_control
@@ -112,7 +112,7 @@ contains
         self%element_id = element_id
         self%computation_type = computation_type
 
-        ! [修正] 標準 allocate を使用し、サイズ変更時のみ再確保
+        ! Reallocate coordinates only when dimensions change
         if (allocated(self%coordinates)) then
             if (size(self%coordinates, 1) /= size(coordinates, 1) .or. &
                 size(self%coordinates, 2) /= size(coordinates, 2)) then
@@ -137,7 +137,7 @@ contains
         call self%fe%get_num_gauss(self%num_fe_gauss)
         call self%fe%get_dimension(self%num_fe_dimension)
 
-        ! [修正] 構造体配列の手動最適化
+        ! Resize struct arrays only when element type changes
         if (allocated(self%state)) then
             if (size(self%state) /= self%num_fe_nodes) then
                 deallocate (self%state)
@@ -176,7 +176,7 @@ contains
             end do
         end if
 
-        ! [修正] 以下、内部サブルーチン呼び出し（標準 allocate 使用）
+        ! Allocate workspace arrays
         call allocate_and_init(self%T_node, self%num_fe_nodes)
         call allocate_and_init(self%P_node, self%num_fe_nodes)
         call allocate_and_init(self%phi_node, self%num_fe_nodes)
@@ -200,7 +200,7 @@ contains
         call allocate_and_init_2d(self%work_matrix, self%num_fe_nodes, self%num_fe_nodes)
 
     contains
-        ! [修正] スレッドセーフな標準 allocate を使用する内部手続き
+        ! Thread-safe allocation helpers
         subroutine allocate_and_init(arr, sz)
             real(real64), allocatable, intent(inout) :: arr(:)
             integer(int32), intent(in) :: sz
@@ -275,10 +275,9 @@ contains
         nullify (gp)
         nullify (work_history_ptr)
 
-        ! GP座標の取得
         call self%fe%get_gauss(gp)
 
-        ! 安全対策: 全変数を妥当な値で初期化
+        ! Initialize all variables to safe defaults
         self%T_node(:) = 273.15d0
         self%P_node(:) = 0.0d0
         self%phi_node(:) = 0.0d0
@@ -531,4 +530,4 @@ contains
 
     end subroutine destroy_type_assemble_workspace
 
-end module governing_base
+end module physics_governing_base

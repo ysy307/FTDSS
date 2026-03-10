@@ -2,8 +2,8 @@ module types_config_observation
     use, intrinsic :: iso_fortran_env
     use :: core_memory
     use :: core_constants
-    use :: types_config_base, only:abst_config
-    use :: types_geometry_coordinate, only:type_coordinate_dp
+    use :: core_types_config_base, only:abst_config
+    use :: core_types_geometry_coordinate, only:type_coordinate_dp
     implicit none
 
     public :: type_config_observation_geometry

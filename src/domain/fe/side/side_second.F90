@@ -43,19 +43,19 @@ contains
 
         integer(int32) :: i
         integer(int32) :: nn
-        integer(int32) :: n_dim ! <--- 追加: 座標の次元数
+        integer(int32) :: n_dim
         real(real64) :: dpsi_val
 
         tangent_vec = 0.0d0
         call self%get_num_nodes(nn)
 
-        ! node_coords の第1次元（空間次元）を取得
+        ! Get the spatial dimension from node_coords
         n_dim = size(node_coords, 1)
 
         do i = 1, nn
             call self%calc_dpsi(i, 1, r, dpsi_val)
 
-            ! tangent_vec のサイズだけでなく、node_coords の次元数もチェックする
+            ! Check both tangent_vec size and node_coords dimension
             if (size(tangent_vec) >= 1 .and. n_dim >= 1) &
                 tangent_vec(1) = tangent_vec(1) + dpsi_val * node_coords(1, i)
 

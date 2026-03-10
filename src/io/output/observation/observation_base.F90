@@ -116,7 +116,7 @@ contains
             end associate
         end do
 
-        ! --- デリミタとフォーマット文字列の設定 ---
+        ! --- Set delimiter and format strings ---
         select case (file_format%ID)
         case (FILE_FORMATS%CSV%ID)
             do i = 1, OUTPUT_VARIABLE_TYPES%NUM_ID
@@ -140,7 +140,7 @@ contains
 
         do i = 1, OUTPUT_VARIABLE_TYPES%NUM_ID
             if (self%settings(i)%do_output) then
-                ! [修正] フォーマット文字列を変数ごとに設定
+                ! Set format string per variable
                 self%settings(i)%fmt_line = '(*(es22.15,:,"'//self%settings(i)%delimiter//'"))'
             end if
         end do
@@ -189,7 +189,7 @@ contains
             write (output_settings%io_unit, '(a)') "# "//strip(output_settings%variable_type%NAME)//" time variation"
             write (output_settings%io_unit, '(a)') "#"
 
-            ! --- 観測点の情報出力（ポリモーフィズムを利用） ---
+            ! --- Output observation point info (using polymorphism) ---
             select case (self%observation_type%ID)
             case (OUTPUT_OBSERVATION_TYPES%NODE_IDS%ID)
                 write (output_settings%io_unit, '(a)') "# Observation Node ID"

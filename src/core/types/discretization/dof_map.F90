@@ -1,4 +1,4 @@
-module types_discretization_dof_map
+module core_types_discretization_dof_map
     use, intrinsic :: iso_fortran_env
     use :: stdlib_optval, only:optval
     use :: core_constants, only:type_constant_id, PHYSICS_TYPES
@@ -119,4 +119,4 @@ contains
         write (unit, '(A)')
     end subroutine display_dof_map
 
-end module types_discretization_dof_map
+end module core_types_discretization_dof_map

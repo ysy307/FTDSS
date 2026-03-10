@@ -1,4 +1,4 @@
-submodule(solver_solve) solve_type_solver_bicgstab
+submodule(numerical_solver_interface) solve_type_solver_bicgstab
     implicit none
 contains
 

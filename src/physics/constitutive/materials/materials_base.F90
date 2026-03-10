@@ -3,7 +3,7 @@ module materials_base
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core, only:type_state, type_config_constitutive
     use :: constitutive_constants, only:TtoK => celsius_to_kelvin, P_atm => standard_atmospheric_pressure
-    use :: constitutive_base, only:abst_constitutive
+    use :: physics_constitutive_base, only:abst_constitutive
     implicit none
     private
 

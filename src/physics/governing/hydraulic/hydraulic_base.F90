@@ -1,4 +1,4 @@
-submodule(governing_hydraulic) hydraulic_base
+submodule(physics_governing_hydraulic) hydraulic_base
     implicit none
 contains
     module subroutine initialize_type_hydraulic(self, input, active_region_ids)

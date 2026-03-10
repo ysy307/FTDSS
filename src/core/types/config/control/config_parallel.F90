@@ -1,7 +1,7 @@
 module types_config_control_parallel
     use, intrinsic :: iso_fortran_env
     use :: core_constants, only:type_constant_id, type_constant_value
-    use :: types_config_base, only:abst_config
+    use :: core_types_config_base, only:abst_config
     implicit none
     private
 

@@ -4,6 +4,7 @@ module domain_fe_manager
     use :: domain_base_fe, only:abst_fe, holder_fes
     use :: domain_fe_factory, only:create_fe
 
+    implicit none
     public :: type_fe_manager
 
     !> Manager type for handling multiple FE objects

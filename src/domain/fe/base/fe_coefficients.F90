@@ -19,7 +19,7 @@ contains
 
         integer(int32) :: i, j, k, dim
         integer(int32) :: ierr
-        ! スタック確保のため固定長にするが、最大次元(3)を確保して dim で制御する
+        ! Use fixed-size arrays on the stack, allocated for max dimension and controlled by dim
         real(real64) :: local_J(self%dimension, self%dimension)
         real(real64) :: local_inv_J(self%dimension, self%dimension)
         real(real64) :: local_det_J
@@ -30,13 +30,13 @@ contains
 
         ! 1. Evaluate Shape Functions (Requires no Jacobian)
         if (present(psi)) then
-            psi(:) = 0.0d0 ! 初期化推奨
+            psi(:) = 0.0d0
             do i = 1, self%num_nodes
                 call self%calc_psi(i, r, psi(i))
             end do
         end if
 
-        ! フラグ判定: ヤコビアン計算が必要か？
+        ! Determine whether Jacobian computation is needed
         need_jacobian = present(determinant_jacobian) .or. &
                         present(inverse_jacobian) .or. &
                         present(dpsi_dx)
@@ -44,7 +44,6 @@ contains
         if (.not. need_jacobian) return
 
         ! --- A. Compute Jacobian Matrix (ONCE) ---
-        ! local_J は (dim, dim)
         call self%calc_jacobian(r, node_coords, local_J)
 
         ! --- B. Compute Determinant ---
@@ -56,13 +55,13 @@ contains
             determinant_jacobian = local_det_J
         end if
 
-        ! フラグ判定: 逆行列が必要か？ (dpsi_dx計算にも必要)
+        ! Determine whether the inverse Jacobian is needed (also required for dpsi_dx)
         need_inverse = present(inverse_jacobian) .or. present(dpsi_dx)
 
         if (.not. need_inverse) return
 
         ! --- C. Compute Inverse Jacobian ---
-        ! local_J の内容を壊さないようコピーして計算
+        ! Copy local_J to preserve its contents
         local_inv_J(1:dim, 1:dim) = local_J(1:dim, 1:dim)
         call matrix_inverse(local_inv_J(1:dim, 1:dim), ierr)
 
@@ -76,14 +75,14 @@ contains
             dpsi_dx(:, :) = 0.0d0
 
             do i = 1, self%num_nodes
-                ! 局所勾配を取得 (dpsi/dxi, dpsi/deta, ...)
+                ! Get local gradients (dpsi/dxi, dpsi/deta, ...)
                 do j = 1, dim
                     call self%calc_dpsi(i, j, r, dpsi_dxi(j))
                 end do
 
-                ! 物理勾配へ変換: J^{-T} を掛ける
+                ! Transform to physical gradients: multiply by J^{-T}
                 ! dpsi_dx(k, i) = sum_l ( invJ(l, k) * dpsi_dxi(l) )
-                ! ここで invJ(l, k) は転置アクセスのため (l, k) としていることに注意
+                ! Note: invJ(l, k) uses transposed access, hence the (l, k) indexing
                 do k = 1, dim
                     do j = 1, dim
                         dpsi_dx(k, i) = dpsi_dx(k, i) + local_inv_J(j, k) * dpsi_dxi(j)

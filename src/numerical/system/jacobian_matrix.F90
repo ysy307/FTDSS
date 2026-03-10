@@ -1,4 +1,4 @@
-module system_jacobian_matrix
+module numerical_system_jacobian_matrix
     use, intrinsic :: iso_fortran_env
     use :: stdlib_optval, only:optval
     use :: module_core
@@ -11,9 +11,9 @@ module system_jacobian_matrix
     public :: type_jacobian_matrix
 
     !>
-    !> ヤコビ行列を管理するコンテナクラス
-    !> 内部で単一のBSR行列(abst_matrix)を保持し、(Node, DOF)のインデックス操作を
-    !> BSRのブロック操作にマッピングする。
+    !> Container class for the Jacobian matrix.
+    !> Holds a single BSR matrix (abst_matrix) internally and maps
+    !> (Node, DOF) index operations to BSR block operations.
     !>
     type :: type_jacobian_matrix
         private
@@ -22,7 +22,7 @@ module system_jacobian_matrix
         integer(int32) :: num_dofs_per_node = 0
         integer(int32) :: size = 0
 
-        ! 以前の holder_matrices 配列を廃止し、単一の行列オブジェクトで管理
+        ! Single matrix object (replaces the former holder_matrices array)
         class(abst_matrix), allocatable :: matrix
     contains
         procedure, public, pass(self) :: initialize => initialize_jacobian_matrix
@@ -31,10 +31,10 @@ module system_jacobian_matrix
         procedure, public, pass(self) :: get_size => get_size_jacobian_matrix
         procedure, public, pass(self) :: get_num_dofs_per_node => get_num_dofs_per_node
 
-        ! ソルバー向けに行列オブジェクトそのものを公開するアクセサ
+        ! Accessor to expose the matrix object for solvers
         procedure, public, pass(self) :: get_matrix => get_underlying_matrix
 
-        ! 値設定・加算系
+        ! Value set/add operations
         procedure, private, pass(self) :: set_value_local => set_value_jacobian_matrix
         procedure, private, pass(self) :: add_value_local => add_value_jacobian_matrix
         procedure, private, pass(self) :: add_local_matrix => add_local_jacobian_matrix
@@ -60,7 +60,6 @@ contains
         integer(int32), allocatable :: row(:), col(:)
         integer(int32) :: target_matrix_type
 
-        ! 既に割り当てられていれば破棄
         if (allocated(self%matrix)) call self%destroy()
 
         call domain%get_total_dofs(self%size)
@@ -70,7 +69,7 @@ contains
 
         self%matrix_type = MATRIX_TYPES%BSR%ID
 
-        ! 行列ファクトリを使用してBSR行列を生成
+        ! Create BSR matrix using the matrix factory
         self%matrix = create_matrix(MATRIX_TYPES%BSR, self%num_nodes, row, col, self%num_dofs_per_node)
 
         deallocate (row, col)
@@ -106,7 +105,7 @@ contains
         num_dofs = self%num_dofs_per_node
     end function
 
-    !> ソルバー等に行列の実体を渡すためのアクセサ
+    !> Accessor to pass the matrix object to solvers
     function get_underlying_matrix(self) result(matrix)
         implicit none
         class(type_jacobian_matrix), intent(in), target :: self
@@ -115,20 +114,20 @@ contains
     end function
 
     ! -------------------------------------------------------------------
-    !  Setters / Adders (ローカルインデックスAPI)
+    !  Setters / Adders (local index API)
     ! -------------------------------------------------------------------
 
     subroutine set_value_jacobian_matrix(self, row_dof, col_dof, row_node, col_node, value)
         implicit none
         class(type_jacobian_matrix), intent(inout) :: self
-        integer(int32), intent(in) :: row_dof ! ブロック内行インデックス (1 to num_dofs)
-        integer(int32), intent(in) :: col_dof ! ブロック内列インデックス (1 to num_dofs)
-        integer(int32), intent(in) :: row_node ! ブロック行インデックス (Node ID)
-        integer(int32), intent(in) :: col_node ! ブロック列インデックス (Node ID)
+        integer(int32), intent(in) :: row_dof ! Block-local row index (1 to num_dofs)
+        integer(int32), intent(in) :: col_dof ! Block-local column index (1 to num_dofs)
+        integer(int32), intent(in) :: row_node ! Block row index (Node ID)
+        integer(int32), intent(in) :: col_node ! Block column index (Node ID)
         real(real64), intent(in) :: value
 
-        ! abst_matrix (BSR) の set_value_block を使用
-        ! 引数順序: op, row(node), col(node), row_block(dof), col_block(dof), value
+        ! Uses abst_matrix (BSR) set_value_block
+        ! Arg order: op, row(node), col(node), row_block(dof), col_block(dof), value
         if (allocated(self%matrix)) then
             call self%matrix%set(MATRIX_OPS%INS, row_node, col_node, row_dof, col_dof, value)
         end if
@@ -241,4 +240,4 @@ contains
         write (unit, '(A)') '-----------------------------------'
     end subroutine display_jacobian_matrix
 
-end module system_jacobian_matrix
+end module numerical_system_jacobian_matrix

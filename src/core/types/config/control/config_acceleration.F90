@@ -1,14 +1,14 @@
 module types_config_control_acceleration
     use, intrinsic :: iso_fortran_env
     use :: core_constants, only:type_constant_id
-    use :: types_config_base, only:abst_config
+    use :: core_types_config_base, only:abst_config
     implicit none
     private
 
     public :: type_config_acceleration
 
     type, extends(abst_config) :: type_config_acceleration
-        !> 加速手法の種類
+        !> Acceleration method type
         type(type_constant_id) :: method = type_constant_id("", "", -1)
         real(real64) :: max_relaxation = 1.0d0
         real(real64) :: min_relaxation = 0.05d0

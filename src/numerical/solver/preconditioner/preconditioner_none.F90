@@ -1,5 +1,5 @@
-submodule(solver_preconditioner) solver_preconditioner_none
-
+submodule(numerical_solver_preconditioner) solver_preconditioner_none
+    implicit none
 contains
     module subroutine initialize_preconditioner_none(self, info)
         implicit none

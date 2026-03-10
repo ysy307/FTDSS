@@ -108,7 +108,7 @@ contains
         integer(int32) :: i
         integer(int32) :: idx
 
-        ! idx はベースとなるパスの長さ（例: "boundary_conditions(1)", "thermal" の2要素）
+        ! idx is the base path depth (e.g., "boundary_conditions(1)", "thermal" = 2 elements)
         idx = end_index
 
         allocate (local_buffer(size(buffer_in) + 2))
@@ -123,7 +123,7 @@ contains
             local_buffer(idx) = hydraulic
         end select
 
-        ! パス: ...thermal.type
+        ! Path: ...thermal.type
         local_buffer(idx + 1) = type
         call get_json_value(json, join(local_buffer(1:idx + 1)), self%bc_type, is_required=.true., valid_list=valid_list)
 
@@ -134,7 +134,7 @@ contains
             bc_kind = HYDRAULIC_BC_TYPES%to_object(self%bc_type)
         end select
 
-        ! パス: ...thermal.value_type
+        ! Path: ...thermal.value_type
         local_buffer(idx + 1) = value_type
         call get_json_value(json, join(local_buffer(1:idx + 1)), self%bc_value_type, is_required=.true.)
         bc_value_type = BC_DATA_PROVIDERS%to_object(self%bc_value_type)
@@ -145,11 +145,11 @@ contains
             self%num_time_points = 1
             allocate (self%values(self%num_time_points))
 
-            ! パス: ...thermal.values
+            ! Path: ...thermal.values
             local_buffer(idx + 1) = values
             call get_json_value(json, join(local_buffer(1:idx + 1)), self%values(1)%values, is_required=.true.)
 
-            ! DirichletやFluxはスカラー値(value)を参照するため，配列の先頭要素をコピーしておく
+            ! For Dirichlet/Flux, copy first array element as scalar value
             select case (bc_kind%ID)
             case (THERMAL_BC_TYPES%DIRICHLET%ID, THERMAL_BC_TYPES%FLUX%ID, &
                   HYDRAULIC_BC_TYPES%DIRICHLET%ID, HYDRAULIC_BC_TYPES%FLUX%ID)
@@ -161,7 +161,7 @@ contains
             end select
 
         case (BC_DATA_PROVIDERS%TABLE%ID)
-            ! パス: ...thermal.values
+            ! Path: ...thermal.values
             local_buffer(idx + 1) = values
             call json%info(join(local_buffer(1:idx + 1)), found=found, n_children=self%num_time_points)
             if (.not. found .or. self%num_time_points <= 0) then
@@ -174,10 +174,10 @@ contains
             case (THERMAL_BC_TYPES%DIRICHLET%ID, THERMAL_BC_TYPES%FLUX%ID, &
                   HYDRAULIC_BC_TYPES%DIRICHLET%ID, HYDRAULIC_BC_TYPES%FLUX%ID)
                 do i = 1, self%num_time_points
-                    ! パス: ...thermal.values(i)
+                    ! Path: ...thermal.values(i)
                     local_buffer(idx + 1) = values//"("//to_string(i)//")"
 
-                    ! パス: ...thermal.values(i).time
+                    ! Path: ...thermal.values(i).time
                     local_buffer(idx + 2) = "time"
                     call get_json_value(json, join(local_buffer(1:idx + 2)), self%values(i)%time, &
                                         found=found_time_real, is_required=.false.)
@@ -188,16 +188,16 @@ contains
                         call raise_error(ERROR_CODES%VAR_INVALID, opt=join(local_buffer(1:idx + 2)))
                     end if
 
-                    ! パス: ...thermal.values(i).value
+                    ! Path: ...thermal.values(i).value
                     local_buffer(idx + 2) = "value"
                     call get_json_value(json, join(local_buffer(1:idx + 2)), self%values(i)%value, is_required=.true.)
                 end do
             case (THERMAL_BC_TYPES%ROBIN%ID, THERMAL_BC_TYPES%CONVECTIVE%ID, THERMAL_BC_TYPES%RADIATION%ID)
                 do i = 1, self%num_time_points
-                    ! パス: ...thermal.values(i)
+                    ! Path: ...thermal.values(i)
                     local_buffer(idx + 1) = values//"("//to_string(i)//")"
 
-                    ! パス: ...thermal.values(i).time
+                    ! Path: ...thermal.values(i).time
                     local_buffer(idx + 2) = "time"
                     call get_json_value(json, join(local_buffer(1:idx + 2)), self%values(i)%time, &
                                         found=found_time_real, is_required=.false.)
@@ -208,7 +208,7 @@ contains
                         call raise_error(ERROR_CODES%VAR_INVALID, opt=join(local_buffer(1:idx + 2)))
                     end if
 
-                    ! パス: ...thermal.values(i).value
+                    ! Path: ...thermal.values(i).value
                     local_buffer(idx + 2) = "value"
                     call get_json_value(json, join(local_buffer(1:idx + 2)), self%values(i)%values, is_required=.true.)
                 end do
@@ -221,7 +221,7 @@ contains
         implicit none
         class(type_boundary_conditions), intent(in) :: self
 
-        !! TODO: 物理ごとに分けて表示する
+        !! TODO: Display separately per physics type
     end subroutine display_boundary_conditions
 
     subroutine display_boundary_local(boundary, title, target_physics)
@@ -230,7 +230,7 @@ contains
         character(*), intent(in) :: title
         integer(int32), intent(in) :: target_physics
 
-        !! TODO: 物理ごとに分けて表示する
+        !! TODO: Display separately per physics type
     end subroutine display_boundary_local
 
 end submodule input_conditions_boundary

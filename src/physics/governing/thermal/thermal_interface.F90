@@ -1,19 +1,18 @@
-module governing_thermal
+module physics_governing_thermal
     use, intrinsic :: iso_fortran_env
     use :: module_core
     use :: module_control, only:type_control
     use :: module_input, only:type_input, input_translator
     use :: module_linalg
     use :: module_constitutive, only:type_constitutive_manager
-    use :: governing_base, only:type_assemble_workspace
+    use :: physics_governing_base, only:type_assemble_workspace
     implicit none
     private
 
     public :: type_thermal
 
-    ! 定数定義（可読性のため）
-    integer, parameter :: SCHEME_TANGENT = 0 ! 厳密な微分（NR法推奨）
-    integer, parameter :: SCHEME_SECANT = 1 ! 差分近似（Picard法/相変化安定化用）
+    integer, parameter :: SCHEME_TANGENT = 0 ! Exact derivative (for Newton-Raphson)
+    integer, parameter :: SCHEME_SECANT = 1 ! Finite difference (for Picard / phase-change stabilization)
 
     type :: type_thermal
         private
@@ -193,4 +192,4 @@ module governing_thermal
 
 contains
 
-end module governing_thermal
+end module physics_governing_thermal

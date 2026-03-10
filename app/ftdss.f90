@@ -15,7 +15,7 @@ program main
     call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
 #endif
 
-    ! テスト関数の呼び出し
+    ! Call test function
     call run_test_ftdss()
 
 #ifdef _MPI

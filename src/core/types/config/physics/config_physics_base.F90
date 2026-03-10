@@ -1,7 +1,7 @@
 module types_config_physics_base
     use, intrinsic :: iso_fortran_env
     use :: core_constants, only:ERROR_CODES
-    use :: types_config_base, only:abst_config
+    use :: core_types_config_base, only:abst_config
     implicit none
     private
 

@@ -16,8 +16,8 @@ module control_acceleration
         logical :: initialized = .false.
     contains
         procedure(abst_initialize_acceleration), public, pass(self), deferred :: initialize
-        procedure(abst_destory_acceleration), public, pass(self), deferred :: destory
-        procedure(abst_compute_relaxatino_acceleration), public, pass(self), deferred :: compute_relaxation
+        procedure(abst_destroy_acceleration), public, pass(self), deferred :: destroy
+        procedure(abst_compute_relaxation_acceleration), public, pass(self), deferred :: compute_relaxation
         procedure(abst_reset_acceleration), public, pass(self), deferred :: reset
         procedure(abst_reach_minimum_relaxation), public, pass(self), deferred :: reach_minimum_relaxation
         procedure(abst_reach_maximum_relaxation), public, pass(self), deferred :: reach_maximum_relaxation
@@ -69,12 +69,12 @@ module control_acceleration
         !>
         !> Failure behavior:
         !> - Returns without error
-        subroutine abst_destory_acceleration(self)
+        subroutine abst_destroy_acceleration(self)
             import :: abst_acceleration
             implicit none
             !> Acceleration object
             class(abst_acceleration), intent(inout) :: self
-        end subroutine abst_destory_acceleration
+        end subroutine abst_destroy_acceleration
 
         !> Apply acceleration to the vector
         !>
@@ -94,7 +94,7 @@ module control_acceleration
         !>
         !> Failure behavior:
         !> - Returns without error
-        subroutine abst_compute_relaxatino_acceleration(self, physics_type, iter, du, vec)
+        subroutine abst_compute_relaxation_acceleration(self, physics_type, iter, du, vec)
             import :: abst_acceleration, type_constant_id, int32, real64
             implicit none
             !> Acceleration object
@@ -110,7 +110,7 @@ module control_acceleration
             !> State vector \(u_k\) on entry
             !> Overwritten by updated vector \(u_{k+1}\) on exit
             real(real64), intent(inout) :: vec(:)
-        end subroutine abst_compute_relaxatino_acceleration
+        end subroutine abst_compute_relaxation_acceleration
 
         !> Reset internal states for a new step
         !>
@@ -243,7 +243,7 @@ module control_acceleration
         real(real64), allocatable, private :: du_raw(:, :)
     contains
         procedure, public, pass(self) :: initialize => initialize_acceleration_aitken
-        procedure, public, pass(self) :: destory => destory_acceleration_aitken
+        procedure, public, pass(self) :: destroy => destroy_acceleration_aitken
         procedure, public, pass(self) :: compute_relaxation => compute_relaxation_acceleration_aitken
         procedure, public, pass(self) :: reset => reset_acceleration_aitken
         procedure, public, pass(self) :: reach_minimum_relaxation => reach_minimum_relaxation_aitken
@@ -263,11 +263,11 @@ module control_acceleration
         end subroutine initialize_acceleration_aitken
 
         !> Destroy Aitken acceleration
-        module subroutine destory_acceleration_aitken(self)
+        module subroutine destroy_acceleration_aitken(self)
             implicit none
             !> Aitken acceleration object
             class(type_acceleration_aitken), intent(inout) :: self
-        end subroutine destory_acceleration_aitken
+        end subroutine destroy_acceleration_aitken
 
         !> Compute Aitken acceleration
         module subroutine compute_relaxation_acceleration_aitken(self, physics_type, iter, du, vec)

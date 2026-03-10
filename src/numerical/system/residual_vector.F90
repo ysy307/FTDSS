@@ -1,9 +1,9 @@
 !>
-!> 残差ベクトルを管理する高レベルなコンテナ．
-!> 内部で単一のブロック付きベクトル(type_vector_dp)を保持し、
-!> (ノード, DOF)の操作をベクトルのブロック操作にマッピングする．
+!> High-level container for the residual vector.
+!> Holds a single blocked vector (type_vector_dp) internally and maps
+!> (node, DOF) operations to block operations on the vector.
 !>
-module system_residual_vector
+module numerical_system_residual_vector
     use, intrinsic :: iso_fortran_env
     use :: stdlib_optval, only:optval
     use :: module_core
@@ -21,7 +21,6 @@ module system_residual_vector
         integer(int32) :: num_dofs_per_node = 0
         integer(int32) :: size = 0
 
-        ! 内部データとして type_vector_dp を保持
         type(type_vector_dp) :: data
     contains
         ! --- initialize/destroy ---
@@ -35,7 +34,7 @@ module system_residual_vector
         procedure, pass(self), public :: get_size => get_size_residual_vector
         procedure, pass(self), public :: get_num_dofs_per_node => get_num_dofs_per_node_residual_vector
 
-        ! 内部ベクトルへのアクセサ
+        ! Accessor to the internal vector
         procedure, public, pass(self) :: get_vector => get_underlying_vector
         procedure, public, pass(self) :: get_data => get_data_vector
 
@@ -74,7 +73,6 @@ contains
         call domain%get_num_dof_per_node(self%num_dofs_per_node)
         call domain%get_num_nodes(self%num_nodes)
 
-        ! num_blocks = num_dofs_per_node として初期化
         call self%data%initialize(self%num_nodes, num_blocks=self%num_dofs_per_node)
 
     end subroutine initialize_residual_vector_from_domain
@@ -235,8 +233,8 @@ contains
 
         if (.not. self%data%is_initialized()) return
 
-        ! type_vector_dp にスカラー倍のインターフェースがないため、
-        ! 生データポインタ経由で計算を行う
+        ! type_vector_dp lacks a scalar multiplication interface,
+        ! so compute via raw data pointer
         raw_data => self%data%get_data()
         raw_data = raw_data * alpha
     end subroutine scale_residual_vector
@@ -285,4 +283,4 @@ contains
         write (unit, '(A)') '---------------------------------'
     end subroutine display_residual_vector
 
-end module system_residual_vector
+end module numerical_system_residual_vector

@@ -125,13 +125,13 @@ contains
             end do
         end associate
 
-        ! --- シミュレーション期間を秒単位に変換 ---
+        ! --- Convert simulation period to seconds ---
         time_unit = TIME_UNITS%to_object(input%conditions%time_control%simulation_period%unit)
 
         simulation_period_second = (input%conditions%time_control%simulation_period%end &
                                     - input%conditions%time_control%simulation_period%start) * time_unit%value
 
-        ! --- 出力インターバルを秒単位に変換 ---
+        ! --- Convert output interval to seconds ---
         if (input%output_settings%field_output%output_interval_step > 0.0d0) then
             time_unit = TIME_UNITS%to_object(input%output_settings%field_output%output_interval_unit)
 

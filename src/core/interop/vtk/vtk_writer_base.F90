@@ -1,4 +1,4 @@
-module core_vtk_vtk_writer_base
+module core_interop_vtk_writer_base
     use, intrinsic :: iso_c_binding
     implicit none
     private
@@ -82,4 +82,4 @@ module core_vtk_vtk_writer_base
         end subroutine finalize_vtk_writer_interface
     end interface
 
-end module core_vtk_vtk_writer_base
+end module core_interop_vtk_writer_base

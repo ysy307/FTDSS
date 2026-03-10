@@ -87,7 +87,6 @@ contains
         integer(int32), intent(inout) :: num_elements
         integer(int32), pointer, contiguous, intent(inout) :: elements(:)
 
-        ! 範囲チェック
         if (.not. value_in_range(color_id, 1, self%num_colors)) then
             num_elements = 0
             nullify (elements)

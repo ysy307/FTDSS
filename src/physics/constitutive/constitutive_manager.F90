@@ -1,8 +1,8 @@
-module constitutive_manager
+module physics_constitutive_manager
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core
-    use :: constitutive_base, only:type_iapws_wrapper
+    use :: physics_constitutive_base, only:type_iapws_wrapper
     use :: constitutive_materials_manager, only:type_material_manager
     use :: constitutive_models_manager, only:type_models_manager
     implicit none
@@ -445,4 +445,4 @@ contains
         call self%models(self%materials_id_map(material_id))%calc_KvT(state, KvT)
     end subroutine calc_KvT
 
-end module constitutive_manager
+end module physics_constitutive_manager

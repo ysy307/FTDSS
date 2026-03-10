@@ -1,7 +1,7 @@
 !>
 !> Implements the procedures for the Coordinate (COO) sparse matrix type.
 !>
-submodule(types_algebra_matrix) algebra_matrix_coo
+submodule(core_types_algebra_matrix) algebra_matrix_coo
     implicit none
 
 contains

@@ -143,7 +143,7 @@ contains
 
     subroutine run_test_solver_coo()
         implicit none
-        type(type_matrix_coo) :: A ! 変更: COO形式
+        type(type_matrix_coo) :: A ! COO format
         type(type_vector_dp) :: b, x
 
         class(abst_solver), allocatable :: solver
@@ -159,9 +159,9 @@ contains
         type(type_solver_settings) :: matrix_info
         type(type_preconditioner_settings) :: pc_info
 
-        ! COO初期化用の作業配列
-        ! row_idx: 行インデックス (サイズ nnz)
-        ! col_idx: 列インデックス (サイズ nnz)
+        ! Work arrays for COO initialization
+        ! row_idx: row indices (size nnz)
+        ! col_idx: column indices (size nnz)
         integer(int32), allocatable :: row_idx(:), col_idx(:)
         integer(int32) :: nnz_est, k
 
@@ -191,29 +191,29 @@ contains
                         return
                     end if
 
-                    ! --- 疎行列パターンの構築 (COO形式) ---
-                    ! 1次元ポアソン(3重対角)なので非ゼロ要素数は概ね 3*N - 2
+                    ! --- Build sparsity pattern (COO format) ---
+                    ! 1D Poisson (tridiagonal): nnz ~ 3*N - 2
                     nnz_est = 3 * n - 2
 
-                    ! COOでは row_idx も col_idx も nnz サイズが必要です
+                    ! COO requires both row_idx and col_idx of size nnz
                     call allocate_array(row_idx, nnz_est)
                     call allocate_array(col_idx, nnz_est)
 
                     k = 1
                     do i = 1, n
-                        ! 1. 左隣 (i, i-1) : 列番号小
+                        ! 1. Lower neighbor (i, i-1)
                         if (i > 1) then
-                            row_idx(k) = i ! 行番号
-                            col_idx(k) = i - 1 ! 列番号
+                            row_idx(k) = i
+                            col_idx(k) = i - 1
                             k = k + 1
                         end if
 
-                        ! 2. 対角成分 (i, i)
+                        ! 2. Diagonal (i, i)
                         row_idx(k) = i
                         col_idx(k) = i
                         k = k + 1
 
-                        ! 3. 右隣 (i, i+1) : 列番号大
+                        ! 3. Upper neighbor (i, i+1)
                         if (i < n) then
                             row_idx(k) = i
                             col_idx(k) = i + 1
@@ -221,11 +221,10 @@ contains
                         end if
                     end do
 
-                    ! パターン情報を渡してCOO行列を初期化
-                    ! 引数: (num_nodes, row_ind, col_ind)
+                    ! Initialize COO matrix with sparsity pattern
                     call A%initialize(n, row_idx, col_idx)
 
-                    ! 作業配列の解放
+                    ! Free work arrays
                     call deallocate_array(row_idx)
                     call deallocate_array(col_idx)
                     ! ----------------------------------------------
@@ -276,7 +275,7 @@ contains
 
     subroutine run_test_solver_csr()
         implicit none
-        type(type_matrix_csr) :: A ! 変更: Dense -> CSR
+        type(type_matrix_csr) :: A ! CSR format
         type(type_vector_dp) :: b, x
 
         class(abst_solver), allocatable :: solver
@@ -292,7 +291,7 @@ contains
         type(type_solver_settings) :: matrix_info
         type(type_preconditioner_settings) :: pc_info
 
-        ! CSR初期化用の作業配列
+        ! Work arrays for CSR initialization
         integer(int32), allocatable :: row_ptr(:), col_idx(:)
         integer(int32) :: nnz_est, k
 
@@ -322,11 +321,11 @@ contains
                         return
                     end if
 
-                    ! --- 疎行列パターンの構築 (ここが追加・変更点) ---
-                    ! 1次元ポアソン(3重対角)なので非ゼロ要素数は概ね 3*N
+                    ! --- Build sparsity pattern (CSR format) ---
+                    ! 1D Poisson (tridiagonal): nnz ~ 3*N
                     nnz_est = 3 * n - 2
 
-                    ! 配列の確保 (row_idx ではなく row_ptr を使います)
+                    ! Allocate arrays (using row_ptr instead of row_idx)
                     call allocate_array(row_ptr, n + 1)
                     call allocate_array(col_idx, nnz_est)
 
@@ -334,29 +333,29 @@ contains
                     k = 1
 
                     do i = 1, n
-                        ! 1. 左隣 (i, i-1) : 列番号小
+                        ! 1. Lower neighbor (i, i-1)
                         if (i > 1) then
                             col_idx(k) = i - 1
                             k = k + 1
                         end if
 
-                        ! 2. 対角成分 (i, i)
+                        ! 2. Diagonal (i, i)
                         col_idx(k) = i
                         k = k + 1
 
-                        ! 3. 右隣 (i, i+1) : 列番号大
+                        ! 3. Upper neighbor (i, i+1)
                         if (i < n) then
                             col_idx(k) = i + 1
                             k = k + 1
                         end if
 
-                        ! 次の行の開始位置 = 現在のカウンタ値
+                        ! Next row starts at current counter value
                         row_ptr(i + 1) = k
                     end do
-                    ! パターン情報を渡してCSR行列を初期化
+                    ! Initialize CSR matrix with sparsity pattern
                     call A%initialize(n, row_ptr, col_idx)
 
-                    ! 作業配列の解放
+                    ! Free work arrays
                     call deallocate_array(row_ptr)
                     call deallocate_array(col_idx)
                     ! ----------------------------------------------
@@ -369,10 +368,10 @@ contains
                     call allocate_array(x_exact, n)
 
                     ! Set up the matrix A (1D Poisson problem)
-                    h = 1.0d0 / dble(n + 1) ! hの計算が抜けていたため補足(Dense版のコンテキストによります)
+                    h = 1.0d0 / dble(n + 1)
 
                     do i = 1, n
-                        ! 構造は定義済みなので、値のセットはDenseと同様に行えます
+                        ! Structure is already defined; set values same as Dense
                         call A%set(OP_ADD, i, i, 2.0d0)
                         if (i > 1) call A%set(OP_ADD, i, i - 1, -1.0d0)
                         if (i < n) call A%set(OP_ADD, i, i + 1, -1.0d0)
@@ -408,15 +407,15 @@ contains
 
     subroutine run_test_solver_bsr()
         implicit none
-        type(type_matrix_bsr) :: A ! BSR形式
+        type(type_matrix_bsr) :: A ! BSR format
         type(type_vector_dp) :: b, x
 
         class(abst_solver), allocatable :: solver
         integer(int32) :: ierr
 
-        integer(int32) :: n ! 節点数
-        integer(int32) :: n_dof ! 全自由度数 (n * nb)
-        integer(int32) :: nb ! ブロックサイズ
+        integer(int32) :: n ! Number of nodes
+        integer(int32) :: n_dof ! Total DOFs (n * nb)
+        integer(int32) :: nb ! Block size
         real(real64) :: h
         real(real64), allocatable :: x_exact(:)
         integer(int32) :: i, is, ip, im, k
@@ -427,11 +426,11 @@ contains
         type(type_solver_settings) :: matrix_info
         type(type_preconditioner_settings) :: pc_info
 
-        ! BSRパターン構築用 (CSRと同一構造: row_ptr, col_idx)
+        ! Work arrays for BSR pattern (same structure as CSR: row_ptr, col_idx)
         integer(int32), allocatable :: row_ptr(:), col_idx(:)
         integer(int32) :: nnz_blocks_est
 
-        ! ブロックサイズ設定 (例: 2変数問題)
+        ! Block size (e.g., 2-variable problem)
         nb = 2
 
         do is = 1, num_solvers
@@ -444,7 +443,7 @@ contains
                         " with pc: ", trim(pc_name_lists(ip)), &
                         " (Nodes: ", n, ", BlockSize: ", nb, ")"
 
-                    ! ソルバーには全自由度数(n_dof)を渡す
+                    ! Pass total DOF count (n_dof) to solver
                     select case (solver_id_lists(is))
                     case (SOLVER_BICGSTAB)
                         call matrix_info%set(solver_id_lists(is), n_dof, tolerance, max_iterations)
@@ -463,8 +462,8 @@ contains
                     call create_solver(solver, matrix_info, pc_info, ierr)
                     if (ierr /= SOLVER_STATUS_SUCCESS) return
 
-                    ! --- 疎行列パターンの構築 (CSRと完全に同一のロジック) ---
-                    ! ブロック単位での接続関係を定義します
+                    ! --- Build sparsity pattern (same logic as CSR) ---
+                    ! Define block-level connectivity
                     nnz_blocks_est = 3 * n - 2
                     call allocate_array(row_ptr, n + 1)
                     call allocate_array(col_idx, nnz_blocks_est)
@@ -473,17 +472,17 @@ contains
                     k = 1
 
                     do i = 1, n
-                        ! 1. 左隣ブロック (i, i-1)
+                        ! 1. Left neighbor block (i, i-1)
                         if (i > 1) then
                             col_idx(k) = i - 1
                             k = k + 1
                         end if
 
-                        ! 2. 対角ブロック (i, i)
+                        ! 2. Diagonal block (i, i)
                         col_idx(k) = i
                         k = k + 1
 
-                        ! 3. 右隣ブロック (i, i+1)
+                        ! 3. Right neighbor block (i, i+1)
                         if (i < n) then
                             col_idx(k) = i + 1
                             k = k + 1
@@ -492,9 +491,9 @@ contains
                         row_ptr(i + 1) = k
                     end do
 
-                    ! BSR行列の初期化
-                    ! 引数: (num_nodes, row_ptr, col_idx, row_block_size, col_block_size)
-                    ! 内部で val(:, :, :) が確保されます
+                    ! Initialize BSR matrix
+                    ! Args: (num_nodes, row_ptr, col_idx, row_block_size, col_block_size)
+                    ! Internally allocates val(:, :, :)
                     call A%initialize(n, row_ptr, col_idx, nb, nb)
 
                     call deallocate_array(row_ptr)
@@ -510,36 +509,36 @@ contains
 
                     h = 1.0d0 / dble(n + 1)
 
-                    ! 行列とベクトルのアセンブル
+                    ! Assemble matrix and vectors
                     do i = 1, n
-                        ! --- ブロック行列への値設定 ---
+                        ! --- Set block matrix values ---
                         ! set_value_block(op, node_row, node_col, local_row, local_col, val)
 
-                        ! 対角ブロック (i, i) -> [[2, 0], [0, 2]]
+                        ! Diagonal block (i, i) -> [[2, 0], [0, 2]]
                         call A%set_value_block(OP_ADD, i, i, 1, 1, 2.0d0)
                         call A%set_value_block(OP_ADD, i, i, 2, 2, 2.0d0)
 
-                        ! 左隣ブロック (i, i-1) -> [[-1, 0], [0, -1]]
+                        ! Left neighbor block (i, i-1) -> [[-1, 0], [0, -1]]
                         if (i > 1) then
                             call A%set_value_block(OP_ADD, i, i - 1, 1, 1, -1.0d0)
                             call A%set_value_block(OP_ADD, i, i - 1, 2, 2, -1.0d0)
                         end if
 
-                        ! 右隣ブロック (i, i+1) -> [[-1, 0], [0, -1]]
+                        ! Right neighbor block (i, i+1) -> [[-1, 0], [0, -1]]
                         if (i < n) then
                             call A%set_value_block(OP_ADD, i, i + 1, 1, 1, -1.0d0)
                             call A%set_value_block(OP_ADD, i, i + 1, 2, 2, -1.0d0)
                         end if
 
-                        ! --- ベクトル設定 (グローバルインデックス計算) ---
+                        ! --- Vector setup (compute global indices) ---
                         xi = dble(i) * h
 
-                        ! 1変数目 (u): -u'' = h^2
+                        ! Variable 1 (u): -u'' = h^2
                         idx = (i - 1) * nb + 1
                         call b%set(OP_INS, idx, h * h)
                         x_exact(idx) = 0.5d0 * xi * (1.0d0 - xi)
 
-                        ! 2変数目 (v): -v'' = 2h^2
+                        ! Variable 2 (v): -v'' = 2h^2
                         idx = (i - 1) * nb + 2
                         call b%set(OP_INS, idx, 2.0d0 * h * h)
                         x_exact(idx) = 1.0d0 * xi * (1.0d0 - xi)

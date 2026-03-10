@@ -2,7 +2,7 @@
 !> Implements the procedures for a Degree-of-Freedom (DOF) based Compressed
 !> Row Storage (bsr) sparse matrix.
 !>
-submodule(types_algebra_matrix) algebra_matrix_bsr
+submodule(core_types_algebra_matrix) algebra_matrix_bsr
     implicit none
 
 contains

@@ -104,7 +104,7 @@ module materials_density
     end interface
 
     ! ------------------------------------------------------------------------------
-    ! 密度計算のための関数インターフェース
+    ! Function interfaces for density calculation
     ! ------------------------------------------------------------------------------
     interface
         module subroutine calc_den_2(density_soil, phi_soil, &

@@ -1,5 +1,5 @@
 module core_types_vector
-    use :: types_algebra_vector
+    use :: core_types_algebra_vector
     implicit none
     private
 

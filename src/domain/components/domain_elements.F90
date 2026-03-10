@@ -1,4 +1,4 @@
-module components_domain_elements
+module domain_components_elements
     use, intrinsic :: iso_fortran_env
     use :: stdlib_optval, only:optval
     use :: module_core
@@ -66,7 +66,7 @@ contains
         call allocate_array(self%fe_types, source=config_elements%fe_types)
         call allocate_array(self%fe_material_ids, source=config_elements%fe_material_ids)
 
-        ! 【追加】接続情報 (connectivity) のコピーが抜けていたため追加
+        ! Copy connectivity data
         if (allocated(config_elements%connectivity%row_ptr) .and. &
             allocated(config_elements%connectivity%col_ind)) then
             call self%connectivity%initialize(size(config_elements%connectivity%row_ptr), &
@@ -151,4 +151,4 @@ contains
         write (unit, '(A)')
     end subroutine display_elements_manager
 
-end module components_domain_elements
+end module domain_components_elements

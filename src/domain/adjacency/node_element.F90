@@ -36,6 +36,7 @@ contains
     !> Builds the node-to-element map by transposing the element connectivity.
     !>
     subroutine initialize(self, num_nodes, num_elements, conn_ind, conn_val)
+        implicit none
         class(type_map_node_to_element), intent(inout) :: self
         integer(int32), intent(in) :: num_nodes
         integer(int32), intent(in) :: num_elements
@@ -133,6 +134,7 @@ contains
     !> Deallocates memory.
     !>
     subroutine destroy(self)
+        implicit none
         class(type_map_node_to_element), intent(inout) :: self
         if (allocated(self%ptr)) deallocate (self%ptr)
         if (allocated(self%ind)) deallocate (self%ind)

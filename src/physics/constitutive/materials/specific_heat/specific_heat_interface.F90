@@ -14,7 +14,7 @@ module materials_specific_heat
     public :: type_sph_3phase
     public :: type_sph_4phase
 
-    ! --- ポリモーフィックなコンテナ ---
+    ! --- Polymorphic container ---
     type :: holder_sphs
         class(abst_sph), allocatable :: p
     contains

@@ -2,27 +2,25 @@ module types_config_conditions_boundary
     use, intrinsic :: iso_fortran_env
     use :: core_memory, only:allocate_array, deallocate_array
     use :: core_constants, only:type_constant_id
-    use :: types_config_base, only:abst_config
-    use :: types_utils_datetime, only:type_datetime
+    use :: core_types_config_base, only:abst_config
+    use :: core_types_utils_datetime, only:type_datetime
     implicit none
     private
 
     public :: type_config_bc
 
     type, extends(abst_config) :: type_config_bc
-        !> 対象とする境界のID
+        !> Target boundary ID
         integer(int32) :: boundary_id = -1
-        !> 対象とする現象の種類
-        !> 熱移動，水分移動など
+        !> Physics type (e.g. heat transfer, moisture transfer)
         type(type_constant_id) :: physics_type = type_constant_id("", "", -1)
-        !> 境界条件の種類
-        !> ディリクレ，ノイマンなど
+        !> Boundary condition type (e.g. Dirichlet, Neumann)
         type(type_constant_id) :: bc_kind = type_constant_id("", "", -1)
         type(type_constant_id) :: bc_data_kind = type_constant_id("", "", -1)
 
         type(type_datetime), allocatable :: datetime_points(:)
         real(real64), allocatable :: time_points(:)
-        real(real64), allocatable :: values(:, :) ! (成分, 時間)
+        real(real64), allocatable :: values(:, :) ! (component, time)
 
         integer(int32) :: num_time_points = 0
         integer(int32) :: num_variables = 0

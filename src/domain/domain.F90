@@ -20,14 +20,14 @@ module module_domain
     use :: domain_multicoloring, only: &
         type_coloring
 
-    use :: components_domain_boundaries, only: &
+    use :: domain_components_boundaries, only: &
         type_boundaries_manager, &
         type_boundary_patch
-    use :: components_domain_elements, only: &
+    use :: domain_components_elements, only: &
         type_elements_manager
-    use :: components_domain_nodes, only: &
+    use :: domain_components_nodes, only: &
         type_nodes_manager
-    use :: domain_manager, only: &
+    use :: domain_domain_manager, only: &
         type_domain
 
     implicit none

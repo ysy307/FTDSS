@@ -1,4 +1,4 @@
-submodule(core_vtk) core_vtk_vtu_initialize
+submodule(core_interop_vtk) core_vtk_vtu_initialize
     implicit none
 contains
     module subroutine type_vtk_vtu_initialize(self, file_name, global_node_id_key, node_type_key, num_sharing_ranks_key, &
@@ -17,7 +17,7 @@ contains
         character(*), intent(in), optional :: color_key
         character(*), intent(in), optional :: point_field_names(:)
 
-        ! --- ローカル変数 ---
+        ! --- Local variables ---
         character(len=256) :: c_file_name
         character(len=256) :: c_array_name
         integer(c_int) :: ierr
@@ -27,7 +27,7 @@ contains
         integer(int64) :: total_conn_size
         integer(int32) :: connectivity_first, connectivity_last, num_nodes_in_cell
 
-        ! --- 生データ格納用の一時配列 ---
+        ! --- Temporary arrays for raw data storage ---
         integer(int64), allocatable :: raw_connectivity(:)
         integer(int64), allocatable :: raw_offsets(:)
         integer(int32), allocatable :: raw_cell_types(:)
@@ -43,7 +43,7 @@ contains
         integer(int32), allocatable :: raw_colors(:)
 
         !----------------------------------------------------------------!
-        ! 1. C++リーダーの初期化とハンドルの取得
+        ! 1. Initialize C++ reader and obtain handle
         !----------------------------------------------------------------!
         self%reader_type = "vtu"
         if (c_associated(self%handle)) then
@@ -63,7 +63,7 @@ contains
         end if
 
         !----------------------------------------------------------------!
-        ! 2. ヘッダー情報の取得
+        ! 2. Read header information
         !----------------------------------------------------------------!
         len_f_dataset = 50
         len_f_format = 50
@@ -74,7 +74,7 @@ contains
         self%dataset = strip(f_dataset)
 
         !----------------------------------------------------------------!
-        ! 3. ポイントデータの取得
+        ! 3. Retrieve point data
         !----------------------------------------------------------------!
         call vtu_get_num_points(self%handle, self%num_points)
         if (self%num_points > 0) then
@@ -130,7 +130,7 @@ contains
         end if
 
         !----------------------------------------------------------------!
-        ! 4. セルデータの取得
+        ! 4. Retrieve cell data
         !----------------------------------------------------------------!
         call vtu_get_num_cells(self%handle, self%num_total_cells)
         if (self%num_total_cells > 0) then
@@ -190,7 +190,7 @@ contains
         call MPI_Allreduce(self%num_total_cells, self%global_num_total_cells, 1, MPI_INTEGER4, MPI_SUM, MPI_COMM_WORLD, ierr)
 
         !----------------------------------------------------------------!
-        ! 6. 後処理: 一時配列を解放し、メモリリークを防止
+        ! 6. Cleanup: deallocate temporary arrays to prevent memory leaks
         !----------------------------------------------------------------!
         call deallocate_array(raw_connectivity)
         call deallocate_array(raw_offsets)

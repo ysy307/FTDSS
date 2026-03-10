@@ -11,10 +11,10 @@ module control_scheduler
 
     type :: type_scheduler_manager
         logical, private :: active = .false.
-        real(real64), private :: interval_seconds = 0.0d0 ! 常に[秒]で保持
-        real(real64), private :: next_output_seconds = 0.0d0 ! 常に[秒]で保持
+        real(real64), private :: interval_seconds = 0.0d0 ! Always stored in seconds
+        real(real64), private :: next_output_seconds = 0.0d0 ! Always stored in seconds
         integer(int32), private :: current_step = 0
-        type(type_constant_value), private :: output_time_unit ! 出力時の変換用
+        type(type_constant_value), private :: output_time_unit ! For output time conversion
     contains
         procedure, pass(self), public :: initialize => initialize_manager
         procedure, pass(self), public :: is_output_triggered => check_output_timing
@@ -43,20 +43,20 @@ contains
 
         self%active = .true.
 
-        ! 1. 間隔を「秒」に変換して保存
+        ! 1. Convert interval to seconds and store
         self%interval_seconds = config%interval_val * config%interval_unit%value
 
-        ! 2. 出力単位オブジェクトを保存
+        ! 2. Store output unit object
         self%output_time_unit = config%output_unit
 
-        ! 3. 次回出力時刻を「秒」で設定
+        ! 3. Set next output time in seconds
         self%next_output_seconds = current_time_seconds
 
         self%current_step = 0
     end subroutine initialize_manager
 
     ! ----------------------------------------------------------------------
-    ! 判定: 引数のcurrent_time(秒)と比較．
+    ! Check: compare current_time (seconds) against scheduled output time
     ! ----------------------------------------------------------------------
     pure function check_output_timing(self, current_time_seconds) result(is_ready)
         implicit none
@@ -78,7 +78,7 @@ contains
     end function check_output_timing
 
     ! ----------------------------------------------------------------------
-    ! 更新: 次回時刻(秒)を進める
+    ! Update: advance next output time (seconds)
     ! ----------------------------------------------------------------------
     subroutine update_state(self, current_time_seconds)
         implicit none
@@ -121,7 +121,7 @@ contains
         step = self%current_step
     end subroutine get_step
 
-    !> 出力が有効かどうかを判定する
+    !> Check whether output is active
     pure function is_active_scheduler_manager(self) result(is_active)
         implicit none
         class(type_scheduler_manager), intent(in) :: self
@@ -130,7 +130,7 @@ contains
         is_active = self%active
     end function is_active_scheduler_manager
 
-    !> 次回の出力予定時刻（秒）を取得する
+    !> Get the next scheduled output time (seconds)
     pure function get_next_time(self) result(next_output_seconds)
         implicit none
         class(type_scheduler_manager), intent(in) :: self
@@ -139,7 +139,7 @@ contains
         next_output_seconds = self%next_output_seconds
     end function get_next_time
 
-    !> 現在時刻に基づき，次に同期すべきターゲット時刻を返す
+    !> Return the next target time to synchronize with, based on current time
     subroutine get_next_target_time(self, current_time, target_time)
         implicit none
         class(type_scheduler_manager), intent(in) :: self
@@ -149,12 +149,12 @@ contains
         real(real64), parameter :: tolerance = 1.0d-9
 
         if (.not. self%active) then
-            target_time = 1.0d+30 ! 無効なら十分遠い未来
+            target_time = 1.0d+30 ! If inactive, return far-future time
             return
         end if
 
-        ! もし現在時刻がすでに出力予定時刻に達している（または過ぎている）なら，
-        ! その「次の間隔」をターゲットとする
+        ! If current time has already reached (or passed) the scheduled output time,
+        ! use the next interval as target
         if (current_time >= self%next_output_seconds - tolerance) then
             target_time = self%next_output_seconds + self%interval_seconds
         else

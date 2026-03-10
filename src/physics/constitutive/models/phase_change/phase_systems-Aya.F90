@@ -100,34 +100,34 @@ contains
             call self%fusion%calc_water_content(state, raw_water_content)
             call self%fusion%calc_water_content_derivatives(state, dQw_dP, dQw_dT)
 
-            ! --- Water upper-bound check (Water Cap) ---
+            ! --- 水の物理的上限チェック (Water Cap) ---
             if (raw_water_content + ice_content > porosity) then
-                ! Oversaturated: water fills remaining pore space after ice
+                ! [過飽和] 氷以外の残りの空隙を水が埋める
                 water_content = max(0.0d0, porosity - ice_content)
 
-                ! Water content depends on (Porosity - Ice), so derivative is opposite sign of ice
+                ! 水分量は (Porosity - Ice) に従属するため、微分は氷の逆符号になる
                 dQw_dP = -1.0d0 * dQi_dP
                 dQw_dT = -1.0d0 * dQi_dT
 
-                ! No gas phase
+                ! 気相は無し
                 air_content = 0.0d0
                 dQa_dP = 0.0d0
                 dQa_dT = 0.0d0
             else
-                ! Unsaturated: use computed values
+                ! [不飽和] 計算値通り
                 water_content = raw_water_content
-                ! Use computed derivatives (dQw_dP, dQw_dT) as-is
+                ! 微分係数はそのまま使用 (dQw_dP, dQw_dT)
 
-                ! Gas phase = porosity - water - ice
+                ! 気相 = 空隙 - 水 - 氷
                 air_content = porosity - water_content - ice_content
 
-                ! Gas phase derivatives (from conservation)
+                ! 気相の微分 (保存則より)
                 dQa_dP = -1.0d0 * (dQw_dP + dQi_dP)
                 dQa_dT = -1.0d0 * (dQw_dT + dQi_dT)
             end if
         end if
 
-        ! 4. Set values (consistency ensured)
+        ! 4. 値のセット（整合性確保済み）
         call state%ice_content%set(ice_content)
         call state%dQi_dP%set(dQi_dP)
         call state%dQi_dT%set(dQi_dT)
@@ -140,14 +140,13 @@ contains
         call state%dQa_dP%set(dQa_dP)
         call state%dQa_dT%set(dQa_dT)
 
-        ! 5. Update vapor content (theta_v)
-        !    Note: If the model depends on gas-phase volume, the logic for
-        !    vapor=0 when air_content=0 should be handled inside evap,
-        !    but here we call it independently.
+        ! 5. 蒸気量 (theta_v) の更新
+        !    ※ 蒸気は気相体積に依存するモデルの場合、air_content=0なら蒸気も0になるロジックが
+        !       evap内部に含まれている必要がありますが、ここでは独立として呼び出します。
         call self%evap%calc_vapor_content(state, vapor_content)
         call self%evap%calc_vapor_content_derivatives(state, dQv_dP, dQv_dT)
 
-        ! Guard: if air_content is zero, vapor cannot physically exist
+        ! air_contentが0なら物理的に蒸気も存在できないため、ここでガードしても良い
         if (air_content <= epsilon(0.0d0)) then
             vapor_content = 0.0d0
             dQv_dP = 0.0d0

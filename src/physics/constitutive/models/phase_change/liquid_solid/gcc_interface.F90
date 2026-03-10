@@ -17,7 +17,7 @@ module models_phase_change_gcc
         Tf0 => water_freezing_point_at_standard_atmospheric_pressure, &
         Tf0_K => water_freezing_point_at_standard_atmospheric_pressure_k
 
-    use :: constitutive_base, only:abst_constitutive
+    use :: physics_constitutive_base, only:abst_constitutive
     implicit none
     private
 

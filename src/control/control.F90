@@ -1,5 +1,5 @@
 module module_control
-    use :: core_control_manager, only:type_control
+    use :: control_control_manager, only:type_control
     implicit none
     private
 

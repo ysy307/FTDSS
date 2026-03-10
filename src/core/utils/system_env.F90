@@ -1,4 +1,4 @@
-module core_system_env
+module core_utils_system_env
 #ifdef _MPI
     use :: mpi_f08
 #endif
@@ -62,4 +62,4 @@ contains
 
     end subroutine get_env_string
 
-end module core_system_env
+end module core_utils_system_env

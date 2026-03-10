@@ -4,7 +4,7 @@ module control_time
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
     use :: stdlib_optval, only:optval
     use :: module_core
-    use :: control_ats, only:type_ats
+    use :: control_time_ats, only:type_ats
 
     implicit none
     private
@@ -118,7 +118,7 @@ contains
 
         self%current_time = self%config%start_time
 
-        ! --- 3. ATS の初期化を追加 ---
+        ! --- 3. Initialize ATS ---
         call self%ats%initialize(config_time_ats)
 
         self%initialized = .true.

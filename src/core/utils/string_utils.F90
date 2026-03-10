@@ -2,7 +2,7 @@
 !> Provides utility functions for string manipulation, such as joining, filtering,
 !> and converting strings to specific types.
 !>
-module core_string_utils
+module core_utils_string_utils
     use, intrinsic :: iso_fortran_env, only: int32
     use :: stdlib_strings, only:strip
     use :: core_constants
@@ -175,4 +175,4 @@ contains
         end if
     end subroutine modify_path_format
 
-end module core_string_utils
+end module core_utils_string_utils

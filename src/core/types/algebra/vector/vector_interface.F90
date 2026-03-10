@@ -1,4 +1,4 @@
-module types_algebra_vector
+module core_types_algebra_vector
     use, intrinsic :: iso_fortran_env
 !$  use :: omp_lib
     use :: stdlib_optval, only:optval
@@ -272,4 +272,4 @@ module types_algebra_vector
 
     end interface
 
-end module types_algebra_vector
+end module core_types_algebra_vector

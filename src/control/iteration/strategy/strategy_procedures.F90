@@ -23,9 +23,9 @@ contains
         type(type_constant_id), intent(in) :: nonlinear_solver_type
         type(type_constant_id), intent(inout) :: compute_solver_type
 
-        ! 初期ステップ周辺の戦略設定:
-        ! 設定(nonlinear_solver_type)がNONEでない場合のみ，Picard法から開始する．
-        ! 設定がNONEの場合は，計算用(compute)もNONEとする．
+        ! Initial step strategy:
+        ! If solver type is not NONE, start with Picard.
+        ! If NONE, set compute solver to NONE as well.
         if (nonlinear_solver_type /= NONLINEAR_SOLVER%NONE) then
             compute_solver_type = NONLINEAR_SOLVER%PICARD
         else
@@ -40,10 +40,10 @@ contains
         logical, intent(in) :: is_converged
         type(type_constant_id), intent(inout) :: compute_solver_type
 
-        ! もしすでに収束しているか，閾値が設定されていない(<=0)なら何もしない
+        ! Skip if already converged or threshold is not set (<=0)
         if (is_converged .or. self%switch_iteration_threshold <= 0) return
 
-        ! Picard法を実行中で，かつ反復回数が閾値を超えたらNewton法に切り替える戦略の例
+        ! Switch from Picard to Newton when iteration count exceeds threshold
         if (compute_solver_type == NONLINEAR_SOLVER%PICARD .and. &
             nonlinear_iter >= self%switch_iteration_threshold) then
             compute_solver_type = NONLINEAR_SOLVER%NEWTON
@@ -60,19 +60,19 @@ contains
         logical, intent(in) :: is_diverged
         logical, intent(inout) :: should_continue
 
-        ! もし発散していれば即座にループを抜ける（将来的な安全装置）
+        ! Exit loop immediately if diverged (safety mechanism)
         if (is_diverged) then
             should_continue = .false.
             return
         end if
 
-        ! 初回ステップ(1回目)は必ず実行（判定前）
+        ! Always execute the first iteration (before convergence check)
         if (nonlinear_iter <= 1) then
             should_continue = .true.
             return
         end if
 
-        ! 収束していない，かつ最大反復回数に達していない場合に継続
+        ! Continue if not converged and max iterations not reached
         should_continue = (.not. is_converged) .and. (nonlinear_iter < max_iterations)
     end subroutine determine_continuation_iteration_strategy
 
@@ -81,10 +81,10 @@ contains
         class(type_iteration_strategy), intent(in) :: self
         real(real64), intent(in) :: current_norm
         real(real64), intent(in) :: previous_norm
-        logical, intent(out) :: is_stagnating
+        logical, intent(inout) :: is_stagnating
 
-        ! 停滞(Stagnation)の簡易的な判定例:
-        ! 前回のノルムと比べてほぼ減衰していない場合
+        ! Simple stagnation check:
+        ! norm has barely decreased compared to previous iteration
         if (current_norm > previous_norm * 0.99d0) then
             is_stagnating = .true.
         else

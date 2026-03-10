@@ -1,9 +1,9 @@
-submodule(solver_preconditioner) solver_preconditioner_jacobi
+submodule(numerical_solver_preconditioner) solver_preconditioner_jacobi
     implicit none
 
 contains
 
-    !> Jacobi 前処理インスタンスを初期化する
+    !> Initialize the Jacobi preconditioner instance.
     module subroutine initialize_preconditioner_jacobi(self, info)
         implicit none
         class(type_preconditioner_jacobi), intent(inout) :: self
@@ -13,8 +13,8 @@ contains
         self%ID = PRECONDITIONER_TYPES%JACOBI%ID
         self%status = SOLVER_STATUS%SUCCESS%ID
 
-        ! 初期化時に設定されたノード数（自由度数）を正とする
-        ! setupルーチンではこの値を変更しない
+        ! Use the node count set at initialization as authoritative.
+        ! The setup routine does not modify this value.
         self%num_nodes = info%num_nodes
 
         if (info%block_size > 1) then
@@ -27,14 +27,13 @@ contains
 
     end subroutine initialize_preconditioner_jacobi
 
-    !> 行列 A に合わせて前処理をセットアップする
+    !> Set up the preconditioner for matrix A.
     module subroutine setup_preconditioner_jacobi(self, A)
         implicit none
         class(type_preconditioner_jacobi), intent(inout) :: self
         class(abst_matrix), intent(in) :: A
 
-        ! サイズ変更ロジックを削除
-        ! Initializeで設定された self%num_nodes を信頼する
+        ! Removed resize logic; trust num_nodes set in initialize
 
         self%status = SOLVER_STATUS%NOT_IMPLEMENTED%ID
 
@@ -66,29 +65,29 @@ contains
 
     end subroutine setup_preconditioner_jacobi
 
-    !> Point Jacobi のセットアップ
+    !> Set up Point Jacobi preconditioner.
     module subroutine setup_preconditioner_jacobi_point(self, A)
         implicit none
         class(type_preconditioner_jacobi), intent(inout) :: self
         class(abst_matrix), intent(in) :: A
 
-        ! 初期化時のサイズでメモリを確保
+        ! Allocate memory using the size set at initialization
         if (self%M_inv%get_size() /= self%num_nodes) then
             call self%M_inv%initialize(self%num_nodes)
         end if
 
         call self%M_inv%zero()
 
-        ! 対角成分を取得
+        ! Extract diagonal entries
         call A%get_diagonal(self%M_inv)
 
-        ! 逆数を計算 (linalg側でゼロ除算回避処理が行われる)
+        ! Compute reciprocals (division-by-zero protection handled in linalg)
         call vector_reciprocal(self%M_inv)
 
         self%status = SOLVER_STATUS%SUCCESS%ID
     end subroutine setup_preconditioner_jacobi_point
 
-    !> Block Jacobi のセットアップ
+    !> Set up Block Jacobi preconditioner.
     module subroutine setup_preconditioner_jacobi_block(self, A)
         implicit none
         class(type_preconditioner_jacobi), intent(inout) :: self
@@ -97,7 +96,7 @@ contains
         integer(int32) :: i, ierr, bs, num_blocks
 
         bs = self%block_size
-        ! ブロック数は num_rows (全自由度) / block_size で計算
+        ! Number of blocks = total DOFs / block_size
         num_blocks = self%num_nodes / bs
 
         select type (A)
@@ -124,7 +123,7 @@ contains
 
     end subroutine setup_preconditioner_jacobi_block
 
-    !> 前処理の適用: z = M^-1 * r
+    !> Apply the preconditioner: z = M^{-1} * r
     module subroutine apply_preconditioner_jacobi(self, r, z)
         implicit none
         class(type_preconditioner_jacobi), intent(inout) :: self
@@ -171,7 +170,7 @@ contains
 
     end subroutine apply_preconditioner_jacobi
 
-    !> メモリの解放
+    !> Deallocate all resources.
     module subroutine destroy_preconditioner_jacobi(self)
         implicit none
         class(type_preconditioner_jacobi), intent(inout) :: self
