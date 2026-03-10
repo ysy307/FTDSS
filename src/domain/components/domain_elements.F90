@@ -106,15 +106,12 @@ contains
         integer(int32), intent(in) :: elem_id
         class(abst_fe), pointer, intent(inout) :: element
 
-        integer(int32) :: type_id
-
         if (.not. value_in_range(elem_id, 1, self%num_fe)) then
             nullify (element)
             return
         end if
 
-        type_id = self%fe_types(elem_id)
-        call self%fe_manager%get_fe(type_id, element)
+        call self%fe_manager%get_fe(elem_id, element)
 
     end subroutine get_fe_elements_manager
 

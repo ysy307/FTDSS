@@ -10,12 +10,16 @@ echo "--- Start VTune Profiling Script ---"
 export FTDSS_PROJECT_PATH="/workspaces/FTDSS/project/1Domain-Square2nd-modified"
 VTUNE_DIR="/workspaces/FTDSS/log/vtune"
 
+# Ensure VTune directory exists (skip chown for mounted volumes)
 if [[ ! -d "$VTUNE_DIR" ]]; then
     mkdir -p "$VTUNE_DIR"
 fi
 
-export TMPDIR="$VTUNE_DIR"
+# Safe temporary directory
+export TMPDIR="${VTUNE_DIR}/tmp"
+mkdir -p "$TMPDIR"
 
+# Allow ptrace for VTune in WSL2/Docker
 if [[ -f /proc/sys/kernel/yama/ptrace_scope ]]; then
     echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope >/dev/null || true
 fi
@@ -38,7 +42,6 @@ echo "Target Result Directory: $RESULT_DIR"
 # =========================
 echo "Running VTune..."
 set +e
-# Execute mpirun inside vtune to preserve environment variables
 vtune -collect hotspots \
     -knob sampling-mode=sw \
     -result-dir "$RESULT_DIR" \
@@ -89,24 +92,24 @@ OUT_MD="${LATEST_DIR}_summary.md"
     echo "Result directory: \`$LATEST_DIR\`"
     echo ""
 
-    if [[ -f "$REPORT" ]]; then
+    if [[ -f "$REPORT" && -s "$REPORT" ]]; then
         echo "## Top Functions"
         echo ""
         tail -n +2 "$REPORT" | head -n 20
         echo ""
     fi
 
-    if [[ -f "$SRC" ]]; then
+    if [[ -f "$SRC" && -s "$SRC" ]]; then
         echo "## Parallel Overhead Indicators"
         echo ""
-        SPIN=$(awk -F, 'NR>1 {sum+=$5} END{print sum}' "$SRC")
-        IMBAL=$(awk -F, 'NR>1 {sum+=$6} END{print sum}' "$SRC")
-        echo "- Total Spin Time: ${SPIN:-0}"
-        echo "- Load Imbalance Spin: ${IMBAL:-0}"
+        SPIN=$(awk -F, 'NR>1 {sum+=$5} END{print sum+0}' "$SRC")
+        IMBAL=$(awk -F, 'NR>1 {sum+=$6} END{print sum+0}' "$SRC")
+        echo "- Total Spin Time: ${SPIN}"
+        echo "- Load Imbalance Spin: ${IMBAL}"
         echo ""
     fi
 
-    if [[ -f "$TOP" ]]; then
+    if [[ -f "$TOP" && -s "$TOP" ]]; then
         echo "## Top-Down Summary"
         echo ""
         head -n 15 "$TOP"
