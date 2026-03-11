@@ -86,7 +86,7 @@ RUN echo 'export PS1="%~ %# "' >> .zshrc && \
     echo "export MPIF77=mpiifx" >> .zshrc && \
     echo "export MPICC=mpiicc" >> .zshrc && \
     echo "export MPICXX=mpiicpc" >> .zshrc && \
-    echo "export PETSC_DIR=/workspaces/FTDSS/third_party/.local" && \
+    echo "export PETSC_DIR=/workspaces/FTCMS/third_party/.local" && \
     echo "ulimit -s unlimited" >> .zshrc && \
     echo '[ -f /etc/profile.d/nvhpc.sh ] && source /etc/profile.d/nvhpc.sh' >> .zprofile && \
     echo '[ -f /etc/profile.d/oneapi.sh ] && source /etc/profile.d/oneapi.sh' >> .zprofile 

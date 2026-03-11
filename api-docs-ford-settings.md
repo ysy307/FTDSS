@@ -1,9 +1,9 @@
 ---
-project: FTDSS
+project: FTCMS
 summary: This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.
 author: Kikuchi Shun
 email: shungiku1012@gmail.com
-project_github: https://github.com/ysy307/FTDSS.git
+project_github: https://github.com/ysy307/FTCMS.git
 src_dir: ./src
 include: ./src
          ./include

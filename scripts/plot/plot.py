@@ -11,10 +11,10 @@ import matplotlib.pyplot as plt
 logging.getLogger('matplotlib.font_manager').setLevel(logging.ERROR)
 
 # Retrieve project path from environment variable
-project_path = os.environ.get("FTDSS_PROJECT_PATH")
+project_path = os.environ.get("FTCMS_PROJECT_PATH")
 
 if not project_path:
-    print("Error: Environment variable 'FTDSS_PROJECT_PATH' is not set.")
+    print("Error: Environment variable 'FTCMS_PROJECT_PATH' is not set.")
     exit(1)
 
 output_dir = os.path.join(project_path, "Output")

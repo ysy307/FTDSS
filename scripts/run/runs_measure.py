@@ -7,8 +7,8 @@ from typing import Tuple
 import traceback
 
 # --- グローバル定数 (基本的に変更不要) ---
-PROJECT_PATH_FILE = Path("/workspaces/FTDSS/ProjectPath.dir")
-EXECUTABLE_PATH = Path("/workspaces/FTDSS/bin/test")
+PROJECT_PATH_FILE = Path("/workspaces/FTCMS/ProjectPath.dir")
+EXECUTABLE_PATH = Path("/workspaces/FTCMS/bin/test")
 # ------------------------------------
 
 def update_json_settings(json_path: Path, num_threads: int, geometry_filename: str) -> Tuple[bool, str]:
@@ -57,9 +57,9 @@ def main():
     # --- ユーザー設定項目 (ここを編集してください) ---
     # ======================================================================
     # 「作業ディレクトリ」のパス。InputとOutputがこの中にある。
-    WORKING_DIR_PATH = "/workspaces/FTDSS/Inout/1Domain-Square2nd"
+    WORKING_DIR_PATH = "/workspaces/FTCMS/Inout/1Domain-Square2nd"
     # 最終的な結果を格納するベースディレクトリのパス
-    RESULTS_BASE_DIR_PATH = "/workspaces/FTDSS/Results/SQ2"
+    RESULTS_BASE_DIR_PATH = "/workspaces/FTCMS/Results/SQ2"
     THREAD_LIST = [16, 32]
     # THREAD_LIST = [1, 2, 4, 8, 16, 32]
     GEOMETRY_COUNT = 1

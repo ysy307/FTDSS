@@ -80,7 +80,7 @@ contains
         write (fmt, '(a,i0,a)') '(a,f', width, '.4,a)'
 
         ! --- Output Header (Markdown) ---
-        write (self%io_unit, '(a)') "# FTDSS System Log"
+        write (self%io_unit, '(a)') "# FTCMS System Log"
         write (self%io_unit, '(a)') ""
 
         ! --- System Information (Markdown List) ---

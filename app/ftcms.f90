@@ -3,7 +3,7 @@ program main
 #ifdef _MPI
     use :: mpi_f08
 #endif
-    use :: module_ftdss
+    use :: module_ftcms
 
     implicit none
 
@@ -16,7 +16,7 @@ program main
 #endif
 
     ! Call test function
-    call run_test_ftdss()
+    call run_test_ftcms()
 
 #ifdef _MPI
     call MPI_Finalize(ierr)
@@ -24,14 +24,14 @@ program main
 
 contains
 
-    subroutine run_test_ftdss()
+    subroutine run_test_ftcms()
         implicit none
-        type(type_ftdss) :: ftdss
+        type(type_ftcms) :: ftcms
 
-        call ftdss%initialize()
-        call ftdss%run()
-        call ftdss%finalize()
+        call ftcms%initialize()
+        call ftcms%run()
+        call ftcms%finalize()
 
-    end subroutine run_test_ftdss
+    end subroutine run_test_ftcms
 
 end program main

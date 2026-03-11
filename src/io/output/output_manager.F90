@@ -51,7 +51,7 @@ contains
         character(:), allocatable :: project_path_env
         character(8) :: output_extentions(3) = [".dat", ".csv", ".log"]
         character(8) :: output_file_extentions(5) = [".dat", ".csv", ".vtk", ".vtu", ".log"]
-        character(*), parameter :: PROJECT_ENV = "FTDSS_PROJECT_PATH"
+        character(*), parameter :: PROJECT_ENV = "FTCMS_PROJECT_PATH"
 
         character(:), allocatable :: dir_output
         character(:), allocatable :: dir_output_field

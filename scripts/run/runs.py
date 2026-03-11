@@ -8,8 +8,8 @@ import traceback
 import zipfile
 
 # --- グローバル定数 (基本的に変更不要) ---
-PROJECT_PATH_FILE = Path("/workspaces/FTDSS/ProjectPath.dir")
-EXECUTABLE_PATH = Path("/workspaces/FTDSS/bin/test")
+PROJECT_PATH_FILE = Path("/workspaces/FTCMS/ProjectPath.dir")
+EXECUTABLE_PATH = Path("/workspaces/FTCMS/bin/test")
 # ------------------------------------
 
 def update_json_settings(json_path: Path, num_threads: int, geometry_filename: str) -> Tuple[bool, str]:
@@ -51,17 +51,17 @@ def archive_results(src_dir: Path, dest_zip: Path, compress_level: int = 9):
 
 def main():
     WORKING_DIR_PATHS = [
-        "/workspaces/FTDSS/project/1Domain-Square1st",
-        "/workspaces/FTDSS/project/1Domain-Square2nd",
-        "/workspaces/FTDSS/project/1Domain-Triangle1st",
-        "/workspaces/FTDSS/project/1Domain-Triangle2nd"
+        "/workspaces/FTCMS/project/1Domain-Square1st",
+        "/workspaces/FTCMS/project/1Domain-Square2nd",
+        "/workspaces/FTCMS/project/1Domain-Triangle1st",
+        "/workspaces/FTCMS/project/1Domain-Triangle2nd"
     ]
 
     RESULTS_BASE_DIR_PATHS = [
-        "/workspaces/FTDSS/Results/SQ1",
-        "/workspaces/FTDSS/Results/SQ2",
-        "/workspaces/FTDSS/Results/TR1",
-        "/workspaces/FTDSS/Results/TR2"
+        "/workspaces/FTCMS/Results/SQ1",
+        "/workspaces/FTCMS/Results/SQ2",
+        "/workspaces/FTCMS/Results/TR1",
+        "/workspaces/FTCMS/Results/TR2"
     ]
     
     start = 1

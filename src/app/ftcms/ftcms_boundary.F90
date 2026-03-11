@@ -1,4 +1,4 @@
-submodule(app_ftdss) ftdss_boundary
+submodule(app_ftcms) ftcms_boundary
     implicit none
 contains
 
@@ -6,9 +6,9 @@ contains
     !> Applies all boundary conditions for active physics.
     !> Order: Prescribe (Step 0) -> Natural (Step 1) -> Essential (Step 2)
     !>
-    module subroutine apply_bc_ftdss(self, prescribed)
+    module subroutine apply_bc_ftcms(self, prescribed)
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
         logical, intent(in), optional :: prescribed
 
         real(real64) :: current_time
@@ -62,14 +62,14 @@ contains
                                                  self%pressure, dof_offset)
         end if
 
-    end subroutine apply_bc_ftdss
+    end subroutine apply_bc_ftcms
 
     !>
     !> Enforces Dirichlet values directly into the solution vector.
     !>
     module subroutine prescribe_essential_bc_generic(self, physics_type, current_time, variable)
         implicit none
-        class(type_ftdss), intent(inout), target :: self
+        class(type_ftcms), intent(inout), target :: self
         type(type_constant_id), intent(in) :: physics_type
         real(real64), intent(in) :: current_time
         type(type_variable), intent(inout) :: variable
@@ -113,7 +113,7 @@ contains
     !>
     module subroutine apply_natural_bc_generic(self, physics_type, current_time, variable, dof_offset)
         implicit none
-        class(type_ftdss), intent(inout), target :: self
+        class(type_ftcms), intent(inout), target :: self
         type(type_constant_id), intent(in) :: physics_type
         real(real64), intent(in) :: current_time
         type(type_variable), intent(in) :: variable
@@ -215,7 +215,7 @@ contains
     !>
     module subroutine apply_essential_bc_generic(self, physics_type, current_time, variable, dof_offset)
         implicit none
-        class(type_ftdss), intent(inout), target :: self
+        class(type_ftcms), intent(inout), target :: self
         type(type_constant_id), intent(in) :: physics_type
         real(real64), intent(in) :: current_time
         type(type_variable), intent(in) :: variable
@@ -273,4 +273,4 @@ contains
         end if
     end subroutine apply_essential_bc_generic
 
-end submodule ftdss_boundary
+end submodule ftcms_boundary

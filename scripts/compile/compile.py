@@ -6,12 +6,14 @@ from pathlib import Path
 from check_log import analyze_log
 
 def run_and_log(cmd, log_file_obj):
-    with subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True) as p:
+    # errors="replace" を追加し、デコードエラーによる強制終了を防止
+    with subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding="utf-8", errors="replace") as p:
         if p.stdout:
             for line in p.stdout:
                 sys.stdout.write(line)
                 sys.stdout.flush()
                 log_file_obj.write(line)
+                log_file_obj.flush()  # ファイルへ即座に書き出す
         p.wait()
     
     if p.returncode != 0:
@@ -58,7 +60,7 @@ def main():
     print(f"--- Build and Analysis Started: {args.target} ({args.compiler}) ---")
     
     success = False
-    with open(log_file, "w", encoding="utf-8") as f:
+    with open(log_file, "w", encoding="utf-8", errors="replace") as f:
         try:
             print("--- Stage 1: Configure ---")
             run_and_log(config_cmd, f)
@@ -70,12 +72,14 @@ def main():
             print(f"\n❌ Build failed (Exit Code: {e.returncode}).")
             success = False
 
-    # withブロックを抜け、ファイルをクローズした後に解析を実行する
     print("\n--- Stage 3: Analyzing Log ---")
-    analyze_log(
-        log_path_str=str(log_file),
-        compiler=args.compiler
-    )
+    try:
+        analyze_log(
+            log_path_str=str(log_file),
+            compiler=args.compiler
+        )
+    except Exception as e:
+        print(f"⚠️ Log analysis failed: {e}")
 
 if __name__ == "__main__":
     main()

@@ -22,7 +22,7 @@ target_link_libraries(${target_name} PRIVATE
     SOLVER::OUTPUT
     SOLVER::CONSTITUTIVE
     SOLVER::GOVERNING
-    SOLVER::FTDSS
+    SOLVER::FTCMS
 )
 
 # CTest登録

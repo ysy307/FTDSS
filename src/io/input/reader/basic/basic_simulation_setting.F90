@@ -16,7 +16,7 @@ contains
         character(256) :: buffer(2) = [character(256) :: simulation_settings, ""]
 
         buffer(2) = title
-        call get_json_value(json, join(buffer), self%simulation_settings%title, default_value="FTDSS Simulation")
+        call get_json_value(json, join(buffer), self%simulation_settings%title, default_value="FTCMS Simulation")
 
         buffer(2) = calculate_type
         call get_json_value(json, join(buffer), self%simulation_settings%calculate_type, &

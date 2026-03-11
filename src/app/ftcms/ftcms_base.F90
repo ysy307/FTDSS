@@ -1,10 +1,10 @@
-submodule(app_ftdss) ftdss_base
+submodule(app_ftcms) ftcms_base
     implicit none
 contains
 
-    module subroutine initialize_type_ftdss(self)
+    module subroutine initialize_type_ftcms(self)
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
 
         type(type_input) :: input
         type(type_ic_manager) :: ic
@@ -165,12 +165,12 @@ contains
         call self%output_history()
 
         ! !
-        ! call global_logger%log_information(message="FTDSS module initialized successfully.")
-    end subroutine initialize_type_ftdss
+        ! call global_logger%log_information(message="FTCMS module initialized successfully.")
+    end subroutine initialize_type_ftcms
 
-    module subroutine output_fields_ftdss(self)
+    module subroutine output_fields_ftcms(self)
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
 
         integer(int32) :: iter
         real(real64) :: current_time
@@ -219,11 +219,11 @@ contains
         end if
 
         call self%control%profiler_stop(PROFILER_TYPES%IO)
-    end subroutine output_fields_ftdss
+    end subroutine output_fields_ftcms
 
-    module subroutine output_history_ftdss(self)
+    module subroutine output_history_ftcms(self)
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
 
         real(real64) :: current_time, current_time_converted
         real(real64), pointer, contiguous, dimension(:) :: temperature
@@ -268,11 +268,11 @@ contains
         end if
 
         call self%control%profiler_stop(PROFILER_TYPES%IO)
-    end subroutine output_history_ftdss
+    end subroutine output_history_ftcms
 
-    module subroutine get_variable_increment_ftdss(self, variable_id, variable)
+    module subroutine get_variable_increment_ftcms(self, variable_id, variable)
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
         type(type_constant_id), intent(in) :: variable_id
         real(real64), intent(inout), allocatable :: variable(:)
 
@@ -313,11 +313,11 @@ contains
 
         nullify (du)
 
-    end subroutine get_variable_increment_ftdss
+    end subroutine get_variable_increment_ftcms
 
-    module subroutine get_variable_residual_ftdss(self, variable_id, variable)
+    module subroutine get_variable_residual_ftcms(self, variable_id, variable)
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
         type(type_constant_id), intent(in) :: variable_id
         real(real64), intent(inout), allocatable :: variable(:)
 
@@ -356,11 +356,11 @@ contains
             call allocate_array(variable, 0)
         end if
 
-    end subroutine get_variable_residual_ftdss
+    end subroutine get_variable_residual_ftcms
 
-    module subroutine set_state_ftdss(self, node_id, element_id, state, calc_physics)
+    module subroutine set_state_ftcms(self, node_id, element_id, state, calc_physics)
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
         integer(int32), intent(in) :: node_id
         integer(int32), intent(in) :: element_id
         type(type_state), intent(inout) :: state
@@ -410,11 +410,11 @@ contains
             call self%update_physical_properties(material_id, state)
         end if
 
-    end subroutine set_state_ftdss
+    end subroutine set_state_ftcms
 
-    module subroutine set_states_from_connectivity_ftdss(self, connectivity, element_id, states, calc_physics)
+    module subroutine set_states_from_connectivity_ftcms(self, connectivity, element_id, states, calc_physics)
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
         integer(int32), intent(in) :: connectivity(:)
         integer(int32), intent(in) :: element_id
         type(type_state), intent(inout) :: states(:)
@@ -436,7 +436,7 @@ contains
         nullify (grad_P_array)
 
         if (size(states) /= size(connectivity)) then
-            error stop 'set_states_from_connectivity_ftdss: size(states) /= size(connectivity)'
+            error stop 'set_states_from_connectivity_ftcms: size(states) /= size(connectivity)'
         end if
 
         do_calc = .true.
@@ -483,12 +483,12 @@ contains
             call self%domain%get_material_id(element_id, material_id)
             call self%update_physical_properties_bulk(material_id, states)
         end if
-    end subroutine set_states_from_connectivity_ftdss
+    end subroutine set_states_from_connectivity_ftcms
 
     ! Update all physical quantities (phase, fluxes) for a given state
-    module subroutine update_physical_properties_ftdss(self, material_id, state)
+    module subroutine update_physical_properties_ftcms(self, material_id, state)
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(inout) :: state
 
@@ -518,11 +518,11 @@ contains
         end if
 
         call state%set(water_flux=water_flux, vapor_flux=vapor_flux)
-    end subroutine update_physical_properties_ftdss
+    end subroutine update_physical_properties_ftcms
 
-    module subroutine update_physical_properties_bulk_ftdss(self, material_id, states)
+    module subroutine update_physical_properties_bulk_ftcms(self, material_id, states)
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(inout) :: states(:)
 
@@ -531,11 +531,11 @@ contains
         do i = 1, size(states)
             call self%update_physical_properties(material_id, states(i))
         end do
-    end subroutine update_physical_properties_bulk_ftdss
+    end subroutine update_physical_properties_bulk_ftcms
 
-    module subroutine shift_ftdss(self)
+    module subroutine shift_ftcms(self)
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
 
         call self%control%profiler_start(PROFILER_TYPES%SETUP)
 
@@ -554,11 +554,11 @@ contains
         call self%Qv%advance()
 
         call self%control%profiler_stop(PROFILER_TYPES%SETUP)
-    end subroutine shift_ftdss
+    end subroutine shift_ftcms
 
-    module subroutine reflect_variables_ftdss(self)
+    module subroutine reflect_variables_ftcms(self)
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
 
         integer(int32) :: iter
         real(real64), pointer, contiguous, dimension(:) :: bdf_coeffs
@@ -669,37 +669,37 @@ contains
 
         call self%control%profiler_stop(PROFILER_TYPES%SETUP)
 
-    end subroutine reflect_variables_ftdss
+    end subroutine reflect_variables_ftcms
 
-    module subroutine reset_ftdss(self)
+    module subroutine reset_ftcms(self)
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
 
         call self%control%reset_iteration()
 
-    end subroutine reset_ftdss
+    end subroutine reset_ftcms
 
-    module function is_active_thermal_ftdss(self) result(is_active)
+    module function is_active_thermal_ftcms(self) result(is_active)
         implicit none
-        class(type_ftdss), intent(in) :: self
+        class(type_ftcms), intent(in) :: self
         logical :: is_active
 
         is_active = self%control%is_physics_active(PHYSICS_TYPES%THERMAL)
 
-    end function is_active_thermal_ftdss
+    end function is_active_thermal_ftcms
 
-    module function is_active_hydraulic_ftdss(self) result(is_active)
+    module function is_active_hydraulic_ftcms(self) result(is_active)
         implicit none
-        class(type_ftdss), intent(in) :: self
+        class(type_ftcms), intent(in) :: self
         logical :: is_active
 
         is_active = self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)
 
-    end function is_active_hydraulic_ftdss
+    end function is_active_hydraulic_ftcms
 
-    module subroutine destroy_type_ftdss(self)
+    module subroutine destroy_type_ftcms(self)
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
 
         integer(int32) :: log_io_unit
 #ifdef _MPI
@@ -718,5 +718,5 @@ contains
         call MPI_Finalize(ierr)
 #endif
 
-    end subroutine destroy_type_ftdss
-end submodule ftdss_base
+    end subroutine destroy_type_ftcms
+end submodule ftcms_base

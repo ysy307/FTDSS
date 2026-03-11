@@ -2,89 +2,89 @@ program test
     use, intrinsic :: iso_fortran_env, only: int32, real64
 !$  use :: omp_lib
     use :: stdlib_logger
-    use :: Main_FTDSS
+    use :: Main_FTCMS
     implicit none
-    type(Type_FTDSS) :: FTDSS
+    type(Type_FTCMS) :: FTCMS
     integer(int32) :: count
     character(256) :: out_char
 
-    call FTDSS%initialize()
+    call FTCMS%initialize()
     if (was_interrupted()) stop
-    call FTDSS%controls%time%profile_start("Setup")
-    call FTDSS%IC%apply("thermal", FTDSS%domain, FTDSS%T)
-    call FTDSS%BC%apply_CRS(boundary_target='thermal', &
+    call FTCMS%controls%time%profile_start("Setup")
+    call FTCMS%IC%apply("thermal", FTCMS%domain, FTCMS%T)
+    call FTCMS%BC%apply_CRS(boundary_target='thermal', &
                             current_time=0.0d0, &
-                            b=FTDSS%T%new, &
-                            Domain=FTDSS%domain, &
+                            b=FTCMS%T%new, &
+                            Domain=FTCMS%domain, &
                             mode=-1)
-    call FTDSS%shift()
-    call FTDSS%thermal%update(FTDSS%domain, FTDSS%property, FTDSS%T%pre, FTDSS%phi%pre, FTDSS%controls)
+    call FTCMS%shift()
+    call FTCMS%thermal%update(FTCMS%domain, FTCMS%property, FTCMS%T%pre, FTCMS%phi%pre, FTCMS%controls)
 
     count = 0
-    call FTDSS%controls%time%profile_stop("Setup")
+    call FTCMS%controls%time%profile_stop("Setup")
 
-    call FTDSS%controls%time%profile_start("IO")
-    call FTDSS%output%output_fields(file_counts=0, &
-                                    domain=FTDSS%domain, &
-                                    porosity=FTDSS%phi%pre, &
-                                    temperature=FTDSS%T%pre, &
-                                    si=FTDSS%thermal%Si%pre)
-    call FTDSS%output%output_history(time=0.0d0, &
-                                     temperature=FTDSS%T%pre, &
-                                     porosity=FTDSS%phi%pre, &
-                                     Propeties=FTDSS%Property, &
-                                     Domain=FTDSS%domain)
-    call FTDSS%controls%time%profile_stop("IO")
+    call FTCMS%controls%time%profile_start("IO")
+    call FTCMS%output%output_fields(file_counts=0, &
+                                    domain=FTCMS%domain, &
+                                    porosity=FTCMS%phi%pre, &
+                                    temperature=FTCMS%T%pre, &
+                                    si=FTCMS%thermal%Si%pre)
+    call FTCMS%output%output_history(time=0.0d0, &
+                                     temperature=FTCMS%T%pre, &
+                                     porosity=FTCMS%phi%pre, &
+                                     Propeties=FTCMS%Property, &
+                                     Domain=FTCMS%domain)
+    call FTCMS%controls%time%profile_stop("IO")
 
     ! stop
 
-    call FTDSS%controls%iteration%reset_timestep()
+    call FTCMS%controls%iteration%reset_timestep()
     call global_logger%log_information(message="Starting time loop")
-    TIME_LOOP: do while (FTDSS%controls%time%time < FTDSS%controls%time%end_time)
+    TIME_LOOP: do while (FTCMS%controls%time%time < FTCMS%controls%time%end_time)
         ! exit TIME_LOOP
-        call FTDSS%controls%time%shift()
-        call FTDSS%controls%iteration%increment_iter()
-        call FTDSS%controls%iteration%reset_step()
-        call FTDSS%thermal%compute(FTDSS%domain, FTDSS%Property, FTDSS%T, FTDSS%phi, &
-                                   FTDSS%controls, FTDSS%BC)
+        call FTCMS%controls%time%shift()
+        call FTCMS%controls%iteration%increment_iter()
+        call FTCMS%controls%iteration%reset_step()
+        call FTCMS%thermal%compute(FTCMS%domain, FTCMS%Property, FTCMS%T, FTCMS%phi, &
+                                   FTCMS%controls, FTCMS%BC)
 
-        call FTDSS%controls%time%profile_start("Setup")
-        call FTDSS%thermal%update(FTDSS%domain, FTDSS%property, FTDSS%T%pre, FTDSS%phi%pre, FTDSS%controls)
-        call FTDSS%controls%time%profile_stop("Setup")
+        call FTCMS%controls%time%profile_start("Setup")
+        call FTCMS%thermal%update(FTCMS%domain, FTCMS%property, FTCMS%T%pre, FTCMS%phi%pre, FTCMS%controls)
+        call FTCMS%controls%time%profile_stop("Setup")
 
         write (out_char, "(A, F10.6, A, I4, A, I3)") &
-            'Time: ', FTDSS%controls%time%get_time(), &
-            ' Iter: ', FTDSS%controls%iteration%get_iter(), &
-            ' Step: ', FTDSS%controls%iteration%get_step()
+            'Time: ', FTCMS%controls%time%get_time(), &
+            ' Iter: ', FTCMS%controls%iteration%get_iter(), &
+            ' Step: ', FTCMS%controls%iteration%get_step()
 
         call global_logger%log_information(message=trim(out_char))
 
-        call FTDSS%controls%time%profile_start("IO")
-        call FTDSS%output%output_history(time=FTDSS%controls%time%get_time(), &
-                                         temperature=FTDSS%T%pre, &
-                                         porosity=FTDSS%phi%pre, &
-                                         Propeties=FTDSS%Property, &
-                                         Domain=FTDSS%domain)
-        ! print *, mod(FTDSS%controls%iteration%step, 100)
-        if (mod(FTDSS%controls%iteration%get_iter(), 10) == 0) then
+        call FTCMS%controls%time%profile_start("IO")
+        call FTCMS%output%output_history(time=FTCMS%controls%time%get_time(), &
+                                         temperature=FTCMS%T%pre, &
+                                         porosity=FTCMS%phi%pre, &
+                                         Propeties=FTCMS%Property, &
+                                         Domain=FTCMS%domain)
+        ! print *, mod(FTCMS%controls%iteration%step, 100)
+        if (mod(FTCMS%controls%iteration%get_iter(), 10) == 0) then
             count = count + 1
-            call FTDSS%output%output_fields(file_counts=count, &
-                                            domain=FTDSS%domain, &
-                                            porosity=FTDSS%phi%pre, &
-                                            temperature=FTDSS%T%pre, &
-                                            si=FTDSS%thermal%Qice%pre)
+            call FTCMS%output%output_fields(file_counts=count, &
+                                            domain=FTCMS%domain, &
+                                            porosity=FTCMS%phi%pre, &
+                                            temperature=FTCMS%T%pre, &
+                                            si=FTCMS%thermal%Qice%pre)
         end if
-        call FTDSS%controls%time%profile_stop("IO")
+        call FTCMS%controls%time%profile_stop("IO")
 
-        call FTDSS%shift()
+        call FTCMS%shift()
 
         if (was_interrupted()) stop
 
     end do TIME_LOOP
 
-    call FTDSS%controls%time%profile_stop("Total")
-    call FTDSS%controls%time%record("End")
-    call FTDSS%output%output_system_log(FTDSS%controls%time, FTDSS%thermal%KT_star, FTDSS%domain)
+    call FTCMS%controls%time%profile_stop("Total")
+    call FTCMS%controls%time%record("End")
+    call FTCMS%output%output_system_log(FTCMS%controls%time, FTCMS%thermal%KT_star, FTCMS%domain)
 
     stop
 

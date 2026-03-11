@@ -12,10 +12,10 @@ def main():
     # =========================
     # Settings
     # =========================
-    ftdss_project_path = "/workspaces/FTDSS/project/1Domain-Square2nd-modified"
+    ftcms_project_path = "/workspaces/FTCMS/project/1Domain-Square2nd-modified"
     
     # 最終的なレポートの保存先（マウントボリューム）
-    workspace_vtune_dir = "/workspaces/FTDSS/log/vtune"
+    workspace_vtune_dir = "/workspaces/FTCMS/log/vtune"
     
     # VTuneの生データ保存先（コンテナ内のネイティブパス）デッドロック回避のため必須
     local_vtune_dir = "/tmp/vtune_results"
@@ -52,14 +52,14 @@ def main():
     # =========================
     print("Running VTune...")
     env = os.environ.copy()
-    env["FTDSS_PROJECT_PATH"] = ftdss_project_path
+    env["FTCMS_PROJECT_PATH"] = ftcms_project_path
     env["TMPDIR"] = tmp_dir
     # オーナーシップ警告の回避
     env["VTUNE_LOG_DIR"] = tmp_dir 
 
     vtune_cmd = [
         "mpirun",
-        "-genv", "FTDSS_PROJECT_PATH", ftdss_project_path,
+        "-genv", "FTCMS_PROJECT_PATH", ftcms_project_path,
         "-n", "1",
         "vtune", "-collect", "hotspots",
         "-knob", "sampling-mode=sw",

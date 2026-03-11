@@ -44,7 +44,7 @@ contains
 
         character(:), allocatable :: project_path_env
 
-        character(*), parameter :: PROJECT_ENV = "FTDSS_PROJECT_PATH"
+        character(*), parameter :: PROJECT_ENV = "FTCMS_PROJECT_PATH"
 
         integer(int32) :: status
         integer(int32) :: ierr, myrank

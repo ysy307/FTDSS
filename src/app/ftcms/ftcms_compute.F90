@@ -5,7 +5,7 @@
 !> - Solving the global linear system
 !> - L2 projection (lumped mass) for nodal gradient calculations
 !> - Evaluation of water and vapor fluxes based on Darcy's law
-submodule(app_ftdss) ftdss_compute
+submodule(app_ftcms) ftcms_compute
     implicit none
 contains
 
@@ -26,10 +26,10 @@ contains
     !>
     !> Failure behavior:
     !> - Assigns zero if isolated node is encountered
-    module subroutine update_variables_ftdss(self)
+    module subroutine update_variables_ftcms(self)
         implicit none
         !> Main application object
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
 
         integer(int32) :: i_node, i_elem, j
         integer(int32) :: num_nodes, num_neighbors, material_id
@@ -137,7 +137,7 @@ contains
 
         call self%control%profiler_stop(PROFILER_TYPES%SETUP)
 
-    end subroutine update_variables_ftdss
+    end subroutine update_variables_ftcms
 
     !> Solve the global linear system
     !>
@@ -155,10 +155,10 @@ contains
     !>
     !> Failure behavior:
     !> - Halts execution if solver fails
-    module subroutine solve_ftdss(self)
+    module subroutine solve_ftcms(self)
         implicit none
         !> Main application object
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
 
         class(abst_matrix), pointer :: K_ptr => null()
         type(type_vector_dp), pointer :: F_ptr => null()
@@ -203,7 +203,7 @@ contains
 
         call self%control%profiler_stop(PROFILER_TYPES%SOLVE)
 
-    end subroutine solve_ftdss
+    end subroutine solve_ftcms
 
     !> Calculate nodal gradient of a scalar field
     !>
@@ -222,10 +222,10 @@ contains
     !>
     !> Failure behavior:
     !> - Returns without error
-    module subroutine calc_gradient_ftdss(self, values_vec, grad)
+    module subroutine calc_gradient_ftcms(self, values_vec, grad)
         implicit none
         !> Main application object
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
         !> Scalar field nodal values
         !> Not modified
         real(real64), intent(in) :: values_vec(:)
@@ -350,7 +350,7 @@ contains
         if (allocated(dpsi_dx)) deallocate (dpsi_dx)
         if (allocated(nodal_vol)) deallocate (nodal_vol)
 
-    end subroutine calc_gradient_ftdss
+    end subroutine calc_gradient_ftcms
 
     !> Calculate temperature gradient
     !>
@@ -368,10 +368,10 @@ contains
     !>
     !> Failure behavior:
     !> - Returns silently if thermal physics is inactive
-    module subroutine calc_gradient_temperature_ftdss(self)
+    module subroutine calc_gradient_temperature_ftcms(self)
         implicit none
         !> Main application object
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
 
         real(real64), pointer, contiguous, dimension(:) :: temperature => null()
         type(type_coordinate_array_dp), pointer :: grad_T
@@ -388,7 +388,7 @@ contains
         end if
         nullify (temperature)
 
-    end subroutine calc_gradient_temperature_ftdss
+    end subroutine calc_gradient_temperature_ftcms
 
     !> Calculate pressure gradient
     !>
@@ -406,10 +406,10 @@ contains
     !>
     !> Failure behavior:
     !> - Returns silently if hydraulic physics is inactive
-    module subroutine calc_gradient_pressure_ftdss(self)
+    module subroutine calc_gradient_pressure_ftcms(self)
         implicit none
         !> Main application object
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
 
         real(real64), pointer, contiguous, dimension(:) :: pressure => null()
         type(type_coordinate_array_dp), pointer :: grad_P
@@ -427,7 +427,7 @@ contains
 
         nullify (pressure)
 
-    end subroutine calc_gradient_pressure_ftdss
+    end subroutine calc_gradient_pressure_ftcms
 
     !> Calculate liquid water flux vector
     !>
@@ -446,10 +446,10 @@ contains
     !>
     !> Failure behavior:
     !> - Returns without error
-    module subroutine calc_water_flux_ftdss(self, material_id, state, grad_T, grad_P, water_flux)
+    module subroutine calc_water_flux_ftcms(self, material_id, state, grad_T, grad_P, water_flux)
         implicit none
         !> Main application object
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
         !> Material identifier
         !> Not modified
         integer(int32), intent(in) :: material_id
@@ -499,7 +499,7 @@ contains
             water_flux%z = -K_wT * grad_T%z - K_wP * grad_P%z - gravity_term ! Assuming Z is vertical
         end select
 
-    end subroutine calc_water_flux_ftdss
+    end subroutine calc_water_flux_ftcms
 
     !> Calculate water vapor flux vector
     !>
@@ -518,10 +518,10 @@ contains
     !>
     !> Failure behavior:
     !> - Returns without error
-    module subroutine calc_vapor_flux_ftdss(self, material_id, state, grad_T, grad_P, water_flux)
+    module subroutine calc_vapor_flux_ftcms(self, material_id, state, grad_T, grad_P, water_flux)
         implicit none
         !> Main application object
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
         !> Material identifier
         !> Not modified
         integer(int32), intent(in) :: material_id
@@ -563,6 +563,6 @@ contains
             water_flux%z = -K_vT * grad_T%z - K_vP * grad_P%z
         end select
 
-    end subroutine calc_vapor_flux_ftdss
+    end subroutine calc_vapor_flux_ftcms
 
-end submodule ftdss_compute
+end submodule ftcms_compute

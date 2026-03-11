@@ -3,7 +3,7 @@ program test_main
 #ifdef _MPI
     use :: mpi_f08
 #endif
-    use :: module_ftdss
+    use :: module_ftcms
 
     implicit none
 
@@ -20,7 +20,7 @@ program test_main
     call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
 #endif
 
-    call run_test_ftdss()
+    call run_test_ftcms()
 
 #ifdef _MPI
     call MPI_Initialized(mpi_is_initialized, ierr)
@@ -30,14 +30,14 @@ program test_main
 
 contains
 
-    subroutine run_test_ftdss()
+    subroutine run_test_ftcms()
         implicit none
-        type(type_ftdss) :: ftdss
+        type(type_ftcms) :: ftcms
 
-        call ftdss%initialize()
-        call ftdss%run()
-        call ftdss%destroy()
+        call ftcms%initialize()
+        call ftcms%run()
+        call ftcms%destroy()
 
-    end subroutine run_test_ftdss
+    end subroutine run_test_ftcms
 
 end program test_main

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.20)
 # ====================================================================
 # 1. Project Setup
 # ====================================================================
-project(FTDSS LANGUAGES Fortran C CXX)
+project(FTCMS LANGUAGES Fortran C CXX)
 
 option(BUILD_TESTING "Build the testing tree" OFF)
 option(ENABLE_OPENMP "Enable OpenMP support" ON)
@@ -32,28 +32,28 @@ add_subdirectory(src/control)
 add_subdirectory(src/domain)
 add_subdirectory(src/io)
 add_subdirectory(src/physics)
-add_subdirectory(src/app/ftdss)
+add_subdirectory(src/app/ftcms)
 # ====================================================================
 # 4. Executable
 # ====================================================================
 # プロジェクト直下の app ディレクトリにあるエントリーポイント
-add_executable(FTDSS app/ftdss.f90)
+add_executable(FTCMS app/ftcms.f90)
 
 # 実行ファイルに必要な最上位ライブラリターゲットをリンクする（名称は仮）
 # 必要なフラグ（インクルードパスやOpenMP等）もターゲット経由で自動伝搬する
-target_link_libraries(FTDSS PRIVATE SOLVER::FTDSS)
+target_link_libraries(FTCMS PRIVATE SOLVER::FTCMS)
 
 if(ENABLE_MPI AND MPI_Fortran_FOUND)
-    target_link_libraries(FTDSS PRIVATE MPI::MPI_Fortran)
+    target_link_libraries(FTCMS PRIVATE MPI::MPI_Fortran)
     add_custom_target(run
-        COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} 4 $<TARGET_FILE:FTDSS>
-        DEPENDS FTDSS
+        COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} 4 $<TARGET_FILE:FTCMS>
+        DEPENDS FTCMS
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     )
 else()
     add_custom_target(run
-        COMMAND ${CMAKE_COMMAND} -E env OMP_NUM_THREADS=4 $<TARGET_FILE:FTDSS>
-        DEPENDS FTDSS
+        COMMAND ${CMAKE_COMMAND} -E env OMP_NUM_THREADS=4 $<TARGET_FILE:FTCMS>
+        DEPENDS FTCMS
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     )
 endif()

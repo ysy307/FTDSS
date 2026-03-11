@@ -40,6 +40,7 @@ def analyze_log(
     }
     comp_regex = compiler_noise_map.get(compiler.lower(), compiler_noise_map["intel"])
 
+    # GNUの「fatal error」や「note」も含めるように拡張
     re_intel_msg = re.compile(r"^\s*(.*?)\((\d+)(?:,\d+)?\):\s*(warning|error|remark)\s*(#\d+)?:?\s*(.*)$", re.IGNORECASE)
     re_gnu_msg = re.compile(r"^\s*(.*?):(\d+):(?:\d+:)?\s*(warning|error|fatal error|note):\s*(.*)$", re.IGNORECASE)
     
@@ -56,7 +57,7 @@ def analyze_log(
     current_entry = None
     current_linker_obj = "Unknown Object"
 
-    with open(log_path, "r", encoding="utf-8", errors="ignore") as f:
+    with open(log_path, "r", encoding="utf-8", errors="replace") as f:
         for line in f:
             line = line.rstrip()
             if not line:
@@ -84,6 +85,7 @@ def analyze_log(
             m_gnu = re_gnu_msg.match(line)
 
             if m_intel or m_gnu:
+                # Pylanceエラーを排除し、型と値を確定させる
                 if m_intel:
                     raw_filename = m_intel.group(1)
                     line_no = m_intel.group(2)
@@ -153,7 +155,7 @@ def analyze_log(
         if general_messages:
             f.write("## ⚙️ Command Line & General Warnings\n\n")
             for entry in general_messages:
-                sev_icon = "🛑" if entry['type'] == 'error' else "⚠️"
+                sev_icon = "🛑" if entry['type'] in ('error', 'fatal error') else "⚠️"
                 f.write(f"- {sev_icon} **{entry['tool']}**: {entry['msg']}\n")
             f.write("\n---\n\n")
 
@@ -161,18 +163,18 @@ def analyze_log(
             f.write("✅ **Success:** No warnings or errors found.\n")
         
         sorted_files = sorted(file_messages.keys(), key=lambda k: (
-            0 if any(e['type'] == 'error' for e in file_messages[k]) else 1, 
+            0 if any(e['type'] in ('error', 'fatal error') for e in file_messages[k]) else 1, 
             k
         ))
 
         for filename in sorted_files:
-            has_error = any(e['type'] == 'error' for e in file_messages[filename])
+            has_error = any(e['type'] in ('error', 'fatal error') for e in file_messages[filename])
             icon = "❌" if has_error else "⚠️"
             
             f.write(f"## {icon} File: `{filename}`\n\n")
 
             for entry in file_messages[filename]:
-                sev_icon = "🛑" if entry['type'] == 'error' else "⚠️" if entry['type'] == 'warning' else "ℹ️"
+                sev_icon = "🛑" if entry['type'] in ('error', 'fatal error') else "⚠️" if entry['type'] == 'warning' else "ℹ️"
                 f.write(f"- **Line {entry['line']}**: {sev_icon} **{entry['type'].upper()}**: {entry['msg']}\n")
                 
                 if entry['context']:

@@ -1,4 +1,4 @@
-# Freezing Thawing Dynamics Simulation Solver
+# Freezing Thawing Coupled Multi-physics Solver
 
 ## About
 
@@ -55,7 +55,7 @@ This allows Git inside the container to inherit your global Git config (e.g., al
 Clone the repository to your local machine:
 
 ```zsh
-git clone https://github.com/ysy307/FTDSS.git
+git clone https://github.com/ysy307/FTCMS.git
 ```
 
 ---
@@ -64,7 +64,7 @@ git clone https://github.com/ysy307/FTDSS.git
 
 Use VS Code and Dev Containers to launch the development environment.
 
-1. Open the cloned `FTDSS` folder in **VS Code**  
+1. Open the cloned `FTCMS` folder in **VS Code**  
 2. Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS) to open the Command Palette  
 3. Select **`Dev Containers: Reopen in Container`**  
 4. VS Code will automatically build the Docker image and reopen the project inside the container
@@ -77,16 +77,16 @@ Run the provided scripts to install the required external libraries:
 
 ```bash
 # Grant execute permissions
-chmod +x scripts/Install_VTKFortran.sh
-chmod +x scripts/Install_VTK_CXX.sh
-chmod +x scripts/Install_stdlib.sh
-chmod +x scripts/Install_JsonFortran.sh
+chmod +x scripts/install/install_stdlib.sh
+chmod +x scripts/install/install_jsonfortran.sh
+chmod +x scripts/install/install_iapws.sh
+chmod +x scripts/install/install_vtk_cxx.sh
 
 # Execute the scripts
-./scripts/Install_VTKFortran.sh
-./scripts/Install_VTK_CXX.sh
-./scripts/Install_stdlib.sh
-./scripts/Install_JsonFortran.sh
+./scripts/install/install_stdlib.sh
+./scripts/install/install_jsonfortran.sh
+./scripts/install/install_iapws.sh
+./scripts/install/install_vtk_cxx.sh
 ```
 
 ---
@@ -122,7 +122,6 @@ Run the compiled test application:
 * CMake version 4.0.3
 * Fortran Standard Library 0.7.0
 * JSON-Fortran 9.0.3
-* VTKFortran 2.0.3
 * VTK - The Visualization Toolkit 9.5.0
 * [IAPWS 0.0.1](https://github.com/ysy307/IAPWS.git)
 
@@ -132,8 +131,4 @@ Run the compiled test application:
 
 ## Links
 
-[Documents](https://ysy307.github.io/FTDSS/)
-
-<!-- bfe41abf0975# code --install-extension /root/fortran-lang.linter-gfortran-3.2.0.vsix  -->
-<!-- 開発コンテナー: FTDSS @ desktop-linux に拡張機能をインストールしています... -->
-<!-- 拡張機能 'fortran-lang.linter-gfortran-3.2.0.vsix' が正常にインストールされました。 -->
+[Documents](https://ysy307.github.io/FTCMS/)

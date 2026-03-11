@@ -1,11 +1,11 @@
-submodule(app_ftdss) ftdss_assemble
+submodule(app_ftcms) ftcms_assemble
     implicit none
 
 contains
 
-    module subroutine assemble_ftdss(self)
+    module subroutine assemble_ftcms(self)
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
 
         type(type_matrix_dense) :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
         type(type_vector_dp) :: local_F_T, local_F_H
@@ -103,14 +103,14 @@ contains
 
         call self%control%profiler_stop(PROFILER_TYPES%ASSEMBLE)
 
-    end subroutine assemble_ftdss
+    end subroutine assemble_ftcms
 
-    module subroutine assemble_initialize_ftdss(self, element_id, workspace, local_K_TT, local_K_TH, &
+    module subroutine assemble_initialize_ftcms(self, element_id, workspace, local_K_TT, local_K_TH, &
                                                 local_K_HH, local_K_HT, local_F_T, local_F_H, &
                                                 coordinates, connectivity)
         implicit none
 
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
         integer(int32), intent(in) :: element_id
         type(type_assemble_workspace), intent(inout) :: workspace
         type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
@@ -159,7 +159,7 @@ contains
             connectivity => connectivity_local
         end if
 
-    end subroutine assemble_initialize_ftdss
+    end subroutine assemble_initialize_ftcms
 
     subroutine check_initialize_matrix(matrix, num_nodes)
         implicit none
@@ -199,11 +199,11 @@ contains
         end if
     end subroutine check_initialize_vector
 
-    module subroutine assemble_local_ftdss(self, workspace, local_K_TT, local_K_TH, &
+    module subroutine assemble_local_ftcms(self, workspace, local_K_TT, local_K_TH, &
                                            local_K_HH, local_K_HT, local_F_T, local_F_H)
 
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
         type(type_assemble_workspace), intent(inout) :: workspace
         type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
         type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
@@ -218,12 +218,12 @@ contains
                                                K_HH=local_K_HH, K_HT=local_K_HT, F_H=local_F_H)
         end if
 
-    end subroutine assemble_local_ftdss
+    end subroutine assemble_local_ftcms
 
-    module subroutine assemble_destroy_ftdss(self, workspace, local_K_TT, local_K_TH, &
+    module subroutine assemble_destroy_ftcms(self, workspace, local_K_TT, local_K_TH, &
                                              local_K_HH, local_K_HT, local_F_T, local_F_H)
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
         type(type_assemble_workspace), intent(inout) :: workspace
         type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
         type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
@@ -236,6 +236,6 @@ contains
         if (present(local_K_HT)) call local_K_HT%destroy()
         if (present(local_F_T)) call local_F_T%destroy()
         if (present(local_F_H)) call local_F_H%destroy()
-    end subroutine assemble_destroy_ftdss
+    end subroutine assemble_destroy_ftcms
 
-end submodule ftdss_assemble
+end submodule ftcms_assemble

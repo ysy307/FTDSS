@@ -1,10 +1,10 @@
-submodule(app_ftdss) ftdss_solve
+submodule(app_ftcms) ftcms_solve
     implicit none
 
 contains
-    module subroutine solve_time_step_initial_setup_ftdss(self)
+    module subroutine solve_time_step_initial_setup_ftcms(self)
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
 
         real(real64), pointer, contiguous, dimension(:) :: u
 
@@ -45,11 +45,11 @@ contains
             end if
         end if
 
-    end subroutine solve_time_step_initial_setup_ftdss
+    end subroutine solve_time_step_initial_setup_ftcms
 
-    module subroutine solve_time_step_setup_ftdss(self, prescribe_bc)
+    module subroutine solve_time_step_setup_ftcms(self, prescribe_bc)
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
         logical, intent(inout) :: prescribe_bc
 
         integer(int32) :: iter
@@ -66,11 +66,11 @@ contains
         call self%calc_gradient_temperature()
         call self%calc_gradient_pressure()
 
-    end subroutine solve_time_step_setup_ftdss
+    end subroutine solve_time_step_setup_ftcms
 
-    module subroutine solve_time_step_check_convergence_ftdss(self)
+    module subroutine solve_time_step_check_convergence_ftcms(self)
         implicit none
-        class(type_ftdss), intent(inout), target :: self
+        class(type_ftcms), intent(inout), target :: self
 
         integer(int32) :: iter
 
@@ -193,11 +193,11 @@ contains
         if (allocated(increment)) call deallocate_array(increment)
         if (allocated(residual)) call deallocate_array(residual)
 
-    end subroutine solve_time_step_check_convergence_ftdss
+    end subroutine solve_time_step_check_convergence_ftcms
 
-    module subroutine solve_time_step_ftdss(self, is_step_converged)
+    module subroutine solve_time_step_ftcms(self, is_step_converged)
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
         logical, intent(inout) :: is_step_converged
         logical :: prescribe_bc
 
@@ -308,11 +308,11 @@ contains
             if (allocated(P_old)) deallocate (P_old)
         end if
 
-    end subroutine solve_time_step_ftdss
+    end subroutine solve_time_step_ftcms
 
-    module subroutine run_ftdss(self)
+    module subroutine run_ftcms(self)
         implicit none
-        class(type_ftdss), intent(inout) :: self
+        class(type_ftcms), intent(inout) :: self
 
         logical :: is_step_converged
 
@@ -339,5 +339,5 @@ contains
 
         end do time_loop
 
-    end subroutine run_ftdss
-end submodule ftdss_solve
+    end subroutine run_ftcms
+end submodule ftcms_solve
