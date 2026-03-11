@@ -11,7 +11,7 @@ if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel|IntelLLVM")
         set(JSON_FORTRAN_PKG "jsonfortran-intel")
     endif()
 elseif(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
-    set(COMPILER_DIR "gcc")
+    set(COMPILER_DIR "gnu")
     set(JSON_FORTRAN_PKG "jsonfortran-gnu")
 elseif(CMAKE_Fortran_COMPILER_ID MATCHES "NVHPC|PGI")
     set(COMPILER_DIR "nvidia")
@@ -71,37 +71,59 @@ function(enable_build_flags target)
         target_compile_options(${target} ${KEYWORD}
             # Fortran: Intel / IntelLLVM
             $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<Fortran_COMPILER_ID:Intel,IntelLLVM>>:
-                -stand f18 -fpp -fpscomp logicals -extend-source -g -traceback
-                $<$<CONFIG:Release>:-O3 -xHost>
-                $<$<CONFIG:Debug>:-O0 -check all -fpe0 -ftrapuv -init=snan -init=arrays -warn all -warn errors -implicitnone -fstack-protector-all>
+            -stand f18 -fpp -fpscomp logicals -extend-source -g -traceback
+            $<$<CONFIG:Release>:-O3 -xHost>
+            $<$<CONFIG:Debug>:-O0 -check all -fpe0 -ftrapuv -init=snan -init=arrays -warn all -warn errors -implicitnone -fstack-protector-all>
             >
             # Fortran: GNU
             $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<Fortran_COMPILER_ID:GNU>>:
-                -std=f2018 -cpp -flogical-argument=0/1
-                $<$<CONFIG:Release>:-O3 -march=native>
-                $<$<CONFIG:Debug>:-g -fbacktrace -fcheck=all -ffpe-trap=invalid,zero,overflow -finit-real=snan -finit-integer=-9999999 -Wall -Wextra -pedantic>
+            -std=f2018 -cpp -flogical-argument=0/1
+            $<$<CONFIG:Release>:-O3 -march=native>
+            $<$<CONFIG:Debug>:-g -fbacktrace -fcheck=all -ffpe-trap=invalid,zero,overflow -finit-real=snan -finit-integer=-9999999 -Wall -Wextra -pedantic>
             >
             # Fortran: NVHPC
             $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<Fortran_COMPILER_ID:NVHPC,PGI>>:
-                -Mpreprocess
-                $<$<CONFIG:Release>:-fast>
-                $<$<CONFIG:Debug>:-g -O0 -Mbounds -Mchkptr -traceback -Ktrap=fp>
+            -Mpreprocess
+            $<$<CONFIG:Release>:-fast>
+            $<$<CONFIG:Debug>:-g -O0 -Mbounds -Mchkptr -traceback -Ktrap=fp>
             >
 
+            # ---------------------------------------------------------
+            # C Compile Options
+            # ---------------------------------------------------------
+            # C: Intel / IntelLLVM
+            $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:Intel,IntelLLVM>>:
+            $<$<CONFIG:Release>:-O3 -xHost -g -traceback>
+            $<$<CONFIG:Debug>:-O0 -g -traceback -Wall -Wextra -Werror -fstack-protector-all -ftrapv>
+            >
+            # C: GNU
+            $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:GNU>>:
+            $<$<CONFIG:Release>:-O3 -march=native>
+            $<$<CONFIG:Debug>:-g -O0 -Wall -Wextra -pedantic -Werror -fstack-protector-all -ftrapv>
+            >
+            # C: NVHPC
+            $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:NVHPC,PGI>>:
+            $<$<CONFIG:Release>:-fast>
+            $<$<CONFIG:Debug>:-g -O0 -Mbounds -Mchkptr -traceback -Ktrap=fp>
+            >
+
+            # ---------------------------------------------------------
+            # CXX Compile Options
+            # ---------------------------------------------------------
             # CXX: Intel / IntelLLVM
             $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:Intel,IntelLLVM>>:
-                $<$<CONFIG:Release>:-O3 -xHost>
-                $<$<CONFIG:Debug>:-g -Wall -Wextra>
+            $<$<CONFIG:Release>:-O3 -xHost -g -traceback>
+            $<$<CONFIG:Debug>:-O0 -g -traceback -Wall -Wextra -Werror -fstack-protector-all -ftrapv>
             >
             # CXX: GNU
             $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:GNU>>:
-                $<$<CONFIG:Release>:-O3 -march=native>
-                $<$<CONFIG:Debug>:-g -Wall -Wextra -pedantic>
+            $<$<CONFIG:Release>:-O3 -march=native>
+            $<$<CONFIG:Debug>:-g -O0 -Wall -Wextra -pedantic -Werror -fstack-protector-all -ftrapv>
             >
             # CXX: NVHPC
             $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:NVHPC,PGI>>:
-                $<$<CONFIG:Release>:-fast>
-                $<$<CONFIG:Debug>:-g -O0>
+            $<$<CONFIG:Release>:-fast>
+            $<$<CONFIG:Debug>:-g -O0 -Mbounds -Mchkptr -traceback -Ktrap=fp>
             >
         )
     endif()

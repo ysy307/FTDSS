@@ -11,7 +11,7 @@ case "$COMPILER" in
     CONFIG_PRESET="intel-release"
     BUILD_PRESET="build-intel-release"
     ;;
-  gcc)
+  gnu)
     CONFIG_PRESET="gcc-release"
     BUILD_PRESET="build-gcc-release"
     ;;

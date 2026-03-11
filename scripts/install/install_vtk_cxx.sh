@@ -14,7 +14,7 @@ case "$COMPILER" in
     CXX_COMP="icpx"
     export FFLAGS="-O3 -xCORE-AVX2"
     ;;
-  gcc)
+  gnu)
     FC_COMP="gfortran"
     CC_COMP="gcc"
     CXX_COMP="g++"
@@ -27,7 +27,7 @@ case "$COMPILER" in
     export FFLAGS="-O3 -fast"
     ;;
   *)
-    echo "Error: Unknown compiler '$COMPILER'. Use intel, gcc, or nvidia."
+    echo "Error: Unknown compiler '$COMPILER'. Use intel, gnu, or nvidia."
     exit 1
     ;;
 esac
