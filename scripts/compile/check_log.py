@@ -33,7 +33,6 @@ def analyze_log(
         print(f"Error: Log file not found at: {log_path}")
         return False
 
-    # Update regex to match base compilers
     compiler_noise_map = {
         "intel": r"ifx|icx|icpx",
         "gnu": r"gfortran|gcc|g\+\+",
@@ -41,7 +40,9 @@ def analyze_log(
     }
     comp_regex = compiler_noise_map.get(compiler.lower(), compiler_noise_map["intel"])
 
-    re_compile_msg = re.compile(r"^\s*(.*?)\((\d+)(?:,\d+)?\):\s*(warning|error|remark)\s*(#\d+)?:?\s*(.*)$", re.IGNORECASE)
+    re_intel_msg = re.compile(r"^\s*(.*?)\((\d+)(?:,\d+)?\):\s*(warning|error|remark)\s*(#\d+)?:?\s*(.*)$", re.IGNORECASE)
+    re_gnu_msg = re.compile(r"^\s*(.*?):(\d+):(?:\d+:)?\s*(warning|error|fatal error|note):\s*(.*)$", re.IGNORECASE)
+    
     re_cmd_msg = re.compile(r"^\s*([a-zA-Z0-9_\-]+):\s*command line\s*(warning|error|remark)\s*(#\d+)?:?\s*(.*)$", re.IGNORECASE)
     re_linker_obj = re.compile(r"^ld:\s*(.*?):\s*in function\s*[`'](.*)['`]:", re.IGNORECASE)
     re_linker_def = re.compile(r".*undefined reference to\s*[`'](.*)['`]", re.IGNORECASE)
@@ -79,13 +80,27 @@ def analyze_log(
                 current_entry = None
                 continue
             
-            m_compile = re_compile_msg.match(line)
-            if m_compile:
-                raw_filename = m_compile.group(1).strip()
+            m_intel = re_intel_msg.match(line)
+            m_gnu = re_gnu_msg.match(line)
+
+            if m_intel or m_gnu:
+                if m_intel:
+                    raw_filename = m_intel.group(1)
+                    line_no = m_intel.group(2)
+                    severity = m_intel.group(3)
+                    msg_body = m_intel.group(5)
+                elif m_gnu:
+                    raw_filename = m_gnu.group(1)
+                    line_no = m_gnu.group(2)
+                    severity = m_gnu.group(3)
+                    msg_body = m_gnu.group(4)
+                else:
+                    continue
+
+                raw_filename = raw_filename.strip()
                 filename = clean_path(raw_filename, project_root)
-                line_no = m_compile.group(2)
-                severity = m_compile.group(3).lower()
-                msg_body = m_compile.group(5).strip()
+                severity = severity.lower()
+                msg_body = msg_body.strip()
 
                 if "Global name too long" in msg_body:
                     global_name_warnings.add(msg_body)
@@ -111,10 +126,8 @@ def analyze_log(
                 current_entry = None
                 continue
 
-            if current_entry:
+            if current_entry is not None:
                 current_entry["context"].append(line)
-            else:
-                current_entry = None
 
     with open(output_file, "w", encoding="utf-8") as f:
         f.write("# Compile Log Summary\n\n")

@@ -6,10 +6,12 @@
 #include <sys/utsname.h>
 #endif
 
+#define INFO_BUFFER_SIZE 256
+
 // OS名を返す（静的バッファへのポインタ）
-const char* system_info_get_os(void)
+const char *system_info_get_os(void)
 {
-    static char osname[64];
+    static char osname[INFO_BUFFER_SIZE];
 #ifdef _WIN32
     snprintf(osname, sizeof(osname), "Windows");
 #elif defined(__APPLE__)
@@ -25,9 +27,9 @@ const char* system_info_get_os(void)
 }
 
 // アーキテクチャ名を返す（静的バッファへのポインタ）
-const char* system_info_get_cpu_architecture(void)
+const char *system_info_get_cpu_architecture(void)
 {
-    static char arch[64];
+    static char arch[INFO_BUFFER_SIZE];
 #ifdef _WIN32
     SYSTEM_INFO si;
     GetSystemInfo(&si);

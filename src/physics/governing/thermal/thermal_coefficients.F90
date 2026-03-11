@@ -148,6 +148,10 @@ contains
     !> Mathematical definition:
     !> - Used for residual calculation in Newton-Raphson method
     !> - \( Res_{transient} = \frac{dU}{dt} = \sum bdf\_coeffs_j U(t_{n+1-j}) \)
+    !>
+    !> When enthalpy cache is valid, history terms (j >= 2) use pre-computed
+    !> nodal U values instead of recomputing phase-change. The cache is
+    !> populated once per time step via cache_enthalpy_history.
     module subroutine compute_transient_term_thermal(self, material_id, state, bdf_coeffs, dU_dt)
         implicit none
         !> Thermal governing equation object
@@ -180,7 +184,6 @@ contains
         n_hist = min(size(bdf_coeffs), size(temperature_history), size(pressure_history), size(porosity_history))
         do j = 1, n_hist
             ! Reconstruct state from history data and recalculate enthalpy
-            ! Note: To reduce computational cost, it is preferable to store U history in state
             call local_state%temperature%set(temperature_history(j))
             call local_state%pressure%set(pressure_history(j))
             call local_state%porosity%set(porosity_history(j))
@@ -502,5 +505,74 @@ contains
         history_term = C_TT * T_hist_sum
 
     end subroutine compute_history_term_thermal
+
+    ! ==========================================================================
+    ! Enthalpy Cache Management
+    ! ==========================================================================
+
+    !> Pre-compute and cache nodal enthalpy density for BDF history levels
+    !>
+    !> Called once per time step before the nonlinear iteration begins.
+    !> For each node and each history level (k = 1..num_hist), computes
+    !> U(T_{n-k}, P_{n-k}, phi_{n-k}) and stores it in enthalpy_cache.
+    !> This avoids redundant phase-change recalculation during assembly.
+    module subroutine cache_enthalpy_history_thermal(self, num_nodes, num_hist, material_ids, &
+                                                     temperature_all, pressure_all, porosity_all)
+        implicit none
+        class(type_thermal), intent(inout) :: self
+        !> Number of mesh nodes
+        integer(int32), intent(in) :: num_nodes
+        !> Number of history levels to cache
+        integer(int32), intent(in) :: num_hist
+        !> Material ID for each node (from element adjacency)
+        integer(int32), intent(in) :: material_ids(:)
+        !> Nodal temperature history: temperature_all(node, hist_level)
+        real(real64), intent(in) :: temperature_all(:, :)
+        !> Nodal pressure history: pressure_all(node, hist_level)
+        real(real64), intent(in) :: pressure_all(:, :)
+        !> Nodal porosity history: porosity_all(node, hist_level)
+        real(real64), intent(in) :: porosity_all(:, :)
+
+        type(type_state) :: local_state
+        real(real64) :: Uj
+        integer(int32) :: i, k
+
+        ! Allocate or reallocate cache if dimensions changed
+        if (.not. allocated(self%enthalpy_cache) .or. &
+            self%enthalpy_cache_num_nodes /= num_nodes .or. &
+            self%enthalpy_cache_num_hist /= num_hist) then
+            if (allocated(self%enthalpy_cache)) deallocate (self%enthalpy_cache)
+            allocate (self%enthalpy_cache(num_nodes, num_hist))
+            self%enthalpy_cache_num_nodes = num_nodes
+            self%enthalpy_cache_num_hist = num_hist
+        end if
+
+        ! Compute enthalpy at each node for each history level
+        do k = 1, num_hist
+            do i = 1, num_nodes
+                call local_state%temperature%set(temperature_all(i, k))
+                call local_state%pressure%set(pressure_all(i, k))
+                call local_state%porosity%set(porosity_all(i, k))
+                call self%update_water_phases(material_ids(i), local_state)
+                call self%calc_enthalpy_density(material_ids(i), local_state, Uj)
+                self%enthalpy_cache(i, k) = Uj
+            end do
+        end do
+
+        self%enthalpy_cache_valid = .true.
+
+    end subroutine cache_enthalpy_history_thermal
+
+    !> Invalidate the enthalpy cache
+    !>
+    !> Called when time step is accepted and variable history is shifted,
+    !> since the cached values correspond to the previous step layout.
+    module subroutine invalidate_enthalpy_cache_thermal(self)
+        implicit none
+        class(type_thermal), intent(inout) :: self
+
+        self%enthalpy_cache_valid = .false.
+
+    end subroutine invalidate_enthalpy_cache_thermal
 
 end submodule thermal_coefficients

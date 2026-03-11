@@ -19,6 +19,10 @@ contains
         call get_json_value(json, join(buffer(1:2)), self%field_output%file_format, &
                             is_required=.true., valid_list=valid_field_file_formats)
 
+        if (self%field_output%file_format == valid_field_file_formats(1)) then
+            return
+        end if
+
         buffer(2) = output_time_unit
         call get_json_value(json, join(buffer(1:2)), self%field_output%output_time_unit, &
                             is_required=.true., valid_list=valid_time_units)

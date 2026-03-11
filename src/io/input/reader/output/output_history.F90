@@ -28,7 +28,7 @@ contains
                             is_required=.true., valid_list=valid_history_file_formats)
 
         select case (self%history_output%file_format)
-        case (valid_history_file_formats(1), valid_history_file_formats(2)) ! "dat", "csv"
+        case (valid_history_file_formats(2), valid_history_file_formats(3)) ! "dat", "csv"
             buffer(2) = observation_type
             call get_json_value(json, join(buffer), self%history_output%observation_type, &
                                 is_required=.true., valid_list=valid_observation_types)
@@ -95,7 +95,7 @@ contains
         write (output_unit, '(A)') "  History Output Settings:"
         write (output_unit, '(A, A)') "    File Format: ", strip(self%file_format)
         select case (self%file_format)
-        case (valid_history_file_formats(1), valid_history_file_formats(2)) ! "dat", "csv"
+        case (valid_history_file_formats(2), valid_history_file_formats(3)) ! "dat", "csv"
             write (output_unit, '(A, A, F8.3)') "    Output Interval: ", strip(self%output_interval_unit), &
                 self%output_interval_step
             write (output_unit, '(A, A)') "    Observation Type: ", strip(self%observation_type)

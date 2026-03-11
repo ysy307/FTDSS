@@ -34,10 +34,17 @@ contains
         type(type_config_output_manager), intent(in) :: config
         real(real64), intent(in) :: current_time_seconds
 
-        type(type_constant_value) :: interval_time_unit
+        self%active = .false.
+        self%interval_seconds = 0.0d0
+        self%next_output_seconds = 0.0d0
+        self%current_step = 0
+        self%output_time_unit = type_constant_value("", "", -1, "", 0.0d0)
+
+        if (config%file_format%ID <= 0) then
+            return
+        end if
 
         if (config%file_format == FILE_FORMATS%NONE) then
-            self%active = .false.
             return
         end if
 

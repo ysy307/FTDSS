@@ -16,8 +16,6 @@ contains
         real(real64) :: dP_ice_dP_water
         real(real64) :: dQw_dP, dQi_dP, dQv_dP
 
-        ! Initialize derivative variables to zero
-        ! (derivative routines are not yet implemented; prevents undefined behavior)
         dQw_dP = 0.0d0
         dQi_dP = 0.0d0
         dQv_dP = 0.0d0
@@ -25,20 +23,16 @@ contains
         drho_ice_dP = 0.0d0
         dP_ice_dP_water = 0.0d0
 
-        ! Get derivatives (assuming state is already updated)
         call state%water_content%get(Qw)
         call state%ice_content%get(Qi)
         call state%vapor_content%get(Qv)
 
-        ! call state%dQw_dP%get(dQw_dP)
-        ! call state%dQi_dP%get(dQi_dP)
-        ! call state%dQv_dP%get(dQv_dP)
+        call state%dQw_dP%get(dQw_dP)
+        call state%dQi_dP%get(dQi_dP)
+        call state%dQv_dP%get(dQv_dP)
 
         call self%physics%calc_density_water(state, rho_w)
         call self%physics%calc_density_ice(state, rho_i)
-        ! call self%physics%calc_density_water_derivatives(material_id, state, pd_T=0.0d0, pd_P=drho_w_dP)
-        ! call self%physics%calc_density_ice_derivatives(material_id, state, pd_T=0.0d0, pd_P=drho_ice_dP)
-        ! call self%physics%calc_pressure_ice_water_derivative(material_id, state, dP_ice_dP_water)
 
         ! C_HH = d(rho_eff)/dP
         ! rho_eff = rho_w*Qw + rho_i*Qi + rho_w*Qv

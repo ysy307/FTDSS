@@ -4,17 +4,11 @@ module numerical_system_jacobian_matrix
     use :: module_core
     use :: module_domain, only:type_domain
     use :: module_linalg
-    ! use :: core_types_matrix_factory
     implicit none
     private
 
     public :: type_jacobian_matrix
 
-    !>
-    !> Container class for the Jacobian matrix.
-    !> Holds a single BSR matrix (abst_matrix) internally and maps
-    !> (Node, DOF) index operations to BSR block operations.
-    !>
     type :: type_jacobian_matrix
         private
         integer(int32) :: matrix_type = -1
@@ -22,24 +16,29 @@ module numerical_system_jacobian_matrix
         integer(int32) :: num_dofs_per_node = 0
         integer(int32) :: size = 0
 
-        ! Single matrix object (replaces the former holder_matrices array)
         class(abst_matrix), allocatable :: matrix
+
+        integer(int32), allocatable :: scatter_data(:)
+        integer(int32), allocatable :: scatter_ptr(:)
+        integer(int32) :: scatter_max_nodes = 0
+        logical :: scatter_ready = .false.
     contains
         procedure, public, pass(self) :: initialize => initialize_jacobian_matrix
         procedure, public, pass(self) :: destroy => destroy_jacobian_matrix
+        procedure, public, pass(self) :: build_scatter_map => build_scatter_map_jacobian
 
         procedure, public, pass(self) :: get_size => get_size_jacobian_matrix
         procedure, public, pass(self) :: get_num_dofs_per_node => get_num_dofs_per_node
 
-        ! Accessor to expose the matrix object for solvers
         procedure, public, pass(self) :: get_matrix => get_underlying_matrix
+        procedure, public, pass(self) :: is_scatter_ready => is_scatter_ready_jacobian
 
-        ! Value set/add operations
         procedure, private, pass(self) :: set_value_local => set_value_jacobian_matrix
         procedure, private, pass(self) :: add_value_local => add_value_jacobian_matrix
         procedure, private, pass(self) :: add_local_matrix => add_local_jacobian_matrix
+        procedure, private, pass(self) :: add_local_matrix_fast => add_local_fast_jacobian_matrix
         generic, public :: set => set_value_local
-        generic, public :: add => add_value_local, add_local_matrix
+        generic, public :: add => add_value_local, add_local_matrix, add_local_matrix_fast
 
         procedure, private, pass(self) :: zero_all => zero_all_jacobian_matrix
         procedure, private, pass(self) :: zero_row => zero_row_jacobian_matrix
@@ -49,9 +48,6 @@ module numerical_system_jacobian_matrix
 
 contains
 
-    ! -------------------------------------------------------------------
-    !  Initialize / Destroy
-    ! -------------------------------------------------------------------
     subroutine initialize_jacobian_matrix(self, domain)
         implicit none
         class(type_jacobian_matrix), intent(inout) :: self
@@ -69,11 +65,74 @@ contains
 
         self%matrix_type = MATRIX_TYPES%BSR%ID
 
-        ! Create BSR matrix using the matrix factory
         self%matrix = create_matrix(MATRIX_TYPES%BSR, self%num_nodes, row, col, self%num_dofs_per_node)
 
         deallocate (row, col)
     end subroutine initialize_jacobian_matrix
+
+    subroutine build_scatter_map_jacobian(self, domain)
+        implicit none
+        class(type_jacobian_matrix), intent(inout) :: self
+        class(type_domain), intent(in) :: domain
+
+        integer(int32) :: num_fe, elem_id, i, j, n_local
+        integer(int32) :: row_node, ptr_start, ptr_end, block_index
+        integer(int32) :: total_entries, offset
+        integer(int32), pointer, contiguous :: connectivity(:)
+        integer(int32), pointer :: bsr_ptr(:), bsr_ind(:)
+
+        if (.not. allocated(self%matrix)) return
+
+        call domain%get_num_fe(num_fe)
+        if (num_fe == 0) return
+
+        select type (matrix => self%matrix)
+        type is (type_matrix_bsr)
+            bsr_ptr => matrix%get_ptr()
+            bsr_ind => matrix%get_ind()
+        class default
+            return
+        end select
+
+        if (allocated(self%scatter_ptr)) deallocate (self%scatter_ptr)
+        allocate (self%scatter_ptr(num_fe + 1))
+
+        total_entries = 0
+        self%scatter_max_nodes = 0
+        do elem_id = 1, num_fe
+            nullify (connectivity)
+            call domain%get_fe_connectivity(elem_id, connectivity)
+            n_local = size(connectivity)
+            self%scatter_ptr(elem_id) = total_entries + 1
+            total_entries = total_entries + n_local * n_local
+            if (n_local > self%scatter_max_nodes) self%scatter_max_nodes = n_local
+        end do
+        self%scatter_ptr(num_fe + 1) = total_entries + 1
+
+        if (allocated(self%scatter_data)) deallocate (self%scatter_data)
+        allocate (self%scatter_data(total_entries))
+
+        do elem_id = 1, num_fe
+            nullify (connectivity)
+            call domain%get_fe_connectivity(elem_id, connectivity)
+            n_local = size(connectivity)
+            offset = self%scatter_ptr(elem_id) - 1
+
+            do i = 1, n_local
+                row_node = connectivity(i)
+                ptr_start = bsr_ptr(row_node)
+                ptr_end = bsr_ptr(row_node + 1) - 1
+
+                do j = 1, n_local
+                    block_index = binary_find(connectivity(j), bsr_ind, ptr_start, ptr_end)
+                    self%scatter_data(offset + (i - 1) * n_local + j) = block_index
+                end do
+            end do
+        end do
+
+        self%scatter_ready = .true.
+
+    end subroutine build_scatter_map_jacobian
 
     subroutine destroy_jacobian_matrix(self)
         implicit none
@@ -83,14 +142,15 @@ contains
             call self%matrix%destroy()
             deallocate (self%matrix)
         end if
+        if (allocated(self%scatter_data)) deallocate (self%scatter_data)
+        if (allocated(self%scatter_ptr)) deallocate (self%scatter_ptr)
+        self%scatter_ready = .false.
+        self%scatter_max_nodes = 0
         self%size = 0
         self%matrix_type = -1
         self%num_dofs_per_node = 0
     end subroutine destroy_jacobian_matrix
 
-    ! -------------------------------------------------------------------
-    !  Getters
-    ! -------------------------------------------------------------------
     pure function get_size_jacobian_matrix(self) result(size)
         implicit none
         class(type_jacobian_matrix), intent(in) :: self
@@ -105,7 +165,13 @@ contains
         num_dofs = self%num_dofs_per_node
     end function
 
-    !> Accessor to pass the matrix object to solvers
+    pure function is_scatter_ready_jacobian(self) result(ready)
+        implicit none
+        class(type_jacobian_matrix), intent(in) :: self
+        logical :: ready
+        ready = self%scatter_ready
+    end function
+
     function get_underlying_matrix(self) result(matrix)
         implicit none
         class(type_jacobian_matrix), intent(in), target :: self
@@ -113,21 +179,15 @@ contains
         matrix => self%matrix
     end function
 
-    ! -------------------------------------------------------------------
-    !  Setters / Adders (local index API)
-    ! -------------------------------------------------------------------
-
     subroutine set_value_jacobian_matrix(self, row_dof, col_dof, row_node, col_node, value)
         implicit none
         class(type_jacobian_matrix), intent(inout) :: self
-        integer(int32), intent(in) :: row_dof ! Block-local row index (1 to num_dofs)
-        integer(int32), intent(in) :: col_dof ! Block-local column index (1 to num_dofs)
-        integer(int32), intent(in) :: row_node ! Block row index (Node ID)
-        integer(int32), intent(in) :: col_node ! Block column index (Node ID)
+        integer(int32), intent(in) :: row_dof
+        integer(int32), intent(in) :: col_dof
+        integer(int32), intent(in) :: row_node
+        integer(int32), intent(in) :: col_node
         real(real64), intent(in) :: value
 
-        ! Uses abst_matrix (BSR) set_value_block
-        ! Arg order: op, row(node), col(node), row_block(dof), col_block(dof), value
         if (allocated(self%matrix)) then
             call self%matrix%set(MATRIX_OPS%INS, row_node, col_node, row_dof, col_dof, value)
         end if
@@ -196,9 +256,38 @@ contains
         end select
     end subroutine add_local_jacobian_matrix
 
-    ! -------------------------------------------------------------------
-    !  Operations
-    ! -------------------------------------------------------------------
+    subroutine add_local_fast_jacobian_matrix(self, row_dof, col_dof, element_id, n_local, local_data)
+        implicit none
+        class(type_jacobian_matrix), intent(inout) :: self
+        integer(int32), intent(in) :: row_dof
+        integer(int32), intent(in) :: col_dof
+        integer(int32), intent(in) :: element_id
+        integer(int32), intent(in) :: n_local
+        type(type_matrix_dense), intent(in) :: local_data
+
+        integer(int32) :: i, j, offset, block_index
+        real(real64), pointer :: val_bsr(:, :, :)
+        real(real64), pointer, dimension(:, :) :: dense_val
+
+        if (.not. allocated(self%matrix)) return
+
+        dense_val => local_data%get_val()
+        offset = self%scatter_ptr(element_id) - 1
+
+        select type (matrix => self%matrix)
+        type is (type_matrix_bsr)
+            val_bsr => matrix%get_val()
+
+            do i = 1, n_local
+                do j = 1, n_local
+                    block_index = self%scatter_data(offset + (i - 1) * n_local + j)
+                    val_bsr(row_dof, col_dof, block_index) = &
+                        val_bsr(row_dof, col_dof, block_index) + dense_val(i, j)
+                end do
+            end do
+        end select
+    end subroutine add_local_fast_jacobian_matrix
+
     subroutine zero_all_jacobian_matrix(self)
         implicit none
         class(type_jacobian_matrix), intent(inout) :: self

@@ -4,6 +4,7 @@ import sys
 import glob
 import csv
 import subprocess
+import shutil
 
 def main():
     print("--- Start VTune Profiling Script ---")
@@ -12,10 +13,16 @@ def main():
     # Settings
     # =========================
     ftdss_project_path = "/workspaces/FTDSS/project/1Domain-Square2nd-modified"
-    vtune_dir = "/workspaces/FTDSS/log/vtune"
-    tmp_dir = os.path.join(vtune_dir, "tmp")
+    
+    # 最終的なレポートの保存先（マウントボリューム）
+    workspace_vtune_dir = "/workspaces/FTDSS/log/vtune"
+    
+    # VTuneの生データ保存先（コンテナ内のネイティブパス）デッドロック回避のため必須
+    local_vtune_dir = "/tmp/vtune_results"
+    tmp_dir = os.path.join(local_vtune_dir, "tmp")
 
-    os.makedirs(vtune_dir, exist_ok=True)
+    os.makedirs(workspace_vtune_dir, exist_ok=True)
+    os.makedirs(local_vtune_dir, exist_ok=True)
     os.makedirs(tmp_dir, exist_ok=True)
 
     # Allow ptrace for VTune in WSL2/Docker
@@ -30,13 +37,15 @@ def main():
     next_idx = 0
     while True:
         result_base = f"r{next_idx:03d}hs"
-        existing = glob.glob(os.path.join(vtune_dir, f"{result_base}*"))
+        # ワークスペース側に同名のレポートがないかチェック
+        existing = glob.glob(os.path.join(workspace_vtune_dir, f"{result_base}*"))
         if not existing:
             break
         next_idx += 1
     
-    result_dir = os.path.join(vtune_dir, result_base)
-    print(f"Target Result Directory: {result_dir}")
+    # 実際の計測ディレクトリは /tmp 以下
+    result_dir = os.path.join(local_vtune_dir, result_base)
+    print(f"Target Result Directory (Local): {result_dir}")
 
     # =========================
     # Run VTune
@@ -45,8 +54,9 @@ def main():
     env = os.environ.copy()
     env["FTDSS_PROJECT_PATH"] = ftdss_project_path
     env["TMPDIR"] = tmp_dir
+    # オーナーシップ警告の回避
+    env["VTUNE_LOG_DIR"] = tmp_dir 
 
-    # 修正箇所: mpirunでvtuneをラップし，-genvの引数を2つに分割
     vtune_cmd = [
         "mpirun",
         "-genv", "FTDSS_PROJECT_PATH", ftdss_project_path,
@@ -59,29 +69,34 @@ def main():
     
     subprocess.run(vtune_cmd, env=env, check=False)
 
-    # Find the actually created directory
-    created_dirs = glob.glob(os.path.join(vtune_dir, f"{result_base}*"))
+    # Find the actually created directory in /tmp
+    created_dirs = glob.glob(os.path.join(local_vtune_dir, f"{result_base}*"))
     valid_dirs = [d for d in created_dirs if os.path.isdir(d)]
     
     if not valid_dirs:
         print("Error: VTune result directory was not created.")
         sys.exit(1)
         
-    latest_dir = valid_dirs[0]
-    print(f"Actual Result Directory: {latest_dir}")
+    latest_dir_local = valid_dirs[0]
+    actual_dir_name = os.path.basename(latest_dir_local)
+    print(f"Actual Result Directory: {latest_dir_local}")
 
     # =========================
     # Export CSV Reports
     # =========================
     print("Exporting CSV reports...")
-    report_csv = f"{latest_dir}_report.csv"
-    src_csv = f"{latest_dir}_source_line.csv"
-    top_csv = f"{latest_dir}_summary.csv"
+    
+    # 出力先をワークスペースにする
+    workspace_out_prefix = os.path.join(workspace_vtune_dir, actual_dir_name)
+    
+    report_csv = f"{workspace_out_prefix}_report.csv"
+    src_csv = f"{workspace_out_prefix}_source_line.csv"
+    top_csv = f"{workspace_out_prefix}_summary.csv"
 
     export_cmds = [
-        ["vtune", "-report", "hotspots", "-result-dir", latest_dir, "-format", "csv", "-report-output", report_csv],
-        ["vtune", "-report", "hotspots", "-result-dir", latest_dir, "-group-by", "source-line", "-format", "csv", "-report-output", src_csv],
-        ["vtune", "-report", "summary", "-result-dir", latest_dir, "-format", "csv", "-report-output", top_csv]
+        ["vtune", "-report", "hotspots", "-result-dir", latest_dir_local, "-format", "csv", "-report-output", report_csv],
+        ["vtune", "-report", "hotspots", "-result-dir", latest_dir_local, "-group-by", "source-line", "-format", "csv", "-report-output", src_csv],
+        ["vtune", "-report", "summary", "-result-dir", latest_dir_local, "-format", "csv", "-report-output", top_csv]
     ]
 
     for cmd in export_cmds:
@@ -91,11 +106,11 @@ def main():
     # Markdown Summary Generation
     # =========================
     print("Generating Markdown report...")
-    out_md = f"{latest_dir}_summary.md"
+    out_md = f"{workspace_out_prefix}_summary.md"
 
     with open(out_md, "w", encoding="utf-8") as md:
         md.write("# VTune Profiling Summary\n\n")
-        md.write(f"Result directory: `{latest_dir}`\n\n")
+        md.write(f"Result directory (Raw data in container `/tmp`): `{latest_dir_local}`\n\n")
 
         # Top Functions
         if os.path.isfile(report_csv) and os.path.getsize(report_csv) > 0:

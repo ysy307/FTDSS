@@ -19,6 +19,14 @@ module physics_governing_thermal
         integer(int32) :: computation_type
         integer(int32) :: computation_dimension
         type(type_constitutive_manager) :: physics
+
+        ! Enthalpy cache for BDF history terms
+        ! Stores U(T_{n-k}) at each node for each history level (k >= 1)
+        ! Avoids recomputing phase-change in compute_transient_term
+        real(real64), allocatable :: enthalpy_cache(:, :)
+        logical :: enthalpy_cache_valid = .false.
+        integer(int32) :: enthalpy_cache_num_nodes = 0
+        integer(int32) :: enthalpy_cache_num_hist = 0
     contains
         procedure, pass(self), public :: initialize => initialize_type_thermal
         procedure, pass(self), public :: destroy => destroy_type_thermal
@@ -39,6 +47,8 @@ module physics_governing_thermal
         procedure, pass(self), public :: calc_density_ice => calc_density_ice_thermal
         procedure, pass(self), public :: calc_density_vapor_saturation => calc_density_vapor_saturation_thermal
         procedure, pass(self), public :: update_water_phases => update_water_phases_thermal
+        procedure, pass(self), public :: cache_enthalpy_history => cache_enthalpy_history_thermal
+        procedure, pass(self), public :: invalidate_enthalpy_cache => invalidate_enthalpy_cache_thermal
     end type type_thermal
 
     interface
@@ -138,6 +148,25 @@ module physics_governing_thermal
             real(real64), intent(inout) :: history_term
 
         end subroutine compute_history_term_thermal
+
+        module subroutine cache_enthalpy_history_thermal(self, num_nodes, num_hist, material_ids, &
+                                                         temperature_all, pressure_all, porosity_all)
+            implicit none
+            class(type_thermal), intent(inout) :: self
+            integer(int32), intent(in) :: num_nodes
+            integer(int32), intent(in) :: num_hist
+            integer(int32), intent(in) :: material_ids(:)
+            real(real64), intent(in) :: temperature_all(:, :)
+            real(real64), intent(in) :: pressure_all(:, :)
+            real(real64), intent(in) :: porosity_all(:, :)
+
+        end subroutine cache_enthalpy_history_thermal
+
+        module subroutine invalidate_enthalpy_cache_thermal(self)
+            implicit none
+            class(type_thermal), intent(inout) :: self
+
+        end subroutine invalidate_enthalpy_cache_thermal
     end interface
 
     interface

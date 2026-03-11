@@ -73,7 +73,9 @@ contains
         case (FILE_FORMATS%VTU%ID)
             allocate (type_output_overall_vtu :: self%overall)
         end select
-        call self%overall%initialize(dir_output_field, config_overall)
+        if (allocated(self%overall)) then
+            call self%overall%initialize(dir_output_field, config_overall)
+        end if
 
         call self%log%initialize(dir_output)
     end subroutine initialize_type_output_manager
@@ -89,6 +91,8 @@ contains
         real(real64), intent(in), optional :: vapor_content(:)
         real(real64), intent(in), optional :: pressure(:)
         type(type_coordinate_array_dp), intent(in), optional :: water_flux
+
+        if (.not. allocated(self%overall)) return
 
         call self%overall%write_fields(file_counts=file_counts, &
                                        temperature=temperature, &

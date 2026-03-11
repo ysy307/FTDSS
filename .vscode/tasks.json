@@ -2,13 +2,42 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "FTDSS Build & Analyze",
+            "label": "FTDSS Build (intel) & Analyze",
             "type": "shell",
             "command": "python3",
             "args": [
                 "scripts/compile/compile.py",
                 "-c",
                 "intel",
+                "-t",
+                "main"
+            ],
+            "options": {
+                "cwd": "${workspaceRoot}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true,
+                "close": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "FTDSS Build (gnu) & Analyze",
+            "type": "shell",
+            "command": "python3",
+            "args": [
+                "scripts/compile/compile.py",
+                "-c",
+                "gnu",
                 "-t",
                 "main"
             ],
@@ -40,7 +69,7 @@
                 "kind": "none",
                 "isDefault": false
             },
-            "command": "find CMakeBuild -mindepth 1 -delete",
+            "command": "find CMakeBuild_* -mindepth 1 -delete",
             "presentation": {
                 "echo": false,
                 "reveal": "always",

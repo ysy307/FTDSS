@@ -10,9 +10,17 @@ contains
 
         associate (output => input%output_settings%field_output)
             config%interval_val = output%output_interval_step
+            config%file_format = FILE_FORMATS%to_object(output%file_format)
+
+            if (config%file_format == FILE_FORMATS%NONE) then
+                config%interval_val = 0.0d0
+                config%interval_unit = TIME_UNITS%to_object("second")
+                config%output_unit = TIME_UNITS%to_object("second")
+                return
+            end if
+
             config%interval_unit = TIME_UNITS%to_object(output%output_interval_unit)
             config%output_unit = TIME_UNITS%to_object(output%output_time_unit)
-            config%file_format = FILE_FORMATS%to_object(output%file_format)
         end associate
 
     end subroutine execute_output_field
@@ -38,6 +46,15 @@ contains
         associate (observation => input%output_settings%history_output)
 
             config%file_format = FILE_FORMATS%to_object(observation%file_format)
+
+            if (config%file_format == FILE_FORMATS%NONE) then
+                config%point_type = OUTPUT_OBSERVATION_TYPES%NONE
+                config%num_observations = 0
+                if (allocated(config%output_variables)) deallocate (config%output_variables)
+                if (allocated(config%observation_geometries)) deallocate (config%observation_geometries)
+                return
+            end if
+
             config%point_type = OUTPUT_OBSERVATION_TYPES%to_object(observation%observation_type)
             config%num_observations = observation%num_observations
             call config%set(config%output_time_unit_name, observation%output_time_unit)

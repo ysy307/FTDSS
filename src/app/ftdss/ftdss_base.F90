@@ -105,6 +105,7 @@ contains
         call self%domain%get_num_nodes(num_nodes)
 
         call self%K%initialize(self%domain)
+        call self%K%build_scatter_map(self%domain)
         call self%F%initialize(self%domain)
         call self%du%initialize(self%domain)
 
@@ -567,6 +568,13 @@ contains
 
         real(real64) :: relaxation_factor
         logical :: is_none
+        logical :: is_newton
+
+        ! Line search parameters for Newton mode
+        real(real64) :: max_du, alpha
+        real(real64), parameter :: MAX_DT_STEP = 5.0d0
+        real(real64), parameter :: MAX_DP_STEP = 1.0d5
+        real(real64), parameter :: ALPHA_MIN = 0.1d0
 
         call self%control%profiler_start(PROFILER_TYPES%SETUP)
 
@@ -578,6 +586,7 @@ contains
         call self%control%get_bdf_coeffs(bdf_order, bdf_coeffs)
 
         is_none = self%control%is_none()
+        is_newton = self%control%is_compute_newton()
 
         if (self%is_active_thermal()) then
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du)
@@ -585,9 +594,25 @@ contains
             if (associated(current)) then
                 if (allocated(du) .and. size(du) > 0) then
                     if (.not. is_none) then
-                        call self%control%compute_relaxation(PHYSICS_TYPES%THERMAL, iter, du, current)
-                        call self%control%get_current_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
-                        write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
+                        if (is_newton) then
+                            ! Damped Newton: clamp step by max allowable change
+                            max_du = maxval(abs(du))
+                            if (max_du > MAX_DT_STEP) then
+                                alpha = MAX_DT_STEP / max_du
+                                alpha = max(alpha, ALPHA_MIN)
+                            else
+                                alpha = 1.0d0
+                            end if
+                            relaxation_factor = alpha
+                            write (*, '("   [Newton] Iter:", I3, " Alpha:", F6.4, " max|dT|:", ES10.3)') &
+                                iter, alpha, max_du
+                            ! Apply damped Newton update directly
+                            current(:) = current(:) + relaxation_factor * du(:)
+                        else
+                            call self%control%compute_relaxation(PHYSICS_TYPES%THERMAL, iter, du, current)
+                            call self%control%get_current_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
+                            write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
+                        end if
                     else
                         relaxation_factor = 1.0d0
                     end if
@@ -609,9 +634,24 @@ contains
             if (associated(current)) then
                 if (allocated(du) .and. size(du) > 0) then
                     if (.not. is_none) then
-                        call self%control%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, iter, du, current)
-                        call self%control%get_current_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
-                        write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
+                        if (is_newton) then
+                            ! Damped Newton: clamp step by max allowable pressure change
+                            max_du = maxval(abs(du))
+                            if (max_du > MAX_DP_STEP) then
+                                alpha = MAX_DP_STEP / max_du
+                                alpha = max(alpha, ALPHA_MIN)
+                            else
+                                alpha = 1.0d0
+                            end if
+                            relaxation_factor = alpha
+                            write (*, '("   [Newton] Iter:", I3, " Alpha:", F6.4, " max|dP|:", ES10.3)') &
+                                iter, alpha, max_du
+                            current(:) = current(:) + relaxation_factor * du(:)
+                        else
+                            call self%control%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, iter, du, current)
+                            call self%control%get_current_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
+                            write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
+                        end if
                     else
                         relaxation_factor = 1.0d0
                     end if

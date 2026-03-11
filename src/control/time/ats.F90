@@ -14,26 +14,27 @@ module control_time_ats
     type :: type_ats
         logical :: active = .false.
 
-        !> [Config] Thresholds for iteration counts
-        integer(int32) :: iter_min = 4 ! If iter < min, increase dt
-        integer(int32) :: iter_max = 8 ! If iter > max, decrease dt
+        integer(int32) :: iter_min = 4
+        integer(int32) :: iter_max = 8
 
-        !> [Config] Scaling factors
-        real(real64) :: scale_up = 1.2d0 ! Success (easy)
-        real(real64) :: scale_down = 0.8d0 ! Success (hard)
-        real(real64) :: scale_retry = 0.5d0 ! Failure (diverged)
+        real(real64) :: scale_up = 1.2d0
+        real(real64) :: scale_down = 0.8d0
+        real(real64) :: scale_retry = 0.5d0
 
         real(real64) :: safety_factor = 0.9d0
         real(real64) :: max_growth_rate = 2.0d0
 
-        !> [Config] Absolute limits (Copies from time control for easy access) in Seconds
         real(real64) :: dt_min = 1.0d-5
         real(real64) :: dt_max = 1.0d+2
+
+        real(real64) :: max_dT_per_step = 5.0d0
+        real(real64) :: max_relative_change = 0.3d0
     contains
         procedure, public, pass(self) :: initialize => initialize_type_ats
         procedure, public, pass(self) :: is_active => is_active_ats
         procedure, public, pass(self) :: predict_next_dt
         procedure, public, pass(self) :: calc_retry_dt
+        procedure, public, pass(self) :: limit_dt_by_solution_change
     end type type_ats
 contains
     ! ==========================================================================
@@ -116,5 +117,35 @@ contains
         ! Clip to minimum allowed dt
         if (retry_dt < self%dt_min) retry_dt = self%dt_min
     end subroutine calc_retry_dt
+
+    pure subroutine limit_dt_by_solution_change(self, current_dt, max_abs_change, ref_scale, limited_dt)
+        implicit none
+        class(type_ats), intent(in) :: self
+        real(real64), intent(in) :: current_dt
+        real(real64), intent(in) :: max_abs_change
+        real(real64), intent(in) :: ref_scale
+        real(real64), intent(inout) :: limited_dt
+
+        real(real64) :: ratio, dt_proposed
+
+        limited_dt = current_dt
+        if (.not. self%active) return
+
+        if (max_abs_change > self%max_dT_per_step .and. max_abs_change > 0.0d0) then
+            ratio = self%max_dT_per_step / max_abs_change
+            dt_proposed = current_dt * ratio * self%safety_factor
+            limited_dt = min(limited_dt, dt_proposed)
+        end if
+
+        if (ref_scale > 0.0d0) then
+            ratio = max_abs_change / ref_scale
+            if (ratio > self%max_relative_change .and. ratio > 0.0d0) then
+                dt_proposed = current_dt * (self%max_relative_change / ratio) * self%safety_factor
+                limited_dt = min(limited_dt, dt_proposed)
+            end if
+        end if
+
+        limited_dt = max(self%dt_min, min(limited_dt, self%dt_max))
+    end subroutine limit_dt_by_solution_change
 
 end module control_time_ats

@@ -1,6 +1,6 @@
 module types_config_control_output_manager
     use, intrinsic :: iso_fortran_env
-    use :: core_constants, only:type_constant_id, type_constant_value
+    use :: core_constants, only:type_constant_id, type_constant_value, FILE_FORMATS
     use :: core_types_config_base, only:abst_config
     implicit none
     private
@@ -42,7 +42,7 @@ contains
         self%interval_val = 0.0d0
         self%interval_unit = type_constant_value("", "", -1, "", 0)
         self%output_unit = type_constant_value("", "", -1, "", 0)
-        self%file_format = type_constant_id("", "", -1)
+        self%file_format = FILE_FORMATS%NONE
     end subroutine reset_config_output_manager
 
 end module types_config_control_output_manager

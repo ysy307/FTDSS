@@ -52,7 +52,7 @@ def main():
     build_cmd = [
         "cmake", "--build", build_dir,
         "--target", f"test_{args.target}",
-        "--parallel", "--verbose"
+        "--parallel", "4"
     ]
 
     print(f"--- Build and Analysis Started: {args.target} ({args.compiler}) ---")
@@ -69,15 +69,13 @@ def main():
         except subprocess.CalledProcessError as e:
             print(f"\n❌ Build failed (Exit Code: {e.returncode}).")
             success = False
-        finally:
-            print("\n--- Stage 3: Analyzing Log ---")
-            analyze_log(
-                log_path_str=str(log_file),
-                compiler=args.compiler
-            )
 
-    if not success:
-        sys.exit(1)
+    # withブロックを抜け、ファイルをクローズした後に解析を実行する
+    print("\n--- Stage 3: Analyzing Log ---")
+    analyze_log(
+        log_path_str=str(log_file),
+        compiler=args.compiler
+    )
 
 if __name__ == "__main__":
     main()

@@ -201,38 +201,113 @@ contains
         logical, intent(inout) :: is_step_converged
         logical :: prescribe_bc
 
+        ! Staggered coupling variables
+        logical :: do_staggered
+        integer(int32) :: coupling_iter
+        integer(int32), parameter :: MAX_COUPLING_ITER = 3
+        real(real64), parameter :: COUPLING_TOL = 1.0d-3
+        real(real64) :: coupling_change_T, coupling_change_P
+        real(real64), allocatable :: T_old(:)
+        real(real64), allocatable :: P_old(:)
+        real(real64), pointer, contiguous :: T_cur(:) => null()
+        real(real64), pointer, contiguous :: P_cur(:) => null()
+        real(real64) :: T_scale, P_scale
+        integer(int32) :: num_nodes
+
         is_step_converged = .false.
 
-        ! Initial setup (compute solver is always set to PICARD here)
-        call self%solve_time_step_initial_setup()
+        ! Use staggered coupling only when both thermal and hydraulic are active
+        do_staggered = self%is_active_thermal() .and. self%is_active_hydraulic()
 
-        ! Nonlinear iteration loop
-        nonlinear: do while (self%control%should_continue())
+        if (do_staggered) then
+            call self%domain%get_num_nodes(num_nodes)
+            allocate (T_old(num_nodes), P_old(num_nodes))
+        end if
 
-            ! Setup (update iteration counter)
-            call self%solve_time_step_setup(prescribe_bc)
+        ! Outer coupling iteration loop
+        coupling_loop: do coupling_iter = 1, merge(MAX_COUPLING_ITER, 1, do_staggered)
 
-            ! Assemble matrices and residual (uses compute_type=PICARD)
-            call self%assemble()
+            ! Save solution before inner nonlinear solve for coupling check
+            if (do_staggered .and. coupling_iter > 1) then
+                call self%temperature%get_current(T_cur)
+                call self%pressure%get_current(P_cur)
+                if (associated(T_cur)) T_old(:) = T_cur(:)
+                if (associated(P_cur)) P_old(:) = P_cur(:)
+                nullify (T_cur)
+                nullify (P_cur)
+            end if
 
-            ! Apply boundary conditions
-            call self%apply_bc(prescribe_bc)
+            ! Initial setup (compute solver is always set to PICARD here)
+            call self%solve_time_step_initial_setup()
 
-            ! Linear solve (K * u = F)
-            call self%solve()
+            ! Nonlinear iteration loop
+            nonlinear: do while (self%control%should_continue())
 
-            ! Convergence check; always converged when config is NONE
-            call self%solve_time_step_check_convergence()
+                ! Setup (update iteration counter)
+                call self%solve_time_step_setup(prescribe_bc)
 
-            ! Update solution; omega=1.0 (Aitken disabled) when config is NONE
-            call self%reflect_variables()
+                ! Assemble matrices and residual
+                call self%assemble()
 
-            ! Force exit after one iteration when config is NONE (linear solve)
-            if (self%control%is_none()) exit nonlinear
+                ! Apply boundary conditions
+                call self%apply_bc(prescribe_bc)
 
-        end do nonlinear
+                ! Linear solve (K * du = F)
+                call self%solve()
 
-        is_step_converged = self%control%is_converged()
+                ! Convergence check; always converged when config is NONE
+                call self%solve_time_step_check_convergence()
+
+                ! Update solution with relaxation (Aitken for Picard, damped for Newton)
+                call self%reflect_variables()
+
+                ! Force exit after one iteration when config is NONE (linear solve)
+                if (self%control%is_none()) exit nonlinear
+
+            end do nonlinear
+
+            is_step_converged = self%control%is_converged()
+
+            ! If inner solve failed, skip coupling check
+            if (.not. is_step_converged) exit coupling_loop
+
+            ! On first coupling iteration or if not staggered, exit
+            if (.not. do_staggered .or. coupling_iter == 1) exit coupling_loop
+
+            ! Check coupling convergence: has the solution changed significantly
+            ! between coupling iterations?
+            coupling_change_T = 0.0d0
+            coupling_change_P = 0.0d0
+
+            call self%temperature%get_current(T_cur)
+            call self%pressure%get_current(P_cur)
+
+            if (associated(T_cur)) then
+                T_scale = maxval(abs(T_cur)) + 1.0d0
+                coupling_change_T = maxval(abs(T_cur - T_old)) / T_scale
+            end if
+            if (associated(P_cur)) then
+                P_scale = maxval(abs(P_cur)) + 1.0d0
+                coupling_change_P = maxval(abs(P_cur - P_old)) / P_scale
+            end if
+
+            nullify (T_cur)
+            nullify (P_cur)
+
+            write (*, '("   [Coupling] Iter:", I2, " dT_rel:", ES10.3, " dP_rel:", ES10.3)') &
+                coupling_iter, coupling_change_T, coupling_change_P
+
+            if (coupling_change_T < COUPLING_TOL .and. coupling_change_P < COUPLING_TOL) then
+                exit coupling_loop
+            end if
+
+        end do coupling_loop
+
+        if (do_staggered) then
+            if (allocated(T_old)) deallocate (T_old)
+            if (allocated(P_old)) deallocate (P_old)
+        end if
+
     end subroutine solve_time_step_ftdss
 
     module subroutine run_ftdss(self)

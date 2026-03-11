@@ -3,7 +3,6 @@ submodule(app_ftdss) ftdss_assemble
 
 contains
 
-!> Perform the global assembly for the FTDSS solver using multicoloring.
     module subroutine assemble_ftdss(self)
         implicit none
         class(type_ftdss), intent(inout) :: self
@@ -12,15 +11,17 @@ contains
         type(type_vector_dp) :: local_F_T, local_F_H
         type(type_assemble_workspace) :: workspace
 
-        ! Coordinate buffer (allocatable for automatic memory management)
         real(real64), allocatable :: elem_coords(:, :)
 
         integer(int32) :: i_color, i_elem, elem_id
         integer(int32), pointer, contiguous, dimension(:) :: p_connectivity
-        integer(int32) :: thermal_dof
+        integer(int32) :: thermal_dof, hydraulic_dof
+        integer(int32) :: num_nodes_local
 
         integer(int32) :: num_colors, num_elements_in_color
         integer(int32), pointer, contiguous, dimension(:) :: elements_list
+
+        logical :: use_scatter, do_hydraulic
 
         call self%control%profiler_start(PROFILER_TYPES%ASSEMBLE)
 
@@ -33,11 +34,19 @@ contains
         call self%domain%get_num_colors(num_colors)
         call self%domain%get_target_dof(PHYSICS_TYPES%THERMAL, thermal_dof)
 
+        do_hydraulic = self%is_active_hydraulic()
+        if (do_hydraulic) then
+            call self%domain%get_target_dof(PHYSICS_TYPES%HYDRAULIC, hydraulic_dof)
+        end if
+
+        use_scatter = self%K%is_scatter_ready()
+
         !$OMP PARALLEL DEFAULT(NONE) &
-        !$OMP SHARED(self, num_colors, elements_list, num_elements_in_color, thermal_dof) &
+        !$OMP SHARED(self, num_colors, elements_list, num_elements_in_color, &
+        !$OMP        thermal_dof, hydraulic_dof, use_scatter, do_hydraulic) &
         !$OMP PRIVATE(i_color, i_elem, elem_id, p_connectivity, workspace, &
         !$OMP         local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
-        !$OMP         local_F_T, local_F_H, elem_coords)
+        !$OMP         local_F_T, local_F_H, elem_coords, num_nodes_local)
 
         do i_color = 1, num_colors
 
@@ -60,8 +69,23 @@ contains
                     call self%assemble_local(workspace, local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
                                              local_F_T, local_F_H)
 
-                    call self%K%add(thermal_dof, thermal_dof, p_connectivity, local_K_TT)
+                    num_nodes_local = workspace%num_fe_nodes
+
+                    if (use_scatter) then
+                        call self%K%add(thermal_dof, thermal_dof, elem_id, num_nodes_local, local_K_TT)
+                    else
+                        call self%K%add(thermal_dof, thermal_dof, p_connectivity, local_K_TT)
+                    end if
                     call self%F%add(thermal_dof, p_connectivity, local_F_T)
+
+                    if (do_hydraulic) then
+                        if (use_scatter) then
+                            call self%K%add(hydraulic_dof, hydraulic_dof, elem_id, num_nodes_local, local_K_HH)
+                        else
+                            call self%K%add(hydraulic_dof, hydraulic_dof, p_connectivity, local_K_HH)
+                        end if
+                        call self%F%add(hydraulic_dof, p_connectivity, local_F_H)
+                    end if
 
                 end do
                 !$OMP END DO
@@ -99,7 +123,6 @@ contains
 
         integer(int32) :: material_id
         type(type_constant_id), pointer :: computation_type
-        ! integer(int32) :: computation_type
         integer(int32) :: num_nodes
 
         integer(int32) :: i
@@ -112,30 +135,16 @@ contains
         call self%domain%get_fe_connectivity(element_id, connectivity_local)
         call self%domain%get_computation_type(computation_type)
 
-        ! Reuses coordinates buffer if already allocated with matching size
         call self%domain%get_fe_coordinate(element_id, coordinates)
 
         call workspace%initialize(fe, material_id, element_id, computation_type%ID, coordinates, self%control)
 
-        ! ---------------------------------------------------------------------
-        ! 1. Load nodal state (T, P, Phi, histories, gradients)
-        !    Skip expensive physics (phase change, etc.) via calc_physics=.false.
-        ! ---------------------------------------------------------------------
         call self%set_states_from_connectivity(connectivity_local, element_id, workspace%state, calc_physics=.false.)
 
-        ! ---------------------------------------------------------------------
-        ! 2. Interpolate nodal values to Gauss points
-        ! ---------------------------------------------------------------------
         call workspace%lerp()
 
-        ! ---------------------------------------------------------------------
-        ! 3. Evaluate phase state, material properties, and fluxes at Gauss points
-        ! ---------------------------------------------------------------------
         call self%update_physical_properties_bulk(material_id, workspace%state_gp)
 
-        ! ---------------------------------------------------------------------
-        ! 4. Initialize local matrices and vectors
-        ! ---------------------------------------------------------------------
         call fe%get_num_nodes(num_nodes)
 
         if (present(local_K_TT)) call check_initialize_matrix(local_K_TT, num_nodes)
@@ -199,8 +208,15 @@ contains
         type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
         type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
 
-        call self%thermal%assemble_local(control=self%control, workspace=workspace, &
-                                         K_TT=local_K_TT, K_TH=local_K_TH, F_T=local_F_T)
+        if (self%is_active_thermal()) then
+            call self%thermal%assemble_local(control=self%control, workspace=workspace, &
+                                             K_TT=local_K_TT, K_TH=local_K_TH, F_T=local_F_T)
+        end if
+
+        if (self%is_active_hydraulic()) then
+            call self%hydraulic%assemble_local(control=self%control, workspace=workspace, &
+                                               K_HH=local_K_HH, K_HT=local_K_HT, F_H=local_F_H)
+        end if
 
     end subroutine assemble_local_ftdss
 

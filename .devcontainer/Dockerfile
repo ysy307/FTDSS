@@ -20,7 +20,7 @@ RUN apt-get update -y && \
     gfortran python3 python3-pip python3-dev zsh sed software-properties-common \
     ninja-build graphviz linux-tools-common linux-tools-generic \
     libx11-dev libxext-dev libxrender-dev libxt-dev pkg-config \
-    adwaita-icon-theme-full gnuplot valgrind kcachegrind gdb tree  && \
+    adwaita-icon-theme-full gnuplot valgrind kcachegrind gdb tree openmpi-bin libopenmpi-dev && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # --- 2. 外部リポジトリの追加 ---

@@ -31,15 +31,17 @@ find_package(OpenMP REQUIRED)
 # 4. MKL Configuration
 set(MKL_LINK static)
 set(MKL_INTERFACE lp64)
-set(MKL_MPI "intelmpi")
 set(MKL_SYCL_LINK OFF)
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel|IntelLLVM")
     set(MKL_THREADING "intel_thread")
+    set(MKL_MPI "intelmpi")
 elseif(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
     set(MKL_THREADING "gnu_thread")
+    set(MKL_MPI "openmpi")
 else()
     set(MKL_THREADING "intel_thread")
+    set(MKL_MPI "intelmpi")
 endif()
 
 set(MKL_COMPONENTS_LIST)
@@ -93,7 +95,7 @@ function(enable_build_flags target)
             >
             # Fortran: GNU
             $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<Fortran_COMPILER_ID:GNU>>:
-            -std=f2018 -cpp -flogical-argument=0/1
+            -std=f2018 -cpp
             $<$<CONFIG:Release>:-O3 -march=native>
             $<$<CONFIG:Debug>:-g -fbacktrace -fcheck=all -ffpe-trap=invalid,zero,overflow -finit-real=snan -finit-integer=-9999999 -Wall -Wextra -pedantic>
             >
