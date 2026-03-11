@@ -2,71 +2,76 @@
 
 set -e
 
-# Parse arguments (default: intel)
-COMPILER=${1:-intel}
+# Use provided arguments or default to 'intel'
+COMPILERS=("$@")
+if [ ${#COMPILERS[@]} -eq 0 ]; then
+    COMPILERS=("intel")
+fi
 
-# Set compiler configurations
-case "$COMPILER" in
-  intel)
-    FC_COMP="ifx"
-    CC_COMP="icx"
-    CXX_COMP="icpx"
-    export FFLAGS="-O3 -xCORE-AVX2"
-    ;;
-  gnu)
-    FC_COMP="gfortran"
-    CC_COMP="gcc"
-    CXX_COMP="g++"
-    export FFLAGS="-O3 -march=native"
-    ;;
-  nvidia)
-    FC_COMP="nvfortran"
-    CC_COMP="nvc"
-    CXX_COMP="nvc++"
-    export FFLAGS="-O3 -fast"
-    ;;
-  *)
-    echo "Error: Unknown compiler '$COMPILER'. Use intel, gnu, or nvidia."
-    exit 1
-    ;;
-esac
-
-# Get absolute path of current directory
 ROOT_DIR=$(realpath .)
-
-# Directory for external dependencies
 THIRD_PARTY_DIR="$ROOT_DIR/third_party"
 JSONFORTRAN_DIR="$THIRD_PARTY_DIR/json-fortran"
-INSTALL_PREFIX="$THIRD_PARTY_DIR/.local/$COMPILER"
 
-# Create third_party directory if it does not exist
-if [ ! -d "$THIRD_PARTY_DIR" ]; then
-    mkdir -p "$THIRD_PARTY_DIR"
-fi
+mkdir -p "$THIRD_PARTY_DIR"
 cd "$THIRD_PARTY_DIR"
 
-# Remove existing json-fortran directory if it exists
-if [ -d "$JSONFORTRAN_DIR" ]; then
-    rm -rf "$JSONFORTRAN_DIR"
+# Clone json-fortran only once if it does not exist
+if [ ! -d "$JSONFORTRAN_DIR" ]; then
+    git clone https://github.com/jacobwilliams/json-fortran.git
 fi
-
-# Clone json-fortran from GitHub
-git clone https://github.com/jacobwilliams/json-fortran.git
 cd "$JSONFORTRAN_DIR"
 
-# CMake configuration
-cmake -B build \
-      -G Ninja \
-      -DCMAKE_Fortran_COMPILER=$FC_COMP \
-      -DCMAKE_C_COMPILER=$CC_COMP \
-      -DCMAKE_CXX_COMPILER=$CXX_COMP \
-      -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" \
-      -DCMAKE_VERBOSE_MAKEFILE=On \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_Fortran_MODULE_DIRECTORY="$JSONFORTRAN_DIR/build/include"
+# Loop through each specified compiler
+for COMPILER in "${COMPILERS[@]}"; do
+    echo "--- Building json-fortran for $COMPILER ---"
 
-# Build
-cmake --build build
+    case "$COMPILER" in
+      intel)
+        FC_COMP="ifx"
+        CC_COMP="icx"
+        CXX_COMP="icpx"
+        export FFLAGS="-O3 -xCORE-AVX2"
+        ;;
+      gnu)
+        FC_COMP="gfortran"
+        CC_COMP="gcc"
+        CXX_COMP="g++"
+        export FFLAGS="-O3 -march=native"
+        ;;
+      nvidia)
+        FC_COMP="nvfortran"
+        CC_COMP="nvc"
+        CXX_COMP="nvc++"
+        export FFLAGS="-O3 -fast"
+        ;;
+      *)
+        echo "Error: Unknown compiler '$COMPILER'. Skipping."
+        continue
+        ;;
+    esac
 
-# Install
-cmake --install build --prefix "$INSTALL_PREFIX"
+    INSTALL_PREFIX="$THIRD_PARTY_DIR/.local/$COMPILER"
+    BUILD_DIR="build-$COMPILER"
+
+    # Reset only the compiler-specific build directory
+    if [ -d "$BUILD_DIR" ]; then
+        rm -rf "$BUILD_DIR"
+    fi
+
+    # CMake configuration
+    cmake -B "$BUILD_DIR" \
+          -G Ninja \
+          -DCMAKE_Fortran_COMPILER=$FC_COMP \
+          -DCMAKE_C_COMPILER=$CC_COMP \
+          -DCMAKE_CXX_COMPILER=$CXX_COMP \
+          -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" \
+          -DCMAKE_VERBOSE_MAKEFILE=On \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_Fortran_MODULE_DIRECTORY="$JSONFORTRAN_DIR/$BUILD_DIR/include"
+
+    # Build and Install
+    cmake --build "$BUILD_DIR"
+    cmake --install "$BUILD_DIR" --prefix "$INSTALL_PREFIX"
+
+    echo "--- Completed json-fortran for $COMPILER ---"
+done
