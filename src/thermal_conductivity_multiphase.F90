@@ -1,4 +1,4 @@
-submodule(physics_materials_thermal_conductivity) thermal_conductivity_multiphase
+submodule(materials_thermal_conductivity) thermal_conductivity_multiphase
     implicit none
 contains
 
@@ -16,7 +16,7 @@ contains
         implicit none
         class(type_thc_1phase), intent(in) :: self
         type(type_state), intent(in) :: state
-        type(type_thc_dispersivity), intent(inout) :: lambda
+        type(type_state_thc), intent(inout) :: lambda
 
         real(real64) :: lambda_0
         type(type_coordinate_dp), pointer :: water_flux
@@ -46,7 +46,7 @@ contains
         implicit none
         class(type_thc_2phase), intent(in) :: self
         type(type_state), intent(in) :: state
-        type(type_thc_dispersivity), intent(inout) :: lambda
+        type(type_state_thc), intent(inout) :: lambda
 
         real(real64) :: lambda_0
         type(type_coordinate_dp), pointer :: water_flux
@@ -82,7 +82,7 @@ contains
         implicit none
         class(type_thc_3phase), intent(in) :: self
         type(type_state), intent(in) :: state
-        type(type_thc_dispersivity), intent(inout) :: lambda
+        type(type_state_thc), intent(inout) :: lambda
 
         real(real64) :: lambda_0
         type(type_coordinate_dp), pointer :: water_flux
@@ -133,7 +133,7 @@ contains
         implicit none
         class(type_thc_4phase), intent(in) :: self
         type(type_state), intent(in) :: state
-        type(type_thc_dispersivity), intent(inout) :: lambda
+        type(type_state_thc), intent(inout) :: lambda
 
         real(real64) :: lambda_0
         type(type_coordinate_dp), pointer :: water_flux

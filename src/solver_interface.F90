@@ -1,10 +1,10 @@
-module solver_solve
+module numerical_solver_interface
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
 !$  use omp_lib
     use :: stdlib_strings, only:strip
     use :: module_core
     use :: module_linalg
-    use :: solver_preconditioner
+    use :: numerical_solver_preconditioner
     implicit none
     private
 
@@ -130,20 +130,20 @@ module solver_solve
     type, extends(abst_solver) :: type_solver_gmres
         integer(int32) :: m_restart = 30
 
-        ! --- ベクトルオブジェクト（システムサイズ N） ---
-        type(type_vector_dp), allocatable :: v(:) ! 基底ベクトル V (m+1)
-        type(type_vector_dp) :: r ! 残差ベクトル
-        type(type_vector_dp) :: z ! 作業用（前処理適用後など）
-        type(type_vector_dp) :: w ! 作業用（前処理適用後など）
-        type(type_vector_dp) :: x_update ! 解の更新用
+        ! --- Vector objects (system size N) ---
+        type(type_vector_dp), allocatable :: v(:) ! Basis vectors V (m+1)
+        type(type_vector_dp) :: r ! Residual vector
+        type(type_vector_dp) :: z ! Work vector (after preconditioning)
+        type(type_vector_dp) :: w ! Work vector (after preconditioning)
+        type(type_vector_dp) :: x_update ! Solution update vector
 
-        ! --- スカラー/小規模配列（サイズ m） ---
-        ! これらはサイズが小さい(m x m)ため，計算効率と記述の簡潔さからFortran標準配列を使用
-        real(real64), allocatable :: h(:, :) ! ヘッセンベルグ行列 (m+1, m)
-        real(real64), allocatable :: g(:) ! 右辺ベクトル g (m+1)
-        real(real64), allocatable :: cs(:) ! ギブンス回転 Cos (m)
-        real(real64), allocatable :: sn(:) ! ギブンス回転 Sin (m)
-        real(real64), allocatable :: y(:) ! 最小二乗解 (m)
+        ! --- Scalar / small arrays (size m) ---
+        ! Small (m x m) arrays use Fortran native arrays for efficiency and simplicity
+        real(real64), allocatable :: h(:, :) ! Hessenberg matrix (m+1, m)
+        real(real64), allocatable :: g(:) ! Right-hand side vector g (m+1)
+        real(real64), allocatable :: cs(:) ! Givens rotation cosine (m)
+        real(real64), allocatable :: sn(:) ! Givens rotation sine (m)
+        real(real64), allocatable :: y(:) ! Least-squares solution (m)
 
     contains
         procedure :: initialize => initialize_type_solver_gmres
@@ -219,30 +219,34 @@ contains
         if (present(time)) then
             select case (self%status)
             case (SOLVER_STATUS%ILL_OPTIONS%ID)
-                write (unit, '(a,es13.4,a)') strip(self%name), ": ", time, " Day: Solver occures ILL_OPTIONS."
+                write (unit, '(a,es13.4,a)') strip(self%name), ": ", time, " Day: Solver encountered ILL_OPTIONS."
             case (SOLVER_STATUS%BREAKDOWN%ID)
-                write (unit, '(a,es13.4,a)') strip(self%name), ": ", time, " Day: Solver occures BREAKDOWN."
+                write (unit, '(a,es13.4,a)') strip(self%name), ": ", time, " Day: Solver encountered BREAKDOWN."
             case (SOLVER_STATUS%OUT_OF_MEMORY%ID)
-                write (unit, '(a,es13.4,a)') strip(self%name), ": ", time, " Day: Solver occures OUT_OF_MEMORY."
+                write (unit, '(a,es13.4,a)') strip(self%name), ": ", time, " Day: Solver encountered OUT_OF_MEMORY."
             case (SOLVER_STATUS%MAXITER%ID)
-                write (unit, '(a,es13.4,a)') strip(self%name), ": ", time, " Day: Solver occures MAXITER."
+                write (unit, '(a,es13.4,a)') strip(self%name), ": ", time, " Day: Solver encountered MAXITER."
             case (SOLVER_STATUS%NOT_IMPLEMENTED%ID)
-                write (unit, '(a,es13.4,a)') strip(self%name), ": ", time, " Day: Solver occures NOT_IMPLEMENTED."
+                write (unit, '(a,es13.4,a)') strip(self%name), ": ", time, " Day: Solver encountered NOT_IMPLEMENTED."
             end select
         else
             select case (self%status)
             case (SOLVER_STATUS%ILL_OPTIONS%ID)
-                write (unit, '(2a)') strip(self%name), ": Solver occures ILL_OPTIONS."
+                write (unit, '(2a)') strip(self%name), ": Solver encountered ILL_OPTIONS."
             case (SOLVER_STATUS%BREAKDOWN%ID)
-                write (unit, '(2a)') strip(self%name), ": Solver occures BREAKDOWN."
+                write (unit, '(2a)') strip(self%name), ": Solver encountered BREAKDOWN."
             case (SOLVER_STATUS%OUT_OF_MEMORY%ID)
-                write (unit, '(2a)') strip(self%name), ": Solver occures OUT_OF_MEMORY."
+                write (unit, '(2a)') strip(self%name), ": Solver encountered OUT_OF_MEMORY."
             case (SOLVER_STATUS%MAXITER%ID)
-                write (unit, '(2a)') strip(self%name), ": Solver occures MAXITER."
+                write (unit, '(2a)') strip(self%name), ": Solver encountered MAXITER."
             case (SOLVER_STATUS%NOT_IMPLEMENTED%ID)
-                write (unit, '(2a)') strip(self%name), ": Solver occures NOT_IMPLEMENTED."
+                write (unit, '(2a)') strip(self%name), ": Solver encountered NOT_IMPLEMENTED."
             end select
         end if
+
+            if (self%status == SOLVER_STATUS%BREAKDOWN%ID) then
+                error stop "Solver BREAKDOWN detected. Program is stopped. Please specify next improvement."
+            end if
     end subroutine check_solver
 
     subroutine display_residual_history_solver(self, unit_display)
@@ -341,5 +345,5 @@ contains
 
     end subroutine create_solver
 
-end module solver_solve
+end module numerical_solver_interface
 

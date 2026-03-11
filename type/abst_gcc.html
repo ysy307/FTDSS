@@ -10,7 +10,7 @@
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>abst_gcc &ndash; FTDSS </title>
+    <title>abst_gcc &ndash; FTCMS </title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -44,7 +44,7 @@
     <div class="container-fluid mb-sm-4 mb-xl-2">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
           <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
                   aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon">
@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.3% of total for derived types.</p>Including implementation: 187 statements,  0.8% of total for derived types.">10 statements</a>
+                 title="<p> 0.3% of total for derived types.</p>Including implementation: 187 statements,  0.7% of total for derived types.">10 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -105,7 +105,7 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
                 <li class="breadcrumb-item"><a href='../sourcefile/gcc_interface.f90.html'>gcc_interface.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/physics_models_phase_change_liquid_solid_gcc.html'>physics_models_phase_change_liquid_solid_gcc</a></li>
+                <li class="breadcrumb-item"><a href='../module/models_phase_change_gcc.html'>models_phase_change_gcc</a></li>
             <li class="breadcrumb-item active" aria-current="page">abst_gcc</li>
           </ol>
         </nav>
@@ -134,10 +134,10 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/abst_gcc.html#variable-ice~15">ice</a>
-            <a class="list-group-item" href="../type/abst_gcc.html#variable-initialized~10">initialized</a>
-            <a class="list-group-item" href="../type/abst_gcc.html#variable-material_id~2">material_id</a>
-            <a class="list-group-item" href="../type/abst_gcc.html#variable-water~16">water</a>
+            <a class="list-group-item" href="../type/abst_gcc.html#variable-ice~22">ice</a>
+            <a class="list-group-item" href="../type/abst_gcc.html#variable-initialized~17">initialized</a>
+            <a class="list-group-item" href="../type/abst_gcc.html#variable-material_id~55">material_id</a>
+            <a class="list-group-item" href="../type/abst_gcc.html#variable-water~23">water</a>
         </div>
       </div>
     </div>
@@ -164,7 +164,7 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/abst_gcc.html#boundprocedure-calc~2">calc</a>
+            <a class="list-group-item" href="../type/abst_gcc.html#boundprocedure-calc~13">calc</a>
             <a class="list-group-item" href="../type/abst_gcc.html#boundprocedure-calc_cp_ice">calc_cp_ice</a>
             <a class="list-group-item" href="../type/abst_gcc.html#boundprocedure-calc_cp_vapor">calc_cp_vapor</a>
             <a class="list-group-item" href="../type/abst_gcc.html#boundprocedure-calc_cp_water">calc_cp_water</a>
@@ -181,11 +181,11 @@
             <a class="list-group-item" href="../type/abst_gcc.html#boundprocedure-calc_rho_vapor_saturation">calc_rho_vapor_saturation</a>
             <a class="list-group-item" href="../type/abst_gcc.html#boundprocedure-calc_rho_water">calc_rho_water</a>
             <a class="list-group-item" href="../type/abst_gcc.html#boundprocedure-deriv_pressure~2">deriv_pressure</a>
-            <a class="list-group-item" href="../type/abst_gcc.html#boundprocedure-deriv_pressure_ice_water">deriv_pressure_ice_water</a>
+            <a class="list-group-item" href="../type/abst_gcc.html#boundprocedure-deriv_pressure_ice_water~2">deriv_pressure_ice_water</a>
             <a class="list-group-item" href="../type/abst_gcc.html#boundprocedure-deriv_temperature~2">deriv_temperature</a>
             <a class="list-group-item" href="../type/abst_gcc.html#boundprocedure-deriv_temperature_2nd">deriv_temperature_2nd</a>
-            <a class="list-group-item" href="../type/abst_gcc.html#boundprocedure-initialize~2">initialize</a>
-            <a class="list-group-item" href="../type/abst_gcc.html#boundprocedure-is_initialized~8">is_initialized</a>
+            <a class="list-group-item" href="../type/abst_gcc.html#boundprocedure-initialize~48">initialize</a>
+            <a class="list-group-item" href="../type/abst_gcc.html#boundprocedure-is_initialized~15">is_initialized</a>
             <a class="list-group-item" href="../type/abst_gcc.html#boundprocedure-shift_pressure_absolute">shift_pressure_absolute</a>
             <a class="list-group-item" href="../type/abst_gcc.html#boundprocedure-shift_temperature_absolute">shift_temperature_absolute</a>
         </div>
@@ -208,7 +208,7 @@
     
     <div class="col-md-9" id='text'>
       <h2 id="type-def-statement">
-        type, public, abstract, extends(<a href='abst_physics.html'>abst_physics</a>) :: abst_gcc</h2>
+        type, public, abstract, extends(<a href='abst_constitutive.html'>abst_constitutive</a>) :: abst_gcc</h2>
     
 <br>      <div class="card">
         <div class="card-header">
@@ -221,31 +221,31 @@
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: type~~abst_gcc~~InheritsGraph Pages: 1 -->
-<svg id="typeabst_gccInheritsGraph" width="332pt" height="74pt"
- viewBox="0.00 0.00 332.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg id="typeabst_gccInheritsGraph" width="355pt" height="74pt"
+ viewBox="0.00 0.00 355.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="type~~abst_gcc~~InheritsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 70)">
 <title>type~~abst_gcc~~InheritsGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 328,-70 328,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 351,-70 351,4 -4,4"/>
 <!-- type~abst_gcc -->
 <g id="type~~abst_gcc~~InheritsGraph_node1" class="node">
 <title>type~abst_gcc</title>
-<polygon fill="none" stroke="black" points="324,-45 265,-45 265,-21 324,-21 324,-45"/>
-<text text-anchor="middle" x="294.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">abst_gcc</text>
+<polygon fill="none" stroke="black" points="347,-45 288,-45 288,-21 347,-21 347,-45"/>
+<text text-anchor="middle" x="317.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">abst_gcc</text>
 </g>
-<!-- type~abst_physics -->
+<!-- type~abst_constitutive -->
 <g id="type~~abst_gcc~~InheritsGraph_node2" class="node">
-<title>type~abst_physics</title>
-<g id="a_type~~abst_gcc~~InheritsGraph_node2"><a xlink:href="../type/abst_physics.html" xlink:title="abst_physics">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="228,-45 149,-45 149,-21 228,-21 228,-45"/>
-<text text-anchor="middle" x="188.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics</text>
+<title>type~abst_constitutive</title>
+<g id="a_type~~abst_gcc~~InheritsGraph_node2"><a xlink:href="../type/abst_constitutive.html" xlink:title="abst_constitutive">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="251,-45 149,-45 149,-21 251,-21 251,-45"/>
+<text text-anchor="middle" x="200" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_constitutive</text>
 </a>
 </g>
 </g>
-<!-- type~abst_gcc&#45;&gt;type~abst_physics -->
+<!-- type~abst_gcc&#45;&gt;type~abst_constitutive -->
 <g id="type~~abst_gcc~~InheritsGraph_edge1" class="edge">
-<title>type~abst_gcc&#45;&gt;type~abst_physics</title>
-<path fill="none" stroke="#ff0000" d="M264.81,-33C256.59,-33 247.4,-33 238.34,-33"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="238.22,-29.5 228.22,-33 238.22,-36.5 238.22,-29.5"/>
+<title>type~abst_gcc&#45;&gt;type~abst_constitutive</title>
+<path fill="none" stroke="#ff0000" d="M287.95,-33C279.81,-33 270.61,-33 261.33,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="261.26,-29.5 251.26,-33 261.26,-36.5 261.26,-29.5"/>
 </g>
 <!-- type_iapws06 -->
 <g id="type~~abst_gcc~~InheritsGraph_node3" class="node">
@@ -253,12 +253,12 @@
 <polygon fill="#5cb85c" stroke="#5cb85c" points="85,-66 0,-66 0,-42 85,-42 85,-66"/>
 <text text-anchor="middle" x="42.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iapws06</text>
 </g>
-<!-- type~abst_physics&#45;&gt;type_iapws06 -->
+<!-- type~abst_constitutive&#45;&gt;type_iapws06 -->
 <g id="type~~abst_gcc~~InheritsGraph_edge3" class="edge">
-<title>type~abst_physics&#45;&gt;type_iapws06</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M148.91,-38.63C132.48,-41.02 113.06,-43.86 95.39,-46.43"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="94.62,-43.01 85.23,-47.91 95.63,-49.93 94.62,-43.01"/>
-<text text-anchor="middle" x="117" y="-46.4" font-family="Helvetica,sans-Serif" font-size="9.50">ice</text>
+<title>type~abst_constitutive&#45;&gt;type_iapws06</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M148.94,-39.76C131.72,-42.09 112.42,-44.69 95.08,-47.03"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="94.57,-43.57 85.13,-48.38 95.51,-50.51 94.57,-43.57"/>
+<text text-anchor="middle" x="117" y="-47.4" font-family="Helvetica,sans-Serif" font-size="9.50">ice</text>
 </g>
 <!-- type_iapws97 -->
 <g id="type~~abst_gcc~~InheritsGraph_node4" class="node">
@@ -266,11 +266,11 @@
 <polygon fill="#5cb85c" stroke="#5cb85c" points="85,-24 0,-24 0,0 85,0 85,-24"/>
 <text text-anchor="middle" x="42.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iapws97</text>
 </g>
-<!-- type~abst_physics&#45;&gt;type_iapws97 -->
+<!-- type~abst_constitutive&#45;&gt;type_iapws97 -->
 <g id="type~~abst_gcc~~InheritsGraph_edge2" class="edge">
-<title>type~abst_physics&#45;&gt;type_iapws97</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M148.97,-25.08C142.97,-23.97 136.83,-22.9 131,-22 119.55,-20.23 107.2,-18.64 95.5,-17.26"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="95.76,-13.77 85.43,-16.12 94.97,-20.72 95.76,-13.77"/>
+<title>type~abst_constitutive&#45;&gt;type_iapws97</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M148.91,-24.63C142.88,-23.7 136.8,-22.8 131,-22 119.52,-20.42 107.17,-18.89 95.46,-17.53"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="95.72,-14.04 85.39,-16.39 94.93,-21 95.72,-14.04"/>
 <text text-anchor="middle" x="117" y="-24.4" font-family="Helvetica,sans-Serif" font-size="9.50">water</text>
 </g>
 </g>
@@ -337,11 +337,11 @@ large graphs.</div>
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: type~~abst_gcc~~InheritedByGraph Pages: 1 -->
-<svg id="typeabst_gccInheritedByGraph" width="641pt" height="91pt"
- viewBox="0.00 0.00 641.00 90.72" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="type~~abst_gcc~~InheritedByGraph" class="graph" transform="scale(0.66 0.66) rotate(0) translate(4 133)">
+<svg id="typeabst_gccInheritedByGraph" width="641pt" height="88pt"
+ viewBox="0.00 0.00 641.00 88.26" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~abst_gcc~~InheritedByGraph" class="graph" transform="scale(0.64 0.64) rotate(0) translate(4 133)">
 <title>type~~abst_gcc~~InheritedByGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-133 964,-133 964,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-133 991,-133 991,4 -4,4"/>
 <!-- type~abst_gcc -->
 <g id="type~~abst_gcc~~InheritedByGraph_node1" class="node">
 <title>type~abst_gcc</title>
@@ -374,7 +374,7 @@ large graphs.</div>
 </g>
 </g>
 <!-- type~type_gcc_non_segregation&#45;&gt;type~abst_gcc -->
-<g id="type~~abst_gcc~~InheritedByGraph_edge3" class="edge">
+<g id="type~~abst_gcc~~InheritedByGraph_edge2" class="edge">
 <title>type~type_gcc_non_segregation&#45;&gt;type~abst_gcc</title>
 <path fill="none" stroke="#ff0000" d="M101.93,-50.33C94.96,-51.1 88.06,-52.28 81.5,-54"/>
 </g>
@@ -388,7 +388,7 @@ large graphs.</div>
 </g>
 </g>
 <!-- type~type_gcc_segregation&#45;&gt;type~abst_gcc -->
-<g id="type~~abst_gcc~~InheritedByGraph_edge2" class="edge">
+<g id="type~~abst_gcc~~InheritedByGraph_edge3" class="edge">
 <title>type~type_gcc_segregation&#45;&gt;type~abst_gcc</title>
 <path fill="none" stroke="#ff0000" d="M121.41,-24C114.64,-26.48 108.01,-29.45 102,-33 90.77,-39.63 94.11,-50.68 81.5,-54"/>
 <path fill="none" stroke="#ff0000" d="M79.5,-54C75.96,-54.93 72.3,-55.97 68.65,-57.07"/>
@@ -410,76 +410,76 @@ large graphs.</div>
 <polygon fill="#ff0000" stroke="#ff0000" points="227.23,-92.5 217.23,-96 227.23,-99.5 227.23,-92.5"/>
 <text text-anchor="middle" x="282.5" y="-98.4" font-family="Helvetica,sans-Serif" font-size="9.50">gcc</text>
 </g>
-<!-- type~type_physics_manager -->
+<!-- type~type_constitutive_manager -->
 <g id="type~~abst_gcc~~InheritedByGraph_node6" class="node">
-<title>type~type_physics_manager</title>
-<g id="a_type~~abst_gcc~~InheritedByGraph_node6"><a xlink:href="../type/type_physics_manager.html" xlink:title="type_physics_manager">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="649,-108 515,-108 515,-84 649,-84 649,-108"/>
-<text text-anchor="middle" x="582" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager</text>
+<title>type~type_constitutive_manager</title>
+<g id="a_type~~abst_gcc~~InheritedByGraph_node6"><a xlink:href="../type/type_constitutive_manager.html" xlink:title="type_constitutive_manager">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="672,-108 515,-108 515,-84 672,-84 672,-108"/>
+<text text-anchor="middle" x="593.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_constitutive_manager</text>
 </a>
 </g>
 </g>
-<!-- type~type_physics_manager&#45;&gt;type~type_models_manager -->
+<!-- type~type_constitutive_manager&#45;&gt;type~type_models_manager -->
 <g id="type~~abst_gcc~~InheritedByGraph_edge5" class="edge">
-<title>type~type_physics_manager&#45;&gt;type~type_models_manager</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M514.77,-96C495.16,-96 473.53,-96 453.34,-96"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="453.25,-92.5 443.25,-96 453.25,-99.5 453.25,-92.5"/>
+<title>type~type_constitutive_manager&#45;&gt;type~type_models_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M514.7,-96C494.78,-96 473.38,-96 453.53,-96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="453.31,-92.5 443.31,-96 453.31,-99.5 453.31,-92.5"/>
 <text text-anchor="middle" x="479" y="-98.4" font-family="Helvetica,sans-Serif" font-size="9.50">models</text>
 </g>
 <!-- type~type_hydraulic -->
 <g id="type~~abst_gcc~~InheritedByGraph_node7" class="node">
 <title>type~type_hydraulic</title>
 <g id="a_type~~abst_gcc~~InheritedByGraph_node7"><a xlink:href="../type/type_hydraulic.html" xlink:title="type_hydraulic">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="813,-129 722,-129 722,-105 813,-105 813,-129"/>
-<text text-anchor="middle" x="767.5" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic</text>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="836,-129 745,-129 745,-105 836,-105 836,-129"/>
+<text text-anchor="middle" x="790.5" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic</text>
 </a>
 </g>
 </g>
-<!-- type~type_hydraulic&#45;&gt;type~type_physics_manager -->
+<!-- type~type_hydraulic&#45;&gt;type~type_constitutive_manager -->
 <g id="type~~abst_gcc~~InheritedByGraph_edge7" class="edge">
-<title>type~type_hydraulic&#45;&gt;type~type_physics_manager</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M721.61,-111.86C702.83,-109.71 680.48,-107.16 659.26,-104.73"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="659.61,-101.25 649.28,-103.59 658.82,-108.2 659.61,-101.25"/>
-<text text-anchor="middle" x="685.5" y="-111.4" font-family="Helvetica,sans-Serif" font-size="9.50">physics</text>
+<title>type~type_hydraulic&#45;&gt;type~type_constitutive_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M744.76,-112.18C726.22,-110.19 704.04,-107.8 682.48,-105.48"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="682.62,-101.97 672.31,-104.38 681.87,-108.93 682.62,-101.97"/>
+<text text-anchor="middle" x="708.5" y="-112.4" font-family="Helvetica,sans-Serif" font-size="9.50">physics</text>
 </g>
 <!-- type~type_thermal -->
 <g id="type~~abst_gcc~~InheritedByGraph_node8" class="node">
 <title>type~type_thermal</title>
 <g id="a_type~~abst_gcc~~InheritedByGraph_node8"><a xlink:href="../type/type_thermal.html" xlink:title="type_thermal">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="809,-87 726,-87 726,-63 809,-63 809,-87"/>
-<text text-anchor="middle" x="767.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal</text>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="832,-87 749,-87 749,-63 832,-63 832,-87"/>
+<text text-anchor="middle" x="790.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal</text>
 </a>
 </g>
 </g>
-<!-- type~type_thermal&#45;&gt;type~type_physics_manager -->
+<!-- type~type_thermal&#45;&gt;type~type_constitutive_manager -->
 <g id="type~~abst_gcc~~InheritedByGraph_edge6" class="edge">
-<title>type~type_thermal&#45;&gt;type~type_physics_manager</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M725.75,-76.99C707.71,-78.1 686.26,-79.72 667,-82 664.49,-82.3 661.95,-82.62 659.38,-82.95"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="658.83,-79.5 649.4,-84.34 659.79,-86.43 658.83,-79.5"/>
-<text text-anchor="middle" x="685.5" y="-84.4" font-family="Helvetica,sans-Serif" font-size="9.50">physics</text>
+<title>type~type_thermal&#45;&gt;type~type_constitutive_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M748.77,-77.17C730.74,-78.31 709.28,-79.91 690,-82 687.45,-82.28 684.86,-82.57 682.25,-82.88"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="681.59,-79.43 672.1,-84.13 682.45,-86.38 681.59,-79.43"/>
+<text text-anchor="middle" x="708.5" y="-84.4" font-family="Helvetica,sans-Serif" font-size="9.50">physics</text>
 </g>
-<!-- type~type_ftdss -->
+<!-- type~type_ftcms -->
 <g id="type~~abst_gcc~~InheritedByGraph_node9" class="node">
-<title>type~type_ftdss</title>
-<g id="a_type~~abst_gcc~~InheritedByGraph_node9"><a xlink:href="../type/type_ftdss.html" xlink:title="type_ftdss">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="960,-107 894,-107 894,-83 960,-83 960,-107"/>
-<text text-anchor="middle" x="927" y="-92.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss</text>
+<title>type~type_ftcms</title>
+<g id="a_type~~abst_gcc~~InheritedByGraph_node9"><a xlink:href="../type/type_ftcms.html" xlink:title="type_ftcms">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="987,-107 917,-107 917,-83 987,-83 987,-107"/>
+<text text-anchor="middle" x="952" y="-92.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms</text>
 </a>
 </g>
 </g>
-<!-- type~type_ftdss&#45;&gt;type~type_hydraulic -->
+<!-- type~type_ftcms&#45;&gt;type~type_hydraulic -->
 <g id="type~~abst_gcc~~InheritedByGraph_edge8" class="edge">
-<title>type~type_ftdss&#45;&gt;type~type_hydraulic</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M893.75,-99.51C873.52,-102.33 846.92,-106.05 823.44,-109.33"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="822.67,-105.9 813.25,-110.75 823.63,-112.83 822.67,-105.9"/>
-<text text-anchor="middle" x="853.5" y="-109.4" font-family="Helvetica,sans-Serif" font-size="9.50">hydraulic</text>
+<title>type~type_ftcms&#45;&gt;type~type_hydraulic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M916.78,-99.72C896.29,-102.55 869.77,-106.2 846.4,-109.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="845.7,-105.99 836.27,-110.83 846.65,-112.93 845.7,-105.99"/>
+<text text-anchor="middle" x="876.5" y="-109.4" font-family="Helvetica,sans-Serif" font-size="9.50">hydraulic</text>
 </g>
-<!-- type~type_ftdss&#45;&gt;type~type_thermal -->
+<!-- type~type_ftcms&#45;&gt;type~type_thermal -->
 <g id="type~~abst_gcc~~InheritedByGraph_edge9" class="edge">
-<title>type~type_ftdss&#45;&gt;type~type_thermal</title>
-<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M893.91,-85.7C888,-84.26 881.84,-82.94 876,-82 857.55,-79.03 837.12,-77.31 819.07,-76.32"/>
-<polygon fill="#00ffff" stroke="#00ffff" points="819.19,-72.82 809.03,-75.83 818.85,-79.81 819.19,-72.82"/>
-<text text-anchor="middle" x="853.5" y="-84.4" font-family="Helvetica,sans-Serif" font-size="9.50">thermal</text>
+<title>type~type_ftcms&#45;&gt;type~type_thermal</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M916.77,-85.52C910.88,-84.15 904.79,-82.91 899,-82 880.53,-79.11 860.1,-77.41 842.05,-76.42"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="842.18,-72.92 832.02,-75.92 841.83,-79.91 842.18,-72.92"/>
+<text text-anchor="middle" x="876.5" y="-84.4" font-family="Helvetica,sans-Serif" font-size="9.50">thermal</text>
 </g>
 </g>
 </svg>
@@ -554,7 +554,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-ice~15"></span>
+              <span class="anchor" id="variable-ice~22"></span>
               type(type_iapws06),
             </td>
               <td>public,</td>
@@ -566,12 +566,12 @@ large graphs.</div>
                 <td></td>
                 <td></td>
             <td>
-                <p>IAPWS-06 氷物性計算オブジェクトへのポインタ</p>
+                <p>Pointer to IAPWS-06 ice model</p>
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-initialized~10"></span>
+              <span class="anchor" id="variable-initialized~17"></span>
               logical,
             </td>
               <td>public</td>
@@ -583,12 +583,12 @@ large graphs.</div>
 <td> =</td>
                 <td>.false.</td>
             <td>
-                <p>初期化済みフラグ</p>
+                <p>Initialization status flag</p>
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material_id~2"></span>
+              <span class="anchor" id="variable-material_id~55"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -605,7 +605,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-water~16"></span>
+              <span class="anchor" id="variable-water~23"></span>
               type(type_iapws97),
             </td>
               <td>public,</td>
@@ -617,7 +617,7 @@ large graphs.</div>
                 <td></td>
                 <td></td>
             <td>
-                <p>IAPWS-97 水物性計算オブジェクトへのポインタ</p>
+                <p>Pointer to IAPWS-97 water model</p>
             </td>
         </tr>
     </tbody>
@@ -633,7 +633,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-calc~2"></span>
+      <span class="anchor" id="boundprocedure-calc~13"></span>
       <h3>
           procedure(<a href='../interface/abst_calc_gcc.html'>abst_calc_gcc</a>), public, deferred, pass(self) ::
   <strong>calc</strong>
@@ -723,22 +723,22 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-calc_cp_ice"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>calc_cp_ice</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_cp_ice_abst_physics.html'>calc_cp_ice_abst_physics</a>
+  <strong>calc_cp_ice</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/calc_cp_ice_abst_constitutive.html'>calc_cp_ice_abst_constitutive</a>
         
       </h3>
     </div>
         <div class="card-body">
           
-          <p>氷の定圧比熱を計算</p>
+          <p>Calculate specific heat capacity of ice</p>
         </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_cp_ice_abst_physics.html'>calc_cp_ice_abst_physics</a>(self, state, cp)  
+    private  subroutine <a href='../proc/calc_cp_ice_abst_constitutive.html'>calc_cp_ice_abst_constitutive</a>(self, state, cp)  
 </h3>
     
 
-  <p>氷の定圧比熱 (Cp) を計算します。</p><a href="../proc/calc_cp_ice_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+  <p>Calculate specific heat capacity of ice</p><a href="../proc/calc_cp_ice_abst_constitutive.html" class="pull-right"><emph>Read more&hellip;</emph></a>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -754,7 +754,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_physics.html'>abst_physics</a>),
+              class(<a href='abst_constitutive.html'>abst_constitutive</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -763,7 +763,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-
+<p>Constitutive model object</p>
             </td>
         </tr>
         <tr>
@@ -778,7 +778,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>state</strong></td>
             <td>
-
+<p>Thermodynamic state
+Not modified</p>
             </td>
         </tr>
         <tr>
@@ -793,7 +794,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>cp</strong></td>
             <td>
-
+<p>Specific heat capacity
+Overwritten on exit</p>
             </td>
         </tr>
     </tbody>
@@ -811,22 +813,22 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-calc_cp_vapor"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>calc_cp_vapor</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_cp_vapor_abst_physics.html'>calc_cp_vapor_abst_physics</a>
+  <strong>calc_cp_vapor</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/calc_cp_vapor_abst_constitutive.html'>calc_cp_vapor_abst_constitutive</a>
         
       </h3>
     </div>
         <div class="card-body">
           
-          <p>水蒸気の定圧比熱(飽和状態)を計算</p>
+          <p>Calculate specific heat capacity of vapor</p>
         </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_cp_vapor_abst_physics.html'>calc_cp_vapor_abst_physics</a>(self, state, cp)  
+    private  subroutine <a href='../proc/calc_cp_vapor_abst_constitutive.html'>calc_cp_vapor_abst_constitutive</a>(self, state, cp)  
 </h3>
     
 
-  <p>蒸気の定圧比熱 (Cp) を飽和状態で計算します。</p><a href="../proc/calc_cp_vapor_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+  <p>Calculate specific heat capacity of vapor</p><a href="../proc/calc_cp_vapor_abst_constitutive.html" class="pull-right"><emph>Read more&hellip;</emph></a>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -842,7 +844,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_physics.html'>abst_physics</a>),
+              class(<a href='abst_constitutive.html'>abst_constitutive</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -851,7 +853,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-
+<p>Constitutive model object</p>
             </td>
         </tr>
         <tr>
@@ -866,7 +868,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>state</strong></td>
             <td>
-
+<p>Thermodynamic state
+Not modified</p>
             </td>
         </tr>
         <tr>
@@ -881,7 +884,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>cp</strong></td>
             <td>
-
+<p>Specific heat capacity
+Overwritten on exit</p>
             </td>
         </tr>
     </tbody>
@@ -899,22 +903,22 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-calc_cp_water"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>calc_cp_water</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_cp_water_abst_physics.html'>calc_cp_water_abst_physics</a>
+  <strong>calc_cp_water</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/calc_cp_water_abst_constitutive.html'>calc_cp_water_abst_constitutive</a>
         
       </h3>
     </div>
         <div class="card-body">
           
-          <p>液体の水の定圧比熱を計算</p>
+          <p>Calculate specific heat capacity of water</p>
         </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_cp_water_abst_physics.html'>calc_cp_water_abst_physics</a>(self, state, cp)  
+    private  subroutine <a href='../proc/calc_cp_water_abst_constitutive.html'>calc_cp_water_abst_constitutive</a>(self, state, cp)  
 </h3>
     
 
-  <p>液体の水の定圧比熱 (Cp) を計算します。</p><a href="../proc/calc_cp_water_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+  <p>Calculate specific heat capacity of water</p><a href="../proc/calc_cp_water_abst_constitutive.html" class="pull-right"><emph>Read more&hellip;</emph></a>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -930,7 +934,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_physics.html'>abst_physics</a>),
+              class(<a href='abst_constitutive.html'>abst_constitutive</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -939,7 +943,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-
+<p>Constitutive model object</p>
             </td>
         </tr>
         <tr>
@@ -954,7 +958,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>state</strong></td>
             <td>
-
+<p>Thermodynamic state
+Not modified</p>
             </td>
         </tr>
         <tr>
@@ -969,7 +974,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>cp</strong></td>
             <td>
-
+<p>Specific heat capacity
+Overwritten on exit</p>
             </td>
         </tr>
     </tbody>
@@ -987,22 +993,22 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-calc_drho_ice_dp"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>calc_drho_ice_dP</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_drho_ice_dp_abst_physics.html'>calc_drho_ice_dP_abst_physics</a>
+  <strong>calc_drho_ice_dP</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/calc_drho_ice_dp_abst_constitutive.html'>calc_drho_ice_dP_abst_constitutive</a>
         
       </h3>
     </div>
         <div class="card-body">
           
-          <p>氷密度の圧力微分を計算</p>
+          <p>Calculate pressure derivative of ice density</p>
         </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_drho_ice_dp_abst_physics.html'>calc_drho_ice_dP_abst_physics</a>(self, state, deriv_density)  
+    private  subroutine <a href='../proc/calc_drho_ice_dp_abst_constitutive.html'>calc_drho_ice_dP_abst_constitutive</a>(self, state, deriv_density)  
 </h3>
     
 
-  <p>氷密度の圧力微分 (dRho/dP) を計算します。</p><a href="../proc/calc_drho_ice_dp_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+  <p>Calculate pressure derivative of ice density</p><a href="../proc/calc_drho_ice_dp_abst_constitutive.html" class="pull-right"><emph>Read more&hellip;</emph></a>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -1018,7 +1024,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_physics.html'>abst_physics</a>),
+              class(<a href='abst_constitutive.html'>abst_constitutive</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -1027,7 +1033,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-
+<p>Constitutive model object</p>
             </td>
         </tr>
         <tr>
@@ -1042,7 +1048,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>state</strong></td>
             <td>
-
+<p>Thermodynamic state
+Not modified</p>
             </td>
         </tr>
         <tr>
@@ -1057,7 +1064,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>deriv_density</strong></td>
             <td>
-
+<p>Density derivative w.r.t pressure
+Overwritten on exit</p>
             </td>
         </tr>
     </tbody>
@@ -1075,22 +1083,22 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-calc_drho_ice_dt"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>calc_drho_ice_dT</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_drho_ice_dt_abst_physics.html'>calc_drho_ice_dT_abst_physics</a>
+  <strong>calc_drho_ice_dT</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/calc_drho_ice_dt_abst_constitutive.html'>calc_drho_ice_dT_abst_constitutive</a>
         
       </h3>
     </div>
         <div class="card-body">
           
-          <p>氷密度の温度微分を計算</p>
+          <p>Calculate temperature derivative of ice density</p>
         </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_drho_ice_dt_abst_physics.html'>calc_drho_ice_dT_abst_physics</a>(self, state, deriv_density)  
+    private  subroutine <a href='../proc/calc_drho_ice_dt_abst_constitutive.html'>calc_drho_ice_dT_abst_constitutive</a>(self, state, deriv_density)  
 </h3>
     
 
-  <p>氷密度の温度微分 (dRho/dT) を計算します。</p><a href="../proc/calc_drho_ice_dt_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+  <p>Calculate temperature derivative of ice density</p><a href="../proc/calc_drho_ice_dt_abst_constitutive.html" class="pull-right"><emph>Read more&hellip;</emph></a>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -1106,7 +1114,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_physics.html'>abst_physics</a>),
+              class(<a href='abst_constitutive.html'>abst_constitutive</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -1115,7 +1123,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-
+<p>Constitutive model object</p>
             </td>
         </tr>
         <tr>
@@ -1130,7 +1138,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>state</strong></td>
             <td>
-
+<p>Thermodynamic state
+Not modified</p>
             </td>
         </tr>
         <tr>
@@ -1145,7 +1154,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>deriv_density</strong></td>
             <td>
-
+<p>Density derivative w.r.t temperature
+Overwritten on exit</p>
             </td>
         </tr>
     </tbody>
@@ -1163,22 +1173,22 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-calc_drho_vapor_dp"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>calc_drho_vapor_dP</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_drho_vapor_dp_abst_physics.html'>calc_drho_vapor_dP_abst_physics</a>
+  <strong>calc_drho_vapor_dP</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/calc_drho_vapor_dp_abst_constitutive.html'>calc_drho_vapor_dP_abst_constitutive</a>
         
       </h3>
     </div>
         <div class="card-body">
           
-          <p>水蒸気密度の圧力微分を計算</p>
+          <p>Calculate pressure derivative of vapor density</p>
         </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_drho_vapor_dp_abst_physics.html'>calc_drho_vapor_dP_abst_physics</a>(self, state, deriv_density)  
+    private  subroutine <a href='../proc/calc_drho_vapor_dp_abst_constitutive.html'>calc_drho_vapor_dP_abst_constitutive</a>(self, state, deriv_density)  
 </h3>
     
 
-  <p>蒸気密度の圧力微分 (dRho_v/dP) を計算します。</p><a href="../proc/calc_drho_vapor_dp_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+  <p>Calculate pressure derivative of vapor density</p><a href="../proc/calc_drho_vapor_dp_abst_constitutive.html" class="pull-right"><emph>Read more&hellip;</emph></a>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -1194,7 +1204,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_physics.html'>abst_physics</a>),
+              class(<a href='abst_constitutive.html'>abst_constitutive</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -1203,7 +1213,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-
+<p>Constitutive model object</p>
             </td>
         </tr>
         <tr>
@@ -1218,7 +1228,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>state</strong></td>
             <td>
-
+<p>Thermodynamic state
+Not modified</p>
             </td>
         </tr>
         <tr>
@@ -1233,7 +1244,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>deriv_density</strong></td>
             <td>
-
+<p>Density derivative w.r.t pressure
+Overwritten on exit</p>
             </td>
         </tr>
     </tbody>
@@ -1251,22 +1263,22 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-calc_drho_vapor_dt"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>calc_drho_vapor_dT</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_drho_vapor_dt_abst_physics.html'>calc_drho_vapor_dT_abst_physics</a>
+  <strong>calc_drho_vapor_dT</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/calc_drho_vapor_dt_abst_constitutive.html'>calc_drho_vapor_dT_abst_constitutive</a>
         
       </h3>
     </div>
         <div class="card-body">
           
-          <p>水蒸気密度の温度微分を計算</p>
+          <p>Calculate temperature derivative of vapor density</p>
         </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_drho_vapor_dt_abst_physics.html'>calc_drho_vapor_dT_abst_physics</a>(self, state, deriv_density)  
+    private  subroutine <a href='../proc/calc_drho_vapor_dt_abst_constitutive.html'>calc_drho_vapor_dT_abst_constitutive</a>(self, state, deriv_density)  
 </h3>
     
 
-  <p>蒸気密度の温度微分 (dRho_v/dT) を計算します。</p><a href="../proc/calc_drho_vapor_dt_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+  <p>Calculate temperature derivative of vapor density</p><a href="../proc/calc_drho_vapor_dt_abst_constitutive.html" class="pull-right"><emph>Read more&hellip;</emph></a>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -1282,7 +1294,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_physics.html'>abst_physics</a>),
+              class(<a href='abst_constitutive.html'>abst_constitutive</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -1291,7 +1303,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-
+<p>Constitutive model object</p>
             </td>
         </tr>
         <tr>
@@ -1306,7 +1318,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>state</strong></td>
             <td>
-
+<p>Thermodynamic state
+Not modified</p>
             </td>
         </tr>
         <tr>
@@ -1321,7 +1334,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>deriv_density</strong></td>
             <td>
-
+<p>Density derivative w.r.t temperature
+Overwritten on exit</p>
             </td>
         </tr>
     </tbody>
@@ -1339,22 +1353,22 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-calc_drho_vapor_saturation_dp"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>calc_drho_vapor_saturation_dP</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_drho_vapor_saturation_dp_abst_physics.html'>calc_drho_vapor_saturation_dP_abst_physics</a>
+  <strong>calc_drho_vapor_saturation_dP</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/calc_drho_vapor_saturation_dp_abst_constitutive.html'>calc_drho_vapor_saturation_dP_abst_constitutive</a>
         
       </h3>
     </div>
         <div class="card-body">
           
-          <p>飽和水蒸気密度の圧力微分を計算</p>
+          <p>Calculate pressure derivative of saturation vapor density</p>
         </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_drho_vapor_saturation_dp_abst_physics.html'>calc_drho_vapor_saturation_dP_abst_physics</a>(self, state, deriv_density)  
+    private  subroutine <a href='../proc/calc_drho_vapor_saturation_dp_abst_constitutive.html'>calc_drho_vapor_saturation_dP_abst_constitutive</a>(self, state, deriv_density)  
 </h3>
     
 
-  <p>飽和水蒸気密度の圧力微分を計算します。</p><a href="../proc/calc_drho_vapor_saturation_dp_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+  <p>Calculate pressure derivative of saturation vapor density</p><a href="../proc/calc_drho_vapor_saturation_dp_abst_constitutive.html" class="pull-right"><emph>Read more&hellip;</emph></a>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -1370,7 +1384,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_physics.html'>abst_physics</a>),
+              class(<a href='abst_constitutive.html'>abst_constitutive</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -1379,7 +1393,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-
+<p>Constitutive model object</p>
             </td>
         </tr>
         <tr>
@@ -1394,7 +1408,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>state</strong></td>
             <td>
-
+<p>Thermodynamic state
+Not modified</p>
             </td>
         </tr>
         <tr>
@@ -1409,7 +1424,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>deriv_density</strong></td>
             <td>
-
+<p>Density derivative w.r.t pressure
+Overwritten on exit</p>
             </td>
         </tr>
     </tbody>
@@ -1427,22 +1443,22 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-calc_drho_vapor_saturation_dt"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>calc_drho_vapor_saturation_dT</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_drho_vapor_saturation_dt_abst_physics.html'>calc_drho_vapor_saturation_dT_abst_physics</a>
+  <strong>calc_drho_vapor_saturation_dT</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/calc_drho_vapor_saturation_dt_abst_constitutive.html'>calc_drho_vapor_saturation_dT_abst_constitutive</a>
         
       </h3>
     </div>
         <div class="card-body">
           
-          <p>飽和水蒸気密度の温度微分を計算</p>
+          <p>Calculate temperature derivative of saturation vapor density</p>
         </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_drho_vapor_saturation_dt_abst_physics.html'>calc_drho_vapor_saturation_dT_abst_physics</a>(self, state, deriv_density)  
+    private  subroutine <a href='../proc/calc_drho_vapor_saturation_dt_abst_constitutive.html'>calc_drho_vapor_saturation_dT_abst_constitutive</a>(self, state, deriv_density)  
 </h3>
     
 
-  <p>飽和水蒸気密度の温度微分を計算します。</p><a href="../proc/calc_drho_vapor_saturation_dt_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+  <p>Calculate temperature derivative of saturation vapor density</p><a href="../proc/calc_drho_vapor_saturation_dt_abst_constitutive.html" class="pull-right"><emph>Read more&hellip;</emph></a>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -1458,7 +1474,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_physics.html'>abst_physics</a>),
+              class(<a href='abst_constitutive.html'>abst_constitutive</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -1467,7 +1483,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-
+<p>Constitutive model object</p>
             </td>
         </tr>
         <tr>
@@ -1482,7 +1498,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>state</strong></td>
             <td>
-
+<p>Thermodynamic state
+Not modified</p>
             </td>
         </tr>
         <tr>
@@ -1497,7 +1514,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>deriv_density</strong></td>
             <td>
-
+<p>Density derivative w.r.t temperature
+Overwritten on exit</p>
             </td>
         </tr>
     </tbody>
@@ -1515,22 +1533,22 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-calc_drho_water_dp"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>calc_drho_water_dP</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_drho_water_dp_abst_physics.html'>calc_drho_water_dP_abst_physics</a>
+  <strong>calc_drho_water_dP</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/calc_drho_water_dp_abst_constitutive.html'>calc_drho_water_dP_abst_constitutive</a>
         
       </h3>
     </div>
         <div class="card-body">
           
-          <p>水密度の圧力微分を計算</p>
+          <p>Calculate pressure derivative of water density</p>
         </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_drho_water_dp_abst_physics.html'>calc_drho_water_dP_abst_physics</a>(self, state, deriv_density)  
+    private  subroutine <a href='../proc/calc_drho_water_dp_abst_constitutive.html'>calc_drho_water_dP_abst_constitutive</a>(self, state, deriv_density)  
 </h3>
     
 
-  <p>水密度の圧力微分 (dRho/dP) を計算します。</p><a href="../proc/calc_drho_water_dp_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+  <p>Calculate pressure derivative of water density</p><a href="../proc/calc_drho_water_dp_abst_constitutive.html" class="pull-right"><emph>Read more&hellip;</emph></a>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -1546,7 +1564,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_physics.html'>abst_physics</a>),
+              class(<a href='abst_constitutive.html'>abst_constitutive</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -1555,7 +1573,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-
+<p>Constitutive model object</p>
             </td>
         </tr>
         <tr>
@@ -1570,7 +1588,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>state</strong></td>
             <td>
-
+<p>Thermodynamic state
+Not modified</p>
             </td>
         </tr>
         <tr>
@@ -1585,7 +1604,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>deriv_density</strong></td>
             <td>
-
+<p>Density derivative w.r.t pressure
+Overwritten on exit</p>
             </td>
         </tr>
     </tbody>
@@ -1603,22 +1623,22 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-calc_drho_water_dt"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>calc_drho_water_dT</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_drho_water_dt_abst_physics.html'>calc_drho_water_dT_abst_physics</a>
+  <strong>calc_drho_water_dT</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/calc_drho_water_dt_abst_constitutive.html'>calc_drho_water_dT_abst_constitutive</a>
         
       </h3>
     </div>
         <div class="card-body">
           
-          <p>水密度の温度微分を計算</p>
+          <p>Calculate temperature derivative of water density</p>
         </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_drho_water_dt_abst_physics.html'>calc_drho_water_dT_abst_physics</a>(self, state, deriv_density)  
+    private  subroutine <a href='../proc/calc_drho_water_dt_abst_constitutive.html'>calc_drho_water_dT_abst_constitutive</a>(self, state, deriv_density)  
 </h3>
     
 
-  <p>水密度の温度微分 (dRho/dT) を計算します。</p><a href="../proc/calc_drho_water_dt_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+  <p>Calculate temperature derivative of water density</p><a href="../proc/calc_drho_water_dt_abst_constitutive.html" class="pull-right"><emph>Read more&hellip;</emph></a>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -1634,7 +1654,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_physics.html'>abst_physics</a>),
+              class(<a href='abst_constitutive.html'>abst_constitutive</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -1643,7 +1663,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-
+<p>Constitutive model object</p>
             </td>
         </tr>
         <tr>
@@ -1658,7 +1678,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>state</strong></td>
             <td>
-
+<p>Thermodynamic state
+Not modified</p>
             </td>
         </tr>
         <tr>
@@ -1673,7 +1694,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>deriv_density</strong></td>
             <td>
-
+<p>Density derivative w.r.t temperature
+Overwritten on exit</p>
             </td>
         </tr>
     </tbody>
@@ -1691,22 +1713,22 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-calc_rho_ice"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>calc_rho_ice</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_rho_ice_abst_physics.html'>calc_rho_ice_abst_physics</a>
+  <strong>calc_rho_ice</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/calc_rho_ice_abst_constitutive.html'>calc_rho_ice_abst_constitutive</a>
         
       </h3>
     </div>
         <div class="card-body">
           
-          <p>氷密度を計算</p>
+          <p>Calculate ice density</p>
         </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_rho_ice_abst_physics.html'>calc_rho_ice_abst_physics</a>(self, state, density)  
+    private  subroutine <a href='../proc/calc_rho_ice_abst_constitutive.html'>calc_rho_ice_abst_constitutive</a>(self, state, density)  
 </h3>
     
 
-  <p>IAPWS-06を用いて氷密度を計算します。</p><a href="../proc/calc_rho_ice_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+  <p>Calculate ice density</p><a href="../proc/calc_rho_ice_abst_constitutive.html" class="pull-right"><emph>Read more&hellip;</emph></a>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -1722,7 +1744,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_physics.html'>abst_physics</a>),
+              class(<a href='abst_constitutive.html'>abst_constitutive</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -1731,7 +1753,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-
+<p>Constitutive model object</p>
             </td>
         </tr>
         <tr>
@@ -1746,7 +1768,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>state</strong></td>
             <td>
-
+<p>Thermodynamic state
+Not modified</p>
             </td>
         </tr>
         <tr>
@@ -1761,7 +1784,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>density</strong></td>
             <td>
-
+<p>Density
+Overwritten on exit</p>
             </td>
         </tr>
     </tbody>
@@ -1779,22 +1803,22 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-calc_rho_vapor"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>calc_rho_vapor</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_rho_vapor_abst_physics.html'>calc_rho_vapor_abst_physics</a>
+  <strong>calc_rho_vapor</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/calc_rho_vapor_abst_constitutive.html'>calc_rho_vapor_abst_constitutive</a>
         
       </h3>
     </div>
         <div class="card-body">
           
-          <p>相対湿度に基づき水蒸気密度を計算</p>
+          <p>Calculate vapor density based on relative humidity</p>
         </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_rho_vapor_abst_physics.html'>calc_rho_vapor_abst_physics</a>(self, state, density)  
+    private  subroutine <a href='../proc/calc_rho_vapor_abst_constitutive.html'>calc_rho_vapor_abst_constitutive</a>(self, state, density)  
 </h3>
     
 
-  <p>相対湿度と飽和密度に基づき蒸気密度を計算します。</p><a href="../proc/calc_rho_vapor_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+  <p>Calculate vapor density</p><a href="../proc/calc_rho_vapor_abst_constitutive.html" class="pull-right"><emph>Read more&hellip;</emph></a>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -1810,7 +1834,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_physics.html'>abst_physics</a>),
+              class(<a href='abst_constitutive.html'>abst_constitutive</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -1819,7 +1843,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-
+<p>Constitutive model object</p>
             </td>
         </tr>
         <tr>
@@ -1834,7 +1858,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>state</strong></td>
             <td>
-
+<p>Thermodynamic state
+Not modified</p>
             </td>
         </tr>
         <tr>
@@ -1849,7 +1874,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>density</strong></td>
             <td>
-
+<p>Density
+Overwritten on exit</p>
             </td>
         </tr>
     </tbody>
@@ -1867,22 +1893,22 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-calc_rho_vapor_saturation"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>calc_rho_vapor_saturation</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_rho_vapor_saturation_abst_physics.html'>calc_rho_vapor_saturation_abst_physics</a>
+  <strong>calc_rho_vapor_saturation</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/calc_rho_vapor_saturation_abst_constitutive.html'>calc_rho_vapor_saturation_abst_constitutive</a>
         
       </h3>
     </div>
         <div class="card-body">
           
-          <p>飽和水蒸気密度を計算</p>
+          <p>Calculate saturation vapor density</p>
         </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_rho_vapor_saturation_abst_physics.html'>calc_rho_vapor_saturation_abst_physics</a>(self, state, density)  
+    private  subroutine <a href='../proc/calc_rho_vapor_saturation_abst_constitutive.html'>calc_rho_vapor_saturation_abst_constitutive</a>(self, state, density)  
 </h3>
     
 
-  <p>飽和水蒸気密度を計算します。</p><a href="../proc/calc_rho_vapor_saturation_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+  <p>Calculate saturation vapor density</p><a href="../proc/calc_rho_vapor_saturation_abst_constitutive.html" class="pull-right"><emph>Read more&hellip;</emph></a>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -1898,7 +1924,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_physics.html'>abst_physics</a>),
+              class(<a href='abst_constitutive.html'>abst_constitutive</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -1907,7 +1933,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-
+<p>Constitutive model object</p>
             </td>
         </tr>
         <tr>
@@ -1922,7 +1948,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>state</strong></td>
             <td>
-
+<p>Thermodynamic state
+Not modified</p>
             </td>
         </tr>
         <tr>
@@ -1937,7 +1964,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>density</strong></td>
             <td>
-
+<p>Density
+Overwritten on exit</p>
             </td>
         </tr>
     </tbody>
@@ -1955,22 +1983,22 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-calc_rho_water"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>calc_rho_water</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/calc_rho_water_abst_physics.html'>calc_rho_water_abst_physics</a>
+  <strong>calc_rho_water</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/calc_rho_water_abst_constitutive.html'>calc_rho_water_abst_constitutive</a>
         
       </h3>
     </div>
         <div class="card-body">
           
-          <p>液体の水密度を計算</p>
+          <p>Calculate liquid water density</p>
         </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_rho_water_abst_physics.html'>calc_rho_water_abst_physics</a>(self, state, density)  
+    private  subroutine <a href='../proc/calc_rho_water_abst_constitutive.html'>calc_rho_water_abst_constitutive</a>(self, state, density)  
 </h3>
     
 
-  <p>IAPWS-97を用いて液体の水密度を計算します。</p><a href="../proc/calc_rho_water_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+  <p>Calculate liquid water density</p><a href="../proc/calc_rho_water_abst_constitutive.html" class="pull-right"><emph>Read more&hellip;</emph></a>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -1986,7 +2014,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_physics.html'>abst_physics</a>),
+              class(<a href='abst_constitutive.html'>abst_constitutive</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -1995,7 +2023,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-
+<p>Constitutive model object</p>
             </td>
         </tr>
         <tr>
@@ -2010,7 +2038,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>state</strong></td>
             <td>
-
+<p>Thermodynamic state
+Not modified</p>
             </td>
         </tr>
         <tr>
@@ -2025,7 +2054,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>density</strong></td>
             <td>
-
+<p>Density
+Overwritten on exit</p>
             </td>
         </tr>
     </tbody>
@@ -2127,7 +2157,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-deriv_pressure_ice_water"></span>
+      <span class="anchor" id="boundprocedure-deriv_pressure_ice_water~2"></span>
       <h3>
           procedure(<a href='../interface/abst_deriv_pressure_ice_water.html'>abst_deriv_pressure_ice_water</a>), public, deferred, pass(self) ::
   <strong>deriv_pressure_ice_water</strong>
@@ -2388,10 +2418,10 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~2"></span>
+      <span class="anchor" id="boundprocedure-initialize~48"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>initialize</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/initialize_abst_gcc.html'>initialize_abst_gcc</a>
+  <strong>initialize</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/initialize_abst_gcc.html'>initialize_abst_gcc</a>
         
       </h3>
     </div>
@@ -2488,21 +2518,25 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-is_initialized~8"></span>
+      <span class="anchor" id="boundprocedure-is_initialized~15"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>is_initialized</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/is_initialized_abst_physics.html'>is_initialized_abst_physics</a>
+  <strong>is_initialized</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_initialized_abst_constitutive.html'>is_initialized_abst_constitutive</a>
         
       </h3>
     </div>
+        <div class="card-body">
+          
+          <p>Check if the model is initialized</p>
+        </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  function <a href='../proc/is_initialized_abst_physics.html'>is_initialized_abst_physics</a>(self) result(initialized)  
+    private  function <a href='../proc/is_initialized_abst_constitutive.html'>is_initialized_abst_constitutive</a>(self) result(initialized)  
 </h3>
     
 
-  
+  <p>Check if the constitutive model is initialized</p><a href="../proc/is_initialized_abst_constitutive.html" class="pull-right"><emph>Read more&hellip;</emph></a>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -2518,7 +2552,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_physics.html'>abst_physics</a>),
+              class(<a href='abst_constitutive.html'>abst_constitutive</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -2527,7 +2561,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-
+<p>Constitutive model object
+Not modified</p>
             </td>
         </tr>
     </tbody>
@@ -2537,7 +2572,7 @@ large graphs.</div>
     Return Value
     <small>logical</small>
     </h4>
-    
+    <p>Initialization status</p>
 
           </li>
       </ul>
@@ -2550,22 +2585,22 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-shift_pressure_absolute"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>shift_pressure_absolute</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/shift_pressure_absolute_abst_physics.html'>shift_pressure_absolute_abst_physics</a>
+  <strong>shift_pressure_absolute</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/shift_pressure_absolute_abst_constitutive.html'>shift_pressure_absolute_abst_constitutive</a>
         
       </h3>
     </div>
         <div class="card-body">
           
-          <p>ゲージ圧を絶対圧に変換</p>
+          <p>Shift pressure to absolute scale</p>
         </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/shift_pressure_absolute_abst_physics.html'>shift_pressure_absolute_abst_physics</a>(self, pressure_gauge, pressure_absolute)  
+    private  subroutine <a href='../proc/shift_pressure_absolute_abst_constitutive.html'>shift_pressure_absolute_abst_constitutive</a>(self, pressure_gauge, pressure_absolute)  
 </h3>
     
 
-  <p>ゲージ圧を絶対圧に変換します。</p><a href="../proc/shift_pressure_absolute_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+  <p>Shift pressure from gauge to absolute</p><a href="../proc/shift_pressure_absolute_abst_constitutive.html" class="pull-right"><emph>Read more&hellip;</emph></a>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -2581,7 +2616,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_physics.html'>abst_physics</a>),
+              class(<a href='abst_constitutive.html'>abst_constitutive</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -2590,7 +2625,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-
+<p>Constitutive model object</p>
             </td>
         </tr>
         <tr>
@@ -2605,7 +2640,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>pressure_gauge</strong></td>
             <td>
-
+<p>Gauge pressure in Pascals
+Not modified</p>
             </td>
         </tr>
         <tr>
@@ -2620,7 +2656,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>pressure_absolute</strong></td>
             <td>
-
+<p>Absolute pressure in Pascals
+Overwritten on exit</p>
             </td>
         </tr>
     </tbody>
@@ -2638,22 +2675,22 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-shift_temperature_absolute"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>shift_temperature_absolute</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/shift_temperature_absolute_abst_physics.html'>shift_temperature_absolute_abst_physics</a>
+  <strong>shift_temperature_absolute</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/shift_temperature_absolute_abst_constitutive.html'>shift_temperature_absolute_abst_constitutive</a>
         
       </h3>
     </div>
         <div class="card-body">
           
-          <p>摂氏温度をケルビンに変換</p>
+          <p>Shift temperature to absolute scale</p>
         </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/shift_temperature_absolute_abst_physics.html'>shift_temperature_absolute_abst_physics</a>(self, temperature_degree, temperature_K)  
+    private  subroutine <a href='../proc/shift_temperature_absolute_abst_constitutive.html'>shift_temperature_absolute_abst_constitutive</a>(self, temperature_degree, temperature_K)  
 </h3>
     
 
-  <p>摂氏温度をケルビンに変換します。</p><a href="../proc/shift_temperature_absolute_abst_physics.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+  <p>Shift temperature from Celsius to Kelvin</p><a href="../proc/shift_temperature_absolute_abst_constitutive.html" class="pull-right"><emph>Read more&hellip;</emph></a>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -2669,7 +2706,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_physics.html'>abst_physics</a>),
+              class(<a href='abst_constitutive.html'>abst_constitutive</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -2678,7 +2715,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-
+<p>Constitutive model object</p>
             </td>
         </tr>
         <tr>
@@ -2693,7 +2730,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>temperature_degree</strong></td>
             <td>
-
+<p>Temperature in Celsius
+Not modified</p>
             </td>
         </tr>
         <tr>
@@ -2708,7 +2746,8 @@ large graphs.</div>
             <td>::</td>
             <td><strong>temperature_K</strong></td>
             <td>
-
+<p>Temperature in Kelvin
+Overwritten on exit</p>
             </td>
         </tr>
     </tbody>
@@ -2724,7 +2763,7 @@ large graphs.</div>
 
     <section>
     <h3><span class="anchor" id="src"></span>Source Code</h3>
-    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">extends</span><span class="p">(</span><span class="n">abst_physics</span><span class="p">),</span><span class="w"> </span><span class="k">abstract</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">abst_gcc</span>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">extends</span><span class="p">(</span><span class="n">abst_constitutive</span><span class="p">),</span><span class="w"> </span><span class="k">abstract</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">abst_gcc</span>
 <span class="w">        </span><span class="c">!&gt; Material ID</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">material_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span>
 <span class="w">    </span><span class="k">contains</span>
@@ -2759,7 +2798,7 @@ large graphs.</div>
         <div class="row justify-content-between">
           <div class="col">
             <p>
-              FTDSS
+              FTCMS
  was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
@@ -2767,7 +2806,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-23 23:52 +0000             </p>
+ on 2026-03-11 14:03 +0000             </p>
           </div>
         </div>
         <br>

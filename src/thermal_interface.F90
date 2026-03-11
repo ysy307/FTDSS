@@ -1,25 +1,32 @@
-module main_thermal
+module physics_governing_thermal
     use, intrinsic :: iso_fortran_env
     use :: module_core
-    use :: module_control, only:type_controls
-    use :: module_input, only:type_input
-    use :: module_physics, only:type_physics_manager, type_wrf_params, type_hcf_params, type_thc_dispersivity
+    use :: module_control, only:type_control
+    use :: module_input, only:type_input, input_translator
     use :: module_linalg
-    use :: main_base, only:type_assemble_workspace
+    use :: module_constitutive, only:type_constitutive_manager
+    use :: physics_governing_base, only:type_assemble_workspace
     implicit none
     private
 
     public :: type_thermal
 
-    ! 定数定義（可読性のため）
-    integer, parameter :: SCHEME_TANGENT = 0 ! 厳密な微分（NR法推奨）
-    integer, parameter :: SCHEME_SECANT = 1 ! 差分近似（Picard法/相変化安定化用）
+    integer, parameter :: SCHEME_TANGENT = 0 ! Exact derivative (for Newton-Raphson)
+    integer, parameter :: SCHEME_SECANT = 1 ! Finite difference (for Picard / phase-change stabilization)
 
     type :: type_thermal
         private
         integer(int32) :: computation_type
         integer(int32) :: computation_dimension
-        type(type_physics_manager) :: physics
+        type(type_constitutive_manager) :: physics
+
+        ! Enthalpy cache for BDF history terms
+        ! Stores U(T_{n-k}) at each node for each history level (k >= 1)
+        ! Avoids recomputing phase-change in compute_transient_term
+        real(real64), allocatable :: enthalpy_cache(:, :)
+        logical :: enthalpy_cache_valid = .false.
+        integer(int32) :: enthalpy_cache_num_nodes = 0
+        integer(int32) :: enthalpy_cache_num_hist = 0
     contains
         procedure, pass(self), public :: initialize => initialize_type_thermal
         procedure, pass(self), public :: destroy => destroy_type_thermal
@@ -40,6 +47,8 @@ module main_thermal
         procedure, pass(self), public :: calc_density_ice => calc_density_ice_thermal
         procedure, pass(self), public :: calc_density_vapor_saturation => calc_density_vapor_saturation_thermal
         procedure, pass(self), public :: update_water_phases => update_water_phases_thermal
+        procedure, pass(self), public :: cache_enthalpy_history => cache_enthalpy_history_thermal
+        procedure, pass(self), public :: invalidate_enthalpy_cache => invalidate_enthalpy_cache_thermal
     end type type_thermal
 
     interface
@@ -101,13 +110,14 @@ module main_thermal
             integer(int32), intent(in), optional :: scheme_opt
 
         end subroutine compute_mass_term_thermal
+        
         module subroutine compute_diffusion_term_thermal(self, material_id, state, D_TT)
             implicit none
             class(type_thermal), intent(in) :: self
             integer(int32), intent(in) :: material_id
             type(type_state), intent(inout) :: state
             real(real64), intent(inout) :: D_TT(:, :)
-            type(type_thc_dispersivity) :: lambda
+            type(type_state_thc) :: lambda
 
         end subroutine compute_diffusion_term_thermal
 
@@ -138,6 +148,25 @@ module main_thermal
             real(real64), intent(inout) :: history_term
 
         end subroutine compute_history_term_thermal
+
+        module subroutine cache_enthalpy_history_thermal(self, num_nodes, num_hist, material_ids, &
+                                                         temperature_all, pressure_all, porosity_all)
+            implicit none
+            class(type_thermal), intent(inout) :: self
+            integer(int32), intent(in) :: num_nodes
+            integer(int32), intent(in) :: num_hist
+            integer(int32), intent(in) :: material_ids(:)
+            real(real64), intent(in) :: temperature_all(:, :)
+            real(real64), intent(in) :: pressure_all(:, :)
+            real(real64), intent(in) :: porosity_all(:, :)
+
+        end subroutine cache_enthalpy_history_thermal
+
+        module subroutine invalidate_enthalpy_cache_thermal(self)
+            implicit none
+            class(type_thermal), intent(inout) :: self
+
+        end subroutine invalidate_enthalpy_cache_thermal
     end interface
 
     interface
@@ -155,10 +184,10 @@ module main_thermal
 
         end subroutine destroy_type_thermal
 
-        module subroutine assemble_local_thermal(self, controls, workspace, K_TT, K_TH, F_T)
+        module subroutine assemble_local_thermal(self, control, workspace, K_TT, K_TH, F_T)
             implicit none
             class(type_thermal), intent(in) :: self
-            type(type_controls), intent(in) :: controls
+            type(type_control), intent(in) :: control
             type(type_assemble_workspace), intent(inout) :: workspace
             type(type_matrix_dense), intent(inout), optional :: K_TT
             type(type_matrix_dense), intent(inout), optional :: K_TH
@@ -166,10 +195,10 @@ module main_thermal
 
         end subroutine assemble_local_thermal
 
-        module subroutine assemble_local_newton_thermal(self, controls, workspace, K_TT, K_TH, F_T)
+        module subroutine assemble_local_newton_thermal(self, control, workspace, K_TT, K_TH, F_T)
             implicit none
             class(type_thermal), intent(in) :: self
-            type(type_controls), intent(in) :: controls
+            type(type_control), intent(in) :: control
             type(type_assemble_workspace), intent(inout) :: workspace
             type(type_matrix_dense), intent(inout), optional :: K_TT
             type(type_matrix_dense), intent(inout), optional :: K_TH
@@ -177,10 +206,10 @@ module main_thermal
 
         end subroutine assemble_local_newton_thermal
 
-        module subroutine assemble_local_picard_thermal(self, controls, workspace, K_TT, K_TH, F_T)
+        module subroutine assemble_local_picard_thermal(self, control, workspace, K_TT, K_TH, F_T)
             implicit none
             class(type_thermal), intent(in) :: self
-            type(type_controls), intent(in) :: controls
+            type(type_control), intent(in) :: control
             type(type_assemble_workspace), intent(inout) :: workspace
             type(type_matrix_dense), intent(inout), optional :: K_TT
             type(type_matrix_dense), intent(inout), optional :: K_TH
@@ -192,4 +221,4 @@ module main_thermal
 
 contains
 
-end module main_thermal
+end module physics_governing_thermal

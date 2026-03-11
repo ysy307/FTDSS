@@ -1,4 +1,4 @@
-submodule(inout_input_output_conditions) inout_input_output_conditions_fields
+submodule(io_input_output_conditions) input_output_conditions_fields
     implicit none
     !!------------------------------------------------------------------------------------------------------------------------------
     !! JSON key names for field output
@@ -18,6 +18,10 @@ contains
         buffer(2) = file_format
         call get_json_value(json, join(buffer(1:2)), self%field_output%file_format, &
                             is_required=.true., valid_list=valid_field_file_formats)
+
+        if (self%field_output%file_format == valid_field_file_formats(1)) then
+            return
+        end if
 
         buffer(2) = output_time_unit
         call get_json_value(json, join(buffer(1:2)), self%field_output%output_time_unit, &
@@ -51,4 +55,4 @@ contains
         end do
 
     end subroutine display_output_settings_fields
-end submodule inout_input_output_conditions_fields
+end submodule input_output_conditions_fields

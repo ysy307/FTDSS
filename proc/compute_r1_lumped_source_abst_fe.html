@@ -10,7 +10,7 @@
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>compute_R1_lumped_source_abst_fe &ndash; FTDSS</title>
+    <title>compute_R1_lumped_source_abst_fe &ndash; FTCMS</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -44,7 +44,7 @@
     <div class="container-fluid mb-sm-4 mb-xl-2">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
           <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
                   aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon">
@@ -186,7 +186,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~1122"></span>
+              <span class="anchor" id="variable-self~1011"></span>
               class(<a href='../type/abst_fe.html'>abst_fe</a>),
             </td>
 <td>intent(in)</td>
@@ -201,7 +201,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-nodes~16"></span>
+              <span class="anchor" id="variable-nodes~8"></span>
               real(kind=real64),
             </td>
 <td>intent(in)</td>
@@ -216,7 +216,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-s_node~3"></span>
+              <span class="anchor" id="variable-s_node"></span>
               real(kind=real64),
             </td>
 <td>intent(in)</td>
@@ -231,7 +231,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-elem_vec~5"></span>
+              <span class="anchor" id="variable-elem_vec~2"></span>
               real(kind=real64),
             </td>
 <td>intent(inout)</td>
@@ -246,7 +246,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-work_psi~15"></span>
+              <span class="anchor" id="variable-work_psi~7"></span>
               real(kind=real64),
             </td>
 <td>intent(inout),</td>
@@ -5455,9 +5455,9 @@ large graphs.</div>
 
 <span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">calc_shape_function</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">nodes</span><span class="p">,</span><span class="w"> </span><span class="n">psi</span><span class="o">=</span><span class="n">p_psi</span><span class="p">,</span><span class="w"> </span><span class="n">determinant_jacobian</span><span class="o">=</span><span class="n">det_J</span><span class="p">)</span>
 
-<span class="w">            </span><span class="c">! 各節点ごとに「支配体積 × 節点値」を計算</span>
+<span class="w">            </span><span class="c">! Compute (control volume) * (nodal value) for each node</span>
 <span class="w">            </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_nodes</span>
-<span class="w">                </span><span class="c">! \int \psi_i d\Omega の寄与分</span>
+<span class="w">                </span><span class="c">! Contribution from \int \psi_i d\Omega</span>
 <span class="w">                </span><span class="c">! R_i += Volume_fraction * S_node_i</span>
 <span class="w">                </span><span class="n">elem_vec</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">elem_vec</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">abs</span><span class="p">(</span><span class="n">det_J</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p_psi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">S_node</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 <span class="w">            </span><span class="k">end do</span>
@@ -5484,7 +5484,7 @@ large graphs.</div>
         <div class="row justify-content-between">
           <div class="col">
             <p>
-              FTDSS
+              FTCMS
  was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
@@ -5492,7 +5492,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-23 23:52 +0000             </p>
+ on 2026-03-11 14:03 +0000             </p>
           </div>
         </div>
         <br>

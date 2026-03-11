@@ -1,4 +1,4 @@
-submodule(physics_models_wrf) calculate_wrf_base
+submodule(models_wrf) calculate_wrf_base
     implicit none
 contains
     ! module subroutine reset_config_wrf(self)
@@ -51,29 +51,29 @@ contains
     !     real(real64) :: pg_val
     !     real(real64) :: scale_pres
 
-    !     ! --- 比重量 (rho*g) の設定 ---
+    !     ! --- Set specific weight (rho*g) ---
     !     if (present(factor)) then
     !         pg_val = factor
     !     else
     !         pg_val = rho_std * g
     !     end if
 
-    !     ! --- 変換係数の決定 ---
+    !     ! --- Determine conversion factor ---
     !     select case (unit_id)
-    !     case (PHYSICS_UNIT_M)
+    !     case (constitutive_UNIT_M)
     !         ! m -> Pa
     !         scale_pres = pg_val
-    !     case (PHYSICS_UNIT_CM)
+    !     case (constitutive_UNIT_CM)
     !         ! cm -> m -> Pa
     !         scale_pres = pg_val * 1.0d-2
-    !     case (PHYSICS_UNIT_PA)
-    !         ! Pa -> Pa (係数は1.0)
+    !     case (constitutive_UNIT_PA)
+    !         ! Pa -> Pa (factor is 1.0)
     !         scale_pres = 1.0d0
     !     case default
     !         scale_pres = 1.0d0
     !     end select
 
-    !     ! --- モデルごとのパラメータ変換 ---
+    !     ! --- Model-specific parameter conversion ---
     !     select case (self%model_number)
     !     case (WRF_BC, WRF_KO)
     !         self%alpha1 = self%alpha1 * scale_pres

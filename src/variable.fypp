@@ -1,29 +1,28 @@
-module core_types_variable
+module types_physics_variable
     use, intrinsic :: iso_fortran_env, only: real64, int32
     use :: core_constants, only:ERROR_CODES
     use :: core_memory
     use :: core_validation, only:raise_error
-    use :: core_types_coordinate_array, only:type_coordinate_array_dp
-    use :: core_types_coordinate, only:type_coordinate_dp
+    use :: core_types_geometry_coordinate_array, only:type_coordinate_array_dp
+    use :: core_types_geometry_coordinate, only:type_coordinate_dp
     implicit none
     private
 
     public :: type_variable
 
     type :: type_variable
-        private
-        logical :: is_initialized = .false.
+        logical, private :: is_initialized = .false.
 
-        integer(int32) :: num_dof = 0
-        integer(int32) :: num_history_steps = 0
-        integer(int32) :: num_time_slots = 0
-        integer(int32) :: head_idx = 1
+        integer(int32), private :: num_dof = 0
+        integer(int32), private :: num_history_steps = 0
+        integer(int32), private :: num_time_slots = 0
+        integer(int32), private :: head_idx = 1
 
-        real(real64), allocatable :: values(:, :)
-        real(real64), allocatable :: delta(:)
-        real(real64), allocatable :: diff(:)
+        real(real64), allocatable, private :: values(:, :)
+        real(real64), allocatable, private :: delta(:)
+        real(real64), allocatable, private :: diff(:)
 
-        type(type_coordinate_array_dp) :: grad
+        type(type_coordinate_array_dp), private :: grad
 
     contains
 
@@ -150,7 +149,7 @@ contains
         class(type_variable), intent(inout) :: self
         integer(int32) :: old_head
 
-        call self%assert_initialized(__LINE__, "core_types_variable:advance_time_step_variable")
+        call self%assert_initialized(__LINE__, "types_physics_variable:advance_time_step_variable")
 
         old_head = self%head_idx
         self%head_idx = self%get_next_index(old_head)
@@ -161,7 +160,7 @@ contains
     subroutine restore_previous_step_variable(self)
         implicit none
         class(type_variable), intent(inout) :: self
-        call self%assert_initialized(__LINE__, "core_types_variable:restore_previous_step_variable")
+        call self%assert_initialized(__LINE__, "types_physics_variable:restore_previous_step_variable")
         self%head_idx = self%get_prev_index(self%head_idx)
     end subroutine restore_previous_step_variable
 
@@ -171,7 +170,7 @@ contains
         real(real64), intent(in) :: initial_value(:)
         integer(int32) :: j
 
-        call self%assert_initialized(__LINE__, "core_types_variable:reset_all_states_variable")
+        call self%assert_initialized(__LINE__, "types_physics_variable:reset_all_states_variable")
 
         if (size(initial_value) /= self%num_dof) then
             error stop "reset: size mismatch"
@@ -196,7 +195,7 @@ contains
 
         integer(int32) :: i, idx, ncopy
 
-        call self%assert_initialized(__LINE__, "core_types_variable:get_history")
+        call self%assert_initialized(__LINE__, "types_physics_variable:get_history")
 
         if (node_id < 1 .or. node_id > self%num_dof) then
             error stop "get_history: invalid node_id"
@@ -218,7 +217,7 @@ contains
         class(type_variable), intent(inout), target :: self
         real(real64), pointer, intent(inout), contiguous :: values(:)
 
-        call self%assert_initialized(__LINE__, "core_types_variable:get_current_values")
+        call self%assert_initialized(__LINE__, "types_physics_variable:get_current_values")
         values => self%values(:, self%head_idx)
     end subroutine get_current_values
 
@@ -228,7 +227,7 @@ contains
         integer(int32), intent(in) :: node_id
         real(real64), intent(inout) :: val
 
-        call self%assert_initialized(__LINE__, "core_types_variable:get_current_scalar")
+        call self%assert_initialized(__LINE__, "types_physics_variable:get_current_scalar")
 
         if (node_id < 1 .or. node_id > self%num_dof) then
             error stop "get_current: invalid node_id"
@@ -245,7 +244,7 @@ contains
         real(real64), pointer, intent(inout), contiguous :: values(:)
         integer(int32) :: prev
 
-        call self%assert_initialized(__LINE__, "core_types_variable:get_previous_values")
+        call self%assert_initialized(__LINE__, "types_physics_variable:get_previous_values")
         prev = self%get_prev_index(self%head_idx)
         values => self%values(:, prev)
     end subroutine get_previous_values
@@ -257,7 +256,7 @@ contains
         real(real64), intent(inout) :: val
         integer(int32) :: prev
 
-        call self%assert_initialized(__LINE__, "core_types_variable:get_previous_scalar")
+        call self%assert_initialized(__LINE__, "types_physics_variable:get_previous_scalar")
 
         if (node_id < 1 .or. node_id > self%num_dof) then
             error stop "get_previous: invalid node_id"
@@ -274,7 +273,7 @@ contains
         class(type_variable), intent(inout), target :: self
         real(real64), pointer, intent(inout), contiguous :: values(:)
 
-        call self%assert_initialized(__LINE__, "core_types_variable:get_delta")
+        call self%assert_initialized(__LINE__, "types_physics_variable:get_delta")
         values => self%delta
     end subroutine get_delta
 
@@ -283,7 +282,7 @@ contains
         class(type_variable), intent(inout), target :: self
         real(real64), pointer, intent(inout), contiguous :: values(:)
 
-        call self%assert_initialized(__LINE__, "core_types_variable:get_diff")
+        call self%assert_initialized(__LINE__, "types_physics_variable:get_diff")
         values => self%diff
     end subroutine get_diff
 
@@ -292,7 +291,7 @@ contains
         class(type_variable), intent(inout), target :: self
         type(type_coordinate_array_dp), pointer, intent(inout) :: values
 
-        call self%assert_initialized(__LINE__, "core_types_variable:get_current_gradient_array")
+        call self%assert_initialized(__LINE__, "types_physics_variable:get_current_gradient_array")
         values => self%grad
     end subroutine get_current_gradient_array
 
@@ -302,7 +301,7 @@ contains
         integer(int32), intent(in) :: node_id
         type(type_coordinate_dp), intent(inout) :: grad
 
-        call self%assert_initialized(__LINE__, "core_types_variable:get_current_gradient_scalar")
+        call self%assert_initialized(__LINE__, "types_physics_variable:get_current_gradient_scalar")
 
         if (node_id < 1 .or. node_id > self%num_dof) then
             error stop "get_current_gradient: invalid node_id"
@@ -318,7 +317,7 @@ contains
         class(type_variable), intent(inout) :: self
         real(real64), intent(in) :: val(:)
 
-        call self%assert_initialized(__LINE__, "core_types_variable:set_current_array_variable")
+        call self%assert_initialized(__LINE__, "types_physics_variable:set_current_array_variable")
 
         if (size(val) /= self%num_dof) then
             error stop "set_current: size mismatch"
@@ -333,7 +332,7 @@ contains
         integer(int32), intent(in) :: node_id
         real(real64), intent(in) :: val
 
-        call self%assert_initialized(__LINE__, "core_types_variable:set_current_scalar_variable")
+        call self%assert_initialized(__LINE__, "types_physics_variable:set_current_scalar_variable")
 
         if (node_id < 1 .or. node_id > self%num_dof) then
             error stop "set_current_scalar: invalid node_id"
@@ -347,7 +346,7 @@ contains
         class(type_variable), intent(inout) :: self
         real(real64), intent(in) :: val
 
-        call self%assert_initialized(__LINE__, "core_types_variable:set_current_scalar_all_variable")
+        call self%assert_initialized(__LINE__, "types_physics_variable:set_current_scalar_all_variable")
         self%values(:, self%head_idx) = val
     end subroutine set_current_scalar_all_variable
 
@@ -359,7 +358,7 @@ contains
         real(real64), intent(in) :: val(:)
         integer(int32) :: prev
 
-        call self%assert_initialized(__LINE__, "core_types_variable:set_previous_array_variable")
+        call self%assert_initialized(__LINE__, "types_physics_variable:set_previous_array_variable")
 
         if (size(val) /= self%num_dof) then
             error stop "set_previous: size mismatch"
@@ -376,7 +375,7 @@ contains
         real(real64), intent(in) :: val
         integer(int32) :: prev
 
-        call self%assert_initialized(__LINE__, "core_types_variable:set_previous_scalar_variable")
+        call self%assert_initialized(__LINE__, "types_physics_variable:set_previous_scalar_variable")
 
         if (node_id < 1 .or. node_id > self%num_dof) then
             error stop "set_previous_scalar: invalid node_id"
@@ -392,7 +391,7 @@ contains
         real(real64), intent(in) :: val
         integer(int32) :: prev
 
-        call self%assert_initialized(__LINE__, "core_types_variable:set_previous_scalar_all_variable")
+        call self%assert_initialized(__LINE__, "types_physics_variable:set_previous_scalar_all_variable")
 
         prev = self%get_prev_index(self%head_idx)
         self%values(:, prev) = val
@@ -403,13 +402,14 @@ contains
         class(type_variable), intent(inout) :: self
         real(real64), intent(in) :: val(:)
 
-        call self%assert_initialized(__LINE__, "core_types_variable:set_delta_array_variable")
+        call self%assert_initialized(__LINE__, "types_physics_variable:set_delta_array_variable")
 
         if (size(val) /= self%num_dof) then
             error stop "set_delta: size mismatch"
         end if
 
         self%delta = val
+        self%values(:, self%head_idx) = self%values(:, self%head_idx) + val
     end subroutine set_delta_array_variable
 
     subroutine compute_time_derivative_variable(self, bdf_coeffs, bdf_order)
@@ -421,7 +421,7 @@ contains
         integer(int32) :: i, idx
         real(real64) :: coeff
 
-        call self%assert_initialized(__LINE__, "core_types_variable:compute_time_derivative_variable")
+        call self%assert_initialized(__LINE__, "types_physics_variable:compute_time_derivative_variable")
 
         if (size(bdf_coeffs) < bdf_order + 1) then
             error stop "compute_time_derivative: coeff size mismatch"
@@ -472,4 +472,4 @@ contains
         end if
     end function get_next_index
 
-end module core_types_variable
+end module types_physics_variable

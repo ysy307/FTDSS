@@ -1,7 +1,7 @@
 !>
 !> Implements the procedures for the Coordinate (COO) sparse matrix type.
 !>
-submodule(core_types_matrix) core_types_matrix_coo
+submodule(core_types_algebra_matrix) algebra_matrix_coo
     implicit none
 
 contains
@@ -99,7 +99,7 @@ contains
         ! Compute the diagonal entries
         do i = 1, self%nnz
             if (self%row(i) == self%col(i)) then
-                call diagonal%set(MATRIX_OPS%INS, self%row(i), self%val(i))
+                call diagonal%set(VECTOR_OPS%INS, self%row(i), self%val(i))
             end if
         end do
 
@@ -407,4 +407,4 @@ contains
         end do
     end subroutine display_coo
 
-end submodule core_types_matrix_coo
+end submodule algebra_matrix_coo

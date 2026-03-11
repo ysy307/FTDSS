@@ -5,12 +5,12 @@
 !> In this project,
 !> - Setting model parameters is called initialization (corresponding procedure: [[initialize(procedure)]])
 !> @endnote
-module physics_models_wrf
+module models_wrf
     use, intrinsic :: iso_fortran_env
     use :: module_core, only:type_config_wrf, SWCC_MODELS
     ! use :: module_core, only:WRF_BC, WRF_VG, WRF_KO, WRF_MVG, WRF_DURNER, WRF_DVGCH, &
-    !     PHYSICS_UNIT_M, PHYSICS_UNIT_CM, PHYSICS_UNIT_PA
-    use :: physics_constants, only:pi => circle_ratio, g => gravity_acceleration, rho_std => reference_water_density
+    !     constitutive_UNIT_M, constitutive_UNIT_CM, constitutive_UNIT_PA
+    use :: constitutive_constants, only:pi => circle_ratio, g => gravity_acceleration, rho_std => reference_water_density
     implicit none
     private
 
@@ -365,4 +365,4 @@ module physics_models_wrf
         end subroutine calculate_wrf_dvgch_derivative
     end interface
 
-end module physics_models_wrf
+end module models_wrf

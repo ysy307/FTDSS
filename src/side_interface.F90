@@ -9,6 +9,7 @@ module domain_fe_side
     use :: stdlib_strings
     use :: module_core
     use :: domain_base_fe, only:abst_fe
+    use :: domain_fe_integration, only:type_gauss_integration_rule
     implicit none
     private
 

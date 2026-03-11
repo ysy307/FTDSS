@@ -10,7 +10,7 @@
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>type_ats &ndash; FTDSS </title>
+    <title>type_ats &ndash; FTCMS </title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -44,7 +44,7 @@
     <div class="container-fluid mb-sm-4 mb-xl-2">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
           <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
                   aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon">
@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.6% of total for derived types.</p>Including implementation: 72 statements,  0.3% of total for derived types.">17 statements</a>
+                 title="<p> 0.6% of total for derived types.</p>Including implementation: 96 statements,  0.4% of total for derived types.">20 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -105,7 +105,7 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
                 <li class="breadcrumb-item"><a href='../sourcefile/ats.f90.html'>ats.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/control_ats.html'>control_ats</a></li>
+                <li class="breadcrumb-item"><a href='../module/control_time_ats.html'>control_time_ats</a></li>
             <li class="breadcrumb-item active" aria-current="page">type_ats</li>
           </ol>
         </nav>
@@ -134,16 +134,18 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_ats.html#variable-dt_max">dt_max</a>
-            <a class="list-group-item" href="../type/type_ats.html#variable-dt_min">dt_min</a>
-            <a class="list-group-item" href="../type/type_ats.html#variable-is_active~16">is_active</a>
-            <a class="list-group-item" href="../type/type_ats.html#variable-iter_max~3">iter_max</a>
-            <a class="list-group-item" href="../type/type_ats.html#variable-iter_min~3">iter_min</a>
-            <a class="list-group-item" href="../type/type_ats.html#variable-max_growth_rate">max_growth_rate</a>
-            <a class="list-group-item" href="../type/type_ats.html#variable-safety_factor">safety_factor</a>
-            <a class="list-group-item" href="../type/type_ats.html#variable-scale_down~3">scale_down</a>
-            <a class="list-group-item" href="../type/type_ats.html#variable-scale_retry~3">scale_retry</a>
-            <a class="list-group-item" href="../type/type_ats.html#variable-scale_up~3">scale_up</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-active~5">active</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-dt_max~2">dt_max</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-dt_min~2">dt_min</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-iter_max~4">iter_max</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-iter_min~4">iter_min</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-max_dt_per_step">max_dT_per_step</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-max_growth_rate~2">max_growth_rate</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-max_relative_change">max_relative_change</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-safety_factor~2">safety_factor</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-scale_down~4">scale_down</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-scale_retry~4">scale_retry</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-scale_up~4">scale_up</a>
         </div>
       </div>
     </div>
@@ -171,8 +173,9 @@
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../type/type_ats.html#boundprocedure-calc_retry_dt">calc_retry_dt</a>
-            <a class="list-group-item" href="../type/type_ats.html#boundprocedure-initialize~48">initialize</a>
-            <a class="list-group-item" href="../type/type_ats.html#boundprocedure-is_enabled~2">is_enabled</a>
+            <a class="list-group-item" href="../type/type_ats.html#boundprocedure-initialize~86">initialize</a>
+            <a class="list-group-item" href="../type/type_ats.html#boundprocedure-is_active~12">is_active</a>
+            <a class="list-group-item" href="../type/type_ats.html#boundprocedure-limit_dt_by_solution_change">limit_dt_by_solution_change</a>
             <a class="list-group-item" href="../type/type_ats.html#boundprocedure-predict_next_dt">predict_next_dt</a>
         </div>
       </div>
@@ -208,11 +211,11 @@ Manages thresholds and scaling factors for automatic time step adjustment.</p>
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: type~~type_ats~~InheritedByGraph Pages: 1 -->
-<svg id="typetype_atsInheritedByGraph" width="465pt" height="32pt"
- viewBox="0.00 0.00 465.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg id="typetype_atsInheritedByGraph" width="458pt" height="32pt"
+ viewBox="0.00 0.00 458.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="type~~type_ats~~InheritedByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>type~~type_ats~~InheritedByGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 461,-28 461,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 454,-28 454,4 -4,4"/>
 <!-- type~type_ats -->
 <g id="type~~type_ats~~InheritedByGraph_node1" class="node">
 <title>type~type_ats</title>
@@ -235,37 +238,37 @@ Manages thresholds and scaling factors for automatic time step adjustment.</p>
 <polygon fill="#ff0000" stroke="#ff0000" points="67.31,-8.5 57.31,-12 67.31,-15.5 67.31,-8.5"/>
 <text text-anchor="middle" x="83" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">ats</text>
 </g>
-<!-- type~type_controls -->
+<!-- type~type_control -->
 <g id="type~~type_ats~~InheritedByGraph_node3" class="node">
-<title>type~type_controls</title>
-<g id="a_type~~type_ats~~InheritedByGraph_node3"><a xlink:href="../type/type_controls.html" xlink:title="type_controls">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="315,-24 232,-24 232,0 315,0 315,-24"/>
-<text text-anchor="middle" x="273.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_controls</text>
+<title>type~type_control</title>
+<g id="a_type~~type_ats~~InheritedByGraph_node3"><a xlink:href="../type/type_control.html" xlink:title="type_control">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="310,-24 232,-24 232,0 310,0 310,-24"/>
+<text text-anchor="middle" x="271" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_control</text>
 </a>
 </g>
 </g>
-<!-- type~type_controls&#45;&gt;type~type_time -->
+<!-- type~type_control&#45;&gt;type~type_time -->
 <g id="type~~type_ats~~InheritedByGraph_edge2" class="edge">
-<title>type~type_controls&#45;&gt;type~type_time</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M231.72,-12C216.6,-12 199.43,-12 184.22,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="184.06,-8.5 174.06,-12 184.06,-15.5 184.06,-8.5"/>
+<title>type~type_control&#45;&gt;type~type_time</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M231.75,-12C216.85,-12 199.72,-12 184.48,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="184.29,-8.5 174.29,-12 184.29,-15.5 184.29,-8.5"/>
 <text text-anchor="middle" x="203" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">time</text>
 </g>
-<!-- type~type_ftdss -->
+<!-- type~type_ftcms -->
 <g id="type~~type_ats~~InheritedByGraph_node4" class="node">
-<title>type~type_ftdss</title>
-<g id="a_type~~type_ats~~InheritedByGraph_node4"><a xlink:href="../type/type_ftdss.html" xlink:title="type_ftdss">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="457,-24 391,-24 391,0 457,0 457,-24"/>
-<text text-anchor="middle" x="424" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss</text>
+<title>type~type_ftcms</title>
+<g id="a_type~~type_ats~~InheritedByGraph_node4"><a xlink:href="../type/type_ftcms.html" xlink:title="type_ftcms">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="450,-24 380,-24 380,0 450,0 450,-24"/>
+<text text-anchor="middle" x="415" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms</text>
 </a>
 </g>
 </g>
-<!-- type~type_ftdss&#45;&gt;type~type_controls -->
+<!-- type~type_ftcms&#45;&gt;type~type_control -->
 <g id="type~~type_ats~~InheritedByGraph_edge3" class="edge">
-<title>type~type_ftdss&#45;&gt;type~type_controls</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M390.78,-12C371.63,-12 346.93,-12 325.21,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="325.16,-8.5 315.16,-12 325.16,-15.5 325.16,-8.5"/>
-<text text-anchor="middle" x="353" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">controls</text>
+<title>type~type_ftcms&#45;&gt;type~type_control</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M379.99,-12C362.18,-12 340.07,-12 320.5,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="320.24,-8.5 310.24,-12 320.24,-15.5 320.24,-8.5"/>
+<text text-anchor="middle" x="345" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">control</text>
 </g>
 </g>
 </svg>
@@ -336,10 +339,27 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-dt_max"></span>
+              <span class="anchor" id="variable-active~5"></span>
+              logical,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>active</strong></td>
+<td> =</td>
+                <td>.false.</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dt_max~2"></span>
               real(kind=real64),
             </td>
-              <td>private</td>
+              <td>public</td>
             <td>
               
             </td>
@@ -353,10 +373,10 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-dt_min"></span>
+              <span class="anchor" id="variable-dt_min~2"></span>
               real(kind=real64),
             </td>
-              <td>private</td>
+              <td>public</td>
             <td>
               
             </td>
@@ -365,32 +385,15 @@ large graphs.</div>
 <td> =</td>
                 <td>1.0d-5</td>
             <td>
-                <p>[Config] Absolute limits (Copies from time control for easy access)</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-is_active~16"></span>
-              logical,
-            </td>
-              <td>private</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>is_active</strong></td>
-<td> =</td>
-                <td>.false.</td>
-            <td>
                 
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-iter_max~3"></span>
+              <span class="anchor" id="variable-iter_max~4"></span>
               integer(kind=int32),
             </td>
-              <td>private</td>
+              <td>public</td>
             <td>
               
             </td>
@@ -404,10 +407,10 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-iter_min~3"></span>
+              <span class="anchor" id="variable-iter_min~4"></span>
               integer(kind=int32),
             </td>
-              <td>private</td>
+              <td>public</td>
             <td>
               
             </td>
@@ -416,15 +419,32 @@ large graphs.</div>
 <td> =</td>
                 <td>4</td>
             <td>
-                <p>[Config] Thresholds for iteration counts</p>
+                
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-max_growth_rate"></span>
+              <span class="anchor" id="variable-max_dt_per_step"></span>
               real(kind=real64),
             </td>
-              <td>private</td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>max_dT_per_step</strong></td>
+<td> =</td>
+                <td>5.0d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-max_growth_rate~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
             <td>
               
             </td>
@@ -438,10 +458,27 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-safety_factor"></span>
+              <span class="anchor" id="variable-max_relative_change"></span>
               real(kind=real64),
             </td>
-              <td>private</td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>max_relative_change</strong></td>
+<td> =</td>
+                <td>0.3d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-safety_factor~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
             <td>
               
             </td>
@@ -455,10 +492,10 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-scale_down~3"></span>
+              <span class="anchor" id="variable-scale_down~4"></span>
               real(kind=real64),
             </td>
-              <td>private</td>
+              <td>public</td>
             <td>
               
             </td>
@@ -472,10 +509,10 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-scale_retry~3"></span>
+              <span class="anchor" id="variable-scale_retry~4"></span>
               real(kind=real64),
             </td>
-              <td>private</td>
+              <td>public</td>
             <td>
               
             </td>
@@ -489,10 +526,10 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-scale_up~3"></span>
+              <span class="anchor" id="variable-scale_up~4"></span>
               real(kind=real64),
             </td>
-              <td>private</td>
+              <td>public</td>
             <td>
               
             </td>
@@ -501,7 +538,7 @@ large graphs.</div>
 <td> =</td>
                 <td>1.2d0</td>
             <td>
-                <p>[Config] Scaling factors</p>
+                
             </td>
         </tr>
     </tbody>
@@ -527,7 +564,7 @@ large graphs.</div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    public pure subroutine <a href='../proc/calc_retry_dt.html'>calc_retry_dt</a>(self, current_dt, retry_dt)  
+    private pure subroutine <a href='../proc/calc_retry_dt.html'>calc_retry_dt</a>(self, current_dt, retry_dt)  
 </h3>
     
 
@@ -601,17 +638,17 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~48"></span>
+      <span class="anchor" id="boundprocedure-initialize~86"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>initialize</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/initialize_type_ats.html'>initialize_type_ats</a>
+  <strong>initialize</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/initialize_type_ats.html'>initialize_type_ats</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    public  subroutine <a href='../proc/initialize_type_ats.html'>initialize_type_ats</a>(self, input, dt_min_limit, dt_max_limit)  
+    private  subroutine <a href='../proc/initialize_type_ats.html'>initialize_type_ats</a>(self, config_time_ats)  
 </h3>
     
 
@@ -646,44 +683,14 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              type(<a href='type_input.html'>type_input</a>),
+              type(<a href='type_config_time_ats.html'>type_config_time_ats</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>input</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>dt_min_limit</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>dt_max_limit</strong></td>
+            <td><strong>config_time_ats</strong></td>
             <td>
 
             </td>
@@ -700,17 +707,17 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-is_enabled~2"></span>
+      <span class="anchor" id="boundprocedure-is_active~12"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>is_enabled</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/is_enabled_ats.html'>is_enabled_ats</a>
+  <strong>is_active</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_active_ats.html'>is_active_ats</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    public pure function <a href='../proc/is_enabled_ats.html'>is_enabled_ats</a>(self) result(is_enabled)  
+    private pure function <a href='../proc/is_active_ats.html'>is_active_ats</a>(self) result(is_active)  
 </h3>
     
 
@@ -759,6 +766,120 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-limit_dt_by_solution_change"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>limit_dt_by_solution_change</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure subroutine <a href='../proc/limit_dt_by_solution_change.html'>limit_dt_by_solution_change</a>(self, current_dt, max_abs_change, ref_scale, limited_dt)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_ats.html'>type_ats</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_dt</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>max_abs_change</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ref_scale</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>limited_dt</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
       <span class="anchor" id="boundprocedure-predict_next_dt"></span>
       <h3>
           procedure, public, pass(self) ::
@@ -769,7 +890,7 @@ large graphs.</div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    public pure subroutine <a href='../proc/predict_next_dt.html'>predict_next_dt</a>(self, current_dt, iter_count, next_dt)  
+    private pure subroutine <a href='../proc/predict_next_dt.html'>predict_next_dt</a>(self, current_dt, iter_count, next_dt)  
 </h3>
     
 
@@ -860,28 +981,29 @@ large graphs.</div>
     <section>
     <h3><span class="anchor" id="src"></span>Source Code</h3>
     <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_ats</span>
-<span class="w">        </span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
 
-<span class="w">        </span><span class="c">!&gt; [Config] Thresholds for iteration counts</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">iter_min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="c">! If iter &lt; min, increase dt</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">iter_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="c">! If iter &gt; max, decrease dt</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">iter_min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">iter_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span>
 
-<span class="w">        </span><span class="c">!&gt; [Config] Scaling factors</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">scale_up</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.2d0</span><span class="w"> </span><span class="c">! Success (easy)</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">scale_down</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.8d0</span><span class="w"> </span><span class="c">! Success (hard)</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">scale_retry</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5d0</span><span class="w"> </span><span class="c">! Failure (diverged)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">scale_up</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.2d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">scale_down</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.8d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">scale_retry</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5d0</span>
 
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">safety_factor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.9d0</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">max_growth_rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.0d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">safety_factor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.9d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">max_growth_rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.0d0</span>
 
-<span class="w">        </span><span class="c">!&gt; [Config] Absolute limits (Copies from time control for easy access)</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dt_min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d-5</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dt_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d+2</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dt_min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d-5</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dt_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d+2</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">max_dT_per_step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">5.0d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">max_relative_change</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.3d0</span>
 <span class="w">    </span><span class="k">contains</span>
 <span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">initialize_type_ats</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_enabled</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_enabled_ats</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_active</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_active_ats</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">predict_next_dt</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc_retry_dt</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">limit_dt_by_solution_change</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_ats</span>
 </pre></div>
 
@@ -897,7 +1019,7 @@ large graphs.</div>
         <div class="row justify-content-between">
           <div class="col">
             <p>
-              FTDSS
+              FTCMS
  was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
@@ -905,7 +1027,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-23 23:52 +0000             </p>
+ on 2026-03-11 14:03 +0000             </p>
           </div>
         </div>
         <br>

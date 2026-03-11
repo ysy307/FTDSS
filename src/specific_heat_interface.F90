@@ -1,9 +1,9 @@
-module physics_materials_specific_heat
+module materials_specific_heat
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
-    use :: module_core, only:type_state, type_physics_info
-    use :: physics_constants, only:TtoK => celsius_to_kelvin
-    use :: physics_materials_base, only:abst_material
+    use :: module_core, only:type_state, type_config_constitutive
+    use :: constitutive_constants, only:TtoK => celsius_to_kelvin
+    use :: materials_base, only:abst_material
     implicit none
     private
 
@@ -14,7 +14,7 @@ module physics_materials_specific_heat
     public :: type_sph_3phase
     public :: type_sph_4phase
 
-    ! --- ポリモーフィックなコンテナ ---
+    ! --- Polymorphic container ---
     type :: holder_sphs
         class(abst_sph), allocatable :: p
     contains
@@ -22,11 +22,11 @@ module physics_materials_specific_heat
     end type holder_sphs
 
     interface
-        module subroutine initialize_holder_sphs(self, material_id, physics_info, water, ice)
+        module subroutine initialize_holder_sphs(self, material_id, constitutive_info, water, ice)
             implicit none
             class(holder_sphs), intent(inout) :: self
             integer(int32), intent(in) :: material_id
-            type(type_physics_info), intent(in) :: physics_info
+            type(type_config_constitutive), intent(in) :: constitutive_info
             type(type_iapws97), intent(in), target :: water
             type(type_iapws06), intent(in), target :: ice
 
@@ -146,4 +146,4 @@ module physics_materials_specific_heat
         end subroutine calc_sph_4
     end interface
 
-end module physics_materials_specific_heat
+end module materials_specific_heat

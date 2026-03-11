@@ -1,4 +1,4 @@
-submodule(inout_input_basic) inout_input_basic_materials
+submodule(io_input_basic) input_basic_materials
     implicit none
     !!------------------------------------------------------------------------------------------------------------------------------
     ! JSON key names for materials
@@ -46,7 +46,7 @@ submodule(inout_input_basic) inout_input_basic_materials
     character(*), parameter :: water_viscosity_model = "water_viscosity_model"
     character(*), parameter :: water_retention_model = "water_retention_model"
 contains
-    module subroutine read_parameters_materials(self, json)
+    module subroutine read_materials(self, json)
         implicit none
         class(type_input_basic), intent(inout) :: self
         type(json_file), intent(inout) :: json
@@ -65,24 +65,24 @@ contains
         allocate (self%materials(self%num_materials))
 
         do i = 1, self%num_materials
-            call read_parameters_materials_basic(self, json, i)
+            call read_materials_basic(self, json, i)
 
-            call read_parameters_materials_physics(self, json, i)
+            call read_materials_physics(self, json, i)
 
             ! if (self%analysis_controls%is_active(get_physics_type(thermal))) then
-            !     call read_parameters_materials_thermal(self, json, i)
+            !     call read_materials_thermal(self, json, i)
             ! end if
             ! if (self%analysis_controls%is_active(get_physics_type(hydraulic))) then
-            !     call read_parameters_materials_hydraulic(self, json, i)
+            !     call read_materials_hydraulic(self, json, i)
             ! end if
             ! if (self%analysis_controls%is_active(get_physics_type(mechanical))) then
             !     ! Mechanical parameters can be added here in the future
             ! end if
         end do
 
-    end subroutine read_parameters_materials
+    end subroutine read_materials
 
-    subroutine read_parameters_materials_basic(self, json, i_material)
+    subroutine read_materials_basic(self, json, i_material)
         !> Load the basic material parameters from the JSON file
         implicit none
         class(type_input_basic), intent(inout) :: self
@@ -122,9 +122,9 @@ contains
         call get_json_value(json, join(buffer), self%materials(i_material)%phase, &
                             is_required=.true., valid_range=[1, 4])
 
-    end subroutine read_parameters_materials_basic
+    end subroutine read_materials_basic
 
-    subroutine read_parameters_materials_physics(self, json, i_material)
+    subroutine read_materials_physics(self, json, i_material)
         implicit none
         class(type_input_basic), intent(inout) :: self
         type(json_file), intent(inout) :: json !! JSON parser
@@ -183,13 +183,13 @@ contains
             call get_json_value(json, join(buffer), self%materials(i_material)%phase_change%equilibrium_model%segregation, &
                                 is_required=.true., default_value=.false.)
 
-            call read_parameters_materials_swcc(self, json, i_material)
-            call read_parameters_materials_hydraulic_model(self, json, i_material)
+            call read_materials_swcc(self, json, i_material)
+            call read_materials_hydraulic_model(self, json, i_material)
         end if
 
-    end subroutine read_parameters_materials_physics
+    end subroutine read_materials_physics
 
-    subroutine read_parameters_materials_hydraulic_model(self, json, i_material)
+    subroutine read_materials_hydraulic_model(self, json, i_material)
         !> Load the hydraulic parameters from the JSON file
         implicit none
         class(type_input_basic), intent(inout) :: self
@@ -222,9 +222,9 @@ contains
             call get_json_value(json, join(buffer(1:3)), hydraulic_conductivity%gain_factor, &
                                 is_required=.false., default_value=1.0d0, valid_range=[0.0d0, huge(0.0d0)])
         end associate
-    end subroutine read_parameters_materials_hydraulic_model
+    end subroutine read_materials_hydraulic_model
 
-    subroutine read_parameters_materials_swcc(self, json, i_material)
+    subroutine read_materials_swcc(self, json, i_material)
         implicit none
         class(type_input_basic), intent(inout) :: self
         type(json_file), intent(inout) :: json !! JSON parser
@@ -291,7 +291,7 @@ contains
 
         end associate
 
-    end subroutine read_parameters_materials_swcc
+    end subroutine read_materials_swcc
 
     ! !---
     ! ! getter
@@ -475,7 +475,7 @@ contains
         call display_material_basic(self)
 
         ! --- 2. Thermal Properties ---
-        !     構造体はフラットですが，表示は見やすく物理現象ごとにまとめます
+        !     The struct is flat, but display is grouped by physics type for readability
         if (self%is_active(PHYSICS_TYPES%THERMAL%ID)) then
             call display_material_thermal(self)
         end if
@@ -501,7 +501,7 @@ contains
             write (*, '(a, a)') "  Name                : ", trim(material%name)
         end if
         write (*, '(a, i0)') "  Phase Count         : ", material%phase
-        ! is_frozen 等のフラグが構造体にない場合は削除，ある場合は復活させてください
+        ! Remove this line if is_frozen flag is absent from the struct; restore if present
         ! write (*, '(a, g0)') "  Is Frozen           : ", material%is_frozen
 
         write (*, '(a, L1)') "  Calculate Thermal   : ", material%is_active(PHYSICS_TYPES%THERMAL%ID)
@@ -559,7 +559,7 @@ contains
 
         ! Phase Change
         write (*, '(a)') "    --- Phase Change ---"
-        ! 読み込みコードに合わせて equilibrium_model へのアクセスパスを調整
+        ! Adjust access path to equilibrium_model to match loading code
         write (*, '(a, L1)') "    Segregation         : ", material%phase_change%equilibrium_model%segregation
 
     end subroutine display_material_thermal
@@ -600,8 +600,8 @@ contains
         write (*, '(a, es12.4e2)') "      n1                : ", wcc%n1
         write (*, '(a, es12.4e2)') "      l                 : ", wcc%l
 
-        ! 以下は値が入っていない可能性があるため条件分岐等を検討しても良いですが
-        ! ここでは単純に表示します (0.0等が表示される想定)
+        ! The following values may be unset; conditionally displaying them could be
+        ! considered, but here we simply print them (expecting 0.0 for unset values)
         write (*, '(a, es12.4e2)') "      h_crit            : ", wcc%h_crit
         write (*, '(a, es12.4e2)') "      alpha2            : ", wcc%alpha2
         write (*, '(a, es12.4e2)') "      n2                : ", wcc%n2
@@ -609,4 +609,4 @@ contains
 
     end subroutine display_wcc
 
-end submodule inout_input_basic_materials
+end submodule input_basic_materials

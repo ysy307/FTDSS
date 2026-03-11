@@ -1,56 +1,144 @@
-module conditions_boundary_manager
-    use, intrinsic :: iso_fortran_env, only: int32
-    use :: stdlib_strings, only:to_string
+module physics_governing_boundary_manager
+    use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core
-    use :: module_input
-    use :: module_control
-    use :: conditions_boundary ! 汎用BC型定義
+    use :: boundary_data_provider
+    use :: boundary_strategy
+    use :: boundary_strategy_factory
     implicit none
     private
 
-    public :: create_boundary_conditions
+    public :: type_bc_manager
+
+    type :: holder_bc_strategy
+        class(abst_bc), allocatable :: p
+    end type holder_bc_strategy
+
+    type :: type_bc_manager
+        integer(int32), private :: num_boundaries = 0
+        type(holder_bc_strategy), allocatable, private :: strategies(:)
+        !> JSON boundary_id for each strategy (same order as strategies(:)).
+        integer(int32), allocatable, private :: boundary_ids(:)
+    contains
+        procedure, public, pass(self) :: initialize => initialize_bc_manager
+        procedure, public, pass(self) :: destroy => destroy_bc_manager
+        generic :: evaluate => evaluate_bc, evaluate_bcs
+        procedure, public, pass(self) :: evaluate_bc => evaluate_bc_manager
+        procedure, public, pass(self) :: evaluate_bcs => evaluate_bcs_manager
+        procedure, public, pass(self) :: get_num_boundaries => get_num_boundaries_bc_manager
+        procedure, public, pass(self) :: get_bc_index => get_bc_index_bc_manager
+    end type type_bc_manager
 
 contains
 
-    !> 境界条件オブジェクトのファクトリ関数
-    function create_boundary_conditions(config_bc) result(bc)
+    subroutine initialize_bc_manager(self, configs)
         implicit none
-        type(type_config_bc), intent(in) :: config_bc
-        class(abst_bc), allocatable :: bc
+        class(type_bc_manager), intent(inout) :: self
+        type(type_config_bc), intent(in) :: configs(:)
 
-        ! 1. IDに基づいて適切なクラスを割り当てる (Allocate)
-        !    ※ 熱(Thermal)も水(Hydraulic)も、数学的性質が同じなら同じ型を使う
-        if (config_bc%bc_kind == THERMAL_BC_TYPES%DIRICHLET .or. &
-            config_bc%bc_kind == HYDRAULIC_BC_TYPES%DIRICHLET) then
-            allocate (type_bc_dirichlet :: bc)
-        else if (config_bc%bc_kind == THERMAL_BC_TYPES%NEUMANN .or. &
-                 config_bc%bc_kind == THERMAL_BC_TYPES%FLUX .or. &
-                 config_bc%bc_kind == HYDRAULIC_BC_TYPES%NEUMANN .or. &
-                 config_bc%bc_kind == HYDRAULIC_BC_TYPES%FLUX .or. &
-                 config_bc%bc_kind == HYDRAULIC_BC_TYPES%SEEPAGE) then
-            allocate (type_bc_neumann :: bc)
-        else if (config_bc%bc_kind == THERMAL_BC_TYPES%ROBIN .or. &
-                 config_bc%bc_kind == THERMAL_BC_TYPES%CONVECTIVE .or. &
-                 config_bc%bc_kind == THERMAL_BC_TYPES%RADIATION) then
-            allocate (type_bc_robin :: bc)
-        else if (config_bc%bc_kind == THERMAL_BC_TYPES%ADIABATIC .or. &
-                 config_bc%bc_kind == HYDRAULIC_BC_TYPES%IMPERMEABLE) then
-            allocate (type_bc_zero_flux :: bc)
-        else if (config_bc%bc_kind == THERMAL_BC_TYPES%FREE) then
-            allocate (type_bc_neumann :: bc)
+        integer(int32) :: i
+
+        self%num_boundaries = size(configs)
+
+        if (allocated(self%strategies)) deallocate (self%strategies)
+        if (allocated(self%boundary_ids)) deallocate (self%boundary_ids)
+
+        if (self%num_boundaries > 0) then
+            allocate (self%strategies(self%num_boundaries))
+            allocate (self%boundary_ids(self%num_boundaries))
+
+            do i = 1, self%num_boundaries
+                self%strategies(i)%p = create_bc_strategy(configs(i))
+                self%boundary_ids(i) = configs(i)%boundary_id
+            end do
+        end if
+
+    end subroutine initialize_bc_manager
+
+    subroutine destroy_bc_manager(self)
+        implicit none
+        class(type_bc_manager), intent(inout) :: self
+        integer(int32) :: i
+
+        if (allocated(self%strategies)) then
+            do i = 1, size(self%strategies)
+                if (allocated(self%strategies(i)%p)) then
+                    call self%strategies(i)%p%destroy()
+                    deallocate (self%strategies(i)%p)
+                end if
+            end do
+            deallocate (self%strategies)
+        end if
+        if (allocated(self%boundary_ids)) deallocate (self%boundary_ids)
+
+    end subroutine destroy_bc_manager
+
+    subroutine evaluate_bc_manager(self, bc_id, current_time, u_curr, result)
+        implicit none
+        class(type_bc_manager), intent(in) :: self
+        integer(int32), intent(in) :: bc_id
+        real(real64), intent(in) :: current_time
+        real(real64), intent(in) :: u_curr
+        type(type_bc_result), intent(inout) :: result
+
+        if (bc_id > 0 .and. bc_id <= size(self%strategies)) then
+            call self%strategies(bc_id)%p%evaluate(current_time, u_curr, result)
         else
-            call raise_error(ERROR_CODES%INVALID_BC_TYPE)
+            call result%initialize()
+        end if
+    end subroutine evaluate_bc_manager
+
+    subroutine evaluate_bcs_manager(self, bc_id, current_time, u_curr, results)
+        implicit none
+        class(type_bc_manager), intent(in) :: self
+        integer(int32), intent(in) :: bc_id
+        real(real64), intent(in) :: current_time
+        real(real64), intent(in) :: u_curr(:)
+        type(type_bc_result), intent(inout) :: results(:)
+
+        integer(int32) :: i
+
+        if (size(u_curr) /= size(results)) then
+            error stop "Size of u_curr and results must be the same in evaluate_bc_manager."
         end if
 
-        ! 2. 共通初期化メソッドを呼ぶ
-        !    ここでデータの読み込み、時間係数の計算準備などが行われる
-        if (allocated(bc)) then
-            call bc%initialize(config_bc)
-
-            ! 初期化に失敗していれば破棄する安全策を入れる場合
-            ! if (.not. bc%initialized) deallocate(bc)
+        if (bc_id > 0 .and. bc_id <= size(self%strategies)) then
+            do i = 1, size(u_curr)
+                call self%strategies(bc_id)%p%evaluate(current_time, u_curr(i), results(i))
+            end do
+        else
+            do i = 1, size(u_curr)
+                call results(i)%initialize()
+            end do
         end if
+    end subroutine evaluate_bcs_manager
 
-    end function create_boundary_conditions
+    pure subroutine get_num_boundaries_bc_manager(self, num_boundaries)
+        implicit none
+        class(type_bc_manager), intent(in) :: self
+        integer(int32), intent(inout) :: num_boundaries
 
-end module conditions_boundary_manager
+        num_boundaries = self%num_boundaries
+    end subroutine get_num_boundaries_bc_manager
+
+    !> Returns the positional strategy index whose boundary_id matches entity_id.
+    !> Returns -1 if no match is found.
+    pure subroutine get_bc_index_bc_manager(self, entity_id, bc_index)
+        implicit none
+        class(type_bc_manager), intent(in) :: self
+        integer(int32), intent(in) :: entity_id
+        integer(int32), intent(inout) :: bc_index
+
+        integer(int32) :: i
+
+        bc_index = -1
+        if (.not. allocated(self%boundary_ids)) return
+
+        do i = 1, self%num_boundaries
+            if (self%boundary_ids(i) == entity_id) then
+                bc_index = i
+                return
+            end if
+        end do
+    end subroutine get_bc_index_bc_manager
+
+end module physics_governing_boundary_manager

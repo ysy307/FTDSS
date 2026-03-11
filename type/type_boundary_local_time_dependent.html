@@ -10,7 +10,7 @@
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>type_boundary_local_time_dependent &ndash; FTDSS </title>
+    <title>type_boundary_local_time_dependent &ndash; FTCMS </title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -44,7 +44,7 @@
     <div class="container-fluid mb-sm-4 mb-xl-2">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
           <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
                   aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon">
@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.2% of total for derived types.</p>Including implementation: 5 statements,  0.0% of total for derived types.">5 statements</a>
+                 title="<p> 0.2% of total for derived types.</p>Including implementation: 6 statements,  0.0% of total for derived types.">6 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -105,7 +105,7 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
                 <li class="breadcrumb-item"><a href='../sourcefile/conditions_interface.f90.html'>conditions_interface.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/inout_input_conditions.html'>inout_input_conditions</a></li>
+                <li class="breadcrumb-item"><a href='../module/io_input_conditions.html'>io_input_conditions</a></li>
             <li class="breadcrumb-item active" aria-current="page">type_boundary_local_time_dependent</li>
           </ol>
         </nav>
@@ -134,9 +134,10 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_boundary_local_time_dependent.html#variable-time~5">time</a>
+            <a class="list-group-item" href="../type/type_boundary_local_time_dependent.html#variable-time~9">time</a>
             <a class="list-group-item" href="../type/type_boundary_local_time_dependent.html#variable-time_iso">time_iso</a>
-            <a class="list-group-item" href="../type/type_boundary_local_time_dependent.html#variable-value~12">value</a>
+            <a class="list-group-item" href="../type/type_boundary_local_time_dependent.html#variable-value~95">value</a>
+            <a class="list-group-item" href="../type/type_boundary_local_time_dependent.html#variable-values~31">values</a>
         </div>
       </div>
     </div>
@@ -238,7 +239,7 @@
 </g>
 </g>
 <!-- type~type_boundary_conditions&#45;&gt;type~type_conditions -->
-<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_edge8" class="edge">
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_edge7" class="edge">
 <title>type~type_boundary_conditions&#45;&gt;type~type_conditions</title>
 <path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1336.72,-100.09C1300.99,-96.23 1257.73,-91.2 1219,-85.71 1216.47,-85.36 1213.89,-84.98 1211.28,-84.58"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="1211.59,-81.09 1201.17,-83.01 1210.51,-88.01 1211.59,-81.09"/>
@@ -316,7 +317,7 @@
 <text text-anchor="middle" x="641" y="-95.11" font-family="Helvetica,sans-Serif" font-size="9.50">boundary</text>
 </g>
 <!-- type~type_initial_conditions&#45;&gt;type~type_conditions -->
-<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_edge7" class="edge">
+<g id="type~~type_boundary_local_time_dependent~~InheritedByGraph_edge8" class="edge">
 <title>type~type_initial_conditions&#45;&gt;type~type_conditions</title>
 <path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M972.06,-80.7C982.55,-78.64 993.59,-76.82 1004,-75.71 1033.79,-72.56 1067.15,-72.07 1094.65,-72.47"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="1094.81,-75.98 1104.88,-72.67 1094.94,-68.98 1094.81,-75.98"/>
@@ -425,7 +426,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-time~5"></span>
+              <span class="anchor" id="variable-time~9"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -459,7 +460,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-value~12"></span>
+              <span class="anchor" id="variable-value~95"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -468,6 +469,23 @@ large graphs.</div>
             </td>
             <td>::</td>
             <td><strong>value</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-values~31"></span>
+              real(kind=real64),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>values</strong>(:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -489,7 +507,8 @@ large graphs.</div>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="nb">time</span>
 <span class="nb">        </span><span class="kt">character</span><span class="p">(:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">time_iso</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="k">value</span>
-<span class="k">    end type </span><span class="n">type_boundary_local_time_dependent</span>
+<span class="k">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">values</span><span class="p">(:)</span>
+<span class="w">    </span><span class="k">end type </span><span class="n">type_boundary_local_time_dependent</span>
 </pre></div>
 
     </section>
@@ -504,7 +523,7 @@ large graphs.</div>
         <div class="row justify-content-between">
           <div class="col">
             <p>
-              FTDSS
+              FTCMS
  was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
@@ -512,7 +531,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-23 23:52 +0000             </p>
+ on 2026-03-11 14:03 +0000             </p>
           </div>
         </div>
         <br>

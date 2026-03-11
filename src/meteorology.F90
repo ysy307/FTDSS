@@ -3,7 +3,7 @@ module core_types_physics_meteorology
     use :: stdlib_optval, only:optval
     use :: core_constants, only:TIME_UNITS
     use :: core_memory, only:allocate_array, deallocate_array
-    use :: core_types_datetime, only:type_datetime
+    use :: core_types_utils_datetime, only:type_datetime
 
     implicit none
     private

@@ -10,7 +10,7 @@
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>compute_quad_rule_gauss_integration &ndash; FTDSS</title>
+    <title>compute_quad_rule_gauss_integration &ndash; FTCMS</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -44,7 +44,7 @@
     <div class="container-fluid mb-sm-4 mb-xl-2">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
           <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
                   aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon">
@@ -97,15 +97,15 @@
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/gauss.F90"> Source File</a>
+              <a href="../src/fe_integration.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/gauss.f90.html'>gauss.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/core_types_math_gauss.html'>core_types_math_gauss</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/fe_integration.f90.html'>fe_integration.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/domain_fe_integration.html'>domain_fe_integration</a></li>
             <li class="breadcrumb-item active" aria-current="page">compute_quad_rule_gauss_integration</li>
           </ol>
         </nav>
@@ -163,8 +163,8 @@
 </h2>
     
 
-    <p>四角形要素用ルール (1Dの直積)
-一次配列をallocateせず，逐次計算して格納する</p>
+    <p>Integration rule for quadrilateral elements (tensor product of 1D rules).
+Computes points incrementally to avoid allocating a temporary 1D array.</p>
 
     <h3>Type Bound</h3>
     <p><a href='../type/type_gauss_integration_rule.html'>type_gauss_integration_rule</a></p>
@@ -182,7 +182,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~108"></span>
+              <span class="anchor" id="variable-self~999"></span>
               class(<a href='../type/type_gauss_integration_rule.html'>type_gauss_integration_rule</a>),
             </td>
 <td>intent(inout)</td>
@@ -197,7 +197,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-order~3"></span>
+              <span class="anchor" id="variable-order~12"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -236,18 +236,18 @@
 <polygon fill="none" stroke="black" points="377,-4035 0,-4035 0,-4011 377,-4011 377,-4035"/>
 <text text-anchor="middle" x="188.5" y="-4020.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_gauss_integration_rule%compute_quad_rule_gauss_integration</text>
 </g>
-<!-- none~set~11 -->
+<!-- none~set~4 -->
 <g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_node2" class="node">
-<title>none~set~11</title>
-<g id="a_proc~~compute_quad_rule_gauss_integration~~CallsGraph_node2"><a xlink:href="../type/type_coordinate_dp.html#boundprocedure-set~11" xlink:title="type_coordinate_dp%set">
+<title>none~set~4</title>
+<g id="a_proc~~compute_quad_rule_gauss_integration~~CallsGraph_node2"><a xlink:href="../type/type_coordinate_dp.html#boundprocedure-set~4" xlink:title="type_coordinate_dp%set">
 <polygon fill="#a7506f" stroke="#a7506f" points="665,-5169 522,-5169 522,-5145 665,-5145 665,-5169"/>
 <text text-anchor="middle" x="593.5" y="-5154.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_coordinate_dp%set</text>
 </a>
 </g>
 </g>
-<!-- proc~compute_quad_rule_gauss_integration&#45;&gt;none~set~11 -->
+<!-- proc~compute_quad_rule_gauss_integration&#45;&gt;none~set~4 -->
 <g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_edge1" class="edge">
-<title>proc~compute_quad_rule_gauss_integration&#45;&gt;none~set~11</title>
+<title>proc~compute_quad_rule_gauss_integration&#45;&gt;none~set~4</title>
 <path fill="none" stroke="#ff0000" d="M193.89,-4035.35C233.71,-4147.4 532.28,-4987.55 584.67,-5134.96"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="581.48,-5136.45 588.13,-5144.7 588.08,-5134.1 581.48,-5136.45"/>
 </g>
@@ -290,9 +290,9 @@
 </a>
 </g>
 </g>
-<!-- none~set~11&#45;&gt;proc~set_coordinate_dp -->
+<!-- none~set~4&#45;&gt;proc~set_coordinate_dp -->
 <g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_edge4" class="edge">
-<title>none~set~11&#45;&gt;proc~set_coordinate_dp</title>
+<title>none~set~4&#45;&gt;proc~set_coordinate_dp</title>
 <path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M665.36,-5165.65C712.75,-5171.44 776.04,-5179.16 829.76,-5185.72"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="829.67,-5189.24 840.02,-5186.98 830.52,-5182.29 829.67,-5189.24"/>
 </g>
@@ -305,9 +305,9 @@
 </a>
 </g>
 </g>
-<!-- none~set~11&#45;&gt;proc~set_coordinate_dp_array -->
+<!-- none~set~4&#45;&gt;proc~set_coordinate_dp_array -->
 <g id="proc~~compute_quad_rule_gauss_integration~~CallsGraph_edge5" class="edge">
-<title>none~set~11&#45;&gt;proc~set_coordinate_dp_array</title>
+<title>none~set~4&#45;&gt;proc~set_coordinate_dp_array</title>
 <path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M665.36,-5157C704.11,-5157 753.49,-5157 799.58,-5157"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="799.67,-5160.5 809.67,-5157 799.67,-5153.5 799.67,-5160.5"/>
 </g>
@@ -5395,11 +5395,11 @@ large graphs.</div>
 
 <span class="w">        </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
 <span class="w">        </span><span class="k">do </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n_1d</span>
-<span class="w">            </span><span class="c">! j方向の座標と重みを取得</span>
+<span class="w">            </span><span class="c">! Get coordinate and weight in j-direction</span>
 <span class="w">            </span><span class="k">call </span><span class="n">get_legendre_point</span><span class="p">(</span><span class="n">n_1d</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="n">w_j</span><span class="p">,</span><span class="w"> </span><span class="n">p_j</span><span class="p">)</span>
 
 <span class="w">            </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n_1d</span>
-<span class="w">                </span><span class="c">! i方向の座標と重みを取得</span>
+<span class="w">                </span><span class="c">! Get coordinate and weight in i-direction</span>
 <span class="w">                </span><span class="k">call </span><span class="n">get_legendre_point</span><span class="p">(</span><span class="n">n_1d</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">w_i</span><span class="p">,</span><span class="w"> </span><span class="n">p_i</span><span class="p">)</span>
 
 <span class="w">                </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
@@ -5423,7 +5423,7 @@ large graphs.</div>
         <div class="row justify-content-between">
           <div class="col">
             <p>
-              FTDSS
+              FTCMS
  was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
@@ -5431,7 +5431,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-23 23:52 +0000             </p>
+ on 2026-03-11 14:03 +0000             </p>
           </div>
         </div>
         <br>

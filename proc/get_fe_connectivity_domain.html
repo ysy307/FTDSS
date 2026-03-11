@@ -1,0 +1,1116 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>get_fe_connectivity_domain &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>get_fe_connectivity_domain
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">7 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/domain_manager.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/domain_manager.f90.html'>domain_manager.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/domain_domain_manager.html'>domain_domain_manager</a></li>
+            <li class="breadcrumb-item active" aria-current="page">get_fe_connectivity_domain</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/get_fe_connectivity_domain.html#src">get_fe_connectivity_domain</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine get_fe_connectivity_domain(self, element_id, connectivity)  
+</h2>
+    
+
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_domain.html'>type_domain</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~766"></span>
+              class(<a href='../type/type_domain.html'>type_domain</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-element_id~5"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>element_id</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-connectivity~11"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              pointer, contiguous, dimension(:)
+            </td>
+            <td>::</td>
+            <td><strong>connectivity</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~get_fe_connectivity_domain~~CallsGraph Pages: 1 -->
+<svg id="procget_fe_connectivity_domainCallsGraph" width="641pt" height="191pt"
+ viewBox="0.00 0.00 641.00 190.62" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_fe_connectivity_domain~~CallsGraph" class="graph" transform="scale(0.67 0.67) rotate(0) translate(4 280)">
+<title>proc~~get_fe_connectivity_domain~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-280 951,-280 951,4 -4,4"/>
+<!-- proc~get_fe_connectivity_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CallsGraph_node1" class="node">
+<title>proc~get_fe_connectivity_domain</title>
+<polygon fill="none" stroke="black" points="240,-150 0,-150 0,-126 240,-126 240,-150"/>
+<text text-anchor="middle" x="120" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_domain%get_fe_connectivity_domain</text>
+</g>
+<!-- proc~get_fe_connectivity_elements_manager -->
+<g id="proc~~get_fe_connectivity_domain~~CallsGraph_node2" class="node">
+<title>proc~get_fe_connectivity_elements_manager</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CallsGraph_node2"><a xlink:href="../proc/get_fe_connectivity_elements_manager.html" xlink:title="type_elements_manager%get_fe_connectivity_elements_manager">
+<polygon fill="#d9534f" stroke="#d9534f" points="642,-150 276,-150 276,-126 642,-126 642,-150"/>
+<text text-anchor="middle" x="459" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_elements_manager%get_fe_connectivity_elements_manager</text>
+</a>
+</g>
+</g>
+<!-- proc~get_fe_connectivity_domain&#45;&gt;proc~get_fe_connectivity_elements_manager -->
+<g id="proc~~get_fe_connectivity_domain~~CallsGraph_edge1" class="edge">
+<title>proc~get_fe_connectivity_domain&#45;&gt;proc~get_fe_connectivity_elements_manager</title>
+<path fill="none" stroke="#ff0000" d="M240.29,-138C248.59,-138 257.07,-138 265.63,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="265.71,-141.5 275.71,-138 265.71,-134.5 265.71,-141.5"/>
+</g>
+<!-- interface~value_in_range -->
+<g id="proc~~get_fe_connectivity_domain~~CallsGraph_node3" class="node">
+<title>interface~value_in_range</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CallsGraph_node3"><a xlink:href="../interface/value_in_range.html" xlink:title="value_in_range">
+<polygon fill="#a7506f" stroke="#a7506f" points="772,-150 678,-150 678,-126 772,-126 772,-150"/>
+<text text-anchor="middle" x="725" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">value_in_range</text>
+</a>
+</g>
+</g>
+<!-- proc~get_fe_connectivity_elements_manager&#45;&gt;interface~value_in_range -->
+<g id="proc~~get_fe_connectivity_domain~~CallsGraph_edge2" class="edge">
+<title>proc~get_fe_connectivity_elements_manager&#45;&gt;interface~value_in_range</title>
+<path fill="none" stroke="#ff0000" d="M642.28,-138C651.19,-138 659.74,-138 667.73,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="667.89,-141.5 677.89,-138 667.89,-134.5 667.89,-141.5"/>
+</g>
+<!-- proc~value_in_range_int16 -->
+<g id="proc~~get_fe_connectivity_domain~~CallsGraph_node4" class="node">
+<title>proc~value_in_range_int16</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CallsGraph_node4"><a xlink:href="../proc/value_in_range_int16.html" xlink:title="value_in_range_int16">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="940.5,-276 814.5,-276 814.5,-252 940.5,-252 940.5,-276"/>
+<text text-anchor="middle" x="877.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">value_in_range_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~value_in_range&#45;&gt;proc~value_in_range_int16 -->
+<g id="proc~~get_fe_connectivity_domain~~CallsGraph_edge3" class="edge">
+<title>interface~value_in_range&#45;&gt;proc~value_in_range_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M732.14,-150.03C743.87,-171.84 771.6,-217.96 808,-243 810.4,-244.65 812.94,-246.18 815.56,-247.59"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="814.24,-250.83 824.77,-251.94 817.23,-244.5 814.24,-250.83"/>
+</g>
+<!-- proc~value_in_range_int32 -->
+<g id="proc~~get_fe_connectivity_domain~~CallsGraph_node5" class="node">
+<title>proc~value_in_range_int32</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CallsGraph_node5"><a xlink:href="../proc/value_in_range_int32.html" xlink:title="value_in_range_int32">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="940.5,-234 814.5,-234 814.5,-210 940.5,-210 940.5,-234"/>
+<text text-anchor="middle" x="877.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">value_in_range_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~value_in_range&#45;&gt;proc~value_in_range_int32 -->
+<g id="proc~~get_fe_connectivity_domain~~CallsGraph_edge4" class="edge">
+<title>interface~value_in_range&#45;&gt;proc~value_in_range_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M738.63,-150.06C753.94,-164.09 781.04,-187.09 808,-201 811.73,-202.92 815.67,-204.71 819.69,-206.35"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="818.6,-209.68 829.19,-209.94 821.07,-203.13 818.6,-209.68"/>
+</g>
+<!-- proc~value_in_range_int64 -->
+<g id="proc~~get_fe_connectivity_domain~~CallsGraph_node6" class="node">
+<title>proc~value_in_range_int64</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CallsGraph_node6"><a xlink:href="../proc/value_in_range_int64.html" xlink:title="value_in_range_int64">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="940.5,-192 814.5,-192 814.5,-168 940.5,-168 940.5,-192"/>
+<text text-anchor="middle" x="877.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">value_in_range_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~value_in_range&#45;&gt;proc~value_in_range_int64 -->
+<g id="proc~~get_fe_connectivity_domain~~CallsGraph_edge5" class="edge">
+<title>interface~value_in_range&#45;&gt;proc~value_in_range_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M769.13,-150.04C786.13,-154.78 805.83,-160.28 823.67,-165.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="822.79,-168.65 833.37,-167.96 824.68,-161.9 822.79,-168.65"/>
+</g>
+<!-- proc~value_in_range_int8 -->
+<g id="proc~~get_fe_connectivity_domain~~CallsGraph_node7" class="node">
+<title>proc~value_in_range_int8</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CallsGraph_node7"><a xlink:href="../proc/value_in_range_int8.html" xlink:title="value_in_range_int8">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="937,-150 818,-150 818,-126 937,-126 937,-150"/>
+<text text-anchor="middle" x="877.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">value_in_range_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~value_in_range&#45;&gt;proc~value_in_range_int8 -->
+<g id="proc~~get_fe_connectivity_domain~~CallsGraph_edge6" class="edge">
+<title>interface~value_in_range&#45;&gt;proc~value_in_range_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M772.38,-138C783.47,-138 795.55,-138 807.42,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="807.76,-141.5 817.76,-138 807.76,-134.5 807.76,-141.5"/>
+</g>
+<!-- proc~value_in_range_real128 -->
+<g id="proc~~get_fe_connectivity_domain~~CallsGraph_node8" class="node">
+<title>proc~value_in_range_real128</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CallsGraph_node8"><a xlink:href="../proc/value_in_range_real128.html" xlink:title="value_in_range_real128">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="947,-108 808,-108 808,-84 947,-84 947,-108"/>
+<text text-anchor="middle" x="877.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">value_in_range_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~value_in_range&#45;&gt;proc~value_in_range_real128 -->
+<g id="proc~~get_fe_connectivity_domain~~CallsGraph_edge7" class="edge">
+<title>interface~value_in_range&#45;&gt;proc~value_in_range_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M769.13,-125.96C786.13,-121.22 805.83,-115.72 823.67,-110.74"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="824.68,-114.1 833.37,-108.04 822.79,-107.35 824.68,-114.1"/>
+</g>
+<!-- proc~value_in_range_real32 -->
+<g id="proc~~get_fe_connectivity_domain~~CallsGraph_node9" class="node">
+<title>proc~value_in_range_real32</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CallsGraph_node9"><a xlink:href="../proc/value_in_range_real32.html" xlink:title="value_in_range_real32">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="944,-66 811,-66 811,-42 944,-42 944,-66"/>
+<text text-anchor="middle" x="877.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">value_in_range_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~value_in_range&#45;&gt;proc~value_in_range_real32 -->
+<g id="proc~~get_fe_connectivity_domain~~CallsGraph_edge8" class="edge">
+<title>interface~value_in_range&#45;&gt;proc~value_in_range_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M738.63,-125.94C753.94,-111.91 781.04,-88.91 808,-75 811.73,-73.08 815.67,-71.29 819.69,-69.65"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="821.07,-72.87 829.19,-66.06 818.6,-66.32 821.07,-72.87"/>
+</g>
+<!-- proc~value_in_range_real64 -->
+<g id="proc~~get_fe_connectivity_domain~~CallsGraph_node10" class="node">
+<title>proc~value_in_range_real64</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CallsGraph_node10"><a xlink:href="../proc/value_in_range_real64.html" xlink:title="value_in_range_real64">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="944,-24 811,-24 811,0 944,0 944,-24"/>
+<text text-anchor="middle" x="877.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">value_in_range_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~value_in_range&#45;&gt;proc~value_in_range_real64 -->
+<g id="proc~~get_fe_connectivity_domain~~CallsGraph_edge9" class="edge">
+<title>interface~value_in_range&#45;&gt;proc~value_in_range_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M732.14,-125.97C743.87,-104.16 771.6,-58.04 808,-33 810.4,-31.35 812.94,-29.82 815.56,-28.41"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="817.23,-31.5 824.77,-24.06 814.24,-25.17 817.23,-31.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocget_fe_connectivity_domainCallsGraph = svgPanZoom('#procget_fe_connectivity_domainCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~get_fe_connectivity_domain~~CalledByGraph Pages: 1 -->
+<svg id="procget_fe_connectivity_domainCalledByGraph" width="641pt" height="71pt"
+ viewBox="0.00 0.00 641.00 71.12" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph" class="graph" transform="scale(0.23 0.23) rotate(0) translate(4 303)">
+<title>proc~~get_fe_connectivity_domain~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-303 2763,-303 2763,4 -4,4"/>
+<!-- proc~get_fe_connectivity_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node1" class="node">
+<title>proc~get_fe_connectivity_domain</title>
+<polygon fill="none" stroke="black" points="2759,-134 2519,-134 2519,-110 2759,-110 2759,-134"/>
+<text text-anchor="middle" x="2639" y="-119.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_domain%get_fe_connectivity_domain</text>
+</g>
+<!-- proc~assemble_initialize_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node2" class="node">
+<title>proc~assemble_initialize_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node2"><a xlink:href="../proc/assemble_initialize_ftcms.html" xlink:title="assemble_initialize_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="2132.5,-226 1984.5,-226 1984.5,-202 2132.5,-202 2132.5,-226"/>
+<text text-anchor="middle" x="2058.5" y="-211.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_initialize_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_initialize_ftcms&#45;&gt;proc~get_fe_connectivity_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge1" class="edge">
+<title>proc~assemble_initialize_ftcms&#45;&gt;proc~get_fe_connectivity_domain</title>
+<path fill="none" stroke="#ff0000" d="M2132.55,-211.83C2217.55,-208.18 2361.74,-198.49 2483,-173 2523.15,-164.56 2567.48,-149.35 2598.41,-137.73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2599.86,-140.92 2607.96,-134.09 2597.37,-134.38 2599.86,-140.92"/>
+</g>
+<!-- proc~get_fe_coordinate_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node7" class="node">
+<title>proc~get_fe_coordinate_domain</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node7"><a xlink:href="../proc/get_fe_coordinate_domain.html" xlink:title="type_domain%get_fe_coordinate_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="2457,-164 2224,-164 2224,-140 2457,-140 2457,-164"/>
+<text text-anchor="middle" x="2340.5" y="-149.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_fe_coordinate_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_initialize_ftcms&#45;&gt;proc~get_fe_coordinate_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge12" class="edge">
+<title>proc~assemble_initialize_ftcms&#45;&gt;proc~get_fe_coordinate_domain</title>
+<path fill="none" stroke="#ff00ff" d="M2119.44,-201.98C2133.42,-199.1 2148.25,-196 2162,-193 2200.95,-184.51 2244.58,-174.44 2278.84,-166.41"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="2279.76,-169.78 2288.7,-164.09 2278.16,-162.97 2279.76,-169.78"/>
+</g>
+<!-- proc~build_scatter_map_jacobian -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node3" class="node">
+<title>proc~build_scatter_map_jacobian</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node3"><a xlink:href="../proc/build_scatter_map_jacobian.html" xlink:title="type_jacobian_matrix%build_scatter_map_jacobian">
+<polygon fill="#d9534f" stroke="#d9534f" points="2483,-24 2198,-24 2198,0 2483,0 2483,-24"/>
+<text text-anchor="middle" x="2340.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_jacobian_matrix%build_scatter_map_jacobian</text>
+</a>
+</g>
+</g>
+<!-- proc~build_scatter_map_jacobian&#45;&gt;proc~get_fe_connectivity_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge2" class="edge">
+<title>proc~build_scatter_map_jacobian&#45;&gt;proc~get_fe_connectivity_domain</title>
+<path fill="none" stroke="#ff0000" d="M2430.94,-24.02C2448.46,-27.6 2466.51,-32.18 2483,-38 2530.87,-54.89 2581.77,-85.15 2611.68,-104.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2609.97,-107.43 2620.26,-109.95 2613.79,-101.56 2609.97,-107.43"/>
+</g>
+<!-- proc~calc_gradient_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node4" class="node">
+<title>proc~calc_gradient_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node4"><a xlink:href="../proc/calc_gradient_ftcms.html" xlink:title="calc_gradient_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="2118,-268 1999,-268 1999,-244 2118,-244 2118,-268"/>
+<text text-anchor="middle" x="2058.5" y="-253.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_gradient_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_ftcms&#45;&gt;proc~get_fe_connectivity_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge3" class="edge">
+<title>proc~calc_gradient_ftcms&#45;&gt;proc~get_fe_connectivity_domain</title>
+<path fill="none" stroke="#ff0000" d="M2118.1,-255.47C2201.16,-253.25 2357.03,-243.57 2483,-204 2531.17,-188.87 2581.98,-158.93 2611.79,-139.72"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2613.89,-142.53 2620.34,-134.13 2610.06,-136.67 2613.89,-142.53"/>
+</g>
+<!-- proc~calc_gradient_ftcms&#45;&gt;proc~get_fe_coordinate_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge13" class="edge">
+<title>proc~calc_gradient_ftcms&#45;&gt;proc~get_fe_coordinate_domain</title>
+<path fill="none" stroke="#ff00ff" d="M2118.13,-246.46C2132.64,-243.43 2148.03,-239.62 2162,-235 2215.58,-217.26 2274.26,-187.66 2308.93,-169.01"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="2310.92,-171.91 2318.04,-164.07 2307.59,-165.76 2310.92,-171.91"/>
+</g>
+<!-- proc~find_element_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node5" class="node">
+<title>proc~find_element_domain</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node5"><a xlink:href="../proc/find_element_domain.html" xlink:title="type_domain%find_element_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="2162,-104 1955,-104 1955,-80 2162,-80 2162,-104"/>
+<text text-anchor="middle" x="2058.5" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%find_element_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~find_element_domain&#45;&gt;proc~get_fe_connectivity_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge4" class="edge">
+<title>proc~find_element_domain&#45;&gt;proc~get_fe_connectivity_domain</title>
+<path fill="none" stroke="#ff0000" d="M2162.26,-97.33C2259.06,-102.35 2404.43,-109.89 2508.99,-115.31"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2508.81,-118.81 2518.98,-115.83 2509.17,-111.81 2508.81,-118.81"/>
+</g>
+<!-- proc~find_element_domain&#45;&gt;proc~get_fe_coordinate_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge16" class="edge">
+<title>proc~find_element_domain&#45;&gt;proc~get_fe_coordinate_domain</title>
+<path fill="none" stroke="#ff00ff" d="M2115.83,-104.07C2161.3,-113.81 2225.37,-127.54 2273.3,-137.81"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="2272.75,-141.28 2283.26,-139.95 2274.22,-134.43 2272.75,-141.28"/>
+</g>
+<!-- proc~get_config_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node6" class="node">
+<title>proc~get_config_domain</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node6"><a xlink:href="../proc/get_config_domain.html" xlink:title="type_domain%get_config_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="1919,-64 1726,-64 1726,-40 1919,-40 1919,-64"/>
+<text text-anchor="middle" x="1822.5" y="-49.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_config_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~get_config_domain&#45;&gt;proc~get_fe_connectivity_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge5" class="edge">
+<title>proc~get_config_domain&#45;&gt;proc~get_fe_connectivity_domain</title>
+<path fill="none" stroke="#ff0000" d="M1919.12,-54.73C2047.71,-59.2 2283.31,-70.2 2483,-95 2510.64,-98.43 2540.86,-103.41 2567.21,-108.17"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2566.64,-111.62 2577.1,-109.97 2567.89,-104.73 2566.64,-111.62"/>
+</g>
+<!-- proc~get_config_domain&#45;&gt;proc~find_element_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge10" class="edge">
+<title>proc~get_config_domain&#45;&gt;proc~find_element_domain</title>
+<path fill="none" stroke="#00ffff" d="M1893.71,-64C1919.85,-68.47 1949.72,-73.58 1976.74,-78.19"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1976.49,-81.7 1986.94,-79.94 1977.67,-74.8 1976.49,-81.7"/>
+</g>
+<!-- proc~get_fe_coordinate_domain&#45;&gt;proc~get_fe_connectivity_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge6" class="edge">
+<title>proc~get_fe_coordinate_domain&#45;&gt;proc~get_fe_connectivity_domain</title>
+<path fill="none" stroke="#ff0000" d="M2457.41,-140.27C2474.38,-138.56 2491.95,-136.78 2509.16,-135.04"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2509.65,-138.5 2519.24,-134.02 2508.94,-131.54 2509.65,-138.5"/>
+</g>
+<!-- interface~assemble_initialize_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node8" class="node">
+<title>interface~assemble_initialize_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node8"><a xlink:href="../interface/assemble_initialize_ftcms.html" xlink:title="type_ftcms%assemble_initialize_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1441,-215 1226,-215 1226,-191 1441,-191 1441,-215"/>
+<text text-anchor="middle" x="1333.5" y="-200.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%assemble_initialize_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_initialize_ftcms&#45;&gt;proc~assemble_initialize_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge7" class="edge">
+<title>interface~assemble_initialize_ftcms&#45;&gt;proc~assemble_initialize_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1441.18,-204.62C1586.27,-206.83 1842.79,-210.73 1974.45,-212.74"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1974.43,-216.24 1984.48,-212.89 1974.53,-209.24 1974.43,-216.24"/>
+</g>
+<!-- interface~calc_gradient_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node9" class="node">
+<title>interface~calc_gradient_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node9"><a xlink:href="../interface/calc_gradient_ftcms.html" xlink:title="type_ftcms%calc_gradient_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1916,-268 1729,-268 1729,-244 1916,-244 1916,-268"/>
+<text text-anchor="middle" x="1822.5" y="-253.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%calc_gradient_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_gradient_ftcms&#45;&gt;proc~calc_gradient_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge9" class="edge">
+<title>interface~calc_gradient_ftcms&#45;&gt;proc~calc_gradient_ftcms</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1916.32,-256C1940.44,-256 1966,-256 1988.64,-256"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1988.82,-259.5 1998.82,-256 1988.82,-252.5 1988.82,-259.5"/>
+</g>
+<!-- proc~calc_measure_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node10" class="node">
+<title>proc~calc_measure_domain</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node10"><a xlink:href="../proc/calc_measure_domain.html" xlink:title="type_domain%calc_measure_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="1168,-163 957,-163 957,-139 1168,-139 1168,-163"/>
+<text text-anchor="middle" x="1062.5" y="-148.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%calc_measure_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_measure_domain&#45;&gt;proc~get_fe_coordinate_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge14" class="edge">
+<title>proc~calc_measure_domain&#45;&gt;proc~get_fe_coordinate_domain</title>
+<path fill="none" stroke="#ff00ff" d="M1168.05,-145.04C1274.92,-139.47 1445.72,-132 1593.5,-132 1593.5,-132 1593.5,-132 1823.5,-132 1956.68,-132 2109.05,-138.73 2213.49,-144.39"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="2213.59,-147.9 2223.76,-144.95 2213.97,-140.91 2213.59,-147.9"/>
+</g>
+<!-- proc~dlerp_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node11" class="node">
+<title>proc~dlerp_domain</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node11"><a xlink:href="../proc/dlerp_domain.html" xlink:title="type_domain%dlerp_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="2141,-184 1976,-184 1976,-160 2141,-160 2141,-184"/>
+<text text-anchor="middle" x="2058.5" y="-169.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%dlerp_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~dlerp_domain&#45;&gt;proc~get_fe_coordinate_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge15" class="edge">
+<title>proc~dlerp_domain&#45;&gt;proc~get_fe_coordinate_domain</title>
+<path fill="none" stroke="#ff00ff" d="M2141.24,-166.16C2163.94,-164.54 2189.13,-162.74 2213.72,-160.98"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="2214.12,-164.46 2223.85,-160.26 2213.62,-157.48 2214.12,-164.46"/>
+</g>
+<!-- proc~initialize_type_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node12" class="node">
+<title>proc~initialize_type_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node12"><a xlink:href="../proc/initialize_type_ftcms.html" xlink:title="initialize_type_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1654.5,-44 1534.5,-44 1534.5,-20 1654.5,-20 1654.5,-44"/>
+<text text-anchor="middle" x="1594.5" y="-29.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_type_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_ftcms&#45;&gt;proc~build_scatter_map_jacobian -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge8" class="edge">
+<title>proc~initialize_type_ftcms&#45;&gt;proc~build_scatter_map_jacobian</title>
+<path fill="none" stroke="#ffff00" d="M1654.5,-30.41C1768.63,-27.35 2022.83,-20.51 2187.42,-16.09"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="2187.74,-19.58 2197.64,-15.81 2187.55,-12.58 2187.74,-19.58"/>
+</g>
+<!-- proc~initialize_type_ftcms&#45;&gt;proc~get_config_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge11" class="edge">
+<title>proc~initialize_type_ftcms&#45;&gt;proc~get_config_domain</title>
+<path fill="none" stroke="#0000ff" d="M1654.58,-37.23C1673.24,-38.88 1694.46,-40.76 1715.36,-42.61"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1715.32,-46.12 1725.59,-43.51 1715.94,-39.14 1715.32,-46.12"/>
+</g>
+<!-- interface~initialize_type_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node13" class="node">
+<title>interface~initialize_type_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node13"><a xlink:href="../interface/initialize_type_ftcms.html" xlink:title="type_ftcms%initialize_type_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1427,-44 1240,-44 1240,-20 1427,-20 1427,-44"/>
+<text text-anchor="middle" x="1333.5" y="-29.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%initialize_type_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_ftcms&#45;&gt;proc~initialize_type_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge21" class="edge">
+<title>interface~initialize_type_ftcms&#45;&gt;proc~initialize_type_ftcms</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1427.27,-32C1459.21,-32 1494.41,-32 1524.15,-32"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1524.43,-35.5 1534.43,-32 1524.43,-28.5 1524.43,-35.5"/>
+</g>
+<!-- proc~assemble_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node14" class="node">
+<title>proc~assemble_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node14"><a xlink:href="../proc/assemble_ftcms.html" xlink:title="assemble_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1111.5,-215 1013.5,-215 1013.5,-191 1111.5,-191 1111.5,-215"/>
+<text text-anchor="middle" x="1062.5" y="-200.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_ftcms&#45;&gt;interface~assemble_initialize_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge17" class="edge">
+<title>proc~assemble_ftcms&#45;&gt;interface~assemble_initialize_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M1111.59,-203C1140.6,-203 1178.91,-203 1215.46,-203"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1215.72,-206.5 1225.72,-203 1215.72,-199.5 1215.72,-206.5"/>
+</g>
+<!-- proc~calc_gradient_pressure_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node15" class="node">
+<title>proc~calc_gradient_pressure_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node15"><a xlink:href="../proc/calc_gradient_pressure_ftcms.html" xlink:title="calc_gradient_pressure_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1679,-299 1510,-299 1510,-275 1679,-275 1679,-299"/>
+<text text-anchor="middle" x="1594.5" y="-284.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_gradient_pressure_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_pressure_ftcms&#45;&gt;interface~calc_gradient_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge18" class="edge">
+<title>proc~calc_gradient_pressure_ftcms&#45;&gt;interface~calc_gradient_ftcms</title>
+<path fill="none" stroke="#cbff00" d="M1679.01,-275.54C1693.52,-273.55 1708.72,-271.47 1723.57,-269.43"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1724.35,-272.86 1733.79,-268.03 1723.4,-265.92 1724.35,-272.86"/>
+</g>
+<!-- proc~calc_gradient_temperature_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node16" class="node">
+<title>proc~calc_gradient_temperature_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node16"><a xlink:href="../proc/calc_gradient_temperature_ftcms.html" xlink:title="calc_gradient_temperature_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1690,-257 1499,-257 1499,-233 1690,-233 1690,-257"/>
+<text text-anchor="middle" x="1594.5" y="-242.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_gradient_temperature_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_temperature_ftcms&#45;&gt;interface~calc_gradient_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge19" class="edge">
+<title>proc~calc_gradient_temperature_ftcms&#45;&gt;interface~calc_gradient_ftcms</title>
+<path fill="none" stroke="#cbff00" d="M1690.03,-249.6C1699.45,-250.06 1709.04,-250.53 1718.54,-250.99"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1718.63,-254.5 1728.79,-251.49 1718.97,-247.51 1718.63,-254.5"/>
+</g>
+<!-- proc~update_variables_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node17" class="node">
+<title>proc~update_variables_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node17"><a xlink:href="../proc/update_variables_ftcms.html" xlink:title="update_variables_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="651,-189 512,-189 512,-165 651,-165 651,-189"/>
+<text text-anchor="middle" x="581.5" y="-174.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">update_variables_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~update_variables_ftcms&#45;&gt;proc~calc_measure_domain -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge20" class="edge">
+<title>proc~update_variables_ftcms&#45;&gt;proc~calc_measure_domain</title>
+<path fill="none" stroke="#00ff66" d="M651.13,-173.27C728.18,-169.09 854.45,-162.24 946.6,-157.24"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="947.03,-160.72 956.82,-156.68 946.65,-153.73 947.03,-160.72"/>
+</g>
+<!-- interface~assemble_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node18" class="node">
+<title>interface~assemble_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node18"><a xlink:href="../interface/assemble_ftcms.html" xlink:title="type_ftcms%assemble_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="887,-215 721,-215 721,-191 887,-191 887,-215"/>
+<text text-anchor="middle" x="804" y="-200.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%assemble_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_ftcms&#45;&gt;proc~assemble_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge22" class="edge">
+<title>interface~assemble_ftcms&#45;&gt;proc~assemble_ftcms</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M887.22,-203C924.93,-203 968.77,-203 1003.04,-203"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1003.36,-206.5 1013.36,-203 1003.36,-199.5 1003.36,-206.5"/>
+</g>
+<!-- interface~calc_gradient_pressure_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node19" class="node">
+<title>interface~calc_gradient_pressure_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node19"><a xlink:href="../interface/calc_gradient_pressure_ftcms.html" xlink:title="type_ftcms%calc_gradient_pressure_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1452,-299 1215,-299 1215,-275 1452,-275 1452,-299"/>
+<text text-anchor="middle" x="1333.5" y="-284.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%calc_gradient_pressure_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_gradient_pressure_ftcms&#45;&gt;proc~calc_gradient_pressure_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge23" class="edge">
+<title>interface~calc_gradient_pressure_ftcms&#45;&gt;proc~calc_gradient_pressure_ftcms</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M1452.25,-287C1468.15,-287 1484.28,-287 1499.68,-287"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1499.69,-290.5 1509.69,-287 1499.69,-283.5 1499.69,-290.5"/>
+</g>
+<!-- interface~calc_gradient_temperature_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node20" class="node">
+<title>interface~calc_gradient_temperature_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node20"><a xlink:href="../interface/calc_gradient_temperature_ftcms.html" xlink:title="type_ftcms%calc_gradient_temperature_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1463,-257 1204,-257 1204,-233 1463,-233 1463,-257"/>
+<text text-anchor="middle" x="1333.5" y="-242.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%calc_gradient_temperature_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_gradient_temperature_ftcms&#45;&gt;proc~calc_gradient_temperature_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge24" class="edge">
+<title>interface~calc_gradient_temperature_ftcms&#45;&gt;proc~calc_gradient_temperature_ftcms</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M1463.24,-245C1471.73,-245 1480.21,-245 1488.56,-245"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1488.66,-248.5 1498.66,-245 1488.66,-241.5 1488.66,-248.5"/>
+</g>
+<!-- interface~update_variables_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node21" class="node">
+<title>interface~update_variables_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node21"><a xlink:href="../interface/update_variables_ftcms.html" xlink:title="type_ftcms%update_variables_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="476,-189 270,-189 270,-165 476,-165 476,-189"/>
+<text text-anchor="middle" x="373" y="-174.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%update_variables_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~update_variables_ftcms&#45;&gt;proc~update_variables_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge25" class="edge">
+<title>interface~update_variables_ftcms&#45;&gt;proc~update_variables_ftcms</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M476.04,-177C484.64,-177 493.24,-177 501.62,-177"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="501.72,-180.5 511.72,-177 501.72,-173.5 501.72,-180.5"/>
+</g>
+<!-- proc~reflect_variables_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node22" class="node">
+<title>proc~reflect_variables_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node22"><a xlink:href="../proc/reflect_variables_ftcms.html" xlink:title="reflect_variables_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1130,-299 995,-299 995,-275 1130,-275 1130,-299"/>
+<text text-anchor="middle" x="1062.5" y="-284.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">reflect_variables_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftcms&#45;&gt;interface~calc_gradient_pressure_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge27" class="edge">
+<title>proc~reflect_variables_ftcms&#45;&gt;interface~calc_gradient_pressure_ftcms</title>
+<path fill="none" stroke="#7fff00" d="M1130.34,-287C1152.94,-287 1178.98,-287 1204.69,-287"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1204.91,-290.5 1214.91,-287 1204.91,-283.5 1204.91,-290.5"/>
+</g>
+<!-- proc~reflect_variables_ftcms&#45;&gt;interface~calc_gradient_temperature_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge29" class="edge">
+<title>proc~reflect_variables_ftcms&#45;&gt;interface~calc_gradient_temperature_ftcms</title>
+<path fill="none" stroke="#00ffff" d="M1130.34,-276.56C1165.19,-271.12 1208.24,-264.4 1245.64,-258.56"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1246.18,-262.02 1255.53,-257.02 1245.1,-255.1 1246.18,-262.02"/>
+</g>
+<!-- proc~run_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node23" class="node">
+<title>proc~run_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node23"><a xlink:href="../proc/run_ftcms.html" xlink:title="run_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-210 169,-210 169,-186 234,-186 234,-210"/>
+<text text-anchor="middle" x="201.5" y="-195.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftcms&#45;&gt;interface~update_variables_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge31" class="edge">
+<title>proc~run_ftcms&#45;&gt;interface~update_variables_ftcms</title>
+<path fill="none" stroke="#7f00ff" d="M234.38,-194.05C243.41,-192.93 253.78,-191.65 264.68,-190.3"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="265.33,-193.74 274.82,-189.04 264.46,-186.8 265.33,-193.74"/>
+</g>
+<!-- interface~solve_time_step_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node28" class="node">
+<title>interface~solve_time_step_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node28"><a xlink:href="../interface/solve_time_step_ftcms.html" xlink:title="type_ftcms%solve_time_step_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="472.5,-238 273.5,-238 273.5,-214 472.5,-214 472.5,-238"/>
+<text text-anchor="middle" x="373" y="-223.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge37" class="edge">
+<title>proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms</title>
+<path fill="none" stroke="#00ffff" d="M234.38,-203.27C250.05,-205.86 269.73,-209.11 289.27,-212.33"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="288.71,-215.79 299.15,-213.97 289.85,-208.88 288.71,-215.79"/>
+</g>
+<!-- proc~solve_time_step_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node24" class="node">
+<title>proc~solve_time_step_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node24"><a xlink:href="../proc/solve_time_step_ftcms.html" xlink:title="solve_time_step_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="647.5,-244 515.5,-244 515.5,-220 647.5,-220 647.5,-244"/>
+<text text-anchor="middle" x="581.5" y="-229.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftcms&#45;&gt;interface~assemble_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge26" class="edge">
+<title>proc~solve_time_step_ftcms&#45;&gt;interface~assemble_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M647.76,-223.42C667.5,-220.82 689.55,-217.92 710.7,-215.14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="711.21,-218.6 720.67,-213.83 710.3,-211.66 711.21,-218.6"/>
+</g>
+<!-- interface~reflect_variables_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node26" class="node">
+<title>interface~reflect_variables_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node26"><a xlink:href="../interface/reflect_variables_ftcms.html" xlink:title="type_ftcms%reflect_variables_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="905,-299 703,-299 703,-275 905,-275 905,-299"/>
+<text text-anchor="middle" x="804" y="-284.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%reflect_variables_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftcms&#45;&gt;interface~reflect_variables_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge36" class="edge">
+<title>proc~solve_time_step_ftcms&#45;&gt;interface~reflect_variables_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M615.58,-244.03C635.97,-251.13 662.76,-259.89 687,-266 697,-268.52 707.56,-270.86 718.07,-273"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="717.62,-276.48 728.11,-274.98 718.98,-269.61 717.62,-276.48"/>
+</g>
+<!-- interface~solve_time_step_setup_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node29" class="node">
+<title>interface~solve_time_step_setup_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node29"><a xlink:href="../interface/solve_time_step_setup_ftcms.html" xlink:title="type_ftcms%solve_time_step_setup_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="921,-257 687,-257 687,-233 921,-233 921,-257"/>
+<text text-anchor="middle" x="804" y="-242.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_setup_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_setup_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge38" class="edge">
+<title>proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_setup_ftcms</title>
+<path fill="none" stroke="#7f00ff" d="M647.76,-235.85C656.9,-236.39 666.55,-236.96 676.36,-237.53"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="676.46,-241.05 686.65,-238.14 676.87,-234.06 676.46,-241.05"/>
+</g>
+<!-- proc~solve_time_step_setup_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node25" class="node">
+<title>proc~solve_time_step_setup_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node25"><a xlink:href="../proc/solve_time_step_setup_ftcms.html" xlink:title="solve_time_step_setup_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1145.5,-257 979.5,-257 979.5,-233 1145.5,-233 1145.5,-257"/>
+<text text-anchor="middle" x="1062.5" y="-242.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_setup_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_setup_ftcms&#45;&gt;interface~calc_gradient_pressure_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge28" class="edge">
+<title>proc~solve_time_step_setup_ftcms&#45;&gt;interface~calc_gradient_pressure_ftcms</title>
+<path fill="none" stroke="#7fff00" d="M1140.58,-257.04C1173.23,-262.13 1211.42,-268.1 1245.11,-273.35"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1244.98,-276.88 1255.4,-274.96 1246.06,-269.96 1244.98,-276.88"/>
+</g>
+<!-- proc~solve_time_step_setup_ftcms&#45;&gt;interface~calc_gradient_temperature_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge30" class="edge">
+<title>proc~solve_time_step_setup_ftcms&#45;&gt;interface~calc_gradient_temperature_ftcms</title>
+<path fill="none" stroke="#00ffff" d="M1145.67,-245C1160.9,-245 1177.18,-245 1193.56,-245"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1193.76,-248.5 1203.76,-245 1193.76,-241.5 1193.76,-248.5"/>
+</g>
+<!-- interface~reflect_variables_ftcms&#45;&gt;proc~reflect_variables_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge32" class="edge">
+<title>interface~reflect_variables_ftcms&#45;&gt;proc~reflect_variables_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M905.27,-287C931.7,-287 959.79,-287 984.76,-287"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="984.89,-290.5 994.89,-287 984.89,-283.5 984.89,-290.5"/>
+</g>
+<!-- interface~run_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_node27" class="node">
+<title>interface~run_ftcms</title>
+<g id="a_proc~~get_fe_connectivity_domain~~CalledByGraph_node27"><a xlink:href="../interface/run_ftcms.html" xlink:title="type_ftcms%run_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="133,-210 0,-210 0,-186 133,-186 133,-210"/>
+<text text-anchor="middle" x="66.5" y="-195.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftcms&#45;&gt;proc~run_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge33" class="edge">
+<title>interface~run_ftcms&#45;&gt;proc~run_ftcms</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M133.22,-198C141.87,-198 150.53,-198 158.63,-198"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="158.89,-201.5 168.89,-198 158.89,-194.5 158.89,-201.5"/>
+</g>
+<!-- interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge34" class="edge">
+<title>interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M472.71,-228.87C483.72,-229.19 494.79,-229.51 505.42,-229.82"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="505.38,-233.32 515.47,-230.11 505.58,-226.32 505.38,-233.32"/>
+</g>
+<!-- interface~solve_time_step_setup_ftcms&#45;&gt;proc~solve_time_step_setup_ftcms -->
+<g id="proc~~get_fe_connectivity_domain~~CalledByGraph_edge35" class="edge">
+<title>interface~solve_time_step_setup_ftcms&#45;&gt;proc~solve_time_step_setup_ftcms</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M921.24,-245C937.33,-245 953.68,-245 969.26,-245"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="969.37,-248.5 979.37,-245 969.37,-241.5 969.37,-248.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocget_fe_connectivity_domainCalledByGraph = svgPanZoom('#procget_fe_connectivity_domainCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">get_fe_connectivity_domain</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">element_id</span><span class="p">,</span><span class="w"> </span><span class="n">connectivity</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_domain</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">target</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">element_id</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">contiguous</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">connectivity</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">elements</span><span class="p">%</span><span class="n">get_fe_connectivity</span><span class="p">(</span><span class="n">element_id</span><span class="p">,</span><span class="w"> </span><span class="n">connectivity</span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">get_fe_connectivity_domain</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-03-11 14:03 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

@@ -1,4 +1,4 @@
-submodule(physics_materials_specific_heat) specific_heat_multiphase
+submodule(materials_specific_heat) specific_heat_multiphase
     implicit none
 contains
     module subroutine calc_sph_gp_1phase(self, state, specific_heat)

@@ -1,0 +1,808 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>get_current_norm_iteration &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>get_current_norm_iteration
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">9 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/iteration_manager.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/iteration_manager.f90.html'>iteration_manager.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/control_iteration_manager.html'>control_iteration_manager</a></li>
+            <li class="breadcrumb-item active" aria-current="page">get_current_norm_iteration</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/get_current_norm_iteration.html#src">get_current_norm_iteration</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine get_current_norm_iteration(self, physics_type, criteria_type, norm_type, current_norm)  
+</h2>
+    
+
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_iteration.html'>type_iteration</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~31"></span>
+              class(<a href='../type/type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-physics_type~4"></span>
+              type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-criteria_type"></span>
+              type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>criteria_type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-norm_type"></span>
+              type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>norm_type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-current_norm"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_norm</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~get_current_norm_iteration~~CallsGraph Pages: 1 -->
+<svg id="procget_current_norm_iterationCallsGraph" width="641pt" height="18pt"
+ viewBox="0.00 0.00 641.00 18.28" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_current_norm_iteration~~CallsGraph" class="graph" transform="scale(0.25 0.25) rotate(0) translate(4 70)">
+<title>proc~~get_current_norm_iteration~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 2591,-70 2591,4 -4,4"/>
+<!-- proc~get_current_norm_iteration -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_node1" class="node">
+<title>proc~get_current_norm_iteration</title>
+<polygon fill="none" stroke="black" points="241,-45 0,-45 0,-21 241,-21 241,-45"/>
+<text text-anchor="middle" x="120.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_iteration%get_current_norm_iteration</text>
+</g>
+<!-- proc~get_current_norm_iteration_setting -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_node2" class="node">
+<title>proc~get_current_norm_iteration_setting</title>
+<g id="a_proc~~get_current_norm_iteration~~CallsGraph_node2"><a xlink:href="../proc/get_current_norm_iteration_setting.html" xlink:title="type_iteration_setting%get_current_norm_iteration_setting">
+<polygon fill="#d9534f" stroke="#d9534f" points="600,-45 277,-45 277,-21 600,-21 600,-45"/>
+<text text-anchor="middle" x="438.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration_setting%get_current_norm_iteration_setting</text>
+</a>
+</g>
+</g>
+<!-- proc~get_current_norm_iteration&#45;&gt;proc~get_current_norm_iteration_setting -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_edge1" class="edge">
+<title>proc~get_current_norm_iteration&#45;&gt;proc~get_current_norm_iteration_setting</title>
+<path fill="none" stroke="#ff0000" d="M241.42,-33C249.76,-33 258.26,-33 266.8,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="266.85,-36.5 276.85,-33 266.85,-29.5 266.85,-36.5"/>
+</g>
+<!-- interface~get_current_norm_convergence_control -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_node3" class="node">
+<title>interface~get_current_norm_convergence_control</title>
+<g id="a_proc~~get_current_norm_iteration~~CallsGraph_node3"><a xlink:href="../interface/get_current_norm_convergence_control.html" xlink:title="type_convergence_control%get_current_norm_convergence_control">
+<polygon fill="#a7506f" stroke="#a7506f" points="1010,-45 636,-45 636,-21 1010,-21 1010,-45"/>
+<text text-anchor="middle" x="823" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_convergence_control%get_current_norm_convergence_control</text>
+</a>
+</g>
+</g>
+<!-- proc~get_current_norm_iteration_setting&#45;&gt;interface~get_current_norm_convergence_control -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_edge2" class="edge">
+<title>proc~get_current_norm_iteration_setting&#45;&gt;interface~get_current_norm_convergence_control</title>
+<path fill="none" stroke="#ff0000" d="M600.05,-33C608.57,-33 617.18,-33 625.8,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="625.92,-36.5 635.92,-33 625.92,-29.5 625.92,-36.5"/>
+</g>
+<!-- proc~get_current_norm_convergence_control -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_node4" class="node">
+<title>proc~get_current_norm_convergence_control</title>
+<g id="a_proc~~get_current_norm_iteration~~CallsGraph_node4"><a xlink:href="../proc/get_current_norm_convergence_control.html" xlink:title="get_current_norm_convergence_control">
+<polygon fill="#d9534f" stroke="#d9534f" points="1270,-45 1046,-45 1046,-21 1270,-21 1270,-45"/>
+<text text-anchor="middle" x="1158" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_current_norm_convergence_control</text>
+</a>
+</g>
+</g>
+<!-- interface~get_current_norm_convergence_control&#45;&gt;proc~get_current_norm_convergence_control -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_edge3" class="edge">
+<title>interface~get_current_norm_convergence_control&#45;&gt;proc~get_current_norm_convergence_control</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1010.46,-33C1019.02,-33 1027.5,-33 1035.83,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1035.89,-36.5 1045.89,-33 1035.89,-29.5 1035.89,-36.5"/>
+</g>
+<!-- interface~get_current_norm_convergence_criterion -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_node5" class="node">
+<title>interface~get_current_norm_convergence_criterion</title>
+<g id="a_proc~~get_current_norm_iteration~~CallsGraph_node5"><a xlink:href="../interface/get_current_norm_convergence_criterion.html" xlink:title="type_convergence_criterion%get_current_norm_convergence_criterion">
+<polygon fill="#a7506f" stroke="#a7506f" points="1697,-24 1306,-24 1306,0 1697,0 1697,-24"/>
+<text text-anchor="middle" x="1501.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_convergence_criterion%get_current_norm_convergence_criterion</text>
+</a>
+</g>
+</g>
+<!-- proc~get_current_norm_convergence_control&#45;&gt;interface~get_current_norm_convergence_criterion -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_edge4" class="edge">
+<title>proc~get_current_norm_convergence_control&#45;&gt;interface~get_current_norm_convergence_criterion</title>
+<path fill="none" stroke="#ff0000" d="M1270.35,-26.15C1278.6,-25.65 1287.07,-25.12 1295.65,-24.6"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1296.01,-28.08 1305.78,-23.97 1295.58,-21.09 1296.01,-28.08"/>
+</g>
+<!-- proc~is_valid_physics_type -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_node6" class="node">
+<title>proc~is_valid_physics_type</title>
+<g id="a_proc~~get_current_norm_iteration~~CallsGraph_node6"><a xlink:href="../proc/is_valid_physics_type.html" xlink:title="type_physics_types%is_valid_physics_type">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1619,-66 1384,-66 1384,-42 1619,-42 1619,-66"/>
+<text text-anchor="middle" x="1501.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_types%is_valid_physics_type</text>
+</a>
+</g>
+</g>
+<!-- proc~get_current_norm_convergence_control&#45;&gt;proc~is_valid_physics_type -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_edge5" class="edge">
+<title>proc~get_current_norm_convergence_control&#45;&gt;proc~is_valid_physics_type</title>
+<path fill="none" stroke="#ff0000" d="M1270.35,-39.85C1303.24,-41.87 1339.5,-44.1 1373.32,-46.18"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1373.53,-49.7 1383.73,-46.82 1373.96,-42.71 1373.53,-49.7"/>
+</g>
+<!-- proc~get_current_norm_convergence_criterion -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_node7" class="node">
+<title>proc~get_current_norm_convergence_criterion</title>
+<g id="a_proc~~get_current_norm_iteration~~CallsGraph_node7"><a xlink:href="../proc/get_current_norm_convergence_criterion.html" xlink:title="get_current_norm_convergence_criterion">
+<polygon fill="#d9534f" stroke="#d9534f" points="1965,-24 1733,-24 1733,0 1965,0 1965,-24"/>
+<text text-anchor="middle" x="1849" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_current_norm_convergence_criterion</text>
+</a>
+</g>
+</g>
+<!-- interface~get_current_norm_convergence_criterion&#45;&gt;proc~get_current_norm_convergence_criterion -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_edge6" class="edge">
+<title>interface~get_current_norm_convergence_criterion&#45;&gt;proc~get_current_norm_convergence_criterion</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1697.21,-12C1705.82,-12 1714.35,-12 1722.73,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1722.85,-15.5 1732.85,-12 1722.85,-8.5 1722.85,-15.5"/>
+</g>
+<!-- proc~in_group_physics_type -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_node8" class="node">
+<title>proc~in_group_physics_type</title>
+<g id="a_proc~~get_current_norm_iteration~~CallsGraph_node8"><a xlink:href="../proc/in_group_physics_type.html" xlink:title="type_physics_types%in_group_physics_type">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="2493,-66 2251,-66 2251,-42 2493,-42 2493,-66"/>
+<text text-anchor="middle" x="2372" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_types%in_group_physics_type</text>
+</a>
+</g>
+</g>
+<!-- proc~is_valid_physics_type&#45;&gt;proc~in_group_physics_type -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_edge7" class="edge">
+<title>proc~is_valid_physics_type&#45;&gt;proc~in_group_physics_type</title>
+<path fill="none" stroke="#00ffff" d="M1619.18,-54C1780.8,-54 2071.91,-54 2240.54,-54"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2240.72,-57.5 2250.72,-54 2240.72,-50.5 2240.72,-57.5"/>
+</g>
+<!-- proc~is_valid_norm_type -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_node9" class="node">
+<title>proc~is_valid_norm_type</title>
+<g id="a_proc~~get_current_norm_iteration~~CallsGraph_node9"><a xlink:href="../proc/is_valid_norm_type.html" xlink:title="type_norm_types%is_valid_norm_type">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="2215,-24 2001,-24 2001,0 2215,0 2215,-24"/>
+<text text-anchor="middle" x="2108" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_norm_types%is_valid_norm_type</text>
+</a>
+</g>
+</g>
+<!-- proc~get_current_norm_convergence_criterion&#45;&gt;proc~is_valid_norm_type -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_edge8" class="edge">
+<title>proc~get_current_norm_convergence_criterion&#45;&gt;proc~is_valid_norm_type</title>
+<path fill="none" stroke="#ff0000" d="M1965.34,-12C1973.69,-12 1982.12,-12 1990.47,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1990.62,-15.5 2000.62,-12 1990.62,-8.5 1990.62,-15.5"/>
+</g>
+<!-- strip -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_node10" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="2585,-66 2531,-66 2531,-42 2585,-42 2585,-66"/>
+<text text-anchor="middle" x="2558" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~in_group_physics_type&#45;&gt;strip -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_edge9" class="edge">
+<title>proc~in_group_physics_type&#45;&gt;strip</title>
+<path fill="none" stroke="#00ffff" d="M2493.16,-54C2503.04,-54 2512.44,-54 2520.84,-54"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2520.9,-57.5 2530.9,-54 2520.9,-50.5 2520.9,-57.5"/>
+</g>
+<!-- to_lower -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_node11" class="node">
+<title>to_lower</title>
+<polygon fill="#777777" stroke="#777777" points="2587,-24 2529,-24 2529,0 2587,0 2587,-24"/>
+<text text-anchor="middle" x="2558" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_lower</text>
+</g>
+<!-- proc~in_group_physics_type&#45;&gt;to_lower -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_edge10" class="edge">
+<title>proc~in_group_physics_type&#45;&gt;to_lower</title>
+<path fill="none" stroke="#00ffff" d="M2451.45,-41.95C2465.36,-39.33 2479.66,-36.34 2493,-33 2501.56,-30.86 2510.64,-28.15 2519.18,-25.41"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2520.51,-28.65 2528.9,-22.19 2518.31,-22.01 2520.51,-28.65"/>
+</g>
+<!-- proc~in_group_norm_type -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_node12" class="node">
+<title>proc~in_group_norm_type</title>
+<g id="a_proc~~get_current_norm_iteration~~CallsGraph_node12"><a xlink:href="../proc/in_group_norm_type.html" xlink:title="type_norm_types%in_group_norm_type">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="2482.5,-24 2261.5,-24 2261.5,0 2482.5,0 2482.5,-24"/>
+<text text-anchor="middle" x="2372" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_norm_types%in_group_norm_type</text>
+</a>
+</g>
+</g>
+<!-- proc~is_valid_norm_type&#45;&gt;proc~in_group_norm_type -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_edge11" class="edge">
+<title>proc~is_valid_norm_type&#45;&gt;proc~in_group_norm_type</title>
+<path fill="none" stroke="#ff0000" d="M2215.19,-12C2227.05,-12 2239.18,-12 2251.2,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2251.25,-15.5 2261.25,-12 2251.25,-8.5 2251.25,-15.5"/>
+</g>
+<!-- proc~in_group_norm_type&#45;&gt;strip -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_edge12" class="edge">
+<title>proc~in_group_norm_type&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M2451.45,-24.05C2465.36,-26.67 2479.66,-29.66 2493,-33 2502.25,-35.31 2512.09,-38.28 2521.22,-41.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2520.19,-44.6 2530.78,-44.45 2522.41,-37.96 2520.19,-44.6"/>
+</g>
+<!-- proc~in_group_norm_type&#45;&gt;to_lower -->
+<g id="proc~~get_current_norm_iteration~~CallsGraph_edge13" class="edge">
+<title>proc~in_group_norm_type&#45;&gt;to_lower</title>
+<path fill="none" stroke="#ff0000" d="M2482.69,-12C2495.5,-12 2507.84,-12 2518.66,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2518.93,-15.5 2528.93,-12 2518.93,-8.5 2518.93,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocget_current_norm_iterationCallsGraph = svgPanZoom('#procget_current_norm_iterationCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~get_current_norm_iteration~~CalledByGraph Pages: 1 -->
+<svg id="procget_current_norm_iterationCalledByGraph" width="641pt" height="11pt"
+ viewBox="0.00 0.00 641.00 11.34" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_current_norm_iteration~~CalledByGraph" class="graph" transform="scale(0.35 0.35) rotate(0) translate(4 28)">
+<title>proc~~get_current_norm_iteration~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 1805,-28 1805,4 -4,4"/>
+<!-- proc~get_current_norm_iteration -->
+<g id="proc~~get_current_norm_iteration~~CalledByGraph_node1" class="node">
+<title>proc~get_current_norm_iteration</title>
+<polygon fill="none" stroke="black" points="1801,-24 1560,-24 1560,0 1801,0 1801,-24"/>
+<text text-anchor="middle" x="1680.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_iteration%get_current_norm_iteration</text>
+</g>
+<!-- proc~get_current_norm_control -->
+<g id="proc~~get_current_norm_iteration~~CalledByGraph_node2" class="node">
+<title>proc~get_current_norm_control</title>
+<g id="a_proc~~get_current_norm_iteration~~CalledByGraph_node2"><a xlink:href="../proc/get_current_norm_control.html" xlink:title="type_control%get_current_norm_control">
+<polygon fill="#d9534f" stroke="#d9534f" points="1524,-24 1300,-24 1300,0 1524,0 1524,-24"/>
+<text text-anchor="middle" x="1412" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_control%get_current_norm_control</text>
+</a>
+</g>
+</g>
+<!-- proc~get_current_norm_control&#45;&gt;proc~get_current_norm_iteration -->
+<g id="proc~~get_current_norm_iteration~~CalledByGraph_edge1" class="edge">
+<title>proc~get_current_norm_control&#45;&gt;proc~get_current_norm_iteration</title>
+<path fill="none" stroke="#ff0000" d="M1524.09,-12C1532.61,-12 1541.25,-12 1549.88,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1549.99,-15.5 1559.99,-12 1549.99,-8.5 1549.99,-15.5"/>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftcms -->
+<g id="proc~~get_current_norm_iteration~~CalledByGraph_node3" class="node">
+<title>proc~solve_time_step_check_convergence_ftcms</title>
+<g id="a_proc~~get_current_norm_iteration~~CalledByGraph_node3"><a xlink:href="../proc/solve_time_step_check_convergence_ftcms.html" xlink:title="solve_time_step_check_convergence_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1264,-24 1020,-24 1020,0 1264,0 1264,-24"/>
+<text text-anchor="middle" x="1142" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_check_convergence_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftcms&#45;&gt;proc~get_current_norm_control -->
+<g id="proc~~get_current_norm_iteration~~CalledByGraph_edge2" class="edge">
+<title>proc~solve_time_step_check_convergence_ftcms&#45;&gt;proc~get_current_norm_control</title>
+<path fill="none" stroke="#ff0000" d="M1264.06,-12C1272.64,-12 1281.28,-12 1289.86,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1289.88,-15.5 1299.88,-12 1289.88,-8.5 1289.88,-15.5"/>
+</g>
+<!-- interface~solve_time_step_check_convergence_ftcms -->
+<g id="proc~~get_current_norm_iteration~~CalledByGraph_node4" class="node">
+<title>interface~solve_time_step_check_convergence_ftcms</title>
+<g id="a_proc~~get_current_norm_iteration~~CalledByGraph_node4"><a xlink:href="../interface/solve_time_step_check_convergence_ftcms.html" xlink:title="type_ftcms%solve_time_step_check_convergence_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="984,-24 673,-24 673,0 984,0 984,-24"/>
+<text text-anchor="middle" x="828.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_check_convergence_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_check_convergence_ftcms&#45;&gt;proc~solve_time_step_check_convergence_ftcms -->
+<g id="proc~~get_current_norm_iteration~~CalledByGraph_edge3" class="edge">
+<title>interface~solve_time_step_check_convergence_ftcms&#45;&gt;proc~solve_time_step_check_convergence_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M984.34,-12C992.8,-12 1001.28,-12 1009.65,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1009.81,-15.5 1019.81,-12 1009.81,-8.5 1009.81,-15.5"/>
+</g>
+<!-- proc~solve_time_step_ftcms -->
+<g id="proc~~get_current_norm_iteration~~CalledByGraph_node5" class="node">
+<title>proc~solve_time_step_ftcms</title>
+<g id="a_proc~~get_current_norm_iteration~~CalledByGraph_node5"><a xlink:href="../proc/solve_time_step_ftcms.html" xlink:title="solve_time_step_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="637,-24 505,-24 505,0 637,0 637,-24"/>
+<text text-anchor="middle" x="571" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_check_convergence_ftcms -->
+<g id="proc~~get_current_norm_iteration~~CalledByGraph_edge4" class="edge">
+<title>proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_check_convergence_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M637.13,-12C645.3,-12 653.92,-12 662.79,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="662.92,-15.5 672.92,-12 662.92,-8.5 662.92,-15.5"/>
+</g>
+<!-- interface~solve_time_step_ftcms -->
+<g id="proc~~get_current_norm_iteration~~CalledByGraph_node6" class="node">
+<title>interface~solve_time_step_ftcms</title>
+<g id="a_proc~~get_current_norm_iteration~~CalledByGraph_node6"><a xlink:href="../interface/solve_time_step_ftcms.html" xlink:title="type_ftcms%solve_time_step_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="469,-24 270,-24 270,0 469,0 469,-24"/>
+<text text-anchor="middle" x="369.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms -->
+<g id="proc~~get_current_norm_iteration~~CalledByGraph_edge5" class="edge">
+<title>interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M469.08,-12C477.74,-12 486.4,-12 494.82,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="494.94,-15.5 504.94,-12 494.94,-8.5 494.94,-15.5"/>
+</g>
+<!-- proc~run_ftcms -->
+<g id="proc~~get_current_norm_iteration~~CalledByGraph_node7" class="node">
+<title>proc~run_ftcms</title>
+<g id="a_proc~~get_current_norm_iteration~~CalledByGraph_node7"><a xlink:href="../proc/run_ftcms.html" xlink:title="run_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 169,-24 169,0 234,0 234,-24"/>
+<text text-anchor="middle" x="201.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms -->
+<g id="proc~~get_current_norm_iteration~~CalledByGraph_edge6" class="edge">
+<title>proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M234.11,-12C241.85,-12 250.57,-12 259.76,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="259.88,-15.5 269.88,-12 259.88,-8.5 259.88,-15.5"/>
+</g>
+<!-- interface~run_ftcms -->
+<g id="proc~~get_current_norm_iteration~~CalledByGraph_node8" class="node">
+<title>interface~run_ftcms</title>
+<g id="a_proc~~get_current_norm_iteration~~CalledByGraph_node8"><a xlink:href="../interface/run_ftcms.html" xlink:title="type_ftcms%run_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="133,-24 0,-24 0,0 133,0 133,-24"/>
+<text text-anchor="middle" x="66.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftcms&#45;&gt;proc~run_ftcms -->
+<g id="proc~~get_current_norm_iteration~~CalledByGraph_edge7" class="edge">
+<title>interface~run_ftcms&#45;&gt;proc~run_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M133.22,-12C141.87,-12 150.53,-12 158.63,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="158.89,-15.5 168.89,-12 158.89,-8.5 158.89,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocget_current_norm_iterationCalledByGraph = svgPanZoom('#procget_current_norm_iterationCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">get_current_norm_iteration</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">physics_type</span><span class="p">,</span><span class="w"> </span><span class="n">criteria_type</span><span class="p">,</span><span class="w"> </span><span class="n">norm_type</span><span class="p">,</span><span class="w"> </span><span class="n">current_norm</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_iteration</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_constant_id</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">physics_type</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_constant_id</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">criteria_type</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_constant_id</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">norm_type</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">current_norm</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">%</span><span class="n">get_current_norm</span><span class="p">(</span><span class="n">physics_type</span><span class="p">,</span><span class="w"> </span><span class="n">criteria_type</span><span class="p">,</span><span class="w"> </span><span class="n">norm_type</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">nonlinear_iter</span><span class="p">,</span><span class="w"> </span><span class="n">current_norm</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">get_current_norm_iteration</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-03-11 14:03 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

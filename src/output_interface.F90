@@ -1,4 +1,4 @@
-module inout_input_output_conditions
+module io_input_output_conditions
     use, intrinsic :: iso_fortran_env
 !$  use :: omp_lib
     use :: mpi_f08
@@ -6,7 +6,7 @@ module inout_input_output_conditions
     use :: stdlib_logger
     use :: json_module, only:json_file
     use :: module_core
-    use :: inout_input_base, only:get_json_value, abst_input
+    use :: io_input_base, only:get_json_value, abst_input
     implicit none
     private
 
@@ -22,7 +22,7 @@ module inout_input_output_conditions
                                                            ! --- Thermal Category ---
                                                            'temperature', 'thermal_conductivity', 'volumetric_heat_capacity', &
                                                            ! --- Ice Category ---
-                                                           'ice_saturation', &
+                                                           'water_content', &
                                                            ! --- Water/Hydraulic Category ---
                                                            'pressure', 'water_flux', 'hydraulic_conductivity']
 
@@ -151,4 +151,4 @@ contains
         end if
     end subroutine display_output_settings
 
-end module inout_input_output_conditions
+end module io_input_output_conditions

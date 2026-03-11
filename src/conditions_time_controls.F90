@@ -1,4 +1,4 @@
-submodule(inout_input_conditions) inout_input_conditions_time_controlss
+submodule(io_input_conditions) input_conditions_time_controls
     implicit none
     !!------------------------------------------------------------------------------------------------------------------------------
     ! JSON key names for time control
@@ -29,13 +29,13 @@ contains
         class(type_conditions), intent(inout) :: self
         type(json_file), intent(inout) :: json
 
-        call read_conditions_time_controls_simulation_period(self, json)
-        call read_conditions_time_controls_time_stepping(self, json)
-        call read_conditions_time_controls_adaptive_stepping(self, json)
+        call read_time_ctrl_sim_period(self, json)
+        call read_time_ctrl_stepping(self, json)
+        call read_time_ctrl_adaptive(self, json)
         ! call read_conditions_time_controls_boundary_time_points(self, json)
     end subroutine read_conditions_time_controls
 
-    subroutine read_conditions_time_controls_simulation_period(self, json)
+    subroutine read_time_ctrl_sim_period(self, json)
         !> Load the time control parameters from the JSON file
         implicit none
         class(type_conditions), intent(inout) :: self
@@ -65,9 +65,9 @@ contains
         if (self%time_control%simulation_period%start >= self%time_control%simulation_period%end) then
             call raise_error(ERROR_CODES%VAR_INVALID, opt=start//" and "//fend)
         end if
-    end subroutine read_conditions_time_controls_simulation_period
+    end subroutine read_time_ctrl_sim_period
 
-    subroutine read_conditions_time_controls_time_stepping(self, json)
+    subroutine read_time_ctrl_stepping(self, json)
         !> Load the time stepping parameters from the JSON file
         implicit none
         class(type_conditions), intent(inout) :: self
@@ -107,9 +107,9 @@ contains
             call raise_error(ERROR_CODES%VAR_INVALID, &
                              opt="In "//join(buffer(1:2))//", 'initial_step' must be between 'min_step' and 'max_step'.")
         end if
-    end subroutine read_conditions_time_controls_time_stepping
+    end subroutine read_time_ctrl_stepping
 
-    subroutine read_conditions_time_controls_adaptive_stepping(self, json)
+    subroutine read_time_ctrl_adaptive(self, json)
         !> Load the adaptive time stepping parameters from the JSON file
         implicit none
         class(type_conditions), intent(inout) :: self
@@ -140,7 +140,7 @@ contains
         buffer(3) = scale_retry
         call get_json_value(json, join(buffer), self%time_control%adaptive_stepping%scale_retry, &
                             is_required=.true., valid_range=[epsilon(0.0d0), 1.0d0])
-    end subroutine read_conditions_time_controls_adaptive_stepping
+    end subroutine read_time_ctrl_adaptive
 
     module subroutine display_time_controls(self)
         !> Displays all settings for this time_control object.
@@ -166,4 +166,4 @@ contains
         write (*, '(a)') "======================================================================"
     end subroutine display_time_controls
 
-end submodule inout_input_conditions_time_controlss
+end submodule input_conditions_time_controls

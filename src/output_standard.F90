@@ -1,4 +1,4 @@
-submodule(inout_input_output_conditions) inout_input_output_conditions_standard
+submodule(io_input_output_conditions) input_output_conditions_standard
     implicit none
 
     !!------------------------------------------------------------------------------------------------------------------------------
@@ -34,9 +34,9 @@ contains
 
         write (output_unit, '(A)') "  Standard Output Settings:"
         write (output_unit, '(A, L1)') "    Print Progress: ", self%print_progress
-        write (output_unit, '(A, A, F8.3)') "    Print Interval: ", trim(self%print_progress_unit), &
+        write (output_unit, '(A, A, F8.3)') "    Print Interval: ", strip(self%print_progress_unit), &
             self%print_progress_interval
 
     end subroutine display_output_settings_standard
 
-end submodule inout_input_output_conditions_standard
+end submodule input_output_conditions_standard

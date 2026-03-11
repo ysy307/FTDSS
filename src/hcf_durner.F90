@@ -1,4 +1,4 @@
-submodule(physics_models_hcf) hcf_durner
+submodule(models_hcf) hcf_durner
     implicit none
 contains
     !----------------------------------------------------------------------------------------------------

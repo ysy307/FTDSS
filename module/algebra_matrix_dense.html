@@ -1,0 +1,1844 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>algebra_matrix_dense &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>algebra_matrix_dense
+      <small>Submodule</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.5% of total for modules and submodules.">210 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/matrix_dense.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/matrix_dense.f90.html'>matrix_dense.F90</a></li>
+            <li class="breadcrumb-item active" aria-current="page">algebra_matrix_dense</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3">
+        <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#modfuncs-0"
+         aria-expanded="false" aria-controls="modfuncs-0">
+         <h4 class="card-header bg-primary text-white">Module Functions</h4>
+      </a>
+      <div id="modfuncs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/algebra_matrix_dense.html#proc-find_dense">find_dense</a>
+            <a class="list-group-item" href="../module/algebra_matrix_dense.html#proc-get_val_dense">get_val_dense</a>
+        </div>
+      </div>
+    </div>
+
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#modsubs-0"
+         aria-expanded="false" aria-controls="modsubs-0">
+         <h4 class="card-header bg-primary text-white">Module Subroutines</h4>
+      </a>
+      <div id="modsubs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/algebra_matrix_dense.html#proc-destroy_dense">destroy_dense</a>
+            <a class="list-group-item" href="../module/algebra_matrix_dense.html#proc-display_dense">display_dense</a>
+            <a class="list-group-item" href="../module/algebra_matrix_dense.html#proc-get_diagonal_dense">get_diagonal_dense</a>
+            <a class="list-group-item" href="../module/algebra_matrix_dense.html#proc-get_info_dense">get_info_dense</a>
+            <a class="list-group-item" href="../module/algebra_matrix_dense.html#proc-initialize_dense">initialize_dense</a>
+            <a class="list-group-item" href="../module/algebra_matrix_dense.html#proc-scale_dense">scale_dense</a>
+            <a class="list-group-item" href="../module/algebra_matrix_dense.html#proc-set_all_dense">set_all_dense</a>
+            <a class="list-group-item" href="../module/algebra_matrix_dense.html#proc-set_row_dense">set_row_dense</a>
+            <a class="list-group-item" href="../module/algebra_matrix_dense.html#proc-set_value_block_dense">set_value_block_dense</a>
+            <a class="list-group-item" href="../module/algebra_matrix_dense.html#proc-set_value_dense">set_value_dense</a>
+            <a class="list-group-item" href="../module/algebra_matrix_dense.html#proc-zero_all_dense">zero_all_dense</a>
+            <a class="list-group-item" href="../module/algebra_matrix_dense.html#proc-zero_row_dense">zero_row_dense</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+
+
+  </div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      <p>Implements the procedures for the dense matrix type.</p>
+<br>          <div class="card mb-4">
+      <h3 class="card-header card-title bg-light">Uses</h3>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <ul class="list-inline">
+                <li><h5>Ancestors:</h5></li>
+                  <li class="list-inline-item"><a href='core_types_algebra_matrix.html'>core_types_algebra_matrix</a></li>
+              </ul>
+            </li>
+            <li class="list-group-item">
+              <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: module~~algebra_matrix_dense~~UsesGraph Pages: 1 -->
+<svg id="modulealgebra_matrix_denseUsesGraph" width="641pt" height="182pt"
+ viewBox="0.00 0.00 641.00 181.93" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~algebra_matrix_dense~~UsesGraph" class="graph" transform="scale(0.41 0.41) rotate(0) translate(4 434.8)">
+<title>module~~algebra_matrix_dense~~UsesGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-434.8 1542,-434.8 1542,4 -4,4"/>
+<!-- module~algebra_matrix_dense -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_node1" class="node">
+<title>module~algebra_matrix_dense</title>
+<polygon fill="none" stroke="black" points="1538,-303.83 1407,-303.83 1407,-279.83 1538,-279.83 1538,-303.83"/>
+<text text-anchor="middle" x="1472.5" y="-289.43" font-family="Helvetica,sans-Serif" font-size="10.50">algebra_matrix_dense</text>
+</g>
+<!-- module~core_types_algebra_matrix -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_node2" class="node">
+<title>module~core_types_algebra_matrix</title>
+<g id="a_module~~algebra_matrix_dense~~UsesGraph_node2"><a xlink:href="../module/core_types_algebra_matrix.html" xlink:title="core_types_algebra_matrix">
+<polygon fill="#337ab7" stroke="#337ab7" points="1371,-303.83 1215,-303.83 1215,-279.83 1371,-279.83 1371,-303.83"/>
+<text text-anchor="middle" x="1293" y="-289.43" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_algebra_matrix</text>
+</a>
+</g>
+</g>
+<!-- module~algebra_matrix_dense&#45;&gt;module~core_types_algebra_matrix -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge1" class="edge">
+<title>module~algebra_matrix_dense&#45;&gt;module~core_types_algebra_matrix</title>
+<path fill="none" stroke="#ff0000" d="M1406.92,-291.83C1398.58,-291.83 1389.94,-291.83 1381.31,-291.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1381.21,-288.33 1371.21,-291.83 1381.21,-295.33 1381.21,-288.33"/>
+</g>
+<!-- iso_fortran_env -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_node3" class="node">
+<title>iso_fortran_env</title>
+<g id="a_module~~algebra_matrix_dense~~UsesGraph_node3"><a xlink:href="http://fortranwiki.org/fortran/show/iso_fortran_env" xlink:title="iso_fortran_env">
+<polygon fill="#337ab7" stroke="#337ab7" points="94,-309.83 0,-309.83 0,-285.83 94,-285.83 94,-309.83"/>
+<text text-anchor="middle" x="47" y="-295.43" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_algebra_matrix&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge2" class="edge">
+<title>module~core_types_algebra_matrix&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M932.5,-411.83C871.94,-405.48 855.79,-403.33 795.5,-411.83"/>
+</g>
+<!-- module~core_allocate -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_node4" class="node">
+<title>module~core_allocate</title>
+<g id="a_module~~algebra_matrix_dense~~UsesGraph_node4"><a xlink:href="../module/core_allocate.html" xlink:title="core_allocate">
+<polygon fill="#337ab7" stroke="#337ab7" points="836.5,-303.83 752.5,-303.83 752.5,-279.83 836.5,-279.83 836.5,-303.83"/>
+<text text-anchor="middle" x="794.5" y="-289.43" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_allocate</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_algebra_matrix&#45;&gt;module~core_allocate -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge3" class="edge">
+<title>module~core_types_algebra_matrix&#45;&gt;module~core_allocate</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M932.5,-213.83C887.39,-222.86 883.07,-243.23 843,-265.83 837.75,-268.79 832.16,-271.9 826.72,-274.89"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="824.89,-271.9 817.8,-279.78 828.25,-278.04 824.89,-271.9"/>
+</g>
+<!-- module~core_check_range -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_node5" class="node">
+<title>module~core_check_range</title>
+<g id="a_module~~algebra_matrix_dense~~UsesGraph_node5"><a xlink:href="../module/core_check_range.html" xlink:title="core_check_range">
+<polygon fill="#337ab7" stroke="#337ab7" points="988,-383.83 879,-383.83 879,-359.83 988,-359.83 988,-383.83"/>
+<text text-anchor="middle" x="933.5" y="-369.43" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_check_range</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_algebra_matrix&#45;&gt;module~core_check_range -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge4" class="edge">
+<title>module~core_types_algebra_matrix&#45;&gt;module~core_check_range</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1279.67,-304.1C1251.41,-331.13 1178.49,-394.79 1102.5,-411.83"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1100.5,-411.83C1053.64,-422.34 999.61,-403.53 966.25,-388.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="967.54,-385.04 957,-383.92 964.54,-391.36 967.54,-385.04"/>
+</g>
+<!-- module~core_constants -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_node6" class="node">
+<title>module~core_constants</title>
+<g id="a_module~~algebra_matrix_dense~~UsesGraph_node6"><a xlink:href="../module/core_constants.html" xlink:title="core_constants">
+<polygon fill="#337ab7" stroke="#337ab7" points="549,-269.83 457,-269.83 457,-245.83 549,-245.83 549,-269.83"/>
+<text text-anchor="middle" x="503" y="-255.43" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_algebra_matrix&#45;&gt;module~core_constants -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge5" class="edge">
+<title>module~core_types_algebra_matrix&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1100.5,-213.83C1032.79,-184.54 1006.84,-199.34 934.5,-213.83"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M932.5,-213.83C870.54,-226.24 858.5,-246.93 795.5,-251.83"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M793.5,-251.83C729.2,-256.84 712.4,-266.58 648.5,-257.83"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M646.5,-257.83C617.94,-253.92 585.85,-253.57 559.37,-254.35"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="559.01,-250.86 549.14,-254.71 559.26,-257.86 559.01,-250.86"/>
+</g>
+<!-- module~core_deallocate -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_node7" class="node">
+<title>module~core_deallocate</title>
+<g id="a_module~~algebra_matrix_dense~~UsesGraph_node7"><a xlink:href="../module/core_deallocate.html" xlink:title="core_deallocate">
+<polygon fill="#337ab7" stroke="#337ab7" points="843,-364.83 746,-364.83 746,-340.83 843,-340.83 843,-364.83"/>
+<text text-anchor="middle" x="794.5" y="-350.43" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_deallocate</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_algebra_matrix&#45;&gt;module~core_deallocate -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge6" class="edge">
+<title>module~core_types_algebra_matrix&#45;&gt;module~core_deallocate</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1100.5,-411.83C1028.51,-427.98 1007.87,-419.53 934.5,-411.83"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M932.5,-411.83C891.72,-407.55 848.98,-386 822.3,-370.17"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="823.93,-367.06 813.56,-364.85 820.28,-373.04 823.93,-367.06"/>
+</g>
+<!-- module~core_findings -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_node8" class="node">
+<title>module~core_findings</title>
+<g id="a_module~~algebra_matrix_dense~~UsesGraph_node8"><a xlink:href="../module/core_findings.html" xlink:title="core_findings">
+<polygon fill="#337ab7" stroke="#337ab7" points="233,-67.83 150,-67.83 150,-43.83 233,-43.83 233,-67.83"/>
+<text text-anchor="middle" x="191.5" y="-53.43" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_findings</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_algebra_matrix&#45;&gt;module~core_findings -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge7" class="edge">
+<title>module~core_types_algebra_matrix&#45;&gt;module~core_findings</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M646.5,-59.83C500.4,-50.27 327.29,-52.48 243.29,-54.41"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="243.17,-50.91 233.25,-54.65 243.33,-57.91 243.17,-50.91"/>
+</g>
+<!-- module~core_types_algebra_vector -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_node9" class="node">
+<title>module~core_types_algebra_vector</title>
+<g id="a_module~~algebra_matrix_dense~~UsesGraph_node9"><a xlink:href="../module/core_types_algebra_vector.html" xlink:title="core_types_algebra_vector">
+<polygon fill="#337ab7" stroke="#337ab7" points="1179,-303.83 1024,-303.83 1024,-279.83 1179,-279.83 1179,-303.83"/>
+<text text-anchor="middle" x="1101.5" y="-289.43" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_algebra_vector</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_algebra_matrix&#45;&gt;module~core_types_algebra_vector -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge8" class="edge">
+<title>module~core_types_algebra_matrix&#45;&gt;module~core_types_algebra_vector</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1214.92,-291.83C1206.45,-291.83 1197.79,-291.83 1189.21,-291.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1189.2,-288.33 1179.2,-291.83 1189.2,-295.33 1189.2,-288.33"/>
+</g>
+<!-- stdlib_optval -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_node10" class="node">
+<title>stdlib_optval</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="86.5,-88.83 7.5,-88.83 7.5,-64.83 86.5,-64.83 86.5,-88.83"/>
+<text text-anchor="middle" x="47" y="-74.43" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_optval</text>
+</g>
+<!-- module~core_types_algebra_matrix&#45;&gt;stdlib_optval -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge9" class="edge">
+<title>module~core_types_algebra_matrix&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1261.67,-279.73C1224.13,-264.67 1158.34,-237.98 1102.5,-213.83"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1100.5,-213.83C1046.67,-190.54 1042.08,-167.55 988,-144.83 844.6,-84.58 803.62,-71.31 648.5,-59.83"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M646.5,-59.83C581.61,-50.59 568.27,-34.72 504,-21.83"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M502,-21.83C339.8,10.71 290.12,6.76 130,-34.83 110.51,-39.89 90.36,-50.13 74.92,-59.23"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="72.67,-56.5 65.95,-64.69 76.31,-62.48 72.67,-56.5"/>
+</g>
+<!-- module~core_allocate&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge10" class="edge">
+<title>module~core_allocate&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M752.29,-298.82C709.01,-307.21 639.76,-323.66 585,-350.83 544.63,-370.86 548.66,-405.76 504,-411.83"/>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M502,-411.83C337.54,-434.53 279.78,-449.44 130,-377.83 101.68,-364.29 77.11,-337.04 62.43,-318.13"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="65.21,-316 56.41,-310.11 59.62,-320.2 65.21,-316"/>
+</g>
+<!-- module~core_allocate&#45;&gt;module~core_constants -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge11" class="edge">
+<title>module~core_allocate&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M752.32,-279.99C723.51,-272.24 683.98,-262.69 648.5,-257.83"/>
+</g>
+<!-- module~core_validation_error -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_node17" class="node">
+<title>module~core_validation_error</title>
+<g id="a_module~~algebra_matrix_dense~~UsesGraph_node17"><a xlink:href="../module/core_validation_error.html" xlink:title="core_validation_error">
+<polygon fill="#337ab7" stroke="#337ab7" points="710,-383.83 585,-383.83 585,-359.83 710,-359.83 710,-383.83"/>
+<text text-anchor="middle" x="647.5" y="-369.43" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_validation_error</text>
+</a>
+</g>
+</g>
+<!-- module~core_allocate&#45;&gt;module~core_validation_error -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge12" class="edge">
+<title>module~core_allocate&#45;&gt;module~core_validation_error</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M776.76,-303.9C760.26,-315.49 734.11,-333.06 710,-345.83 703.45,-349.3 696.34,-352.66 689.35,-355.74"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="687.77,-352.61 679.96,-359.77 690.53,-359.04 687.77,-352.61"/>
+</g>
+<!-- module~core_check_range&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge13" class="edge">
+<title>module~core_check_range&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M900.96,-383.86C873.56,-393.63 832.55,-406.61 795.5,-411.83"/>
+</g>
+<!-- module~core_constants_base -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_node12" class="node">
+<title>module~core_constants_base</title>
+<g id="a_module~~algebra_matrix_dense~~UsesGraph_node12"><a xlink:href="../module/core_constants_base.html" xlink:title="core_constants_base">
+<polygon fill="#337ab7" stroke="#337ab7" points="253,-269.83 130,-269.83 130,-245.83 253,-245.83 253,-269.83"/>
+<text text-anchor="middle" x="191.5" y="-255.43" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_base</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_base -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge14" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_base</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M457,-257.83C406.2,-257.83 322.91,-257.83 263.36,-257.83"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="263.27,-254.33 253.27,-257.83 263.27,-261.33 263.27,-254.33"/>
+</g>
+<!-- module~core_constants_error -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_node13" class="node">
+<title>module~core_constants_error</title>
+<g id="a_module~~algebra_matrix_dense~~UsesGraph_node13"><a xlink:href="../module/core_constants_error.html" xlink:title="core_constants_error">
+<polygon fill="#337ab7" stroke="#337ab7" points="417,-309.83 293,-309.83 293,-285.83 417,-285.83 417,-309.83"/>
+<text text-anchor="middle" x="355" y="-295.43" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_error</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_error -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge15" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_error</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M458.2,-269.83C442.96,-274 425.7,-278.73 409.75,-283.1"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="408.75,-279.75 400.03,-285.77 410.6,-286.5 408.75,-279.75"/>
+</g>
+<!-- module~core_constants_ids -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_node14" class="node">
+<title>module~core_constants_ids</title>
+<g id="a_module~~algebra_matrix_dense~~UsesGraph_node14"><a xlink:href="../module/core_constants_ids.html" xlink:title="core_constants_ids">
+<polygon fill="#337ab7" stroke="#337ab7" points="411,-187.83 299,-187.83 299,-163.83 411,-163.83 411,-187.83"/>
+<text text-anchor="middle" x="355" y="-173.43" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_ids</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_ids -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge16" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_ids</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M488.9,-245.75C473.61,-232.21 447.09,-210.38 421,-196.83 417.33,-194.92 413.45,-193.15 409.49,-191.5"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="410.76,-188.24 400.17,-187.89 408.23,-194.77 410.76,-188.24"/>
+</g>
+<!-- module~core_constants_values -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_node15" class="node">
+<title>module~core_constants_values</title>
+<g id="a_module~~algebra_matrix_dense~~UsesGraph_node15"><a xlink:href="../module/core_constants_values.html" xlink:title="core_constants_values">
+<polygon fill="#337ab7" stroke="#337ab7" points="421,-229.83 289,-229.83 289,-205.83 421,-205.83 421,-229.83"/>
+<text text-anchor="middle" x="355" y="-215.43" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_values</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_values -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge17" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_values</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M458.2,-245.83C442.96,-241.66 425.7,-236.93 409.75,-232.56"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="410.6,-229.16 400.03,-229.89 408.75,-235.91 410.6,-229.16"/>
+</g>
+<!-- module~core_deallocate&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge18" class="edge">
+<title>module~core_deallocate&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M774.27,-364.86C747.36,-380.69 696.37,-407.07 648.5,-411.83"/>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M646.5,-411.83C583.48,-418.09 566.22,-400.01 504,-411.83"/>
+</g>
+<!-- module~core_deallocate&#45;&gt;module~core_constants -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge19" class="edge">
+<title>module~core_deallocate&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M778.62,-340.66C747.9,-315.94 677.87,-261.85 648.5,-257.83"/>
+</g>
+<!-- module~core_deallocate&#45;&gt;module~core_validation_error -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge20" class="edge">
+<title>module~core_deallocate&#45;&gt;module~core_validation_error</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M745.62,-359.1C737.44,-360.18 728.78,-361.31 720.14,-362.44"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="719.49,-359 710.03,-363.77 720.4,-365.94 719.49,-359"/>
+</g>
+<!-- module~core_findings&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge21" class="edge">
+<title>module~core_findings&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M149.73,-63.35C142.26,-66.42 135.2,-70.75 130,-76.83 71.31,-145.48 149.4,-205.5 94,-276.83 93.41,-277.59 92.79,-278.32 92.14,-279.03"/>
+<polygon fill="#003fff" stroke="#003fff" points="89.63,-276.56 84.19,-285.66 94.11,-281.94 89.63,-276.56"/>
+</g>
+<!-- module~core_findings&#45;&gt;stdlib_optval -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge22" class="edge">
+<title>module~core_findings&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M149.67,-61.85C133.32,-64.26 114.34,-67.05 97.24,-69.57"/>
+<polygon fill="#003fff" stroke="#003fff" points="96.26,-66.18 86.88,-71.1 97.28,-73.11 96.26,-66.18"/>
+</g>
+<!-- module~core_types_algebra_vector&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge23" class="edge">
+<title>module~core_types_algebra_vector&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1029.06,-303.86C984.46,-313.04 926.67,-328.06 879,-350.83 837.53,-370.64 841.01,-405.41 795.5,-411.83"/>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M793.5,-411.83C729.69,-420.83 712.63,-405.46 648.5,-411.83"/>
+</g>
+<!-- module~core_types_algebra_vector&#45;&gt;module~core_check_range -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge25" class="edge">
+<title>module~core_types_algebra_vector&#45;&gt;module~core_check_range</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1075.29,-303.98C1046.85,-317.69 1000.44,-340.05 968.74,-355.33"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="966.89,-352.33 959.41,-359.83 969.93,-358.64 966.89,-352.33"/>
+</g>
+<!-- module~core_types_algebra_vector&#45;&gt;module~core_constants -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge26" class="edge">
+<title>module~core_types_algebra_vector&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1055.92,-279.81C996.63,-265.24 888.46,-243.6 795.5,-251.83"/>
+</g>
+<!-- module~core_types_algebra_vector&#45;&gt;stdlib_optval -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge28" class="edge">
+<title>module~core_types_algebra_vector&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1085.76,-279.52C1056.5,-255.12 993.46,-202.73 988,-199.83 848.89,-125.87 804.41,-120.54 648.5,-97.83"/>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M646.5,-97.83C617.97,-90.99 611.14,-87.15 585,-73.83 546.89,-54.4 545.94,-30.25 504,-21.83"/>
+</g>
+<!-- module~core_check_length -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_node11" class="node">
+<title>module~core_check_length</title>
+<g id="a_module~~algebra_matrix_dense~~UsesGraph_node11"><a xlink:href="../module/core_check_length.html" xlink:title="core_check_length">
+<polygon fill="#337ab7" stroke="#337ab7" points="247.5,-109.83 135.5,-109.83 135.5,-85.83 247.5,-85.83 247.5,-109.83"/>
+<text text-anchor="middle" x="191.5" y="-95.43" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_check_length</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_algebra_vector&#45;&gt;module~core_check_length -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge24" class="edge">
+<title>module~core_types_algebra_vector&#45;&gt;module~core_check_length</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M646.5,-97.83C509.09,-80.06 346.32,-86.7 257.81,-92.6"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="257.39,-89.12 247.65,-93.29 257.87,-96.1 257.39,-89.12"/>
+</g>
+<!-- module~core_memory -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_node16" class="node">
+<title>module~core_memory</title>
+<g id="a_module~~algebra_matrix_dense~~UsesGraph_node16"><a xlink:href="../module/core_memory.html" xlink:title="core_memory">
+<polygon fill="#337ab7" stroke="#337ab7" points="976.5,-303.83 890.5,-303.83 890.5,-279.83 976.5,-279.83 976.5,-303.83"/>
+<text text-anchor="middle" x="933.5" y="-289.43" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_memory</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_algebra_vector&#45;&gt;module~core_memory -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge27" class="edge">
+<title>module~core_types_algebra_vector&#45;&gt;module~core_memory</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1023.82,-291.83C1011.33,-291.83 998.66,-291.83 986.93,-291.83"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="986.89,-288.33 976.89,-291.83 986.89,-295.33 986.89,-288.33"/>
+</g>
+<!-- module~core_check_length&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge29" class="edge">
+<title>module~core_check_length&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M175.8,-109.85C162.15,-121.74 142.14,-141.12 130,-161.83 102.91,-208.03 129.43,-236.67 94,-276.83 93.24,-277.69 92.45,-278.51 91.62,-279.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="89.17,-276.76 83.32,-285.6 93.4,-282.34 89.17,-276.76"/>
+</g>
+<!-- module~core_check_length&#45;&gt;stdlib_optval -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge30" class="edge">
+<title>module~core_check_length&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M135.41,-89.71C122.68,-87.84 109.23,-85.85 96.79,-84.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="97.02,-80.52 86.62,-82.52 96,-87.44 97.02,-80.52"/>
+</g>
+<!-- stdlib_strings -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_node19" class="node">
+<title>stdlib_strings</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="88,-267.83 6,-267.83 6,-243.83 88,-243.83 88,-267.83"/>
+<text text-anchor="middle" x="47" y="-253.43" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_strings</text>
+</g>
+<!-- module~core_check_length&#45;&gt;stdlib_strings -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge31" class="edge">
+<title>module~core_check_length&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M152.6,-109.91C144.59,-113.57 136.59,-118.16 130,-123.83 94.12,-154.7 68.9,-205.26 56.59,-234.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="53.23,-232.97 52.64,-243.55 59.7,-235.65 53.23,-232.97"/>
+</g>
+<!-- module~core_constants_base&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge32" class="edge">
+<title>module~core_constants_base&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M147.75,-269.83C133.08,-273.95 116.5,-278.6 101.12,-282.92"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="99.9,-279.63 91.22,-285.7 101.79,-286.37 99.9,-279.63"/>
+</g>
+<!-- module~core_constants_base&#45;&gt;stdlib_optval -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge33" class="edge">
+<title>module~core_constants_base&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M143.56,-245.7C138.67,-243.26 134.03,-240.33 130,-236.83 86.85,-199.32 63.47,-133.57 53.66,-99.2"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="56.94,-97.95 50.94,-89.22 50.19,-99.79 56.94,-97.95"/>
+</g>
+<!-- module~core_constants_base&#45;&gt;stdlib_strings -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge34" class="edge">
+<title>module~core_constants_base&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M129.65,-256.98C119.21,-256.83 108.46,-256.68 98.33,-256.54"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="98.09,-253.03 88.04,-256.39 97.99,-260.03 98.09,-253.03"/>
+</g>
+<!-- module~core_constants_error&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge35" class="edge">
+<title>module~core_constants_error&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M190.5,-335.83C155.68,-333.05 117.51,-322.44 89.44,-313.14"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="90.55,-309.82 79.96,-309.92 88.3,-316.45 90.55,-309.82"/>
+</g>
+<!-- module~core_constants_error&#45;&gt;module~core_constants_base -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge36" class="edge">
+<title>module~core_constants_error&#45;&gt;module~core_constants_base</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M305.54,-285.83C288.38,-281.58 268.88,-276.75 250.96,-272.31"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="251.75,-268.9 241.2,-269.89 250.07,-275.69 251.75,-268.9"/>
+</g>
+<!-- stdlib_ascii -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_node18" class="node">
+<title>stdlib_ascii</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="226.5,-227.83 156.5,-227.83 156.5,-203.83 226.5,-203.83 226.5,-227.83"/>
+<text text-anchor="middle" x="191.5" y="-213.43" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_ascii</text>
+</g>
+<!-- module~core_constants_error&#45;&gt;stdlib_ascii -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge37" class="edge">
+<title>module~core_constants_error&#45;&gt;stdlib_ascii</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M336.39,-285.63C316.71,-272.38 283.6,-251.19 253,-236.83 247.65,-234.32 241.91,-231.95 236.18,-229.76"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="237.19,-226.41 226.6,-226.27 234.8,-232.98 237.19,-226.41"/>
+</g>
+<!-- module~core_constants_error&#45;&gt;stdlib_strings -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge38" class="edge">
+<title>module~core_constants_error&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M326.11,-309.92C294.24,-322.42 240.31,-339.65 192.5,-335.83"/>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M190.5,-335.83C140.39,-331.83 138.39,-300.42 94,-276.83 91.13,-275.31 88.13,-273.78 85.1,-272.29"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="86.53,-269.1 75.99,-267.96 83.52,-275.42 86.53,-269.1"/>
+</g>
+<!-- module~core_constants_ids&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge39" class="edge">
+<title>module~core_constants_ids&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M298.94,-165.82C250.02,-160.09 178.89,-159.87 130,-194.83 97.63,-217.98 121.94,-248.48 94,-276.83 92.92,-277.92 91.78,-278.97 90.58,-279.96"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="88.31,-277.27 82.04,-285.82 92.27,-283.05 88.31,-277.27"/>
+</g>
+<!-- module~core_constants_ids&#45;&gt;module~core_constants_base -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge40" class="edge">
+<title>module~core_constants_ids&#45;&gt;module~core_constants_base</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M306.49,-187.91C300.37,-190.4 294.37,-193.35 289,-196.83 268.93,-209.84 272.93,-223.6 253,-236.83 250.57,-238.44 248,-239.95 245.35,-241.35"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="243.64,-238.28 236.08,-245.71 246.62,-244.62 243.64,-238.28"/>
+</g>
+<!-- module~core_constants_ids&#45;&gt;stdlib_ascii -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge41" class="edge">
+<title>module~core_constants_ids&#45;&gt;stdlib_ascii</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M305.54,-187.83C283.57,-193.27 257.77,-199.66 236.37,-204.96"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="235.43,-201.59 226.57,-207.39 237.12,-208.39 235.43,-201.59"/>
+</g>
+<!-- module~core_constants_ids&#45;&gt;stdlib_strings -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge42" class="edge">
+<title>module~core_constants_ids&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M329.57,-163.79C298.1,-149.74 241.62,-129.44 192.5,-137.83"/>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M190.5,-137.83C161.99,-142.7 153.62,-145.13 130,-161.83 101.35,-182.09 76.12,-214.36 61.46,-235.32"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="58.41,-233.57 55.66,-243.81 64.19,-237.52 58.41,-233.57"/>
+</g>
+<!-- module~core_constants_values&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge43" class="edge">
+<title>module~core_constants_values&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M338.99,-229.92C320.16,-244.34 286.27,-267.88 253,-278.83 204.54,-294.78 146.39,-298.85 104.42,-299.33"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="104.37,-295.83 94.39,-299.38 104.4,-302.83 104.37,-295.83"/>
+</g>
+<!-- module~core_constants_values&#45;&gt;module~core_constants_base -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge44" class="edge">
+<title>module~core_constants_values&#45;&gt;module~core_constants_base</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M305.54,-229.83C288.38,-234.08 268.88,-238.91 250.96,-243.35"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="250.07,-239.97 241.2,-245.77 251.75,-246.76 250.07,-239.97"/>
+</g>
+<!-- module~core_constants_values&#45;&gt;stdlib_ascii -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge45" class="edge">
+<title>module~core_constants_values&#45;&gt;stdlib_ascii</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M288.78,-217.02C271.4,-216.81 253.02,-216.58 237.04,-216.38"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="236.95,-212.88 226.91,-216.26 236.86,-219.88 236.95,-212.88"/>
+</g>
+<!-- module~core_constants_values&#45;&gt;stdlib_strings -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge46" class="edge">
+<title>module~core_constants_values&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M311.83,-205.82C304.11,-203.17 296.22,-200.15 289,-196.83 243.32,-175.85 242.05,-129.36 192.5,-137.83"/>
+</g>
+<!-- module~core_memory&#45;&gt;module~core_allocate -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge47" class="edge">
+<title>module~core_memory&#45;&gt;module~core_allocate</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M890.28,-291.83C876.61,-291.83 861.3,-291.83 847.04,-291.83"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="846.88,-288.33 836.88,-291.83 846.88,-295.33 846.88,-288.33"/>
+</g>
+<!-- module~core_memory&#45;&gt;module~core_deallocate -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge48" class="edge">
+<title>module~core_memory&#45;&gt;module~core_deallocate</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M905.43,-303.88C884.32,-313.28 854.81,-326.42 831.67,-336.73"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="830.22,-333.54 822.51,-340.8 833.07,-339.93 830.22,-333.54"/>
+</g>
+<!-- module~core_validation_error&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge49" class="edge">
+<title>module~core_validation_error&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M613.65,-383.86C585.12,-393.63 542.45,-406.61 504,-411.83"/>
+</g>
+<!-- module~core_validation_error&#45;&gt;module~core_constants -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge50" class="edge">
+<title>module~core_validation_error&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M631.25,-359.63C606.29,-339.66 556.55,-299.87 527.19,-276.39"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="529.14,-273.46 519.14,-269.94 524.76,-278.92 529.14,-273.46"/>
+</g>
+<!-- module~core_validation_error&#45;&gt;stdlib_strings -->
+<g id="module~~algebra_matrix_dense~~UsesGraph_edge51" class="edge">
+<title>module~core_validation_error&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M584.99,-376.82C464.62,-385.37 203.31,-397.61 130,-349.83 99.69,-330.08 119.96,-302.02 94,-276.83 92.9,-275.76 91.73,-274.74 90.51,-273.76"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="92.15,-270.65 81.9,-267.99 88.26,-276.46 92.15,-270.65"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panmodulealgebra_matrix_denseUsesGraph = svgPanZoom('#modulealgebra_matrix_denseUsesGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#UsesGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="UsesGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="518pt" height="32pt"
+ viewBox="0.00 0.00 517.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 513.5,-28 513.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node">
+<title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node">
+<title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="145.5,-24 72.5,-24 72.5,0 145.5,0 145.5,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 164,-24 164,0 234,0 234,-24"/>
+<text text-anchor="middle" x="199" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="310,-24 252,-24 252,0 310,0 310,-24"/>
+<text text-anchor="middle" x="281" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="386,-24 328,-24 328,0 386,0 386,-24"/>
+<text text-anchor="middle" x="357" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="509.5,-24 404.5,-24 404.5,0 509.5,0 509.5,-24"/>
+<text text-anchor="middle" x="457" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a submodule to the (sub)module which it is
+descended from. Dashed arrows point from a module or program unit to 
+modules which it uses.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+            </li>
+        </ul>
+      </div>
+    </div>
+
+      
+      <br>
+
+
+
+
+
+
+
+
+
+        <section>
+          <h2>Module Functions</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-find_dense"></span> <h3>pure module function <a href='../proc/find_dense.html'>find_dense</a>(self, row, col) result(index)  
+    <a href="../interface/find_dense.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Finds the storage index of a matrix entry.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~871"></span>
+              class(<a href='../type/type_matrix_dense.html'>type_matrix_dense</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row~27"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-col~25"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>integer(kind=int32)</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_val_dense"></span> <h3>module function <a href='../proc/get_val_dense.html'>get_val_dense</a>(self) result(val)  
+    <a href="../interface/get_val_dense.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Returns a pointer to the internal 2D array holding the matrix values.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~863"></span>
+              class(<a href='../type/type_matrix_dense.html'>type_matrix_dense</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>real(kind=real64), pointer, dimension(:, :)</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+        <section>
+          <h2>Module Subroutines</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-destroy_dense"></span> <h3>module subroutine <a href='../proc/destroy_dense.html'>destroy_dense</a>(self)  
+    <a href="../interface/destroy_dense.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Deallocates the dense matrix's internal value array.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~860"></span>
+              class(<a href='../type/type_matrix_dense.html'>type_matrix_dense</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-display_dense"></span> <h3>module subroutine <a href='../proc/display_dense.html'>display_dense</a>(self, unit_in)  
+    <a href="../interface/display_dense.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Prints the contents of the dense matrix to standard output.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~872"></span>
+              class(<a href='../type/type_matrix_dense.html'>type_matrix_dense</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-unit_in~20"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>unit_in</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_diagonal_dense"></span> <h3>module subroutine <a href='../proc/get_diagonal_dense.html'>get_diagonal_dense</a>(self, diagonal)  
+    <a href="../interface/get_diagonal_dense.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~862"></span>
+              class(<a href='../type/type_matrix_dense.html'>type_matrix_dense</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-diagonal~4"></span>
+              type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>diagonal</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_info_dense"></span> <h3>module subroutine <a href='../proc/get_info_dense.html'>get_info_dense</a>(self, info)  
+    <a href="../interface/get_info_dense.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Returns the number of rows in the matrix.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~861"></span>
+              class(<a href='../type/type_matrix_dense.html'>type_matrix_dense</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-info~20"></span>
+              type(<a href='../type/type_matrix_info.html'>type_matrix_info</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>info</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-initialize_dense"></span> <h3>module subroutine <a href='../proc/initialize_dense.html'>initialize_dense</a>(self, num_nodes, row, col, row_blocks, col_blocks)  
+    <a href="../interface/initialize_dense.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Initializes and allocates a dense matrix.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~859"></span>
+              class(<a href='../type/type_matrix_dense.html'>type_matrix_dense</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_nodes~37"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_nodes</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row~22"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-col~22"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row_blocks~4"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_blocks</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-col_blocks~4"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col_blocks</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-scale_dense"></span> <h3>module subroutine <a href='../proc/scale_dense.html'>scale_dense</a>(self, op, alpha)  
+    <a href="../interface/scale_dense.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Scales all stored values in the Dense matrix (2D array).</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~868"></span>
+              class(<a href='../type/type_matrix_dense.html'>type_matrix_dense</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-op~41"></span>
+              type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-alpha~26"></span>
+              type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>alpha</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-set_all_dense"></span> <h3>module subroutine <a href='../proc/set_all_dense.html'>set_all_dense</a>(self, op, value)  
+    <a href="../interface/set_all_dense.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Sets all entries in the matrix to a single scalar value.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~867"></span>
+              class(<a href='../type/type_matrix_dense.html'>type_matrix_dense</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-op~40"></span>
+              type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~38"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-set_row_dense"></span> <h3>module subroutine <a href='../proc/set_row_dense.html'>set_row_dense</a>(self, op, row, value, row_block)  
+    <a href="../interface/set_row_dense.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Sets all entries in a specified row to a single scalar value.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~866"></span>
+              class(<a href='../type/type_matrix_dense.html'>type_matrix_dense</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-op~39"></span>
+              type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row~25"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~37"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row_block~25"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_block</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-set_value_block_dense"></span> <h3>module subroutine <a href='../proc/set_value_block_dense.html'>set_value_block_dense</a>(self, op, row, col, row_block, col_block, value)  
+    <a href="../interface/set_value_block_dense.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Sets the value of a block (Not implemented for dense yet, usually for BSR).</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~865"></span>
+              class(<a href='../type/type_matrix_dense.html'>type_matrix_dense</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-op~38"></span>
+              type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row~24"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-col~24"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row_block~24"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_block</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-col_block~4"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col_block</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~36"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-set_value_dense"></span> <h3>module subroutine <a href='../proc/set_value_dense.html'>set_value_dense</a>(self, op, row, col, value)  
+    <a href="../interface/set_value_dense.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Sets the value of a single entry in the matrix.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~864"></span>
+              class(<a href='../type/type_matrix_dense.html'>type_matrix_dense</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-op~37"></span>
+              type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row~23"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-col~23"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~35"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-zero_all_dense"></span> <h3>module subroutine <a href='../proc/zero_all_dense.html'>zero_all_dense</a>(self)  
+    <a href="../interface/zero_all_dense.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Sets all entries in the matrix to zero.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~869"></span>
+              class(<a href='../type/type_matrix_dense.html'>type_matrix_dense</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-zero_row_dense"></span> <h3>module subroutine <a href='../proc/zero_row_dense.html'>zero_row_dense</a>(self, row, row_block)  
+    <a href="../interface/zero_row_dense.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Sets all values in a specified row of the dense matrix to zero.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~870"></span>
+              class(<a href='../type/type_matrix_dense.html'>type_matrix_dense</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row~26"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row_block~26"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_block</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-03-11 14:03 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

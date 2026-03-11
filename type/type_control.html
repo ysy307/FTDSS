@@ -1,0 +1,4603 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>type_control &ndash; FTCMS </title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>type_control
+      <small>Derived Type</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title="<p> 1.7% of total for derived types.</p>Including implementation: 487 statements,  1.9% of total for derived types.">60 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/control_manager.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/control_manager.f90.html'>control_manager.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/control_control_manager.html'>control_control_manager</a></li>
+            <li class="breadcrumb-item active" aria-current="page">type_control</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#vars-0"
+         aria-expanded="false" aria-controls="vars-0">
+         <h4 class="card-header bg-primary text-white">Variables</h4>
+      </a>
+      <div id="vars-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/type_control.html#variable-acceleration">acceleration</a>
+            <a class="list-group-item" href="../type/type_control.html#variable-compute_active">compute_active</a>
+            <a class="list-group-item" href="../type/type_control.html#variable-coupling_mode~3">coupling_mode</a>
+            <a class="list-group-item" href="../type/type_control.html#variable-iteration">iteration</a>
+            <a class="list-group-item" href="../type/type_control.html#variable-physics_active">physics_active</a>
+            <a class="list-group-item" href="../type/type_control.html#variable-profiler">profiler</a>
+            <a class="list-group-item" href="../type/type_control.html#variable-scheduler_field">scheduler_field</a>
+            <a class="list-group-item" href="../type/type_control.html#variable-scheduler_history">scheduler_history</a>
+            <a class="list-group-item" href="../type/type_control.html#variable-time~4">time</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#boundprocs-0"
+         aria-expanded="false" aria-controls="boundprocs-0">
+         <h4 class="card-header bg-primary text-white">Type-Bound Procedures</h4>
+      </a>
+      <div id="boundprocs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-check_convergence~2">check_convergence</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-compute_relaxation">compute_relaxation</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-display~14">display</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-display_profiler">display_profiler</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-get_bdf_coeffs~2">get_bdf_coeffs</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-get_coupling_mode">get_coupling_mode</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-get_current_norm~2">get_current_norm</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-get_current_relaxation">get_current_relaxation</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-get_max_iterations~2">get_max_iterations</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-get_nonlinear_iter~2">get_nonlinear_iter</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-get_nonlinear_solver~2">get_nonlinear_solver</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-get_output_step">get_output_step</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-get_output_time">get_output_time</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-get_previous_relaxation">get_previous_relaxation</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-get_time~2">get_time</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-get_tolerances~2">get_tolerances</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-get_total_iter~2">get_total_iter</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-get_update_frequency~2">get_update_frequency</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-increment_nonlinear~2">increment_nonlinear</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-increment_total~2">increment_total</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-initialize~31">initialize</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-is_compute_newton~3">is_compute_newton</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-is_compute_none~2">is_compute_none</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-is_compute_picard~3">is_compute_picard</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-is_converged~3">is_converged</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-is_diverged~3">is_diverged</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-is_end_time~2">is_end_time</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-is_monolithic">is_monolithic</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-is_newton~5">is_newton</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-is_none~5">is_none</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-is_output_triggered">is_output_triggered</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-is_physics_active">is_physics_active</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-is_picard~4">is_picard</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-is_staggered">is_staggered</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-is_target">is_target</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-profiler_record">profiler_record</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-profiler_start">profiler_start</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-profiler_stop">profiler_stop</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-reach_maximum_relaxation">reach_maximum_relaxation</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-reach_minimum_relaxation">reach_minimum_relaxation</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-reset_acceleration">reset_acceleration</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-reset_iteration">reset_iteration</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-set_converged~2">set_converged</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-set_diverged~2">set_diverged</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-set_nonlinear_solver~2">set_nonlinear_solver</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-should_continue~3">should_continue</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-update~3">update</a>
+            <a class="list-group-item" href="../type/type_control.html#boundprocedure-update_output">update_output</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../type/type_control.html#src">type_control</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2 id="type-def-statement">
+        type, public :: type_control</h2>
+    
+<br>      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Inherits</h3>
+        </div>
+        <div class="card-body">
+          <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: type~~type_control~~InheritsGraph Pages: 1 -->
+<svg id="typetype_controlInheritsGraph" width="641pt" height="155pt"
+ viewBox="0.00 0.00 641.00 154.67" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_control~~InheritsGraph" class="graph" transform="scale(0.36 0.36) rotate(0) translate(4 426)">
+<title>type~~type_control~~InheritsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-426 1778,-426 1778,4 -4,4"/>
+<!-- type~type_control -->
+<g id="type~~type_control~~InheritsGraph_node1" class="node">
+<title>type~type_control</title>
+<polygon fill="none" stroke="black" points="1774,-229 1696,-229 1696,-205 1774,-205 1774,-229"/>
+<text text-anchor="middle" x="1735" y="-214.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_control</text>
+</g>
+<!-- type~abst_acceleration -->
+<g id="type~~type_control~~InheritsGraph_node2" class="node">
+<title>type~abst_acceleration</title>
+<g id="a_type~~type_control~~InheritsGraph_node2"><a xlink:href="../type/abst_acceleration.html" xlink:title="abst_acceleration">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1348.5,-402 1241.5,-402 1241.5,-378 1348.5,-378 1348.5,-402"/>
+<text text-anchor="middle" x="1295" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_acceleration</text>
+</a>
+</g>
+</g>
+<!-- type~type_control&#45;&gt;type~abst_acceleration -->
+<g id="type~~type_control~~InheritsGraph_edge6" class="edge">
+<title>type~type_control&#45;&gt;type~abst_acceleration</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1733.35,-229.12C1731.12,-257.43 1721.26,-327.92 1678,-360 1584.51,-429.31 1440.39,-417.9 1358.51,-403.73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1359.06,-400.27 1348.59,-401.94 1357.82,-407.16 1359.06,-400.27"/>
+<text text-anchor="middle" x="1596" y="-414.4" font-family="Helvetica,sans-Serif" font-size="9.50">acceleration</text>
+</g>
+<!-- type~type_constant_id -->
+<g id="type~~type_control~~InheritsGraph_node3" class="node">
+<title>type~type_constant_id</title>
+<g id="a_type~~type_control~~InheritsGraph_node3"><a xlink:href="../type/type_constant_id.html" xlink:title="type_constant_id">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="102,-272 0,-272 0,-248 102,-248 102,-272"/>
+<text text-anchor="middle" x="51" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_constant_id</text>
+</a>
+</g>
+</g>
+<!-- type~type_control&#45;&gt;type~type_constant_id -->
+<g id="type~~type_control~~InheritsGraph_edge1" class="edge">
+<title>type~type_control&#45;&gt;type~type_constant_id</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1718.94,-229.14C1677.52,-261.25 1557.33,-346 1442.5,-346 1442.5,-346 1442.5,-346 945,-346 749.22,-346 700.27,-347.39 504.5,-346"/>
+<text text-anchor="middle" x="946" y="-348.4" font-family="Helvetica,sans-Serif" font-size="9.50">coupling_mode</text>
+</g>
+<!-- type~type_iteration -->
+<g id="type~~type_control~~InheritsGraph_node4" class="node">
+<title>type~type_iteration</title>
+<g id="a_type~~type_control~~InheritsGraph_node4"><a xlink:href="../type/type_iteration.html" xlink:title="type_iteration">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1484.5,-266 1398.5,-266 1398.5,-242 1484.5,-242 1484.5,-266"/>
+<text text-anchor="middle" x="1441.5" y="-251.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration</text>
+</a>
+</g>
+</g>
+<!-- type~type_control&#45;&gt;type~type_iteration -->
+<g id="type~~type_control~~InheritsGraph_edge2" class="edge">
+<title>type~type_control&#45;&gt;type~type_iteration</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1695.89,-221.84C1644.5,-228.36 1552.77,-240 1494.91,-247.35"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1494.35,-243.89 1484.87,-248.62 1495.23,-250.83 1494.35,-243.89"/>
+<text text-anchor="middle" x="1596" y="-246.4" font-family="Helvetica,sans-Serif" font-size="9.50">iteration</text>
+</g>
+<!-- type~type_scheduler_manager -->
+<g id="type~~type_control~~InheritsGraph_node5" class="node">
+<title>type~type_scheduler_manager</title>
+<g id="a_type~~type_control~~InheritsGraph_node5"><a xlink:href="../type/type_scheduler_manager.html" xlink:title="type_scheduler_manager">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1369,-200 1221,-200 1221,-176 1369,-176 1369,-200"/>
+<text text-anchor="middle" x="1295" y="-185.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_scheduler_manager</text>
+</a>
+</g>
+</g>
+<!-- type~type_control&#45;&gt;type~type_scheduler_manager -->
+<g id="type~~type_control~~InheritsGraph_edge5" class="edge">
+<title>type~type_control&#45;&gt;type~type_scheduler_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1695.78,-211.88C1689.83,-211.18 1683.76,-210.52 1678,-210 1575.43,-200.65 1456.99,-194.55 1379.52,-191.2"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1379.48,-187.7 1369.34,-190.77 1379.18,-194.69 1379.48,-187.7"/>
+<text text-anchor="middle" x="1596" y="-212.4" font-family="Helvetica,sans-Serif" font-size="9.50">scheduler_field, scheduler_history</text>
+</g>
+<!-- type~type_time -->
+<g id="type~~type_control~~InheritsGraph_node6" class="node">
+<title>type~type_time</title>
+<g id="a_type~~type_control~~InheritsGraph_node6"><a xlink:href="../type/type_time.html" xlink:title="type_time">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1474,-150 1409,-150 1409,-126 1474,-126 1474,-150"/>
+<text text-anchor="middle" x="1441.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time</text>
+</a>
+</g>
+</g>
+<!-- type~type_control&#45;&gt;type~type_time -->
+<g id="type~~type_control~~InheritsGraph_edge3" class="edge">
+<title>type~type_control&#45;&gt;type~type_time</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1724.79,-204.75C1714.76,-192.42 1697.53,-173.98 1678,-165 1615.13,-136.07 1533.24,-133.5 1484.45,-135.14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1484.11,-131.65 1474.26,-135.56 1484.4,-138.64 1484.11,-131.65"/>
+<text text-anchor="middle" x="1596" y="-167.4" font-family="Helvetica,sans-Serif" font-size="9.50">time</text>
+</g>
+<!-- type~type_time_profiler -->
+<g id="type~~type_control~~InheritsGraph_node7" class="node">
+<title>type~type_time_profiler</title>
+<g id="a_type~~type_control~~InheritsGraph_node7"><a xlink:href="../type/type_time_profiler.html" xlink:title="type_time_profiler">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1496,-66 1387,-66 1387,-42 1496,-42 1496,-66"/>
+<text text-anchor="middle" x="1441.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time_profiler</text>
+</a>
+</g>
+</g>
+<!-- type~type_control&#45;&gt;type~type_time_profiler -->
+<g id="type~~type_control~~InheritsGraph_edge4" class="edge">
+<title>type~type_control&#45;&gt;type~type_time_profiler</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1730.36,-204.85C1723.54,-184.22 1706.87,-142.42 1678,-120 1628.32,-81.43 1557.29,-65.39 1506.25,-58.73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1506.67,-55.26 1496.32,-57.52 1505.82,-62.21 1506.67,-55.26"/>
+<text text-anchor="middle" x="1596" y="-122.4" font-family="Helvetica,sans-Serif" font-size="9.50">profiler</text>
+</g>
+<!-- type~abst_acceleration&#45;&gt;type~type_constant_id -->
+<g id="type~~type_control~~InheritsGraph_edge7" class="edge">
+<title>type~abst_acceleration&#45;&gt;type~type_constant_id</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1241.23,-391.47C1120.24,-394.06 813.8,-396.11 561,-360 535.39,-356.34 530.37,-346.18 504.5,-346"/>
+<text text-anchor="middle" x="692.5" y="-386.4" font-family="Helvetica,sans-Serif" font-size="9.50">method</text>
+</g>
+<!-- type~type_iteration&#45;&gt;type~type_constant_id -->
+<g id="type~~type_control~~InheritsGraph_edge8" class="edge">
+<title>type~type_iteration&#45;&gt;type~type_constant_id</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1408.54,-266.08C1396.33,-270.22 1382.18,-274.44 1369,-277 1296.38,-291.09 1276.83,-284.43 1203,-289 917.83,-306.63 839.41,-257.83 561,-322 534.41,-328.13 531.78,-346 504.5,-346"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M502.5,-346C341.85,-344.02 292.88,-380.83 141.5,-327"/>
+<text text-anchor="middle" x="692.5" y="-324.4" font-family="Helvetica,sans-Serif" font-size="9.50">nonlinear_solver_type, compute_nonlinear_solver_type</text>
+</g>
+<!-- type~type_iteration_setting -->
+<g id="type~~type_control~~InheritsGraph_node11" class="node">
+<title>type~type_iteration_setting</title>
+<g id="a_type~~type_control~~InheritsGraph_node11"><a xlink:href="../type/type_iteration_setting.html" xlink:title="type_iteration_setting">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1199,-280 1072,-280 1072,-256 1199,-256 1199,-280"/>
+<text text-anchor="middle" x="1135.5" y="-265.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration_setting</text>
+</a>
+</g>
+</g>
+<!-- type~type_iteration&#45;&gt;type~type_iteration_setting -->
+<g id="type~~type_control~~InheritsGraph_edge9" class="edge">
+<title>type~type_iteration&#45;&gt;type~type_iteration_setting</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1398.23,-255.95C1349.42,-258.19 1268.28,-261.93 1209.26,-264.65"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1209.08,-261.15 1199.25,-265.11 1209.4,-268.15 1209.08,-261.15"/>
+<text text-anchor="middle" x="1295" y="-265.4" font-family="Helvetica,sans-Serif" font-size="9.50">settings</text>
+</g>
+<!-- type~type_iteration_strategy -->
+<g id="type~~type_control~~InheritsGraph_node12" class="node">
+<title>type~type_iteration_strategy</title>
+<g id="a_type~~type_control~~InheritsGraph_node12"><a xlink:href="../type/type_iteration_strategy.html" xlink:title="type_iteration_strategy">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1203,-238 1068,-238 1068,-214 1203,-214 1203,-238"/>
+<text text-anchor="middle" x="1135.5" y="-223.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration_strategy</text>
+</a>
+</g>
+</g>
+<!-- type~type_iteration&#45;&gt;type~type_iteration_strategy -->
+<g id="type~~type_control~~InheritsGraph_edge10" class="edge">
+<title>type~type_iteration&#45;&gt;type~type_iteration_strategy</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1398.23,-246.93C1388.64,-245.48 1378.48,-244.07 1369,-243 1317.12,-237.12 1258.5,-232.85 1213.09,-230.06"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1213.22,-226.56 1203.02,-229.45 1212.8,-233.55 1213.22,-226.56"/>
+<text text-anchor="middle" x="1295" y="-245.4" font-family="Helvetica,sans-Serif" font-size="9.50">strategy</text>
+</g>
+<!-- type~type_constant_value -->
+<g id="type~~type_control~~InheritsGraph_node10" class="node">
+<title>type~type_constant_value</title>
+<g id="a_type~~type_control~~InheritsGraph_node10"><a xlink:href="../type/type_constant_value.html" xlink:title="type_constant_value">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="753,-178 632,-178 632,-154 753,-154 753,-178"/>
+<text text-anchor="middle" x="692.5" y="-163.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_constant_value</text>
+</a>
+</g>
+</g>
+<!-- type~type_scheduler_manager&#45;&gt;type~type_constant_value -->
+<g id="type~~type_control~~InheritsGraph_edge11" class="edge">
+<title>type~type_scheduler_manager&#45;&gt;type~type_constant_value</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1220.97,-185.32C1104.46,-181.06 878.02,-172.76 763.47,-168.56"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="763.53,-165.06 753.41,-168.19 763.28,-172.06 763.53,-165.06"/>
+<text text-anchor="middle" x="1135.5" y="-186.4" font-family="Helvetica,sans-Serif" font-size="9.50">output_time_unit</text>
+</g>
+<!-- type~type_ats -->
+<g id="type~~type_control~~InheritsGraph_node8" class="node">
+<title>type~type_ats</title>
+<g id="a_type~~type_control~~InheritsGraph_node8"><a xlink:href="../type/type_ats.html" xlink:title="type_ats">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1164,-150 1107,-150 1107,-126 1164,-126 1164,-150"/>
+<text text-anchor="middle" x="1135.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ats</text>
+</a>
+</g>
+</g>
+<!-- type~type_time&#45;&gt;type~type_ats -->
+<g id="type~~type_control~~InheritsGraph_edge13" class="edge">
+<title>type~type_time&#45;&gt;type~type_ats</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M1408.83,-138C1352.45,-138 1234.93,-138 1174.38,-138"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1174.11,-134.5 1164.11,-138 1174.11,-141.5 1174.11,-134.5"/>
+<text text-anchor="middle" x="1295" y="-140.4" font-family="Helvetica,sans-Serif" font-size="9.50">ats</text>
+</g>
+<!-- type~type_config_time -->
+<g id="type~~type_control~~InheritsGraph_node9" class="node">
+<title>type~type_config_time</title>
+<g id="a_type~~type_control~~InheritsGraph_node9"><a xlink:href="../type/type_config_time.html" xlink:title="type_config_time">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1187,-108 1084,-108 1084,-84 1187,-84 1187,-108"/>
+<text text-anchor="middle" x="1135.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_config_time</text>
+</a>
+</g>
+</g>
+<!-- type~type_time&#45;&gt;type~type_config_time -->
+<g id="type~~type_control~~InheritsGraph_edge12" class="edge">
+<title>type~type_time&#45;&gt;type~type_config_time</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M1408.91,-131.3C1396.5,-128.8 1382.12,-126.07 1369,-124 1311.01,-114.84 1244.46,-107.11 1197.47,-102.1"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1197.76,-98.61 1187.45,-101.05 1197.02,-105.58 1197.76,-98.61"/>
+<text text-anchor="middle" x="1295" y="-126.4" font-family="Helvetica,sans-Serif" font-size="9.50">config</text>
+</g>
+<!-- type~type_record_profiler -->
+<g id="type~~type_control~~InheritsGraph_node13" class="node">
+<title>type~type_record_profiler</title>
+<g id="a_type~~type_control~~InheritsGraph_node13"><a xlink:href="../type/type_record_profiler.html" xlink:title="type_record_profiler">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1195,-66 1076,-66 1076,-42 1195,-42 1195,-66"/>
+<text text-anchor="middle" x="1135.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_record_profiler</text>
+</a>
+</g>
+</g>
+<!-- type~type_time_profiler&#45;&gt;type~type_record_profiler -->
+<g id="type~~type_control~~InheritsGraph_edge14" class="edge">
+<title>type~type_time_profiler&#45;&gt;type~type_record_profiler</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M1386.85,-54C1336.22,-54 1260.09,-54 1205.07,-54"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="1205.06,-50.5 1195.06,-54 1205.06,-57.5 1205.06,-50.5"/>
+<text text-anchor="middle" x="1295" y="-56.4" font-family="Helvetica,sans-Serif" font-size="9.50">timers</text>
+</g>
+<!-- type~type_record_time -->
+<g id="type~~type_control~~InheritsGraph_node14" class="node">
+<title>type~type_record_time</title>
+<g id="a_type~~type_control~~InheritsGraph_node14"><a xlink:href="../type/type_record_time.html" xlink:title="type_record_time">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1188,-24 1083,-24 1083,0 1188,0 1188,-24"/>
+<text text-anchor="middle" x="1135.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_record_time</text>
+</a>
+</g>
+</g>
+<!-- type~type_time_profiler&#45;&gt;type~type_record_time -->
+<g id="type~~type_control~~InheritsGraph_edge15" class="edge">
+<title>type~type_time_profiler&#45;&gt;type~type_record_time</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M1386.7,-43.03C1380.74,-41.94 1374.75,-40.91 1369,-40 1311.38,-30.9 1245.32,-23.21 1198.38,-18.2"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="1198.68,-14.71 1188.36,-17.14 1197.94,-21.67 1198.68,-14.71"/>
+<text text-anchor="middle" x="1295" y="-42.4" font-family="Helvetica,sans-Serif" font-size="9.50">timestamps</text>
+</g>
+<!-- type~type_config_time&#45;&gt;type~type_constant_value -->
+<g id="type~~type_control~~InheritsGraph_edge16" class="edge">
+<title>type~type_config_time&#45;&gt;type~type_constant_value</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M1083.57,-104.51C1072.51,-106.34 1060.86,-108.25 1050,-110 950.52,-126.05 835.32,-144.04 763.42,-155.19"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="762.48,-151.8 753.13,-156.79 763.55,-158.72 762.48,-151.8"/>
+<text text-anchor="middle" x="946" y="-144.4" font-family="Helvetica,sans-Serif" font-size="9.50">time_stepping_unit, simulation_period_unit</text>
+</g>
+<!-- type~abst_config -->
+<g id="type~~type_control~~InheritsGraph_node15" class="node">
+<title>type~abst_config</title>
+<g id="a_type~~type_control~~InheritsGraph_node15"><a xlink:href="../type/abst_config.html" xlink:title="abst_config">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="729,-108 656,-108 656,-84 729,-84 729,-108"/>
+<text text-anchor="middle" x="692.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config</text>
+</a>
+</g>
+</g>
+<!-- type~type_config_time&#45;&gt;type~abst_config -->
+<g id="type~~type_control~~InheritsGraph_edge17" class="edge">
+<title>type~type_config_time&#45;&gt;type~abst_config</title>
+<path fill="none" stroke="#ffda00" d="M1083.91,-96C997.45,-96 822.56,-96 739.41,-96"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="739.26,-92.5 729.26,-96 739.26,-99.5 739.26,-92.5"/>
+</g>
+<!-- type~type_convergence_control -->
+<g id="type~~type_control~~InheritsGraph_node17" class="node">
+<title>type~type_convergence_control</title>
+<g id="a_type~~type_control~~InheritsGraph_node17"><a xlink:href="../type/type_convergence_control.html" xlink:title="type_convergence_control">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="769,-272 616,-272 616,-248 769,-248 769,-272"/>
+<text text-anchor="middle" x="692.5" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_convergence_control</text>
+</a>
+</g>
+</g>
+<!-- type~type_iteration_setting&#45;&gt;type~type_convergence_control -->
+<g id="type~~type_control~~InheritsGraph_edge18" class="edge">
+<title>type~type_iteration_setting&#45;&gt;type~type_convergence_control</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M1071.78,-266.86C995.23,-265.47 865.4,-263.12 779.55,-261.56"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="779.37,-258.06 769.31,-261.38 779.24,-265.06 779.37,-258.06"/>
+<text text-anchor="middle" x="946" y="-268.4" font-family="Helvetica,sans-Serif" font-size="9.50">convergence_control</text>
+</g>
+<!-- type~abst_record -->
+<g id="type~~type_control~~InheritsGraph_node16" class="node">
+<title>type~abst_record</title>
+<g id="a_type~~type_control~~InheritsGraph_node16"><a xlink:href="../type/abst_record.html" xlink:title="abst_record">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="730,-66 655,-66 655,-42 730,-42 730,-66"/>
+<text text-anchor="middle" x="692.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_record</text>
+</a>
+</g>
+</g>
+<!-- type~type_record_profiler&#45;&gt;type~abst_record -->
+<g id="type~~type_control~~InheritsGraph_edge19" class="edge">
+<title>type~type_record_profiler&#45;&gt;type~abst_record</title>
+<path fill="none" stroke="#4800ff" d="M1075.76,-52.34C1038.78,-51.7 990.07,-51.62 947,-54"/>
+</g>
+<!-- type~type_record_time&#45;&gt;type~abst_record -->
+<g id="type~~type_control~~InheritsGraph_edge20" class="edge">
+<title>type~type_record_time&#45;&gt;type~abst_record</title>
+<path fill="none" stroke="#ff00da" d="M1097.66,-24.05C1060.21,-35.39 1000.29,-51.06 947,-54"/>
+<path fill="none" stroke="#ff00da" d="M945,-54C873.77,-57.93 791.02,-56.85 740.47,-55.55"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="740.28,-52.04 730.19,-55.27 740.09,-59.04 740.28,-52.04"/>
+</g>
+<!-- type~abst_record&#45;&gt;type~type_constant_id -->
+<g id="type~~type_control~~InheritsGraph_edge21" class="edge">
+<title>type~abst_record&#45;&gt;type~type_constant_id</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M654.83,-58.02C628.47,-61.36 592.21,-66.9 561,-75 379.32,-122.18 171.46,-208.28 88.74,-243.91"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="87.07,-240.81 79.28,-247.99 89.85,-247.24 87.07,-240.81"/>
+<text text-anchor="middle" x="312.5" y="-207.4" font-family="Helvetica,sans-Serif" font-size="9.50">label</text>
+</g>
+<!-- type~type_convergence_control&#45;&gt;type~type_constant_id -->
+<g id="type~~type_control~~InheritsGraph_edge22" class="edge">
+<title>type~type_convergence_control&#45;&gt;type~type_constant_id</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M615.92,-268.85C515.91,-280.63 334.15,-302.27 179,-322 162.32,-324.12 157.45,-332.31 141.5,-327"/>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M139.5,-327C112.23,-317.3 86.64,-295.68 70.27,-279.6"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="72.51,-276.9 63,-272.23 67.53,-281.81 72.51,-276.9"/>
+<text text-anchor="middle" x="312.5" y="-324.4" font-family="Helvetica,sans-Serif" font-size="9.50">norm_type, combination_logic, convergence_norm_type</text>
+</g>
+<!-- type~type_convergence_criterion -->
+<g id="type~~type_control~~InheritsGraph_node18" class="node">
+<title>type~type_convergence_criterion</title>
+<g id="a_type~~type_control~~InheritsGraph_node18"><a xlink:href="../type/type_convergence_criterion.html" xlink:title="type_convergence_criterion">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="393,-272 232,-272 232,-248 393,-248 393,-272"/>
+<text text-anchor="middle" x="312.5" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_convergence_criterion</text>
+</a>
+</g>
+</g>
+<!-- type~type_convergence_control&#45;&gt;type~type_convergence_criterion -->
+<g id="type~~type_control~~InheritsGraph_edge23" class="edge">
+<title>type~type_convergence_control&#45;&gt;type~type_convergence_criterion</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M615.91,-260C554.66,-260 468.2,-260 403.4,-260"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="403.19,-256.5 393.19,-260 403.19,-263.5 403.19,-256.5"/>
+<text text-anchor="middle" x="503.5" y="-262.4" font-family="Helvetica,sans-Serif" font-size="9.50">residual, update</text>
+</g>
+<!-- type~type_convergence_criterion&#45;&gt;type~type_constant_id -->
+<g id="type~~type_control~~InheritsGraph_edge24" class="edge">
+<title>type~type_convergence_criterion&#45;&gt;type~type_constant_id</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M231.88,-260C193.37,-260 147.89,-260 112.3,-260"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="112.07,-256.5 102.07,-260 112.07,-263.5 112.07,-256.5"/>
+<text text-anchor="middle" x="140.5" y="-262.4" font-family="Helvetica,sans-Serif" font-size="9.50">criterion</text>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var pantypetype_controlInheritsGraph = svgPanZoom('#typetype_controlInheritsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#InheritsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="InheritsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="186pt" height="32pt"
+ viewBox="0.00 0.00 185.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 181.5,-28 181.5,4 -4,4"/>
+<!-- Type -->
+<g id="node1" class="node">
+<title>Type</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="177.5,-24 72.5,-24 72.5,0 177.5,0 177.5,-24"/>
+<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a derived type to the parent type which it
+extends. Dashed arrows point from a derived type to the other
+types it contains as a components, with a label listing the name(s) of
+said component(s).
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Inherited by</h3>
+        </div>
+        <div class="card-body">
+          <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: type~~type_control~~InheritedByGraph Pages: 1 -->
+<svg id="typetype_controlInheritedByGraph" width="226pt" height="32pt"
+ viewBox="0.00 0.00 226.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_control~~InheritedByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>type~~type_control~~InheritedByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 222,-28 222,4 -4,4"/>
+<!-- type~type_control -->
+<g id="type~~type_control~~InheritedByGraph_node1" class="node">
+<title>type~type_control</title>
+<polygon fill="none" stroke="black" points="78,-24 0,-24 0,0 78,0 78,-24"/>
+<text text-anchor="middle" x="39" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_control</text>
+</g>
+<!-- type~type_ftcms -->
+<g id="type~~type_control~~InheritedByGraph_node2" class="node">
+<title>type~type_ftcms</title>
+<g id="a_type~~type_control~~InheritedByGraph_node2"><a xlink:href="../type/type_ftcms.html" xlink:title="type_ftcms">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="218,-24 148,-24 148,0 218,0 218,-24"/>
+<text text-anchor="middle" x="183" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms</text>
+</a>
+</g>
+</g>
+<!-- type~type_ftcms&#45;&gt;type~type_control -->
+<g id="type~~type_control~~InheritedByGraph_edge1" class="edge">
+<title>type~type_ftcms&#45;&gt;type~type_control</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M147.99,-12C130.18,-12 108.07,-12 88.5,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="88.24,-8.5 78.24,-12 88.24,-15.5 88.24,-8.5"/>
+<text text-anchor="middle" x="113" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">control</text>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#InheritedByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="InheritedByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="186pt" height="32pt"
+ viewBox="0.00 0.00 185.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 181.5,-28 181.5,4 -4,4"/>
+<!-- Type -->
+<g id="node1" class="node">
+<title>Type</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="177.5,-24 72.5,-24 72.5,0 177.5,0 177.5,-24"/>
+<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a derived type to the parent type which it
+extends. Dashed arrows point from a derived type to the other
+types it contains as a components, with a label listing the name(s) of
+said component(s).
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    <br>
+
+    <section>
+    <h2>Components</h2>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-acceleration"></span>
+              class(<a href='abst_acceleration.html'>abst_acceleration</a>),
+            </td>
+              <td>private,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>acceleration</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-compute_active"></span>
+              logical,
+            </td>
+              <td>private,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>compute_active</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-coupling_mode~3"></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>coupling_mode</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-iteration"></span>
+              type(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>iteration</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-physics_active"></span>
+              logical,
+            </td>
+              <td>private,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>physics_active</strong>(:,:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-profiler"></span>
+              type(<a href='type_time_profiler.html'>type_time_profiler</a>),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>profiler</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-scheduler_field"></span>
+              type(<a href='type_scheduler_manager.html'>type_scheduler_manager</a>),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>scheduler_field</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-scheduler_history"></span>
+              type(<a href='type_scheduler_manager.html'>type_scheduler_manager</a>),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>scheduler_history</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-time~4"></span>
+              type(<a href='type_time.html'>type_time</a>),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>time</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    </section>
+    <br>
+    
+
+
+      <section>
+        <h2>Type-Bound Procedures</h2>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-check_convergence~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>check_convergence</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/check_convergence_control~2.html'>check_convergence_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/check_convergence_control~2.html'>check_convergence_control</a>(self, physics_type, residual_vector, update_vector)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>residual_vector</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>update_vector</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-compute_relaxation"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>compute_relaxation</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/compute_relaxation_control.html'>compute_relaxation_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/compute_relaxation_control.html'>compute_relaxation_control</a>(self, physics_type, iter, du, vec)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>Aitken acceleration object</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+<p>Identifier for the physics type</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>iter</strong></td>
+            <td>
+<p>Current iteration number</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>du</strong>(:)</td>
+            <td>
+<p>Increment vector <script type="math/tex">\Delta u_k</script>
+</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>vec</strong>(:)</td>
+            <td>
+<p>State vector <script type="math/tex">u_k</script> on entry
+Overwritten by updated vector <script type="math/tex">u_{k+1}</script> on exit</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-display~14"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>display</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/display_control.html'>display_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/display_control.html'>display_control</a>(self, unit_in)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>unit_in</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-display_profiler"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>display_profiler</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/display_profiler_control.html'>display_profiler_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/display_profiler_control.html'>display_profiler_control</a>(self, unit_in)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>unit_in</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_bdf_coeffs~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_bdf_coeffs</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_bdf_coeffs_control.html'>get_bdf_coeffs_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/get_bdf_coeffs_control.html'>get_bdf_coeffs_control</a>(self, bdf_order, bdf_coeffs)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>bdf_order</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout),</td>
+              <td>optional,</td>            <td>
+              pointer, contiguous, dimension(:)
+            </td>
+            <td>::</td>
+            <td><strong>bdf_coeffs</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_coupling_mode"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_coupling_mode</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_coupling_mode_control.html'>get_coupling_mode_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/get_coupling_mode_control.html'>get_coupling_mode_control</a>(self, coupling_mode)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>coupling_mode</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_current_norm~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_current_norm</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_current_norm_control.html'>get_current_norm_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/get_current_norm_control.html'>get_current_norm_control</a>(self, physics_type, criteria_type, norm_type, current_norm)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>criteria_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>norm_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_norm</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_current_relaxation"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_current_relaxation</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_current_relaxation_control.html'>get_current_relaxation_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/get_current_relaxation_control.html'>get_current_relaxation_control</a>(self, physics_type, relaxation)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>relaxation</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_max_iterations~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_max_iterations</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_max_iterations_control.html'>get_max_iterations_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/get_max_iterations_control.html'>get_max_iterations_control</a>(self, max_iterations)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>max_iterations</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_nonlinear_iter~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_nonlinear_iter</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_nonlinear_iter_control.html'>get_nonlinear_iter_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/get_nonlinear_iter_control.html'>get_nonlinear_iter_control</a>(self, nonlinear_iter)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nonlinear_iter</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_nonlinear_solver~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_nonlinear_solver</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_nonlinear_solver_control.html'>get_nonlinear_solver_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/get_nonlinear_solver_control.html'>get_nonlinear_solver_control</a>(self, nonlinear_solver_type)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>nonlinear_solver_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_output_step"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_output_step</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_output_step_control.html'>get_output_step_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure subroutine <a href='../proc/get_output_step_control.html'>get_output_step_control</a>(self, output_type, step)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>output_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>step</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_output_time"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_output_time</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_output_time_control.html'>get_output_time_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure subroutine <a href='../proc/get_output_time_control.html'>get_output_time_control</a>(self, output_type, current_time_seconds, converted_time)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>output_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_time_seconds</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>converted_time</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_previous_relaxation"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_previous_relaxation</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_previous_relaxation_control.html'>get_previous_relaxation_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/get_previous_relaxation_control.html'>get_previous_relaxation_control</a>(self, physics_type, relaxation)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>relaxation</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_time~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_time</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_time_control.html'>get_time_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/get_time_control.html'>get_time_control</a>(self, time)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>time</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_tolerances~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_tolerances</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_tolerances_control.html'>get_tolerances_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/get_tolerances_control.html'>get_tolerances_control</a>(self, physics_type, absolute_tolerance, relative_tolerance)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>absolute_tolerance</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>relative_tolerance</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_total_iter~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_total_iter</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_total_iter_control.html'>get_total_iter_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/get_total_iter_control.html'>get_total_iter_control</a>(self, total_iter)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>total_iter</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_update_frequency~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_update_frequency</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_update_frequency_control.html'>get_update_frequency_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/get_update_frequency_control.html'>get_update_frequency_control</a>(self, update_frequency)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>update_frequency</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-increment_nonlinear~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>increment_nonlinear</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/increment_nonlinear_control.html'>increment_nonlinear_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/increment_nonlinear_control.html'>increment_nonlinear_control</a>(self)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-increment_total~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>increment_total</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/increment_total_control.html'>increment_total_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/increment_total_control.html'>increment_total_control</a>(self)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-initialize~31"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>initialize</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/initialize_type_control.html'>initialize_type_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/initialize_type_control.html'>initialize_type_control</a>(self, config_control_manager, config_iteration, config_time, config_time_ats, config_output_field, config_output_history, config_acceleration, config_parallel_openmp)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_config_control_manager.html'>type_config_control_manager</a>),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>config_control_manager</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_config_iteration.html'>type_config_iteration</a>),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>config_iteration</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_config_time.html'>type_config_time</a>),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>config_time</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_config_time_ats.html'>type_config_time_ats</a>),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>config_time_ats</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_config_output_manager.html'>type_config_output_manager</a>),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>config_output_field</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_config_output_manager.html'>type_config_output_manager</a>),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>config_output_history</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_config_acceleration.html'>type_config_acceleration</a>),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>config_acceleration</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_config_parallel_openmp.html'>type_config_parallel_openmp</a>),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>config_parallel_openmp</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_compute_newton~3"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_compute_newton</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_compute_newton_control.html'>is_compute_newton_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_compute_newton_control.html'>is_compute_newton_control</a>(self) result(is_compute_newton)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_compute_none~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_compute_none</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_compute_none_control.html'>is_compute_none_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_compute_none_control.html'>is_compute_none_control</a>(self) result(is_compute_none)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_compute_picard~3"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_compute_picard</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_compute_picard_control.html'>is_compute_picard_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_compute_picard_control.html'>is_compute_picard_control</a>(self) result(is_compute_picard)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_converged~3"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_converged</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_converged_control.html'>is_converged_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_converged_control.html'>is_converged_control</a>(self) result(is_converged)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_diverged~3"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_diverged</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_diverged_control.html'>is_diverged_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_diverged_control.html'>is_diverged_control</a>(self) result(is_diverged)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_end_time~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_end_time</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_end_time_control.html'>is_end_time_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_end_time_control.html'>is_end_time_control</a>(self) result(is_end_time)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_monolithic"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_monolithic</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_monolithic_control.html'>is_monolithic_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_monolithic_control.html'>is_monolithic_control</a>(self) result(is_monolithic)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_newton~5"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_newton</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_newton_control.html'>is_newton_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_newton_control.html'>is_newton_control</a>(self) result(is_newton)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_none~5"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_none</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_none_control.html'>is_none_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_none_control.html'>is_none_control</a>(self) result(is_none)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_output_triggered"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_output_triggered</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_output_triggered_control.html'>is_output_triggered_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  function <a href='../proc/is_output_triggered_control.html'>is_output_triggered_control</a>(self, output_type, current_time_seconds) result(is_output_triggered)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>output_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_time_seconds</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_physics_active"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_physics_active</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_physics_active_control.html'>is_physics_active_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_physics_active_control.html'>is_physics_active_control</a>(self, physics_type) result(compute_active)  
+</h3>
+    
+
+  <p>Check if the given physics type is active for computation</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>Instance of control settings</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+<p>Physics type identifier in PHYSICS_TYPES</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    <p>Returns <code>true</code> if the physics type is active</p>
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_picard~4"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_picard</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_picard_control.html'>is_picard_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_picard_control.html'>is_picard_control</a>(self) result(is_picard)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_staggered"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_staggered</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_staggered_control.html'>is_staggered_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_staggered_control.html'>is_staggered_control</a>(self) result(is_staggered)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_target"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_target</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_target_control.html'>is_target_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_target_control.html'>is_target_control</a>(self, target_physics, material_id) result(compute_active)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>target_physics</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>material_id</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-profiler_record"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>profiler_record</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/profiler_record_control.html'>profiler_record_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/profiler_record_control.html'>profiler_record_control</a>(self, label)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>label</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-profiler_start"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>profiler_start</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/profiler_start_control.html'>profiler_start_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/profiler_start_control.html'>profiler_start_control</a>(self, label)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+<p>Profiler manager object</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>label</strong></td>
+            <td>
+<p>Identifier for the profiler record</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-profiler_stop"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>profiler_stop</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/profiler_stop_control.html'>profiler_stop_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/profiler_stop_control.html'>profiler_stop_control</a>(self, label)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>label</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-reach_maximum_relaxation"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>reach_maximum_relaxation</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/reach_maximum_relaxation_control.html'>reach_maximum_relaxation_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/reach_maximum_relaxation_control.html'>reach_maximum_relaxation_control</a>(self, physics_type) result(reached)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-reach_minimum_relaxation"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>reach_minimum_relaxation</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/reach_minimum_relaxation_control.html'>reach_minimum_relaxation_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/reach_minimum_relaxation_control.html'>reach_minimum_relaxation_control</a>(self, physics_type) result(reached)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-reset_acceleration"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>reset_acceleration</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/reset_acceleration_control.html'>reset_acceleration_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/reset_acceleration_control.html'>reset_acceleration_control</a>(self)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-reset_iteration"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>reset_iteration</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/reset_iteration_control.html'>reset_iteration_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/reset_iteration_control.html'>reset_iteration_control</a>(self)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-set_converged~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>set_converged</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/set_converged_control.html'>set_converged_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/set_converged_control.html'>set_converged_control</a>(self, physics_type, converged)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              logical,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>converged</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-set_diverged~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>set_diverged</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/set_diverged_control.html'>set_diverged_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/set_diverged_control.html'>set_diverged_control</a>(self, physics_type, diverged)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              logical,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>diverged</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-set_nonlinear_solver~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>set_nonlinear_solver</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/set_nonlinear_solver_control.html'>set_nonlinear_solver_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/set_nonlinear_solver_control.html'>set_nonlinear_solver_control</a>(self, nonlinear_solver_type)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nonlinear_solver_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-should_continue~3"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>should_continue</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/should_continue_control.html'>should_continue_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/should_continue_control.html'>should_continue_control</a>(self) result(should_continue)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-update~3"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>update</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/update_controls.html'>update_controls</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/update_controls.html'>update_controls</a>(self, success)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              logical,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>success</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-update_output"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>update_output</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/update_output_control.html'>update_output_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/update_output_control.html'>update_output_control</a>(self, output_type, current_time_seconds)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_control.html'>type_control</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>output_type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_time_seconds</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+      </section>
+
+    <section>
+    <h3><span class="anchor" id="src"></span>Source Code</h3>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_control</span>
+<span class="w">        </span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">compute_active</span><span class="p">(:)</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_constant_id</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">coupling_mode</span>
+<span class="w">        </span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">physics_active</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span>
+
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_iteration</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">iteration</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_time</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="nb">time</span>
+<span class="nb">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_time_profiler</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">profiler</span>
+
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_scheduler_manager</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">scheduler_field</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_scheduler_manager</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">scheduler_history</span>
+
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">abst_acceleration</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">acceleration</span>
+
+<span class="w">    </span><span class="k">contains</span>
+<span class="w">        </span><span class="c">! ---- Lifecycle ----</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">initialize_type_control</span>
+
+<span class="w">        </span><span class="c">! ---- Mutator ----</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">update</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">update_controls</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">update_output</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">update_output_control</span>
+<span class="w">        </span><span class="c">! - iteration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">reset_iteration</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">reset_iteration_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">increment_nonlinear</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">increment_nonlinear_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">increment_total</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">increment_total_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">set_nonlinear_solver</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">set_nonlinear_solver_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">set_converged</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">set_converged_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">set_diverged</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">set_diverged_control</span>
+<span class="w">        </span><span class="c">! - acceleration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">reset_acceleration</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">reset_acceleration_control</span>
+<span class="w">        </span><span class="c">! ---- Algorithm / Operation ----</span>
+<span class="w">        </span><span class="c">! - profiler</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">profiler_start</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">profiler_start_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">profiler_stop</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">profiler_stop_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">profiler_record</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">profiler_record_control</span>
+<span class="w">        </span><span class="c">! - iteration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">check_convergence</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">check_convergence_control</span>
+<span class="w">        </span><span class="c">! - acceleration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">compute_relaxation</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">compute_relaxation_control</span>
+
+<span class="w">        </span><span class="c">! ---- Inquiry ----</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_physics_active</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_physics_active_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_target</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_target_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_monolithic</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_monolithic_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_staggered</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_staggered_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_end_time</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_end_time_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_output_triggered</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_output_triggered_control</span>
+<span class="w">        </span><span class="c">! - iteration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_diverged</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_diverged_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_converged</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_converged_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_compute_newton</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_compute_newton_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_compute_picard</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_compute_picard_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_compute_none</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_compute_none_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_newton</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_newton_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_picard</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_picard_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_none</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_none_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">should_continue</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">should_continue_control</span>
+<span class="w">        </span><span class="c">! - acceleration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">reach_minimum_relaxation</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">reach_minimum_relaxation_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">reach_maximum_relaxation</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">reach_maximum_relaxation_control</span>
+
+<span class="w">        </span><span class="c">! ---- Getter ----</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_coupling_mode</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_coupling_mode_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_output_time</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_output_time_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_output_step</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_output_step_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_bdf_coeffs</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_bdf_coeffs_control</span>
+<span class="w">        </span><span class="c">! - iteration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_nonlinear_solver</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_nonlinear_solver_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_nonlinear_iter</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_nonlinear_iter_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_total_iter</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_total_iter_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_max_iterations</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_max_iterations_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_update_frequency</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_update_frequency_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_current_norm</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_current_norm_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_tolerances</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_tolerances_control</span>
+<span class="w">        </span><span class="c">! - time</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_time</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_time_control</span>
+<span class="w">        </span><span class="c">! - acceleration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_current_relaxation</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_current_relaxation_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_previous_relaxation</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_previous_relaxation_control</span>
+
+<span class="w">        </span><span class="c">! ---- Meta / Utility ----</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">display</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">display_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">display_profiler</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">display_profiler_control</span>
+
+<span class="w">    </span><span class="k">end type </span><span class="n">type_control</span>
+</pre></div>
+
+    </section>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-03-11 14:03 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

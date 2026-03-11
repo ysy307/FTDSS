@@ -2,53 +2,54 @@
 ! module conditions_initial_manager
 ! Purpose: Manages all initial condition objects.
 ! =============================================================================
-module conditions_initial_manager
+module condition_initial_manager
     use, intrinsic :: iso_fortran_env
     use :: module_core
     use :: module_domain, only:type_domain
     use :: module_input, only:type_input
-    use :: conditions_initial, only:abst_ic, type_ic_uniform, holder_ics
+    use :: condition_initial, only:abst_ic, type_ic_uniform, holder_ics
     implicit none
     private
 
     public :: type_ic_manager
 
     type :: type_ic_manager
-        type(holder_ics) :: list(NUM_IC_TARGETS)
+        type(holder_ics), private :: ic(IC_TARGETS%NUM_ID)
     contains
-        procedure :: initialize => initialize_type_ic_manager
-        procedure :: apply => apply_ic_manager
+        procedure, public, pass(self) :: initialize => initialize_type_ic_manager
+        procedure, public, pass(self) :: apply => apply_ic_manager
     end type type_ic_manager
 
 contains
 
     ! Sets up the manager by creating the correct IC objects based on input.
-    subroutine initialize_type_ic_manager(self, input)
+    subroutine initialize_type_ic_manager(self, configs)
         implicit none
         class(type_ic_manager), intent(inout) :: self
-        type(type_input), intent(in) :: input
+        type(type_config_ic), intent(in) :: configs(:)
+        ! type(type_input), intent(in) :: input
 
         integer(int32) :: i, ic_method
         integer(int32) :: target_ic_id
         character(:), allocatable :: target_str
 
-        do i = 1, NUM_IC_TARGETS
+        do i = 1, IC_TARGETS%NUM_ID
             ! Skip if analysis is not active (except Porosity which might always be needed)
-            if (.not. input%basic%analysis_controls%is_active(i) .and. i /= IC_TARGET_POROSITY) cycle
+            ! if (.not. input%basic%analysis_controls%is_active(i) .and. i /= IC_TARGETS%POROSITY%ID) cycle
 
-            ic_method = input%conditions%initial_conditions%physics(i)%type
+            ! ic_method = input%conditions%initial_conditions%physics(i)%type
 
-            select case (ic_method)
-            case (IC_METHOD_UNIFORM)
-                allocate (type_ic_uniform :: self%list(i)%ic)
+            select case (configs(i)%ic_kind%ID)
+            case (IC_METHODS%UNIFORM%ID)
+                allocate (type_ic_uniform :: self%ic(i)%p)
                 ! case (IC_METHOD_LAPLACE)
-                !     allocate (type_ic_laplace :: self%list(i)%ic)
+                !     allocate (type_ic_laplace :: self%ic(i)%p)
             case default
                 ! Future: Handle IC_METHOD_FROM_FILE or others
             end select
 
-            if (allocated(self%list(i)%ic)) then
-                call self%list(i)%ic%initialize(input, i)
+            if (allocated(self%ic(i)%p)) then
+                call self%ic(i)%p%initialize(configs(i))
             end if
         end do
 
@@ -57,16 +58,17 @@ contains
     subroutine apply_ic_manager(self, initial_target_id, variable)
         implicit none
         class(type_ic_manager), intent(in) :: self
-        integer(int32), intent(in) :: initial_target_id
+        type(type_constant_id), intent(in) :: initial_target_id
         type(type_variable), intent(inout) :: variable
 
         integer(int32) :: id
 
-        if (initial_target_id > 0 .and. initial_target_id <= NUM_IC_TARGETS) then
-            if (allocated(self%list(initial_target_id)%ic)) then
-                call self%list(initial_target_id)%ic%apply(variable)
-            end if
+        if (.not. IC_TARGETS%is_valid(initial_target_id)) then
+            return
         end if
+
+        call self%ic(initial_target_id%ID)%p%apply(variable)
+
     end subroutine apply_ic_manager
 
-end module conditions_initial_manager
+end module condition_initial_manager

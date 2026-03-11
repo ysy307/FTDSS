@@ -10,7 +10,7 @@
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>type_thermal &ndash; FTDSS </title>
+    <title>type_thermal &ndash; FTCMS </title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -44,7 +44,7 @@
     <div class="container-fluid mb-sm-4 mb-xl-2">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
           <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
                   aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon">
@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.8% of total for derived types.</p>Including implementation: 23 statements,  0.1% of total for derived types.">23 statements</a>
+                 title="<p> 0.8% of total for derived types.</p>Including implementation: 29 statements,  0.1% of total for derived types.">29 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -105,7 +105,7 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
                 <li class="breadcrumb-item"><a href='../sourcefile/thermal_interface.f90.html'>thermal_interface.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/main_thermal.html'>main_thermal</a></li>
+                <li class="breadcrumb-item"><a href='../module/physics_governing_thermal.html'>physics_governing_thermal</a></li>
             <li class="breadcrumb-item active" aria-current="page">type_thermal</li>
           </ol>
         </nav>
@@ -134,9 +134,13 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_thermal.html#variable-computation_dimension~4">computation_dimension</a>
-            <a class="list-group-item" href="../type/type_thermal.html#variable-computation_type~8">computation_type</a>
-            <a class="list-group-item" href="../type/type_thermal.html#variable-physics~4">physics</a>
+            <a class="list-group-item" href="../type/type_thermal.html#variable-computation_dimension~2">computation_dimension</a>
+            <a class="list-group-item" href="../type/type_thermal.html#variable-computation_type">computation_type</a>
+            <a class="list-group-item" href="../type/type_thermal.html#variable-enthalpy_cache">enthalpy_cache</a>
+            <a class="list-group-item" href="../type/type_thermal.html#variable-enthalpy_cache_num_hist">enthalpy_cache_num_hist</a>
+            <a class="list-group-item" href="../type/type_thermal.html#variable-enthalpy_cache_num_nodes">enthalpy_cache_num_nodes</a>
+            <a class="list-group-item" href="../type/type_thermal.html#variable-enthalpy_cache_valid">enthalpy_cache_valid</a>
+            <a class="list-group-item" href="../type/type_thermal.html#variable-physics">physics</a>
         </div>
       </div>
     </div>
@@ -163,12 +167,13 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-assemble_local~2">assemble_local</a>
+            <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-assemble_local">assemble_local</a>
             <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-assemble_local_newton">assemble_local_newton</a>
             <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-assemble_local_picard">assemble_local_picard</a>
-            <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-calc_density_ice">calc_density_ice</a>
-            <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-calc_density_vapor_saturation">calc_density_vapor_saturation</a>
-            <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-calc_density_water">calc_density_water</a>
+            <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-cache_enthalpy_history">cache_enthalpy_history</a>
+            <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-calc_density_ice~2">calc_density_ice</a>
+            <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-calc_density_vapor_saturation~2">calc_density_vapor_saturation</a>
+            <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-calc_density_water~2">calc_density_water</a>
             <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-calc_enthalpy_density">calc_enthalpy_density</a>
             <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-compute_advective_term">compute_advective_term</a>
             <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-compute_diffusion_term">compute_diffusion_term</a>
@@ -176,9 +181,10 @@
             <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-compute_latent_term">compute_latent_term</a>
             <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-compute_mass_term">compute_mass_term</a>
             <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-compute_transient_term">compute_transient_term</a>
-            <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-destroy~17">destroy</a>
-            <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-initialize~41">initialize</a>
-            <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-update_water_phases~3">update_water_phases</a>
+            <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-destroy~4">destroy</a>
+            <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-initialize~6">initialize</a>
+            <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-invalidate_enthalpy_cache">invalidate_enthalpy_cache</a>
+            <a class="list-group-item" href="../type/type_thermal.html#boundprocedure-update_water_phases~2">update_water_phases</a>
         </div>
       </div>
     </div>
@@ -212,32 +218,32 @@
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: type~~type_thermal~~InheritsGraph Pages: 1 -->
-<svg id="typetype_thermalInheritsGraph" width="641pt" height="209pt"
- viewBox="0.00 0.00 641.00 209.43" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="type~~type_thermal~~InheritsGraph" class="graph" transform="scale(0.36 0.36) rotate(0) translate(4 576.27)">
+<svg id="typetype_thermalInheritsGraph" width="641pt" height="207pt"
+ viewBox="0.00 0.00 641.00 206.84" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_thermal~~InheritsGraph" class="graph" transform="scale(0.36 0.36) rotate(0) translate(4 576.52)">
 <title>type~~type_thermal~~InheritsGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-576.27 1772,-576.27 1772,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-576.52 1795,-576.52 1795,4 -4,4"/>
 <!-- type~type_thermal -->
 <g id="type~~type_thermal~~InheritsGraph_node1" class="node">
 <title>type~type_thermal</title>
-<polygon fill="none" stroke="black" points="1768,-455 1685,-455 1685,-431 1768,-431 1768,-455"/>
-<text text-anchor="middle" x="1726.5" y="-440.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_thermal</text>
+<polygon fill="none" stroke="black" points="1791,-455 1708,-455 1708,-431 1791,-431 1791,-455"/>
+<text text-anchor="middle" x="1749.5" y="-440.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_thermal</text>
 </g>
-<!-- type~type_physics_manager -->
+<!-- type~type_constitutive_manager -->
 <g id="type~~type_thermal~~InheritsGraph_node2" class="node">
-<title>type~type_physics_manager</title>
-<g id="a_type~~type_thermal~~InheritsGraph_node2"><a xlink:href="../type/type_physics_manager.html" xlink:title="type_physics_manager">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="1612,-455 1478,-455 1478,-431 1612,-431 1612,-455"/>
-<text text-anchor="middle" x="1545" y="-440.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_manager</text>
+<title>type~type_constitutive_manager</title>
+<g id="a_type~~type_thermal~~InheritsGraph_node2"><a xlink:href="../type/type_constitutive_manager.html" xlink:title="type_constitutive_manager">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1635,-455 1478,-455 1478,-431 1635,-431 1635,-455"/>
+<text text-anchor="middle" x="1556.5" y="-440.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_constitutive_manager</text>
 </a>
 </g>
 </g>
-<!-- type~type_thermal&#45;&gt;type~type_physics_manager -->
+<!-- type~type_thermal&#45;&gt;type~type_constitutive_manager -->
 <g id="type~~type_thermal~~InheritsGraph_edge1" class="edge">
-<title>type~type_thermal&#45;&gt;type~type_physics_manager</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1684.77,-443C1666.28,-443 1643.8,-443 1622.36,-443"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="1622.27,-439.5 1612.27,-443 1622.27,-446.5 1622.27,-439.5"/>
-<text text-anchor="middle" x="1648.5" y="-445.4" font-family="Helvetica,sans-Serif" font-size="9.50">physics</text>
+<title>type~type_thermal&#45;&gt;type~type_constitutive_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1707.99,-443C1689.67,-443 1667.24,-443 1645.35,-443"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1645.35,-439.5 1635.35,-443 1645.35,-446.5 1645.35,-439.5"/>
+<text text-anchor="middle" x="1671.5" y="-445.4" font-family="Helvetica,sans-Serif" font-size="9.50">physics</text>
 </g>
 <!-- type_iapws06 -->
 <g id="type~~type_thermal~~InheritsGraph_node3" class="node">
@@ -245,9 +251,9 @@
 <polygon fill="#5cb85c" stroke="#5cb85c" points="231,-526 146,-526 146,-502 231,-502 231,-526"/>
 <text text-anchor="middle" x="188.5" y="-511.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iapws06</text>
 </g>
-<!-- type~type_physics_manager&#45;&gt;type_iapws06 -->
+<!-- type~type_constitutive_manager&#45;&gt;type_iapws06 -->
 <g id="type~~type_thermal~~InheritsGraph_edge3" class="edge">
-<title>type~type_physics_manager&#45;&gt;type_iapws06</title>
+<title>type~type_constitutive_manager&#45;&gt;type_iapws06</title>
 <path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M912,-564C835.03,-552.82 814.78,-564 737,-564 737,-564 737,-564 432.5,-564 362.53,-564 283.52,-543.87 235.11,-529.15"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="235.84,-525.72 225.26,-526.1 233.77,-532.4 235.84,-525.72"/>
 <text text-anchor="middle" x="843.5" y="-562.4" font-family="Helvetica,sans-Serif" font-size="9.50">ice</text>
@@ -258,10 +264,10 @@
 <polygon fill="#5cb85c" stroke="#5cb85c" points="231,-475 146,-475 146,-451 231,-451 231,-475"/>
 <text text-anchor="middle" x="188.5" y="-460.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iapws97</text>
 </g>
-<!-- type~type_physics_manager&#45;&gt;type_iapws97 -->
+<!-- type~type_constitutive_manager&#45;&gt;type_iapws97 -->
 <g id="type~~type_thermal~~InheritsGraph_edge2" class="edge">
-<title>type~type_physics_manager&#45;&gt;type_iapws97</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1517.08,-455.03C1430.13,-492.4 1148.75,-601.84 914,-564"/>
+<title>type~type_constitutive_manager&#45;&gt;type_iapws97</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1528.08,-455.08C1439.5,-492.62 1152.89,-602.5 914,-564"/>
 <path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M912,-564C892.25,-560.18 898.18,-540.59 880,-532 822.26,-504.71 800.86,-518 737,-518 737,-518 737,-518 432.5,-518 360.42,-518 279.21,-494.69 231.3,-478.42"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="232.19,-475.03 221.6,-475.07 229.91,-481.65 232.19,-475.03"/>
 <text text-anchor="middle" x="843.5" y="-534.4" font-family="Helvetica,sans-Serif" font-size="9.50">water</text>
@@ -275,11 +281,11 @@
 </a>
 </g>
 </g>
-<!-- type~type_physics_manager&#45;&gt;type~type_iapws_wrapper -->
+<!-- type~type_constitutive_manager&#45;&gt;type~type_iapws_wrapper -->
 <g id="type~~type_thermal~~InheritsGraph_edge4" class="edge">
-<title>type~type_physics_manager&#45;&gt;type~type_iapws_wrapper</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1477.59,-446.9C1406.68,-451.07 1294.8,-457.64 1222.53,-461.89"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="1221.95,-458.41 1212.17,-462.49 1222.36,-465.4 1221.95,-458.41"/>
+<title>type~type_constitutive_manager&#45;&gt;type~type_iapws_wrapper</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1477.8,-447.43C1403.89,-451.65 1293.72,-457.94 1222.48,-462.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1222.05,-458.53 1212.26,-462.59 1222.45,-465.51 1222.05,-458.53"/>
 <text text-anchor="middle" x="1424" y="-454.4" font-family="Helvetica,sans-Serif" font-size="9.50">iapws_wrapper</text>
 </g>
 <!-- type~type_material_manager -->
@@ -291,11 +297,11 @@
 </a>
 </g>
 </g>
-<!-- type~type_physics_manager&#45;&gt;type~type_material_manager -->
+<!-- type~type_constitutive_manager&#45;&gt;type~type_material_manager -->
 <g id="type~~type_thermal~~InheritsGraph_edge5" class="edge">
-<title>type~type_physics_manager&#45;&gt;type~type_material_manager</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1497.44,-430.95C1485.28,-427.92 1472.17,-424.74 1460,-422 1432.11,-415.71 1401.34,-409.38 1374.35,-404.02"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="1374.69,-400.52 1364.2,-402.02 1373.34,-407.39 1374.69,-400.52"/>
+<title>type~type_constitutive_manager&#45;&gt;type~type_material_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1501.5,-430.95C1487.96,-427.98 1473.46,-424.83 1460,-422 1431.29,-415.95 1399.61,-409.53 1372.13,-404.03"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1372.7,-400.58 1362.21,-402.05 1371.33,-407.44 1372.7,-400.58"/>
 <text text-anchor="middle" x="1424" y="-424.4" font-family="Helvetica,sans-Serif" font-size="9.50">materials</text>
 </g>
 <!-- type~type_models_manager -->
@@ -307,25 +313,25 @@
 </a>
 </g>
 </g>
-<!-- type~type_physics_manager&#45;&gt;type~type_models_manager -->
+<!-- type~type_constitutive_manager&#45;&gt;type~type_models_manager -->
 <g id="type~~type_thermal~~InheritsGraph_edge6" class="edge">
-<title>type~type_physics_manager&#45;&gt;type~type_models_manager</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1530.94,-430.69C1490.87,-392.93 1369.55,-278.61 1321.2,-233.04"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="1323.51,-230.41 1313.83,-226.09 1318.71,-235.5 1323.51,-230.41"/>
-<text text-anchor="middle" x="1424" y="-364.4" font-family="Helvetica,sans-Serif" font-size="9.50">models</text>
+<title>type~type_constitutive_manager&#45;&gt;type~type_models_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1541.82,-430.69C1499.86,-392.93 1372.8,-278.61 1322.16,-233.04"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1324.22,-230.18 1314.44,-226.09 1319.53,-235.39 1324.22,-230.18"/>
+<text text-anchor="middle" x="1424" y="-358.4" font-family="Helvetica,sans-Serif" font-size="9.50">models</text>
 </g>
-<!-- type~abst_physics -->
+<!-- type~abst_constitutive -->
 <g id="type~~type_thermal~~InheritsGraph_node8" class="node">
-<title>type~abst_physics</title>
-<g id="a_type~~type_thermal~~InheritsGraph_node8"><a xlink:href="../type/abst_physics.html" xlink:title="abst_physics">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="473,-444 394,-444 394,-420 473,-420 473,-444"/>
-<text text-anchor="middle" x="433.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_physics</text>
+<title>type~abst_constitutive</title>
+<g id="a_type~~type_thermal~~InheritsGraph_node8"><a xlink:href="../type/abst_constitutive.html" xlink:title="abst_constitutive">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="484.5,-444 382.5,-444 382.5,-420 484.5,-420 484.5,-444"/>
+<text text-anchor="middle" x="433.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_constitutive</text>
 </a>
 </g>
 </g>
-<!-- type~type_iapws_wrapper&#45;&gt;type~abst_physics -->
+<!-- type~type_iapws_wrapper&#45;&gt;type~abst_constitutive -->
 <g id="type~~type_thermal~~InheritsGraph_edge7" class="edge">
-<title>type~type_iapws_wrapper&#45;&gt;type~abst_physics</title>
+<title>type~type_iapws_wrapper&#45;&gt;type~abst_constitutive</title>
 <path fill="none" stroke="#00ff66" d="M1090.7,-470.81C957.1,-480.58 638.6,-498.22 543,-453 531.89,-447.74 537.29,-432 525,-432"/>
 </g>
 <!-- type~holder_dens -->
@@ -456,17 +462,17 @@
 <polygon fill="#cc00ff" stroke="#cc00ff" points="1068.16,-109.34 1057.59,-110.05 1066.29,-116.09 1068.16,-109.34"/>
 <text text-anchor="middle" x="1151.5" y="-165.4" font-family="Helvetica,sans-Serif" font-size="9.50">phase_manager</text>
 </g>
-<!-- type~abst_physics&#45;&gt;type_iapws06 -->
+<!-- type~abst_constitutive&#45;&gt;type_iapws06 -->
 <g id="type~~type_thermal~~InheritsGraph_edge17" class="edge">
-<title>type~abst_physics&#45;&gt;type_iapws06</title>
+<title>type~abst_constitutive&#45;&gt;type_iapws06</title>
 <path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M396.91,-444.01C353.95,-458.51 281.67,-482.9 234.79,-498.72"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="233.55,-495.44 225.19,-501.96 235.78,-502.08 233.55,-495.44"/>
 <text text-anchor="middle" x="314" y="-482.4" font-family="Helvetica,sans-Serif" font-size="9.50">ice</text>
 </g>
-<!-- type~abst_physics&#45;&gt;type_iapws97 -->
+<!-- type~abst_constitutive&#45;&gt;type_iapws97 -->
 <g id="type~~type_thermal~~InheritsGraph_edge16" class="edge">
-<title>type~abst_physics&#45;&gt;type_iapws97</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M393.91,-435.24C364.1,-437.9 321.86,-442.04 285,-447 270.79,-448.91 255.45,-451.32 241.3,-453.69"/>
+<title>type~abst_constitutive&#45;&gt;type_iapws97</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M382.23,-436.3C353.66,-438.95 317.27,-442.66 285,-447 270.79,-448.91 255.45,-451.32 241.3,-453.69"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="240.52,-450.28 231.25,-455.4 241.69,-457.18 240.52,-450.28"/>
 <text text-anchor="middle" x="314" y="-449.4" font-family="Helvetica,sans-Serif" font-size="9.50">water</text>
 </g>
@@ -625,18 +631,18 @@
 <title>type~abst_den&#45;&gt;type~abst_material</title>
 <path fill="none" stroke="#ffaa00" d="M812.95,-422.33C791.56,-416.78 762.1,-412.14 737,-419"/>
 </g>
-<!-- type~abst_gcc&#45;&gt;type~abst_physics -->
+<!-- type~abst_gcc&#45;&gt;type~abst_constitutive -->
 <g id="type~~type_thermal~~InheritsGraph_edge28" class="edge">
-<title>type~abst_gcc&#45;&gt;type~abst_physics</title>
+<title>type~abst_gcc&#45;&gt;type~abst_constitutive</title>
 <path fill="none" stroke="#aaff00" d="M706.46,-387.48C679.68,-384.29 638.8,-382.13 605,-392"/>
 </g>
-<!-- type~abst_hcf&#45;&gt;type~abst_physics -->
+<!-- type~abst_hcf&#45;&gt;type~abst_constitutive -->
 <g id="type~~type_thermal~~InheritsGraph_edge34" class="edge">
-<title>type~abst_hcf&#45;&gt;type~abst_physics</title>
+<title>type~abst_hcf&#45;&gt;type~abst_constitutive</title>
 <path fill="none" stroke="#00ff00" d="M826.11,-226.31C819.16,-232.39 811.62,-240.28 807,-249 786.27,-288.13 819.39,-314.79 789,-347 774.56,-362.31 625.2,-386.1 605,-392"/>
 <path fill="none" stroke="#00ff00" d="M603,-392C576.21,-400.04 566.33,-395.57 543,-411 532.75,-417.78 537.29,-432 525,-432"/>
-<path fill="none" stroke="#00ff00" d="M524,-432C510.88,-432 496.68,-432 483.54,-432"/>
-<polygon fill="#00ff00" stroke="#00ff00" points="483.27,-428.5 473.27,-432 483.27,-435.5 483.27,-428.5"/>
+<path fill="none" stroke="#00ff00" d="M524,-432C514.54,-432 504.53,-432 494.75,-432"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="494.68,-428.5 484.68,-432 494.68,-435.5 494.68,-428.5"/>
 </g>
 <!-- type~abst_hcf_base -->
 <g id="type~~type_thermal~~InheritsGraph_node26" class="node">
@@ -751,9 +757,9 @@
 <polygon fill="#aa00ff" stroke="#aa00ff" points="489.25,-155.37 481.71,-162.81 492.25,-161.7 489.25,-155.37"/>
 <text text-anchor="middle" x="604" y="-71.4" font-family="Helvetica,sans-Serif" font-size="9.50">config</text>
 </g>
-<!-- type~type_evaporation&#45;&gt;type~abst_physics -->
+<!-- type~type_evaporation&#45;&gt;type~abst_constitutive -->
 <g id="type~~type_thermal~~InheritsGraph_edge39" class="edge">
-<title>type~type_evaporation&#45;&gt;type~abst_physics</title>
+<title>type~type_evaporation&#45;&gt;type~abst_constitutive</title>
 <path fill="none" stroke="#ff00aa" d="M682.85,-2.29C640.06,2.49 580.6,1.36 543,-32 487.43,-81.3 524.96,-123.17 506,-195 484.91,-274.89 455.17,-368.46 441.67,-410.1"/>
 <polygon fill="#ff00aa" stroke="#ff00aa" points="438.29,-409.16 438.53,-419.75 444.95,-411.32 438.29,-409.16"/>
 </g>
@@ -778,9 +784,9 @@
 <polygon fill="#48ff00" stroke="#48ff00" points="812.73,-200.5 823.22,-202 815.96,-194.29 812.73,-200.5"/>
 <text text-anchor="middle" x="736" y="-190.4" font-family="Helvetica,sans-Serif" font-size="9.50">parent</text>
 </g>
-<!-- type~abst_material&#45;&gt;type~abst_physics -->
+<!-- type~abst_material&#45;&gt;type~abst_constitutive -->
 <g id="type~~type_thermal~~InheritsGraph_edge43" class="edge">
-<title>type~abst_material&#45;&gt;type~abst_physics</title>
+<title>type~abst_material&#45;&gt;type~abst_constitutive</title>
 <path fill="none" stroke="#00ff91" d="M561.31,-432C549.56,-432 536.78,-432 525,-432"/>
 </g>
 <!-- type~type_config_hcf&#45;&gt;type~type_config_wrf -->
@@ -828,9 +834,9 @@
 <polygon fill="#4800ff" stroke="#4800ff" points="250.23,-146.47 239.86,-148.63 249.32,-153.41 250.23,-146.47"/>
 <text text-anchor="middle" x="314" y="-164.4" font-family="Helvetica,sans-Serif" font-size="9.50">swcc_model</text>
 </g>
-<!-- type~type_hcf_vapor&#45;&gt;type~abst_physics -->
+<!-- type~type_hcf_vapor&#45;&gt;type~abst_constitutive -->
 <g id="type~~type_thermal~~InheritsGraph_edge49" class="edge">
-<title>type~type_hcf_vapor&#45;&gt;type~abst_physics</title>
+<title>type~type_hcf_vapor&#45;&gt;type~abst_constitutive</title>
 <path fill="none" stroke="#ff00da" d="M556.89,-103.09C544.82,-106.01 532.75,-111.14 524,-120 499.91,-144.39 514.95,-161.91 506,-195 484.42,-274.76 454.92,-368.4 441.58,-410.08"/>
 <polygon fill="#ff00da" stroke="#ff00da" points="438.2,-409.14 438.47,-419.74 444.86,-411.28 438.2,-409.14"/>
 </g>
@@ -924,31 +930,31 @@ large graphs.</div>
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: type~~type_thermal~~InheritedByGraph Pages: 1 -->
-<svg id="typetype_thermalInheritedByGraph" width="231pt" height="32pt"
- viewBox="0.00 0.00 231.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg id="typetype_thermalInheritedByGraph" width="235pt" height="32pt"
+ viewBox="0.00 0.00 235.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="type~~type_thermal~~InheritedByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>type~~type_thermal~~InheritedByGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 227,-28 227,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 231,-28 231,4 -4,4"/>
 <!-- type~type_thermal -->
 <g id="type~~type_thermal~~InheritedByGraph_node1" class="node">
 <title>type~type_thermal</title>
 <polygon fill="none" stroke="black" points="83,-24 0,-24 0,0 83,0 83,-24"/>
 <text text-anchor="middle" x="41.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_thermal</text>
 </g>
-<!-- type~type_ftdss -->
+<!-- type~type_ftcms -->
 <g id="type~~type_thermal~~InheritedByGraph_node2" class="node">
-<title>type~type_ftdss</title>
-<g id="a_type~~type_thermal~~InheritedByGraph_node2"><a xlink:href="../type/type_ftdss.html" xlink:title="type_ftdss">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="223,-24 157,-24 157,0 223,0 223,-24"/>
-<text text-anchor="middle" x="190" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss</text>
+<title>type~type_ftcms</title>
+<g id="a_type~~type_thermal~~InheritedByGraph_node2"><a xlink:href="../type/type_ftcms.html" xlink:title="type_ftcms">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="227,-24 157,-24 157,0 227,0 227,-24"/>
+<text text-anchor="middle" x="192" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms</text>
 </a>
 </g>
 </g>
-<!-- type~type_ftdss&#45;&gt;type~type_thermal -->
+<!-- type~type_ftcms&#45;&gt;type~type_thermal -->
 <g id="type~~type_thermal~~InheritedByGraph_edge1" class="edge">
-<title>type~type_ftdss&#45;&gt;type~type_thermal</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M156.85,-12C138.25,-12 114.42,-12 93.33,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="93.23,-8.5 83.23,-12 93.23,-15.5 93.23,-8.5"/>
+<title>type~type_ftcms&#45;&gt;type~type_thermal</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M156.93,-12C138.02,-12 114.13,-12 93.08,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="93,-8.5 83,-12 93,-15.5 93,-8.5"/>
 <text text-anchor="middle" x="120" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">thermal</text>
 </g>
 </g>
@@ -1020,7 +1026,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-computation_dimension~4"></span>
+              <span class="anchor" id="variable-computation_dimension~2"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -1037,7 +1043,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-computation_type~8"></span>
+              <span class="anchor" id="variable-computation_type"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -1054,8 +1060,76 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-physics~4"></span>
-              type(<a href='type_physics_manager.html'>type_physics_manager</a>),
+              <span class="anchor" id="variable-enthalpy_cache"></span>
+              real(kind=real64),
+            </td>
+              <td>private,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>enthalpy_cache</strong>(:,:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-enthalpy_cache_num_hist"></span>
+              integer(kind=int32),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>enthalpy_cache_num_hist</strong></td>
+<td> =</td>
+                <td>0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-enthalpy_cache_num_nodes"></span>
+              integer(kind=int32),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>enthalpy_cache_num_nodes</strong></td>
+<td> =</td>
+                <td>0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-enthalpy_cache_valid"></span>
+              logical,
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>enthalpy_cache_valid</strong></td>
+<td> =</td>
+                <td>.false.</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-physics"></span>
+              type(<a href='type_constitutive_manager.html'>type_constitutive_manager</a>),
             </td>
               <td>private</td>
             <td>
@@ -1082,10 +1156,10 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-assemble_local~2"></span>
+      <span class="anchor" id="boundprocedure-assemble_local"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>assemble_local</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/assemble_local_thermal.html'>assemble_local_thermal</a>
+  <strong>assemble_local</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/assemble_local_thermal.html'>assemble_local_thermal</a>
         
       </h3>
     </div>
@@ -1093,7 +1167,7 @@ large graphs.</div>
           <li class="list-group-item">
                 <h3>interface </h3>
                     <h3>
-    private module subroutine assemble_local_thermal(self, controls, workspace, K_TT, K_TH, F_T)  
+    private module subroutine assemble_local_thermal(self, control, workspace, K_TT, K_TH, F_T)  
     <a href="../proc/assemble_local_thermal.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
@@ -1128,14 +1202,14 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              type(<a href='type_controls.html'>type_controls</a>),
+              type(<a href='type_control.html'>type_control</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>controls</strong></td>
+            <td><strong>control</strong></td>
             <td>
                 
             </td>
@@ -1215,7 +1289,7 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-assemble_local_newton"></span>
       <h3>
           procedure, private, pass(self) ::
-  <strong>assemble_local_newton</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/assemble_local_newton_thermal.html'>assemble_local_newton_thermal</a>
+  <strong>assemble_local_newton</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/assemble_local_newton_thermal.html'>assemble_local_newton_thermal</a>
         
       </h3>
     </div>
@@ -1223,7 +1297,7 @@ large graphs.</div>
           <li class="list-group-item">
                 <h3>interface </h3>
                     <h3>
-    private module subroutine assemble_local_newton_thermal(self, controls, workspace, K_TT, K_TH, F_T)  
+    private module subroutine assemble_local_newton_thermal(self, control, workspace, K_TT, K_TH, F_T)  
     <a href="../proc/assemble_local_newton_thermal.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
@@ -1258,14 +1332,14 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              type(<a href='type_controls.html'>type_controls</a>),
+              type(<a href='type_control.html'>type_control</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>controls</strong></td>
+            <td><strong>control</strong></td>
             <td>
                 
             </td>
@@ -1345,7 +1419,7 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-assemble_local_picard"></span>
       <h3>
           procedure, private, pass(self) ::
-  <strong>assemble_local_picard</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/assemble_local_picard_thermal.html'>assemble_local_picard_thermal</a>
+  <strong>assemble_local_picard</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/assemble_local_picard_thermal.html'>assemble_local_picard_thermal</a>
         
       </h3>
     </div>
@@ -1353,7 +1427,7 @@ large graphs.</div>
           <li class="list-group-item">
                 <h3>interface </h3>
                     <h3>
-    private module subroutine assemble_local_picard_thermal(self, controls, workspace, K_TT, K_TH, F_T)  
+    private module subroutine assemble_local_picard_thermal(self, control, workspace, K_TT, K_TH, F_T)  
     <a href="../proc/assemble_local_picard_thermal.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
@@ -1388,14 +1462,14 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              type(<a href='type_controls.html'>type_controls</a>),
+              type(<a href='type_control.html'>type_control</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>controls</strong></td>
+            <td><strong>control</strong></td>
             <td>
                 
             </td>
@@ -1472,10 +1546,155 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-calc_density_ice"></span>
+      <span class="anchor" id="boundprocedure-cache_enthalpy_history"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>calc_density_ice</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/calc_density_ice_thermal.html'>calc_density_ice_thermal</a>
+  <strong>cache_enthalpy_history</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/cache_enthalpy_history_thermal.html'>cache_enthalpy_history_thermal</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine cache_enthalpy_history_thermal(self, num_nodes, num_hist, material_ids, temperature_all, pressure_all, porosity_all)  
+    <a href="../proc/cache_enthalpy_history_thermal.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_thermal.html'>type_thermal</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_nodes</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_hist</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>material_ids</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>temperature_all</strong>(:,:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>pressure_all</strong>(:,:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>porosity_all</strong>(:,:)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_density_ice~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_density_ice</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/calc_density_ice_thermal.html'>calc_density_ice_thermal</a>
         
       </h3>
     </div>
@@ -1557,10 +1776,10 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-calc_density_vapor_saturation"></span>
+      <span class="anchor" id="boundprocedure-calc_density_vapor_saturation~2"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>calc_density_vapor_saturation</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/calc_density_vapor_saturation_thermal.html'>calc_density_vapor_saturation_thermal</a>
+  <strong>calc_density_vapor_saturation</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/calc_density_vapor_saturation_thermal.html'>calc_density_vapor_saturation_thermal</a>
         
       </h3>
     </div>
@@ -1642,10 +1861,10 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-calc_density_water"></span>
+      <span class="anchor" id="boundprocedure-calc_density_water~2"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>calc_density_water</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/calc_density_water_thermal.html'>calc_density_water_thermal</a>
+  <strong>calc_density_water</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/calc_density_water_thermal.html'>calc_density_water_thermal</a>
         
       </h3>
     </div>
@@ -1730,7 +1949,7 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-calc_enthalpy_density"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>calc_enthalpy_density</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/calc_enthalpy_density_thermal.html'>calc_enthalpy_density_thermal</a>
+  <strong>calc_enthalpy_density</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/calc_enthalpy_density_thermal.html'>calc_enthalpy_density_thermal</a>
         
       </h3>
     </div>
@@ -1830,7 +2049,7 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-compute_advective_term"></span>
       <h3>
           procedure, private, pass(self) ::
-  <strong>compute_advective_term</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/compute_advective_term_thermal.html'>compute_advective_term_thermal</a>
+  <strong>compute_advective_term</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/compute_advective_term_thermal.html'>compute_advective_term_thermal</a>
         
       </h3>
     </div>
@@ -1930,7 +2149,7 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-compute_diffusion_term"></span>
       <h3>
           procedure, private, pass(self) ::
-  <strong>compute_diffusion_term</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/compute_diffusion_term_thermal.html'>compute_diffusion_term_thermal</a>
+  <strong>compute_diffusion_term</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/compute_diffusion_term_thermal.html'>compute_diffusion_term_thermal</a>
         
       </h3>
     </div>
@@ -2030,7 +2249,7 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-compute_history_term"></span>
       <h3>
           procedure, private, pass(self) ::
-  <strong>compute_history_term</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/compute_history_term_thermal.html'>compute_history_term_thermal</a>
+  <strong>compute_history_term</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/compute_history_term_thermal.html'>compute_history_term_thermal</a>
         
       </h3>
     </div>
@@ -2145,7 +2364,7 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-compute_latent_term"></span>
       <h3>
           procedure, private, pass(self) ::
-  <strong>compute_latent_term</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/compute_latent_term_thermal.html'>compute_latent_term_thermal</a>
+  <strong>compute_latent_term</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/compute_latent_term_thermal.html'>compute_latent_term_thermal</a>
         
       </h3>
     </div>
@@ -2245,7 +2464,7 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-compute_mass_term"></span>
       <h3>
           procedure, private, pass(self) ::
-  <strong>compute_mass_term</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/compute_mass_term_thermal.html'>compute_mass_term_thermal</a>
+  <strong>compute_mass_term</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/compute_mass_term_thermal.html'>compute_mass_term_thermal</a>
         
       </h3>
     </div>
@@ -2360,7 +2579,7 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-compute_transient_term"></span>
       <h3>
           procedure, private, pass(self) ::
-  <strong>compute_transient_term</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/compute_transient_term_thermal.html'>compute_transient_term_thermal</a>
+  <strong>compute_transient_term</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/compute_transient_term_thermal.html'>compute_transient_term_thermal</a>
         
       </h3>
     </div>
@@ -2472,10 +2691,10 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-destroy~17"></span>
+      <span class="anchor" id="boundprocedure-destroy~4"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>destroy</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/destroy_type_thermal.html'>destroy_type_thermal</a>
+  <strong>destroy</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/destroy_type_thermal.html'>destroy_type_thermal</a>
         
       </h3>
     </div>
@@ -2527,10 +2746,10 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~41"></span>
+      <span class="anchor" id="boundprocedure-initialize~6"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>initialize</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/initialize_type_thermal.html'>initialize_type_thermal</a>
+  <strong>initialize</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/initialize_type_thermal.html'>initialize_type_thermal</a>
         
       </h3>
     </div>
@@ -2612,10 +2831,65 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-update_water_phases~3"></span>
+      <span class="anchor" id="boundprocedure-invalidate_enthalpy_cache"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>update_water_phases</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/update_water_phases_thermal.html'>update_water_phases_thermal</a>
+  <strong>invalidate_enthalpy_cache</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/invalidate_enthalpy_cache_thermal.html'>invalidate_enthalpy_cache_thermal</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine invalidate_enthalpy_cache_thermal(self)  
+    <a href="../proc/invalidate_enthalpy_cache_thermal.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_thermal.html'>type_thermal</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-update_water_phases~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>update_water_phases</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/update_water_phases_thermal.html'>update_water_phases_thermal</a>
         
       </h3>
     </div>
@@ -2702,7 +2976,15 @@ large graphs.</div>
 <span class="w">        </span><span class="k">private</span>
 <span class="k">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">computation_type</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">computation_dimension</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_physics_manager</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">physics</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_constitutive_manager</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">physics</span>
+
+<span class="w">        </span><span class="c">! Enthalpy cache for BDF history terms</span>
+<span class="w">        </span><span class="c">! Stores U(T_{n-k}) at each node for each history level (k &gt;= 1)</span>
+<span class="w">        </span><span class="c">! Avoids recomputing phase-change in compute_transient_term</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">enthalpy_cache</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">enthalpy_cache_valid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">enthalpy_cache_num_nodes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">enthalpy_cache_num_hist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
 <span class="w">    </span><span class="k">contains</span>
 <span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">initialize_type_thermal</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">destroy</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">destroy_type_thermal</span>
@@ -2723,6 +3005,8 @@ large graphs.</div>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc_density_ice</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">calc_density_ice_thermal</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc_density_vapor_saturation</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">calc_density_vapor_saturation_thermal</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">update_water_phases</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">update_water_phases_thermal</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">cache_enthalpy_history</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">cache_enthalpy_history_thermal</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">invalidate_enthalpy_cache</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">invalidate_enthalpy_cache_thermal</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_thermal</span>
 </pre></div>
 
@@ -2738,7 +3022,7 @@ large graphs.</div>
         <div class="row justify-content-between">
           <div class="col">
             <p>
-              FTDSS
+              FTCMS
  was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
@@ -2746,7 +3030,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-23 23:52 +0000             </p>
+ on 2026-03-11 14:03 +0000             </p>
           </div>
         </div>
         <br>

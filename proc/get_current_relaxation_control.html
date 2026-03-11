@@ -1,0 +1,598 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>get_current_relaxation_control &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>get_current_relaxation_control
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">7 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/control_manager.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/control_manager.f90.html'>control_manager.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/control_control_manager.html'>control_control_manager</a></li>
+            <li class="breadcrumb-item active" aria-current="page">get_current_relaxation_control</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/get_current_relaxation_control.html#src">get_current_relaxation_control</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine get_current_relaxation_control(self, physics_type, relaxation)  
+</h2>
+    
+
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_control.html'>type_control</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~530"></span>
+              class(<a href='../type/type_control.html'>type_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-physics_type~19"></span>
+              type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-relaxation"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>relaxation</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~get_current_relaxation_control~~CallsGraph Pages: 1 -->
+<svg id="procget_current_relaxation_controlCallsGraph" width="425pt" height="32pt"
+ viewBox="0.00 0.00 425.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_current_relaxation_control~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~get_current_relaxation_control~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 421,-28 421,4 -4,4"/>
+<!-- proc~get_current_relaxation_control -->
+<g id="proc~~get_current_relaxation_control~~CallsGraph_node1" class="node">
+<title>proc~get_current_relaxation_control</title>
+<polygon fill="none" stroke="black" points="249,-24 0,-24 0,0 249,0 249,-24"/>
+<text text-anchor="middle" x="124.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_control%get_current_relaxation_control</text>
+</g>
+<!-- get_current_relaxation -->
+<g id="proc~~get_current_relaxation_control~~CallsGraph_node2" class="node">
+<title>get_current_relaxation</title>
+<polygon fill="#777777" stroke="#777777" points="417,-24 285,-24 285,0 417,0 417,-24"/>
+<text text-anchor="middle" x="351" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_current_relaxation</text>
+</g>
+<!-- proc~get_current_relaxation_control&#45;&gt;get_current_relaxation -->
+<g id="proc~~get_current_relaxation_control~~CallsGraph_edge1" class="edge">
+<title>proc~get_current_relaxation_control&#45;&gt;get_current_relaxation</title>
+<path fill="none" stroke="#ff0000" d="M249.24,-12C257.99,-12 266.64,-12 274.98,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="274.98,-15.5 284.98,-12 274.98,-8.5 274.98,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~get_current_relaxation_control~~CalledByGraph Pages: 1 -->
+<svg id="procget_current_relaxation_controlCalledByGraph" width="641pt" height="15pt"
+ viewBox="0.00 0.00 641.00 15.32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_current_relaxation_control~~CalledByGraph" class="graph" transform="scale(0.48 0.48) rotate(0) translate(4 28)">
+<title>proc~~get_current_relaxation_control~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 1335,-28 1335,4 -4,4"/>
+<!-- proc~get_current_relaxation_control -->
+<g id="proc~~get_current_relaxation_control~~CalledByGraph_node1" class="node">
+<title>proc~get_current_relaxation_control</title>
+<polygon fill="none" stroke="black" points="1331,-24 1082,-24 1082,0 1331,0 1331,-24"/>
+<text text-anchor="middle" x="1206.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_control%get_current_relaxation_control</text>
+</g>
+<!-- proc~reflect_variables_ftcms -->
+<g id="proc~~get_current_relaxation_control~~CalledByGraph_node2" class="node">
+<title>proc~reflect_variables_ftcms</title>
+<g id="a_proc~~get_current_relaxation_control~~CalledByGraph_node2"><a xlink:href="../proc/reflect_variables_ftcms.html" xlink:title="reflect_variables_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1046,-24 911,-24 911,0 1046,0 1046,-24"/>
+<text text-anchor="middle" x="978.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">reflect_variables_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftcms&#45;&gt;proc~get_current_relaxation_control -->
+<g id="proc~~get_current_relaxation_control~~CalledByGraph_edge1" class="edge">
+<title>proc~reflect_variables_ftcms&#45;&gt;proc~get_current_relaxation_control</title>
+<path fill="none" stroke="#ff0000" d="M1046.09,-12C1054.23,-12 1062.76,-12 1071.46,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1071.74,-15.5 1081.74,-12 1071.74,-8.5 1071.74,-15.5"/>
+</g>
+<!-- interface~reflect_variables_ftcms -->
+<g id="proc~~get_current_relaxation_control~~CalledByGraph_node3" class="node">
+<title>interface~reflect_variables_ftcms</title>
+<g id="a_proc~~get_current_relaxation_control~~CalledByGraph_node3"><a xlink:href="../interface/reflect_variables_ftcms.html" xlink:title="type_ftcms%reflect_variables_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="875,-24 673,-24 673,0 875,0 875,-24"/>
+<text text-anchor="middle" x="774" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%reflect_variables_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~reflect_variables_ftcms&#45;&gt;proc~reflect_variables_ftcms -->
+<g id="proc~~get_current_relaxation_control~~CalledByGraph_edge2" class="edge">
+<title>interface~reflect_variables_ftcms&#45;&gt;proc~reflect_variables_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M875.06,-12C883.71,-12 892.36,-12 900.77,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="900.9,-15.5 910.9,-12 900.9,-8.5 900.9,-15.5"/>
+</g>
+<!-- proc~solve_time_step_ftcms -->
+<g id="proc~~get_current_relaxation_control~~CalledByGraph_node4" class="node">
+<title>proc~solve_time_step_ftcms</title>
+<g id="a_proc~~get_current_relaxation_control~~CalledByGraph_node4"><a xlink:href="../proc/solve_time_step_ftcms.html" xlink:title="solve_time_step_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="637,-24 505,-24 505,0 637,0 637,-24"/>
+<text text-anchor="middle" x="571" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftcms&#45;&gt;interface~reflect_variables_ftcms -->
+<g id="proc~~get_current_relaxation_control~~CalledByGraph_edge3" class="edge">
+<title>proc~solve_time_step_ftcms&#45;&gt;interface~reflect_variables_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M637.26,-12C645.42,-12 653.93,-12 662.54,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="662.67,-15.5 672.67,-12 662.67,-8.5 662.67,-15.5"/>
+</g>
+<!-- interface~solve_time_step_ftcms -->
+<g id="proc~~get_current_relaxation_control~~CalledByGraph_node5" class="node">
+<title>interface~solve_time_step_ftcms</title>
+<g id="a_proc~~get_current_relaxation_control~~CalledByGraph_node5"><a xlink:href="../interface/solve_time_step_ftcms.html" xlink:title="type_ftcms%solve_time_step_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="469,-24 270,-24 270,0 469,0 469,-24"/>
+<text text-anchor="middle" x="369.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms -->
+<g id="proc~~get_current_relaxation_control~~CalledByGraph_edge4" class="edge">
+<title>interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M469.08,-12C477.74,-12 486.4,-12 494.82,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="494.94,-15.5 504.94,-12 494.94,-8.5 494.94,-15.5"/>
+</g>
+<!-- proc~run_ftcms -->
+<g id="proc~~get_current_relaxation_control~~CalledByGraph_node6" class="node">
+<title>proc~run_ftcms</title>
+<g id="a_proc~~get_current_relaxation_control~~CalledByGraph_node6"><a xlink:href="../proc/run_ftcms.html" xlink:title="run_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 169,-24 169,0 234,0 234,-24"/>
+<text text-anchor="middle" x="201.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms -->
+<g id="proc~~get_current_relaxation_control~~CalledByGraph_edge5" class="edge">
+<title>proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M234.11,-12C241.85,-12 250.57,-12 259.76,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="259.88,-15.5 269.88,-12 259.88,-8.5 259.88,-15.5"/>
+</g>
+<!-- interface~run_ftcms -->
+<g id="proc~~get_current_relaxation_control~~CalledByGraph_node7" class="node">
+<title>interface~run_ftcms</title>
+<g id="a_proc~~get_current_relaxation_control~~CalledByGraph_node7"><a xlink:href="../interface/run_ftcms.html" xlink:title="type_ftcms%run_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="133,-24 0,-24 0,0 133,0 133,-24"/>
+<text text-anchor="middle" x="66.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftcms&#45;&gt;proc~run_ftcms -->
+<g id="proc~~get_current_relaxation_control~~CalledByGraph_edge6" class="edge">
+<title>interface~run_ftcms&#45;&gt;proc~run_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M133.22,-12C141.87,-12 150.53,-12 158.63,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="158.89,-15.5 168.89,-12 158.89,-8.5 158.89,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocget_current_relaxation_controlCalledByGraph = svgPanZoom('#procget_current_relaxation_controlCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">get_current_relaxation_control</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">physics_type</span><span class="p">,</span><span class="w"> </span><span class="n">relaxation</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_control</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_constant_id</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">physics_type</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">relaxation</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">acceleration</span><span class="p">%</span><span class="n">get_current_relaxation</span><span class="p">(</span><span class="n">physics_type</span><span class="p">,</span><span class="w"> </span><span class="n">relaxation</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">get_current_relaxation_control</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-03-11 14:03 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

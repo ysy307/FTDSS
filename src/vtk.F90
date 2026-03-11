@@ -1,6 +1,6 @@
 !> Provides high-level structures and procedures for reading VTK and VTU files.
 !> This module acts as a Fortran interface to a C++ backend that handles the low-level file I/O.
-module core_vtk
+module core_interop_vtk
     use, intrinsic :: iso_fortran_env
     use, intrinsic :: iso_c_binding
     use :: mpi_f08
@@ -11,9 +11,9 @@ module core_vtk
     use :: core_allocate, only:allocate_array
     use :: core_deallocate, only:deallocate_array
     use :: core_unique, only:unique
-    use :: core_vtk_vtk_constants
-    use :: core_vtk_vtk_wrapper
-    use :: core_vtk_vtu_wrapper
+    use :: core_interop_vtk_constants
+    use :: core_interop_vtk_wrapper
+    use :: core_interop_vtu_wrapper
 
     implicit none
     private
@@ -203,7 +203,7 @@ contains
 
         if (c_associated(self%handle)) then
 
-            select case (trim(adjustl(self%reader_type)))
+            select case (strip(self%reader_type))
             case ("vtk")
                 call vtk_finalize(self%handle)
             case ("vtu")
@@ -217,4 +217,4 @@ contains
         end if
     end subroutine finalize_vtk_object
 
-end module core_vtk
+end module core_interop_vtk

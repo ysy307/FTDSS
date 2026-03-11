@@ -1,6 +1,6 @@
 module module_solver
-    use :: solver_solve
-    use :: solver_preconditioner
+    use :: numerical_solver_interface
+    use :: numerical_solver_preconditioner
     implicit none
     private
 

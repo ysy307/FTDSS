@@ -1,0 +1,702 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>write_observation_header &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>write_observation_header
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">49 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/observation_base.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/observation_base.f90.html'>observation_base.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/output_observation_base.html'>output_observation_base</a></li>
+            <li class="breadcrumb-item active" aria-current="page">write_observation_header</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/write_observation_header.html#src">write_observation_header</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine write_observation_header(self, output_variable_type, output_time_unit_name)  
+    <a href="../interface/write_observation_header.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~155"></span>
+              class(<a href='../type/type_output_observation.html'>type_output_observation</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-output_variable_type"></span>
+              type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>output_variable_type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-output_time_unit_name"></span>
+              character(len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>output_time_unit_name</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~write_observation_header~~CallsGraph Pages: 1 -->
+<svg id="procwrite_observation_headerCallsGraph" width="560pt" height="145pt"
+ viewBox="0.00 0.00 560.00 145.09" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~write_observation_header~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 141.09)">
+<title>proc~~write_observation_header~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-141.09 556,-141.09 556,4 -4,4"/>
+<!-- proc~write_observation_header -->
+<g id="proc~~write_observation_header~~CallsGraph_node1" class="node">
+<title>proc~write_observation_header</title>
+<polygon fill="none" stroke="black" points="151,-75.09 0,-75.09 0,-51.09 151,-51.09 151,-75.09"/>
+<text text-anchor="middle" x="75.5" y="-60.69" font-family="Helvetica,sans-Serif" font-size="10.50">write_observation_header</text>
+</g>
+<!-- proc~check_unit_writable -->
+<g id="proc~~write_observation_header~~CallsGraph_node2" class="node">
+<title>proc~check_unit_writable</title>
+<g id="a_proc~~write_observation_header~~CallsGraph_node2"><a xlink:href="../proc/check_unit_writable.html" xlink:title="check_unit_writable">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="305,-137.09 187,-137.09 187,-113.09 305,-113.09 305,-137.09"/>
+<text text-anchor="middle" x="246" y="-122.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">check_unit_writable</text>
+</a>
+</g>
+</g>
+<!-- proc~write_observation_header&#45;&gt;proc~check_unit_writable -->
+<g id="proc~~write_observation_header~~CallsGraph_edge1" class="edge">
+<title>proc~write_observation_header&#45;&gt;proc~check_unit_writable</title>
+<path fill="none" stroke="#ff0000" d="M108.87,-75.18C130.88,-83.38 160.68,-94.45 187,-104.09 191.84,-105.87 196.91,-107.72 201.96,-109.55"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="200.96,-112.91 211.55,-113.03 203.35,-106.33 200.96,-112.91"/>
+</g>
+<!-- proc~raise_error -->
+<g id="proc~~write_observation_header~~CallsGraph_node3" class="node">
+<title>proc~raise_error</title>
+<g id="a_proc~~write_observation_header~~CallsGraph_node3"><a xlink:href="../proc/raise_error.html" xlink:title="raise_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="281,-95.09 211,-95.09 211,-71.09 281,-71.09 281,-95.09"/>
+<text text-anchor="middle" x="246" y="-80.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">raise_error</text>
+</a>
+</g>
+</g>
+<!-- proc~write_observation_header&#45;&gt;proc~raise_error -->
+<g id="proc~~write_observation_header~~CallsGraph_edge2" class="edge">
+<title>proc~write_observation_header&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff0000" d="M151.39,-71.98C168.24,-73.98 185.6,-76.04 200.72,-77.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="200.46,-81.33 210.8,-79.03 201.29,-74.38 200.46,-81.33"/>
+</g>
+<!-- strip -->
+<g id="proc~~write_observation_header~~CallsGraph_node4" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="552,-97.09 498,-97.09 498,-73.09 552,-73.09 552,-97.09"/>
+<text text-anchor="middle" x="525" y="-82.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~write_observation_header&#45;&gt;strip -->
+<g id="proc~~write_observation_header~~CallsGraph_edge3" class="edge">
+<title>proc~write_observation_header&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M104.96,-50.99C170.74,-24.91 337.22,30.18 462,-22.09 482.59,-30.72 499.8,-49.88 510.82,-64.82"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="507.96,-66.84 516.57,-73.02 513.69,-62.82 507.96,-66.84"/>
+</g>
+<!-- to_string -->
+<g id="proc~~write_observation_header~~CallsGraph_node5" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="430.5,-55.09 372.5,-55.09 372.5,-31.09 430.5,-31.09 430.5,-55.09"/>
+<text text-anchor="middle" x="401.5" y="-40.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~write_observation_header&#45;&gt;to_string -->
+<g id="proc~~write_observation_header~~CallsGraph_edge4" class="edge">
+<title>proc~write_observation_header&#45;&gt;to_string</title>
+<path fill="none" stroke="#ff0000" d="M151.24,-58.48C217.15,-54.41 310.54,-48.65 362.27,-45.45"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="362.58,-48.94 372.35,-44.83 362.15,-41.95 362.58,-48.94"/>
+</g>
+<!-- proc~raise_error&#45;&gt;strip -->
+<g id="proc~~write_observation_header~~CallsGraph_edge6" class="edge">
+<title>proc~raise_error&#45;&gt;strip</title>
+<path fill="none" stroke="#7fff00" d="M281.01,-93.51C298.71,-98.39 320.82,-103.66 341,-106.09 394.39,-112.53 408.94,-114.84 462,-106.09 470.7,-104.66 479.83,-102.16 488.32,-99.38"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="489.64,-102.63 497.94,-96.03 487.34,-96.02 489.64,-102.63"/>
+</g>
+<!-- proc~raise_error&#45;&gt;to_string -->
+<g id="proc~~write_observation_header~~CallsGraph_edge7" class="edge">
+<title>proc~raise_error&#45;&gt;to_string</title>
+<path fill="none" stroke="#7fff00" d="M281.07,-74.22C305.13,-67.94 337.41,-59.53 362.34,-53.04"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="363.39,-56.38 372.18,-50.47 361.62,-49.61 363.39,-56.38"/>
+</g>
+<!-- proc~replace_placeholder -->
+<g id="proc~~write_observation_header~~CallsGraph_node6" class="node">
+<title>proc~replace_placeholder</title>
+<g id="a_proc~~write_observation_header~~CallsGraph_node6"><a xlink:href="../proc/replace_placeholder.html" xlink:title="replace_placeholder">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="462,-97.09 341,-97.09 341,-73.09 462,-73.09 462,-97.09"/>
+<text text-anchor="middle" x="401.5" y="-82.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">replace_placeholder</text>
+</a>
+</g>
+</g>
+<!-- proc~raise_error&#45;&gt;proc~replace_placeholder -->
+<g id="proc~~write_observation_header~~CallsGraph_edge5" class="edge">
+<title>proc~raise_error&#45;&gt;proc~replace_placeholder</title>
+<path fill="none" stroke="#7fff00" d="M281.07,-83.54C295.76,-83.73 313.51,-83.96 330.79,-84.18"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="330.83,-87.69 340.87,-84.32 330.92,-80.69 330.83,-87.69"/>
+</g>
+<!-- proc~replace_placeholder&#45;&gt;strip -->
+<g id="proc~~write_observation_header~~CallsGraph_edge8" class="edge">
+<title>proc~replace_placeholder&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M462.18,-85.09C470.86,-85.09 479.57,-85.09 487.6,-85.09"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="487.7,-88.59 497.7,-85.09 487.7,-81.59 487.7,-88.59"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~write_observation_header~~CalledByGraph Pages: 1 -->
+<svg id="procwrite_observation_headerCalledByGraph" width="641pt" height="14pt"
+ viewBox="0.00 0.00 641.00 14.36" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~write_observation_header~~CalledByGraph" class="graph" transform="scale(0.45 0.45) rotate(0) translate(4 28)">
+<title>proc~~write_observation_header~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 1424,-28 1424,4 -4,4"/>
+<!-- proc~write_observation_header -->
+<g id="proc~~write_observation_header~~CalledByGraph_node1" class="node">
+<title>proc~write_observation_header</title>
+<polygon fill="none" stroke="black" points="1420,-24 1269,-24 1269,0 1420,0 1420,-24"/>
+<text text-anchor="middle" x="1344.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">write_observation_header</text>
+</g>
+<!-- interface~write_observation_header -->
+<g id="proc~~write_observation_header~~CalledByGraph_node2" class="node">
+<title>interface~write_observation_header</title>
+<g id="a_proc~~write_observation_header~~CalledByGraph_node2"><a xlink:href="../interface/write_observation_header.html" xlink:title="type_output_observation%write_observation_header">
+<polygon fill="#a7506f" stroke="#a7506f" points="1233,-24 941,-24 941,0 1233,0 1233,-24"/>
+<text text-anchor="middle" x="1087" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output_observation%write_observation_header</text>
+</a>
+</g>
+</g>
+<!-- interface~write_observation_header&#45;&gt;proc~write_observation_header -->
+<g id="proc~~write_observation_header~~CalledByGraph_edge1" class="edge">
+<title>interface~write_observation_header&#45;&gt;proc~write_observation_header</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1233.29,-12C1241.9,-12 1250.4,-12 1258.64,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1258.91,-15.5 1268.91,-12 1258.91,-8.5 1258.91,-15.5"/>
+</g>
+<!-- proc~initialize_type_output_observation -->
+<g id="proc~~write_observation_header~~CalledByGraph_node3" class="node">
+<title>proc~initialize_type_output_observation</title>
+<g id="a_proc~~write_observation_header~~CalledByGraph_node3"><a xlink:href="../proc/initialize_type_output_observation.html" xlink:title="initialize_type_output_observation">
+<polygon fill="#d9534f" stroke="#d9534f" points="905,-24 712,-24 712,0 905,0 905,-24"/>
+<text text-anchor="middle" x="808.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_type_output_observation</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_output_observation&#45;&gt;interface~write_observation_header -->
+<g id="proc~~write_observation_header~~CalledByGraph_edge2" class="edge">
+<title>proc~initialize_type_output_observation&#45;&gt;interface~write_observation_header</title>
+<path fill="none" stroke="#ff0000" d="M905.04,-12C913.35,-12 921.88,-12 930.5,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="930.65,-15.5 940.65,-12 930.65,-8.5 930.65,-15.5"/>
+</g>
+<!-- interface~initialize_type_output_observation -->
+<g id="proc~~write_observation_header~~CalledByGraph_node4" class="node">
+<title>interface~initialize_type_output_observation</title>
+<g id="a_proc~~write_observation_header~~CalledByGraph_node4"><a xlink:href="../interface/initialize_type_output_observation.html" xlink:title="type_output_observation%initialize_type_output_observation">
+<polygon fill="#a7506f" stroke="#a7506f" points="676,-24 342,-24 342,0 676,0 676,-24"/>
+<text text-anchor="middle" x="509" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output_observation%initialize_type_output_observation</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_output_observation&#45;&gt;proc~initialize_type_output_observation -->
+<g id="proc~~write_observation_header~~CalledByGraph_edge3" class="edge">
+<title>interface~initialize_type_output_observation&#45;&gt;proc~initialize_type_output_observation</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M676.15,-12C684.76,-12 693.29,-12 701.62,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="701.69,-15.5 711.69,-12 701.69,-8.5 701.69,-15.5"/>
+</g>
+<!-- proc~initialize_type_output_manager -->
+<g id="proc~~write_observation_header~~CalledByGraph_node5" class="node">
+<title>proc~initialize_type_output_manager</title>
+<g id="a_proc~~write_observation_header~~CalledByGraph_node5"><a xlink:href="../proc/initialize_type_output_manager.html" xlink:title="type_output_manager%initialize_type_output_manager">
+<polygon fill="#d9534f" stroke="#d9534f" points="306,-24 0,-24 0,0 306,0 306,-24"/>
+<text text-anchor="middle" x="153" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output_manager%initialize_type_output_manager</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_output_manager&#45;&gt;interface~initialize_type_output_observation -->
+<g id="proc~~write_observation_header~~CalledByGraph_edge4" class="edge">
+<title>proc~initialize_type_output_manager&#45;&gt;interface~initialize_type_output_observation</title>
+<path fill="none" stroke="#ff0000" d="M306.18,-12C314.67,-12 323.23,-12 331.79,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="331.84,-15.5 341.84,-12 331.83,-8.5 331.84,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocwrite_observation_headerCalledByGraph = svgPanZoom('#procwrite_observation_headerCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">write_observation_header</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">output_variable_type</span><span class="p">,</span><span class="w"> </span><span class="n">output_time_unit_name</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_output_observation</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_constant_id</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">output_variable_type</span>
+<span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="o">*</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">output_time_unit_name</span>
+
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span>
+<span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="mi">4096</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">header_line</span>
+
+<span class="w">        </span><span class="k">associate</span><span class="w"> </span><span class="p">(</span><span class="n">output_settings</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">output_variable_type</span><span class="p">%</span><span class="n">ID</span><span class="p">))</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">output_settings</span><span class="p">%</span><span class="n">do_output</span><span class="p">)</span><span class="w"> </span><span class="k">return</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">check_unit_writable</span><span class="p">(</span><span class="n">output_settings</span><span class="p">%</span><span class="n">io_unit</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                call </span><span class="n">raise_error</span><span class="p">(</span><span class="n">ERROR_CODES</span><span class="p">%</span><span class="n">WRITE_FILE_FAILED</span><span class="p">,</span><span class="w"> </span><span class="n">output_settings</span><span class="p">%</span><span class="n">file_name</span><span class="p">)</span>
+<span class="w">            </span><span class="k">end if</span>
+
+<span class="k">            write</span><span class="w"> </span><span class="p">(</span><span class="n">output_settings</span><span class="p">%</span><span class="n">io_unit</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;# &quot;</span><span class="o">//</span><span class="n">strip</span><span class="p">(</span><span class="n">output_settings</span><span class="p">%</span><span class="n">variable_type</span><span class="p">%</span><span class="n">NAME</span><span class="p">)</span><span class="o">//</span><span class="s2">&quot; time variation&quot;</span>
+<span class="w">            </span><span class="k">write</span><span class="w"> </span><span class="p">(</span><span class="n">output_settings</span><span class="p">%</span><span class="n">io_unit</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;#&quot;</span>
+
+<span class="w">            </span><span class="c">! --- Output observation point info (using polymorphism) ---</span>
+<span class="w">            </span><span class="k">select case</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">observation_type</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">OUTPUT_OBSERVATION_TYPES</span><span class="p">%</span><span class="n">NODE_IDS</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
+<span class="w">                </span><span class="k">write</span><span class="w"> </span><span class="p">(</span><span class="n">output_settings</span><span class="p">%</span><span class="n">io_unit</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;# Observation Node ID&quot;</span>
+<span class="w">                </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_observations</span>
+<span class="w">                    </span><span class="k">select type</span><span class="w"> </span><span class="p">(</span><span class="n">p</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">observation_points</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">point</span><span class="p">)</span>
+<span class="w">                    </span><span class="k">type is</span><span class="w"> </span><span class="p">(</span><span class="n">type_observation_point_node</span><span class="p">)</span>
+<span class="w">                        </span><span class="k">write</span><span class="w"> </span><span class="p">(</span><span class="n">output_settings</span><span class="p">%</span><span class="n">io_unit</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(a,i0,a,1x,i0)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;# Node ID &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;:&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">%</span><span class="n">node_id</span>
+<span class="w">                    </span><span class="k">end select</span>
+<span class="k">                end do</span>
+
+<span class="k">            case</span><span class="w"> </span><span class="p">(</span><span class="n">OUTPUT_OBSERVATION_TYPES</span><span class="p">%</span><span class="n">COORDINATES</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
+<span class="w">                </span><span class="k">write</span><span class="w"> </span><span class="p">(</span><span class="n">output_settings</span><span class="p">%</span><span class="n">io_unit</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;# Observation Coordinate (x,y,z)&quot;</span>
+<span class="w">                </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_observations</span>
+<span class="w">                    </span><span class="k">select type</span><span class="w"> </span><span class="p">(</span><span class="n">p</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">observation_points</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">point</span><span class="p">)</span>
+<span class="w">                    </span><span class="k">type is</span><span class="w"> </span><span class="p">(</span><span class="n">type_observation_point_coordinate</span><span class="p">)</span>
+<span class="w">                        </span><span class="k">write</span><span class="w"> </span><span class="p">(</span><span class="n">output_settings</span><span class="p">%</span><span class="n">io_unit</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(a,1x,i0,a,3(1x,es18.11,a),a,i0)&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                            </span><span class="s2">&quot;#    Point&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;: (&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                            </span><span class="n">p</span><span class="p">%</span><span class="n">coordinate</span><span class="p">%</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;,&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                            </span><span class="n">p</span><span class="p">%</span><span class="n">coordinate</span><span class="p">%</span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;,&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                            </span><span class="n">p</span><span class="p">%</span><span class="n">coordinate</span><span class="p">%</span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;)&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                            </span><span class="s2">&quot; =&gt; Element ID: &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">%</span><span class="n">fe_id</span>
+<span class="w">                    </span><span class="k">end select</span>
+<span class="k">                end do</span>
+<span class="k">            end select</span>
+
+<span class="k">            write</span><span class="w"> </span><span class="p">(</span><span class="n">output_settings</span><span class="p">%</span><span class="n">io_unit</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;#&quot;</span>
+<span class="w">            </span><span class="k">write</span><span class="w"> </span><span class="p">(</span><span class="n">output_settings</span><span class="p">%</span><span class="n">io_unit</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;# Output Unit: Time [&quot;</span><span class="o">//</span><span class="n">strip</span><span class="p">(</span><span class="n">output_time_unit_name</span><span class="p">)</span><span class="o">//</span><span class="s2">&quot;], &quot;</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                </span><span class="o">//</span><span class="n">strip</span><span class="p">(</span><span class="n">output_settings</span><span class="p">%</span><span class="n">variable_type</span><span class="p">%</span><span class="n">NAME</span><span class="p">)</span><span class="o">//</span><span class="s2">&quot; [&quot;</span><span class="o">//</span><span class="n">strip</span><span class="p">(</span><span class="n">output_settings</span><span class="p">%</span><span class="n">variable_unit</span><span class="p">)</span><span class="o">//</span><span class="s2">&quot;]&quot;</span>
+<span class="w">            </span><span class="k">write</span><span class="w"> </span><span class="p">(</span><span class="n">output_settings</span><span class="p">%</span><span class="n">io_unit</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;#&quot;</span>
+
+<span class="w">            </span><span class="c">! Build the header line explicitly so the format always matches the item count.</span>
+<span class="w">            </span><span class="n">header_line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Time&quot;</span>
+<span class="w">            </span><span class="k">select case</span><span class="w"> </span><span class="p">(</span><span class="n">output_settings</span><span class="p">%</span><span class="n">variable_type</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">OUTPUT_VARIABLE_TYPES</span><span class="p">%</span><span class="n">WATER_FLUX</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
+<span class="w">                </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_observations</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">3</span>
+<span class="w">                    </span><span class="n">header_line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">trim</span><span class="p">(</span><span class="n">header_line</span><span class="p">)</span><span class="o">//</span><span class="n">output_settings</span><span class="p">%</span><span class="n">delimiter</span><span class="o">//</span><span class="s2">&quot;Obs&quot;</span><span class="o">//</span><span class="n">to_string</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">//</span><span class="s2">&quot;_x&quot;</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                  </span><span class="o">//</span><span class="n">output_settings</span><span class="p">%</span><span class="n">delimiter</span><span class="o">//</span><span class="s2">&quot;Obs&quot;</span><span class="o">//</span><span class="n">to_string</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">//</span><span class="s2">&quot;_y&quot;</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                  </span><span class="o">//</span><span class="n">output_settings</span><span class="p">%</span><span class="n">delimiter</span><span class="o">//</span><span class="s2">&quot;Obs&quot;</span><span class="o">//</span><span class="n">to_string</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">//</span><span class="s2">&quot;_z&quot;</span>
+<span class="w">                </span><span class="k">end do</span>
+<span class="k">            case </span><span class="n">default</span>
+<span class="w">                </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_observations</span>
+<span class="w">                    </span><span class="n">header_line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">trim</span><span class="p">(</span><span class="n">header_line</span><span class="p">)</span><span class="o">//</span><span class="n">output_settings</span><span class="p">%</span><span class="n">delimiter</span><span class="o">//</span><span class="s2">&quot;Obs&quot;</span><span class="o">//</span><span class="n">to_string</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="w">                </span><span class="k">end do</span>
+<span class="k">            end select</span>
+<span class="k">            write</span><span class="w"> </span><span class="p">(</span><span class="n">output_settings</span><span class="p">%</span><span class="n">io_unit</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span><span class="w"> </span><span class="nb">trim</span><span class="p">(</span><span class="n">header_line</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">end associate</span>
+
+<span class="k">    end subroutine </span><span class="n">write_observation_header</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-03-11 14:03 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

@@ -1,4 +1,4 @@
-submodule(core_vtk) core_vtk_vtu_initialize
+submodule(core_interop_vtk) core_vtk_vtu_initialize
     implicit none
 contains
     module subroutine type_vtk_vtu_initialize(self, file_name, global_node_id_key, node_type_key, num_sharing_ranks_key, &
@@ -17,7 +17,7 @@ contains
         character(*), intent(in), optional :: color_key
         character(*), intent(in), optional :: point_field_names(:)
 
-        ! --- ローカル変数 ---
+        ! --- Local variables ---
         character(len=256) :: c_file_name
         character(len=256) :: c_array_name
         integer(c_int) :: ierr
@@ -27,23 +27,17 @@ contains
         integer(int64) :: total_conn_size
         integer(int32) :: connectivity_first, connectivity_last, num_nodes_in_cell
 
-        ! --- 生データ格納用の一時配列 ---
+        ! --- Temporary arrays for raw data storage ---
         integer(int64), allocatable :: raw_connectivity(:)
         integer(int64), allocatable :: raw_offsets(:)
         integer(int32), allocatable :: raw_cell_types(:)
         integer(int32), allocatable :: raw_cell_entity_ids(:)
-        real(real64), allocatable :: raw_point_field_values(:, :)
-        integer(int32), allocatable :: raw_global_node_ids(:)
-        integer(int32), allocatable :: raw_node_types(:)
-        integer(int32), allocatable :: raw_num_sharing_ranks(:)
-        integer(int32), allocatable :: raw_owner_ranks(:, :)
-        integer(int32), allocatable :: raw_communication_partners(:, :)
         integer(int32), allocatable :: raw_ranks(:)
         integer(int32) :: local_max_node_id, global_max_node_id
         integer(int32), allocatable :: raw_colors(:)
 
         !----------------------------------------------------------------!
-        ! 1. C++リーダーの初期化とハンドルの取得
+        ! 1. Initialize C++ reader and obtain handle
         !----------------------------------------------------------------!
         self%reader_type = "vtu"
         if (c_associated(self%handle)) then
@@ -57,13 +51,13 @@ contains
 
         self%handle = vtu_initialize(c_file_name, ierr)
         if (.not. c_associated(self%handle) .or. ierr /= 0) then
-            call global_logger%log_error("C++ VTU Reader failed to initialize for file: "//trim(c_file_name))
+            call global_logger%log_error("C++ VTU Reader failed to initialize for file: "//strip(c_file_name))
             call global_logger%log_error("Error code: "//to_string(ierr))
             stop "VTU Initialization Failed"
         end if
 
         !----------------------------------------------------------------!
-        ! 2. ヘッダー情報の取得
+        ! 2. Read header information
         !----------------------------------------------------------------!
         len_f_dataset = 50
         len_f_format = 50
@@ -74,7 +68,7 @@ contains
         self%dataset = strip(f_dataset)
 
         !----------------------------------------------------------------!
-        ! 3. ポイントデータの取得
+        ! 3. Retrieve point data
         !----------------------------------------------------------------!
         call vtu_get_num_points(self%handle, self%num_points)
         if (self%num_points > 0) then
@@ -82,55 +76,49 @@ contains
             call vtu_get_points(self%handle, self%points%x, self%points%y, self%points%z)
 
             if (present(global_node_id_key)) then
-                call allocate_array(raw_global_node_ids, self%num_points)
+                call allocate_array(self%global_node_ids, self%num_points)
                 c_array_name = strip(global_node_id_key)//c_null_char
-                call vtu_get_point_data_int32(self%handle, c_array_name, raw_global_node_ids)
-                raw_global_node_ids = raw_global_node_ids + 1 ! 0-based to 1-based
-                allocate (self%global_node_ids, source=raw_global_node_ids)
+                call vtu_get_point_data_int32(self%handle, c_array_name, self%global_node_ids)
+                self%global_node_ids = self%global_node_ids + 1 ! 0-based to 1-based
             end if
 
             if (present(node_type_key)) then
-                call allocate_array(raw_node_types, self%num_points)
+                call allocate_array(self%node_type, self%num_points)
                 c_array_name = strip(node_type_key)//c_null_char
-                call vtu_get_point_data_int32(self%handle, c_array_name, raw_node_types)
-                allocate (self%node_type, source=raw_node_types)
+                call vtu_get_point_data_int32(self%handle, c_array_name, self%node_type)
             end if
 
             if (present(num_sharing_ranks_key)) then
-                call allocate_array(raw_num_sharing_ranks, self%num_points)
+                call allocate_array(self%num_sharing_ranks, self%num_points)
                 c_array_name = strip(num_sharing_ranks_key)//c_null_char
-                call vtu_get_point_data_int32(self%handle, c_array_name, raw_num_sharing_ranks)
-                allocate (self%num_sharing_ranks, source=raw_num_sharing_ranks)
+                call vtu_get_point_data_int32(self%handle, c_array_name, self%num_sharing_ranks)
             end if
 
             if (present(owner_ranks_key)) then
-                call allocate_array(raw_owner_ranks, self%num_procs, self%num_points)
+                call allocate_array(self%owner_rank, self%num_procs, self%num_points)
                 c_array_name = strip(owner_ranks_key)//c_null_char
-                call vtu_get_point_data_int32(self%handle, c_array_name, raw_owner_ranks)
-                allocate (self%owner_rank, source=raw_owner_ranks)
+                call vtu_get_point_data_int32(self%handle, c_array_name, self%owner_rank)
             end if
 
             if (present(communication_partners_key)) then
-                call allocate_array(raw_communication_partners, self%num_procs, self%num_points)
+                call allocate_array(self%communication_partners, self%num_procs, self%num_points)
                 c_array_name = strip(communication_partners_key)//c_null_char
-                call vtu_get_point_data_int32(self%handle, c_array_name, raw_communication_partners)
-                allocate (self%communication_partners, source=raw_communication_partners)
+                call vtu_get_point_data_int32(self%handle, c_array_name, self%communication_partners)
             end if
 
             if (present(point_field_names)) then
                 if (size(point_field_names) > 0) then
-                    call allocate_array(raw_point_field_values, self%num_points, size(point_field_names))
+                    call allocate_array(self%point_field_values, self%num_points, size(point_field_names))
                     do i = 1, size(point_field_names)
                         c_array_name = strip(point_field_names(i))//c_null_char
-                        call vtu_get_point_data_float64(self%handle, c_array_name, raw_point_field_values(:, i))
+                        call vtu_get_point_data_float64(self%handle, c_array_name, self%point_field_values(:, i))
                     end do
-                    allocate (self%point_field_values, source=raw_point_field_values)
                 end if
             end if
         end if
 
         !----------------------------------------------------------------!
-        ! 4. セルデータの取得
+        ! 4. Retrieve cell data
         !----------------------------------------------------------------!
         call vtu_get_num_cells(self%handle, self%num_total_cells)
         if (self%num_total_cells > 0) then
@@ -190,18 +178,12 @@ contains
         call MPI_Allreduce(self%num_total_cells, self%global_num_total_cells, 1, MPI_INTEGER4, MPI_SUM, MPI_COMM_WORLD, ierr)
 
         !----------------------------------------------------------------!
-        ! 6. 後処理: 一時配列を解放し、メモリリークを防止
+        ! 6. Cleanup: deallocate temporary arrays to prevent memory leaks
         !----------------------------------------------------------------!
         call deallocate_array(raw_connectivity)
         call deallocate_array(raw_offsets)
         call deallocate_array(raw_cell_types)
         call deallocate_array(raw_cell_entity_ids)
-        call deallocate_array(raw_point_field_values)
-        call deallocate_array(raw_global_node_ids)
-        call deallocate_array(raw_node_types)
-        call deallocate_array(raw_num_sharing_ranks)
-        call deallocate_array(raw_owner_ranks)
-        call deallocate_array(raw_communication_partners)
         call deallocate_array(raw_ranks)
         call deallocate_array(raw_colors)
 

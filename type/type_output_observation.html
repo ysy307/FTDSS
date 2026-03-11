@@ -10,7 +10,7 @@
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>type_output_observation &ndash; FTDSS </title>
+    <title>type_output_observation &ndash; FTCMS </title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -44,7 +44,7 @@
     <div class="container-fluid mb-sm-4 mb-xl-2">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
           <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
                   aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon">
@@ -92,20 +92,20 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.6% of total for derived types.</p>Including implementation: 18 statements,  0.1% of total for derived types.">18 statements</a>
+                 title="<p> 0.3% of total for derived types.</p>Including implementation: 12 statements,  0.0% of total for derived types.">12 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/output_interface.F90"> Source File</a>
+              <a href="../src/observation_interface.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/output_interface.f90.html'>output_interface.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/inout_output.html'>inout_output</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/observation_interface.f90.html'>observation_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/io_output_observation.html'>io_output_observation</a></li>
             <li class="breadcrumb-item active" aria-current="page">type_output_observation</li>
           </ol>
         </nav>
@@ -134,20 +134,10 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_output_observation.html#variable-coordinate">coordinate</a>
-            <a class="list-group-item" href="../type/type_output_observation.html#variable-coordinate_normalized">coordinate_normalized</a>
-            <a class="list-group-item" href="../type/type_output_observation.html#variable-do_output">do_output</a>
-            <a class="list-group-item" href="../type/type_output_observation.html#variable-element_ids">element_ids</a>
-            <a class="list-group-item" href="../type/type_output_observation.html#variable-file_name">file_name</a>
-            <a class="list-group-item" href="../type/type_output_observation.html#variable-get_values">get_values</a>
-            <a class="list-group-item" href="../type/type_output_observation.html#variable-name">name</a>
-            <a class="list-group-item" href="../type/type_output_observation.html#variable-node_ids">node_ids</a>
-            <a class="list-group-item" href="../type/type_output_observation.html#variable-num_observations">num_observations</a>
-            <a class="list-group-item" href="../type/type_output_observation.html#variable-num_unit">num_unit</a>
-            <a class="list-group-item" href="../type/type_output_observation.html#variable-type">type</a>
-            <a class="list-group-item" href="../type/type_output_observation.html#variable-unit~2">unit</a>
-            <a class="list-group-item" href="../type/type_output_observation.html#variable-write_header">write_header</a>
-            <a class="list-group-item" href="../type/type_output_observation.html#variable-write_line">write_line</a>
+            <a class="list-group-item" href="../type/type_output_observation.html#variable-num_observations~2">num_observations</a>
+            <a class="list-group-item" href="../type/type_output_observation.html#variable-observation_points">observation_points</a>
+            <a class="list-group-item" href="../type/type_output_observation.html#variable-observation_type">observation_type</a>
+            <a class="list-group-item" href="../type/type_output_observation.html#variable-settings~2">settings</a>
         </div>
       </div>
     </div>
@@ -174,7 +164,11 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_output_observation.html#boundprocedure-initialize~5">initialize</a>
+            <a class="list-group-item" href="../type/type_output_observation.html#boundprocedure-destroy~23">destroy</a>
+            <a class="list-group-item" href="../type/type_output_observation.html#boundprocedure-initialize~58">initialize</a>
+            <a class="list-group-item" href="../type/type_output_observation.html#boundprocedure-output_history~2">output_history</a>
+            <a class="list-group-item" href="../type/type_output_observation.html#boundprocedure-write_header">write_header</a>
+            <a class="list-group-item" href="../type/type_output_observation.html#boundprocedure-write_line">write_line</a>
         </div>
       </div>
     </div>
@@ -195,8 +189,8 @@
     
     <div class="col-md-9" id='text'>
       <h2 id="type-def-statement">
-        type, private :: type_output_observation</h2>
-    
+        type, public :: type_output_observation</h2>
+    <p>Manager for file output and iterating over observation points</p>
 <br>      <div class="card">
         <div class="card-header">
           <h3 class="card-title">Inherits</h3>
@@ -208,52 +202,102 @@
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: type~~type_output_observation~~InheritsGraph Pages: 1 -->
-<svg id="typetype_output_observationInheritsGraph" width="450pt" height="74pt"
- viewBox="0.00 0.00 450.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="type~~type_output_observation~~InheritsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 70)">
+<svg id="typetype_output_observationInheritsGraph" width="641pt" height="72pt"
+ viewBox="0.00 0.00 641.00 72.02" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_output_observation~~InheritsGraph" class="graph" transform="scale(0.65 0.65) rotate(0) translate(4 106)">
 <title>type~~type_output_observation~~InheritsGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 446,-70 446,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-106 975,-106 975,4 -4,4"/>
 <!-- type~type_output_observation -->
 <g id="type~~type_output_observation~~InheritsGraph_node1" class="node">
 <title>type~type_output_observation</title>
-<polygon fill="none" stroke="black" points="442,-45 298,-45 298,-21 442,-21 442,-45"/>
-<text text-anchor="middle" x="370" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_output_observation</text>
+<polygon fill="none" stroke="black" points="971,-62 827,-62 827,-38 971,-38 971,-62"/>
+<text text-anchor="middle" x="899" y="-47.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_output_observation</text>
 </g>
-<!-- type~type_coordinate_array_dp -->
+<!-- type~holder_observation_point -->
 <g id="type~~type_output_observation~~InheritsGraph_node2" class="node">
-<title>type~type_coordinate_array_dp</title>
-<g id="a_type~~type_output_observation~~InheritsGraph_node2"><a xlink:href="../type/type_coordinate_array_dp.html" xlink:title="type_coordinate_array_dp">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="151,-66 0,-66 0,-42 151,-42 151,-66"/>
-<text text-anchor="middle" x="75.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_coordinate_array_dp</text>
+<title>type~holder_observation_point</title>
+<g id="a_type~~type_output_observation~~InheritsGraph_node2"><a xlink:href="../type/holder_observation_point.html" xlink:title="holder_observation_point">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="699,-102 551,-102 551,-78 699,-78 699,-102"/>
+<text text-anchor="middle" x="625" y="-87.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">holder_observation_point</text>
 </a>
 </g>
 </g>
-<!-- type~type_output_observation&#45;&gt;type~type_coordinate_array_dp -->
-<g id="type~~type_output_observation~~InheritsGraph_edge1" class="edge">
-<title>type~type_output_observation&#45;&gt;type~type_coordinate_array_dp</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M297.82,-38.11C256.65,-41.07 204.58,-44.8 161.3,-47.91"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="160.79,-44.44 151.07,-48.65 161.29,-51.42 160.79,-44.44"/>
-<text text-anchor="middle" x="224.5" y="-49.4" font-family="Helvetica,sans-Serif" font-size="9.50">coordinate</text>
+<!-- type~type_output_observation&#45;&gt;type~holder_observation_point -->
+<g id="type~~type_output_observation~~InheritsGraph_edge3" class="edge">
+<title>type~type_output_observation&#45;&gt;type~holder_observation_point</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M826.61,-61.33C820.65,-62.24 814.72,-63.14 809,-64 776.35,-68.89 740.4,-74.04 709.06,-78.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="708.47,-75.01 699.06,-79.87 709.45,-81.95 708.47,-75.01"/>
+<text text-anchor="middle" x="763" y="-79.4" font-family="Helvetica,sans-Serif" font-size="9.50">observation_points</text>
 </g>
-<!-- type~type_coordinate_dp -->
+<!-- type~type_constant_id -->
 <g id="type~~type_output_observation~~InheritsGraph_node3" class="node">
-<title>type~type_coordinate_dp</title>
-<g id="a_type~~type_output_observation~~InheritsGraph_node3"><a xlink:href="../type/type_coordinate_dp.html" xlink:title="type_coordinate_dp">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="134.5,-24 16.5,-24 16.5,0 134.5,0 134.5,-24"/>
-<text text-anchor="middle" x="75.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_coordinate_dp</text>
+<title>type~type_constant_id</title>
+<g id="a_type~~type_output_observation~~InheritsGraph_node3"><a xlink:href="../type/type_constant_id.html" xlink:title="type_constant_id">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="102,-78 0,-78 0,-54 102,-54 102,-78"/>
+<text text-anchor="middle" x="51" y="-63.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_constant_id</text>
 </a>
 </g>
 </g>
-<!-- type~type_output_observation&#45;&gt;type~type_coordinate_dp -->
+<!-- type~type_output_observation&#45;&gt;type~type_constant_id -->
 <g id="type~~type_output_observation~~InheritsGraph_edge2" class="edge">
-<title>type~type_output_observation&#45;&gt;type~type_coordinate_dp</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M297.61,-26.42C291.65,-25.92 285.72,-25.44 280,-25 235.03,-21.54 184.41,-18.31 144.91,-15.93"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="145.05,-12.43 134.86,-15.33 144.63,-19.42 145.05,-12.43"/>
-<text text-anchor="middle" x="224.5" y="-27.4" font-family="Helvetica,sans-Serif" font-size="9.50">coordinate_normalized</text>
+<title>type~type_output_observation&#45;&gt;type~type_constant_id</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M826.83,-47.51C665.59,-42.28 276.38,-32.03 146.5,-50"/>
+<text text-anchor="middle" x="438" y="-42.4" font-family="Helvetica,sans-Serif" font-size="9.50">observation_type</text>
+</g>
+<!-- type~type_output_observation_settings -->
+<g id="type~~type_output_observation~~InheritsGraph_node4" class="node">
+<title>type~type_output_observation_settings</title>
+<g id="a_type~~type_output_observation~~InheritsGraph_node4"><a xlink:href="../type/type_output_observation_settings.html" xlink:title="type_output_observation_settings">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="533,-24 343,-24 343,0 533,0 533,-24"/>
+<text text-anchor="middle" x="438" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output_observation_settings</text>
+</a>
+</g>
+</g>
+<!-- type~type_output_observation&#45;&gt;type~type_output_observation_settings -->
+<g id="type~~type_output_observation~~InheritsGraph_edge1" class="edge">
+<title>type~type_output_observation&#45;&gt;type~type_output_observation_settings</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M860.72,-37.94C844.94,-33.36 826.25,-28.62 809,-26 720.08,-12.5 617.83,-9.58 543.38,-9.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="543.06,-6.2 533.07,-9.74 543.08,-13.2 543.06,-6.2"/>
+<text text-anchor="middle" x="763" y="-28.4" font-family="Helvetica,sans-Serif" font-size="9.50">settings</text>
+</g>
+<!-- type~abst_observation_point -->
+<g id="type~~type_output_observation~~InheritsGraph_node5" class="node">
+<title>type~abst_observation_point</title>
+<g id="a_type~~type_output_observation~~InheritsGraph_node5"><a xlink:href="../type/abst_observation_point.html" xlink:title="abst_observation_point">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="325,-102 189,-102 189,-78 325,-78 325,-102"/>
+<text text-anchor="middle" x="257" y="-87.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_observation_point</text>
+</a>
+</g>
+</g>
+<!-- type~holder_observation_point&#45;&gt;type~abst_observation_point -->
+<g id="type~~type_output_observation~~InheritsGraph_edge4" class="edge">
+<title>type~holder_observation_point&#45;&gt;type~abst_observation_point</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M550.81,-90C488.47,-90 399.14,-90 335.57,-90"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="335.2,-86.5 325.2,-90 335.2,-93.5 335.2,-86.5"/>
+<text text-anchor="middle" x="438" y="-92.4" font-family="Helvetica,sans-Serif" font-size="9.50">point</text>
+</g>
+<!-- type~type_output_observation_settings&#45;&gt;type~type_constant_id -->
+<g id="type~~type_output_observation~~InheritsGraph_edge5" class="edge">
+<title>type~type_output_observation_settings&#45;&gt;type~type_constant_id</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M342.84,-7.33C295.77,-7.49 238.45,-11.5 189,-26 168.18,-32.1 167.89,-46.37 146.5,-50"/>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M144.5,-50C134.1,-51.44 123.08,-53.17 112.41,-54.95"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="111.58,-51.54 102.31,-56.66 112.76,-58.44 111.58,-51.54"/>
+<text text-anchor="middle" x="257" y="-28.4" font-family="Helvetica,sans-Serif" font-size="9.50">variable_type</text>
+</g>
+<!-- type~abst_observation_point&#45;&gt;type~type_constant_id -->
+<g id="type~~type_output_observation~~InheritsGraph_edge6" class="edge">
+<title>type~abst_observation_point&#45;&gt;type~type_constant_id</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M188.92,-82.11C164.23,-79.2 136.43,-75.93 112.37,-73.1"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="112.64,-69.61 102.3,-71.92 111.82,-76.56 112.64,-69.61"/>
+<text text-anchor="middle" x="145.5" y="-81.4" font-family="Helvetica,sans-Serif" font-size="9.50">point_type</text>
 </g>
 </g>
 </svg>
-</div>          <div>
+</div>                <script>
+                  var pantypetype_output_observationInheritsGraph = svgPanZoom('#typetype_output_observationInheritsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
             <a type="button" class="graph-help" data-bs-toggle="modal" href="#InheritsGraph-help-text">Help</a>
           </div>
           <div class="modal fade" id="InheritsGraph-help-text" tabindex="-1" role="dialog">
@@ -315,48 +359,48 @@ large graphs.</div>
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: type~~type_output_observation~~InheritedByGraph Pages: 1 -->
-<svg id="typetype_output_observationInheritedByGraph" width="461pt" height="32pt"
- viewBox="0.00 0.00 461.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg id="typetype_output_observationInheritedByGraph" width="514pt" height="32pt"
+ viewBox="0.00 0.00 514.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="type~~type_output_observation~~InheritedByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>type~~type_output_observation~~InheritedByGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 457,-28 457,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 510,-28 510,4 -4,4"/>
 <!-- type~type_output_observation -->
 <g id="type~~type_output_observation~~InheritedByGraph_node1" class="node">
 <title>type~type_output_observation</title>
 <polygon fill="none" stroke="black" points="144,-24 0,-24 0,0 144,0 144,-24"/>
 <text text-anchor="middle" x="72" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_output_observation</text>
 </g>
-<!-- type~type_output -->
+<!-- type~type_output_manager -->
 <g id="type~~type_output_observation~~InheritedByGraph_node2" class="node">
-<title>type~type_output</title>
-<g id="a_type~~type_output_observation~~InheritedByGraph_node2"><a xlink:href="../type/type_output.html" xlink:title="type_output">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="319,-24 243,-24 243,0 319,0 319,-24"/>
-<text text-anchor="middle" x="281" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output</text>
+<title>type~type_output_manager</title>
+<g id="a_type~~type_output_observation~~InheritedByGraph_node2"><a xlink:href="../type/type_output_manager.html" xlink:title="type_output_manager">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="368,-24 238,-24 238,0 368,0 368,-24"/>
+<text text-anchor="middle" x="303" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output_manager</text>
 </a>
 </g>
 </g>
-<!-- type~type_output&#45;&gt;type~type_output_observation -->
+<!-- type~type_output_manager&#45;&gt;type~type_output_observation -->
 <g id="type~~type_output_observation~~InheritedByGraph_edge1" class="edge">
-<title>type~type_output&#45;&gt;type~type_output_observation</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M242.99,-12C218.34,-12 184.95,-12 154.29,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="154.01,-8.5 144.01,-12 154.01,-15.5 154.01,-8.5"/>
-<text text-anchor="middle" x="193.5" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">observations</text>
+<title>type~type_output_manager&#45;&gt;type~type_output_observation</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M237.91,-12C212.09,-12 182.01,-12 154.66,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="154.33,-8.5 144.33,-12 154.33,-15.5 154.33,-8.5"/>
+<text text-anchor="middle" x="191" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">observation</text>
 </g>
-<!-- type~type_ftdss -->
+<!-- type~type_ftcms -->
 <g id="type~~type_output_observation~~InheritedByGraph_node3" class="node">
-<title>type~type_ftdss</title>
-<g id="a_type~~type_output_observation~~InheritedByGraph_node3"><a xlink:href="../type/type_ftdss.html" xlink:title="type_ftdss">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="453,-24 387,-24 387,0 453,0 453,-24"/>
-<text text-anchor="middle" x="420" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss</text>
+<title>type~type_ftcms</title>
+<g id="a_type~~type_output_observation~~InheritedByGraph_node3"><a xlink:href="../type/type_ftcms.html" xlink:title="type_ftcms">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="506,-24 436,-24 436,0 506,0 506,-24"/>
+<text text-anchor="middle" x="471" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms</text>
 </a>
 </g>
 </g>
-<!-- type~type_ftdss&#45;&gt;type~type_output -->
+<!-- type~type_ftcms&#45;&gt;type~type_output_manager -->
 <g id="type~~type_output_observation~~InheritedByGraph_edge2" class="edge">
-<title>type~type_ftdss&#45;&gt;type~type_output</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M386.88,-12C369.8,-12 348.46,-12 329.5,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="329.25,-8.5 319.25,-12 329.25,-15.5 329.25,-8.5"/>
-<text text-anchor="middle" x="353" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">output</text>
+<title>type~type_ftcms&#45;&gt;type~type_output_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M435.6,-12C418.95,-12 398.27,-12 378.26,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="378.21,-8.5 368.21,-12 378.21,-15.5 378.21,-8.5"/>
+<text text-anchor="middle" x="402" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">output</text>
 </g>
 </g>
 </svg>
@@ -427,146 +471,10 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-coordinate"></span>
-              type(<a href='type_coordinate_array_dp.html'>type_coordinate_array_dp</a>),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>coordinate</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-coordinate_normalized"></span>
-              type(<a href='type_coordinate_dp.html'>type_coordinate_dp</a>),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>coordinate_normalized</strong>(:)</td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-do_output"></span>
-              logical,
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>do_output</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-element_ids"></span>
+              <span class="anchor" id="variable-num_observations~2"></span>
               integer(kind=int32),
             </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>element_ids</strong>(:)</td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-file_name"></span>
-              character(len=:),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>file_name</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-get_values"></span>
-              procedure(<a href='../interface/abst_get_values.html'>abst_get_values</a>),
-            </td>
-              <td>public,</td>
-            <td>
-              pointer, pass(self)
-            </td>
-            <td>::</td>
-            <td><strong>get_values</strong></td>
-<td>=&gt; </td>
-                <td>null()</td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-name"></span>
-              character(len=:),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>name</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-node_ids"></span>
-              integer(kind=int32),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>node_ids</strong>(:)</td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-num_observations"></span>
-              integer(kind=int32),
-            </td>
-              <td>public</td>
+              <td>private</td>
             <td>
               
             </td>
@@ -580,85 +488,51 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-num_unit"></span>
-              integer(kind=int32),
+              <span class="anchor" id="variable-observation_points"></span>
+              type(<a href='holder_observation_point.html'>holder_observation_point</a>),
             </td>
-              <td>public</td>
+              <td>private,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>observation_points</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-observation_type"></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+              <td>private</td>
             <td>
               
             </td>
             <td>::</td>
-            <td><strong>num_unit</strong></td>
-                <td></td>
-                <td></td>
+            <td><strong>observation_type</strong></td>
+<td> =</td>
+                <td>OUTPUT_OBSERVATION_TYPES%NONE</td>
             <td>
                 
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-type"></span>
-              character(len=:),
+              <span class="anchor" id="variable-settings~2"></span>
+              type(<a href='type_output_observation_settings.html'>type_output_observation_settings</a>),
             </td>
-              <td>public,</td>
+              <td>private</td>
             <td>
-              allocatable
+              
             </td>
             <td>::</td>
-            <td><strong>type</strong></td>
+            <td><strong>settings</strong>(OUTPUT_VARIABLE_TYPES%NUM_ID)</td>
                 <td></td>
                 <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-unit~2"></span>
-              character(len=:),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>unit</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-write_header"></span>
-              procedure(<a href='../interface/abst_write_obeservation_header.html'>abst_write_obeservation_header</a>),
-            </td>
-              <td>public,</td>
-            <td>
-              pointer, pass(self)
-            </td>
-            <td>::</td>
-            <td><strong>write_header</strong></td>
-<td>=&gt; </td>
-                <td>null()</td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-write_line"></span>
-              procedure(<a href='../interface/abst_write_line.html'>abst_write_line</a>),
-            </td>
-              <td>public,</td>
-            <td>
-              pointer, pass(self)
-            </td>
-            <td>::</td>
-            <td><strong>write_line</strong></td>
-<td>=&gt; </td>
-                <td>null()</td>
             <td>
                 
             </td>
@@ -676,10 +550,10 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~5"></span>
+      <span class="anchor" id="boundprocedure-destroy~23"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>initialize</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/initialize_type_output_observation.html'>initialize_type_output_observation</a>
+  <strong>destroy</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/destroy_type_output_observation.html'>destroy_type_output_observation</a>
         
       </h3>
     </div>
@@ -687,7 +561,62 @@ large graphs.</div>
           <li class="list-group-item">
                 <h3>interface </h3>
                     <h3>
-    private module subroutine initialize_type_output_observation(self, input, domain, dir_output, variable_name)  
+    private module subroutine destroy_type_output_observation(self)  
+    <a href="../proc/destroy_type_output_observation.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_output_observation.html'>type_output_observation</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-initialize~58"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>initialize</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/initialize_type_output_observation.html'>initialize_type_output_observation</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine initialize_type_output_observation(self, dir_output, config)  
     <a href="../proc/initialize_type_output_observation.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
@@ -722,36 +651,6 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              type(<a href='type_input.html'>type_input</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>input</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              type(<a href='type_domain.html'>type_domain</a>),
-            </td>
-<td>intent(inout)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>domain</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
               character(len=*),
             </td>
 <td>intent(in)</td>
@@ -767,6 +666,236 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
+              type(<a href='type_config_observation.html'>type_config_observation</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>config</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-output_history~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>output_history</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/output_history_output_observation.html'>output_history_output_observation</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine output_history_output_observation(self, time, temperature, water_content, ice_content, vapor_content, pressure)  
+    <a href="../proc/output_history_output_observation.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_output_observation.html'>type_output_observation</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>time</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>temperature</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>water_content</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ice_content</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>vapor_content</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>pressure</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-write_header"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>write_header</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/write_observation_header.html'>write_observation_header</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine write_observation_header(self, output_variable_type, output_time_unit_name)  
+    <a href="../proc/write_observation_header.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_output_observation.html'>type_output_observation</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>output_variable_type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
               character(len=*),
             </td>
 <td>intent(in)</td>
@@ -774,7 +903,107 @@ large graphs.</div>
               
             </td>
             <td>::</td>
-            <td><strong>variable_name</strong></td>
+            <td><strong>output_time_unit_name</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-write_line"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>write_line</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/write_observation_line.html'>write_observation_line</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine write_observation_line(self, output_variable_type, time, output_values)  
+    <a href="../proc/write_observation_line.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_output_observation.html'>type_output_observation</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>output_variable_type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>time</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>output_values</strong>(:)</td>
             <td>
                 
             </td>
@@ -793,25 +1022,19 @@ large graphs.</div>
     <section>
     <h3><span class="anchor" id="src"></span>Source Code</h3>
     <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_output_observation</span>
-<span class="w">        </span><span class="kt">character</span><span class="p">(:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">name</span>
-<span class="w">        </span><span class="kt">character</span><span class="p">(:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">unit</span>
-<span class="w">        </span><span class="kt">character</span><span class="p">(:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">file_name</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_unit</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_output_observation_settings</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">settings</span><span class="p">(</span><span class="n">OUTPUT_VARIABLE_TYPES</span><span class="p">%</span><span class="n">NUM_ID</span><span class="p">)</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_constant_id</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">observation_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OUTPUT_OBSERVATION_TYPES</span><span class="p">%</span><span class="k">NONE</span>
+<span class="k">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_observations</span>
 
-<span class="w">        </span><span class="kt">character</span><span class="p">(:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="k">type</span>
-<span class="k">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">do_output</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_observations</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_coordinate_array_dp</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">coordinate</span>
+<span class="w">        </span><span class="c">! Renamed from output_methods to observation_points</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">holder_observation_point</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">observation_points</span><span class="p">(:)</span>
 
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">element_ids</span><span class="p">(:)</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_coordinate_dp</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">coordinate_normalized</span><span class="p">(:)</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">node_ids</span><span class="p">(:)</span>
-
-<span class="w">        </span><span class="k">procedure</span><span class="p">(</span><span class="n">abst_write_line</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">write_line</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="nb">null</span><span class="p">()</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">(</span><span class="n">abst_write_obeservation_header</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">write_header</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="nb">null</span><span class="p">()</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">(</span><span class="n">abst_get_values</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_values</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="nb">null</span><span class="p">()</span>
 <span class="w">    </span><span class="k">contains</span>
-<span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">initialize_type_output_observation</span>
+<span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">initialize_type_output_observation</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">destroy</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">destroy_type_output_observation</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">write_header</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">write_observation_header</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">write_line</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">write_observation_line</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">output_history</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">output_history_output_observation</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_output_observation</span>
 </pre></div>
 
@@ -827,7 +1050,7 @@ large graphs.</div>
         <div class="row justify-content-between">
           <div class="col">
             <p>
-              FTDSS
+              FTCMS
  was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
@@ -835,7 +1058,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-23 23:52 +0000             </p>
+ on 2026-03-11 14:03 +0000             </p>
           </div>
         </div>
         <br>

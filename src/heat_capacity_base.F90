@@ -1,29 +1,29 @@
-submodule(physics_materials_heat_capacity) heat_capacity_base
+submodule(materials_heat_capacity) heat_capacity_base
     implicit none
 
 contains
 
-    module subroutine initialize_holder_vhcs(self, material_id, physics_info, water, ice)
+    module subroutine initialize_holder_vhcs(self, material_id, constitutive_info, water, ice)
         implicit none
         class(holder_vhcs), intent(inout) :: self
         integer(int32), intent(in) :: material_id
-        type(type_physics_info), intent(in) :: physics_info
+        type(type_config_constitutive), intent(in) :: constitutive_info
         type(type_iapws97), intent(in), target :: water
         type(type_iapws06), intent(in), target :: ice
 
-        select case (physics_info%num_phases)
+        select case (constitutive_info%num_phases)
         case (1)
             allocate (type_vhc_1phase :: self%p)
-            call self%p%initialize(material_id, physics_info, water, ice)
+            call self%p%initialize(material_id, constitutive_info, water, ice)
         case (2)
             allocate (type_vhc_2phase :: self%p)
-            call self%p%initialize(material_id, physics_info, water, ice)
+            call self%p%initialize(material_id, constitutive_info, water, ice)
         case (3)
             allocate (type_vhc_3phase :: self%p)
-            call self%p%initialize(material_id, physics_info, water, ice)
+            call self%p%initialize(material_id, constitutive_info, water, ice)
         case (4)
             allocate (type_vhc_4phase :: self%p)
-            call self%p%initialize(material_id, physics_info, water, ice)
+            call self%p%initialize(material_id, constitutive_info, water, ice)
         end select
 
     end subroutine initialize_holder_vhcs

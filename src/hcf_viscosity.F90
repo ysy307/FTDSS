@@ -1,4 +1,4 @@
-submodule(physics_models_hcf) hcf_viscosity
+submodule(models_hcf) hcf_viscosity
     implicit none
 contains
     module subroutine initialize_abst_hcf_viscosity(self, temperature_critical)

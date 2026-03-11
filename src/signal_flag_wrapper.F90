@@ -2,9 +2,9 @@
 !> Provides a Fortran wrapper for C functions that handle interrupt signals
 !> (e.g., Ctrl+C), allowing for graceful program termination.
 !>
-module core_fortran_utils_signal_flag_wrapper
+module core_interop_signal_flag_wrapper
     use :: stdlib_logger
-    use :: core_c_utils_signal_flag, only:c_setup_signal_handler, c_get_interrupted_flag
+    use :: core_interop_signal_flag, only:c_setup_signal_handler, c_get_interrupted_flag
     implicit none
 
     private
@@ -40,4 +40,4 @@ contains
             interrupted = .false.
         end if
     end function was_interrupted
-end module core_fortran_utils_signal_flag_wrapper
+end module core_interop_signal_flag_wrapper

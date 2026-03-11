@@ -1,195 +1,402 @@
 module control_time_profiler
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
+#ifdef _OPENMP
     use :: omp_lib
-    use :: stdlib_strings, only:strip
+#endif
+    use :: stdlib_strings, only:strip, to_string
     use :: module_core
     implicit none
     private
 
-    public :: type_profiler
+    public :: type_time_profiler
 
-    type :: type_profiler_section
-        character(20) :: label = ''
+    !> Abstract base type for profiling and time records
+    type, abstract :: abst_record
+        !> Identifier for the record
+        type(type_constant_id) :: label = type_constant_id("", "", -1)
+    contains
+        procedure(abst_get_log_entry), public, pass(self), deferred :: get_log_entry
+    end type abst_record
+
+    abstract interface
+        !> Retrieve a formatted log entry string
+        !>
+        !> Mathematical definition:
+        !> - Generates a string representation of the record
+        !>
+        !> Assumptions:
+        !> - None
+        !>
+        !> Numerical guarantee:
+        !> - No theoretical error bound available
+        !>
+        !> Computational complexity:
+        !> - Memory: \(O(1)\)
+        !> - Arithmetic: \(O(1)\)
+        !>
+        !> Failure behavior:
+        !> - Returns without error
+        subroutine abst_get_log_entry(self, log_entry)
+            import :: abst_record
+            implicit none
+            !> Record object
+
+            class(abst_record), intent(in) :: self
+            !> String to hold the formatted log entry
+            !> Overwritten on exit
+            character(:), intent(inout), allocatable :: log_entry
+        end subroutine abst_get_log_entry
+    end interface
+
+    !> Record type for tracking execution time intervals
+    type, extends(abst_record) :: type_record_profiler
+        !> Flag indicating if the profiler is currently running
+        logical :: running = .false.
+        !> Accumulated total execution time in seconds
         real(real64) :: total_time = 0.0d0
+        !> Start time of the current execution lap in seconds
         real(real64) :: start_time = 0.0d0
-        integer(int32) :: call_count = 0
+        !> Number of times the profiler has been called
+        integer(int32) :: num_calls = 0
     contains
-        procedure, pass(self), public :: match_label => match_profiler_section_label
-    end type type_profiler_section
+        procedure, public, pass(self) :: get_log_entry => get_log_entry_profiler
+    end type type_record_profiler
 
-    type :: type_time_record
-        type(type_constant_id) :: label = type_constant_id("none", "none", -1)
-        character(10) :: date = ''
-        character(10) :: time = ''
-        character(10) :: zone = ''
+    !> Record type for tracking absolute timestamps
+    type, extends(abst_record) :: type_record_time
+        !> Date string representation
+        character(10) :: date = ""
+        !> Time string representation
+        character(10) :: time = ""
+        !> Time zone representation
+        character(10) :: zone = ""
     contains
-        procedure, pass(self), public :: format => format_profiler_section
-        procedure, pass(self), public :: get_log => get_log_formatted
-    end type type_time_record
+        procedure, public, pass(self) :: get_timestamp => get_timestamp_time_record
+        procedure, public, pass(self) :: get_log_entry => get_log_entry_time_record
+    end type type_record_time
 
-    type :: type_profiler
-        private
-        type(type_time_record) :: record_start
-        type(type_time_record) :: record_end
-        type(type_profiler_section), allocatable :: sections(:)
+    !> Profiler management class
+    type :: type_time_profiler
+        !> Array of execution time profilers
+        type(type_record_profiler), private, allocatable :: timers(:)
+        !> Array of absolute timestamp records
+        type(type_record_time), private, allocatable :: timestamps(:)
     contains
-        procedure, pass(self), public :: initialize => initialize_profiler
-        procedure, pass(self), private :: start_profile_by_name
-        procedure, pass(self), private :: start_profile_by_id
-        generic, public :: start => start_profile_by_name, start_profile_by_id
-        procedure, pass(self), private :: stop_profile_by_name
-        procedure, pass(self), private :: stop_profile_by_id
-        generic, public :: stop => stop_profile_by_name, stop_profile_by_id
-        procedure, pass(self), private :: get_current_wall_time
-        procedure, pass(self), private :: get_profiler_id
-
-        procedure, pass(self), public :: record => record_profiler
-        procedure, pass(self), public :: get_record => get_record_profiler
-
-        ! > Getter for exporting data to logger (Updated with percentage)
-        procedure, pass(self), public :: get_data => get_profiling_data
-
-        procedure, pass(self), public :: display => display_profiler
-
-    end type type_profiler
+        procedure, public, pass(self) :: initialize => initialize_type_time_profiler
+        procedure, public, pass(self) :: destroy => destroy_type_time_profiler
+        procedure, public, pass(self) :: record => record_time
+        procedure, public, pass(self) :: start => start_profile
+        procedure, public, pass(self) :: stop => stop_profile
+        procedure, private, pass(self) :: get_current_wall_time
+        procedure, public, pass(self) :: display => display_profiler
+    end type type_time_profiler
 
 contains
 
-    subroutine initialize_profiler(self, labels)
+    !> Format the timestamp record into a standardized string
+    !>
+    !> Mathematical definition:
+    !> - Concatenates date, time, and zone into ISO 8601-like format
+    !>
+    !> Assumptions:
+    !> - Date, time, and zone fields are populated
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
+    subroutine get_timestamp_time_record(self, timestamp_str)
         implicit none
-        class(type_profiler), intent(inout) :: self
-        character(len=10), intent(in) :: labels(:)
+        !> Timestamp record object
+        class(type_record_time), intent(in) :: self
+        !> Formatted timestamp string
+        !> Overwritten on exit
+        character(:), intent(inout), allocatable :: timestamp_str
 
-        integer(int32) :: i
-
-        ! --- Profiler Sections Initialization ---
-        if (allocated(self%sections)) deallocate (self%sections)
-        if (size(labels) > 0) then
-            allocate (self%sections(size(labels)))
-
-            do i = 1, size(labels)
-                self%sections(i)%label = trim(labels(i))
-                self%sections(i)%total_time = 0.0d0
-                self%sections(i)%start_time = 0.0d0
-                self%sections(i)%call_count = 0
-            end do
-        end if
-
-    end subroutine initialize_profiler
-
-    subroutine format_profiler_section(self, formatted_string)
-        implicit none
-        class(type_time_record), intent(in) :: self
-        character(:), allocatable, intent(inout) :: formatted_string
-
-        formatted_string = &
+        timestamp_str = &
             self%date(1:4)//"-"//self%date(5:6)//"-"//self%date(7:8)//"T"// &
             self%time(1:2)//":"//self%time(3:4)//":"//self%time(5:6)//strip(self%zone)
+    end subroutine get_timestamp_time_record
 
-    end subroutine format_profiler_section
-
-    subroutine get_log_formatted(self, log_string)
+    !> Retrieve a formatted log entry for the timestamp record
+    !>
+    !> Mathematical definition:
+    !> - Appends the label name to the formatted timestamp string
+    !>
+    !> Assumptions:
+    !> - None
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
+    subroutine get_log_entry_time_record(self, log_entry)
         implicit none
-        class(type_time_record), intent(in) :: self
-        character(:), allocatable, intent(inout) :: log_string
+        !> Timestamp record object
+        class(type_record_time), intent(in) :: self
+        !> String to hold the formatted log entry
+        !> Overwritten on exit
+        character(:), intent(inout), allocatable :: log_entry
 
         character(:), allocatable :: time_stamp
 
-        ! First, create date-time string
-        call self%format(time_stamp)
+        call self%get_timestamp(time_stamp)
+        log_entry = strip(self%label%NAME)//" Time : "//time_stamp
+    end subroutine get_log_entry_time_record
 
-        ! Combine with label
-        log_string = strip(self%label%name)//" Time : "//time_stamp
-    end subroutine get_log_formatted
-
-    function match_profiler_section_label(self, label) result(is_match)
+    !> Retrieve a formatted log entry for the profiler record
+    !>
+    !> Mathematical definition:
+    !> - Converts accumulated time and call counts to a string
+    !>
+    !> Assumptions:
+    !> - None
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
+    subroutine get_log_entry_profiler(self, log_entry)
         implicit none
-        class(type_profiler_section), intent(in) :: self
-        character(*), intent(in) :: label
-        logical :: is_match
+        !> Profiler record object
+        class(type_record_profiler), intent(in) :: self
+        !> String to hold the formatted log entry
+        !> Overwritten on exit
+        character(:), intent(inout), allocatable :: log_entry
 
-        is_match = (strip(self%label) == strip(label))
-    end function match_profiler_section_label
+        log_entry = strip(self%label%NAME)//" - Total Time: "// &
+                    to_string(self%total_time)//" s, Calls: "// &
+                    to_string(self%num_calls)
+    end subroutine get_log_entry_profiler
 
-    subroutine get_profiler_id(self, label, id)
+    !> Initialize the time profiler
+    !>
+    !> Mathematical definition:
+    !> - Allocates arrays for timers and timestamp records
+    !>
+    !> Assumptions:
+    !> - None
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(n)\)
+    !> - Arithmetic: \(O(n)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
+    subroutine initialize_type_time_profiler(self)
         implicit none
-        class(type_profiler), intent(in) :: self
-        character(*), intent(in) :: label
-        integer(int32), intent(inout) :: id
+        !> Profiler manager object
+        !> Overwritten on exit
+        class(type_time_profiler), intent(inout) :: self
+
         integer(int32) :: i
+        integer(int32) :: stat
 
-        id = -1
-        if (allocated(self%sections)) then
-            do i = 1, size(self%sections)
-                if (self%sections(i)%match_label(label)) then
-                    id = i
-                    return
-                end if
+        allocate (self%timers(PROFILER_TYPES%NUM_ID), stat=stat)
+        if (stat == 0) then
+            do i = 1, PROFILER_TYPES%NUM_ID
+                self%timers(i)%label = PROFILER_TYPES%to_object(i)
+                self%timers(i)%total_time = 0.0d0
+                self%timers(i)%start_time = 0.0d0
+                self%timers(i)%num_calls = 0
             end do
         end if
-    end subroutine get_profiler_id
 
-    subroutine start_profile_by_name(self, label)
-        implicit none
-        class(type_profiler), intent(inout) :: self
-        character(*), intent(in) :: label
-        integer(int32) :: id
-
-        call self%get_profiler_id(label, id)
-        if (id > 0) then
-            call self%start_profile_by_id(id)
-        else
-            call raise_error(ERROR_CODES%INVALID_PROFILER_LABEL, opt=strip(label))
+        allocate (self%timestamps(TIME_RECORDS%NUM_ID), stat=stat)
+        if (stat == 0) then
+            do i = 1, TIME_RECORDS%NUM_ID
+                self%timestamps(i)%label = TIME_RECORDS%to_object(i)
+                self%timestamps(i)%date = ""
+                self%timestamps(i)%time = ""
+                self%timestamps(i)%zone = ""
+            end do
         end if
-    end subroutine start_profile_by_name
+    end subroutine initialize_type_time_profiler
 
-    subroutine start_profile_by_id(self, id)
+    !> Destroy the time profiler
+    !>
+    !> Mathematical definition:
+    !> - Deallocates arrays for timers and timestamp records
+    !>
+    !> Assumptions:
+    !> - None
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
+    subroutine destroy_type_time_profiler(self)
         implicit none
-        class(type_profiler), intent(inout) :: self
-        integer(int32), intent(in) :: id
+        !> Profiler manager object
+        !> Overwritten on exit
+        class(type_time_profiler), intent(inout) :: self
 
-        if (allocated(self%sections)) then
-            if (id >= 1 .and. id <= size(self%sections)) then
-                call self%get_current_wall_time(self%sections(id)%start_time)
-                self%sections(id)%call_count = self%sections(id)%call_count + 1
-            end if
+        if (allocated(self%timers)) deallocate (self%timers)
+        if (allocated(self%timestamps)) deallocate (self%timestamps)
+    end subroutine destroy_type_time_profiler
+
+    !> Record an absolute timestamp
+    !>
+    !> Mathematical definition:
+    !> - Calls system date and time routines to log current state
+    !>
+    !> Assumptions:
+    !> - Label is a valid timestamp identifier
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns silently if label is invalid
+    subroutine record_time(self, label)
+        implicit none
+        !> Profiler manager object
+        !> Overwritten on exit
+        class(type_time_profiler), intent(inout) :: self
+        !> Identifier for the timestamp record
+        type(type_constant_id), intent(in) :: label
+
+        if (.not. TIME_RECORDS%is_valid(label)) return
+
+        associate (record => self%timestamps(label%ID))
+            call date_and_time(date=record%date, time=record%time, zone=record%zone)
+        end associate
+    end subroutine record_time
+
+    !> Start the timer for a specified profiling section
+    !>
+    !> Mathematical definition:
+    !> - Records the current system wall time
+    !>
+    !> Assumptions:
+    !> - Label is a valid profiler identifier
+    !> - Timer is not already running
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Stops execution if label is invalid or timer is already running
+    subroutine start_profile(self, label)
+        implicit none
+        !> Profiler manager object
+        !> Overwritten on exit
+        class(type_time_profiler), intent(inout) :: self
+        !> Identifier for the profiler record
+        type(type_constant_id), intent(in) :: label
+
+        if (.not. PROFILER_TYPES%is_valid(label)) then
+            call raise_error(ERROR_CODES%INVALID_PROFILER_LABEL, opt=strip(label%NAME))
         end if
-    end subroutine start_profile_by_id
 
-    subroutine stop_profile_by_name(self, label)
-        implicit none
-        class(type_profiler), intent(inout) :: self
-        character(len=*), intent(in) :: label
-        integer(int32) :: id
-
-        call self%get_profiler_id(label, id)
-        if (id > 0) then
-            call self%stop_profile_by_id(id)
-        else
-            call raise_error(ERROR_CODES%INVALID_PROFILER_LABEL, opt=strip(label))
+        if (self%timers(label%ID)%running) then
+            error stop "Profiler '"//strip(label%NAME)//"' is already running."
         end if
-    end subroutine stop_profile_by_name
 
-    subroutine stop_profile_by_id(self, id)
+        call self%get_current_wall_time(self%timers(label%ID)%start_time)
+        self%timers(label%ID)%running = .true.
+        self%timers(label%ID)%num_calls = self%timers(label%ID)%num_calls + 1
+    end subroutine start_profile
+
+    !> Stop the timer for a specified profiling section
+    !>
+    !> Mathematical definition:
+    !> - Calculates elapsed time and accumulates it
+    !>
+    !> Assumptions:
+    !> - Label is a valid profiler identifier
+    !> - Timer is currently running
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Stops execution if label is invalid or timer is not running
+    subroutine stop_profile(self, label)
         implicit none
-        class(type_profiler), intent(inout) :: self
-        integer(int32), intent(in) :: id
+        !> Profiler manager object
+        !> Overwritten on exit
+        class(type_time_profiler), intent(inout) :: self
+        !> Identifier for the profiler record
+        type(type_constant_id), intent(in) :: label
+
         real(real64) :: end_time
 
-        if (allocated(self%sections)) then
-            if (id >= 1 .and. id <= size(self%sections)) then
-                call self%get_current_wall_time(end_time)
-                self%sections(id)%total_time = self%sections(id)%total_time &
-                                               + (end_time - self%sections(id)%start_time)
-                self%sections(id)%start_time = 0.0d0
-            end if
+        if (.not. PROFILER_TYPES%is_valid(label)) then
+            call raise_error(ERROR_CODES%INVALID_PROFILER_LABEL, opt=strip(label%NAME))
         end if
-    end subroutine stop_profile_by_id
 
+        if (.not. self%timers(label%ID)%running) then
+            error stop "Profiler '"//strip(label%NAME)//"' is not running."
+        end if
+
+        call self%get_current_wall_time(end_time)
+        self%timers(label%ID)%total_time = self%timers(label%ID)%total_time &
+                                           + (end_time - self%timers(label%ID)%start_time)
+        self%timers(label%ID)%start_time = 0.0d0
+        self%timers(label%ID)%running = .false.
+    end subroutine stop_profile
+
+    !> Get the current system wall time
+    !>
+    !> Mathematical definition:
+    !> - Retrieves the wall clock time in seconds
+    !>
+    !> Assumptions:
+    !> - OpenMP or system clock is available
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine get_current_wall_time(self, current_time)
         implicit none
-        class(type_profiler), intent(in) :: self
+        !> Profiler manager object
+        class(type_time_profiler), intent(in) :: self
+        !> Current wall time in seconds
+        !> Overwritten on exit
         real(real64), intent(inout) :: current_time
+
         integer(int32) :: count, rate
 
 #ifdef _OPENMP
@@ -200,155 +407,49 @@ contains
 #endif
     end subroutine get_current_wall_time
 
-    subroutine record_profiler(self, label)
-        implicit none
-        class(type_profiler), intent(inout) :: self
-        type(type_constant_id), intent(in) :: label
-
-        if (.not. TIME_RECORDS%is_valid(label)) then
-            ! call raise_error(ERROR_CODES%INVALID_PROFILER_LABEL, opt=strip(get_time_record_string(label)))
-            return
-        end if
-
-        if (label == TIME_RECORDS%START) then
-            call date_and_time(date=self%record_start%date, time=self%record_start%time, &
-                               zone=self%record_start%zone)
-
-            self%record_start%label = TIME_RECORDS%START
-        else if (label == TIME_RECORDS%END) then
-            call date_and_time(date=self%record_end%date, time=self%record_end%time, &
-                               zone=self%record_end%zone)
-            self%record_end%label = TIME_RECORDS%END
-        end if
-
-    end subroutine record_profiler
-
-    subroutine get_record_profiler(self, label, record)
-        implicit none
-        class(type_profiler), intent(in) :: self
-        type(type_constant_id), intent(in) :: label
-        character(:), allocatable, intent(inout) :: record
-
-        if (.not. TIME_RECORDS%is_valid(label) ) then
-            return
-        end if
-
-        if (label == TIME_RECORDS%START) then
-            call self%record_start%get_log(record)
-        else if (label == TIME_RECORDS%END) then
-            call self%record_end%get_log(record)
-        end if
-
-    end subroutine get_record_profiler
-
-!> Extracts all profiling data including percentage
-    !> Logic: If "Total" section exists, use its time as 100%. Otherwise, sum of all sections is 100%.
-    subroutine get_profiling_data(self, str_start, str_end, sec_labels, sec_total_times, sec_call_counts, sec_percentages)
-        implicit none
-        class(type_profiler), intent(in) :: self
-        character(:), allocatable, intent(inout) :: str_start
-        character(:), allocatable, intent(inout) :: str_end
-        character(20), allocatable, intent(inout) :: sec_labels(:)
-        real(real64), allocatable, intent(inout) :: sec_total_times(:)
-        integer(int32), allocatable, intent(inout) :: sec_call_counts(:)
-        real(real64), allocatable, intent(inout) :: sec_percentages(:)
-
-        integer(int32) :: n, i, idx_total
-        real(real64) :: total_basis
-
-        ! --- Export Time Records ---
-        call self%record_start%format(str_start)
-        call self%record_end%format(str_end)
-
-        ! --- Export Section Arrays ---
-        if (allocated(self%sections)) then
-            n = size(self%sections)
-
-            ! Reallocate output arrays
-            if (allocated(sec_labels)) deallocate (sec_labels)
-            if (allocated(sec_total_times)) deallocate (sec_total_times)
-            if (allocated(sec_call_counts)) deallocate (sec_call_counts)
-            if (allocated(sec_percentages)) deallocate (sec_percentages)
-
-            allocate (sec_labels(n))
-            allocate (sec_total_times(n))
-            allocate (sec_call_counts(n))
-            allocate (sec_percentages(n))
-
-            ! Copy Data
-            sec_labels = self%sections%label
-            sec_total_times = self%sections%total_time
-            sec_call_counts = self%sections%call_count
-
-            ! --- Calculate Percentages ---
-            total_basis = 0.0d0
-            idx_total = -1
-
-            ! 1. Search for "Total" section
-            do i = 1, n
-                if (strip(self%sections(i)%label) == 'Total') then
-                    idx_total = i
-                    exit
-                end if
-            end do
-
-            ! 2. Determine the basis (denominator)
-            if (idx_total > 0) then
-                ! If "Total" exists, use its time as the basis
-                total_basis = self%sections(idx_total)%total_time
-            else
-                ! If not, use the sum of all sections
-                total_basis = sum(self%sections%total_time)
-            end if
-
-            ! 3. Compute percentage
-            if (total_basis > 1.0d-12) then
-                sec_percentages = (self%sections%total_time / total_basis) * 100.0d0
-            else
-                sec_percentages = 0.0d0
-            end if
-
-        else
-            ! Deallocate if no sections
-            if (allocated(sec_labels)) deallocate (sec_labels)
-            if (allocated(sec_total_times)) deallocate (sec_total_times)
-            if (allocated(sec_call_counts)) deallocate (sec_call_counts)
-            if (allocated(sec_percentages)) deallocate (sec_percentages)
-        end if
-
-    end subroutine get_profiling_data
-
+    !> Display the accumulated profiling results
+    !>
+    !> Mathematical definition:
+    !> - Formats and writes timing summaries to the specified output unit
+    !>
+    !> Assumptions:
+    !> - None
+    !>
+    !> Numerical guarantee:
+    !> - No theoretical error bound available
+    !>
+    !> Computational complexity:
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(n)\)
+    !>
+    !> Failure behavior:
+    !> - Returns without error
     subroutine display_profiler(self, unit)
         implicit none
-        class(type_profiler), intent(in) :: self
+        !> Profiler manager object
+        class(type_time_profiler), intent(in) :: self
+        !> Optional output unit number
         integer(int32), intent(in), optional :: unit
 
         integer(int32) :: i, out_unit
         character(:), allocatable :: str_start, str_end
-        real(real64) :: sum_total_time, percentage
-
+        real(real64) :: percentage, total_reference
         logical :: is_opened
         character(20) :: write_action
 
-        ! --- Output destination setting and validation ---
         out_unit = output_unit
         if (present(unit)) then
             if (unit /= output_unit) then
                 inquire (unit=unit, opened=is_opened, write=write_action)
-                if (is_opened .and. strip(write_action) == 'YES') then
-                    out_unit = unit
-                else
-                    out_unit = output_unit
-                end if
+                if (is_opened .and. strip(write_action) == "YES") out_unit = unit
             else
                 out_unit = unit
             end if
         end if
 
-        call self%record_start%format(str_start)
-        call self%record_end%format(str_end)
+        call self%timestamps(TIME_RECORDS%START%ID)%get_log_entry(str_start)
+        call self%timestamps(TIME_RECORDS%END%ID)%get_log_entry(str_end)
 
-        ! --- Output in Markdown format ---
         write (out_unit, '(a)') "## Time Profiler Results"
         write (out_unit, '(a)') ""
 
@@ -366,36 +467,40 @@ contains
 
         write (out_unit, '(a)') ""
 
-        ! --- Display section table with Percentage ---
-        if (allocated(self%sections)) then
-            if (size(self%sections) > 0) then
-                sum_total_time = sum(self%sections%total_time)
+        if (allocated(self%timers)) then
+            if (size(self%timers) > 0) then
+                total_reference = self%timers(PROFILER_TYPES%TOTAL%ID)%total_time
+                if (total_reference <= 1.0d-12) total_reference = sum(self%timers%total_time)
 
-                ! Header adjusted for Percentage column
-                write (out_unit, '(a)') "| Section            | Time (s)   | Calls | Percentage |"
-                write (out_unit, '(a)') "|:-------------------|:----------:|:-----:|:----------:|"
+                write (out_unit, '(a)') "| Section      | Time (s)   | Calls | %     |"
+                write (out_unit, '(a)') "|:-------------|:----------:|:-----:|:-----:|"
 
-                do i = 1, size(self%sections)
-                    ! Calculate percentage for display
+                do i = 1, size(self%timers)
+                    if (self%timers(i)%label%ID == PROFILER_TYPES%TOTAL%ID) cycle
+
                     percentage = 0.0d0
-                    if (sum_total_time > 1.0d-12) then
-                        percentage = (self%sections(i)%total_time / sum_total_time) * 100.0d0
+                    if (total_reference > 1.0d-12) then
+                        percentage = (self%timers(i)%total_time / total_reference) * 100.0d0
                     end if
 
-                    ! f6.1 format for percentage (e.g. 100.0 or 12.5)
-                    write (out_unit, '("| ", a20, " | ", es10.3, " | ", i5, " | ", f6.1, "%    |")') &
-                        self%sections(i)%label, &
-                        self%sections(i)%total_time, &
-                        self%sections(i)%call_count, &
+                    write (out_unit, '("| ", a12, " | ", es10.3, " | ", i5, " | ", f5.1, " |")') &
+                        self%timers(i)%label%NAME, &
+                        self%timers(i)%total_time, &
+                        self%timers(i)%num_calls, &
                         percentage
                 end do
+
+                write (out_unit, '(a)') "|--------------|------------|-------|-------|"
+                write (out_unit, '("| ", a12, " | ", es10.3, " | ", i5, " |   -   |")') &
+                    self%timers(PROFILER_TYPES%TOTAL%ID)%label%NAME, &
+                    self%timers(PROFILER_TYPES%TOTAL%ID)%total_time, &
+                    self%timers(PROFILER_TYPES%TOTAL%ID)%num_calls
             else
                 write (out_unit, '(a)') "(No sections recorded)"
             end if
         end if
 
         write (out_unit, '(a)') ""
-
     end subroutine display_profiler
 
 end module control_time_profiler

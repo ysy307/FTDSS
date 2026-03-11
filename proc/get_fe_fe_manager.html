@@ -1,0 +1,988 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>get_fe_fe_manager &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>get_fe_fe_manager
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">10 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/fe_manager.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/fe_manager.f90.html'>fe_manager.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/domain_fe_manager.html'>domain_fe_manager</a></li>
+            <li class="breadcrumb-item active" aria-current="page">get_fe_fe_manager</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/get_fe_fe_manager.html#src">get_fe_fe_manager</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>public  subroutine get_fe_fe_manager(self, fe_id, fe)  
+</h2>
+    
+
+    <p>Get a pointer to the FE object corresponding to a given ID</p>
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_fe_manager.html'>type_fe_manager</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~40"></span>
+              class(<a href='../type/type_fe_manager.html'>type_fe_manager</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                <p>The FE manager object</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-fe_id"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>fe_id</strong></td>
+            <td>
+                <p>The ID of the FE object</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-fe~2"></span>
+              class(<a href='../type/abst_fe.html'>abst_fe</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>fe</strong></td>
+            <td>
+                <p>Pointer to the requested FE object</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~get_fe_fe_manager~~CalledByGraph Pages: 1 -->
+<svg id="procget_fe_fe_managerCalledByGraph" width="641pt" height="85pt"
+ viewBox="0.00 0.00 641.00 84.90" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_fe_fe_manager~~CalledByGraph" class="graph" transform="scale(0.21 0.21) rotate(0) translate(4 394.56)">
+<title>proc~~get_fe_fe_manager~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-394.56 3005,-394.56 3005,4 -4,4"/>
+<!-- proc~get_fe_fe_manager -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node1" class="node">
+<title>proc~get_fe_fe_manager</title>
+<polygon fill="none" stroke="black" points="3001,-270.56 2783,-270.56 2783,-246.56 3001,-246.56 3001,-270.56"/>
+<text text-anchor="middle" x="2892" y="-256.16" font-family="Helvetica,sans-Serif" font-size="10.50">type_fe_manager%get_fe_fe_manager</text>
+</g>
+<!-- proc~apply_natural_bc_generic -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node2" class="node">
+<title>proc~apply_natural_bc_generic</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node2"><a xlink:href="../proc/apply_natural_bc_generic.html" xlink:title="apply_natural_bc_generic">
+<polygon fill="#d9534f" stroke="#d9534f" points="2673.5,-321.56 2524.5,-321.56 2524.5,-297.56 2673.5,-297.56 2673.5,-321.56"/>
+<text text-anchor="middle" x="2599" y="-307.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">apply_natural_bc_generic</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_natural_bc_generic&#45;&gt;proc~get_fe_fe_manager -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge1" class="edge">
+<title>proc~apply_natural_bc_generic&#45;&gt;proc~get_fe_fe_manager</title>
+<path fill="none" stroke="#ff0000" d="M2668.59,-297.54C2711.71,-289.98 2767.47,-280.21 2812.37,-272.34"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2813.12,-275.76 2822.36,-270.59 2811.91,-268.87 2813.12,-275.76"/>
+</g>
+<!-- proc~get_fe_elements_manager -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node3" class="node">
+<title>proc~get_fe_elements_manager</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node3"><a xlink:href="../proc/get_fe_elements_manager.html" xlink:title="type_elements_manager%get_fe_elements_manager">
+<polygon fill="#d9534f" stroke="#d9534f" points="2747,-249.56 2451,-249.56 2451,-225.56 2747,-225.56 2747,-249.56"/>
+<text text-anchor="middle" x="2599" y="-235.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_elements_manager%get_fe_elements_manager</text>
+</a>
+</g>
+</g>
+<!-- proc~get_fe_elements_manager&#45;&gt;proc~get_fe_fe_manager -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge2" class="edge">
+<title>proc~get_fe_elements_manager&#45;&gt;proc~get_fe_fe_manager</title>
+<path fill="none" stroke="#ff0000" d="M2747.21,-248.18C2755.72,-248.8 2764.23,-249.41 2772.62,-250.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2772.56,-253.52 2782.78,-250.75 2773.06,-246.54 2772.56,-253.52"/>
+</g>
+<!-- interface~apply_natural_bc_generic -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node4" class="node">
+<title>interface~apply_natural_bc_generic</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node4"><a xlink:href="../interface/apply_natural_bc_generic.html" xlink:title="type_ftcms%apply_natural_bc_generic">
+<polygon fill="#a7506f" stroke="#a7506f" points="2415,-382.56 2198,-382.56 2198,-358.56 2415,-358.56 2415,-382.56"/>
+<text text-anchor="middle" x="2306.5" y="-368.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%apply_natural_bc_generic</text>
+</a>
+</g>
+</g>
+<!-- interface~apply_natural_bc_generic&#45;&gt;proc~apply_natural_bc_generic -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge3" class="edge">
+<title>interface~apply_natural_bc_generic&#45;&gt;proc~apply_natural_bc_generic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2364.89,-358.51C2412.64,-348.48 2480.67,-334.19 2530.92,-323.64"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2531.66,-327.07 2540.73,-321.58 2530.22,-320.21 2531.66,-327.07"/>
+</g>
+<!-- proc~get_fe_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node5" class="node">
+<title>proc~get_fe_domain</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node5"><a xlink:href="../proc/get_fe_domain.html" xlink:title="type_domain%get_fe_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="2391.5,-199.56 2221.5,-199.56 2221.5,-175.56 2391.5,-175.56 2391.5,-199.56"/>
+<text text-anchor="middle" x="2306.5" y="-185.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_fe_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~get_fe_domain&#45;&gt;proc~get_fe_elements_manager -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge4" class="edge">
+<title>proc~get_fe_domain&#45;&gt;proc~get_fe_elements_manager</title>
+<path fill="none" stroke="#00ffff" d="M2377.45,-199.6C2419.82,-206.89 2474,-216.21 2518.05,-223.8"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2517.7,-227.29 2528.15,-225.54 2518.89,-220.39 2517.7,-227.29"/>
+</g>
+<!-- proc~initialize_type_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node6" class="node">
+<title>proc~initialize_type_domain</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node6"><a xlink:href="../proc/initialize_type_domain.html" xlink:title="type_domain%initialize_type_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="2411.5,-249.56 2201.5,-249.56 2201.5,-225.56 2411.5,-225.56 2411.5,-249.56"/>
+<text text-anchor="middle" x="2306.5" y="-235.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%initialize_type_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_domain&#45;&gt;proc~get_fe_elements_manager -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge5" class="edge">
+<title>proc~initialize_type_domain&#45;&gt;proc~get_fe_elements_manager</title>
+<path fill="none" stroke="#00ffff" d="M2411.56,-237.56C2421.04,-237.56 2430.78,-237.56 2440.6,-237.56"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2440.85,-241.06 2450.85,-237.56 2440.85,-234.06 2440.85,-241.06"/>
+</g>
+<!-- proc~apply_bc_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node7" class="node">
+<title>proc~apply_bc_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node7"><a xlink:href="../proc/apply_bc_ftcms.html" xlink:title="apply_bc_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="2105.5,-390.56 2011.5,-390.56 2011.5,-366.56 2105.5,-366.56 2105.5,-390.56"/>
+<text text-anchor="middle" x="2058.5" y="-376.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">apply_bc_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~apply_bc_ftcms&#45;&gt;interface~apply_natural_bc_generic -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge6" class="edge">
+<title>proc~apply_bc_ftcms&#45;&gt;interface~apply_natural_bc_generic</title>
+<path fill="none" stroke="#ff0000" d="M2105.77,-377.05C2129.11,-376.29 2158.6,-375.34 2187.69,-374.39"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2188.08,-377.88 2197.96,-374.06 2187.85,-370.88 2188.08,-377.88"/>
+</g>
+<!-- proc~assemble_initialize_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node8" class="node">
+<title>proc~assemble_initialize_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node8"><a xlink:href="../proc/assemble_initialize_ftcms.html" xlink:title="assemble_initialize_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1896.5,-72.56 1748.5,-72.56 1748.5,-48.56 1896.5,-48.56 1896.5,-72.56"/>
+<text text-anchor="middle" x="1822.5" y="-58.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_initialize_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_initialize_ftcms&#45;&gt;proc~get_fe_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge7" class="edge">
+<title>proc~assemble_initialize_ftcms&#45;&gt;proc~get_fe_domain</title>
+<path fill="none" stroke="#00ff00" d="M1896.1,-48.52C1966.48,-39.94 2075.03,-34.97 2162,-67.56 2216.8,-88.1 2265.56,-139.18 2289.63,-167.63"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="2286.94,-169.88 2296.01,-175.35 2292.33,-165.41 2286.94,-169.88"/>
+</g>
+<!-- proc~calc_gradient_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node9" class="node">
+<title>proc~calc_gradient_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node9"><a xlink:href="../proc/calc_gradient_ftcms.html" xlink:title="calc_gradient_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="2118,-226.56 1999,-226.56 1999,-202.56 2118,-202.56 2118,-226.56"/>
+<text text-anchor="middle" x="2058.5" y="-212.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_gradient_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_ftcms&#45;&gt;proc~get_fe_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge8" class="edge">
+<title>proc~calc_gradient_ftcms&#45;&gt;proc~get_fe_domain</title>
+<path fill="none" stroke="#00ff00" d="M2118.11,-208.13C2145.94,-205.07 2179.89,-201.34 2211.21,-197.91"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="2211.71,-201.37 2221.27,-196.8 2210.95,-194.41 2211.71,-201.37"/>
+</g>
+<!-- proc~calc_measure_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node10" class="node">
+<title>proc~calc_measure_domain</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node10"><a xlink:href="../proc/calc_measure_domain.html" xlink:title="type_domain%calc_measure_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="1168,-42.56 957,-42.56 957,-18.56 1168,-18.56 1168,-42.56"/>
+<text text-anchor="middle" x="1062.5" y="-28.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%calc_measure_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_measure_domain&#45;&gt;proc~get_fe_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge9" class="edge">
+<title>proc~calc_measure_domain&#45;&gt;proc~get_fe_domain</title>
+<path fill="none" stroke="#00ff00" d="M1168.04,-24.28C1274.91,-18.42 1445.71,-10.56 1593.5,-10.56 1593.5,-10.56 1593.5,-10.56 1823.5,-10.56 1974.46,-10.56 2025.64,26.2 2162,-38.56 2222.49,-67.29 2271,-133.22 2292.88,-166.91"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="2290.02,-168.94 2298.33,-175.5 2295.93,-165.18 2290.02,-168.94"/>
+</g>
+<!-- proc~dlerp_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node11" class="node">
+<title>proc~dlerp_domain</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node11"><a xlink:href="../proc/dlerp_domain.html" xlink:title="type_domain%dlerp_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="2141,-100.56 1976,-100.56 1976,-76.56 2141,-76.56 2141,-100.56"/>
+<text text-anchor="middle" x="2058.5" y="-86.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%dlerp_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~dlerp_domain&#45;&gt;proc~get_fe_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge10" class="edge">
+<title>proc~dlerp_domain&#45;&gt;proc~get_fe_domain</title>
+<path fill="none" stroke="#00ff00" d="M2131.93,-100.6C2142.16,-103.1 2152.44,-106.07 2162,-109.56 2205.02,-125.26 2250.88,-152.2 2278.87,-169.94"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="2277,-172.9 2287.3,-175.36 2280.78,-167.01 2277,-172.9"/>
+</g>
+<!-- proc~find_element_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node12" class="node">
+<title>proc~find_element_domain</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node12"><a xlink:href="../proc/find_element_domain.html" xlink:title="type_domain%find_element_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="2162,-268.56 1955,-268.56 1955,-244.56 2162,-244.56 2162,-268.56"/>
+<text text-anchor="middle" x="2058.5" y="-254.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%find_element_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~find_element_domain&#45;&gt;proc~get_fe_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge11" class="edge">
+<title>proc~find_element_domain&#45;&gt;proc~get_fe_domain</title>
+<path fill="none" stroke="#00ff00" d="M2131.35,-244.55C2141.76,-242.03 2152.25,-239.05 2162,-235.56 2179.03,-229.46 2181.16,-223.18 2198,-216.56 2211.89,-211.1 2227.17,-206.3 2241.75,-202.25"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="2242.96,-205.55 2251.7,-199.57 2241.14,-198.79 2242.96,-205.55"/>
+</g>
+<!-- proc~get_config_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node13" class="node">
+<title>proc~get_config_domain</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node13"><a xlink:href="../proc/get_config_domain.html" xlink:title="type_domain%get_config_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="1919,-288.56 1726,-288.56 1726,-264.56 1919,-264.56 1919,-288.56"/>
+<text text-anchor="middle" x="1822.5" y="-274.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_config_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~get_config_domain&#45;&gt;proc~get_fe_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge12" class="edge">
+<title>proc~get_config_domain&#45;&gt;proc~get_fe_domain</title>
+<path fill="none" stroke="#00ff00" d="M1919.06,-287.23C2004.45,-294.91 2122.07,-300.36 2162,-277.56 2189.34,-261.95 2172.95,-235.62 2198,-216.56 2205.04,-211.2 2213,-206.83 2221.33,-203.27"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="2222.79,-206.45 2230.85,-199.58 2220.26,-199.93 2222.79,-206.45"/>
+</g>
+<!-- proc~get_config_domain&#45;&gt;proc~find_element_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge20" class="edge">
+<title>proc~get_config_domain&#45;&gt;proc~find_element_domain</title>
+<path fill="none" stroke="#00ffff" d="M1919.01,-268.39C1927.46,-267.67 1936.06,-266.94 1944.64,-266.2"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1945.01,-269.69 1954.67,-265.35 1944.41,-262.71 1945.01,-269.69"/>
+</g>
+<!-- proc~lerp_1d_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node14" class="node">
+<title>proc~lerp_1d_domain</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node14"><a xlink:href="../proc/lerp_1d_domain.html" xlink:title="type_domain%lerp_1d_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="2147,-348.56 1970,-348.56 1970,-324.56 2147,-324.56 2147,-348.56"/>
+<text text-anchor="middle" x="2058.5" y="-334.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%lerp_1d_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~lerp_1d_domain&#45;&gt;proc~get_fe_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge13" class="edge">
+<title>proc~lerp_1d_domain&#45;&gt;proc~get_fe_domain</title>
+<path fill="none" stroke="#00ff00" d="M2139.5,-324.55C2147.69,-320.99 2155.41,-316.41 2162,-310.56 2195.43,-280.83 2164.79,-246.53 2198,-216.56 2203.57,-211.53 2209.93,-207.35 2216.71,-203.9"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="2218.5,-206.93 2226.17,-199.61 2215.62,-200.55 2218.5,-206.93"/>
+</g>
+<!-- proc~lerp_2d_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node15" class="node">
+<title>proc~lerp_2d_domain</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node15"><a xlink:href="../proc/lerp_2d_domain.html" xlink:title="type_domain%lerp_2d_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="2147,-184.56 1970,-184.56 1970,-160.56 2147,-160.56 2147,-184.56"/>
+<text text-anchor="middle" x="2058.5" y="-170.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%lerp_2d_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~lerp_2d_domain&#45;&gt;proc~get_fe_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge14" class="edge">
+<title>proc~lerp_2d_domain&#45;&gt;proc~get_fe_domain</title>
+<path fill="none" stroke="#00ff00" d="M2147.27,-177.91C2168.02,-179.18 2190.23,-180.53 2211.26,-181.81"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="2211.28,-185.32 2221.47,-182.43 2211.7,-178.33 2211.28,-185.32"/>
+</g>
+<!-- proc~lerp_3d_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node16" class="node">
+<title>proc~lerp_3d_domain</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node16"><a xlink:href="../proc/lerp_3d_domain.html" xlink:title="type_domain%lerp_3d_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="2147,-142.56 1970,-142.56 1970,-118.56 2147,-118.56 2147,-142.56"/>
+<text text-anchor="middle" x="2058.5" y="-128.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%lerp_3d_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~lerp_3d_domain&#45;&gt;proc~get_fe_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge15" class="edge">
+<title>proc~lerp_3d_domain&#45;&gt;proc~get_fe_domain</title>
+<path fill="none" stroke="#00ff00" d="M2120.57,-142.61C2134.23,-145.44 2148.63,-148.51 2162,-151.56 2191.09,-158.18 2223.33,-166.21 2249.86,-173"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="2249.18,-176.44 2259.74,-175.54 2250.92,-169.66 2249.18,-176.44"/>
+</g>
+<!-- interface~apply_bc_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node17" class="node">
+<title>interface~apply_bc_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node17"><a xlink:href="../interface/apply_bc_ftcms.html" xlink:title="type_ftcms%apply_bc_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1903.5,-330.56 1741.5,-330.56 1741.5,-306.56 1903.5,-306.56 1903.5,-330.56"/>
+<text text-anchor="middle" x="1822.5" y="-316.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%apply_bc_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~apply_bc_ftcms&#45;&gt;proc~apply_bc_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge16" class="edge">
+<title>interface~apply_bc_ftcms&#45;&gt;proc~apply_bc_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1860.96,-330.6C1887.14,-338.79 1923.01,-349.55 1955,-357.56 1969.89,-361.28 1986.12,-364.84 2001.18,-367.93"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2000.89,-371.44 2011.39,-369.99 2002.28,-364.58 2000.89,-371.44"/>
+</g>
+<!-- interface~assemble_initialize_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node18" class="node">
+<title>interface~assemble_initialize_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node18"><a xlink:href="../interface/assemble_initialize_ftcms.html" xlink:title="type_ftcms%assemble_initialize_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1441,-83.56 1226,-83.56 1226,-59.56 1441,-59.56 1441,-83.56"/>
+<text text-anchor="middle" x="1333.5" y="-69.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%assemble_initialize_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_initialize_ftcms&#45;&gt;proc~assemble_initialize_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge17" class="edge">
+<title>interface~assemble_initialize_ftcms&#45;&gt;proc~assemble_initialize_ftcms</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1441.07,-69.15C1530.42,-67.13 1656.22,-64.29 1738.3,-62.44"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="1738.41,-65.94 1748.33,-62.21 1738.25,-58.94 1738.41,-65.94"/>
+</g>
+<!-- interface~calc_gradient_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node19" class="node">
+<title>interface~calc_gradient_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node19"><a xlink:href="../interface/calc_gradient_ftcms.html" xlink:title="type_ftcms%calc_gradient_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1916,-187.56 1729,-187.56 1729,-163.56 1916,-163.56 1916,-187.56"/>
+<text text-anchor="middle" x="1822.5" y="-173.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%calc_gradient_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_gradient_ftcms&#45;&gt;proc~calc_gradient_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge18" class="edge">
+<title>interface~calc_gradient_ftcms&#45;&gt;proc~calc_gradient_ftcms</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M1895.62,-187.58C1925.29,-192.52 1959.5,-198.22 1988.8,-203.11"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1988.51,-206.61 1998.95,-204.8 1989.66,-199.7 1988.51,-206.61"/>
+</g>
+<!-- proc~initialize_type_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node20" class="node">
+<title>proc~initialize_type_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node20"><a xlink:href="../proc/initialize_type_ftcms.html" xlink:title="initialize_type_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1654.5,-288.56 1534.5,-288.56 1534.5,-264.56 1654.5,-264.56 1654.5,-288.56"/>
+<text text-anchor="middle" x="1594.5" y="-274.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_type_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_ftcms&#45;&gt;proc~get_config_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge21" class="edge">
+<title>proc~initialize_type_ftcms&#45;&gt;proc~get_config_domain</title>
+<path fill="none" stroke="#0066ff" d="M1654.58,-276.56C1673.24,-276.56 1694.46,-276.56 1715.36,-276.56"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1715.59,-280.06 1725.59,-276.56 1715.59,-273.06 1715.59,-280.06"/>
+</g>
+<!-- proc~initialize_type_ftcms&#45;&gt;interface~apply_bc_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge22" class="edge">
+<title>proc~initialize_type_ftcms&#45;&gt;interface~apply_bc_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M1654.58,-287.54C1682.78,-292.78 1716.84,-299.11 1746.81,-304.68"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1746.33,-308.15 1756.8,-306.53 1747.61,-301.27 1746.33,-308.15"/>
+</g>
+<!-- proc~update_variables_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node21" class="node">
+<title>proc~update_variables_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node21"><a xlink:href="../proc/update_variables_ftcms.html" xlink:title="update_variables_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="651,-68.56 512,-68.56 512,-44.56 651,-44.56 651,-68.56"/>
+<text text-anchor="middle" x="581.5" y="-54.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">update_variables_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~update_variables_ftcms&#45;&gt;proc~calc_measure_domain -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge19" class="edge">
+<title>proc~update_variables_ftcms&#45;&gt;proc~calc_measure_domain</title>
+<path fill="none" stroke="#33ff00" d="M651.13,-52.83C728.18,-48.65 854.45,-41.8 946.6,-36.79"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="947.03,-40.28 956.82,-36.24 946.65,-33.29 947.03,-40.28"/>
+</g>
+<!-- interface~initialize_type_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node22" class="node">
+<title>interface~initialize_type_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node22"><a xlink:href="../interface/initialize_type_ftcms.html" xlink:title="type_ftcms%initialize_type_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1427,-288.56 1240,-288.56 1240,-264.56 1427,-264.56 1427,-288.56"/>
+<text text-anchor="middle" x="1333.5" y="-274.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%initialize_type_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_ftcms&#45;&gt;proc~initialize_type_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge27" class="edge">
+<title>interface~initialize_type_ftcms&#45;&gt;proc~initialize_type_ftcms</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M1427.27,-276.56C1459.21,-276.56 1494.41,-276.56 1524.15,-276.56"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1524.43,-280.06 1534.43,-276.56 1524.43,-273.06 1524.43,-280.06"/>
+</g>
+<!-- interface~update_variables_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node23" class="node">
+<title>interface~update_variables_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node23"><a xlink:href="../interface/update_variables_ftcms.html" xlink:title="type_ftcms%update_variables_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="476,-88.56 270,-88.56 270,-64.56 476,-64.56 476,-88.56"/>
+<text text-anchor="middle" x="373" y="-74.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%update_variables_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~update_variables_ftcms&#45;&gt;proc~update_variables_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge28" class="edge">
+<title>interface~update_variables_ftcms&#45;&gt;proc~update_variables_ftcms</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M476.04,-66.68C484.64,-65.84 493.24,-65.01 501.62,-64.2"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="502.1,-67.67 511.72,-63.22 501.43,-60.7 502.1,-67.67"/>
+</g>
+<!-- proc~assemble_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node24" class="node">
+<title>proc~assemble_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node24"><a xlink:href="../proc/assemble_ftcms.html" xlink:title="assemble_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1111.5,-103.56 1013.5,-103.56 1013.5,-79.56 1111.5,-79.56 1111.5,-103.56"/>
+<text text-anchor="middle" x="1062.5" y="-89.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_ftcms&#45;&gt;interface~assemble_initialize_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge24" class="edge">
+<title>proc~assemble_ftcms&#45;&gt;interface~assemble_initialize_ftcms</title>
+<path fill="none" stroke="#cbff00" d="M1111.59,-87.98C1140.6,-85.83 1178.91,-82.98 1215.46,-80.26"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1216.01,-83.73 1225.72,-79.5 1215.49,-76.75 1216.01,-83.73"/>
+</g>
+<!-- proc~calc_gradient_pressure_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node25" class="node">
+<title>proc~calc_gradient_pressure_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node25"><a xlink:href="../proc/calc_gradient_pressure_ftcms.html" xlink:title="calc_gradient_pressure_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1679,-145.56 1510,-145.56 1510,-121.56 1679,-121.56 1679,-145.56"/>
+<text text-anchor="middle" x="1594.5" y="-131.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_gradient_pressure_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_pressure_ftcms&#45;&gt;interface~calc_gradient_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge25" class="edge">
+<title>proc~calc_gradient_pressure_ftcms&#45;&gt;interface~calc_gradient_ftcms</title>
+<path fill="none" stroke="#00ff66" d="M1660.26,-145.59C1687.21,-150.6 1718.67,-156.45 1746.61,-161.64"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1746.26,-165.13 1756.73,-163.52 1747.54,-158.25 1746.26,-165.13"/>
+</g>
+<!-- proc~calc_gradient_temperature_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node26" class="node">
+<title>proc~calc_gradient_temperature_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node26"><a xlink:href="../proc/calc_gradient_temperature_ftcms.html" xlink:title="calc_gradient_temperature_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1690,-187.56 1499,-187.56 1499,-163.56 1690,-163.56 1690,-187.56"/>
+<text text-anchor="middle" x="1594.5" y="-173.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_gradient_temperature_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_gradient_temperature_ftcms&#45;&gt;interface~calc_gradient_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge26" class="edge">
+<title>proc~calc_gradient_temperature_ftcms&#45;&gt;interface~calc_gradient_ftcms</title>
+<path fill="none" stroke="#00ff66" d="M1690.03,-175.56C1699.45,-175.56 1709.04,-175.56 1718.54,-175.56"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1718.79,-179.06 1728.79,-175.56 1718.79,-172.06 1718.79,-179.06"/>
+</g>
+<!-- proc~solve_time_step_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node27" class="node">
+<title>proc~solve_time_step_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node27"><a xlink:href="../proc/solve_time_step_ftcms.html" xlink:title="solve_time_step_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="647.5,-145.56 515.5,-145.56 515.5,-121.56 647.5,-121.56 647.5,-145.56"/>
+<text text-anchor="middle" x="581.5" y="-131.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftcms&#45;&gt;interface~apply_bc_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge23" class="edge">
+<title>proc~solve_time_step_ftcms&#45;&gt;interface~apply_bc_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M599.84,-145.63C660.36,-186.57 869.08,-317.56 1061.5,-317.56 1061.5,-317.56 1061.5,-317.56 1334.5,-317.56 1472.91,-317.56 1633.45,-317.97 1731.22,-318.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1731.35,-321.76 1741.36,-318.29 1731.37,-314.76 1731.35,-321.76"/>
+</g>
+<!-- interface~assemble_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node28" class="node">
+<title>interface~assemble_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node28"><a xlink:href="../interface/assemble_ftcms.html" xlink:title="type_ftcms%assemble_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="887,-103.56 721,-103.56 721,-79.56 887,-79.56 887,-103.56"/>
+<text text-anchor="middle" x="804" y="-89.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%assemble_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftcms&#45;&gt;interface~assemble_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge34" class="edge">
+<title>proc~solve_time_step_ftcms&#45;&gt;interface~assemble_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M641.32,-121.53C656.21,-118.54 672.19,-115.39 687,-112.56 699.29,-110.21 712.33,-107.79 725.06,-105.46"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="725.97,-108.85 735.18,-103.61 724.71,-101.96 725.97,-108.85"/>
+</g>
+<!-- interface~reflect_variables_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node36" class="node">
+<title>interface~reflect_variables_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node36"><a xlink:href="../interface/reflect_variables_ftcms.html" xlink:title="type_ftcms%reflect_variables_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="905,-145.56 703,-145.56 703,-121.56 905,-121.56 905,-145.56"/>
+<text text-anchor="middle" x="804" y="-131.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%reflect_variables_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftcms&#45;&gt;interface~reflect_variables_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge43" class="edge">
+<title>proc~solve_time_step_ftcms&#45;&gt;interface~reflect_variables_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M647.76,-133.56C661.93,-133.56 677.29,-133.56 692.66,-133.56"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="692.75,-137.06 702.75,-133.56 692.75,-130.06 692.75,-137.06"/>
+</g>
+<!-- interface~solve_time_step_setup_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node37" class="node">
+<title>interface~solve_time_step_setup_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node37"><a xlink:href="../interface/solve_time_step_setup_ftcms.html" xlink:title="type_ftcms%solve_time_step_setup_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="921,-187.56 687,-187.56 687,-163.56 921,-163.56 921,-187.56"/>
+<text text-anchor="middle" x="804" y="-173.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_setup_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_setup_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge44" class="edge">
+<title>proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_setup_ftcms</title>
+<path fill="none" stroke="#00ffff" d="M641.32,-145.58C656.21,-148.57 672.19,-151.73 687,-154.56 699.29,-156.91 712.33,-159.33 725.06,-161.66"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="724.71,-165.16 735.18,-163.51 725.97,-158.27 724.71,-165.16"/>
+</g>
+<!-- interface~assemble_ftcms&#45;&gt;proc~assemble_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge30" class="edge">
+<title>interface~assemble_ftcms&#45;&gt;proc~assemble_ftcms</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M887.22,-91.56C924.93,-91.56 968.77,-91.56 1003.04,-91.56"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1003.36,-95.06 1013.36,-91.56 1003.36,-88.06 1003.36,-95.06"/>
+</g>
+<!-- interface~calc_gradient_pressure_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node29" class="node">
+<title>interface~calc_gradient_pressure_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node29"><a xlink:href="../interface/calc_gradient_pressure_ftcms.html" xlink:title="type_ftcms%calc_gradient_pressure_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1452,-145.56 1215,-145.56 1215,-121.56 1452,-121.56 1452,-145.56"/>
+<text text-anchor="middle" x="1333.5" y="-131.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%calc_gradient_pressure_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_gradient_pressure_ftcms&#45;&gt;proc~calc_gradient_pressure_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge31" class="edge">
+<title>interface~calc_gradient_pressure_ftcms&#45;&gt;proc~calc_gradient_pressure_ftcms</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1452.25,-133.56C1468.15,-133.56 1484.28,-133.56 1499.68,-133.56"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1499.69,-137.06 1509.69,-133.56 1499.69,-130.06 1499.69,-137.06"/>
+</g>
+<!-- interface~calc_gradient_temperature_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node30" class="node">
+<title>interface~calc_gradient_temperature_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node30"><a xlink:href="../interface/calc_gradient_temperature_ftcms.html" xlink:title="type_ftcms%calc_gradient_temperature_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1463,-187.56 1204,-187.56 1204,-163.56 1463,-163.56 1463,-187.56"/>
+<text text-anchor="middle" x="1333.5" y="-173.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%calc_gradient_temperature_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_gradient_temperature_ftcms&#45;&gt;proc~calc_gradient_temperature_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge32" class="edge">
+<title>interface~calc_gradient_temperature_ftcms&#45;&gt;proc~calc_gradient_temperature_ftcms</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M1463.24,-175.56C1471.73,-175.56 1480.21,-175.56 1488.56,-175.56"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1488.66,-179.06 1498.66,-175.56 1488.66,-172.06 1488.66,-179.06"/>
+</g>
+<!-- interface~solve_time_step_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node31" class="node">
+<title>interface~solve_time_step_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node31"><a xlink:href="../interface/solve_time_step_ftcms.html" xlink:title="type_ftcms%solve_time_step_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="472.5,-140.56 273.5,-140.56 273.5,-116.56 472.5,-116.56 472.5,-140.56"/>
+<text text-anchor="middle" x="373" y="-126.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge33" class="edge">
+<title>interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M472.71,-130.95C483.72,-131.21 494.79,-131.48 505.42,-131.74"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="505.39,-135.24 515.47,-131.98 505.56,-128.24 505.39,-135.24"/>
+</g>
+<!-- proc~run_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node32" class="node">
+<title>proc~run_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node32"><a xlink:href="../proc/run_ftcms.html" xlink:title="run_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-109.56 169,-109.56 169,-85.56 234,-85.56 234,-109.56"/>
+<text text-anchor="middle" x="201.5" y="-95.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftcms&#45;&gt;interface~update_variables_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge29" class="edge">
+<title>proc~run_ftcms&#45;&gt;interface~update_variables_ftcms</title>
+<path fill="none" stroke="#ffff00" d="M234.38,-93.61C243.41,-92.49 253.78,-91.21 264.68,-89.85"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="265.33,-93.3 274.82,-88.6 264.46,-86.35 265.33,-93.3"/>
+</g>
+<!-- proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge39" class="edge">
+<title>proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms</title>
+<path fill="none" stroke="#0066ff" d="M234.38,-103.39C251.93,-106.6 274.51,-110.73 296.29,-114.71"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="295.75,-118.17 306.21,-116.53 297.01,-111.28 295.75,-118.17"/>
+</g>
+<!-- interface~run_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node33" class="node">
+<title>interface~run_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node33"><a xlink:href="../interface/run_ftcms.html" xlink:title="type_ftcms%run_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="133,-109.56 0,-109.56 0,-85.56 133,-85.56 133,-109.56"/>
+<text text-anchor="middle" x="66.5" y="-95.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftcms&#45;&gt;proc~run_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge40" class="edge">
+<title>interface~run_ftcms&#45;&gt;proc~run_ftcms</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M133.22,-97.56C141.87,-97.56 150.53,-97.56 158.63,-97.56"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="158.89,-101.06 168.89,-97.56 158.89,-94.06 158.89,-101.06"/>
+</g>
+<!-- proc~reflect_variables_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node34" class="node">
+<title>proc~reflect_variables_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node34"><a xlink:href="../proc/reflect_variables_ftcms.html" xlink:title="reflect_variables_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1130,-145.56 995,-145.56 995,-121.56 1130,-121.56 1130,-145.56"/>
+<text text-anchor="middle" x="1062.5" y="-131.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">reflect_variables_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~reflect_variables_ftcms&#45;&gt;interface~calc_gradient_pressure_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge35" class="edge">
+<title>proc~reflect_variables_ftcms&#45;&gt;interface~calc_gradient_pressure_ftcms</title>
+<path fill="none" stroke="#cbff00" d="M1130.34,-133.56C1152.94,-133.56 1178.98,-133.56 1204.69,-133.56"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1204.91,-137.06 1214.91,-133.56 1204.91,-130.06 1204.91,-137.06"/>
+</g>
+<!-- proc~reflect_variables_ftcms&#45;&gt;interface~calc_gradient_temperature_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge37" class="edge">
+<title>proc~reflect_variables_ftcms&#45;&gt;interface~calc_gradient_temperature_ftcms</title>
+<path fill="none" stroke="#00ff66" d="M1130.34,-143.99C1165.19,-149.44 1208.24,-156.16 1245.64,-162"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1245.1,-165.46 1255.53,-163.54 1246.18,-158.54 1245.1,-165.46"/>
+</g>
+<!-- proc~solve_time_step_setup_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_node35" class="node">
+<title>proc~solve_time_step_setup_ftcms</title>
+<g id="a_proc~~get_fe_fe_manager~~CalledByGraph_node35"><a xlink:href="../proc/solve_time_step_setup_ftcms.html" xlink:title="solve_time_step_setup_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1145.5,-187.56 979.5,-187.56 979.5,-163.56 1145.5,-163.56 1145.5,-187.56"/>
+<text text-anchor="middle" x="1062.5" y="-173.16" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_setup_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_setup_ftcms&#45;&gt;interface~calc_gradient_pressure_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge36" class="edge">
+<title>proc~solve_time_step_setup_ftcms&#45;&gt;interface~calc_gradient_pressure_ftcms</title>
+<path fill="none" stroke="#cbff00" d="M1140.58,-163.52C1173.23,-158.43 1211.42,-152.46 1245.11,-147.2"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1246.06,-150.6 1255.4,-145.6 1244.98,-143.68 1246.06,-150.6"/>
+</g>
+<!-- proc~solve_time_step_setup_ftcms&#45;&gt;interface~calc_gradient_temperature_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge38" class="edge">
+<title>proc~solve_time_step_setup_ftcms&#45;&gt;interface~calc_gradient_temperature_ftcms</title>
+<path fill="none" stroke="#00ff66" d="M1145.67,-175.56C1160.9,-175.56 1177.18,-175.56 1193.56,-175.56"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1193.76,-179.06 1203.76,-175.56 1193.76,-172.06 1193.76,-179.06"/>
+</g>
+<!-- interface~reflect_variables_ftcms&#45;&gt;proc~reflect_variables_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge41" class="edge">
+<title>interface~reflect_variables_ftcms&#45;&gt;proc~reflect_variables_ftcms</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M905.27,-133.56C931.7,-133.56 959.79,-133.56 984.76,-133.56"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="984.89,-137.06 994.89,-133.56 984.89,-130.06 984.89,-137.06"/>
+</g>
+<!-- interface~solve_time_step_setup_ftcms&#45;&gt;proc~solve_time_step_setup_ftcms -->
+<g id="proc~~get_fe_fe_manager~~CalledByGraph_edge42" class="edge">
+<title>interface~solve_time_step_setup_ftcms&#45;&gt;proc~solve_time_step_setup_ftcms</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M921.24,-175.56C937.33,-175.56 953.68,-175.56 969.26,-175.56"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="969.37,-179.06 979.37,-175.56 969.37,-172.06 969.37,-179.06"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocget_fe_fe_managerCalledByGraph = svgPanZoom('#procget_fe_fe_managerCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">get_fe_fe_manager</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">fe_id</span><span class="p">,</span><span class="w"> </span><span class="n">fe</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="w">        </span><span class="c">!&gt; The FE manager object</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">type_fe_manager</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">target</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="c">!&gt; The ID of the FE object</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">fe_id</span>
+<span class="w">        </span><span class="c">!&gt; Pointer to the requested FE object</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">abst_fe</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">fe</span>
+
+<span class="w">        </span><span class="k">nullify</span><span class="w"> </span><span class="p">(</span><span class="n">fe</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fe_id</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="n">fe_id</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">fe_map</span><span class="p">))</span><span class="w"> </span><span class="k">return</span>
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">fe_map</span><span class="p">(</span><span class="n">fe_id</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">return</span>
+
+<span class="k">        </span><span class="n">fe</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">fe_list</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">fe_map</span><span class="p">(</span><span class="n">fe_id</span><span class="p">))%</span><span class="n">fe</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">get_fe_fe_manager</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-03-11 14:03 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

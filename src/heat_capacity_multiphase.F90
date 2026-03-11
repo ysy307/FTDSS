@@ -1,4 +1,4 @@
-submodule(physics_materials_heat_capacity) heat_capacity_multiphase
+submodule(materials_heat_capacity) heat_capacity_multiphase
     implicit none
 contains
     module subroutine calc_vhc_gp_1phase(self, state, vhc)
@@ -85,7 +85,7 @@ contains
 
         vhc_water = density_water * sph_water
         vhc_ice = density_ice * sph_ice
-        ! Qvは液状水換算水分量なので、密度は水のまま計算する
+        ! Qv is liquid-equivalent water content, so use water density
         vhc_vapor = density_water * sph_vapor
 
         call state%latent_heat_fusion%get(latent_heat_fusion)

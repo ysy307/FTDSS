@@ -1,7 +1,7 @@
 module module_input
-    use :: inout_input, only: &
+    use :: io_input, only: &
         type_input
-    use :: inout_input_translator, only: &
+    use :: io_input_translator, only: &
         input_translator
     implicit none
     private

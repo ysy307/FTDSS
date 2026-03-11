@@ -2,7 +2,7 @@
 !> Implements the procedures for a Degree-of-Freedom (DOF) based Compressed
 !> Row Storage (csr) sparse matrix.
 !>
-submodule(core_types_matrix) core_types_matrix_csr
+submodule(core_types_algebra_matrix) algebra_matrix_csr
     implicit none
 
 contains
@@ -97,7 +97,7 @@ contains
             row_end = self%ptr(i + 1) - 1
             do j = row_start, row_end
                 if (self%ind(j) == i) then
-                    call diagonal%set(MATRIX_OPS%INS, i, self%val(j))
+                    call diagonal%set(VECTOR_OPS%INS, i, self%val(j))
                     exit
                 end if
             end do
@@ -425,4 +425,4 @@ contains
         end do
     end subroutine display_csr
 
-end submodule core_types_matrix_csr
+end submodule algebra_matrix_csr

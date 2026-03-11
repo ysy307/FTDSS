@@ -1,0 +1,1668 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>algebra_vector_dp &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>algebra_vector_dp
+      <small>Submodule</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.6% of total for modules and submodules.">249 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/vector_dp.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/vector_dp.f90.html'>vector_dp.F90</a></li>
+            <li class="breadcrumb-item active" aria-current="page">algebra_vector_dp</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3">
+        <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#modfuncs-0"
+         aria-expanded="false" aria-controls="modfuncs-0">
+         <h4 class="card-header bg-primary text-white">Module Functions</h4>
+      </a>
+      <div id="modfuncs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/algebra_vector_dp.html#proc-get_data_vector_dp">get_data_vector_dp</a>
+            <a class="list-group-item" href="../module/algebra_vector_dp.html#proc-get_size_vector_dp">get_size_vector_dp</a>
+            <a class="list-group-item" href="../module/algebra_vector_dp.html#proc-get_status_vector_dp">get_status_vector_dp</a>
+            <a class="list-group-item" href="../module/algebra_vector_dp.html#proc-is_initialized_vector_dp">is_initialized_vector_dp</a>
+        </div>
+      </div>
+    </div>
+
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#modsubs-0"
+         aria-expanded="false" aria-controls="modsubs-0">
+         <h4 class="card-header bg-primary text-white">Module Subroutines</h4>
+      </a>
+      <div id="modsubs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/algebra_vector_dp.html#proc-check_vector_dp">check_vector_dp</a>
+            <a class="list-group-item" href="../module/algebra_vector_dp.html#proc-copy_vector_dp">copy_vector_dp</a>
+            <a class="list-group-item" href="../module/algebra_vector_dp.html#proc-destroy_vector_dp">destroy_vector_dp</a>
+            <a class="list-group-item" href="../module/algebra_vector_dp.html#proc-display_vector_dp">display_vector_dp</a>
+            <a class="list-group-item" href="../module/algebra_vector_dp.html#proc-initialize_vector_dp">initialize_vector_dp</a>
+            <a class="list-group-item" href="../module/algebra_vector_dp.html#proc-scale_vector_dp">scale_vector_dp</a>
+            <a class="list-group-item" href="../module/algebra_vector_dp.html#proc-set_array_vector_dp">set_array_vector_dp</a>
+            <a class="list-group-item" href="../module/algebra_vector_dp.html#proc-set_scalar_vector_dp">set_scalar_vector_dp</a>
+            <a class="list-group-item" href="../module/algebra_vector_dp.html#proc-set_value_at_index_vector_dp">set_value_at_index_vector_dp</a>
+            <a class="list-group-item" href="../module/algebra_vector_dp.html#proc-set_values_at_indices_vector_dp">set_values_at_indices_vector_dp</a>
+            <a class="list-group-item" href="../module/algebra_vector_dp.html#proc-zero_vector_dp">zero_vector_dp</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+
+
+  </div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      
+<br>          <div class="card mb-4">
+      <h3 class="card-header card-title bg-light">Uses</h3>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <ul class="list-inline">
+                <li><h5>Ancestors:</h5></li>
+                  <li class="list-inline-item"><a href='core_types_algebra_vector.html'>core_types_algebra_vector</a></li>
+              </ul>
+            </li>
+            <li class="list-group-item">
+              <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: module~~algebra_vector_dp~~UsesGraph Pages: 1 -->
+<svg id="modulealgebra_vector_dpUsesGraph" width="641pt" height="207pt"
+ viewBox="0.00 0.00 641.00 206.53" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~algebra_vector_dp~~UsesGraph" class="graph" transform="scale(0.49 0.49) rotate(0) translate(4 418.72)">
+<title>module~~algebra_vector_dp~~UsesGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-418.72 1308,-418.72 1308,4 -4,4"/>
+<!-- module~algebra_vector_dp -->
+<g id="module~~algebra_vector_dp~~UsesGraph_node1" class="node">
+<title>module~algebra_vector_dp</title>
+<polygon fill="none" stroke="black" points="1304,-104 1192,-104 1192,-80 1304,-80 1304,-104"/>
+<text text-anchor="middle" x="1248" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50">algebra_vector_dp</text>
+</g>
+<!-- module~core_types_algebra_vector -->
+<g id="module~~algebra_vector_dp~~UsesGraph_node2" class="node">
+<title>module~core_types_algebra_vector</title>
+<g id="a_module~~algebra_vector_dp~~UsesGraph_node2"><a xlink:href="../module/core_types_algebra_vector.html" xlink:title="core_types_algebra_vector">
+<polygon fill="#337ab7" stroke="#337ab7" points="1156,-104 1001,-104 1001,-80 1156,-80 1156,-104"/>
+<text text-anchor="middle" x="1078.5" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_algebra_vector</text>
+</a>
+</g>
+</g>
+<!-- module~algebra_vector_dp&#45;&gt;module~core_types_algebra_vector -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge1" class="edge">
+<title>module~algebra_vector_dp&#45;&gt;module~core_types_algebra_vector</title>
+<path fill="none" stroke="#ff0000" d="M1191.69,-92C1183.54,-92 1174.98,-92 1166.38,-92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1166.28,-88.5 1156.28,-92 1166.28,-95.5 1166.28,-88.5"/>
+</g>
+<!-- iso_fortran_env -->
+<g id="module~~algebra_vector_dp~~UsesGraph_node3" class="node">
+<title>iso_fortran_env</title>
+<g id="a_module~~algebra_vector_dp~~UsesGraph_node3"><a xlink:href="http://fortranwiki.org/fortran/show/iso_fortran_env" xlink:title="iso_fortran_env">
+<polygon fill="#337ab7" stroke="#337ab7" points="94,-256 0,-256 0,-232 94,-232 94,-256"/>
+<text text-anchor="middle" x="47" y="-241.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_algebra_vector&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge2" class="edge">
+<title>module~core_types_algebra_vector&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M793.5,-12C726.65,-12.35 715.2,-47.48 648.5,-52"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M646.5,-52C583.31,-56.28 566.14,-39.76 504,-52"/>
+</g>
+<!-- module~core_check_length -->
+<g id="module~~algebra_vector_dp~~UsesGraph_node4" class="node">
+<title>module~core_check_length</title>
+<g id="a_module~~algebra_vector_dp~~UsesGraph_node4"><a xlink:href="../module/core_check_length.html" xlink:title="core_check_length">
+<polygon fill="#337ab7" stroke="#337ab7" points="247.5,-378 135.5,-378 135.5,-354 247.5,-354 247.5,-378"/>
+<text text-anchor="middle" x="191.5" y="-363.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_check_length</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_algebra_vector&#45;&gt;module~core_check_length -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge3" class="edge">
+<title>module~core_types_algebra_vector&#45;&gt;module~core_check_length</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M646.5,-406C521,-375.68 484.87,-413.85 356,-406"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M354,-406C312.27,-404.59 266.18,-392.02 233.95,-381.34"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="235.01,-378 224.42,-378.1 232.76,-384.63 235.01,-378"/>
+</g>
+<!-- module~core_check_range -->
+<g id="module~~algebra_vector_dp~~UsesGraph_node5" class="node">
+<title>module~core_check_range</title>
+<g id="a_module~~algebra_vector_dp~~UsesGraph_node5"><a xlink:href="../module/core_check_range.html" xlink:title="core_check_range">
+<polygon fill="#337ab7" stroke="#337ab7" points="702,-24 593,-24 593,0 702,0 702,-24"/>
+<text text-anchor="middle" x="647.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_check_range</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_algebra_vector&#45;&gt;module~core_check_range -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge4" class="edge">
+<title>module~core_types_algebra_vector&#45;&gt;module~core_check_range</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1055.05,-79.95C1008.03,-55.99 895.27,-5.24 795.5,-12"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M793.5,-12C766.95,-12.14 737.67,-12.16 712.41,-12.14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="712.22,-8.64 702.21,-12.13 712.21,-15.64 712.22,-8.64"/>
+</g>
+<!-- module~core_constants -->
+<g id="module~~algebra_vector_dp~~UsesGraph_node6" class="node">
+<title>module~core_constants</title>
+<g id="a_module~~algebra_vector_dp~~UsesGraph_node6"><a xlink:href="../module/core_constants.html" xlink:title="core_constants">
+<polygon fill="#337ab7" stroke="#337ab7" points="549,-222 457,-222 457,-198 549,-198 549,-222"/>
+<text text-anchor="middle" x="503" y="-207.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_algebra_vector&#45;&gt;module~core_constants -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge5" class="edge">
+<title>module~core_types_algebra_vector&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1070.69,-104.24C1033.6,-169.14 850.11,-467.92 648.5,-406"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M646.5,-406C565.12,-386.34 524.15,-278.81 509.94,-231.9"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="513.25,-230.74 507.1,-222.11 506.53,-232.69 513.25,-230.74"/>
+</g>
+<!-- module~core_memory -->
+<g id="module~~algebra_vector_dp~~UsesGraph_node7" class="node">
+<title>module~core_memory</title>
+<g id="a_module~~algebra_vector_dp~~UsesGraph_node7"><a xlink:href="../module/core_memory.html" xlink:title="core_memory">
+<polygon fill="#337ab7" stroke="#337ab7" points="965,-104 879,-104 879,-80 965,-80 965,-104"/>
+<text text-anchor="middle" x="922" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_memory</text>
+</a>
+</g>
+</g>
+<!-- module~core_types_algebra_vector&#45;&gt;module~core_memory -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge6" class="edge">
+<title>module~core_types_algebra_vector&#45;&gt;module~core_memory</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1000.7,-92C992.08,-92 983.44,-92 975.23,-92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="975.09,-88.5 965.09,-92 975.09,-95.5 975.09,-88.5"/>
+</g>
+<!-- stdlib_optval -->
+<g id="module~~algebra_vector_dp~~UsesGraph_node8" class="node">
+<title>stdlib_optval</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="86.5,-378 7.5,-378 7.5,-354 86.5,-354 86.5,-378"/>
+<text text-anchor="middle" x="47" y="-363.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_optval</text>
+</g>
+<!-- module~core_types_algebra_vector&#45;&gt;stdlib_optval -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge7" class="edge">
+<title>module~core_types_algebra_vector&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M354,-406C254.14,-402.62 228.51,-403.67 130,-387 119.02,-385.14 107.35,-382.54 96.37,-379.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="97.07,-376.37 86.51,-377.27 95.32,-383.15 97.07,-376.37"/>
+</g>
+<!-- module~core_check_length&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge8" class="edge">
+<title>module~core_check_length&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M177.18,-353.67C164.7,-341.95 145.66,-323.69 130,-307 113.18,-289.07 113.64,-279.79 94,-265 92.18,-263.63 90.25,-262.32 88.26,-261.07"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="89.67,-257.85 79.24,-256.02 86.25,-263.96 89.67,-257.85"/>
+</g>
+<!-- module~core_check_length&#45;&gt;stdlib_optval -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge9" class="edge">
+<title>module~core_check_length&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M135.41,-366C122.68,-366 109.23,-366 96.79,-366"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="96.62,-362.5 86.62,-366 96.62,-369.5 96.62,-362.5"/>
+</g>
+<!-- stdlib_strings -->
+<g id="module~~algebra_vector_dp~~UsesGraph_node15" class="node">
+<title>stdlib_strings</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="88,-298 6,-298 6,-274 88,-274 88,-298"/>
+<text text-anchor="middle" x="47" y="-283.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_strings</text>
+</g>
+<!-- module~core_check_length&#45;&gt;stdlib_strings -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge10" class="edge">
+<title>module~core_check_length&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M159.54,-353.93C149.9,-349.85 139.36,-345.04 130,-340 109.99,-329.22 88.59,-315.03 72.66,-303.89"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="74.61,-300.98 64.43,-298.07 70.57,-306.7 74.61,-300.98"/>
+</g>
+<!-- module~core_check_range&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge11" class="edge">
+<title>module~core_check_range&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M609.68,-24.07C581.14,-33.01 540.43,-44.83 504,-52"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M502,-52C436.21,-64.95 423.05,-90 356,-90"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M354,-90C282.22,-90 261.25,-69.37 192.5,-90"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M190.5,-90C162.79,-98.31 152.26,-95.52 130,-114 93.98,-143.9 68.81,-193.88 56.55,-222.37"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="53.23,-221.24 52.61,-231.82 59.69,-223.93 53.23,-221.24"/>
+</g>
+<!-- module~core_constants_base -->
+<g id="module~~algebra_vector_dp~~UsesGraph_node10" class="node">
+<title>module~core_constants_base</title>
+<g id="a_module~~algebra_vector_dp~~UsesGraph_node10"><a xlink:href="../module/core_constants_base.html" xlink:title="core_constants_base">
+<polygon fill="#337ab7" stroke="#337ab7" points="253,-298 130,-298 130,-274 253,-274 253,-298"/>
+<text text-anchor="middle" x="191.5" y="-283.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_base</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_base -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge12" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_base</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M491.08,-222.16C476.7,-237.21 449.86,-262.17 421,-273 370.68,-291.88 309.74,-294.44 263.45,-292.65"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="263.36,-289.14 253.21,-292.18 263.04,-296.14 263.36,-289.14"/>
+</g>
+<!-- module~core_constants_error -->
+<g id="module~~algebra_vector_dp~~UsesGraph_node11" class="node">
+<title>module~core_constants_error</title>
+<g id="a_module~~algebra_vector_dp~~UsesGraph_node11"><a xlink:href="../module/core_constants_error.html" xlink:title="core_constants_error">
+<polygon fill="#337ab7" stroke="#337ab7" points="417,-264 293,-264 293,-240 417,-240 417,-264"/>
+<text text-anchor="middle" x="355" y="-249.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_error</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_error -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge13" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_error</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M460.16,-222.04C443.82,-226.74 424.91,-232.18 407.73,-237.12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="406.49,-233.83 397.84,-239.96 408.42,-240.56 406.49,-233.83"/>
+</g>
+<!-- module~core_constants_ids -->
+<g id="module~~algebra_vector_dp~~UsesGraph_node12" class="node">
+<title>module~core_constants_ids</title>
+<g id="a_module~~algebra_vector_dp~~UsesGraph_node12"><a xlink:href="../module/core_constants_ids.html" xlink:title="core_constants_ids">
+<polygon fill="#337ab7" stroke="#337ab7" points="411,-222 299,-222 299,-198 411,-198 411,-222"/>
+<text text-anchor="middle" x="355" y="-207.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_ids</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_ids -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge14" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_ids</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M456.61,-210C445.47,-210 433.33,-210 421.46,-210"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="421.12,-206.5 411.12,-210 421.12,-213.5 421.12,-206.5"/>
+</g>
+<!-- module~core_constants_values -->
+<g id="module~~algebra_vector_dp~~UsesGraph_node13" class="node">
+<title>module~core_constants_values</title>
+<g id="a_module~~algebra_vector_dp~~UsesGraph_node13"><a xlink:href="../module/core_constants_values.html" xlink:title="core_constants_values">
+<polygon fill="#337ab7" stroke="#337ab7" points="421,-180 289,-180 289,-156 421,-156 421,-180"/>
+<text text-anchor="middle" x="355" y="-165.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_constants_values</text>
+</a>
+</g>
+</g>
+<!-- module~core_constants&#45;&gt;module~core_constants_values -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge15" class="edge">
+<title>module~core_constants&#45;&gt;module~core_constants_values</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M460.16,-197.96C443.82,-193.26 424.91,-187.82 407.73,-182.88"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="408.42,-179.44 397.84,-180.04 406.49,-186.17 408.42,-179.44"/>
+</g>
+<!-- module~core_allocate -->
+<g id="module~~algebra_vector_dp~~UsesGraph_node9" class="node">
+<title>module~core_allocate</title>
+<g id="a_module~~algebra_vector_dp~~UsesGraph_node9"><a xlink:href="../module/core_allocate.html" xlink:title="core_allocate">
+<polygon fill="#337ab7" stroke="#337ab7" points="836.5,-144 752.5,-144 752.5,-120 836.5,-120 836.5,-144"/>
+<text text-anchor="middle" x="794.5" y="-129.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_allocate</text>
+</a>
+</g>
+</g>
+<!-- module~core_memory&#45;&gt;module~core_allocate -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge16" class="edge">
+<title>module~core_memory&#45;&gt;module~core_allocate</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M883.35,-104C870.8,-108 856.66,-112.51 843.44,-116.72"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="842.03,-113.5 833.56,-119.87 844.15,-120.17 842.03,-113.5"/>
+</g>
+<!-- module~core_deallocate -->
+<g id="module~~algebra_vector_dp~~UsesGraph_node14" class="node">
+<title>module~core_deallocate</title>
+<g id="a_module~~algebra_vector_dp~~UsesGraph_node14"><a xlink:href="../module/core_deallocate.html" xlink:title="core_deallocate">
+<polygon fill="#337ab7" stroke="#337ab7" points="843,-64 746,-64 746,-40 843,-40 843,-64"/>
+<text text-anchor="middle" x="794.5" y="-49.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_deallocate</text>
+</a>
+</g>
+</g>
+<!-- module~core_memory&#45;&gt;module~core_deallocate -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge17" class="edge">
+<title>module~core_memory&#45;&gt;module~core_deallocate</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M883.35,-80C870.8,-76 856.66,-71.49 843.44,-67.28"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="844.15,-63.83 833.56,-64.13 842.03,-70.5 844.15,-63.83"/>
+</g>
+<!-- module~core_allocate&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge18" class="edge">
+<title>module~core_allocate&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M752.25,-129.3C688.73,-124.97 563.19,-115.77 457,-104 411.96,-99.01 401.32,-90 356,-90"/>
+</g>
+<!-- module~core_allocate&#45;&gt;module~core_constants -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge19" class="edge">
+<title>module~core_allocate&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M752.33,-139.97C722.83,-146.35 682.47,-156.47 648.5,-170"/>
+</g>
+<!-- module~core_validation_error -->
+<g id="module~~algebra_vector_dp~~UsesGraph_node16" class="node">
+<title>module~core_validation_error</title>
+<g id="a_module~~algebra_vector_dp~~UsesGraph_node16"><a xlink:href="../module/core_validation_error.html" xlink:title="core_validation_error">
+<polygon fill="#337ab7" stroke="#337ab7" points="710,-104 585,-104 585,-80 710,-80 710,-104"/>
+<text text-anchor="middle" x="647.5" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_validation_error</text>
+</a>
+</g>
+</g>
+<!-- module~core_allocate&#45;&gt;module~core_validation_error -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge20" class="edge">
+<title>module~core_allocate&#45;&gt;module~core_validation_error</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M752.34,-120.64C736.59,-116.3 718.4,-111.28 701.68,-106.67"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="702.62,-103.3 692.04,-104.01 700.75,-110.05 702.62,-103.3"/>
+</g>
+<!-- module~core_constants_base&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge21" class="edge">
+<title>module~core_constants_base&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M149.67,-273.96C133.72,-269.26 115.26,-263.82 98.49,-258.88"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="99.42,-255.51 88.84,-256.04 97.44,-262.22 99.42,-255.51"/>
+</g>
+<!-- module~core_constants_base&#45;&gt;stdlib_optval -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge22" class="edge">
+<title>module~core_constants_base&#45;&gt;stdlib_optval</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M168.86,-298.15C144.76,-311.68 105.63,-333.65 78.45,-348.9"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="76.39,-346.05 69.38,-354 79.81,-352.15 76.39,-346.05"/>
+</g>
+<!-- module~core_constants_base&#45;&gt;stdlib_strings -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge23" class="edge">
+<title>module~core_constants_base&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M129.65,-286C119.21,-286 108.46,-286 98.33,-286"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="98.04,-282.5 88.04,-286 98.04,-289.5 98.04,-282.5"/>
+</g>
+<!-- module~core_constants_error&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge24" class="edge">
+<title>module~core_constants_error&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M292.81,-250.4C237.87,-248.96 157.87,-246.87 104.44,-245.48"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="104.21,-241.97 94.12,-245.21 104.03,-248.97 104.21,-241.97"/>
+</g>
+<!-- module~core_constants_error&#45;&gt;module~core_constants_base -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge25" class="edge">
+<title>module~core_constants_error&#45;&gt;module~core_constants_base</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M296.61,-264.08C284.71,-266.59 272.07,-269.25 259.85,-271.82"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="258.77,-268.47 249.71,-273.96 260.22,-275.32 258.77,-268.47"/>
+</g>
+<!-- module~core_constants_error&#45;&gt;stdlib_strings -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge27" class="edge">
+<title>module~core_constants_error&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M337.92,-264.09C318.84,-277.62 285.51,-298.72 253,-307 200.84,-320.28 139.19,-310.7 97.22,-300.54"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="98.07,-297.15 87.52,-298.1 96.36,-303.93 98.07,-297.15"/>
+</g>
+<!-- stdlib_ascii -->
+<g id="module~~algebra_vector_dp~~UsesGraph_node17" class="node">
+<title>stdlib_ascii</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="226.5,-180 156.5,-180 156.5,-156 226.5,-156 226.5,-180"/>
+<text text-anchor="middle" x="191.5" y="-165.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_ascii</text>
+</g>
+<!-- module~core_constants_error&#45;&gt;stdlib_ascii -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge26" class="edge">
+<title>module~core_constants_error&#45;&gt;stdlib_ascii</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M307.3,-239.99C300.93,-237.48 294.64,-234.5 289,-231 269.51,-218.89 271.9,-207 253,-194 247.75,-190.39 241.91,-187.11 235.99,-184.2"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="237.25,-180.93 226.7,-179.93 234.33,-187.29 237.25,-180.93"/>
+</g>
+<!-- module~core_constants_ids&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge28" class="edge">
+<title>module~core_constants_ids&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M298.98,-204.09C267.54,-202.01 227.52,-201.56 192.5,-208"/>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M190.5,-208C160.01,-213.6 126.37,-221.99 99.43,-229.27"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="98.18,-225.98 89.46,-231.99 100.03,-232.73 98.18,-225.98"/>
+</g>
+<!-- module~core_constants_ids&#45;&gt;module~core_constants_base -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge29" class="edge">
+<title>module~core_constants_ids&#45;&gt;module~core_constants_base</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M312.26,-222.08C304.42,-224.74 296.38,-227.75 289,-231 264.74,-241.7 238.7,-256.77 219.79,-268.43"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="217.75,-265.58 211.12,-273.85 221.46,-271.52 217.75,-265.58"/>
+</g>
+<!-- module~core_constants_ids&#45;&gt;stdlib_strings -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge31" class="edge">
+<title>module~core_constants_ids&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M190.5,-208C141.51,-217 138.16,-241.96 94,-265 91.12,-266.5 88.11,-268.01 85.07,-269.49"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="83.5,-266.36 75.96,-273.81 86.49,-272.69 83.5,-266.36"/>
+</g>
+<!-- module~core_constants_ids&#45;&gt;stdlib_ascii -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge30" class="edge">
+<title>module~core_constants_ids&#45;&gt;stdlib_ascii</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M307.72,-197.96C285.33,-192.14 258.59,-185.19 236.51,-179.44"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="237.28,-176.03 226.72,-176.9 235.52,-182.8 237.28,-176.03"/>
+</g>
+<!-- module~core_constants_values&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge32" class="edge">
+<title>module~core_constants_values&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M342.76,-155.87C317.17,-129.78 252.15,-72.1 192.5,-90"/>
+</g>
+<!-- module~core_constants_values&#45;&gt;module~core_constants_base -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge33" class="edge">
+<title>module~core_constants_values&#45;&gt;module~core_constants_base</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M307.34,-180.07C300.96,-182.57 294.66,-185.53 289,-189 279.92,-194.57 236.22,-239.92 210.85,-266.6"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="208.27,-264.23 203.93,-273.89 213.35,-269.05 208.27,-264.23"/>
+</g>
+<!-- module~core_constants_values&#45;&gt;stdlib_strings -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge35" class="edge">
+<title>module~core_constants_values&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M322.85,-155.89C282.97,-141.15 216.21,-119.24 192.5,-128"/>
+</g>
+<!-- module~core_constants_values&#45;&gt;stdlib_ascii -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge34" class="edge">
+<title>module~core_constants_values&#45;&gt;stdlib_ascii</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M288.78,-168C271.4,-168 253.02,-168 237.04,-168"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="236.91,-164.5 226.91,-168 236.91,-171.5 236.91,-164.5"/>
+</g>
+<!-- module~core_deallocate&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge36" class="edge">
+<title>module~core_deallocate&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M745.77,-50.38C717.47,-49.82 680.9,-49.81 648.5,-52"/>
+</g>
+<!-- module~core_deallocate&#45;&gt;module~core_constants -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge37" class="edge">
+<title>module~core_deallocate&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M783.41,-64.14C761.75,-89.22 707.9,-146.35 648.5,-170"/>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M646.5,-170C618.35,-181.21 585.89,-190.58 559.07,-197.43"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="557.94,-194.1 549.09,-199.93 559.64,-200.89 557.94,-194.1"/>
+</g>
+<!-- module~core_deallocate&#45;&gt;module~core_validation_error -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge38" class="edge">
+<title>module~core_deallocate&#45;&gt;module~core_validation_error</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M750,-64C734.87,-68.17 717.72,-72.9 701.89,-77.27"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="700.93,-73.9 692.22,-79.94 702.8,-80.65 700.93,-73.9"/>
+</g>
+<!-- module~core_validation_error&#45;&gt;iso_fortran_env -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge39" class="edge">
+<title>module~core_validation_error&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M584.73,-89.23C559.66,-88.6 530.43,-88.49 504,-90"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M502,-90C437.22,-93.69 420.89,-90 356,-90"/>
+</g>
+<!-- module~core_validation_error&#45;&gt;module~core_constants -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge40" class="edge">
+<title>module~core_validation_error&#45;&gt;module~core_constants</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M631.79,-104.18C606.83,-124.85 556.03,-166.91 526.56,-191.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="524.32,-188.63 518.85,-197.71 528.78,-194.02 524.32,-188.63"/>
+</g>
+<!-- module~core_validation_error&#45;&gt;stdlib_strings -->
+<g id="module~~algebra_vector_dp~~UsesGraph_edge41" class="edge">
+<title>module~core_validation_error&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M502,-90C465.53,-92.08 457.19,-98.98 421,-104 319.86,-118.04 288.28,-92.59 192.5,-128"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M190.5,-128C164.41,-138.65 149.85,-126.99 130,-147 91.39,-185.93 130.13,-223.75 94,-265 93.25,-265.86 92.45,-266.68 91.62,-267.48"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="89.18,-264.94 83.35,-273.79 93.42,-270.51 89.18,-264.94"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panmodulealgebra_vector_dpUsesGraph = svgPanZoom('#modulealgebra_vector_dpUsesGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#UsesGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="UsesGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="518pt" height="32pt"
+ viewBox="0.00 0.00 517.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 513.5,-28 513.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node">
+<title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node">
+<title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="145.5,-24 72.5,-24 72.5,0 145.5,0 145.5,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 164,-24 164,0 234,0 234,-24"/>
+<text text-anchor="middle" x="199" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="310,-24 252,-24 252,0 310,0 310,-24"/>
+<text text-anchor="middle" x="281" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="386,-24 328,-24 328,0 386,0 386,-24"/>
+<text text-anchor="middle" x="357" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="509.5,-24 404.5,-24 404.5,0 509.5,0 509.5,-24"/>
+<text text-anchor="middle" x="457" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a submodule to the (sub)module which it is
+descended from. Dashed arrows point from a module or program unit to 
+modules which it uses.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+            </li>
+        </ul>
+      </div>
+    </div>
+
+      
+      <br>
+
+
+
+
+
+
+
+
+
+        <section>
+          <h2>Module Functions</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_data_vector_dp"></span> <h3>module function <a href='../proc/get_data_vector_dp.html'>get_data_vector_dp</a>(self) result(data)  
+    <a href="../interface/get_data_vector_dp.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Returns data pointer.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~324"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>real(kind=real64), pointer, dimension(:)</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_size_vector_dp"></span> <h3>pure module function <a href='../proc/get_size_vector_dp.html'>get_size_vector_dp</a>(self) result(vector_size)  
+    <a href="../interface/get_size_vector_dp.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Returns size.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~323"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>integer(kind=int32)</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_status_vector_dp"></span> <h3>pure module function <a href='../proc/get_status_vector_dp.html'>get_status_vector_dp</a>(self) result(status)  
+    <a href="../interface/get_status_vector_dp.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~325"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>type(<a href='../type/type_constant_id.html'>type_constant_id</a>)</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-is_initialized_vector_dp"></span> <h3>pure module function <a href='../proc/is_initialized_vector_dp.html'>is_initialized_vector_dp</a>(self) result(initialized)  
+    <a href="../interface/is_initialized_vector_dp.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Checks initialization status.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~322"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+        <section>
+          <h2>Module Subroutines</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-check_vector_dp"></span> <h3>module subroutine <a href='../proc/check_vector_dp.html'>check_vector_dp</a>(self)  
+    <a href="../interface/check_vector_dp.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~334"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-copy_vector_dp"></span> <h3>module subroutine <a href='../proc/copy_vector_dp.html'>copy_vector_dp</a>(self, source_vector)  
+    <a href="../interface/copy_vector_dp.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Optimized Copy.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~331"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-source_vector~3"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>source_vector</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-destroy_vector_dp"></span> <h3>module subroutine <a href='../proc/destroy_vector_dp.html'>destroy_vector_dp</a>(self)  
+    <a href="../interface/destroy_vector_dp.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Destroys the vector.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~321"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-display_vector_dp"></span> <h3>module subroutine <a href='../proc/display_vector_dp.html'>display_vector_dp</a>(self, unit_in)  
+    <a href="../interface/display_vector_dp.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Display with block awareness.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~333"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-unit_in~8"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>unit_in</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-initialize_vector_dp"></span> <h3>module subroutine <a href='../proc/initialize_vector_dp.html'>initialize_vector_dp</a>(self, num_nodes, num_blocks)  
+    <a href="../interface/initialize_vector_dp.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Initializes the vector.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~320"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_nodes~15"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_nodes</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_blocks~5"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_blocks</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-scale_vector_dp"></span> <h3>module subroutine <a href='../proc/scale_vector_dp.html'>scale_vector_dp</a>(self, op, alpha)  
+    <a href="../interface/scale_vector_dp.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~330"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-op~25"></span>
+              type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-alpha~16"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>alpha</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-set_array_vector_dp"></span> <h3>module subroutine <a href='../proc/set_array_vector_dp.html'>set_array_vector_dp</a>(self, op, array_value, row_block)  
+    <a href="../interface/set_array_vector_dp.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Sets array values using array syntax.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~327"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-op~22"></span>
+              type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-array_value~3"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>array_value</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row_block~15"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_block</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-set_scalar_vector_dp"></span> <h3>module subroutine <a href='../proc/set_scalar_vector_dp.html'>set_scalar_vector_dp</a>(self, op, scalar_value, row_block)  
+    <a href="../interface/set_scalar_vector_dp.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Sets scalar value using array syntax.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~326"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-op~21"></span>
+              type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-scalar_value~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>scalar_value</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row_block~14"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_block</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-set_value_at_index_vector_dp"></span> <h3>module subroutine <a href='../proc/set_value_at_index_vector_dp.html'>set_value_at_index_vector_dp</a>(self, op, global_index, value, row_block)  
+    <a href="../interface/set_value_at_index_vector_dp.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Sets value at specific index.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~328"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-op~23"></span>
+              type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-global_index~3"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>global_index</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~11"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row_block~16"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_block</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-set_values_at_indices_vector_dp"></span> <h3>module subroutine <a href='../proc/set_values_at_indices_vector_dp.html'>set_values_at_indices_vector_dp</a>(self, op, global_indices, new_values, row_block)  
+    <a href="../interface/set_values_at_indices_vector_dp.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Sets values using vector subscripts (Scatter).</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~329"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-op~24"></span>
+              type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>op</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-global_indices~3"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>global_indices</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-new_values~3"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>new_values</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row_block~17"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_block</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-zero_vector_dp"></span> <h3>module subroutine <a href='../proc/zero_vector_dp.html'>zero_vector_dp</a>(self)  
+    <a href="../interface/zero_vector_dp.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  <p>Zero vector.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~332"></span>
+              class(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-03-11 14:03 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

@@ -1,4 +1,4 @@
-submodule(inout_input_basic) inout_input_basic_solver_settings
+submodule(io_input_basic) input_basic_solver_settings
     use omp_lib
     implicit none
 
@@ -68,7 +68,7 @@ contains
     ! Read Routines for Solver Settings
     !======================================================================
 
-    module subroutine read_parameters_solver_settings(self, json)
+    module subroutine read_solver_settings(self, json)
         !> Reads all solver settings from the JSON object. This is the main entry point.
         implicit none
         class(type_input_basic), intent(inout) :: self
@@ -80,13 +80,13 @@ contains
         call get_json_value(json, join(buffer), self%solver_settings%bdf_order, &
                             is_required=.true., default_value=1, valid_range=[1, 6])
 
-        call read_parameters_solver_settings_nonlinear(self, json)
-        call read_parameters_solver_settings_linear(self, json)
-        call read_parameters_solver_parallel_settings(self, json)
+        call read_solver_settings_nonlinear(self, json)
+        call read_solver_settings_linear(self, json)
+        call read_solver_parallel_settings(self, json)
 
-    end subroutine read_parameters_solver_settings
+    end subroutine read_solver_settings
 
-    subroutine read_parameters_solver_settings_nonlinear(self, json)
+    subroutine read_solver_settings_nonlinear(self, json)
         !> Reads nonlinear solver settings.
         implicit none
         class(type_input_basic), intent(inout) :: self
@@ -135,22 +135,22 @@ contains
             if (any(self%solver_settings%nonlinear_solver%convergence%use_criteria == &
                     [NONLINEAR_NORM_CRITERIA%RESIDUAL%ID, NONLINEAR_NORM_CRITERIA%BOTH%ID])) then
                 buffer(4) = residual
-                call read_parameters_solver_settings_nonlinear_convergence( &
+                call read_solver_settings_nonlinear_convergence( &
                     self%solver_settings%nonlinear_solver%convergence%residual, json, buffer, 4)
             end if
             if (any(self%solver_settings%nonlinear_solver%convergence%use_criteria == &
                     [NONLINEAR_NORM_CRITERIA%UPDATE%ID, NONLINEAR_NORM_CRITERIA%BOTH%ID])) then
                 buffer(4) = update
-                call read_parameters_solver_settings_nonlinear_convergence( &
+                call read_solver_settings_nonlinear_convergence( &
                     self%solver_settings%nonlinear_solver%convergence%update, json, buffer, 4)
             end if
         end if
 
         if (allocated(temp_string)) deallocate (temp_string)
-    end subroutine read_parameters_solver_settings_nonlinear
+    end subroutine read_solver_settings_nonlinear
 
     !> Reads a specific convergence criteria block (residual or update).
-    subroutine read_parameters_solver_settings_nonlinear_convergence(convergence_obj, json, buffer, end_index)
+    subroutine read_solver_settings_nonlinear_convergence(convergence_obj, json, buffer, end_index)
         implicit none
         type(type_convergence_criteria), intent(inout) :: convergence_obj
         type(json_file), intent(inout) :: json
@@ -187,15 +187,15 @@ contains
 
         if (allocated(temp_string)) deallocate (temp_string)
         if (allocated(local_buffer)) deallocate (local_buffer)
-    end subroutine read_parameters_solver_settings_nonlinear_convergence
+    end subroutine read_solver_settings_nonlinear_convergence
 
-    subroutine read_parameters_solver_settings_linear(self, json)
+    subroutine read_solver_settings_linear(self, json)
         !> Reads linear solver settings for all active physics.
         implicit none
         class(type_input_basic), intent(inout) :: self
         type(json_file), intent(inout) :: json
-        integer(int32) :: target_id
         character(256) :: buffer(3)
+        character(256) :: legacy_buffer(2)
 
         buffer(1) = solver_settings
         buffer(2) = linear_solver
@@ -213,9 +213,32 @@ contains
         call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%tolerance, &
                             is_required=.true., default_value=1.0d-6, valid_range=[0.0d0, huge(0.0d0)])
 
-    end subroutine read_parameters_solver_settings_linear
+        ! Backward compatibility: also accept legacy top-level "linear_solver".
+        legacy_buffer(1) = linear_solver
 
-    subroutine read_parameters_solver_parallel_settings(self, json)
+        legacy_buffer(2) = solver_type
+        call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%solver_type, &
+                    is_required=.false., default_value=self%solver_settings%linear_solver%solver_type, &
+                    valid_range=[1, 20])
+
+        legacy_buffer(2) = preconditioner_type
+        call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%preconditioner_type, &
+                    is_required=.false., default_value=self%solver_settings%linear_solver%preconditioner_type, &
+                    valid_range=[1, 10])
+
+        legacy_buffer(2) = max_iterations
+        call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%max_iterations, &
+                    is_required=.false., default_value=self%solver_settings%linear_solver%max_iterations, &
+                    valid_range=[1, huge(1)])
+
+        legacy_buffer(2) = tolerance
+        call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%tolerance, &
+                    is_required=.false., default_value=self%solver_settings%linear_solver%tolerance, &
+                    valid_range=[0.0d0, huge(0.0d0)])
+
+    end subroutine read_solver_settings_linear
+
+    subroutine read_solver_parallel_settings(self, json)
         implicit none
         class(type_input_basic), intent(inout) :: self
         type(json_file), intent(inout) :: json
@@ -249,7 +272,7 @@ contains
             call get_json_value(json, join(buffer(1:3)), self%solver_settings%parallel_settings%threads%max_active_levels, &
                                 is_required=.true., default_value=1, valid_range=[1, huge(1)])
         end if
-    end subroutine read_parameters_solver_parallel_settings
+    end subroutine read_solver_parallel_settings
 
     !======================================================================
     ! Private Helper Functions for Display Routines
@@ -379,4 +402,4 @@ contains
         end if
     end subroutine display_solver_settings_parallel
 
-end submodule inout_input_basic_solver_settings
+end submodule input_basic_solver_settings

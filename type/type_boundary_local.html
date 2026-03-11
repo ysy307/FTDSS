@@ -10,7 +10,7 @@
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>type_boundary_local &ndash; FTDSS </title>
+    <title>type_boundary_local &ndash; FTCMS </title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -44,7 +44,7 @@
     <div class="container-fluid mb-sm-4 mb-xl-2">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
           <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
                   aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon">
@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.2% of total for derived types.</p>Including implementation: 6 statements,  0.0% of total for derived types.">6 statements</a>
+                 title="<p> 0.2% of total for derived types.</p>Including implementation: 9 statements,  0.0% of total for derived types.">9 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -105,7 +105,7 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
                 <li class="breadcrumb-item"><a href='../sourcefile/conditions_interface.f90.html'>conditions_interface.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/inout_input_conditions.html'>inout_input_conditions</a></li>
+                <li class="breadcrumb-item"><a href='../module/io_input_conditions.html'>io_input_conditions</a></li>
             <li class="breadcrumb-item active" aria-current="page">type_boundary_local</li>
           </ol>
         </nav>
@@ -134,10 +134,11 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_boundary_local.html#variable-bc_type~2">bc_type</a>
-            <a class="list-group-item" href="../type/type_boundary_local.html#variable-is_active~14">is_active</a>
-            <a class="list-group-item" href="../type/type_boundary_local.html#variable-num_time_points">num_time_points</a>
-            <a class="list-group-item" href="../type/type_boundary_local.html#variable-values~13">values</a>
+            <a class="list-group-item" href="../type/type_boundary_local.html#variable-bc_type">bc_type</a>
+            <a class="list-group-item" href="../type/type_boundary_local.html#variable-bc_value_type~2">bc_value_type</a>
+            <a class="list-group-item" href="../type/type_boundary_local.html#variable-is_active~11">is_active</a>
+            <a class="list-group-item" href="../type/type_boundary_local.html#variable-num_time_points~2">num_time_points</a>
+            <a class="list-group-item" href="../type/type_boundary_local.html#variable-values~32">values</a>
         </div>
       </div>
     </div>
@@ -157,7 +158,18 @@
   
   
   
-  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#boundprocs-0"
+         aria-expanded="false" aria-controls="boundprocs-0">
+         <h4 class="card-header bg-primary text-white">Type-Bound Procedures</h4>
+      </a>
+      <div id="boundprocs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/type_boundary_local.html#boundprocedure-read">read</a>
+        </div>
+      </div>
+    </div>
+
   
   
     <div class="card card-primary">
@@ -314,7 +326,7 @@ large graphs.</div>
 </g>
 </g>
 <!-- type~type_boundary_conditions&#45;&gt;type~type_conditions -->
-<g id="type~~type_boundary_local~~InheritedByGraph_edge7" class="edge">
+<g id="type~~type_boundary_local~~InheritedByGraph_edge6" class="edge">
 <title>type~type_boundary_conditions&#45;&gt;type~type_conditions</title>
 <path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1053.72,-100.09C1017.99,-96.23 974.73,-91.2 936,-85.71 933.47,-85.36 930.89,-84.98 928.28,-84.58"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="928.59,-81.09 918.17,-83.01 927.51,-88.01 928.59,-81.09"/>
@@ -392,7 +404,7 @@ large graphs.</div>
 <text text-anchor="middle" x="358" y="-95.11" font-family="Helvetica,sans-Serif" font-size="9.50">boundary</text>
 </g>
 <!-- type~type_initial_conditions&#45;&gt;type~type_conditions -->
-<g id="type~~type_boundary_local~~InheritedByGraph_edge6" class="edge">
+<g id="type~~type_boundary_local~~InheritedByGraph_edge7" class="edge">
 <title>type~type_initial_conditions&#45;&gt;type~type_conditions</title>
 <path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M689.06,-80.7C699.55,-78.64 710.59,-76.82 721,-75.71 750.79,-72.56 784.15,-72.07 811.65,-72.47"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="811.81,-75.98 821.88,-72.67 811.94,-68.98 811.81,-75.98"/>
@@ -501,7 +513,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-bc_type~2"></span>
+              <span class="anchor" id="variable-bc_type"></span>
               character(len=:),
             </td>
               <td>public,</td>
@@ -518,7 +530,24 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-is_active~14"></span>
+              <span class="anchor" id="variable-bc_value_type~2"></span>
+              character(len=:),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>bc_value_type</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-is_active~11"></span>
               logical,
             </td>
               <td>public</td>
@@ -535,7 +564,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-num_time_points"></span>
+              <span class="anchor" id="variable-num_time_points~2"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -552,7 +581,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-values~13"></span>
+              <span class="anchor" id="variable-values~32"></span>
               type(<a href='type_boundary_local_time_dependent.html'>type_boundary_local_time_dependent</a>),
             </td>
               <td>public,</td>
@@ -575,15 +604,135 @@ large graphs.</div>
     
 
 
+      <section>
+        <h2>Type-Bound Procedures</h2>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-read"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>read</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/read_conditions_bc_local.html'>read_conditions_bc_local</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine read_conditions_bc_local(self, json, buffer_in, end_index, physics_type)  
+    <a href="../proc/read_conditions_bc_local.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_boundary_local.html'>type_boundary_local</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(json_file),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>json</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              character(len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>buffer_in</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>end_index</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+      </section>
 
     <section>
     <h3><span class="anchor" id="src"></span>Source Code</h3>
     <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_boundary_local</span>
 <span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
 <span class="w">        </span><span class="kt">character</span><span class="p">(:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">bc_type</span>
+<span class="w">        </span><span class="kt">character</span><span class="p">(:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">bc_value_type</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_time_points</span>
 <span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_boundary_local_time_dependent</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">values</span><span class="p">(:)</span>
-<span class="w">        </span>
+<span class="w">    </span><span class="k">contains</span>
+<span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="k">read</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">read_conditions_bc_local</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_boundary_local</span>
 </pre></div>
 
@@ -599,7 +748,7 @@ large graphs.</div>
         <div class="row justify-content-between">
           <div class="col">
             <p>
-              FTDSS
+              FTCMS
  was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
@@ -607,7 +756,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-23 23:52 +0000             </p>
+ on 2026-03-11 14:03 +0000             </p>
           </div>
         </div>
         <br>

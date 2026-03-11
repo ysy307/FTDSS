@@ -1,0 +1,852 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>output_system_log_output_manager &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>output_system_log_output_manager
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">5 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/output_manager.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/output_manager.f90.html'>output_manager.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/io_output_manager.html'>io_output_manager</a></li>
+            <li class="breadcrumb-item active" aria-current="page">output_system_log_output_manager</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/output_system_log_output_manager.html#src">output_system_log_output_manager</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine output_system_log_output_manager(self)  
+</h2>
+    
+
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_output_manager.html'>type_output_manager</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~460"></span>
+              class(<a href='../type/type_output_manager.html'>type_output_manager</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~output_system_log_output_manager~~CallsGraph Pages: 1 -->
+<svg id="procoutput_system_log_output_managerCallsGraph" width="641pt" height="260pt"
+ viewBox="0.00 0.00 641.00 259.73" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~output_system_log_output_manager~~CallsGraph" class="graph" transform="scale(0.46 0.46) rotate(0) translate(4 558)">
+<title>proc~~output_system_log_output_manager~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-558 1383,-558 1383,4 -4,4"/>
+<!-- proc~output_system_log_output_manager -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node1" class="node">
+<title>proc~output_system_log_output_manager</title>
+<polygon fill="none" stroke="black" points="332,-348 0,-348 0,-324 332,-324 332,-348"/>
+<text text-anchor="middle" x="166" y="-333.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_output_manager%output_system_log_output_manager</text>
+</g>
+<!-- interface~output_system_log_type_output_log -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node2" class="node">
+<title>interface~output_system_log_type_output_log</title>
+<g id="a_proc~~output_system_log_output_manager~~CallsGraph_node2"><a xlink:href="../interface/output_system_log_type_output_log.html" xlink:title="type_output_log%output_system_log_type_output_log">
+<polygon fill="#a7506f" stroke="#a7506f" points="664,-348 368,-348 368,-324 664,-324 664,-348"/>
+<text text-anchor="middle" x="516" y="-333.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output_log%output_system_log_type_output_log</text>
+</a>
+</g>
+</g>
+<!-- proc~output_system_log_output_manager&#45;&gt;interface~output_system_log_type_output_log -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge1" class="edge">
+<title>proc~output_system_log_output_manager&#45;&gt;interface~output_system_log_type_output_log</title>
+<path fill="none" stroke="#ff0000" d="M332.08,-336C340.66,-336 349.27,-336 357.82,-336"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="357.83,-339.5 367.83,-336 357.83,-332.5 357.83,-339.5"/>
+</g>
+<!-- proc~output_system_log_type_output_log -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node3" class="node">
+<title>proc~output_system_log_type_output_log</title>
+<g id="a_proc~~output_system_log_output_manager~~CallsGraph_node3"><a xlink:href="../proc/output_system_log_type_output_log.html" xlink:title="output_system_log_type_output_log">
+<polygon fill="#d9534f" stroke="#d9534f" points="902,-348 700,-348 700,-324 902,-324 902,-348"/>
+<text text-anchor="middle" x="801" y="-333.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">output_system_log_type_output_log</text>
+</a>
+</g>
+</g>
+<!-- interface~output_system_log_type_output_log&#45;&gt;proc~output_system_log_type_output_log -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge2" class="edge">
+<title>interface~output_system_log_type_output_log&#45;&gt;proc~output_system_log_type_output_log</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M664.3,-336C672.8,-336 681.27,-336 689.59,-336"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="689.65,-339.5 699.65,-336 689.65,-332.5 689.65,-339.5"/>
+</g>
+<!-- omp_get_max_threads -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node4" class="node">
+<title>omp_get_max_threads</title>
+<polygon fill="#777777" stroke="#777777" points="1071,-554 938,-554 938,-530 1071,-530 1071,-554"/>
+<text text-anchor="middle" x="1004.5" y="-539.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">omp_get_max_threads</text>
+</g>
+<!-- proc~output_system_log_type_output_log&#45;&gt;omp_get_max_threads -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge3" class="edge">
+<title>proc~output_system_log_type_output_log&#45;&gt;omp_get_max_threads</title>
+<path fill="none" stroke="#ff0000" d="M807.68,-348.44C823.44,-381.6 871.01,-472.82 938,-521 940.12,-522.53 942.36,-523.94 944.67,-525.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="943.42,-528.55 953.94,-529.86 946.54,-522.28 943.42,-528.55"/>
+</g>
+<!-- omp_get_num_procs -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node5" class="node">
+<title>omp_get_num_procs</title>
+<polygon fill="#777777" stroke="#777777" points="1065.5,-512 943.5,-512 943.5,-488 1065.5,-488 1065.5,-512"/>
+<text text-anchor="middle" x="1004.5" y="-497.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">omp_get_num_procs</text>
+</g>
+<!-- proc~output_system_log_type_output_log&#45;&gt;omp_get_num_procs -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge4" class="edge">
+<title>proc~output_system_log_type_output_log&#45;&gt;omp_get_num_procs</title>
+<path fill="none" stroke="#ff0000" d="M810.34,-348.31C829.6,-375.79 879.96,-442.58 938,-479 940.78,-480.75 943.72,-482.36 946.75,-483.85"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="945.5,-487.12 956.06,-487.95 948.32,-480.71 945.5,-487.12"/>
+</g>
+<!-- proc~get_compiler_name -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node6" class="node">
+<title>proc~get_compiler_name</title>
+<g id="a_proc~~output_system_log_output_manager~~CallsGraph_node6"><a xlink:href="../proc/get_compiler_name.html" xlink:title="get_compiler_name">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1063.5,-470 945.5,-470 945.5,-446 1063.5,-446 1063.5,-470"/>
+<text text-anchor="middle" x="1004.5" y="-455.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_compiler_name</text>
+</a>
+</g>
+</g>
+<!-- proc~output_system_log_type_output_log&#45;&gt;proc~get_compiler_name -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge5" class="edge">
+<title>proc~output_system_log_type_output_log&#45;&gt;proc~get_compiler_name</title>
+<path fill="none" stroke="#ff0000" d="M816.73,-348.18C840.9,-367.74 890.98,-406.54 938,-432 944.66,-435.6 951.92,-438.99 959.11,-442.04"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="958.23,-445.46 968.81,-445.99 960.87,-438.98 958.23,-445.46"/>
+</g>
+<!-- proc~get_compiler_version -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node7" class="node">
+<title>proc~get_compiler_version</title>
+<g id="a_proc~~output_system_log_output_manager~~CallsGraph_node7"><a xlink:href="../proc/get_compiler_version.html" xlink:title="get_compiler_version">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1068,-390 941,-390 941,-366 1068,-366 1068,-390"/>
+<text text-anchor="middle" x="1004.5" y="-375.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_compiler_version</text>
+</a>
+</g>
+</g>
+<!-- proc~output_system_log_type_output_log&#45;&gt;proc~get_compiler_version -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge6" class="edge">
+<title>proc~output_system_log_type_output_log&#45;&gt;proc~get_compiler_version</title>
+<path fill="none" stroke="#ff0000" d="M859.74,-348.04C883.46,-352.98 911.08,-358.74 935.74,-363.88"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="935.25,-367.35 945.75,-365.96 936.67,-360.5 935.25,-367.35"/>
+</g>
+<!-- proc~get_cpu_architecture -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node8" class="node">
+<title>proc~get_cpu_architecture</title>
+<g id="a_proc~~output_system_log_output_manager~~CallsGraph_node8"><a xlink:href="../proc/get_cpu_architecture.html" xlink:title="get_cpu_architecture">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1066.5,-150 942.5,-150 942.5,-126 1066.5,-126 1066.5,-150"/>
+<text text-anchor="middle" x="1004.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_cpu_architecture</text>
+</a>
+</g>
+</g>
+<!-- proc~output_system_log_type_output_log&#45;&gt;proc~get_cpu_architecture -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge7" class="edge">
+<title>proc~output_system_log_type_output_log&#45;&gt;proc~get_cpu_architecture</title>
+<path fill="none" stroke="#ff0000" d="M813.39,-323.85C836.45,-299.37 890.5,-242.58 938,-197 952.36,-183.22 969.03,-168.22 981.96,-156.79"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="984.27,-159.42 989.47,-150.18 979.65,-154.16 984.27,-159.42"/>
+</g>
+<!-- proc~get_hostname -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node9" class="node">
+<title>proc~get_hostname</title>
+<g id="a_proc~~output_system_log_output_manager~~CallsGraph_node9"><a xlink:href="../proc/get_hostname.html" xlink:title="get_hostname">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1048.5,-230 960.5,-230 960.5,-206 1048.5,-206 1048.5,-230"/>
+<text text-anchor="middle" x="1004.5" y="-215.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_hostname</text>
+</a>
+</g>
+</g>
+<!-- proc~output_system_log_type_output_log&#45;&gt;proc~get_hostname -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge8" class="edge">
+<title>proc~output_system_log_type_output_log&#45;&gt;proc~get_hostname</title>
+<path fill="none" stroke="#ff0000" d="M815.75,-323.96C839.3,-303.86 889.52,-263.31 938,-239 942.07,-236.96 946.39,-235.06 950.78,-233.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="952.31,-236.47 960.46,-229.69 949.87,-229.91 952.31,-236.47"/>
+</g>
+<!-- proc~get_memory_usage -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node10" class="node">
+<title>proc~get_memory_usage</title>
+<g id="a_proc~~output_system_log_output_manager~~CallsGraph_node10"><a xlink:href="../proc/get_memory_usage.html" xlink:title="get_memory_usage">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1063.5,-45 945.5,-45 945.5,-21 1063.5,-21 1063.5,-45"/>
+<text text-anchor="middle" x="1004.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_memory_usage</text>
+</a>
+</g>
+</g>
+<!-- proc~output_system_log_type_output_log&#45;&gt;proc~get_memory_usage -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge9" class="edge">
+<title>proc~output_system_log_type_output_log&#45;&gt;proc~get_memory_usage</title>
+<path fill="none" stroke="#ff0000" d="M805.82,-323.75C818.76,-283.87 864.23,-155.71 938,-75 946.83,-65.34 958.36,-56.98 969.27,-50.31"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="971.33,-53.16 978.23,-45.12 967.82,-47.11 971.33,-53.16"/>
+</g>
+<!-- proc~get_os -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node11" class="node">
+<title>proc~get_os</title>
+<g id="a_proc~~output_system_log_output_manager~~CallsGraph_node11"><a xlink:href="../proc/get_os.html" xlink:title="get_os">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1031.5,-108 977.5,-108 977.5,-84 1031.5,-84 1031.5,-108"/>
+<text text-anchor="middle" x="1004.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_os</text>
+</a>
+</g>
+</g>
+<!-- proc~output_system_log_type_output_log&#45;&gt;proc~get_os -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge10" class="edge">
+<title>proc~output_system_log_type_output_log&#45;&gt;proc~get_os</title>
+<path fill="none" stroke="#ff0000" d="M806.04,-323.99C819.02,-287.25 863.2,-175.37 938,-117 946.47,-110.39 957.08,-105.83 967.28,-102.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="968.5,-105.99 977.25,-100.02 966.68,-99.23 968.5,-105.99"/>
+</g>
+<!-- proc~get_username -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node12" class="node">
+<title>proc~get_username</title>
+<g id="a_proc~~output_system_log_output_manager~~CallsGraph_node12"><a xlink:href="../proc/get_username.html" xlink:title="get_username">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1049,-272 960,-272 960,-248 1049,-248 1049,-272"/>
+<text text-anchor="middle" x="1004.5" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_username</text>
+</a>
+</g>
+</g>
+<!-- proc~output_system_log_type_output_log&#45;&gt;proc~get_username -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge11" class="edge">
+<title>proc~output_system_log_type_output_log&#45;&gt;proc~get_username</title>
+<path fill="none" stroke="#ff0000" d="M833.93,-323.96C868.46,-310.93 923.66,-290.11 961.64,-275.79"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="963.27,-278.92 971.39,-272.11 960.8,-272.37 963.27,-278.92"/>
+</g>
+<!-- proc~raise_error -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node13" class="node">
+<title>proc~raise_error</title>
+<g id="a_proc~~output_system_log_output_manager~~CallsGraph_node13"><a xlink:href="../proc/raise_error.html" xlink:title="raise_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="1039.5,-348 969.5,-348 969.5,-324 1039.5,-324 1039.5,-348"/>
+<text text-anchor="middle" x="1004.5" y="-333.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">raise_error</text>
+</a>
+</g>
+</g>
+<!-- proc~output_system_log_type_output_log&#45;&gt;proc~raise_error -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge12" class="edge">
+<title>proc~output_system_log_type_output_log&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff0000" d="M902.16,-336C922.12,-336 942.11,-336 958.99,-336"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="959.08,-339.5 969.08,-336 959.08,-332.5 959.08,-339.5"/>
+</g>
+<!-- strip -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node14" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="1355.5,-308 1301.5,-308 1301.5,-284 1355.5,-284 1355.5,-308"/>
+<text text-anchor="middle" x="1328.5" y="-293.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~output_system_log_type_output_log&#45;&gt;strip -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge13" class="edge">
+<title>proc~output_system_log_type_output_log&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M821.31,-348.25C846.85,-363.65 893.78,-389.26 938,-399 1069.95,-428.08 1119.7,-456.43 1242,-399 1277.84,-382.17 1303.85,-342.12 1317.23,-317.21"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1320.42,-318.67 1321.89,-308.18 1314.2,-315.46 1320.42,-318.67"/>
+</g>
+<!-- to_string -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node21" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="1203.5,-390 1145.5,-390 1145.5,-366 1203.5,-366 1203.5,-390"/>
+<text text-anchor="middle" x="1174.5" y="-375.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~get_compiler_version&#45;&gt;to_string -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge14" class="edge">
+<title>proc~get_compiler_version&#45;&gt;to_string</title>
+<path fill="none" stroke="#5cff00" d="M1068.06,-378C1090.52,-378 1115.17,-378 1134.98,-378"/>
+<polygon fill="#5cff00" stroke="#5cff00" points="1135.16,-381.5 1145.16,-378 1135.16,-374.5 1135.16,-381.5"/>
+</g>
+<!-- interface~c_get_cpu_architecture -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node15" class="node">
+<title>interface~c_get_cpu_architecture</title>
+<g id="a_proc~~output_system_log_output_manager~~CallsGraph_node15"><a xlink:href="../interface/c_get_cpu_architecture.html" xlink:title="c_get_cpu_architecture">
+<polygon fill="#a7506f" stroke="#a7506f" points="1242,-150 1107,-150 1107,-126 1242,-126 1242,-150"/>
+<text text-anchor="middle" x="1174.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">c_get_cpu_architecture</text>
+</a>
+</g>
+</g>
+<!-- proc~get_cpu_architecture&#45;&gt;interface~c_get_cpu_architecture -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge15" class="edge">
+<title>proc~get_cpu_architecture&#45;&gt;interface~c_get_cpu_architecture</title>
+<path fill="none" stroke="#00ff2e" d="M1066.63,-138C1076.41,-138 1086.64,-138 1096.72,-138"/>
+<polygon fill="#00ff2e" stroke="#00ff2e" points="1096.74,-141.5 1106.74,-138 1096.74,-134.5 1096.74,-141.5"/>
+</g>
+<!-- proc~c_ptr_to_string -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node18" class="node">
+<title>proc~c_ptr_to_string</title>
+<g id="a_proc~~output_system_log_output_manager~~CallsGraph_node18"><a xlink:href="../proc/c_ptr_to_string.html" xlink:title="c_ptr_to_string">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1219.5,-108 1129.5,-108 1129.5,-84 1219.5,-84 1219.5,-108"/>
+<text text-anchor="middle" x="1174.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">c_ptr_to_string</text>
+</a>
+</g>
+</g>
+<!-- proc~get_cpu_architecture&#45;&gt;proc~c_ptr_to_string -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge16" class="edge">
+<title>proc~get_cpu_architecture&#45;&gt;proc~c_ptr_to_string</title>
+<path fill="none" stroke="#00ff2e" d="M1053.64,-125.96C1074.23,-120.82 1098.36,-114.78 1119.55,-109.49"/>
+<polygon fill="#00ff2e" stroke="#00ff2e" points="1120.52,-112.85 1129.38,-107.03 1118.83,-106.06 1120.52,-112.85"/>
+</g>
+<!-- proc~get_hostname&#45;&gt;strip -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge18" class="edge">
+<title>proc~get_hostname&#45;&gt;strip</title>
+<path fill="none" stroke="#00ffb9" d="M1048.77,-223.84C1096.61,-230.84 1175.69,-244.06 1242,-263 1258.69,-267.77 1276.69,-274.46 1291.84,-280.58"/>
+<polygon fill="#00ffb9" stroke="#00ffb9" points="1290.77,-283.92 1301.35,-284.49 1293.43,-277.45 1290.77,-283.92"/>
+</g>
+<!-- proc~get_env_string -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node19" class="node">
+<title>proc~get_env_string</title>
+<g id="a_proc~~output_system_log_output_manager~~CallsGraph_node19"><a xlink:href="../proc/get_env_string.html" xlink:title="get_env_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="1219.5,-192 1129.5,-192 1129.5,-168 1219.5,-168 1219.5,-192"/>
+<text text-anchor="middle" x="1174.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_env_string</text>
+</a>
+</g>
+</g>
+<!-- proc~get_hostname&#45;&gt;proc~get_env_string -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge17" class="edge">
+<title>proc~get_hostname&#45;&gt;proc~get_env_string</title>
+<path fill="none" stroke="#00ffb9" d="M1048.76,-208.21C1070.28,-203.35 1096.49,-197.42 1119.32,-192.25"/>
+<polygon fill="#00ffb9" stroke="#00ffb9" points="1120.23,-195.64 1129.21,-190.02 1118.69,-188.81 1120.23,-195.64"/>
+</g>
+<!-- interface~c_get_rss_kb -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node17" class="node">
+<title>interface~c_get_rss_kb</title>
+<g id="a_proc~~output_system_log_output_manager~~CallsGraph_node17"><a xlink:href="../interface/c_get_rss_kb.html" xlink:title="c_get_rss_kb">
+<polygon fill="#a7506f" stroke="#a7506f" points="1214,-24 1135,-24 1135,0 1214,0 1214,-24"/>
+<text text-anchor="middle" x="1174.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">c_get_rss_kb</text>
+</a>
+</g>
+</g>
+<!-- proc~get_memory_usage&#45;&gt;interface~c_get_rss_kb -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge19" class="edge">
+<title>proc~get_memory_usage&#45;&gt;interface~c_get_rss_kb</title>
+<path fill="none" stroke="#00b9ff" d="M1063.79,-25.71C1083.71,-23.22 1105.77,-20.47 1124.85,-18.08"/>
+<polygon fill="#00b9ff" stroke="#00b9ff" points="1125.33,-21.55 1134.82,-16.84 1124.46,-14.6 1125.33,-21.55"/>
+</g>
+<!-- interface~c_get_os -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node16" class="node">
+<title>interface~c_get_os</title>
+<g id="a_proc~~output_system_log_output_manager~~CallsGraph_node16"><a xlink:href="../interface/c_get_os.html" xlink:title="c_get_os">
+<polygon fill="#a7506f" stroke="#a7506f" points="1203.5,-66 1145.5,-66 1145.5,-42 1203.5,-42 1203.5,-66"/>
+<text text-anchor="middle" x="1174.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">c_get_os</text>
+</a>
+</g>
+</g>
+<!-- proc~get_os&#45;&gt;interface~c_get_os -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge20" class="edge">
+<title>proc~get_os&#45;&gt;interface~c_get_os</title>
+<path fill="none" stroke="#002eff" d="M1031.75,-89.44C1059.65,-82.46 1104.01,-71.37 1135.68,-63.46"/>
+<polygon fill="#002eff" stroke="#002eff" points="1136.62,-66.83 1145.48,-61.01 1134.92,-60.04 1136.62,-66.83"/>
+</g>
+<!-- proc~get_os&#45;&gt;proc~c_ptr_to_string -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge21" class="edge">
+<title>proc~get_os&#45;&gt;proc~c_ptr_to_string</title>
+<path fill="none" stroke="#002eff" d="M1031.75,-96C1055.11,-96 1090.03,-96 1119.36,-96"/>
+<polygon fill="#002eff" stroke="#002eff" points="1119.47,-99.5 1129.47,-96 1119.47,-92.5 1119.47,-99.5"/>
+</g>
+<!-- proc~get_username&#45;&gt;strip -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge23" class="edge">
+<title>proc~get_username&#45;&gt;strip</title>
+<path fill="none" stroke="#5c00ff" d="M1049.19,-263.15C1096.73,-266.79 1174.92,-273.4 1242,-282 1258.24,-284.08 1276.14,-286.93 1291.34,-289.51"/>
+<polygon fill="#5c00ff" stroke="#5c00ff" points="1290.93,-292.99 1301.37,-291.24 1292.12,-286.09 1290.93,-292.99"/>
+</g>
+<!-- proc~get_username&#45;&gt;proc~get_env_string -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge22" class="edge">
+<title>proc~get_username&#45;&gt;proc~get_env_string</title>
+<path fill="none" stroke="#5c00ff" d="M1047.57,-247.97C1055.47,-245.3 1063.57,-242.28 1071,-239 1097.71,-227.19 1126.37,-210.29 1146.58,-197.61"/>
+<polygon fill="#5c00ff" stroke="#5c00ff" points="1148.67,-200.43 1155.23,-192.11 1144.92,-194.52 1148.67,-200.43"/>
+</g>
+<!-- proc~raise_error&#45;&gt;strip -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge25" class="edge">
+<title>proc~raise_error&#45;&gt;strip</title>
+<path fill="none" stroke="#e700ff" d="M1039.62,-327.89C1059.23,-323.5 1084.39,-318.3 1107,-315 1171.45,-305.59 1247.23,-300.31 1291.08,-297.82"/>
+<polygon fill="#e700ff" stroke="#e700ff" points="1291.46,-301.3 1301.25,-297.26 1291.07,-294.31 1291.46,-301.3"/>
+</g>
+<!-- proc~replace_placeholder -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node20" class="node">
+<title>proc~replace_placeholder</title>
+<g id="a_proc~~output_system_log_output_manager~~CallsGraph_node20"><a xlink:href="../proc/replace_placeholder.html" xlink:title="replace_placeholder">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1235,-348 1114,-348 1114,-324 1235,-324 1235,-348"/>
+<text text-anchor="middle" x="1174.5" y="-333.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">replace_placeholder</text>
+</a>
+</g>
+</g>
+<!-- proc~raise_error&#45;&gt;proc~replace_placeholder -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge24" class="edge">
+<title>proc~raise_error&#45;&gt;proc~replace_placeholder</title>
+<path fill="none" stroke="#e700ff" d="M1039.9,-336C1058.38,-336 1081.85,-336 1103.95,-336"/>
+<polygon fill="#e700ff" stroke="#e700ff" points="1103.98,-339.5 1113.98,-336 1103.98,-332.5 1103.98,-339.5"/>
+</g>
+<!-- proc~raise_error&#45;&gt;to_string -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge26" class="edge">
+<title>proc~raise_error&#45;&gt;to_string</title>
+<path fill="none" stroke="#e700ff" d="M1039.9,-344.6C1067.6,-351.53 1106.52,-361.25 1135.2,-368.43"/>
+<polygon fill="#e700ff" stroke="#e700ff" points="1134.72,-371.91 1145.27,-370.94 1136.42,-365.12 1134.72,-371.91"/>
+</g>
+<!-- mpi_bcast -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node22" class="node">
+<title>mpi_bcast</title>
+<polygon fill="#777777" stroke="#777777" points="1362,-171 1295,-171 1295,-147 1362,-147 1362,-171"/>
+<text text-anchor="middle" x="1328.5" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mpi_bcast</text>
+</g>
+<!-- proc~get_env_string&#45;&gt;mpi_bcast -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge27" class="edge">
+<title>proc~get_env_string&#45;&gt;mpi_bcast</title>
+<path fill="none" stroke="#0091ff" d="M1219.87,-173.87C1240.41,-171.03 1264.7,-167.68 1285.01,-164.87"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="1285.49,-168.34 1294.92,-163.5 1284.53,-161.4 1285.49,-168.34"/>
+</g>
+<!-- mpi_comm_rank -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_node23" class="node">
+<title>mpi_comm_rank</title>
+<polygon fill="#777777" stroke="#777777" points="1379,-213 1278,-213 1278,-189 1379,-189 1379,-213"/>
+<text text-anchor="middle" x="1328.5" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mpi_comm_rank</text>
+</g>
+<!-- proc~get_env_string&#45;&gt;mpi_comm_rank -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge28" class="edge">
+<title>proc~get_env_string&#45;&gt;mpi_comm_rank</title>
+<path fill="none" stroke="#0091ff" d="M1219.87,-186.13C1234.75,-188.19 1251.6,-190.51 1267.47,-192.71"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="1267.35,-196.22 1277.74,-194.12 1268.31,-189.29 1267.35,-196.22"/>
+</g>
+<!-- proc~replace_placeholder&#45;&gt;strip -->
+<g id="proc~~output_system_log_output_manager~~CallsGraph_edge29" class="edge">
+<title>proc~replace_placeholder&#45;&gt;strip</title>
+<path fill="none" stroke="#4800ff" d="M1221.11,-324C1243.65,-318.07 1270.47,-311.01 1291.54,-305.46"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="1292.6,-308.8 1301.38,-302.87 1290.81,-302.04 1292.6,-308.8"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocoutput_system_log_output_managerCallsGraph = svgPanZoom('#procoutput_system_log_output_managerCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~output_system_log_output_manager~~CalledByGraph Pages: 1 -->
+<svg id="procoutput_system_log_output_managerCalledByGraph" width="641pt" height="29pt"
+ viewBox="0.00 0.00 641.00 28.93" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~output_system_log_output_manager~~CalledByGraph" class="graph" transform="scale(0.9 0.9) rotate(0) translate(4 28)">
+<title>proc~~output_system_log_output_manager~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 705,-28 705,4 -4,4"/>
+<!-- proc~output_system_log_output_manager -->
+<g id="proc~~output_system_log_output_manager~~CalledByGraph_node1" class="node">
+<title>proc~output_system_log_output_manager</title>
+<polygon fill="none" stroke="black" points="701,-24 369,-24 369,0 701,0 701,-24"/>
+<text text-anchor="middle" x="535" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_output_manager%output_system_log_output_manager</text>
+</g>
+<!-- proc~destroy_type_ftcms -->
+<g id="proc~~output_system_log_output_manager~~CalledByGraph_node2" class="node">
+<title>proc~destroy_type_ftcms</title>
+<g id="a_proc~~output_system_log_output_manager~~CalledByGraph_node2"><a xlink:href="../proc/destroy_type_ftcms.html" xlink:title="destroy_type_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="333,-24 218,-24 218,0 333,0 333,-24"/>
+<text text-anchor="middle" x="275.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">destroy_type_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~destroy_type_ftcms&#45;&gt;proc~output_system_log_output_manager -->
+<g id="proc~~output_system_log_output_manager~~CalledByGraph_edge1" class="edge">
+<title>proc~destroy_type_ftcms&#45;&gt;proc~output_system_log_output_manager</title>
+<path fill="none" stroke="#ff0000" d="M333.01,-12C341.08,-12 349.7,-12 358.68,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="358.95,-15.5 368.95,-12 358.95,-8.5 358.95,-15.5"/>
+</g>
+<!-- interface~destroy_type_ftcms -->
+<g id="proc~~output_system_log_output_manager~~CalledByGraph_node3" class="node">
+<title>interface~destroy_type_ftcms</title>
+<g id="a_proc~~output_system_log_output_manager~~CalledByGraph_node3"><a xlink:href="../interface/destroy_type_ftcms.html" xlink:title="type_ftcms%destroy_type_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="182,-24 0,-24 0,0 182,0 182,-24"/>
+<text text-anchor="middle" x="91" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%destroy_type_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~destroy_type_ftcms&#45;&gt;proc~destroy_type_ftcms -->
+<g id="proc~~output_system_log_output_manager~~CalledByGraph_edge2" class="edge">
+<title>interface~destroy_type_ftcms&#45;&gt;proc~destroy_type_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M182.18,-12C190.8,-12 199.43,-12 207.77,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="207.77,-15.5 217.77,-12 207.77,-8.5 207.77,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocoutput_system_log_output_managerCalledByGraph = svgPanZoom('#procoutput_system_log_output_managerCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">output_system_log_output_manager</span><span class="p">(</span><span class="n">self</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_output_manager</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="nb">log</span><span class="p">%</span><span class="n">output_system_log</span><span class="p">()</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">output_system_log_output_manager</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-03-11 14:03 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

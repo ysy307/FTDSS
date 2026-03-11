@@ -10,7 +10,7 @@
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>type_vtk_vtu_initialize &ndash; FTDSS</title>
+    <title>type_vtk_vtu_initialize &ndash; FTCMS</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -44,7 +44,7 @@
     <div class="container-fluid mb-sm-4 mb-xl-2">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
           <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
                   aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon">
@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.3% of total for procedures.">162 statements</a>
+                 title=" 0.2% of total for procedures.">144 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -179,7 +179,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~1235"></span>
+              <span class="anchor" id="variable-self~586"></span>
               class(<a href='../type/type_vtk.html'>type_vtk</a>),
             </td>
 <td>intent(inout)</td>
@@ -194,7 +194,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-file_name~10"></span>
+              <span class="anchor" id="variable-file_name~11"></span>
               character(len=*),
             </td>
 <td>intent(in)</td>
@@ -209,7 +209,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-global_node_id_key~5"></span>
+              <span class="anchor" id="variable-global_node_id_key~6"></span>
               character(len=*),
             </td>
 <td>intent(in),</td>
@@ -224,7 +224,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-node_type_key~5"></span>
+              <span class="anchor" id="variable-node_type_key~6"></span>
               character(len=*),
             </td>
 <td>intent(in),</td>
@@ -239,7 +239,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-num_sharing_ranks_key~5"></span>
+              <span class="anchor" id="variable-num_sharing_ranks_key~6"></span>
               character(len=*),
             </td>
 <td>intent(in),</td>
@@ -254,7 +254,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-owner_ranks_key~5"></span>
+              <span class="anchor" id="variable-owner_ranks_key~6"></span>
               character(len=*),
             </td>
 <td>intent(in),</td>
@@ -269,7 +269,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-communication_partners_key~5"></span>
+              <span class="anchor" id="variable-communication_partners_key~6"></span>
               character(len=*),
             </td>
 <td>intent(in),</td>
@@ -284,7 +284,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-cell_id_key~5"></span>
+              <span class="anchor" id="variable-cell_id_key~6"></span>
               character(len=*),
             </td>
 <td>intent(in),</td>
@@ -299,7 +299,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-rank_key~5"></span>
+              <span class="anchor" id="variable-rank_key~6"></span>
               character(len=*),
             </td>
 <td>intent(in),</td>
@@ -314,7 +314,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-color_key~5"></span>
+              <span class="anchor" id="variable-color_key~6"></span>
               character(len=*),
             </td>
 <td>intent(in),</td>
@@ -329,7 +329,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-point_field_names~3"></span>
+              <span class="anchor" id="variable-point_field_names~4"></span>
               character(len=*),
             </td>
 <td>intent(in),</td>
@@ -5577,7 +5577,7 @@ large graphs.</div>
 <span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="o">*</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">color_key</span>
 <span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="o">*</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">point_field_names</span><span class="p">(:)</span>
 
-<span class="w">        </span><span class="c">! --- ローカル変数 ---</span>
+<span class="w">        </span><span class="c">! --- Local variables ---</span>
 <span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">c_file_name</span>
 <span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">c_array_name</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="kt">c_int</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ierr</span>
@@ -5587,23 +5587,17 @@ large graphs.</div>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">total_conn_size</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">connectivity_first</span><span class="p">,</span><span class="w"> </span><span class="n">connectivity_last</span><span class="p">,</span><span class="w"> </span><span class="n">num_nodes_in_cell</span>
 
-<span class="w">        </span><span class="c">! --- 生データ格納用の一時配列 ---</span>
+<span class="w">        </span><span class="c">! --- Temporary arrays for raw data storage ---</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">raw_connectivity</span><span class="p">(:)</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">raw_offsets</span><span class="p">(:)</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">raw_cell_types</span><span class="p">(:)</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">raw_cell_entity_ids</span><span class="p">(:)</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">raw_point_field_values</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">raw_global_node_ids</span><span class="p">(:)</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">raw_node_types</span><span class="p">(:)</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">raw_num_sharing_ranks</span><span class="p">(:)</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">raw_owner_ranks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">raw_communication_partners</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">raw_ranks</span><span class="p">(:)</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">local_max_node_id</span><span class="p">,</span><span class="w"> </span><span class="n">global_max_node_id</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">raw_colors</span><span class="p">(:)</span>
 
 <span class="w">        </span><span class="c">!----------------------------------------------------------------!</span>
-<span class="w">        </span><span class="c">! 1. C++リーダーの初期化とハンドルの取得</span>
+<span class="w">        </span><span class="c">! 1. Initialize C++ reader and obtain handle</span>
 <span class="w">        </span><span class="c">!----------------------------------------------------------------!</span>
 <span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">reader_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;vtu&quot;</span>
 <span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">c_associated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">handle</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
@@ -5617,13 +5611,13 @@ large graphs.</div>
 
 <span class="nb">        </span><span class="n">self</span><span class="p">%</span><span class="n">handle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vtu_initialize</span><span class="p">(</span><span class="n">c_file_name</span><span class="p">,</span><span class="w"> </span><span class="n">ierr</span><span class="p">)</span>
 <span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">c_associated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">handle</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="n">ierr</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
-<span class="k">            call </span><span class="n">global_logger</span><span class="p">%</span><span class="n">log_error</span><span class="p">(</span><span class="s2">&quot;C++ VTU Reader failed to initialize for file: &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">c_file_name</span><span class="p">))</span>
+<span class="k">            call </span><span class="n">global_logger</span><span class="p">%</span><span class="n">log_error</span><span class="p">(</span><span class="s2">&quot;C++ VTU Reader failed to initialize for file: &quot;</span><span class="o">//</span><span class="n">strip</span><span class="p">(</span><span class="n">c_file_name</span><span class="p">))</span>
 <span class="w">            </span><span class="k">call </span><span class="n">global_logger</span><span class="p">%</span><span class="n">log_error</span><span class="p">(</span><span class="s2">&quot;Error code: &quot;</span><span class="o">//</span><span class="n">to_string</span><span class="p">(</span><span class="n">ierr</span><span class="p">))</span>
 <span class="w">            </span><span class="k">stop</span><span class="w"> </span><span class="s2">&quot;VTU Initialization Failed&quot;</span>
 <span class="w">        </span><span class="k">end if</span>
 
 <span class="w">        </span><span class="c">!----------------------------------------------------------------!</span>
-<span class="w">        </span><span class="c">! 2. ヘッダー情報の取得</span>
+<span class="w">        </span><span class="c">! 2. Read header information</span>
 <span class="w">        </span><span class="c">!----------------------------------------------------------------!</span>
 <span class="w">        </span><span class="n">len_f_dataset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">50</span>
 <span class="w">        </span><span class="n">len_f_format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">50</span>
@@ -5634,7 +5628,7 @@ large graphs.</div>
 <span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">dataset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">strip</span><span class="p">(</span><span class="n">f_dataset</span><span class="p">)</span>
 
 <span class="w">        </span><span class="c">!----------------------------------------------------------------!</span>
-<span class="w">        </span><span class="c">! 3. ポイントデータの取得</span>
+<span class="w">        </span><span class="c">! 3. Retrieve point data</span>
 <span class="w">        </span><span class="c">!----------------------------------------------------------------!</span>
 <span class="w">        </span><span class="k">call </span><span class="n">vtu_get_num_points</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">handle</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_points</span><span class="p">)</span>
 <span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_points</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
@@ -5642,55 +5636,49 @@ large graphs.</div>
 <span class="w">            </span><span class="k">call </span><span class="n">vtu_get_points</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">handle</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">points</span><span class="p">%</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">points</span><span class="p">%</span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">points</span><span class="p">%</span><span class="n">z</span><span class="p">)</span>
 
 <span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">global_node_id_key</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
-<span class="k">                call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">raw_global_node_ids</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_points</span><span class="p">)</span>
+<span class="k">                call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">global_node_ids</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_points</span><span class="p">)</span>
 <span class="w">                </span><span class="n">c_array_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">strip</span><span class="p">(</span><span class="n">global_node_id_key</span><span class="p">)</span><span class="o">//</span><span class="nb">c_null_char</span>
-<span class="nb">                </span><span class="k">call </span><span class="n">vtu_get_point_data_int32</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">handle</span><span class="p">,</span><span class="w"> </span><span class="n">c_array_name</span><span class="p">,</span><span class="w"> </span><span class="n">raw_global_node_ids</span><span class="p">)</span>
-<span class="w">                </span><span class="n">raw_global_node_ids</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raw_global_node_ids</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="c">! 0-based to 1-based</span>
-<span class="w">                </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">global_node_ids</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="o">=</span><span class="n">raw_global_node_ids</span><span class="p">)</span>
+<span class="nb">                </span><span class="k">call </span><span class="n">vtu_get_point_data_int32</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">handle</span><span class="p">,</span><span class="w"> </span><span class="n">c_array_name</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">global_node_ids</span><span class="p">)</span>
+<span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">global_node_ids</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">global_node_ids</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="c">! 0-based to 1-based</span>
 <span class="w">            </span><span class="k">end if</span>
 
 <span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">node_type_key</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
-<span class="k">                call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">raw_node_types</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_points</span><span class="p">)</span>
+<span class="k">                call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">node_type</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_points</span><span class="p">)</span>
 <span class="w">                </span><span class="n">c_array_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">strip</span><span class="p">(</span><span class="n">node_type_key</span><span class="p">)</span><span class="o">//</span><span class="nb">c_null_char</span>
-<span class="nb">                </span><span class="k">call </span><span class="n">vtu_get_point_data_int32</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">handle</span><span class="p">,</span><span class="w"> </span><span class="n">c_array_name</span><span class="p">,</span><span class="w"> </span><span class="n">raw_node_types</span><span class="p">)</span>
-<span class="w">                </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">node_type</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="o">=</span><span class="n">raw_node_types</span><span class="p">)</span>
+<span class="nb">                </span><span class="k">call </span><span class="n">vtu_get_point_data_int32</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">handle</span><span class="p">,</span><span class="w"> </span><span class="n">c_array_name</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">node_type</span><span class="p">)</span>
 <span class="w">            </span><span class="k">end if</span>
 
 <span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">num_sharing_ranks_key</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
-<span class="k">                call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">raw_num_sharing_ranks</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_points</span><span class="p">)</span>
+<span class="k">                call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_sharing_ranks</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_points</span><span class="p">)</span>
 <span class="w">                </span><span class="n">c_array_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">strip</span><span class="p">(</span><span class="n">num_sharing_ranks_key</span><span class="p">)</span><span class="o">//</span><span class="nb">c_null_char</span>
-<span class="nb">                </span><span class="k">call </span><span class="n">vtu_get_point_data_int32</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">handle</span><span class="p">,</span><span class="w"> </span><span class="n">c_array_name</span><span class="p">,</span><span class="w"> </span><span class="n">raw_num_sharing_ranks</span><span class="p">)</span>
-<span class="w">                </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_sharing_ranks</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="o">=</span><span class="n">raw_num_sharing_ranks</span><span class="p">)</span>
+<span class="nb">                </span><span class="k">call </span><span class="n">vtu_get_point_data_int32</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">handle</span><span class="p">,</span><span class="w"> </span><span class="n">c_array_name</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_sharing_ranks</span><span class="p">)</span>
 <span class="w">            </span><span class="k">end if</span>
 
 <span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">owner_ranks_key</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
-<span class="k">                call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">raw_owner_ranks</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_procs</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_points</span><span class="p">)</span>
+<span class="k">                call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">owner_rank</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_procs</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_points</span><span class="p">)</span>
 <span class="w">                </span><span class="n">c_array_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">strip</span><span class="p">(</span><span class="n">owner_ranks_key</span><span class="p">)</span><span class="o">//</span><span class="nb">c_null_char</span>
-<span class="nb">                </span><span class="k">call </span><span class="n">vtu_get_point_data_int32</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">handle</span><span class="p">,</span><span class="w"> </span><span class="n">c_array_name</span><span class="p">,</span><span class="w"> </span><span class="n">raw_owner_ranks</span><span class="p">)</span>
-<span class="w">                </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">owner_rank</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="o">=</span><span class="n">raw_owner_ranks</span><span class="p">)</span>
+<span class="nb">                </span><span class="k">call </span><span class="n">vtu_get_point_data_int32</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">handle</span><span class="p">,</span><span class="w"> </span><span class="n">c_array_name</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">owner_rank</span><span class="p">)</span>
 <span class="w">            </span><span class="k">end if</span>
 
 <span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">communication_partners_key</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
-<span class="k">                call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">raw_communication_partners</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_procs</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_points</span><span class="p">)</span>
+<span class="k">                call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">communication_partners</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_procs</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_points</span><span class="p">)</span>
 <span class="w">                </span><span class="n">c_array_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">strip</span><span class="p">(</span><span class="n">communication_partners_key</span><span class="p">)</span><span class="o">//</span><span class="nb">c_null_char</span>
-<span class="nb">                </span><span class="k">call </span><span class="n">vtu_get_point_data_int32</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">handle</span><span class="p">,</span><span class="w"> </span><span class="n">c_array_name</span><span class="p">,</span><span class="w"> </span><span class="n">raw_communication_partners</span><span class="p">)</span>
-<span class="w">                </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">communication_partners</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="o">=</span><span class="n">raw_communication_partners</span><span class="p">)</span>
+<span class="nb">                </span><span class="k">call </span><span class="n">vtu_get_point_data_int32</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">handle</span><span class="p">,</span><span class="w"> </span><span class="n">c_array_name</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">communication_partners</span><span class="p">)</span>
 <span class="w">            </span><span class="k">end if</span>
 
 <span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">point_field_names</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
 <span class="k">                if</span><span class="w"> </span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">point_field_names</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
-<span class="k">                    call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">raw_point_field_values</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_points</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">point_field_names</span><span class="p">))</span>
+<span class="k">                    call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">point_field_values</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_points</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">point_field_names</span><span class="p">))</span>
 <span class="w">                    </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">point_field_names</span><span class="p">)</span>
 <span class="w">                        </span><span class="n">c_array_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">strip</span><span class="p">(</span><span class="n">point_field_names</span><span class="p">(</span><span class="n">i</span><span class="p">))</span><span class="o">//</span><span class="nb">c_null_char</span>
-<span class="nb">                        </span><span class="k">call </span><span class="n">vtu_get_point_data_float64</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">handle</span><span class="p">,</span><span class="w"> </span><span class="n">c_array_name</span><span class="p">,</span><span class="w"> </span><span class="n">raw_point_field_values</span><span class="p">(:,</span><span class="w"> </span><span class="n">i</span><span class="p">))</span>
+<span class="nb">                        </span><span class="k">call </span><span class="n">vtu_get_point_data_float64</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">handle</span><span class="p">,</span><span class="w"> </span><span class="n">c_array_name</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">point_field_values</span><span class="p">(:,</span><span class="w"> </span><span class="n">i</span><span class="p">))</span>
 <span class="w">                    </span><span class="k">end do</span>
-<span class="k">                    allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">point_field_values</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="o">=</span><span class="n">raw_point_field_values</span><span class="p">)</span>
-<span class="w">                </span><span class="k">end if</span>
+<span class="k">                end if</span>
 <span class="k">            end if</span>
 <span class="k">        end if</span>
 
 <span class="w">        </span><span class="c">!----------------------------------------------------------------!</span>
-<span class="w">        </span><span class="c">! 4. セルデータの取得</span>
+<span class="w">        </span><span class="c">! 4. Retrieve cell data</span>
 <span class="w">        </span><span class="c">!----------------------------------------------------------------!</span>
 <span class="w">        </span><span class="k">call </span><span class="n">vtu_get_num_cells</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">handle</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_total_cells</span><span class="p">)</span>
 <span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_total_cells</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
@@ -5750,18 +5738,12 @@ large graphs.</div>
 <span class="k">        call </span><span class="n">MPI_Allreduce</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_total_cells</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">global_num_total_cells</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_INTEGER4</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_SUM</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="w"> </span><span class="n">ierr</span><span class="p">)</span>
 
 <span class="w">        </span><span class="c">!----------------------------------------------------------------!</span>
-<span class="w">        </span><span class="c">! 6. 後処理: 一時配列を解放し、メモリリークを防止</span>
+<span class="w">        </span><span class="c">! 6. Cleanup: deallocate temporary arrays to prevent memory leaks</span>
 <span class="w">        </span><span class="c">!----------------------------------------------------------------!</span>
 <span class="w">        </span><span class="k">call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">raw_connectivity</span><span class="p">)</span>
 <span class="w">        </span><span class="k">call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">raw_offsets</span><span class="p">)</span>
 <span class="w">        </span><span class="k">call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">raw_cell_types</span><span class="p">)</span>
 <span class="w">        </span><span class="k">call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">raw_cell_entity_ids</span><span class="p">)</span>
-<span class="w">        </span><span class="k">call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">raw_point_field_values</span><span class="p">)</span>
-<span class="w">        </span><span class="k">call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">raw_global_node_ids</span><span class="p">)</span>
-<span class="w">        </span><span class="k">call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">raw_node_types</span><span class="p">)</span>
-<span class="w">        </span><span class="k">call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">raw_num_sharing_ranks</span><span class="p">)</span>
-<span class="w">        </span><span class="k">call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">raw_owner_ranks</span><span class="p">)</span>
-<span class="w">        </span><span class="k">call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">raw_communication_partners</span><span class="p">)</span>
 <span class="w">        </span><span class="k">call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">raw_ranks</span><span class="p">)</span>
 <span class="w">        </span><span class="k">call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">raw_colors</span><span class="p">)</span>
 
@@ -5781,7 +5763,7 @@ large graphs.</div>
         <div class="row justify-content-between">
           <div class="col">
             <p>
-              FTDSS
+              FTCMS
  was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
@@ -5789,7 +5771,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-23 23:52 +0000             </p>
+ on 2026-03-11 14:03 +0000             </p>
           </div>
         </div>
         <br>

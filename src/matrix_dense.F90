@@ -1,7 +1,7 @@
 !>
 !> Implements the procedures for the dense matrix type.
 !>
-submodule(core_types_matrix) core_types_matrix_dense
+submodule(core_types_algebra_matrix) algebra_matrix_dense
     implicit none
 
 contains
@@ -69,7 +69,7 @@ contains
 
         if (allocated(self%val)) then
             do i = 1, self%num_rows
-                call diagonal%set(MATRIX_OPS%INS, i, self%val(i, i))
+                call diagonal%set(VECTOR_OPS%INS, i, self%val(i, i))
             end do
         end if
 
@@ -329,4 +329,4 @@ contains
         end do
     end subroutine display_dense
 
-end submodule core_types_matrix_dense
+end submodule algebra_matrix_dense

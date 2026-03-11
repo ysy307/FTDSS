@@ -1,0 +1,953 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>find_element_domain &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>find_element_domain
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">38 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/domain_manager.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/domain_manager.f90.html'>domain_manager.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/domain_domain_manager.html'>domain_domain_manager</a></li>
+            <li class="breadcrumb-item active" aria-current="page">find_element_domain</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/find_element_domain.html#src">find_element_domain</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine find_element_domain(self, coordinate, coordinate_normalized, found_fe_id)  
+</h2>
+    
+
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_domain.html'>type_domain</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~783"></span>
+              class(<a href='../type/type_domain.html'>type_domain</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-coordinate~4"></span>
+              type(<a href='../type/type_coordinate_dp.html'>type_coordinate_dp</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>coordinate</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-coordinate_normalized~2"></span>
+              type(<a href='../type/type_coordinate_dp.html'>type_coordinate_dp</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>coordinate_normalized</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-found_fe_id"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>found_fe_id</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~find_element_domain~~CallsGraph Pages: 1 -->
+<svg id="procfind_element_domainCallsGraph" width="641pt" height="120pt"
+ viewBox="0.00 0.00 641.00 119.84" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~find_element_domain~~CallsGraph" class="graph" transform="scale(0.39 0.39) rotate(0) translate(4 300)">
+<title>proc~~find_element_domain~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-300 1622,-300 1622,4 -4,4"/>
+<!-- proc~find_element_domain -->
+<g id="proc~~find_element_domain~~CallsGraph_node1" class="node">
+<title>proc~find_element_domain</title>
+<polygon fill="none" stroke="black" points="207,-192 0,-192 0,-168 207,-168 207,-192"/>
+<text text-anchor="middle" x="103.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_domain%find_element_domain</text>
+</g>
+<!-- is_inside -->
+<g id="proc~~find_element_domain~~CallsGraph_node2" class="node">
+<title>is_inside</title>
+<polygon fill="#777777" stroke="#777777" points="434.5,-295 376.5,-295 376.5,-271 434.5,-271 434.5,-295"/>
+<text text-anchor="middle" x="405.5" y="-280.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">is_inside</text>
+</g>
+<!-- proc~find_element_domain&#45;&gt;is_inside -->
+<g id="proc~~find_element_domain~~CallsGraph_edge1" class="edge">
+<title>proc~find_element_domain&#45;&gt;is_inside</title>
+<path fill="none" stroke="#ff0000" d="M120.07,-192.14C144.65,-210.59 194.65,-245.34 243,-262 283.52,-275.97 332.68,-280.76 366.04,-282.34"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="366.16,-285.85 376.29,-282.75 366.44,-278.85 366.16,-285.85"/>
+</g>
+<!-- none~set~4 -->
+<g id="proc~~find_element_domain~~CallsGraph_node3" class="node">
+<title>none~set~4</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node3"><a xlink:href="../type/type_coordinate_dp.html#boundprocedure-set~4" xlink:title="type_coordinate_dp%set">
+<polygon fill="#a7506f" stroke="#a7506f" points="477,-253 334,-253 334,-229 477,-229 477,-253"/>
+<text text-anchor="middle" x="405.5" y="-238.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_coordinate_dp%set</text>
+</a>
+</g>
+</g>
+<!-- proc~find_element_domain&#45;&gt;none~set~4 -->
+<g id="proc~~find_element_domain~~CallsGraph_edge2" class="edge">
+<title>proc~find_element_domain&#45;&gt;none~set~4</title>
+<path fill="none" stroke="#ff0000" d="M149.84,-192.04C176.79,-198.97 211.72,-207.55 243,-214 269.18,-219.39 297.91,-224.47 323.79,-228.73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="323.5,-232.23 333.93,-230.38 324.63,-225.32 323.5,-232.23"/>
+</g>
+<!-- proc~get_fe_connectivity_domain -->
+<g id="proc~~find_element_domain~~CallsGraph_node4" class="node">
+<title>proc~get_fe_connectivity_domain</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node4"><a xlink:href="../proc/get_fe_connectivity_domain.html" xlink:title="type_domain%get_fe_connectivity_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="877.5,-212 637.5,-212 637.5,-188 877.5,-188 877.5,-212"/>
+<text text-anchor="middle" x="757.5" y="-197.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_fe_connectivity_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~find_element_domain&#45;&gt;proc~get_fe_connectivity_domain -->
+<g id="proc~~find_element_domain~~CallsGraph_edge3" class="edge">
+<title>proc~find_element_domain&#45;&gt;proc~get_fe_connectivity_domain</title>
+<path fill="none" stroke="#ff0000" d="M207.09,-183.15C320.63,-186.63 503.83,-192.25 627.13,-196.03"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="627.28,-199.54 637.38,-196.35 627.49,-192.54 627.28,-199.54"/>
+</g>
+<!-- proc~get_fe_coordinate_domain -->
+<g id="proc~~find_element_domain~~CallsGraph_node5" class="node">
+<title>proc~get_fe_coordinate_domain</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node5"><a xlink:href="../proc/get_fe_coordinate_domain.html" xlink:title="type_domain%get_fe_coordinate_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="522,-172 289,-172 289,-148 522,-148 522,-172"/>
+<text text-anchor="middle" x="405.5" y="-157.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_fe_coordinate_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~find_element_domain&#45;&gt;proc~get_fe_coordinate_domain -->
+<g id="proc~~find_element_domain~~CallsGraph_edge4" class="edge">
+<title>proc~find_element_domain&#45;&gt;proc~get_fe_coordinate_domain</title>
+<path fill="none" stroke="#ff0000" d="M207.32,-173.15C230.33,-171.61 254.98,-169.97 278.79,-168.38"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="279.2,-171.86 288.94,-167.7 278.73,-164.88 279.2,-171.86"/>
+</g>
+<!-- proc~get_fe_domain -->
+<g id="proc~~find_element_domain~~CallsGraph_node6" class="node">
+<title>proc~get_fe_domain</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node6"><a xlink:href="../proc/get_fe_domain.html" xlink:title="type_domain%get_fe_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="490.5,-130 320.5,-130 320.5,-106 490.5,-106 490.5,-130"/>
+<text text-anchor="middle" x="405.5" y="-115.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_fe_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~find_element_domain&#45;&gt;proc~get_fe_domain -->
+<g id="proc~~find_element_domain~~CallsGraph_edge5" class="edge">
+<title>proc~find_element_domain&#45;&gt;proc~get_fe_domain</title>
+<path fill="none" stroke="#ff0000" d="M139.4,-167.99C167.17,-158.85 207.18,-146.58 243,-139 264.59,-134.43 288.03,-130.7 310.18,-127.71"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="310.79,-131.16 320.25,-126.39 309.88,-124.22 310.79,-131.16"/>
+</g>
+<!-- proc~get_num_fe_elements_manager -->
+<g id="proc~~find_element_domain~~CallsGraph_node7" class="node">
+<title>proc~get_num_fe_elements_manager</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node7"><a xlink:href="../proc/get_num_fe_elements_manager.html" xlink:title="type_elements_manager%get_num_fe_elements_manager">
+<polygon fill="#d9534f" stroke="#d9534f" points="568,-88 243,-88 243,-64 568,-64 568,-88"/>
+<text text-anchor="middle" x="405.5" y="-73.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_elements_manager%get_num_fe_elements_manager</text>
+</a>
+</g>
+</g>
+<!-- proc~find_element_domain&#45;&gt;proc~get_num_fe_elements_manager -->
+<g id="proc~~find_element_domain~~CallsGraph_edge6" class="edge">
+<title>proc~find_element_domain&#45;&gt;proc~get_num_fe_elements_manager</title>
+<path fill="none" stroke="#ff0000" d="M120.04,-167.71C144.59,-149.02 194.55,-113.85 243,-97 250.06,-94.55 257.38,-92.38 264.83,-90.46"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="265.8,-93.82 274.7,-88.07 264.15,-87.02 265.8,-93.82"/>
+</g>
+<!-- proc~set_coordinate_dp -->
+<g id="proc~~find_element_domain~~CallsGraph_node12" class="node">
+<title>proc~set_coordinate_dp</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node12"><a xlink:href="../proc/set_coordinate_dp.html" xlink:title="type_coordinate_dp%set_coordinate_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="870,-296 645,-296 645,-272 870,-272 870,-296"/>
+<text text-anchor="middle" x="757.5" y="-281.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_coordinate_dp%set_coordinate_dp</text>
+</a>
+</g>
+</g>
+<!-- none~set~4&#45;&gt;proc~set_coordinate_dp -->
+<g id="proc~~find_element_domain~~CallsGraph_edge7" class="edge">
+<title>none~set~4&#45;&gt;proc~set_coordinate_dp</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M477.33,-249.7C526.41,-255.73 592.67,-263.87 648.33,-270.71"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="648.24,-274.23 658.59,-271.97 649.09,-267.28 648.24,-274.23"/>
+</g>
+<!-- proc~set_coordinate_dp_array -->
+<g id="proc~~find_element_domain~~CallsGraph_node13" class="node">
+<title>proc~set_coordinate_dp_array</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node13"><a xlink:href="../proc/set_coordinate_dp_array.html" xlink:title="type_coordinate_dp%set_coordinate_dp_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="887,-254 628,-254 628,-230 887,-230 887,-254"/>
+<text text-anchor="middle" x="757.5" y="-239.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_coordinate_dp%set_coordinate_dp_array</text>
+</a>
+</g>
+</g>
+<!-- none~set~4&#45;&gt;proc~set_coordinate_dp_array -->
+<g id="proc~~find_element_domain~~CallsGraph_edge8" class="edge">
+<title>none~set~4&#45;&gt;proc~set_coordinate_dp_array</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M477.33,-241.2C517.61,-241.32 569.47,-241.47 617.53,-241.6"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="617.72,-245.1 627.73,-241.63 617.74,-238.1 617.72,-245.1"/>
+</g>
+<!-- proc~get_fe_connectivity_elements_manager -->
+<g id="proc~~find_element_domain~~CallsGraph_node10" class="node">
+<title>proc~get_fe_connectivity_elements_manager</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node10"><a xlink:href="../proc/get_fe_connectivity_elements_manager.html" xlink:title="type_elements_manager%get_fe_connectivity_elements_manager">
+<polygon fill="#d9534f" stroke="#d9534f" points="1313,-212 947,-212 947,-188 1313,-188 1313,-212"/>
+<text text-anchor="middle" x="1130" y="-197.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_elements_manager%get_fe_connectivity_elements_manager</text>
+</a>
+</g>
+</g>
+<!-- proc~get_fe_connectivity_domain&#45;&gt;proc~get_fe_connectivity_elements_manager -->
+<g id="proc~~find_element_domain~~CallsGraph_edge9" class="edge">
+<title>proc~get_fe_connectivity_domain&#45;&gt;proc~get_fe_connectivity_elements_manager</title>
+<path fill="none" stroke="#00ff00" d="M877.51,-200C896.43,-200 916.41,-200 936.5,-200"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="936.69,-203.5 946.69,-200 936.69,-196.5 936.69,-203.5"/>
+</g>
+<!-- proc~get_fe_coordinate_domain&#45;&gt;proc~get_fe_connectivity_domain -->
+<g id="proc~~find_element_domain~~CallsGraph_edge12" class="edge">
+<title>proc~get_fe_coordinate_domain&#45;&gt;proc~get_fe_connectivity_domain</title>
+<path fill="none" stroke="#00ffff" d="M511.51,-172C552.43,-176.68 599.46,-182.05 641.3,-186.83"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="640.93,-190.31 651.26,-187.97 641.72,-183.36 640.93,-190.31"/>
+</g>
+<!-- none~get_coordinate -->
+<g id="proc~~find_element_domain~~CallsGraph_node8" class="node">
+<title>none~get_coordinate</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node8"><a xlink:href="../type/type_nodes_manager.html#boundprocedure-get_coordinate" xlink:title="type_nodes_manager%get_coordinate">
+<polygon fill="#a7506f" stroke="#a7506f" points="866,-170 649,-170 649,-146 866,-146 866,-170"/>
+<text text-anchor="middle" x="757.5" y="-155.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_nodes_manager%get_coordinate</text>
+</a>
+</g>
+</g>
+<!-- proc~get_fe_coordinate_domain&#45;&gt;none~get_coordinate -->
+<g id="proc~~find_element_domain~~CallsGraph_edge10" class="edge">
+<title>proc~get_fe_coordinate_domain&#45;&gt;none~get_coordinate</title>
+<path fill="none" stroke="#00ffff" d="M522.07,-159.34C559.38,-159.13 600.78,-158.89 638.28,-158.68"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="638.77,-162.17 648.75,-158.62 638.73,-155.17 638.77,-162.17"/>
+</g>
+<!-- proc~get_dimension_nodes_manager -->
+<g id="proc~~find_element_domain~~CallsGraph_node9" class="node">
+<title>proc~get_dimension_nodes_manager</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node9"><a xlink:href="../proc/get_dimension_nodes_manager.html" xlink:title="type_nodes_manager%get_dimension_nodes_manager">
+<polygon fill="#d9534f" stroke="#d9534f" points="911,-128 604,-128 604,-104 911,-104 911,-128"/>
+<text text-anchor="middle" x="757.5" y="-113.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_nodes_manager%get_dimension_nodes_manager</text>
+</a>
+</g>
+</g>
+<!-- proc~get_fe_coordinate_domain&#45;&gt;proc~get_dimension_nodes_manager -->
+<g id="proc~~find_element_domain~~CallsGraph_edge11" class="edge">
+<title>proc~get_fe_coordinate_domain&#45;&gt;proc~get_dimension_nodes_manager</title>
+<path fill="none" stroke="#00ffff" d="M502.14,-147.98C548.25,-142.18 603.68,-135.21 651.01,-129.26"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="651.49,-132.73 660.98,-128.01 650.62,-125.78 651.49,-132.73"/>
+</g>
+<!-- proc~get_fe_elements_manager -->
+<g id="proc~~find_element_domain~~CallsGraph_node11" class="node">
+<title>proc~get_fe_elements_manager</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node11"><a xlink:href="../proc/get_fe_elements_manager.html" xlink:title="type_elements_manager%get_fe_elements_manager">
+<polygon fill="#d9534f" stroke="#d9534f" points="905.5,-86 609.5,-86 609.5,-62 905.5,-62 905.5,-86"/>
+<text text-anchor="middle" x="757.5" y="-71.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_elements_manager%get_fe_elements_manager</text>
+</a>
+</g>
+</g>
+<!-- proc~get_fe_domain&#45;&gt;proc~get_fe_elements_manager -->
+<g id="proc~~find_element_domain~~CallsGraph_edge13" class="edge">
+<title>proc~get_fe_domain&#45;&gt;proc~get_fe_elements_manager</title>
+<path fill="none" stroke="#0000ff" d="M490.78,-107.4C538.85,-101.36 599.55,-93.73 650.79,-87.29"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="651.42,-90.74 660.91,-86.02 650.55,-83.79 651.42,-90.74"/>
+</g>
+<!-- proc~get_coordinate_nodes_manager -->
+<g id="proc~~find_element_domain~~CallsGraph_node15" class="node">
+<title>proc~get_coordinate_nodes_manager</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node15"><a xlink:href="../proc/get_coordinate_nodes_manager.html" xlink:title="type_nodes_manager%get_coordinate_nodes_manager">
+<polygon fill="#d9534f" stroke="#d9534f" points="1284.5,-170 975.5,-170 975.5,-146 1284.5,-146 1284.5,-170"/>
+<text text-anchor="middle" x="1130" y="-155.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_nodes_manager%get_coordinate_nodes_manager</text>
+</a>
+</g>
+</g>
+<!-- none~get_coordinate&#45;&gt;proc~get_coordinate_nodes_manager -->
+<g id="proc~~find_element_domain~~CallsGraph_edge14" class="edge">
+<title>none~get_coordinate&#45;&gt;proc~get_coordinate_nodes_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M866.16,-158C897.04,-158 931.44,-158 964.9,-158"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="965.25,-161.5 975.25,-158 965.25,-154.5 965.25,-161.5"/>
+</g>
+<!-- proc~get_coordinates_nodes_manager -->
+<g id="proc~~find_element_domain~~CallsGraph_node16" class="node">
+<title>proc~get_coordinates_nodes_manager</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node16"><a xlink:href="../proc/get_coordinates_nodes_manager.html" xlink:title="type_nodes_manager%get_coordinates_nodes_manager">
+<polygon fill="#d9534f" stroke="#d9534f" points="1287,-128 973,-128 973,-104 1287,-104 1287,-128"/>
+<text text-anchor="middle" x="1130" y="-113.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_nodes_manager%get_coordinates_nodes_manager</text>
+</a>
+</g>
+</g>
+<!-- none~get_coordinate&#45;&gt;proc~get_coordinates_nodes_manager -->
+<g id="proc~~find_element_domain~~CallsGraph_edge15" class="edge">
+<title>none~get_coordinate&#45;&gt;proc~get_coordinates_nodes_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M864.67,-145.96C911.08,-140.7 965.65,-134.52 1013.12,-129.14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1013.59,-132.61 1023.13,-128 1012.8,-125.65 1013.59,-132.61"/>
+</g>
+<!-- interface~value_in_range -->
+<g id="proc~~find_element_domain~~CallsGraph_node14" class="node">
+<title>interface~value_in_range</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node14"><a xlink:href="../interface/value_in_range.html" xlink:title="value_in_range">
+<polygon fill="#a7506f" stroke="#a7506f" points="1443,-150 1349,-150 1349,-126 1443,-126 1443,-150"/>
+<text text-anchor="middle" x="1396" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">value_in_range</text>
+</a>
+</g>
+</g>
+<!-- proc~get_fe_connectivity_elements_manager&#45;&gt;interface~value_in_range -->
+<g id="proc~~find_element_domain~~CallsGraph_edge16" class="edge">
+<title>proc~get_fe_connectivity_elements_manager&#45;&gt;interface~value_in_range</title>
+<path fill="none" stroke="#00ff00" d="M1275.99,-187.94C1288.62,-185.49 1301.11,-182.54 1313,-179 1331.7,-173.44 1351.29,-163.8 1366.63,-155.27"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1368.64,-158.15 1375.59,-150.15 1365.17,-152.07 1368.64,-158.15"/>
+</g>
+<!-- proc~get_fe_elements_manager&#45;&gt;interface~value_in_range -->
+<g id="proc~~find_element_domain~~CallsGraph_edge17" class="edge">
+<title>proc~get_fe_elements_manager&#45;&gt;interface~value_in_range</title>
+<path fill="none" stroke="#00ffff" d="M905.59,-62.1C1018.88,-57.08 1178.37,-59.13 1313,-95 1333,-100.33 1353.62,-111.17 1369.18,-120.64"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1367.38,-123.64 1377.71,-126 1371.11,-117.71 1367.38,-123.64"/>
+</g>
+<!-- proc~get_fe_fe_manager -->
+<g id="proc~~find_element_domain~~CallsGraph_node17" class="node">
+<title>proc~get_fe_fe_manager</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node17"><a xlink:href="../proc/get_fe_fe_manager.html" xlink:title="type_fe_manager%get_fe_fe_manager">
+<polygon fill="#d9534f" stroke="#d9534f" points="1239,-48 1021,-48 1021,-24 1239,-24 1239,-48"/>
+<text text-anchor="middle" x="1130" y="-33.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_fe_manager%get_fe_fe_manager</text>
+</a>
+</g>
+</g>
+<!-- proc~get_fe_elements_manager&#45;&gt;proc~get_fe_fe_manager -->
+<g id="proc~~find_element_domain~~CallsGraph_edge18" class="edge">
+<title>proc~get_fe_elements_manager&#45;&gt;proc~get_fe_fe_manager</title>
+<path fill="none" stroke="#00ffff" d="M875.73,-61.98C918.8,-57.56 967.57,-52.56 1010.74,-48.13"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1011.12,-51.61 1020.72,-47.11 1010.41,-44.64 1011.12,-51.61"/>
+</g>
+<!-- proc~value_in_range_int16 -->
+<g id="proc~~find_element_domain~~CallsGraph_node18" class="node">
+<title>proc~value_in_range_int16</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node18"><a xlink:href="../proc/value_in_range_int16.html" xlink:title="value_in_range_int16">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1611.5,-276 1485.5,-276 1485.5,-252 1611.5,-252 1611.5,-276"/>
+<text text-anchor="middle" x="1548.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">value_in_range_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~value_in_range&#45;&gt;proc~value_in_range_int16 -->
+<g id="proc~~find_element_domain~~CallsGraph_edge19" class="edge">
+<title>interface~value_in_range&#45;&gt;proc~value_in_range_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1403.14,-150.03C1414.87,-171.84 1442.6,-217.96 1479,-243 1481.4,-244.65 1483.94,-246.18 1486.56,-247.59"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1485.24,-250.83 1495.77,-251.94 1488.23,-244.5 1485.24,-250.83"/>
+</g>
+<!-- proc~value_in_range_int32 -->
+<g id="proc~~find_element_domain~~CallsGraph_node19" class="node">
+<title>proc~value_in_range_int32</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node19"><a xlink:href="../proc/value_in_range_int32.html" xlink:title="value_in_range_int32">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1611.5,-234 1485.5,-234 1485.5,-210 1611.5,-210 1611.5,-234"/>
+<text text-anchor="middle" x="1548.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">value_in_range_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~value_in_range&#45;&gt;proc~value_in_range_int32 -->
+<g id="proc~~find_element_domain~~CallsGraph_edge20" class="edge">
+<title>interface~value_in_range&#45;&gt;proc~value_in_range_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1409.63,-150.06C1424.94,-164.09 1452.04,-187.09 1479,-201 1482.73,-202.92 1486.67,-204.71 1490.69,-206.35"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1489.6,-209.68 1500.19,-209.94 1492.07,-203.13 1489.6,-209.68"/>
+</g>
+<!-- proc~value_in_range_int64 -->
+<g id="proc~~find_element_domain~~CallsGraph_node20" class="node">
+<title>proc~value_in_range_int64</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node20"><a xlink:href="../proc/value_in_range_int64.html" xlink:title="value_in_range_int64">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1611.5,-192 1485.5,-192 1485.5,-168 1611.5,-168 1611.5,-192"/>
+<text text-anchor="middle" x="1548.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">value_in_range_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~value_in_range&#45;&gt;proc~value_in_range_int64 -->
+<g id="proc~~find_element_domain~~CallsGraph_edge21" class="edge">
+<title>interface~value_in_range&#45;&gt;proc~value_in_range_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1440.13,-150.04C1457.13,-154.78 1476.83,-160.28 1494.67,-165.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1493.79,-168.65 1504.37,-167.96 1495.68,-161.9 1493.79,-168.65"/>
+</g>
+<!-- proc~value_in_range_int8 -->
+<g id="proc~~find_element_domain~~CallsGraph_node21" class="node">
+<title>proc~value_in_range_int8</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node21"><a xlink:href="../proc/value_in_range_int8.html" xlink:title="value_in_range_int8">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1608,-150 1489,-150 1489,-126 1608,-126 1608,-150"/>
+<text text-anchor="middle" x="1548.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">value_in_range_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~value_in_range&#45;&gt;proc~value_in_range_int8 -->
+<g id="proc~~find_element_domain~~CallsGraph_edge22" class="edge">
+<title>interface~value_in_range&#45;&gt;proc~value_in_range_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1443.38,-138C1454.47,-138 1466.55,-138 1478.42,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1478.76,-141.5 1488.76,-138 1478.76,-134.5 1478.76,-141.5"/>
+</g>
+<!-- proc~value_in_range_real128 -->
+<g id="proc~~find_element_domain~~CallsGraph_node22" class="node">
+<title>proc~value_in_range_real128</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node22"><a xlink:href="../proc/value_in_range_real128.html" xlink:title="value_in_range_real128">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1618,-108 1479,-108 1479,-84 1618,-84 1618,-108"/>
+<text text-anchor="middle" x="1548.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">value_in_range_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~value_in_range&#45;&gt;proc~value_in_range_real128 -->
+<g id="proc~~find_element_domain~~CallsGraph_edge23" class="edge">
+<title>interface~value_in_range&#45;&gt;proc~value_in_range_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1440.13,-125.96C1457.13,-121.22 1476.83,-115.72 1494.67,-110.74"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1495.68,-114.1 1504.37,-108.04 1493.79,-107.35 1495.68,-114.1"/>
+</g>
+<!-- proc~value_in_range_real32 -->
+<g id="proc~~find_element_domain~~CallsGraph_node23" class="node">
+<title>proc~value_in_range_real32</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node23"><a xlink:href="../proc/value_in_range_real32.html" xlink:title="value_in_range_real32">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1615,-66 1482,-66 1482,-42 1615,-42 1615,-66"/>
+<text text-anchor="middle" x="1548.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">value_in_range_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~value_in_range&#45;&gt;proc~value_in_range_real32 -->
+<g id="proc~~find_element_domain~~CallsGraph_edge24" class="edge">
+<title>interface~value_in_range&#45;&gt;proc~value_in_range_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1409.63,-125.94C1424.94,-111.91 1452.04,-88.91 1479,-75 1482.73,-73.08 1486.67,-71.29 1490.69,-69.65"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1492.07,-72.87 1500.19,-66.06 1489.6,-66.32 1492.07,-72.87"/>
+</g>
+<!-- proc~value_in_range_real64 -->
+<g id="proc~~find_element_domain~~CallsGraph_node24" class="node">
+<title>proc~value_in_range_real64</title>
+<g id="a_proc~~find_element_domain~~CallsGraph_node24"><a xlink:href="../proc/value_in_range_real64.html" xlink:title="value_in_range_real64">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1615,-24 1482,-24 1482,0 1615,0 1615,-24"/>
+<text text-anchor="middle" x="1548.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">value_in_range_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~value_in_range&#45;&gt;proc~value_in_range_real64 -->
+<g id="proc~~find_element_domain~~CallsGraph_edge25" class="edge">
+<title>interface~value_in_range&#45;&gt;proc~value_in_range_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1403.14,-125.97C1414.87,-104.16 1442.6,-58.04 1479,-33 1481.4,-31.35 1483.94,-29.82 1486.56,-28.41"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1488.23,-31.5 1495.77,-24.06 1485.24,-25.17 1488.23,-31.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocfind_element_domainCallsGraph = svgPanZoom('#procfind_element_domainCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~find_element_domain~~CalledByGraph Pages: 1 -->
+<svg id="procfind_element_domainCalledByGraph" width="641pt" height="25pt"
+ viewBox="0.00 0.00 641.00 24.92" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~find_element_domain~~CalledByGraph" class="graph" transform="scale(0.78 0.78) rotate(0) translate(4 28)">
+<title>proc~~find_element_domain~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 819,-28 819,4 -4,4"/>
+<!-- proc~find_element_domain -->
+<g id="proc~~find_element_domain~~CalledByGraph_node1" class="node">
+<title>proc~find_element_domain</title>
+<polygon fill="none" stroke="black" points="815,-24 608,-24 608,0 815,0 815,-24"/>
+<text text-anchor="middle" x="711.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_domain%find_element_domain</text>
+</g>
+<!-- proc~get_config_domain -->
+<g id="proc~~find_element_domain~~CalledByGraph_node2" class="node">
+<title>proc~get_config_domain</title>
+<g id="a_proc~~find_element_domain~~CalledByGraph_node2"><a xlink:href="../proc/get_config_domain.html" xlink:title="type_domain%get_config_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="572,-24 379,-24 379,0 572,0 572,-24"/>
+<text text-anchor="middle" x="475.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_config_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~get_config_domain&#45;&gt;proc~find_element_domain -->
+<g id="proc~~find_element_domain~~CalledByGraph_edge1" class="edge">
+<title>proc~get_config_domain&#45;&gt;proc~find_element_domain</title>
+<path fill="none" stroke="#ff0000" d="M572.01,-12C580.46,-12 589.06,-12 597.64,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="597.67,-15.5 607.67,-12 597.67,-8.5 597.67,-15.5"/>
+</g>
+<!-- proc~initialize_type_ftcms -->
+<g id="proc~~find_element_domain~~CalledByGraph_node3" class="node">
+<title>proc~initialize_type_ftcms</title>
+<g id="a_proc~~find_element_domain~~CalledByGraph_node3"><a xlink:href="../proc/initialize_type_ftcms.html" xlink:title="initialize_type_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="343,-24 223,-24 223,0 343,0 343,-24"/>
+<text text-anchor="middle" x="283" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_type_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_ftcms&#45;&gt;proc~get_config_domain -->
+<g id="proc~~find_element_domain~~CalledByGraph_edge2" class="edge">
+<title>proc~initialize_type_ftcms&#45;&gt;proc~get_config_domain</title>
+<path fill="none" stroke="#ff0000" d="M343.23,-12C351.4,-12 359.97,-12 368.67,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="368.92,-15.5 378.92,-12 368.92,-8.5 368.92,-15.5"/>
+</g>
+<!-- interface~initialize_type_ftcms -->
+<g id="proc~~find_element_domain~~CalledByGraph_node4" class="node">
+<title>interface~initialize_type_ftcms</title>
+<g id="a_proc~~find_element_domain~~CalledByGraph_node4"><a xlink:href="../interface/initialize_type_ftcms.html" xlink:title="type_ftcms%initialize_type_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="187,-24 0,-24 0,0 187,0 187,-24"/>
+<text text-anchor="middle" x="93.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%initialize_type_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_ftcms&#45;&gt;proc~initialize_type_ftcms -->
+<g id="proc~~find_element_domain~~CalledByGraph_edge3" class="edge">
+<title>interface~initialize_type_ftcms&#45;&gt;proc~initialize_type_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M187.15,-12C195.81,-12 204.48,-12 212.87,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="212.94,-15.5 222.94,-12 212.94,-8.5 212.94,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocfind_element_domainCalledByGraph = svgPanZoom('#procfind_element_domainCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">find_element_domain</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">coordinate</span><span class="p">,</span><span class="w"> </span><span class="n">coordinate_normalized</span><span class="p">,</span><span class="w"> </span><span class="n">found_fe_id</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_domain</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_coordinate_dp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">coordinate</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_coordinate_dp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">coordinate_normalized</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">found_fe_id</span>
+
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_fe</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_coordinate_dp</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">cartesian</span><span class="p">,</span><span class="w"> </span><span class="n">normalized</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">abst_fe</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">fe</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">contiguous</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="nb">null</span><span class="p">()</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">element_coordinate</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">inside</span>
+
+<span class="w">        </span><span class="n">found_fe_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span>
+
+<span class="w">        </span><span class="c">! Set search point coordinates based on computation type</span>
+<span class="w">        </span><span class="k">select case</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">computation_type</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">COMP_TYPES</span><span class="p">%</span><span class="n">XY_2D</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">cartesian</span><span class="p">%</span><span class="n">set</span><span class="p">(</span><span class="n">coordinate</span><span class="p">%</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">coordinate</span><span class="p">%</span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">COMP_TYPES</span><span class="p">%</span><span class="n">XZ_2D</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">cartesian</span><span class="p">%</span><span class="n">set</span><span class="p">(</span><span class="n">coordinate</span><span class="p">%</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">coordinate</span><span class="p">%</span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">COMP_TYPES</span><span class="p">%</span><span class="n">XYZ_3D</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">cartesian</span><span class="p">%</span><span class="n">set</span><span class="p">(</span><span class="n">coordinate</span><span class="p">%</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">coordinate</span><span class="p">%</span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">coordinate</span><span class="p">%</span><span class="n">z</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end select</span>
+
+<span class="k">        call </span><span class="n">self</span><span class="p">%</span><span class="n">elements</span><span class="p">%</span><span class="n">get_num_fe</span><span class="p">(</span><span class="n">num_fe</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_fe</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">get_fe</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">fe</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">fe</span><span class="p">))</span><span class="w"> </span><span class="k">cycle</span>
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">get_fe_connectivity</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">conn</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">conn</span><span class="p">))</span><span class="w"> </span><span class="k">cycle</span>
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">get_fe_coordinate</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">element_coordinate</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">element_coordinate</span><span class="p">))</span><span class="w"> </span><span class="k">cycle</span>
+<span class="w">            </span><span class="c">! Containment check</span>
+<span class="w">            </span><span class="k">call </span><span class="n">fe</span><span class="p">%</span><span class="n">is_inside</span><span class="p">(</span><span class="n">cartesian</span><span class="p">,</span><span class="w"> </span><span class="n">normalized</span><span class="p">,</span><span class="w"> </span><span class="n">element_coordinate</span><span class="p">,</span><span class="w"> </span><span class="n">inside</span><span class="p">)</span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">inside</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">coordinate_normalized</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">normalized</span>
+<span class="w">                </span><span class="n">found_fe_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span>
+<span class="w">                </span><span class="k">exit</span>
+<span class="k">            end if</span>
+<span class="k">        end do</span>
+
+<span class="k">    end subroutine </span><span class="n">find_element_domain</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-03-11 14:03 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

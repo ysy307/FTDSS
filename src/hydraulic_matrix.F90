@@ -1,30 +1,30 @@
-submodule(main_hydraulic) hydraulic_matrix
+submodule(physics_governing_hydraulic) hydraulic_matrix
     implicit none
 contains
 
     !> @brief Assemble Local Matrix and Vector (Wrapper)
-    module subroutine assemble_local_hydraulic(self, controls, workspace, K_HH, K_HT, F_H)
+    module subroutine assemble_local_hydraulic(self, control, workspace, K_HH, K_HT, F_H)
         implicit none
         class(type_hydraulic), intent(in) :: self
-        type(type_controls), intent(in) :: controls
+        type(type_control), intent(in) :: control
         type(type_assemble_workspace), intent(inout) :: workspace
         type(type_matrix_dense), intent(inout), optional :: K_HH
         type(type_matrix_dense), intent(inout), optional :: K_HT
         type(type_vector_dp), intent(inout), optional :: F_H
 
-        if (controls%iteration%is_compute_newton()) then
-            call self%assemble_local_newton(controls, workspace, K_HH, K_HT, F_H)
-        else if (controls%iteration%is_compute_picard()) then
-            call self%assemble_local_picard(controls, workspace, K_HH, K_HT, F_H)
+        if (control%is_compute_newton()) then
+            call self%assemble_local_newton(control, workspace, K_HH, K_HT, F_H)
+        else if (control%is_compute_picard()) then
+            call self%assemble_local_picard(control, workspace, K_HH, K_HT, F_H)
         end if
 
     end subroutine assemble_local_hydraulic
 
     !> @brief Assemble Newton-Raphson Local Components
-    module subroutine assemble_local_newton_hydraulic(self, controls, workspace, K_HH, K_HT, F_H)
+    module subroutine assemble_local_newton_hydraulic(self, control, workspace, K_HH, K_HT, F_H)
         implicit none
         class(type_hydraulic), intent(in) :: self
-        type(type_controls), intent(in) :: controls
+        type(type_control), intent(in) :: control
         type(type_assemble_workspace), intent(inout) :: workspace
         type(type_matrix_dense), intent(inout), optional :: K_HH
         type(type_matrix_dense), intent(inout), optional :: K_HT
@@ -67,7 +67,7 @@ contains
         if (present(K_HH)) then
             do j = 1, workspace%num_fe_nodes
                 do i = 1, workspace%num_fe_nodes
-                    call K_HH%set(OP_ADD, i, j, bdf0 * workspace%work_matrix(i, j))
+                    call K_HH%set(MATRIX_OPS%ADD, i, j, bdf0 * workspace%work_matrix(i, j))
                 end do
             end do
         end if
@@ -78,7 +78,7 @@ contains
             workspace%work_vec(:) = 0.0d0
             call workspace%compute_R1(workspace%work_d_dt, workspace%work_vec)
             do i = 1, workspace%num_fe_nodes
-                call F_H%set(OP_ADD, i, -workspace%work_vec(i))
+                call F_H%set(VECTOR_OPS%ADD, i, -workspace%work_vec(i))
             end do
         end if
 
@@ -88,7 +88,7 @@ contains
         if (present(K_HH)) then
             do j = 1, workspace%num_fe_nodes
                 do i = 1, workspace%num_fe_nodes
-                    call K_HH%set(OP_ADD, i, j, workspace%work_matrix(i, j))
+                    call K_HH%set(MATRIX_OPS%ADD, i, j, workspace%work_matrix(i, j))
                 end do
             end do
         end if
@@ -99,7 +99,7 @@ contains
             workspace%work_vec(:) = 0.0d0
             call matvec(workspace%work_matrix, workspace%P_node, workspace%work_vec, ierr)
             do i = 1, workspace%num_fe_nodes
-                call F_H%set(OP_ADD, i, -workspace%work_vec(i))
+                call F_H%set(VECTOR_OPS%ADD, i, -workspace%work_vec(i))
             end do
         end if
 
@@ -113,26 +113,28 @@ contains
             workspace%work_vec(:) = 0.0d0
             call workspace%compute_R2(workspace%work_V, workspace%work_vec)
             do i = 1, workspace%num_fe_nodes
-                call F_H%set(OP_ADD, i, -workspace%work_vec(i))
+                call F_H%set(VECTOR_OPS%ADD, i, -workspace%work_vec(i))
             end do
         end if
 
     end subroutine assemble_local_newton_hydraulic
 
     !> @brief Assemble Picard Local Components
-    module subroutine assemble_local_picard_hydraulic(self, controls, workspace, K_HH, K_HT, F_H)
+    module subroutine assemble_local_picard_hydraulic(self, control, workspace, K_HH, K_HT, F_H)
         implicit none
         class(type_hydraulic), intent(in) :: self
-        type(type_controls), intent(in) :: controls
+        type(type_control), intent(in) :: control
         type(type_assemble_workspace), intent(inout) :: workspace
         type(type_matrix_dense), intent(inout), optional :: K_HH
         type(type_matrix_dense), intent(inout), optional :: K_HT
         type(type_vector_dp), intent(inout), optional :: F_H
 
-        integer(int32) :: i, j
+        integer(int32) :: i, j, n_nodes
         real(real64) :: bdf0
-        real(real64) :: local_vec_res(workspace%num_fe_nodes)
+        real(real64), allocatable :: local_vec_res(:)
 
+        n_nodes = workspace%num_fe_nodes
+        allocate (local_vec_res(n_nodes))
         bdf0 = workspace%bdf_coeffs(1)
 
         workspace%work_C(:) = 0.0d0
@@ -156,7 +158,7 @@ contains
         if (present(K_HH)) then
             do j = 1, workspace%num_fe_nodes
                 do i = 1, workspace%num_fe_nodes
-                    call K_HH%set(OP_ADD, i, j, bdf0 * workspace%work_matrix(i, j))
+                    call K_HH%set(MATRIX_OPS%ADD, i, j, bdf0 * workspace%work_matrix(i, j))
                 end do
             end do
         end if
@@ -166,7 +168,7 @@ contains
         if (present(K_HH)) then
             do j = 1, workspace%num_fe_nodes
                 do i = 1, workspace%num_fe_nodes
-                    call K_HH%set(OP_ADD, i, j, workspace%work_matrix(i, j))
+                    call K_HH%set(MATRIX_OPS%ADD, i, j, workspace%work_matrix(i, j))
                 end do
             end do
         end if
@@ -194,9 +196,11 @@ contains
 
             ! F = - Residual
             do i = 1, workspace%num_fe_nodes
-                call F_H%set(OP_ADD, i, -local_vec_res(i))
+                call F_H%set(VECTOR_OPS%ADD, i, -local_vec_res(i))
             end do
         end if
+
+        if (allocated(local_vec_res)) deallocate (local_vec_res)
 
     end subroutine assemble_local_picard_hydraulic
 

@@ -1,12 +1,9 @@
-submodule(solver_preconditioner) solver_preconditioner_iluk
-    use :: core_constants
-    use :: core_types_matrix
-    use :: module_type_vector, only:type_vector_dp
+submodule(numerical_solver_preconditioner) solver_preconditioner_iluk
     implicit none
 
 contains
 
-    !> ILU(k) 前処理インスタンスを初期化する
+    !> Initialize the ILU(k) preconditioner instance.
     module subroutine initialize_preconditioner_iluk(self, info)
         implicit none
         class(type_preconditioner_iluk), intent(inout) :: self
@@ -18,7 +15,7 @@ contains
         if (allocated(self%name)) deallocate (self%name)
         self%name = "ILU(0)"
 
-        ! 初期値としてノード数を設定するが、setup時に行列の実サイズで上書きされる
+        ! Set the initial node count; it will be overwritten by the actual matrix size in setup
         self%num_rows = info%num_nodes
 
         if (info%block_size > 1) then
@@ -33,7 +30,7 @@ contains
 
     end subroutine initialize_preconditioner_iluk
 
-    !> 行列 A に対する ILU(0) 分解のセットアップを行う
+    !> Set up the ILU(0) factorization for matrix A.
     module subroutine setup_preconditioner_iluk(self, A)
         implicit none
         class(type_preconditioner_iluk), intent(inout) :: self
@@ -43,7 +40,7 @@ contains
 
         call A%get_info(info)
 
-        ! 重要: 前処理のサイズを行列の実サイズに合わせる
+        ! Important: match preconditioner size to the actual matrix size
         if (self%num_rows /= info%num_rows) then
             self%num_rows = info%num_rows
         end if
@@ -68,7 +65,7 @@ contains
 
     end subroutine setup_preconditioner_iluk
 
-    !> CSR行列に対するスカラ ILU(0) 分解を実行する
+    !> Perform scalar ILU(0) factorization for a CSR matrix.
     module subroutine setup_csr_ilu0(self, A)
         implicit none
         class(type_preconditioner_iluk), intent(inout) :: self
@@ -161,7 +158,7 @@ contains
         self%status = SOLVER_STATUS%SUCCESS%ID
     end subroutine setup_csr_ilu0
 
-    !> BSR行列に対するブロック ILU(0) 分解を実行する
+    !> Perform block ILU(0) factorization for a BSR matrix.
     module subroutine setup_bsr_ilu0(self, A)
         implicit none
         class(type_preconditioner_iluk), intent(inout) :: self
@@ -257,14 +254,14 @@ contains
         self%status = SOLVER_STATUS%SUCCESS%ID
     end subroutine setup_bsr_ilu0
 
-    !> 前処理の適用
+    !> Apply the preconditioner.
     module subroutine apply_preconditioner_iluk(self, r, z)
         implicit none
         class(type_preconditioner_iluk), intent(inout) :: self
         type(type_vector_dp), intent(in) :: r
         type(type_vector_dp), intent(inout) :: z
 
-        ! 安全装置：セットアップ未完了時は恒等写像を返す
+        ! Safety guard: return identity mapping if setup is incomplete
         if (.not. allocated(self%ptr)) then
             write (*, *) "Warning: ILU preconditioner not initialized/setup. Applying Identity."
             call z%copy(r)
@@ -278,7 +275,7 @@ contains
         end if
     end subroutine apply_preconditioner_iluk
 
-    !> スカラ ILU(0) 適用 (CSR)
+    !> Apply scalar ILU(0) solve (CSR).
     module subroutine apply_csr_ilu0(self, r, z)
         implicit none
         class(type_preconditioner_iluk), intent(inout) :: self
@@ -291,17 +288,17 @@ contains
         call z%copy(r)
         x => z%get_data()
 
-        ! --- サイズチェックの追加 ---
+        ! --- Size check ---
         if (size(x) /= self%num_rows) then
             write (*, '(A, I0, A, I0)') "Error in apply_csr_ilu0: Vector size (", size(x), &
                 ") does not match Preconditioner Matrix size (", self%num_rows, ")"
-            ! ここで処理を中断しないと、次のループでメモリ破壊や変な数値計算エラーが起きる
+            ! Abort here to prevent memory corruption or numerical errors in the following loop
             self%status = -1
             return
         end if
         ! -------------------------
 
-        ! 前進代入 Lz = r
+        ! Forward substitution: Lz = r
         do i = 1, self%num_rows
             do k = self%ptr(i), self%diag_ptr(i) - 1
                 col = self%ind(k)
@@ -309,7 +306,7 @@ contains
             end do
         end do
 
-        ! 後退代入 Uz = z
+        ! Back substitution: Uz = z
         do i = self%num_rows, 1, -1
             do k = self%diag_ptr(i) + 1, self%ptr(i + 1) - 1
                 col = self%ind(k)
@@ -319,7 +316,7 @@ contains
         end do
     end subroutine apply_csr_ilu0
 
-    !> ブロック ILU(0) 適用 (BSR)
+    !> Apply block ILU(0) solve (BSR).
     module subroutine apply_bsr_ilu0(self, r, z)
         implicit none
         class(type_preconditioner_iluk), intent(inout) :: self
@@ -333,8 +330,8 @@ contains
         call z%copy(r)
         x => z%get_data()
 
-        ! --- サイズチェックの追加 ---
-        ! ブロック行列の場合、ベクトルサイズは num_rows * block_size のはず
+        ! --- Size check ---
+        ! For block matrices, vector size should be num_rows * block_size
         if (size(x) /= self%num_rows * bs) then
             write (*, '(A, I0, A, I0)') "Error in apply_bsr_ilu0: Vector size (", size(x), &
                 ") does not match Preconditioner Matrix size (", self%num_rows * bs, ")"
@@ -343,7 +340,7 @@ contains
         end if
         ! -------------------------
 
-        ! 前進代入
+        ! Forward substitution
         do i = 1, self%num_rows
             idx_i = (i - 1) * bs + 1
             do k = self%ptr(i), self%diag_ptr(i) - 1
@@ -356,7 +353,7 @@ contains
             end do
         end do
 
-        ! 後退代入
+        ! Back substitution
         do i = self%num_rows, 1, -1
             idx_i = (i - 1) * bs + 1
             do k = self%diag_ptr(i) + 1, self%ptr(i + 1) - 1
@@ -374,7 +371,7 @@ contains
         end do
     end subroutine apply_bsr_ilu0
 
-    !> デストラクタ
+    !> Destructor: deallocate all resources.
     module subroutine destroy_preconditioner_iluk(self)
         implicit none
         class(type_preconditioner_iluk), intent(inout) :: self

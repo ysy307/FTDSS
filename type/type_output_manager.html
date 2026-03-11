@@ -10,7 +10,7 @@
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>type_output_manager &ndash; FTDSS </title>
+    <title>type_output_manager &ndash; FTCMS </title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -44,7 +44,7 @@
     <div class="container-fluid mb-sm-4 mb-xl-2">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
           <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
                   aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon">
@@ -92,20 +92,20 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.6% of total for derived types.</p>Including implementation: 115 statements,  0.5% of total for derived types.">17 statements</a>
+                 title="<p> 0.3% of total for derived types.</p>Including implementation: 79 statements,  0.3% of total for derived types.">12 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/output.F90"> Source File</a>
+              <a href="../src/output_manager.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/output.f90.html'>output.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/control_output.html'>control_output</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/output_manager.f90.html'>output_manager.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/io_output_manager.html'>io_output_manager</a></li>
             <li class="breadcrumb-item active" aria-current="page">type_output_manager</li>
           </ol>
         </nav>
@@ -134,11 +134,10 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_output_manager.html#variable-current_step">current_step</a>
-            <a class="list-group-item" href="../type/type_output_manager.html#variable-interval_seconds">interval_seconds</a>
-            <a class="list-group-item" href="../type/type_output_manager.html#variable-is_active~3">is_active</a>
-            <a class="list-group-item" href="../type/type_output_manager.html#variable-next_output_seconds">next_output_seconds</a>
-            <a class="list-group-item" href="../type/type_output_manager.html#variable-output_time_unit">output_time_unit</a>
+            <a class="list-group-item" href="../type/type_output_manager.html#variable-active">active</a>
+            <a class="list-group-item" href="../type/type_output_manager.html#variable-log">log</a>
+            <a class="list-group-item" href="../type/type_output_manager.html#variable-observation">observation</a>
+            <a class="list-group-item" href="../type/type_output_manager.html#variable-overall">overall</a>
         </div>
       </div>
     </div>
@@ -165,14 +164,11 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_output_manager.html#boundprocedure-convert_output_time">convert_output_time</a>
-            <a class="list-group-item" href="../type/type_output_manager.html#boundprocedure-get_next_target_time">get_next_target_time</a>
-            <a class="list-group-item" href="../type/type_output_manager.html#boundprocedure-get_next_time">get_next_time</a>
-            <a class="list-group-item" href="../type/type_output_manager.html#boundprocedure-get_step">get_step</a>
-            <a class="list-group-item" href="../type/type_output_manager.html#boundprocedure-initialize~4">initialize</a>
-            <a class="list-group-item" href="../type/type_output_manager.html#boundprocedure-is_due">is_due</a>
-            <a class="list-group-item" href="../type/type_output_manager.html#boundprocedure-is_enabled">is_enabled</a>
-            <a class="list-group-item" href="../type/type_output_manager.html#boundprocedure-update">update</a>
+            <a class="list-group-item" href="../type/type_output_manager.html#boundprocedure-get_log_io_unit">get_log_io_unit</a>
+            <a class="list-group-item" href="../type/type_output_manager.html#boundprocedure-initialize~28">initialize</a>
+            <a class="list-group-item" href="../type/type_output_manager.html#boundprocedure-output_fields">output_fields</a>
+            <a class="list-group-item" href="../type/type_output_manager.html#boundprocedure-output_history">output_history</a>
+            <a class="list-group-item" href="../type/type_output_manager.html#boundprocedure-output_system_log">output_system_log</a>
         </div>
       </div>
     </div>
@@ -206,36 +202,173 @@
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: type~~type_output_manager~~InheritsGraph Pages: 1 -->
-<svg id="typetype_output_managerInheritsGraph" width="377pt" height="32pt"
- viewBox="0.00 0.00 377.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="type~~type_output_manager~~InheritsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<svg id="typetype_output_managerInheritsGraph" width="641pt" height="91pt"
+ viewBox="0.00 0.00 641.00 90.89" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_output_manager~~InheritsGraph" class="graph" transform="scale(0.53 0.53) rotate(0) translate(4 167)">
 <title>type~~type_output_manager~~InheritsGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 373,-28 373,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-167 1202,-167 1202,4 -4,4"/>
 <!-- type~type_output_manager -->
 <g id="type~~type_output_manager~~InheritsGraph_node1" class="node">
 <title>type~type_output_manager</title>
-<polygon fill="none" stroke="black" points="369,-24 239,-24 239,0 369,0 369,-24"/>
-<text text-anchor="middle" x="304" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_output_manager</text>
+<polygon fill="none" stroke="black" points="1198,-104 1068,-104 1068,-80 1198,-80 1198,-104"/>
+<text text-anchor="middle" x="1133" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_output_manager</text>
 </g>
-<!-- type~type_constant_value -->
+<!-- type~abst_output_overall -->
 <g id="type~~type_output_manager~~InheritsGraph_node2" class="node">
-<title>type~type_constant_value</title>
-<g id="a_type~~type_output_manager~~InheritsGraph_node2"><a xlink:href="../type/type_constant_value.html" xlink:title="type_constant_value">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="121,-24 0,-24 0,0 121,0 121,-24"/>
-<text text-anchor="middle" x="60.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_constant_value</text>
+<title>type~abst_output_overall</title>
+<g id="a_type~~type_output_manager~~InheritsGraph_node2"><a xlink:href="../type/abst_output_overall.html" xlink:title="abst_output_overall">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="960.5,-146 843.5,-146 843.5,-122 960.5,-122 960.5,-146"/>
+<text text-anchor="middle" x="902" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_output_overall</text>
 </a>
 </g>
 </g>
-<!-- type~type_output_manager&#45;&gt;type~type_constant_value -->
+<!-- type~type_output_manager&#45;&gt;type~abst_output_overall -->
+<g id="type~~type_output_manager~~InheritsGraph_edge2" class="edge">
+<title>type~type_output_manager&#45;&gt;type~abst_output_overall</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1067.91,-103.76C1037.71,-109.29 1001.67,-115.9 971,-121.53"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="970.02,-118.15 960.82,-123.4 971.28,-125.03 970.02,-118.15"/>
+<text text-anchor="middle" x="1021" y="-118.4" font-family="Helvetica,sans-Serif" font-size="9.50">overall</text>
+</g>
+<!-- type~type_output_log -->
+<g id="type~~type_output_manager~~InheritsGraph_node3" class="node">
+<title>type~type_output_log</title>
+<g id="a_type~~type_output_manager~~InheritsGraph_node3"><a xlink:href="../type/type_output_log.html" xlink:title="type_output_log">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="950.5,-104 853.5,-104 853.5,-80 950.5,-80 950.5,-104"/>
+<text text-anchor="middle" x="902" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output_log</text>
+</a>
+</g>
+</g>
+<!-- type~type_output_manager&#45;&gt;type~type_output_log -->
+<g id="type~~type_output_manager~~InheritsGraph_edge3" class="edge">
+<title>type~type_output_manager&#45;&gt;type~type_output_log</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1067.91,-92C1034.36,-92 993.59,-92 960.99,-92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="960.71,-88.5 950.71,-92 960.71,-95.5 960.71,-88.5"/>
+<text text-anchor="middle" x="1021" y="-94.4" font-family="Helvetica,sans-Serif" font-size="9.50">log</text>
+</g>
+<!-- type~type_output_observation -->
+<g id="type~~type_output_manager~~InheritsGraph_node4" class="node">
+<title>type~type_output_observation</title>
+<g id="a_type~~type_output_manager~~InheritsGraph_node4"><a xlink:href="../type/type_output_observation.html" xlink:title="type_output_observation">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="974,-62 830,-62 830,-38 974,-38 974,-62"/>
+<text text-anchor="middle" x="902" y="-47.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output_observation</text>
+</a>
+</g>
+</g>
+<!-- type~type_output_manager&#45;&gt;type~type_output_observation -->
 <g id="type~~type_output_manager~~InheritsGraph_edge1" class="edge">
-<title>type~type_output_manager&#45;&gt;type~type_constant_value</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M238.92,-12C205.86,-12 165.49,-12 131.61,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="131.31,-8.5 121.31,-12 131.31,-15.5 131.31,-8.5"/>
-<text text-anchor="middle" x="180" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">output_time_unit</text>
+<title>type~type_output_manager&#45;&gt;type~type_output_observation</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1067.91,-80.24C1040.21,-75.17 1007.6,-69.18 978.72,-63.89"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="979.14,-60.41 968.67,-62.04 977.88,-67.29 979.14,-60.41"/>
+<text text-anchor="middle" x="1021" y="-77.4" font-family="Helvetica,sans-Serif" font-size="9.50">observation</text>
+</g>
+<!-- type~type_constant_id -->
+<g id="type~~type_output_manager~~InheritsGraph_node6" class="node">
+<title>type~type_constant_id</title>
+<g id="a_type~~type_output_manager~~InheritsGraph_node6"><a xlink:href="../type/type_constant_id.html" xlink:title="type_constant_id">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="102,-102 0,-102 0,-78 102,-78 102,-102"/>
+<text text-anchor="middle" x="51" y="-87.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_constant_id</text>
+</a>
+</g>
+</g>
+<!-- type~abst_output_overall&#45;&gt;type~type_constant_id -->
+<g id="type~~type_output_manager~~InheritsGraph_edge4" class="edge">
+<title>type~abst_output_overall&#45;&gt;type~type_constant_id</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M843.17,-143.22C832.81,-144.65 822.1,-145.99 812,-147 763.28,-151.88 750.94,-151.67 702,-153 442.51,-160.07 376.34,-144.88 120,-104 117.36,-103.58 114.66,-103.12 111.94,-102.65"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="112.51,-99.19 102.04,-100.83 111.25,-106.08 112.51,-99.19"/>
+<text text-anchor="middle" x="438" y="-155.4" font-family="Helvetica,sans-Serif" font-size="9.50">file_format, variables</text>
+</g>
+<!-- type~type_coordinate_array_dp -->
+<g id="type~~type_output_manager~~InheritsGraph_node7" class="node">
+<title>type~type_coordinate_array_dp</title>
+<g id="a_type~~type_output_manager~~InheritsGraph_node7"><a xlink:href="../type/type_coordinate_array_dp.html" xlink:title="type_coordinate_array_dp">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="702,-144 551,-144 551,-120 702,-120 702,-144"/>
+<text text-anchor="middle" x="626.5" y="-129.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_coordinate_array_dp</text>
+</a>
+</g>
+</g>
+<!-- type~abst_output_overall&#45;&gt;type~type_coordinate_array_dp -->
+<g id="type~~type_output_manager~~InheritsGraph_edge5" class="edge">
+<title>type~abst_output_overall&#45;&gt;type~type_coordinate_array_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M843.33,-133.58C805.32,-133.3 754.88,-132.93 712.33,-132.62"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="712.28,-129.12 702.25,-132.55 712.23,-136.12 712.28,-129.12"/>
+<text text-anchor="middle" x="766" y="-135.4" font-family="Helvetica,sans-Serif" font-size="9.50">coordinate</text>
+</g>
+<!-- type~holder_observation_point -->
+<g id="type~~type_output_manager~~InheritsGraph_node5" class="node">
+<title>type~holder_observation_point</title>
+<g id="a_type~~type_output_manager~~InheritsGraph_node5"><a xlink:href="../type/holder_observation_point.html" xlink:title="holder_observation_point">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="700.5,-102 552.5,-102 552.5,-78 700.5,-78 700.5,-102"/>
+<text text-anchor="middle" x="626.5" y="-87.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">holder_observation_point</text>
+</a>
+</g>
+</g>
+<!-- type~type_output_observation&#45;&gt;type~holder_observation_point -->
+<g id="type~~type_output_manager~~InheritsGraph_edge8" class="edge">
+<title>type~type_output_observation&#45;&gt;type~holder_observation_point</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M829.61,-61.33C823.65,-62.25 817.72,-63.15 812,-64 778.94,-68.93 742.52,-74.11 710.83,-78.55"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="710.13,-75.11 700.71,-79.96 711.1,-82.04 710.13,-75.11"/>
+<text text-anchor="middle" x="766" y="-79.4" font-family="Helvetica,sans-Serif" font-size="9.50">observation_points</text>
+</g>
+<!-- type~type_output_observation&#45;&gt;type~type_constant_id -->
+<g id="type~~type_output_manager~~InheritsGraph_edge7" class="edge">
+<title>type~type_output_observation&#45;&gt;type~type_constant_id</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M829.87,-47.97C654.59,-43.25 211.36,-33.17 146.5,-50"/>
+<text text-anchor="middle" x="438" y="-44.4" font-family="Helvetica,sans-Serif" font-size="9.50">observation_type</text>
+</g>
+<!-- type~type_output_observation_settings -->
+<g id="type~~type_output_manager~~InheritsGraph_node8" class="node">
+<title>type~type_output_observation_settings</title>
+<g id="a_type~~type_output_manager~~InheritsGraph_node8"><a xlink:href="../type/type_output_observation_settings.html" xlink:title="type_output_observation_settings">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="533,-24 343,-24 343,0 533,0 533,-24"/>
+<text text-anchor="middle" x="438" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output_observation_settings</text>
+</a>
+</g>
+</g>
+<!-- type~type_output_observation&#45;&gt;type~type_output_observation_settings -->
+<g id="type~~type_output_manager~~InheritsGraph_edge6" class="edge">
+<title>type~type_output_observation&#45;&gt;type~type_output_observation_settings</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M863.72,-37.93C847.94,-33.35 829.25,-28.61 812,-26 722.05,-12.36 618.57,-9.47 543.46,-9.64"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="543.04,-6.15 533.06,-9.69 543.07,-13.15 543.04,-6.15"/>
+<text text-anchor="middle" x="766" y="-28.4" font-family="Helvetica,sans-Serif" font-size="9.50">settings</text>
+</g>
+<!-- type~abst_observation_point -->
+<g id="type~~type_output_manager~~InheritsGraph_node9" class="node">
+<title>type~abst_observation_point</title>
+<g id="a_type~~type_output_manager~~InheritsGraph_node9"><a xlink:href="../type/abst_observation_point.html" xlink:title="abst_observation_point">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="325,-102 189,-102 189,-78 325,-78 325,-102"/>
+<text text-anchor="middle" x="257" y="-87.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_observation_point</text>
+</a>
+</g>
+</g>
+<!-- type~holder_observation_point&#45;&gt;type~abst_observation_point -->
+<g id="type~~type_output_manager~~InheritsGraph_edge9" class="edge">
+<title>type~holder_observation_point&#45;&gt;type~abst_observation_point</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M552.45,-90C489.57,-90 399.1,-90 335.07,-90"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="335.03,-86.5 325.03,-90 335.03,-93.5 335.03,-86.5"/>
+<text text-anchor="middle" x="438" y="-92.4" font-family="Helvetica,sans-Serif" font-size="9.50">point</text>
+</g>
+<!-- type~type_output_observation_settings&#45;&gt;type~type_constant_id -->
+<g id="type~~type_output_manager~~InheritsGraph_edge10" class="edge">
+<title>type~type_output_observation_settings&#45;&gt;type~type_constant_id</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M342.84,-7.33C295.77,-7.49 238.45,-11.5 189,-26 168.18,-32.1 167.32,-43.91 146.5,-50"/>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M144.5,-50C123.49,-55.45 101.13,-65.01 83.65,-73.41"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="81.91,-70.37 74.49,-77.93 85,-76.65 81.91,-70.37"/>
+<text text-anchor="middle" x="257" y="-28.4" font-family="Helvetica,sans-Serif" font-size="9.50">variable_type</text>
+</g>
+<!-- type~abst_observation_point&#45;&gt;type~type_constant_id -->
+<g id="type~~type_output_manager~~InheritsGraph_edge11" class="edge">
+<title>type~abst_observation_point&#45;&gt;type~type_constant_id</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M188.92,-90C164.23,-90 136.43,-90 112.37,-90"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="112.3,-86.5 102.3,-90 112.3,-93.5 112.3,-86.5"/>
+<text text-anchor="middle" x="145.5" y="-92.4" font-family="Helvetica,sans-Serif" font-size="9.50">point_type</text>
 </g>
 </g>
 </svg>
-</div>          <div>
+</div>                <script>
+                  var pantypetype_output_managerInheritsGraph = svgPanZoom('#typetype_output_managerInheritsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
             <a type="button" class="graph-help" data-bs-toggle="modal" href="#InheritsGraph-help-text">Help</a>
           </div>
           <div class="modal fade" id="InheritsGraph-help-text" tabindex="-1" role="dialog">
@@ -297,48 +430,32 @@ large graphs.</div>
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: type~~type_output_manager~~InheritedByGraph Pages: 1 -->
-<svg id="typetype_output_managerInheritedByGraph" width="500pt" height="32pt"
- viewBox="0.00 0.00 500.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg id="typetype_output_managerInheritedByGraph" width="276pt" height="32pt"
+ viewBox="0.00 0.00 276.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="type~~type_output_manager~~InheritedByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>type~~type_output_manager~~InheritedByGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 496,-28 496,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 272,-28 272,4 -4,4"/>
 <!-- type~type_output_manager -->
 <g id="type~~type_output_manager~~InheritedByGraph_node1" class="node">
 <title>type~type_output_manager</title>
 <polygon fill="none" stroke="black" points="130,-24 0,-24 0,0 130,0 130,-24"/>
 <text text-anchor="middle" x="65" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_output_manager</text>
 </g>
-<!-- type~type_controls -->
+<!-- type~type_ftcms -->
 <g id="type~~type_output_manager~~InheritedByGraph_node2" class="node">
-<title>type~type_controls</title>
-<g id="a_type~~type_output_manager~~InheritedByGraph_node2"><a xlink:href="../type/type_controls.html" xlink:title="type_controls">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="350,-24 267,-24 267,0 350,0 350,-24"/>
-<text text-anchor="middle" x="308.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_controls</text>
+<title>type~type_ftcms</title>
+<g id="a_type~~type_output_manager~~InheritedByGraph_node2"><a xlink:href="../type/type_ftcms.html" xlink:title="type_ftcms">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="268,-24 198,-24 198,0 268,0 268,-24"/>
+<text text-anchor="middle" x="233" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms</text>
 </a>
 </g>
 </g>
-<!-- type~type_controls&#45;&gt;type~type_output_manager -->
+<!-- type~type_ftcms&#45;&gt;type~type_output_manager -->
 <g id="type~~type_output_manager~~InheritedByGraph_edge1" class="edge">
-<title>type~type_controls&#45;&gt;type~type_output_manager</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M266.81,-12C232.28,-12 181.87,-12 140.19,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="140.07,-8.5 130.07,-12 140.07,-15.5 140.07,-8.5"/>
-<text text-anchor="middle" x="198.5" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">out_field, out_history</text>
-</g>
-<!-- type~type_ftdss -->
-<g id="type~~type_output_manager~~InheritedByGraph_node3" class="node">
-<title>type~type_ftdss</title>
-<g id="a_type~~type_output_manager~~InheritedByGraph_node3"><a xlink:href="../type/type_ftdss.html" xlink:title="type_ftdss">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="492,-24 426,-24 426,0 492,0 492,-24"/>
-<text text-anchor="middle" x="459" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss</text>
-</a>
-</g>
-</g>
-<!-- type~type_ftdss&#45;&gt;type~type_controls -->
-<g id="type~~type_output_manager~~InheritedByGraph_edge2" class="edge">
-<title>type~type_ftdss&#45;&gt;type~type_controls</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M425.78,-12C406.63,-12 381.93,-12 360.21,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="360.16,-8.5 350.16,-12 360.16,-15.5 360.16,-8.5"/>
-<text text-anchor="middle" x="388" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">controls</text>
+<title>type~type_ftcms&#45;&gt;type~type_output_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M197.6,-12C180.95,-12 160.27,-12 140.26,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="140.21,-8.5 130.21,-12 140.21,-15.5 140.21,-8.5"/>
+<text text-anchor="middle" x="164" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">output</text>
 </g>
 </g>
 </svg>
@@ -409,83 +526,66 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-current_step"></span>
-              integer(kind=int32),
-            </td>
-              <td>private</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>current_step</strong></td>
-<td> =</td>
-                <td>0</td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-interval_seconds"></span>
-              real(kind=real64),
-            </td>
-              <td>private</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>interval_seconds</strong></td>
-<td> =</td>
-                <td>0.0d0</td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-is_active~3"></span>
+              <span class="anchor" id="variable-active"></span>
               logical,
             </td>
-              <td>private</td>
+              <td>private,</td>
             <td>
-              
+              allocatable
             </td>
             <td>::</td>
-            <td><strong>is_active</strong></td>
-<td> =</td>
-                <td>.false.</td>
+            <td><strong>active</strong>(:)</td>
+                <td></td>
+                <td></td>
             <td>
                 
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-next_output_seconds"></span>
-              real(kind=real64),
+              <span class="anchor" id="variable-log"></span>
+              type(<a href='type_output_log.html'>type_output_log</a>),
             </td>
               <td>private</td>
             <td>
               
             </td>
             <td>::</td>
-            <td><strong>next_output_seconds</strong></td>
-<td> =</td>
-                <td>0.0d0</td>
+            <td><strong>log</strong></td>
+                <td></td>
+                <td></td>
             <td>
                 
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-output_time_unit"></span>
-              type(<a href='type_constant_value.html'>type_constant_value</a>),
+              <span class="anchor" id="variable-observation"></span>
+              type(<a href='type_output_observation.html'>type_output_observation</a>),
             </td>
               <td>private</td>
             <td>
               
             </td>
             <td>::</td>
-            <td><strong>output_time_unit</strong></td>
+            <td><strong>observation</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-overall"></span>
+              class(<a href='abst_output_overall.html'>abst_output_overall</a>),
+            </td>
+              <td>private,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>overall</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -505,234 +605,17 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-convert_output_time"></span>
+      <span class="anchor" id="boundprocedure-get_log_io_unit"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>convert_output_time</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/convert_output_time_value.html'>convert_output_time_value</a>
+  <strong>get_log_io_unit</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_log_io_unit_output_manager.html'>get_log_io_unit_output_manager</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private pure function <a href='../proc/convert_output_time_value.html'>convert_output_time_value</a>(self, current_time_seconds) result(converted_time)  
-</h3>
-    
-
-  
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              class(<a href='type_output_manager.html'>type_output_manager</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>self</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>current_time_seconds</strong></td>
-            <td>
-
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-    <h4>
-    Return Value
-    <small>real(kind=real64)</small>
-    </h4>
-    
-
-          </li>
-      </ul>
-  </div>
-
-          </div>
-          <div class="row">
-              <div class="card mt-3">
-    <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-get_next_target_time"></span>
-      <h3>
-          procedure, public, pass(self) ::
-  <strong>get_next_target_time</strong>
-        
-      </h3>
-    </div>
-      <ul class="list-group">
-          <li class="list-group-item">
-                    <h3>
-    private  subroutine <a href='../proc/get_next_target_time.html'>get_next_target_time</a>(self, current_time, target_time)  
-</h3>
-    
-
-  <p>現在時刻に基づき，次に同期すべきターゲット時刻を返す</p>
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              class(<a href='type_output_manager.html'>type_output_manager</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>self</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>current_time</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(inout)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>target_time</strong></td>
-            <td>
-
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-          </li>
-      </ul>
-  </div>
-
-          </div>
-          <div class="row">
-              <div class="card mt-3">
-    <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-get_next_time"></span>
-      <h3>
-          procedure, public, pass(self) ::
-  <strong>get_next_time</strong>
-        
-      </h3>
-    </div>
-      <ul class="list-group">
-          <li class="list-group-item">
-                    <h3>
-    private pure function <a href='../proc/get_next_time.html'>get_next_time</a>(self) result(next_output_seconds)  
-</h3>
-    
-
-  <p>次回の出力予定時刻（秒）を取得する</p>
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              class(<a href='type_output_manager.html'>type_output_manager</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>self</strong></td>
-            <td>
-
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-    <h4>
-    Return Value
-    <small>real(kind=real64)</small>
-    </h4>
-    
-
-          </li>
-      </ul>
-  </div>
-
-          </div>
-          <div class="row">
-              <div class="card mt-3">
-    <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-get_step"></span>
-      <h3>
-          procedure, public, pass(self) ::
-  <strong>get_step</strong>
-        
-      </h3>
-    </div>
-      <ul class="list-group">
-          <li class="list-group-item">
-                    <h3>
-    private pure subroutine <a href='../proc/get_step.html'>get_step</a>(self, step)  
+    private  subroutine <a href='../proc/get_log_io_unit_output_manager.html'>get_log_io_unit_output_manager</a>(self, io_unit)  
 </h3>
     
 
@@ -774,7 +657,7 @@ large graphs.</div>
               
             </td>
             <td>::</td>
-            <td><strong>step</strong></td>
+            <td><strong>io_unit</strong></td>
             <td>
 
             </td>
@@ -791,17 +674,17 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~4"></span>
+      <span class="anchor" id="boundprocedure-initialize~28"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>initialize</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/initialize_manager.html'>initialize_manager</a>
+  <strong>initialize</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/initialize_type_output_manager.html'>initialize_type_output_manager</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/initialize_manager.html'>initialize_manager</a>(self, interval_val, interval_unit_id, output_unit_id, file_format, current_time, initial_step)  
+    private  subroutine <a href='../proc/initialize_type_output_manager.html'>initialize_type_output_manager</a>(self, config_output, config_observation, config_overall)  
 </h3>
     
 
@@ -836,143 +719,128 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
+              type(<a href='type_config_output.html'>type_config_output</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>config_output</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_config_observation.html'>type_config_observation</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>config_observation</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_config_overall.html'>type_config_overall</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>config_overall</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-output_fields"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>output_fields</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/output_fields_output_manager.html'>output_fields_output_manager</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/output_fields_output_manager.html'>output_fields_output_manager</a>(self, file_counts, temperature, water_content, ice_content, vapor_content, pressure, water_flux)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_output_manager.html'>type_output_manager</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>file_counts</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
               real(kind=real64),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>interval_val</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              integer(kind=int32),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>interval_unit_id</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              integer(kind=int32),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>output_unit_id</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              character(len=*),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>file_format</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>current_time</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              integer(kind=int32),
             </td>
 <td>intent(in),</td>
               <td>optional</td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>initial_step</strong></td>
-            <td>
-
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-          </li>
-      </ul>
-  </div>
-
-          </div>
-          <div class="row">
-              <div class="card mt-3">
-    <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-is_due"></span>
-      <h3>
-          procedure, public, pass(self) ::
-  <strong>is_due</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/check_output_timing.html'>check_output_timing</a>
-        
-      </h3>
-    </div>
-      <ul class="list-group">
-          <li class="list-group-item">
-                    <h3>
-    private pure function <a href='../proc/check_output_timing.html'>check_output_timing</a>(self, current_time_seconds) result(is_ready)  
-</h3>
-    
-
-  
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              class(<a href='type_output_manager.html'>type_output_manager</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>self</strong></td>
+            <td><strong>temperature</strong>(:)</td>
             <td>
 
             </td>
@@ -982,71 +850,72 @@ large graphs.</div>
               <span class="anchor" ></span>
               real(kind=real64),
             </td>
-<td>intent(in)</td>
-              <td></td>            <td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>current_time_seconds</strong></td>
+            <td><strong>water_content</strong>(:)</td>
             <td>
 
             </td>
         </tr>
-    </tbody>
-  </table>
-
-    <h4>
-    Return Value
-    <small>logical</small>
-    </h4>
-    
-
-          </li>
-      </ul>
-  </div>
-
-          </div>
-          <div class="row">
-              <div class="card mt-3">
-    <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-is_enabled"></span>
-      <h3>
-          procedure, public, pass(self) ::
-  <strong>is_enabled</strong>
-        
-      </h3>
-    </div>
-      <ul class="list-group">
-          <li class="list-group-item">
-                    <h3>
-    private pure function <a href='../proc/is_enabled.html'>is_enabled</a>(self) result(is_active)  
-</h3>
-    
-
-  <p>出力が有効かどうかを判定する</p>
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='type_output_manager.html'>type_output_manager</a>),
+              real(kind=real64),
             </td>
-<td>intent(in)</td>
-              <td></td>            <td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>self</strong></td>
+            <td><strong>ice_content</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>vapor_content</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>pressure</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_coordinate_array_dp.html'>type_coordinate_array_dp</a>),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>water_flux</strong></td>
             <td>
 
             </td>
@@ -1054,11 +923,6 @@ large graphs.</div>
     </tbody>
   </table>
 
-    <h4>
-    Return Value
-    <small>logical</small>
-    </h4>
-    
 
           </li>
       </ul>
@@ -1068,17 +932,17 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-update"></span>
+      <span class="anchor" id="boundprocedure-output_history"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>update</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/update_state.html'>update_state</a>
+  <strong>output_history</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/output_history_output_manager.html'>output_history_output_manager</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/update_state.html'>update_state</a>(self, current_time_seconds)  
+    private  subroutine <a href='../proc/output_history_output_manager.html'>output_history_output_manager</a>(self, time, temperature, water_content, ice_content, vapor_content, pressure)  
 </h3>
     
 
@@ -1120,7 +984,136 @@ large graphs.</div>
               
             </td>
             <td>::</td>
-            <td><strong>current_time_seconds</strong></td>
+            <td><strong>time</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>temperature</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>water_content</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ice_content</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>vapor_content</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>pressure</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-output_system_log"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>output_system_log</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/output_system_log_output_manager.html'>output_system_log_output_manager</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/output_system_log_output_manager.html'>output_system_log_output_manager</a>(self)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_output_manager.html'>type_output_manager</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
             <td>
 
             </td>
@@ -1139,21 +1132,18 @@ large graphs.</div>
     <section>
     <h3><span class="anchor" id="src"></span>Source Code</h3>
     <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_output_manager</span>
-<span class="w">        </span><span class="k">private</span>
-<span class="k">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">interval_seconds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span><span class="w"> </span><span class="c">! 常に[秒]で保持</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">next_output_seconds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span><span class="w"> </span><span class="c">! 常に[秒]で保持</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">current_step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_constant_value</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">output_time_unit</span><span class="w"> </span><span class="c">! 出力時の変換用</span>
-<span class="w">    </span><span class="k">contains</span>
-<span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">initialize_manager</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_due</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">check_output_timing</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">update</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">update_state</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_step</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">convert_output_time</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">convert_output_time_value</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_enabled</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_next_time</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_next_target_time</span>
+<span class="w">        </span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">active</span><span class="p">(:)</span>
+
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_output_observation</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">observation</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">abst_output_overall</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">overall</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_output_log</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="nb">log</span>
+
+<span class="nb">    </span><span class="k">contains</span>
+<span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">initialize_type_output_manager</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">output_fields</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">output_fields_output_manager</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">output_history</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">output_history_output_manager</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">output_system_log</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">output_system_log_output_manager</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_log_io_unit</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_log_io_unit_output_manager</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_output_manager</span>
 </pre></div>
 
@@ -1169,7 +1159,7 @@ large graphs.</div>
         <div class="row justify-content-between">
           <div class="col">
             <p>
-              FTDSS
+              FTCMS
  was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
@@ -1177,7 +1167,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-23 23:52 +0000             </p>
+ on 2026-03-11 14:03 +0000             </p>
           </div>
         </div>
         <br>

@@ -1,4 +1,4 @@
-submodule(physics_models_wrf) wrf_dvgch
+submodule(models_wrf) wrf_dvgch
     implicit none
 contains
     module subroutine calculate_wrf_dvgch(self, h, Qw)

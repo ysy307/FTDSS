@@ -450,9 +450,9 @@ contains
 
             call self%calc_shape_function(r, nodes, psi=p_psi, determinant_jacobian=det_J)
 
-            ! 各節点ごとに「支配体積 × 節点値」を計算
+            ! Compute (control volume) * (nodal value) for each node
             do i = 1, num_nodes
-                ! \int \psi_i d\Omega の寄与分
+                ! Contribution from \int \psi_i d\Omega
                 ! R_i += Volume_fraction * S_node_i
                 elem_vec(i) = elem_vec(i) + w * abs(det_J) * p_psi(i) * S_node(i)
             end do

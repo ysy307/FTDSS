@@ -10,7 +10,7 @@
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>type_jacobian_matrix &ndash; FTDSS </title>
+    <title>type_jacobian_matrix &ndash; FTCMS </title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -44,7 +44,7 @@
     <div class="container-fluid mb-sm-4 mb-xl-2">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
           <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
                   aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon">
@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.8% of total for derived types.</p>Including implementation: 144 statements,  0.6% of total for derived types.">23 statements</a>
+                 title="<p> 0.8% of total for derived types.</p>Including implementation: 257 statements,  1.0% of total for derived types.">30 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -105,7 +105,7 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
                 <li class="breadcrumb-item"><a href='../sourcefile/jacobian_matrix.f90.html'>jacobian_matrix.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/field_jacobian_matrix.html'>field_jacobian_matrix</a></li>
+                <li class="breadcrumb-item"><a href='../module/numerical_system_jacobian_matrix.html'>numerical_system_jacobian_matrix</a></li>
             <li class="breadcrumb-item active" aria-current="page">type_jacobian_matrix</li>
           </ol>
         </nav>
@@ -134,11 +134,15 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_jacobian_matrix.html#variable-matrix">matrix</a>
-            <a class="list-group-item" href="../type/type_jacobian_matrix.html#variable-matrix_type">matrix_type</a>
-            <a class="list-group-item" href="../type/type_jacobian_matrix.html#variable-num_dofs_per_node~5">num_dofs_per_node</a>
-            <a class="list-group-item" href="../type/type_jacobian_matrix.html#variable-num_nodes~15">num_nodes</a>
-            <a class="list-group-item" href="../type/type_jacobian_matrix.html#variable-size~2">size</a>
+            <a class="list-group-item" href="../type/type_jacobian_matrix.html#variable-matrix~2">matrix</a>
+            <a class="list-group-item" href="../type/type_jacobian_matrix.html#variable-matrix_type~2">matrix_type</a>
+            <a class="list-group-item" href="../type/type_jacobian_matrix.html#variable-num_dofs_per_node~7">num_dofs_per_node</a>
+            <a class="list-group-item" href="../type/type_jacobian_matrix.html#variable-num_nodes~58">num_nodes</a>
+            <a class="list-group-item" href="../type/type_jacobian_matrix.html#variable-scatter_data">scatter_data</a>
+            <a class="list-group-item" href="../type/type_jacobian_matrix.html#variable-scatter_max_nodes">scatter_max_nodes</a>
+            <a class="list-group-item" href="../type/type_jacobian_matrix.html#variable-scatter_ptr">scatter_ptr</a>
+            <a class="list-group-item" href="../type/type_jacobian_matrix.html#variable-scatter_ready">scatter_ready</a>
+            <a class="list-group-item" href="../type/type_jacobian_matrix.html#variable-size~3">size</a>
         </div>
       </div>
     </div>
@@ -167,18 +171,21 @@
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-add">add</a>
             <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-add_local_matrix">add_local_matrix</a>
+            <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-add_local_matrix_fast">add_local_matrix_fast</a>
             <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-add_value_local">add_value_local</a>
-            <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-destroy~8">destroy</a>
-            <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-display~2">display</a>
+            <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-build_scatter_map">build_scatter_map</a>
+            <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-destroy~35">destroy</a>
+            <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-display~27">display</a>
             <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-get_matrix">get_matrix</a>
             <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-get_num_dofs_per_node">get_num_dofs_per_node</a>
-            <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-get_size~2">get_size</a>
-            <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-initialize~19">initialize</a>
-            <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-set~4">set</a>
+            <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-get_size~4">get_size</a>
+            <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-initialize~73">initialize</a>
+            <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-is_scatter_ready">is_scatter_ready</a>
+            <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-set~9">set</a>
             <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-set_value_local">set_value_local</a>
-            <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-zero">zero</a>
-            <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-zero_all">zero_all</a>
-            <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-zero_row">zero_row</a>
+            <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-zero~4">zero</a>
+            <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-zero_all~7">zero_all</a>
+            <a class="list-group-item" href="../type/type_jacobian_matrix.html#boundprocedure-zero_row~7">zero_row</a>
         </div>
       </div>
     </div>
@@ -200,9 +207,7 @@
     <div class="col-md-9" id='text'>
       <h2 id="type-def-statement">
         type, public :: type_jacobian_matrix</h2>
-    <p>ヤコビ行列を管理するコンテナクラス
-内部で単一のBSR行列(abst_matrix)を保持し、(Node, DOF)のインデックス操作を
-BSRのブロック操作にマッピングする。</p>
+    
 <br>      <div class="card">
         <div class="card-header">
           <h3 class="card-title">Inherits</h3>
@@ -321,31 +326,31 @@ large graphs.</div>
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: type~~type_jacobian_matrix~~InheritedByGraph Pages: 1 -->
-<svg id="typetype_jacobian_matrixInheritedByGraph" width="244pt" height="32pt"
- viewBox="0.00 0.00 244.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg id="typetype_jacobian_matrixInheritedByGraph" width="248pt" height="32pt"
+ viewBox="0.00 0.00 248.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="type~~type_jacobian_matrix~~InheritedByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>type~~type_jacobian_matrix~~InheritedByGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 240,-28 240,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 244,-28 244,4 -4,4"/>
 <!-- type~type_jacobian_matrix -->
 <g id="type~~type_jacobian_matrix~~InheritedByGraph_node1" class="node">
 <title>type~type_jacobian_matrix</title>
 <polygon fill="none" stroke="black" points="127,-24 0,-24 0,0 127,0 127,-24"/>
 <text text-anchor="middle" x="63.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_jacobian_matrix</text>
 </g>
-<!-- type~type_ftdss -->
+<!-- type~type_ftcms -->
 <g id="type~~type_jacobian_matrix~~InheritedByGraph_node2" class="node">
-<title>type~type_ftdss</title>
-<g id="a_type~~type_jacobian_matrix~~InheritedByGraph_node2"><a xlink:href="../type/type_ftdss.html" xlink:title="type_ftdss">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="236,-24 170,-24 170,0 236,0 236,-24"/>
-<text text-anchor="middle" x="203" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss</text>
+<title>type~type_ftcms</title>
+<g id="a_type~~type_jacobian_matrix~~InheritedByGraph_node2"><a xlink:href="../type/type_ftcms.html" xlink:title="type_ftcms">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="240,-24 170,-24 170,0 240,0 240,-24"/>
+<text text-anchor="middle" x="205" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms</text>
 </a>
 </g>
 </g>
-<!-- type~type_ftdss&#45;&gt;type~type_jacobian_matrix -->
+<!-- type~type_ftcms&#45;&gt;type~type_jacobian_matrix -->
 <g id="type~~type_jacobian_matrix~~InheritedByGraph_edge1" class="edge">
-<title>type~type_ftdss&#45;&gt;type~type_jacobian_matrix</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M169.76,-12C159.88,-12 148.58,-12 137.13,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="137.06,-8.5 127.06,-12 137.06,-15.5 137.06,-8.5"/>
+<title>type~type_ftcms&#45;&gt;type~type_jacobian_matrix</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M169.87,-12C159.89,-12 148.58,-12 137.16,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="137.13,-8.5 127.13,-12 137.13,-15.5 137.13,-8.5"/>
 <text text-anchor="middle" x="148.5" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">K</text>
 </g>
 </g>
@@ -417,7 +422,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-matrix"></span>
+              <span class="anchor" id="variable-matrix~2"></span>
               class(<a href='abst_matrix.html'>abst_matrix</a>),
             </td>
               <td>private,</td>
@@ -434,7 +439,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-matrix_type"></span>
+              <span class="anchor" id="variable-matrix_type~2"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -451,7 +456,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-num_dofs_per_node~5"></span>
+              <span class="anchor" id="variable-num_dofs_per_node~7"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -468,7 +473,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-num_nodes~15"></span>
+              <span class="anchor" id="variable-num_nodes~58"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -485,7 +490,75 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-size~2"></span>
+              <span class="anchor" id="variable-scatter_data"></span>
+              integer(kind=int32),
+            </td>
+              <td>private,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>scatter_data</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-scatter_max_nodes"></span>
+              integer(kind=int32),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>scatter_max_nodes</strong></td>
+<td> =</td>
+                <td>0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-scatter_ptr"></span>
+              integer(kind=int32),
+            </td>
+              <td>private,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>scatter_ptr</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-scatter_ready"></span>
+              logical,
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>scatter_ready</strong></td>
+<td> =</td>
+                <td>.false.</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-size~3"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -516,7 +589,7 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-add"></span>
       <h3>
           generic, public ::
-  <strong>add</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_jacobian_matrix.html#boundprocedure-add_value_local'>add_value_local</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_jacobian_matrix.html#boundprocedure-add_local_matrix'>add_local_matrix</a>
+  <strong>add</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/type_jacobian_matrix.html#boundprocedure-add_value_local'>add_value_local</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/type_jacobian_matrix.html#boundprocedure-add_local_matrix'>add_local_matrix</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/type_jacobian_matrix.html#boundprocedure-add_local_matrix_fast'>add_local_matrix_fast</a>
         
       </h3>
     </div>
@@ -710,6 +783,120 @@ large graphs.</div>
             </td>
             <td>::</td>
             <td><strong>global_connectivity</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_matrix_dense.html'>type_matrix_dense</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>local_data</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/add_local_fast_jacobian_matrix.html'>add_local_fast_jacobian_matrix</a>(self, row_dof, col_dof, element_id, n_local, local_data)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_jacobian_matrix.html'>type_jacobian_matrix</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_dof</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col_dof</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>element_id</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>n_local</strong></td>
             <td>
 
             </td>
@@ -744,7 +931,7 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-add_local_matrix"></span>
       <h3>
           procedure, private, pass(self) ::
-  <strong>add_local_matrix</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/add_local_jacobian_matrix.html'>add_local_jacobian_matrix</a>
+  <strong>add_local_matrix</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/add_local_jacobian_matrix.html'>add_local_jacobian_matrix</a>
         
       </h3>
     </div>
@@ -855,10 +1042,139 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-add_local_matrix_fast"></span>
+      <h3>
+          procedure, private, pass(self) ::
+  <strong>add_local_matrix_fast</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/add_local_fast_jacobian_matrix.html'>add_local_fast_jacobian_matrix</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/add_local_fast_jacobian_matrix.html'>add_local_fast_jacobian_matrix</a>(self, row_dof, col_dof, element_id, n_local, local_data)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_jacobian_matrix.html'>type_jacobian_matrix</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_dof</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col_dof</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>element_id</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>n_local</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_matrix_dense.html'>type_matrix_dense</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>local_data</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
       <span class="anchor" id="boundprocedure-add_value_local"></span>
       <h3>
           procedure, private, pass(self) ::
-  <strong>add_value_local</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/add_value_jacobian_matrix.html'>add_value_jacobian_matrix</a>
+  <strong>add_value_local</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/add_value_jacobian_matrix.html'>add_value_jacobian_matrix</a>
         
       </h3>
     </div>
@@ -984,10 +1300,79 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-destroy~8"></span>
+      <span class="anchor" id="boundprocedure-build_scatter_map"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>destroy</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/destroy_jacobian_matrix.html'>destroy_jacobian_matrix</a>
+  <strong>build_scatter_map</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/build_scatter_map_jacobian.html'>build_scatter_map_jacobian</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/build_scatter_map_jacobian.html'>build_scatter_map_jacobian</a>(self, domain)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_jacobian_matrix.html'>type_jacobian_matrix</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_domain.html'>type_domain</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>domain</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-destroy~35"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>destroy</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/destroy_jacobian_matrix.html'>destroy_jacobian_matrix</a>
         
       </h3>
     </div>
@@ -1038,10 +1423,10 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-display~2"></span>
+      <span class="anchor" id="boundprocedure-display~27"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>display</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/display_jacobian_matrix.html'>display_jacobian_matrix</a>
+  <strong>display</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/display_jacobian_matrix.html'>display_jacobian_matrix</a>
         
       </h3>
     </div>
@@ -1110,7 +1495,7 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-get_matrix"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>get_matrix</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/get_underlying_matrix.html'>get_underlying_matrix</a>
+  <strong>get_matrix</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_underlying_matrix.html'>get_underlying_matrix</a>
         
       </h3>
     </div>
@@ -1121,7 +1506,7 @@ large graphs.</div>
 </h3>
     
 
-  <p>ソルバー等に行列の実体を渡すためのアクセサ</p>
+  
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -1225,10 +1610,10 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-get_size~2"></span>
+      <span class="anchor" id="boundprocedure-get_size~4"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>get_size</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/get_size_jacobian_matrix.html'>get_size_jacobian_matrix</a>
+  <strong>get_size</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_size_jacobian_matrix.html'>get_size_jacobian_matrix</a>
         
       </h3>
     </div>
@@ -1284,10 +1669,10 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~19"></span>
+      <span class="anchor" id="boundprocedure-initialize~73"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>initialize</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/initialize_jacobian_matrix.html'>initialize_jacobian_matrix</a>
+  <strong>initialize</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/initialize_jacobian_matrix.html'>initialize_jacobian_matrix</a>
         
       </h3>
     </div>
@@ -1353,10 +1738,69 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-set~4"></span>
+      <span class="anchor" id="boundprocedure-is_scatter_ready"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_scatter_ready</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_scatter_ready_jacobian.html'>is_scatter_ready_jacobian</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_scatter_ready_jacobian.html'>is_scatter_ready_jacobian</a>(self) result(ready)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_jacobian_matrix.html'>type_jacobian_matrix</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-set~9"></span>
       <h3>
           generic, public ::
-  <strong>set</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_jacobian_matrix.html#boundprocedure-set_value_local'>set_value_local</a>
+  <strong>set</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/type_jacobian_matrix.html#boundprocedure-set_value_local'>set_value_local</a>
         
       </h3>
     </div>
@@ -1485,7 +1929,7 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-set_value_local"></span>
       <h3>
           procedure, private, pass(self) ::
-  <strong>set_value_local</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/set_value_jacobian_matrix.html'>set_value_jacobian_matrix</a>
+  <strong>set_value_local</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/set_value_jacobian_matrix.html'>set_value_jacobian_matrix</a>
         
       </h3>
     </div>
@@ -1611,10 +2055,10 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-zero"></span>
+      <span class="anchor" id="boundprocedure-zero~4"></span>
       <h3>
           generic, public ::
-  <strong>zero</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_jacobian_matrix.html#boundprocedure-zero_all'>zero_all</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_jacobian_matrix.html#boundprocedure-zero_row'>zero_row</a>
+  <strong>zero</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/type_jacobian_matrix.html#boundprocedure-zero_all~7'>zero_all</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/type_jacobian_matrix.html#boundprocedure-zero_row~7'>zero_row</a>
         
       </h3>
     </div>
@@ -1734,10 +2178,10 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-zero_all"></span>
+      <span class="anchor" id="boundprocedure-zero_all~7"></span>
       <h3>
           procedure, private, pass(self) ::
-  <strong>zero_all</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/zero_all_jacobian_matrix.html'>zero_all_jacobian_matrix</a>
+  <strong>zero_all</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/zero_all_jacobian_matrix.html'>zero_all_jacobian_matrix</a>
         
       </h3>
     </div>
@@ -1788,10 +2232,10 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-zero_row"></span>
+      <span class="anchor" id="boundprocedure-zero_row~7"></span>
       <h3>
           procedure, private, pass(self) ::
-  <strong>zero_row</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/zero_row_jacobian_matrix.html'>zero_row_jacobian_matrix</a>
+  <strong>zero_row</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/zero_row_jacobian_matrix.html'>zero_row_jacobian_matrix</a>
         
       </h3>
     </div>
@@ -1880,24 +2324,29 @@ large graphs.</div>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_dofs_per_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
 
-<span class="w">        </span><span class="c">! 以前の holder_matrices 配列を廃止し、単一の行列オブジェクトで管理</span>
 <span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">abst_matrix</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">matrix</span>
+
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">scatter_data</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">scatter_ptr</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">scatter_max_nodes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">scatter_ready</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
 <span class="w">    </span><span class="k">contains</span>
 <span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">initialize_jacobian_matrix</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">destroy</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">destroy_jacobian_matrix</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">build_scatter_map</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">build_scatter_map_jacobian</span>
 
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_size</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_size_jacobian_matrix</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_num_dofs_per_node</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_num_dofs_per_node</span>
 
-<span class="w">        </span><span class="c">! ソルバー向けに行列オブジェクトそのものを公開するアクセサ</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_matrix</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_underlying_matrix</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_scatter_ready</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_scatter_ready_jacobian</span>
 
-<span class="w">        </span><span class="c">! 値設定・加算系</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">set_value_local</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">set_value_jacobian_matrix</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">add_value_local</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">add_value_jacobian_matrix</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">add_local_matrix</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">add_local_jacobian_matrix</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">add_local_matrix_fast</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">add_local_fast_jacobian_matrix</span>
 <span class="w">        </span><span class="k">generic</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">set</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">set_value_local</span>
-<span class="w">        </span><span class="k">generic</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">add</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">add_value_local</span><span class="p">,</span><span class="w"> </span><span class="n">add_local_matrix</span>
+<span class="w">        </span><span class="k">generic</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">add</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">add_value_local</span><span class="p">,</span><span class="w"> </span><span class="n">add_local_matrix</span><span class="p">,</span><span class="w"> </span><span class="n">add_local_matrix_fast</span>
 
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">zero_all</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">zero_all_jacobian_matrix</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">zero_row</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">zero_row_jacobian_matrix</span>
@@ -1918,7 +2367,7 @@ large graphs.</div>
         <div class="row justify-content-between">
           <div class="col">
             <p>
-              FTDSS
+              FTCMS
  was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
@@ -1926,7 +2375,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-23 23:52 +0000             </p>
+ on 2026-03-11 14:03 +0000             </p>
           </div>
         </div>
         <br>

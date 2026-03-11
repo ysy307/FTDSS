@@ -1,7 +1,7 @@
 !>
 !> Implements the procedures for a Diagonal (DIA) storage sparse matrix.
 !>
-submodule(core_types_matrix) core_types_matrix_dia
+submodule(core_types_algebra_matrix) algebra_matrix_dia
     implicit none
 
 contains
@@ -142,11 +142,11 @@ contains
         if (main_diag_idx /= -1) then
             ! Use type_vector_dp's set method instead of direct access
             do i = 1, self%num_rows
-                call diagonal%set(MATRIX_OPS%INS, i, self%val(i, main_diag_idx))
+                call diagonal%set(VECTOR_OPS%INS, i, self%val(i, main_diag_idx))
             end do
         else
             ! No main diagonal stored, set to zero
-            call diagonal%set(MATRIX_OPS%INS, 0.0_real64)
+            call diagonal%set(VECTOR_OPS%INS, 0.0_real64)
         end if
     end subroutine get_diagonal_dia
 
@@ -383,4 +383,4 @@ contains
         end do
     end subroutine display_dia
 
-end submodule core_types_matrix_dia
+end submodule algebra_matrix_dia

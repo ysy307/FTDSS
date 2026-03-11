@@ -1,8 +1,8 @@
-module core_types_config_physics_swcc
+module types_config_physics_swcc
     use, intrinsic :: iso_fortran_env
     use :: core_constants, only:type_constant_id
     use :: core_types_config_base, only:abst_config
-    use :: core_types_config_physics_base, only:abst_config_physics_model
+    use :: types_config_physics_base, only:abst_config_physics_model, copy_config_physics_model, reset_config_physics_model
     implicit none
     private
 
@@ -70,7 +70,6 @@ contains
 
         select type (source)
         type is (type_config_wrf)
-            ! 親型メンバーを self にコピー
             call self%set(self%swcc_model, source%swcc_model)
             call self%set(self%theta_s, source%theta_s)
             call self%set(self%theta_r, source%theta_r)
@@ -117,9 +116,7 @@ contains
 
         select type (source)
         type is (type_config_hcf)
-            ! まず親型の copy を呼ぶ
             call copy_config_wrf(self, source)
-            ! 追加メンバーのみコピー
             call self%set(self%model, source%model)
             call self%set(self%water_viscosity_model, source%water_viscosity_model)
             call self%set(self%k_sat, source%k_sat)
@@ -136,10 +133,8 @@ contains
         implicit none
         class(type_config_hcf), intent(inout) :: self
 
-        ! まず親型の reset を呼ぶ
         call reset_config_wrf(self)
 
-        ! 追加メンバーのみリセット
         self%model = type_constant_id("none", "none", -1)
         self%water_viscosity_model = type_constant_id("none", "none", -1)
         self%k_sat = 0.0d0
@@ -148,4 +143,4 @@ contains
         self%gain_factor = 0.0d0
     end subroutine reset_config_hcf
 
-end module core_types_config_physics_swcc
+end module types_config_physics_swcc

@@ -1,15 +1,15 @@
 !>
-!> 残差ベクトルを管理する高レベルなコンテナ．
-!> 内部で単一のブロック付きベクトル(type_vector_dp)を保持し、
-!> (ノード, DOF)の操作をベクトルのブロック操作にマッピングする．
+!> High-level container for the residual vector.
+!> Holds a single blocked vector (type_vector_dp) internally and maps
+!> (node, DOF) operations to block operations on the vector.
 !>
-module field_residual_vector
+module numerical_system_residual_vector
     use, intrinsic :: iso_fortran_env
     use :: stdlib_optval, only:optval
     use :: module_core
     use :: module_domain, only:type_domain
     use :: module_linalg
-    use :: core_types_vector
+    ! use :: core_types_vector
     implicit none
     private
 
@@ -21,7 +21,6 @@ module field_residual_vector
         integer(int32) :: num_dofs_per_node = 0
         integer(int32) :: size = 0
 
-        ! 内部データとして type_vector_dp を保持
         type(type_vector_dp) :: data
     contains
         ! --- initialize/destroy ---
@@ -35,7 +34,7 @@ module field_residual_vector
         procedure, pass(self), public :: get_size => get_size_residual_vector
         procedure, pass(self), public :: get_num_dofs_per_node => get_num_dofs_per_node_residual_vector
 
-        ! 内部ベクトルへのアクセサ
+        ! Accessor to the internal vector
         procedure, public, pass(self) :: get_vector => get_underlying_vector
         procedure, public, pass(self) :: get_data => get_data_vector
 
@@ -71,10 +70,9 @@ contains
         type(type_domain), intent(in) :: domain
 
         call domain%get_total_dofs(self%size)
-        call domain%get_num_dofs_per_node(self%num_dofs_per_node)
+        call domain%get_num_dof_per_node(self%num_dofs_per_node)
         call domain%get_num_nodes(self%num_nodes)
 
-        ! num_blocks = num_dofs_per_node として初期化
         call self%data%initialize(self%num_nodes, num_blocks=self%num_dofs_per_node)
 
     end subroutine initialize_residual_vector_from_domain
@@ -117,7 +115,7 @@ contains
     function get_data_vector(self) result(data_ptr)
         implicit none
         class(type_residual_vector), intent(in), target :: self
-        real(real64), pointer, contiguous, dimension(:) :: data_ptr
+        real(real64), pointer, dimension(:) :: data_ptr
 
         data_ptr => self%data%get_data()
     end function get_data_vector
@@ -132,7 +130,7 @@ contains
         integer(int32), intent(in) :: row_dof
         real(real64), intent(in) :: value
 
-        call self%data%set(OP_INS, value, row_block=row_dof)
+        call self%data%set(VECTOR_OPS%INS, value, row_block=row_dof)
     end subroutine set_scalar_residual_vector
 
     subroutine set_array_residual_vector(self, row_dof, values)
@@ -141,7 +139,7 @@ contains
         integer(int32), intent(in) :: row_dof
         real(real64), intent(in) :: values(:)
 
-        call self%data%set(OP_INS, values, row_block=row_dof)
+        call self%data%set(VECTOR_OPS%INS, values, row_block=row_dof)
     end subroutine set_array_residual_vector
 
     subroutine set_value_at_index_residual_vector(self, row_dof, global_index, value)
@@ -151,7 +149,7 @@ contains
         integer(int32), intent(in) :: global_index
         real(real64), intent(in) :: value
 
-        call self%data%set(OP_INS, global_index, value, row_block=row_dof)
+        call self%data%set(VECTOR_OPS%INS, global_index, value, row_block=row_dof)
     end subroutine set_value_at_index_residual_vector
 
     subroutine set_values_at_indices_residual_vector(self, row_dof, global_indices, values)
@@ -161,11 +159,11 @@ contains
         integer(int32), intent(in) :: global_indices(:)
         real(real64), intent(in) :: values(:)
 
-        call self%data%set(OP_INS, global_indices, values, row_block=row_dof)
+        call self%data%set(VECTOR_OPS%INS, global_indices, values, row_block=row_dof)
     end subroutine set_values_at_indices_residual_vector
 
     ! -------------------------------------------------------------------
-    !  Adders (Mapping row_dof to row_block with OP_ADD)
+    !  Adders (Mapping row_dof to row_block with VECTOR_OPS%ADD)
     ! -------------------------------------------------------------------
 
     subroutine add_value_residual_vector(self, row_dof, value)
@@ -174,7 +172,7 @@ contains
         integer(int32), intent(in) :: row_dof
         real(real64), intent(in) :: value
 
-        call self%data%set(OP_ADD, value, row_block=row_dof)
+        call self%data%set(VECTOR_OPS%ADD, value, row_block=row_dof)
     end subroutine add_value_residual_vector
 
     subroutine add_array_residual_vector(self, row_dof, values)
@@ -183,7 +181,7 @@ contains
         integer(int32), intent(in) :: row_dof
         real(real64), intent(in) :: values(:)
 
-        call self%data%set(OP_ADD, values, row_block=row_dof)
+        call self%data%set(VECTOR_OPS%ADD, values, row_block=row_dof)
     end subroutine add_array_residual_vector
 
     subroutine add_value_at_index_residual_vector(self, row_dof, global_index, value)
@@ -193,7 +191,7 @@ contains
         integer(int32), intent(in) :: global_index
         real(real64), intent(in) :: value
 
-        call self%data%set(OP_ADD, global_index, value, row_block=row_dof)
+        call self%data%set(VECTOR_OPS%ADD, global_index, value, row_block=row_dof)
     end subroutine add_value_at_index_residual_vector
 
     subroutine add_values_at_indices_residual_vector(self, row_dof, global_indices, values)
@@ -203,7 +201,7 @@ contains
         integer(int32), intent(in) :: global_indices(:)
         real(real64), intent(in) :: values(:)
 
-        call self%data%set(OP_ADD, global_indices, values, row_block=row_dof)
+        call self%data%set(VECTOR_OPS%ADD, global_indices, values, row_block=row_dof)
     end subroutine add_values_at_indices_residual_vector
 
     subroutine add_values_from_vector_residual_vector(self, row_dof, global_indices, values)
@@ -214,14 +212,12 @@ contains
         type(type_vector_dp), intent(in) :: values
 
         real(real64), pointer, dimension(:) :: vals_data
-        integer(int32) :: i
 
         vals_data => values%get_data()
 
-        ! ループ処理で値を加算
-        do i = 1, size(global_indices)
-            call self%data%set(OP_ADD, global_indices(i), vals_data(i), row_block=row_dof)
-        end do
+        if (.not. associated(vals_data)) return
+
+        call self%data%set(VECTOR_OPS%ADD, global_indices, vals_data, row_block=row_dof)
     end subroutine add_values_from_vector_residual_vector
 
     ! -------------------------------------------------------------------
@@ -237,8 +233,8 @@ contains
 
         if (.not. self%data%is_initialized()) return
 
-        ! type_vector_dp にスカラー倍のインターフェースがないため、
-        ! 生データポインタ経由で計算を行う
+        ! type_vector_dp lacks a scalar multiplication interface,
+        ! so compute via raw data pointer
         raw_data => self%data%get_data()
         raw_data = raw_data * alpha
     end subroutine scale_residual_vector
@@ -287,4 +283,4 @@ contains
         write (unit, '(A)') '---------------------------------'
     end subroutine display_residual_vector
 
-end module field_residual_vector
+end module numerical_system_residual_vector

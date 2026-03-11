@@ -1,13 +1,13 @@
-module core_types_vector
+module core_types_algebra_vector
     use, intrinsic :: iso_fortran_env
 !$  use :: omp_lib
     use :: stdlib_optval, only:optval
     use :: core_constants
     use :: core_check_length, only:check_match_length
     use :: core_check_range, only:value_in_range
-    use :: core_allocate, only:allocate_array
-    use :: core_deallocate, only:deallocate_array
+    use :: core_memory, only:allocate_array, deallocate_array
     implicit none
+    private
 
     public :: type_vector_dp
     public :: type_vector_int
@@ -105,7 +105,7 @@ module core_types_vector
         module function get_data_vector_dp(self) result(data)
             implicit none
             class(type_vector_dp), intent(in), target :: self
-            real(real64), pointer, contiguous, dimension(:) :: data
+            real(real64), pointer, dimension(:) :: data
         end function get_data_vector_dp
 
         module pure function get_status_vector_dp(self) result(status)
@@ -206,7 +206,7 @@ module core_types_vector
         module function get_data_vector_int(self) result(data)
             implicit none
             class(type_vector_int), intent(in), target :: self
-            integer(int32), pointer, contiguous, dimension(:) :: data
+            integer(int32), pointer, dimension(:) :: data
         end function get_data_vector_int
 
         module pure function get_status_vector_int(self) result(status)
@@ -272,4 +272,4 @@ module core_types_vector
 
     end interface
 
-end module core_types_vector
+end module core_types_algebra_vector

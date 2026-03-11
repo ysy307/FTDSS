@@ -2,15 +2,15 @@
 !> @brief Manages phase composition (water, ice, gas, vapor) and their derivatives.
 !> Integrates Fusion and Vaporization models to ensure thermodynamic consistency.
 !>
-module physics_models_phase_systems
+module models_phase_change_manager
     use, intrinsic :: iso_fortran_env
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core, only:type_state
-    use :: physics_constants, only:latent_heat_fusion_water_0C
-    use :: physics_models_phase_change_liquid_solid_gcc, only:abst_gcc
-    use :: physics_models_wrf, only:abst_wrf
-    use :: physics_models_phase_change_liquid_solid_fusion, only:type_fusion
-    use :: physics_models_phase_change_liquid_vapor_vaporization, only:type_evaporation
+    use :: constitutive_constants, only:latent_heat_fusion_water_0C
+    use :: models_phase_change_gcc, only:abst_gcc
+    use :: models_wrf, only:abst_wrf
+    use :: models_phase_change_fusion, only:type_fusion
+    use :: models_phase_change_vaporization, only:type_evaporation
     implicit none
     private
 
@@ -29,7 +29,7 @@ module physics_models_phase_systems
         procedure, public :: calc_latent_heat_fusion
         procedure, public :: calc_latent_heat_vaporization
         procedure, public :: deriv_pressure_ice_water
-        ! procedure, public :: update_phases_array ! 必要に応じて実装
+        ! procedure, public :: update_phases_array ! Implement as needed
     end type type_phase_manager
 
 contains
@@ -48,7 +48,7 @@ contains
     end subroutine initialize
 
     !>
-    !> @brief P, T から全ての相の状態量(量と微分)を一括更新する
+    !> @brief Update all phase quantities and their derivatives from P and T.
     !>
     subroutine update_water_phases(self, state)
         implicit none
@@ -67,23 +67,23 @@ contains
         real(real64) :: dQa_dP, dQa_dT
         real(real64) :: dQv_dP, dQv_dT
 
-        ! 1. 空隙率の取得
+        ! 1. Get porosity
         call state%porosity%get(porosity)
 
-        ! 2. 氷含有量 (theta_i) の仮計算
+        ! 2. Preliminary ice content (theta_i) calculation
         call self%fusion%calc_ice_content(state, raw_ice_content)
         call self%fusion%calc_ice_content_derivatives(state, dQi_dP, dQi_dT)
 
-        ! --- 氷の物理的上限チェック (Ice Cap) ---
+        ! --- Ice upper-bound check (Ice Cap) ---
         if (raw_ice_content > porosity) then
-            ! [氷過剰] 空隙すべてが氷
+            ! Ice exceeds porosity: all pore space is ice
             ice_content = porosity
 
-            ! 上限に張り付いているため、微分は0とする（これ以上増えない）
+            ! Derivatives are zero since ice is capped at the upper limit
             ! dQi_dP = 0.0d0
             ! dQi_dT = 0.0d0
 
-            ! 水・空気は存在できない
+            ! No water or air can exist
             water_content = 0.0d0
             dQw_dP = 0.0d0
             dQw_dT = 0.0d0
@@ -92,42 +92,42 @@ contains
             dQa_dP = 0.0d0
             dQa_dT = 0.0d0
         else
-            ! [通常] 氷は計算値通り
+            ! Normal case: ice content as computed
             ice_content = raw_ice_content
-            ! 微分係数はそのまま使用 (dQi_dP, dQi_dT)
+            ! Use computed derivatives (dQi_dP, dQi_dT) as-is
 
-            ! 3. 液状水分量 (theta_w) の仮計算
+            ! 3. Preliminary liquid water content (theta_w) calculation
             call self%fusion%calc_water_content(state, raw_water_content)
             call self%fusion%calc_water_content_derivatives(state, dQw_dP, dQw_dT)
 
-            ! --- 水の物理的上限チェック (Water Cap) ---
+            ! --- Water upper-bound check (Water Cap) ---
             if (raw_water_content + ice_content > porosity) then
-                ! [過飽和] 氷以外の残りの空隙を水が埋める
+                ! Oversaturated: water fills remaining pore space after ice
                 water_content = max(0.0d0, porosity - ice_content)
 
-                ! 水分量は (Porosity - Ice) に従属するため、微分は氷の逆符号になる
+                ! Water content depends on (Porosity - Ice), so derivative is opposite sign of ice
                 dQw_dP = -1.0d0 * dQi_dP
                 dQw_dT = -1.0d0 * dQi_dT
 
-                ! 気相は無し
+                ! No gas phase
                 air_content = 0.0d0
                 dQa_dP = 0.0d0
                 dQa_dT = 0.0d0
             else
-                ! [不飽和] 計算値通り
+                ! Unsaturated: use computed values
                 water_content = raw_water_content
-                ! 微分係数はそのまま使用 (dQw_dP, dQw_dT)
+                ! Use computed derivatives (dQw_dP, dQw_dT) as-is
 
-                ! 気相 = 空隙 - 水 - 氷
+                ! Gas phase = porosity - water - ice
                 air_content = porosity - water_content - ice_content
 
-                ! 気相の微分 (保存則より)
+                ! Gas phase derivatives (from conservation)
                 dQa_dP = -1.0d0 * (dQw_dP + dQi_dP)
                 dQa_dT = -1.0d0 * (dQw_dT + dQi_dT)
             end if
         end if
 
-        ! 4. 値のセット（整合性確保済み）
+        ! 4. Set values (consistency ensured)
         call state%ice_content%set(ice_content)
         call state%dQi_dP%set(dQi_dP)
         call state%dQi_dT%set(dQi_dT)
@@ -140,13 +140,14 @@ contains
         call state%dQa_dP%set(dQa_dP)
         call state%dQa_dT%set(dQa_dT)
 
-        ! 5. 蒸気量 (theta_v) の更新
-        !    ※ 蒸気は気相体積に依存するモデルの場合、air_content=0なら蒸気も0になるロジックが
-        !       evap内部に含まれている必要がありますが、ここでは独立として呼び出します。
+        ! 5. Update vapor content (theta_v)
+        !    Note: If the model depends on gas-phase volume, the logic for
+        !    vapor=0 when air_content=0 should be handled inside evap,
+        !    but here we call it independently.
         call self%evap%calc_vapor_content(state, vapor_content)
         call self%evap%calc_vapor_content_derivatives(state, dQv_dP, dQv_dT)
 
-        ! air_contentが0なら物理的に蒸気も存在できないため、ここでガードしても良い
+        ! Guard: if air_content is zero, vapor cannot physically exist
         if (air_content <= epsilon(0.0d0)) then
             vapor_content = 0.0d0
             dQv_dP = 0.0d0
@@ -194,4 +195,4 @@ contains
 
     end subroutine deriv_pressure_ice_water
 
-end module physics_models_phase_systems
+end module models_phase_change_manager

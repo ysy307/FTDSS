@@ -1,0 +1,837 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>output_history_output_manager &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>output_history_output_manager
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">11 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/output_manager.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/output_manager.f90.html'>output_manager.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/io_output_manager.html'>io_output_manager</a></li>
+            <li class="breadcrumb-item active" aria-current="page">output_history_output_manager</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/output_history_output_manager.html#src">output_history_output_manager</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine output_history_output_manager(self, time, temperature, water_content, ice_content, vapor_content, pressure)  
+</h2>
+    
+
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_output_manager.html'>type_output_manager</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~458"></span>
+              class(<a href='../type/type_output_manager.html'>type_output_manager</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-time~3"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>time</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-temperature~11"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>temperature</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-water_content~11"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>water_content</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ice_content~11"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ice_content</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-vapor_content~10"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>vapor_content</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-pressure~11"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>pressure</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~output_history_output_manager~~CallsGraph Pages: 1 -->
+<svg id="procoutput_history_output_managerCallsGraph" width="641pt" height="50pt"
+ viewBox="0.00 0.00 641.00 50.30" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~output_history_output_manager~~CallsGraph" class="graph" transform="scale(0.32 0.32) rotate(0) translate(4 152)">
+<title>proc~~output_history_output_manager~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-152 1984,-152 1984,4 -4,4"/>
+<!-- proc~output_history_output_manager -->
+<g id="proc~~output_history_output_manager~~CallsGraph_node1" class="node">
+<title>proc~output_history_output_manager</title>
+<polygon fill="none" stroke="black" points="309,-127 0,-127 0,-103 309,-103 309,-127"/>
+<text text-anchor="middle" x="154.5" y="-112.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_output_manager%output_history_output_manager</text>
+</g>
+<!-- interface~output_history_output_observation -->
+<g id="proc~~output_history_output_manager~~CallsGraph_node2" class="node">
+<title>interface~output_history_output_observation</title>
+<g id="a_proc~~output_history_output_manager~~CallsGraph_node2"><a xlink:href="../interface/output_history_output_observation.html" xlink:title="type_output_observation%output_history_output_observation">
+<polygon fill="#a7506f" stroke="#a7506f" points="682,-127 345,-127 345,-103 682,-103 682,-127"/>
+<text text-anchor="middle" x="513.5" y="-112.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output_observation%output_history_output_observation</text>
+</a>
+</g>
+</g>
+<!-- proc~output_history_output_manager&#45;&gt;interface~output_history_output_observation -->
+<g id="proc~~output_history_output_manager~~CallsGraph_edge1" class="edge">
+<title>proc~output_history_output_manager&#45;&gt;interface~output_history_output_observation</title>
+<path fill="none" stroke="#ff0000" d="M309.23,-115C317.71,-115 326.27,-115 334.83,-115"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="334.87,-118.5 344.87,-115 334.87,-111.5 334.87,-118.5"/>
+</g>
+<!-- proc~output_history_output_observation -->
+<g id="proc~~output_history_output_manager~~CallsGraph_node3" class="node">
+<title>proc~output_history_output_observation</title>
+<g id="a_proc~~output_history_output_manager~~CallsGraph_node3"><a xlink:href="../proc/output_history_output_observation.html" xlink:title="output_history_output_observation">
+<polygon fill="#d9534f" stroke="#d9534f" points="914,-127 718,-127 718,-103 914,-103 914,-127"/>
+<text text-anchor="middle" x="816" y="-112.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">output_history_output_observation</text>
+</a>
+</g>
+</g>
+<!-- interface~output_history_output_observation&#45;&gt;proc~output_history_output_observation -->
+<g id="proc~~output_history_output_manager~~CallsGraph_edge2" class="edge">
+<title>interface~output_history_output_observation&#45;&gt;proc~output_history_output_observation</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M682.32,-115C690.92,-115 699.45,-115 707.78,-115"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="707.84,-118.5 717.84,-115 707.84,-111.5 707.84,-118.5"/>
+</g>
+<!-- interface~extract_value_holder_observation_point -->
+<g id="proc~~output_history_output_manager~~CallsGraph_node4" class="node">
+<title>interface~extract_value_holder_observation_point</title>
+<g id="a_proc~~output_history_output_manager~~CallsGraph_node4"><a xlink:href="../interface/extract_value_holder_observation_point.html" xlink:title="holder_observation_point%extract_value_holder_observation_point">
+<polygon fill="#a7506f" stroke="#a7506f" points="1319,-148 950,-148 950,-124 1319,-124 1319,-148"/>
+<text text-anchor="middle" x="1134.5" y="-133.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">holder_observation_point%extract_value_holder_observation_point</text>
+</a>
+</g>
+</g>
+<!-- proc~output_history_output_observation&#45;&gt;interface~extract_value_holder_observation_point -->
+<g id="proc~~output_history_output_manager~~CallsGraph_edge3" class="edge">
+<title>proc~output_history_output_observation&#45;&gt;interface~extract_value_holder_observation_point</title>
+<path fill="none" stroke="#ff0000" d="M914.11,-121.44C923.28,-122.05 932.78,-122.68 942.44,-123.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="942.36,-126.83 952.57,-124 942.82,-119.84 942.36,-126.83"/>
+</g>
+<!-- interface~write_observation_line -->
+<g id="proc~~output_history_output_manager~~CallsGraph_node5" class="node">
+<title>interface~write_observation_line</title>
+<g id="a_proc~~output_history_output_manager~~CallsGraph_node5"><a xlink:href="../interface/write_observation_line.html" xlink:title="type_output_observation%write_observation_line">
+<polygon fill="#a7506f" stroke="#a7506f" points="1271,-106 998,-106 998,-82 1271,-82 1271,-106"/>
+<text text-anchor="middle" x="1134.5" y="-91.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_output_observation%write_observation_line</text>
+</a>
+</g>
+</g>
+<!-- proc~output_history_output_observation&#45;&gt;interface~write_observation_line -->
+<g id="proc~~output_history_output_manager~~CallsGraph_edge4" class="edge">
+<title>proc~output_history_output_observation&#45;&gt;interface~write_observation_line</title>
+<path fill="none" stroke="#ff0000" d="M914.11,-108.56C937.35,-107.01 962.66,-105.34 987.57,-103.68"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="988.09,-107.16 997.84,-103 987.63,-100.17 988.09,-107.16"/>
+</g>
+<!-- proc~extract_value_holder_observation_point -->
+<g id="proc~~output_history_output_manager~~CallsGraph_node6" class="node">
+<title>proc~extract_value_holder_observation_point</title>
+<g id="a_proc~~output_history_output_manager~~CallsGraph_node6"><a xlink:href="../proc/extract_value_holder_observation_point.html" xlink:title="extract_value_holder_observation_point">
+<polygon fill="#d9534f" stroke="#d9534f" points="1579,-148 1355,-148 1355,-124 1579,-124 1579,-148"/>
+<text text-anchor="middle" x="1467" y="-133.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">extract_value_holder_observation_point</text>
+</a>
+</g>
+</g>
+<!-- interface~extract_value_holder_observation_point&#45;&gt;proc~extract_value_holder_observation_point -->
+<g id="proc~~output_history_output_manager~~CallsGraph_edge5" class="edge">
+<title>interface~extract_value_holder_observation_point&#45;&gt;proc~extract_value_holder_observation_point</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1319.11,-136C1327.77,-136 1336.37,-136 1344.8,-136"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1344.99,-139.5 1354.99,-136 1344.99,-132.5 1344.99,-139.5"/>
+</g>
+<!-- proc~write_observation_line -->
+<g id="proc~~output_history_output_manager~~CallsGraph_node7" class="node">
+<title>proc~write_observation_line</title>
+<g id="a_proc~~output_history_output_manager~~CallsGraph_node7"><a xlink:href="../proc/write_observation_line.html" xlink:title="write_observation_line">
+<polygon fill="#d9534f" stroke="#d9534f" points="1533,-106 1401,-106 1401,-82 1533,-82 1533,-106"/>
+<text text-anchor="middle" x="1467" y="-91.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_observation_line</text>
+</a>
+</g>
+</g>
+<!-- interface~write_observation_line&#45;&gt;proc~write_observation_line -->
+<g id="proc~~output_history_output_manager~~CallsGraph_edge6" class="edge">
+<title>interface~write_observation_line&#45;&gt;proc~write_observation_line</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1271.36,-94C1312.03,-94 1355.16,-94 1390.45,-94"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1390.67,-97.5 1400.67,-94 1390.67,-90.5 1390.67,-97.5"/>
+</g>
+<!-- extract_value -->
+<g id="proc~~output_history_output_manager~~CallsGraph_node8" class="node">
+<title>extract_value</title>
+<polygon fill="#777777" stroke="#777777" points="1716,-148 1632,-148 1632,-124 1716,-124 1716,-148"/>
+<text text-anchor="middle" x="1674" y="-133.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">extract_value</text>
+</g>
+<!-- proc~extract_value_holder_observation_point&#45;&gt;extract_value -->
+<g id="proc~~output_history_output_manager~~CallsGraph_edge7" class="edge">
+<title>proc~extract_value_holder_observation_point&#45;&gt;extract_value</title>
+<path fill="none" stroke="#ff0000" d="M1579.2,-136C1594.05,-136 1608.66,-136 1621.77,-136"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1621.93,-139.5 1631.93,-136 1621.93,-132.5 1621.93,-139.5"/>
+</g>
+<!-- proc~check_unit_writable -->
+<g id="proc~~output_history_output_manager~~CallsGraph_node9" class="node">
+<title>proc~check_unit_writable</title>
+<g id="a_proc~~output_history_output_manager~~CallsGraph_node9"><a xlink:href="../proc/check_unit_writable.html" xlink:title="check_unit_writable">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1733,-106 1615,-106 1615,-82 1733,-82 1733,-106"/>
+<text text-anchor="middle" x="1674" y="-91.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">check_unit_writable</text>
+</a>
+</g>
+</g>
+<!-- proc~write_observation_line&#45;&gt;proc~check_unit_writable -->
+<g id="proc~~output_history_output_manager~~CallsGraph_edge8" class="edge">
+<title>proc~write_observation_line&#45;&gt;proc~check_unit_writable</title>
+<path fill="none" stroke="#00ffff" d="M1533.14,-94C1556.02,-94 1581.77,-94 1604.89,-94"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1604.96,-97.5 1614.96,-94 1604.96,-90.5 1604.96,-97.5"/>
+</g>
+<!-- proc~raise_error -->
+<g id="proc~~output_history_output_manager~~CallsGraph_node10" class="node">
+<title>proc~raise_error</title>
+<g id="a_proc~~output_history_output_manager~~CallsGraph_node10"><a xlink:href="../proc/raise_error.html" xlink:title="raise_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="1709,-64 1639,-64 1639,-40 1709,-40 1709,-64"/>
+<text text-anchor="middle" x="1674" y="-49.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">raise_error</text>
+</a>
+</g>
+</g>
+<!-- proc~write_observation_line&#45;&gt;proc~raise_error -->
+<g id="proc~~output_history_output_manager~~CallsGraph_edge9" class="edge">
+<title>proc~write_observation_line&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ffff" d="M1526.74,-81.96C1559.24,-75.31 1598.95,-67.17 1628.79,-61.06"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1629.81,-64.42 1638.9,-58.99 1628.41,-57.56 1629.81,-64.42"/>
+</g>
+<!-- proc~replace_placeholder -->
+<g id="proc~~output_history_output_manager~~CallsGraph_node11" class="node">
+<title>proc~replace_placeholder</title>
+<g id="a_proc~~output_history_output_manager~~CallsGraph_node11"><a xlink:href="../proc/replace_placeholder.html" xlink:title="replace_placeholder">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1890,-104 1769,-104 1769,-80 1890,-80 1890,-104"/>
+<text text-anchor="middle" x="1829.5" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">replace_placeholder</text>
+</a>
+</g>
+</g>
+<!-- proc~raise_error&#45;&gt;proc~replace_placeholder -->
+<g id="proc~~output_history_output_manager~~CallsGraph_edge10" class="edge">
+<title>proc~raise_error&#45;&gt;proc~replace_placeholder</title>
+<path fill="none" stroke="#0000ff" d="M1709.07,-60.88C1727.67,-65.73 1751.18,-71.85 1772.41,-77.38"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1771.74,-80.83 1782.3,-79.96 1773.51,-74.05 1771.74,-80.83"/>
+</g>
+<!-- strip -->
+<g id="proc~~output_history_output_manager~~CallsGraph_node12" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="1980,-84 1926,-84 1926,-60 1980,-60 1980,-84"/>
+<text text-anchor="middle" x="1953" y="-69.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~raise_error&#45;&gt;strip -->
+<g id="proc~~output_history_output_manager~~CallsGraph_edge11" class="edge">
+<title>proc~raise_error&#45;&gt;strip</title>
+<path fill="none" stroke="#0000ff" d="M1709.24,-54.47C1761.76,-58.26 1861.75,-65.48 1915.56,-69.37"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1915.45,-72.87 1925.67,-70.1 1915.95,-65.89 1915.45,-72.87"/>
+</g>
+<!-- to_string -->
+<g id="proc~~output_history_output_manager~~CallsGraph_node13" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="1858.5,-24 1800.5,-24 1800.5,0 1858.5,0 1858.5,-24"/>
+<text text-anchor="middle" x="1829.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~raise_error&#45;&gt;to_string -->
+<g id="proc~~output_history_output_manager~~CallsGraph_edge12" class="edge">
+<title>proc~raise_error&#45;&gt;to_string</title>
+<path fill="none" stroke="#0000ff" d="M1709.07,-43.12C1733.13,-36.85 1765.41,-28.44 1790.34,-21.94"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1791.39,-25.29 1800.18,-19.38 1789.62,-18.51 1791.39,-25.29"/>
+</g>
+<!-- proc~replace_placeholder&#45;&gt;strip -->
+<g id="proc~~output_history_output_manager~~CallsGraph_edge13" class="edge">
+<title>proc~replace_placeholder&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M1890.18,-82.18C1898.86,-80.75 1907.57,-79.31 1915.6,-77.99"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1916.4,-81.41 1925.7,-76.33 1915.27,-74.5 1916.4,-81.41"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocoutput_history_output_managerCallsGraph = svgPanZoom('#procoutput_history_output_managerCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~output_history_output_manager~~CalledByGraph Pages: 1 -->
+<svg id="procoutput_history_output_managerCalledByGraph" width="641pt" height="44pt"
+ viewBox="0.00 0.00 641.00 43.88" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~output_history_output_manager~~CalledByGraph" class="graph" transform="scale(0.59 0.59) rotate(0) translate(4 70)">
+<title>proc~~output_history_output_manager~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 1077,-70 1077,4 -4,4"/>
+<!-- proc~output_history_output_manager -->
+<g id="proc~~output_history_output_manager~~CalledByGraph_node1" class="node">
+<title>proc~output_history_output_manager</title>
+<polygon fill="none" stroke="black" points="1073,-45 764,-45 764,-21 1073,-21 1073,-45"/>
+<text text-anchor="middle" x="918.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_output_manager%output_history_output_manager</text>
+</g>
+<!-- proc~output_history_ftcms -->
+<g id="proc~~output_history_output_manager~~CalledByGraph_node2" class="node">
+<title>proc~output_history_ftcms</title>
+<g id="a_proc~~output_history_output_manager~~CalledByGraph_node2"><a xlink:href="../proc/output_history_ftcms.html" xlink:title="output_history_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="728,-45 605,-45 605,-21 728,-21 728,-45"/>
+<text text-anchor="middle" x="666.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">output_history_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~output_history_ftcms&#45;&gt;proc~output_history_output_manager -->
+<g id="proc~~output_history_output_manager~~CalledByGraph_edge1" class="edge">
+<title>proc~output_history_ftcms&#45;&gt;proc~output_history_output_manager</title>
+<path fill="none" stroke="#ff0000" d="M728.02,-33C736.1,-33 744.68,-33 753.55,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="753.68,-36.5 763.68,-33 753.68,-29.5 753.68,-36.5"/>
+</g>
+<!-- interface~output_history_ftcms -->
+<g id="proc~~output_history_output_manager~~CalledByGraph_node3" class="node">
+<title>interface~output_history_ftcms</title>
+<g id="a_proc~~output_history_output_manager~~CalledByGraph_node3"><a xlink:href="../interface/output_history_ftcms.html" xlink:title="type_ftcms%output_history_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="569,-45 379,-45 379,-21 569,-21 569,-45"/>
+<text text-anchor="middle" x="474" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%output_history_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~output_history_ftcms&#45;&gt;proc~output_history_ftcms -->
+<g id="proc~~output_history_output_manager~~CalledByGraph_edge2" class="edge">
+<title>interface~output_history_ftcms&#45;&gt;proc~output_history_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M569.13,-33C577.8,-33 586.47,-33 594.87,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="594.97,-36.5 604.97,-33 594.97,-29.5 594.97,-36.5"/>
+</g>
+<!-- proc~initialize_type_ftcms -->
+<g id="proc~~output_history_output_manager~~CalledByGraph_node4" class="node">
+<title>proc~initialize_type_ftcms</title>
+<g id="a_proc~~output_history_output_manager~~CalledByGraph_node4"><a xlink:href="../proc/initialize_type_ftcms.html" xlink:title="initialize_type_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="343,-66 223,-66 223,-42 343,-42 343,-66"/>
+<text text-anchor="middle" x="283" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_type_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_ftcms&#45;&gt;interface~output_history_ftcms -->
+<g id="proc~~output_history_output_manager~~CalledByGraph_edge3" class="edge">
+<title>proc~initialize_type_ftcms&#45;&gt;interface~output_history_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M343.02,-47.44C351.29,-46.52 359.97,-45.56 368.77,-44.58"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="369.19,-48.06 378.74,-43.47 368.41,-41.1 369.19,-48.06"/>
+</g>
+<!-- proc~run_ftcms -->
+<g id="proc~~output_history_output_manager~~CalledByGraph_node5" class="node">
+<title>proc~run_ftcms</title>
+<g id="a_proc~~output_history_output_manager~~CalledByGraph_node5"><a xlink:href="../proc/run_ftcms.html" xlink:title="run_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="315.5,-24 250.5,-24 250.5,0 315.5,0 315.5,-24"/>
+<text text-anchor="middle" x="283" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftcms&#45;&gt;interface~output_history_ftcms -->
+<g id="proc~~output_history_output_manager~~CalledByGraph_edge4" class="edge">
+<title>proc~run_ftcms&#45;&gt;interface~output_history_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M315.63,-15.51C330.58,-17.18 349.36,-19.26 368.7,-21.41"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="368.52,-24.91 378.84,-22.54 369.29,-17.96 368.52,-24.91"/>
+</g>
+<!-- interface~initialize_type_ftcms -->
+<g id="proc~~output_history_output_manager~~CalledByGraph_node6" class="node">
+<title>interface~initialize_type_ftcms</title>
+<g id="a_proc~~output_history_output_manager~~CalledByGraph_node6"><a xlink:href="../interface/initialize_type_ftcms.html" xlink:title="type_ftcms%initialize_type_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="187,-66 0,-66 0,-42 187,-42 187,-66"/>
+<text text-anchor="middle" x="93.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%initialize_type_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_ftcms&#45;&gt;proc~initialize_type_ftcms -->
+<g id="proc~~output_history_output_manager~~CalledByGraph_edge5" class="edge">
+<title>interface~initialize_type_ftcms&#45;&gt;proc~initialize_type_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M187.15,-54C195.81,-54 204.48,-54 212.87,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="212.94,-57.5 222.94,-54 212.94,-50.5 212.94,-57.5"/>
+</g>
+<!-- interface~run_ftcms -->
+<g id="proc~~output_history_output_manager~~CalledByGraph_node7" class="node">
+<title>interface~run_ftcms</title>
+<g id="a_proc~~output_history_output_manager~~CalledByGraph_node7"><a xlink:href="../interface/run_ftcms.html" xlink:title="type_ftcms%run_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="160,-24 27,-24 27,0 160,0 160,-24"/>
+<text text-anchor="middle" x="93.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftcms&#45;&gt;proc~run_ftcms -->
+<g id="proc~~output_history_output_manager~~CalledByGraph_edge6" class="edge">
+<title>interface~run_ftcms&#45;&gt;proc~run_ftcms</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M160.08,-12C186.76,-12 216.79,-12 240.37,-12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="240.39,-15.5 250.39,-12 240.39,-8.5 240.39,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocoutput_history_output_managerCalledByGraph = svgPanZoom('#procoutput_history_output_managerCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">output_history_output_manager</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="nb">time</span><span class="p">,</span><span class="w"> </span><span class="n">temperature</span><span class="p">,</span><span class="w"> </span><span class="n">water_content</span><span class="p">,</span><span class="w"> </span><span class="n">ice_content</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                             </span><span class="n">vapor_content</span><span class="p">,</span><span class="w"> </span><span class="n">pressure</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_output_manager</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="nb">time</span>
+<span class="nb">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">temperature</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">water_content</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ice_content</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">vapor_content</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">pressure</span><span class="p">(:)</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">observation</span><span class="p">%</span><span class="n">output_history</span><span class="p">(</span><span class="nb">time</span><span class="o">=</span><span class="nb">time</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                             </span><span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                             </span><span class="n">water_content</span><span class="o">=</span><span class="n">water_content</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                             </span><span class="n">ice_content</span><span class="o">=</span><span class="n">ice_content</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                             </span><span class="n">vapor_content</span><span class="o">=</span><span class="n">vapor_content</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                             </span><span class="n">pressure</span><span class="o">=</span><span class="n">pressure</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">output_history_output_manager</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-03-11 14:03 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

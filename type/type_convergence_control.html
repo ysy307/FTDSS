@@ -10,7 +10,7 @@
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>type_convergence_control &ndash; FTDSS </title>
+    <title>type_convergence_control &ndash; FTCMS </title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -44,7 +44,7 @@
     <div class="container-fluid mb-sm-4 mb-xl-2">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
           <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
                   aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon">
@@ -92,20 +92,20 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.3% of total for derived types.</p>Including implementation: 30 statements,  0.1% of total for derived types.">10 statements</a>
+                 title="<p> 0.6% of total for derived types.</p>Including implementation: 20 statements,  0.1% of total for derived types.">20 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/iteration.F90"> Source File</a>
+              <a href="../src/convergence_interface.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/iteration.f90.html'>iteration.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/control_iteration.html'>control_iteration</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/convergence_interface.f90.html'>convergence_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/control_iteration_convergence.html'>control_iteration_convergence</a></li>
             <li class="breadcrumb-item active" aria-current="page">type_convergence_control</li>
           </ol>
         </nav>
@@ -134,11 +134,12 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_convergence_control.html#variable-combination_logic">combination_logic</a>
-            <a class="list-group-item" href="../type/type_convergence_control.html#variable-convergence_norm_type">convergence_norm_type</a>
-            <a class="list-group-item" href="../type/type_convergence_control.html#variable-norm_type~2">norm_type</a>
-            <a class="list-group-item" href="../type/type_convergence_control.html#variable-residual~2">residual</a>
-            <a class="list-group-item" href="../type/type_convergence_control.html#variable-update~4">update</a>
+            <a class="list-group-item" href="../type/type_convergence_control.html#variable-combination_logic~2">combination_logic</a>
+            <a class="list-group-item" href="../type/type_convergence_control.html#variable-convergence_norm_type~2">convergence_norm_type</a>
+            <a class="list-group-item" href="../type/type_convergence_control.html#variable-initialized~12">initialized</a>
+            <a class="list-group-item" href="../type/type_convergence_control.html#variable-norm_type~10">norm_type</a>
+            <a class="list-group-item" href="../type/type_convergence_control.html#variable-residual~3">residual</a>
+            <a class="list-group-item" href="../type/type_convergence_control.html#variable-update~5">update</a>
         </div>
       </div>
     </div>
@@ -165,6 +166,15 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/type_convergence_control.html#boundprocedure-check_convergence~4">check_convergence</a>
+            <a class="list-group-item" href="../type/type_convergence_control.html#boundprocedure-get_combination_logic">get_combination_logic</a>
+            <a class="list-group-item" href="../type/type_convergence_control.html#boundprocedure-get_convergence_norm_type">get_convergence_norm_type</a>
+            <a class="list-group-item" href="../type/type_convergence_control.html#boundprocedure-get_current_norm~4">get_current_norm</a>
+            <a class="list-group-item" href="../type/type_convergence_control.html#boundprocedure-get_norm_type">get_norm_type</a>
+            <a class="list-group-item" href="../type/type_convergence_control.html#boundprocedure-get_tolerances~4">get_tolerances</a>
+            <a class="list-group-item" href="../type/type_convergence_control.html#boundprocedure-initialize~54">initialize</a>
+            <a class="list-group-item" href="../type/type_convergence_control.html#boundprocedure-is_initialized~8">is_initialized</a>
+            <a class="list-group-item" href="../type/type_convergence_control.html#boundprocedure-reset~22">reset</a>
             <a class="list-group-item" href="../type/type_convergence_control.html#boundprocedure-should_check_residual">should_check_residual</a>
             <a class="list-group-item" href="../type/type_convergence_control.html#boundprocedure-should_check_update">should_check_update</a>
         </div>
@@ -187,7 +197,7 @@
     
     <div class="col-md-9" id='text'>
       <h2 id="type-def-statement">
-        type, private :: type_convergence_control</h2>
+        type, public :: type_convergence_control</h2>
     <p>Overall convergence control settings</p>
 <br>      <div class="card">
         <div class="card-header">
@@ -318,80 +328,80 @@ large graphs.</div>
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: type~~type_convergence_control~~InheritedByGraph Pages: 1 -->
-<svg id="typetype_convergence_controlInheritedByGraph" width="641pt" height="24pt"
- viewBox="0.00 0.00 641.00 23.55" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="type~~type_convergence_control~~InheritedByGraph" class="graph" transform="scale(0.74 0.74) rotate(0) translate(4 28)">
+<svg id="typetype_convergence_controlInheritedByGraph" width="641pt" height="23pt"
+ viewBox="0.00 0.00 641.00 23.26" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_convergence_control~~InheritedByGraph" class="graph" transform="scale(0.73 0.73) rotate(0) translate(4 28)">
 <title>type~~type_convergence_control~~InheritedByGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 867,-28 867,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 878,-28 878,4 -4,4"/>
 <!-- type~type_convergence_control -->
 <g id="type~~type_convergence_control~~InheritedByGraph_node1" class="node">
 <title>type~type_convergence_control</title>
 <polygon fill="none" stroke="black" points="153,-24 0,-24 0,0 153,0 153,-24"/>
 <text text-anchor="middle" x="76.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_convergence_control</text>
 </g>
-<!-- type~type_iterator_config -->
+<!-- type~type_iteration_setting -->
 <g id="type~~type_convergence_control~~InheritedByGraph_node2" class="node">
-<title>type~type_iterator_config</title>
-<g id="a_type~~type_convergence_control~~InheritedByGraph_node2"><a xlink:href="../type/type_iterator_config.html" xlink:title="type_iterator_config">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="408,-24 289,-24 289,0 408,0 408,-24"/>
-<text text-anchor="middle" x="348.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iterator_config</text>
+<title>type~type_iteration_setting</title>
+<g id="a_type~~type_convergence_control~~InheritedByGraph_node2"><a xlink:href="../type/type_iteration_setting.html" xlink:title="type_iteration_setting">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="416,-24 289,-24 289,0 416,0 416,-24"/>
+<text text-anchor="middle" x="352.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration_setting</text>
 </a>
 </g>
 </g>
-<!-- type~type_iterator_config&#45;&gt;type~type_convergence_control -->
+<!-- type~type_iteration_setting&#45;&gt;type~type_convergence_control -->
 <g id="type~~type_convergence_control~~InheritedByGraph_edge1" class="edge">
-<title>type~type_iterator_config&#45;&gt;type~type_convergence_control</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M288.91,-12C252.24,-12 204.35,-12 163.42,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="163.18,-8.5 153.18,-12 163.18,-15.5 163.18,-8.5"/>
+<title>type~type_iteration_setting&#45;&gt;type~type_convergence_control</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M288.98,-12C251.78,-12 204.05,-12 163.35,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="163.17,-8.5 153.17,-12 163.17,-15.5 163.17,-8.5"/>
 <text text-anchor="middle" x="221" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">convergence_control</text>
 </g>
 <!-- type~type_iteration -->
 <g id="type~~type_convergence_control~~InheritedByGraph_node3" class="node">
 <title>type~type_iteration</title>
 <g id="a_type~~type_convergence_control~~InheritedByGraph_node3"><a xlink:href="../type/type_iteration.html" xlink:title="type_iteration">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="560,-24 474,-24 474,0 560,0 560,-24"/>
-<text text-anchor="middle" x="517" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration</text>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="578,-24 492,-24 492,0 578,0 578,-24"/>
+<text text-anchor="middle" x="535" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration</text>
 </a>
 </g>
 </g>
-<!-- type~type_iteration&#45;&gt;type~type_iterator_config -->
+<!-- type~type_iteration&#45;&gt;type~type_iteration_setting -->
 <g id="type~~type_convergence_control~~InheritedByGraph_edge2" class="edge">
-<title>type~type_iteration&#45;&gt;type~type_iterator_config</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M473.99,-12C457.08,-12 437.14,-12 418.24,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="418.17,-8.5 408.17,-12 418.17,-15.5 418.17,-8.5"/>
-<text text-anchor="middle" x="441" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">config</text>
+<title>type~type_iteration&#45;&gt;type~type_iteration_setting</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M491.68,-12C472.16,-12 448.43,-12 426.18,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="426.08,-8.5 416.08,-12 426.08,-15.5 426.08,-8.5"/>
+<text text-anchor="middle" x="454" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">settings</text>
 </g>
-<!-- type~type_controls -->
+<!-- type~type_control -->
 <g id="type~~type_convergence_control~~InheritedByGraph_node4" class="node">
-<title>type~type_controls</title>
-<g id="a_type~~type_convergence_control~~InheritedByGraph_node4"><a xlink:href="../type/type_controls.html" xlink:title="type_controls">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="721,-24 638,-24 638,0 721,0 721,-24"/>
-<text text-anchor="middle" x="679.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_controls</text>
+<title>type~type_control</title>
+<g id="a_type~~type_convergence_control~~InheritedByGraph_node4"><a xlink:href="../type/type_control.html" xlink:title="type_control">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="734,-24 656,-24 656,0 734,0 734,-24"/>
+<text text-anchor="middle" x="695" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_control</text>
 </a>
 </g>
 </g>
-<!-- type~type_controls&#45;&gt;type~type_iteration -->
+<!-- type~type_control&#45;&gt;type~type_iteration -->
 <g id="type~~type_convergence_control~~InheritedByGraph_edge3" class="edge">
-<title>type~type_controls&#45;&gt;type~type_iteration</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M638,-12C617.48,-12 592.31,-12 570.34,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="570.17,-8.5 560.17,-12 570.17,-15.5 570.17,-8.5"/>
-<text text-anchor="middle" x="599" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">iteration</text>
+<title>type~type_control&#45;&gt;type~type_iteration</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M655.75,-12C635.49,-12 610.3,-12 588.26,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="588.06,-8.5 578.06,-12 588.06,-15.5 588.06,-8.5"/>
+<text text-anchor="middle" x="617" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">iteration</text>
 </g>
-<!-- type~type_ftdss -->
+<!-- type~type_ftcms -->
 <g id="type~~type_convergence_control~~InheritedByGraph_node5" class="node">
-<title>type~type_ftdss</title>
-<g id="a_type~~type_convergence_control~~InheritedByGraph_node5"><a xlink:href="../type/type_ftdss.html" xlink:title="type_ftdss">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="863,-24 797,-24 797,0 863,0 863,-24"/>
-<text text-anchor="middle" x="830" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss</text>
+<title>type~type_ftcms</title>
+<g id="a_type~~type_convergence_control~~InheritedByGraph_node5"><a xlink:href="../type/type_ftcms.html" xlink:title="type_ftcms">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="874,-24 804,-24 804,0 874,0 874,-24"/>
+<text text-anchor="middle" x="839" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms</text>
 </a>
 </g>
 </g>
-<!-- type~type_ftdss&#45;&gt;type~type_controls -->
+<!-- type~type_ftcms&#45;&gt;type~type_control -->
 <g id="type~~type_convergence_control~~InheritedByGraph_edge4" class="edge">
-<title>type~type_ftdss&#45;&gt;type~type_controls</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M796.78,-12C777.63,-12 752.93,-12 731.21,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="731.16,-8.5 721.16,-12 731.16,-15.5 731.16,-8.5"/>
-<text text-anchor="middle" x="759" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">controls</text>
+<title>type~type_ftcms&#45;&gt;type~type_control</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M803.99,-12C786.18,-12 764.07,-12 744.5,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="744.24,-8.5 734.24,-12 744.24,-15.5 744.24,-8.5"/>
+<text text-anchor="middle" x="769" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">control</text>
 </g>
 </g>
 </svg>
@@ -466,7 +476,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-combination_logic"></span>
+              <span class="anchor" id="variable-combination_logic~2"></span>
               type(<a href='type_constant_id.html'>type_constant_id</a>),
             </td>
               <td>private</td>
@@ -483,7 +493,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-convergence_norm_type"></span>
+              <span class="anchor" id="variable-convergence_norm_type~2"></span>
               type(<a href='type_constant_id.html'>type_constant_id</a>),
             </td>
               <td>private</td>
@@ -503,7 +513,24 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-norm_type~2"></span>
+              <span class="anchor" id="variable-initialized~12"></span>
+              logical,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>initialized</strong></td>
+<td> =</td>
+                <td>.false.</td>
+            <td>
+                <p>Flag to indicate whether this control has been initialized</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-norm_type~10"></span>
               type(<a href='type_constant_id.html'>type_constant_id</a>),
             </td>
               <td>private</td>
@@ -520,7 +547,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-residual~2"></span>
+              <span class="anchor" id="variable-residual~3"></span>
               type(<a href='type_convergence_criterion.html'>type_convergence_criterion</a>),
             </td>
               <td>private</td>
@@ -537,7 +564,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-update~4"></span>
+              <span class="anchor" id="variable-update~5"></span>
               type(<a href='type_convergence_criterion.html'>type_convergence_criterion</a>),
             </td>
               <td>private</td>
@@ -565,19 +592,280 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-should_check_residual"></span>
+      <span class="anchor" id="boundprocedure-check_convergence~4"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>should_check_residual</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/should_check_residual_convergence_control.html'>should_check_residual_convergence_control</a>
+  <strong>check_convergence</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/check_convergence_control.html'>check_convergence_control</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
+                <h3>interface </h3>
                     <h3>
-    private pure function <a href='../proc/should_check_residual_convergence_control.html'>should_check_residual_convergence_control</a>(self) result(should_check)  
+    private module function check_convergence_control(self, physics_type, nonlinear_iter, residual_vector, update_vector) result(is_ok)  
+    <a href="../proc/check_convergence_control.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_convergence_control.html'>type_convergence_control</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nonlinear_iter</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>residual_vector</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>update_vector</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
     
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_combination_logic"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_combination_logic</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/get_combination_logic_convergence_control.html'>get_combination_logic_convergence_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine get_combination_logic_convergence_control(self, combination_logic)  
+    <a href="../proc/get_combination_logic_convergence_control.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_convergence_control.html'>type_convergence_control</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>combination_logic</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_convergence_norm_type"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_convergence_norm_type</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/get_convergence_norm_type_convergence_control.html'>get_convergence_norm_type_convergence_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine get_convergence_norm_type_convergence_control(self, convergence_norm_type)  
+    <a href="../proc/get_convergence_norm_type_convergence_control.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_convergence_control.html'>type_convergence_control</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>convergence_norm_type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_current_norm~4"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_current_norm</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/get_current_norm_convergence_control.html'>get_current_norm_convergence_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine get_current_norm_convergence_control(self, physics_type, criteria_type, norm_type, nonlinear_iter, current_norm)  
+    <a href="../proc/get_current_norm_convergence_control.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
 
   
 
@@ -604,7 +892,522 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>criteria_type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>norm_type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nonlinear_iter</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_norm</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
 
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_norm_type"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_norm_type</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/get_norm_type_convergence_control.html'>get_norm_type_convergence_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine get_norm_type_convergence_control(self, norm_type)  
+    <a href="../proc/get_norm_type_convergence_control.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_convergence_control.html'>type_convergence_control</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>norm_type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_tolerances~4"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_tolerances</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/get_tolerances_convergence_control.html'>get_tolerances_convergence_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine get_tolerances_convergence_control(self, physics_type, absolute_tolerance, relative_tolerance)  
+    <a href="../proc/get_tolerances_convergence_control.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_convergence_control.html'>type_convergence_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>absolute_tolerance</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>relative_tolerance</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-initialize~54"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>initialize</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/initialize_convergence_control.html'>initialize_convergence_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine initialize_convergence_control(self, config, max_iterations, reference_values)  
+    <a href="../proc/initialize_convergence_control.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_convergence_control.html'>type_convergence_control</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_config_iteration_nonlinear.html'>type_config_iteration_nonlinear</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>config</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>max_iterations</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>reference_values</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_initialized~8"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_initialized</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/is_initialized_convergence_control.html'>is_initialized_convergence_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private pure module function is_initialized_convergence_control(self) result(is_initialized)  
+    <a href="../proc/is_initialized_convergence_control.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_convergence_control.html'>type_convergence_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-reset~22"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>reset</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/reset_convergence_control.html'>reset_convergence_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine reset_convergence_control(self)  
+    <a href="../proc/reset_convergence_control.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_convergence_control.html'>type_convergence_control</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-should_check_residual"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>should_check_residual</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/should_check_residual_convergence_control.html'>should_check_residual_convergence_control</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private pure module function should_check_residual_convergence_control(self) result(should_check)  
+    <a href="../proc/should_check_residual_convergence_control.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_convergence_control.html'>type_convergence_control</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
             </td>
         </tr>
     </tbody>
@@ -627,16 +1430,17 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-should_check_update"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>should_check_update</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/should_check_update_convergence_control.html'>should_check_update_convergence_control</a>
+  <strong>should_check_update</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/should_check_update_convergence_control.html'>should_check_update_convergence_control</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
+                <h3>interface </h3>
                     <h3>
-    private pure function <a href='../proc/should_check_update_convergence_control.html'>should_check_update_convergence_control</a>(self) result(should_check)  
+    private pure module function should_check_update_convergence_control(self) result(should_check)  
+    <a href="../proc/should_check_update_convergence_control.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
-    
 
   
 
@@ -663,7 +1467,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-
+                
             </td>
         </tr>
     </tbody>
@@ -685,6 +1489,8 @@ large graphs.</div>
     <section>
     <h3><span class="anchor" id="src"></span>Source Code</h3>
     <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_convergence_control</span>
+<span class="w">        </span><span class="c">!&gt; Flag to indicate whether this control has been initialized</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialized</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
 <span class="w">        </span><span class="c">!&gt; Norm type used for convergence check (L2, LInf, etc.)</span>
 <span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_constant_id</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">norm_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NORM_TYPES</span><span class="p">%</span><span class="n">L2</span>
 <span class="w">        </span><span class="c">!&gt; Combination logic between multiple criteria (Residual and Update) (AND, OR)</span>
@@ -699,8 +1505,23 @@ large graphs.</div>
 <span class="w">        </span><span class="c">!&gt; Update vector convergence criteria (for each physical quantity)</span>
 <span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_convergence_criterion</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">update</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">NUM_ID</span><span class="p">)</span>
 <span class="w">    </span><span class="k">contains</span>
-<span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">should_check_residual</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">should_check_residual_convergence_control</span>
+<span class="w">        </span><span class="c">! ---- Lifecycle ----</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">initialize_convergence_control</span>
+<span class="w">        </span><span class="c">! ---- Mutator ----</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">reset</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">reset_convergence_control</span>
+<span class="w">        </span><span class="c">! ---- Algorithm / Operation ----</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">check_convergence</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">check_convergence_control</span>
+<span class="w">        </span><span class="c">! ---- Inquiry ----</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_initialized</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_initialized_convergence_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">should_check_residual</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">should_check_residual_convergence_control</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">should_check_update</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">should_check_update_convergence_control</span>
+<span class="w">        </span><span class="c">! ---- Getter ----</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_norm_type</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_norm_type_convergence_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_combination_logic</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_combination_logic_convergence_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_convergence_norm_type</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_convergence_norm_type_convergence_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_current_norm</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_current_norm_convergence_control</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_tolerances</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_tolerances_convergence_control</span>
+<span class="w">        </span><span class="c">! ---- Meta / Utility ----</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_convergence_control</span>
 </pre></div>
 
@@ -716,7 +1537,7 @@ large graphs.</div>
         <div class="row justify-content-between">
           <div class="col">
             <p>
-              FTDSS
+              FTCMS
  was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
@@ -724,7 +1545,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-23 23:52 +0000             </p>
+ on 2026-03-11 14:03 +0000             </p>
           </div>
         </div>
         <br>

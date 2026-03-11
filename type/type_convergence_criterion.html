@@ -10,7 +10,7 @@
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>type_convergence_criterion &ndash; FTDSS </title>
+    <title>type_convergence_criterion &ndash; FTCMS </title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -44,7 +44,7 @@
     <div class="container-fluid mb-sm-4 mb-xl-2">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
           <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
                   aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon">
@@ -92,20 +92,20 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.4% of total for derived types.</p>Including implementation: 82 statements,  0.4% of total for derived types.">12 statements</a>
+                 title="<p> 0.5% of total for derived types.</p>Including implementation: 17 statements,  0.1% of total for derived types.">17 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/iteration.F90"> Source File</a>
+              <a href="../src/convergence_interface.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/iteration.f90.html'>iteration.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/control_iteration.html'>control_iteration</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/convergence_interface.f90.html'>convergence_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/control_iteration_convergence.html'>control_iteration_convergence</a></li>
             <li class="breadcrumb-item active" aria-current="page">type_convergence_criterion</li>
           </ol>
         </nav>
@@ -134,12 +134,14 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-absolute_tolerance~2">absolute_tolerance</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-absolute_tolerance~6">absolute_tolerance</a>
             <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-criterion">criterion</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-initialized~11">initialized</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-max_iterations~9">max_iterations</a>
             <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-norms_history">norms_history</a>
-            <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-reference_value">reference_value</a>
-            <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-relative_tolerance~2">relative_tolerance</a>
-            <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-should_check">should_check</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-reference_value~2">reference_value</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-relative_tolerance~6">relative_tolerance</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-should_check~4">should_check</a>
         </div>
       </div>
     </div>
@@ -166,9 +168,12 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-check~3">check</a>
-            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-initialize~45">initialize</a>
-            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-reset~10">reset</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-check_convergence~3">check_convergence</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-destroy~22">destroy</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-get_current_norm~3">get_current_norm</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-get_tolerances~3">get_tolerances</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-initialize~53">initialize</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-reset~21">reset</a>
         </div>
       </div>
     </div>
@@ -189,7 +194,7 @@
     
     <div class="col-md-9" id='text'>
       <h2 id="type-def-statement">
-        type, private :: type_convergence_criterion</h2>
+        type, public :: type_convergence_criterion</h2>
     <p>Individual convergence criterion (residual or update, for one physical quantity)</p>
 <br>      <div class="card">
         <div class="card-header">
@@ -294,10 +299,10 @@ large graphs.</div>
  -->
 <!-- Title: type~~type_convergence_criterion~~InheritedByGraph Pages: 1 -->
 <svg id="typetype_convergence_criterionInheritedByGraph" width="641pt" height="18pt"
- viewBox="0.00 0.00 641.00 17.88" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="type~~type_convergence_criterion~~InheritedByGraph" class="graph" transform="scale(0.56 0.56) rotate(0) translate(4 28)">
+ viewBox="0.00 0.00 641.00 17.71" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_convergence_criterion~~InheritedByGraph" class="graph" transform="scale(0.55 0.55) rotate(0) translate(4 28)">
 <title>type~~type_convergence_criterion~~InheritedByGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 1143,-28 1143,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 1154,-28 1154,4 -4,4"/>
 <!-- type~type_convergence_criterion -->
 <g id="type~~type_convergence_criterion~~InheritedByGraph_node1" class="node">
 <title>type~type_convergence_criterion</title>
@@ -320,69 +325,69 @@ large graphs.</div>
 <polygon fill="#ff0000" stroke="#ff0000" points="171.29,-8.5 161.29,-12 171.29,-15.5 171.29,-8.5"/>
 <text text-anchor="middle" x="218.5" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">residual, update</text>
 </g>
-<!-- type~type_iterator_config -->
+<!-- type~type_iteration_setting -->
 <g id="type~~type_convergence_criterion~~InheritedByGraph_node3" class="node">
-<title>type~type_iterator_config</title>
-<g id="a_type~~type_convergence_criterion~~InheritedByGraph_node3"><a xlink:href="../type/type_iterator_config.html" xlink:title="type_iterator_config">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="684,-24 565,-24 565,0 684,0 684,-24"/>
-<text text-anchor="middle" x="624.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iterator_config</text>
+<title>type~type_iteration_setting</title>
+<g id="a_type~~type_convergence_criterion~~InheritedByGraph_node3"><a xlink:href="../type/type_iteration_setting.html" xlink:title="type_iteration_setting">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="692,-24 565,-24 565,0 692,0 692,-24"/>
+<text text-anchor="middle" x="628.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration_setting</text>
 </a>
 </g>
 </g>
-<!-- type~type_iterator_config&#45;&gt;type~type_convergence_control -->
+<!-- type~type_iteration_setting&#45;&gt;type~type_convergence_control -->
 <g id="type~~type_convergence_criterion~~InheritedByGraph_edge2" class="edge">
-<title>type~type_iterator_config&#45;&gt;type~type_convergence_control</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M564.91,-12C528.24,-12 480.35,-12 439.42,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="439.18,-8.5 429.18,-12 439.18,-15.5 439.18,-8.5"/>
+<title>type~type_iteration_setting&#45;&gt;type~type_convergence_control</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M564.98,-12C527.78,-12 480.05,-12 439.35,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="439.17,-8.5 429.17,-12 439.17,-15.5 439.17,-8.5"/>
 <text text-anchor="middle" x="497" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">convergence_control</text>
 </g>
 <!-- type~type_iteration -->
 <g id="type~~type_convergence_criterion~~InheritedByGraph_node4" class="node">
 <title>type~type_iteration</title>
 <g id="a_type~~type_convergence_criterion~~InheritedByGraph_node4"><a xlink:href="../type/type_iteration.html" xlink:title="type_iteration">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="836,-24 750,-24 750,0 836,0 836,-24"/>
-<text text-anchor="middle" x="793" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration</text>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="854,-24 768,-24 768,0 854,0 854,-24"/>
+<text text-anchor="middle" x="811" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration</text>
 </a>
 </g>
 </g>
-<!-- type~type_iteration&#45;&gt;type~type_iterator_config -->
+<!-- type~type_iteration&#45;&gt;type~type_iteration_setting -->
 <g id="type~~type_convergence_criterion~~InheritedByGraph_edge3" class="edge">
-<title>type~type_iteration&#45;&gt;type~type_iterator_config</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M749.99,-12C733.08,-12 713.14,-12 694.24,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="694.17,-8.5 684.17,-12 694.17,-15.5 694.17,-8.5"/>
-<text text-anchor="middle" x="717" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">config</text>
+<title>type~type_iteration&#45;&gt;type~type_iteration_setting</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M767.68,-12C748.16,-12 724.43,-12 702.18,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="702.08,-8.5 692.08,-12 702.08,-15.5 702.08,-8.5"/>
+<text text-anchor="middle" x="730" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">settings</text>
 </g>
-<!-- type~type_controls -->
+<!-- type~type_control -->
 <g id="type~~type_convergence_criterion~~InheritedByGraph_node5" class="node">
-<title>type~type_controls</title>
-<g id="a_type~~type_convergence_criterion~~InheritedByGraph_node5"><a xlink:href="../type/type_controls.html" xlink:title="type_controls">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="997,-24 914,-24 914,0 997,0 997,-24"/>
-<text text-anchor="middle" x="955.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_controls</text>
+<title>type~type_control</title>
+<g id="a_type~~type_convergence_criterion~~InheritedByGraph_node5"><a xlink:href="../type/type_control.html" xlink:title="type_control">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1010,-24 932,-24 932,0 1010,0 1010,-24"/>
+<text text-anchor="middle" x="971" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_control</text>
 </a>
 </g>
 </g>
-<!-- type~type_controls&#45;&gt;type~type_iteration -->
+<!-- type~type_control&#45;&gt;type~type_iteration -->
 <g id="type~~type_convergence_criterion~~InheritedByGraph_edge4" class="edge">
-<title>type~type_controls&#45;&gt;type~type_iteration</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M914,-12C893.48,-12 868.31,-12 846.34,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="846.17,-8.5 836.17,-12 846.17,-15.5 846.17,-8.5"/>
-<text text-anchor="middle" x="875" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">iteration</text>
+<title>type~type_control&#45;&gt;type~type_iteration</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M931.75,-12C911.49,-12 886.3,-12 864.26,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="864.06,-8.5 854.06,-12 864.06,-15.5 864.06,-8.5"/>
+<text text-anchor="middle" x="893" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">iteration</text>
 </g>
-<!-- type~type_ftdss -->
+<!-- type~type_ftcms -->
 <g id="type~~type_convergence_criterion~~InheritedByGraph_node6" class="node">
-<title>type~type_ftdss</title>
-<g id="a_type~~type_convergence_criterion~~InheritedByGraph_node6"><a xlink:href="../type/type_ftdss.html" xlink:title="type_ftdss">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="1139,-24 1073,-24 1073,0 1139,0 1139,-24"/>
-<text text-anchor="middle" x="1106" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss</text>
+<title>type~type_ftcms</title>
+<g id="a_type~~type_convergence_criterion~~InheritedByGraph_node6"><a xlink:href="../type/type_ftcms.html" xlink:title="type_ftcms">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1150,-24 1080,-24 1080,0 1150,0 1150,-24"/>
+<text text-anchor="middle" x="1115" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms</text>
 </a>
 </g>
 </g>
-<!-- type~type_ftdss&#45;&gt;type~type_controls -->
+<!-- type~type_ftcms&#45;&gt;type~type_control -->
 <g id="type~~type_convergence_criterion~~InheritedByGraph_edge5" class="edge">
-<title>type~type_ftdss&#45;&gt;type~type_controls</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1072.78,-12C1053.63,-12 1028.93,-12 1007.21,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="1007.16,-8.5 997.16,-12 1007.16,-15.5 1007.16,-8.5"/>
-<text text-anchor="middle" x="1035" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">controls</text>
+<title>type~type_ftcms&#45;&gt;type~type_control</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1079.99,-12C1062.18,-12 1040.07,-12 1020.5,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1020.24,-8.5 1010.24,-12 1020.24,-15.5 1020.24,-8.5"/>
+<text text-anchor="middle" x="1045" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">control</text>
 </g>
 </g>
 </svg>
@@ -457,7 +462,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-absolute_tolerance~2"></span>
+              <span class="anchor" id="variable-absolute_tolerance~6"></span>
               real(kind=real64),
             </td>
               <td>private</td>
@@ -491,6 +496,40 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
+              <span class="anchor" id="variable-initialized~11"></span>
+              logical,
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>initialized</strong></td>
+<td> =</td>
+                <td>.false.</td>
+            <td>
+                <p>Flag to indicate whether this criterion has been initialized</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-max_iterations~9"></span>
+              integer(kind=int32),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>max_iterations</strong></td>
+<td> =</td>
+                <td>0</td>
+            <td>
+                <p>Maximum number of iterations for which to store norm history (used for convergence check and debugging)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
               <span class="anchor" id="variable-norms_history"></span>
               real(kind=real64),
             </td>
@@ -512,7 +551,7 @@ Dimension: (num_norm_type, max_iteration)
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-reference_value"></span>
+              <span class="anchor" id="variable-reference_value~2"></span>
               real(kind=real64),
             </td>
               <td>private</td>
@@ -532,7 +571,7 @@ Typically, this should be set to the characteristic physical scale (e.g., max-mi
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-relative_tolerance~2"></span>
+              <span class="anchor" id="variable-relative_tolerance~6"></span>
               real(kind=real64),
             </td>
               <td>private</td>
@@ -544,12 +583,12 @@ Typically, this should be set to the characteristic physical scale (e.g., max-mi
 <td> =</td>
                 <td>1.0d-6</td>
             <td>
-                <p>Tolerance of relative error</p>
+                <p>Tolerance of relative errorF</p>
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-should_check"></span>
+              <span class="anchor" id="variable-should_check~4"></span>
               logical,
             </td>
               <td>private</td>
@@ -577,267 +616,20 @@ Typically, this should be set to the characteristic physical scale (e.g., max-mi
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-check~3"></span>
+      <span class="anchor" id="boundprocedure-check_convergence~3"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>check</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/check_convergence_criterion.html'>check_convergence_criterion</a>
+  <strong>check_convergence</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/check_convergence_criterion.html'>check_convergence_criterion</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
+                <h3>interface </h3>
                     <h3>
-    private  function <a href='../proc/check_convergence_criterion.html'>check_convergence_criterion</a>(self, vector, iter, norm_type) result(is_ok)  
+    private module function check_convergence_criterion(self, vector, iter, norm_type) result(is_ok)  
+    <a href="../proc/check_convergence_criterion.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
-    
-
-  <p>Calculate norms, store them in history, and check convergence criteria.</p>
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              class(<a href='type_convergence_criterion.html'>type_convergence_criterion</a>),
-            </td>
-<td>intent(inout)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>self</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>vector</strong>(:)</td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              integer(kind=int32),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>iter</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              type(<a href='type_constant_id.html'>type_constant_id</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>norm_type</strong></td>
-            <td>
-
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-    <h4>
-    Return Value
-    <small>logical</small>
-    </h4>
-    
-
-          </li>
-      </ul>
-  </div>
-
-          </div>
-          <div class="row">
-              <div class="card mt-3">
-    <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~45"></span>
-      <h3>
-          procedure, public, pass(self) ::
-  <strong>initialize</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/initialize_type_convergence_criterion.html'>initialize_type_convergence_criterion</a>
-        
-      </h3>
-    </div>
-      <ul class="list-group">
-          <li class="list-group-item">
-                    <h3>
-    private  subroutine <a href='../proc/initialize_type_convergence_criterion.html'>initialize_type_convergence_criterion</a>(self, should_check, criterion, absolute_tolerance, relative_tolerance, max_iterations, reference_value)  
-</h3>
-    
-
-  <p>Initialize convergence criterion</p>
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              class(<a href='type_convergence_criterion.html'>type_convergence_criterion</a>),
-            </td>
-<td>intent(inout)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>self</strong></td>
-            <td>
-<p>Initialize the convergence criterion with specified parameters.</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              logical,
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>should_check</strong></td>
-            <td>
-<p>Flag to indicate whether to check this criterion</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              type(<a href='type_constant_id.html'>type_constant_id</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>criterion</strong></td>
-            <td>
-<p>Criterion type (Absolute, Relative, Both, None)</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>absolute_tolerance</strong></td>
-            <td>
-<p>Tolerance of absolute error</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>relative_tolerance</strong></td>
-            <td>
-<p>Tolerance of relative error</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              integer(kind=int32),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>max_iterations</strong></td>
-            <td>
-<p>Maximum number of iterations for allocating norm history</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>reference_value</strong></td>
-            <td>
-<p>Reference value for relative error calculation</p>
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-          </li>
-      </ul>
-  </div>
-
-          </div>
-          <div class="row">
-              <div class="card mt-3">
-    <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-reset~10"></span>
-      <h3>
-          procedure, public, pass(self) ::
-  <strong>reset</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/reset_criterion.html'>reset_criterion</a>
-        
-      </h3>
-    </div>
-      <ul class="list-group">
-          <li class="list-group-item">
-                    <h3>
-    private  subroutine <a href='../proc/reset_criterion.html'>reset_criterion</a>(self)  
-</h3>
-    
 
   
 
@@ -864,7 +656,467 @@ Typically, this should be set to the characteristic physical scale (e.g., max-mi
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>vector</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>iter</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>norm_type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
 
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-destroy~22"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>destroy</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/destroy_type_convergence_criterion.html'>destroy_type_convergence_criterion</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine destroy_type_convergence_criterion(self)  
+    <a href="../proc/destroy_type_convergence_criterion.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_convergence_criterion.html'>type_convergence_criterion</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_current_norm~3"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_current_norm</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/get_current_norm_convergence_criterion.html'>get_current_norm_convergence_criterion</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine get_current_norm_convergence_criterion(self, norm_type, nonlinear_iter, current_norm)  
+    <a href="../proc/get_current_norm_convergence_criterion.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_convergence_criterion.html'>type_convergence_criterion</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>norm_type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nonlinear_iter</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_norm</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_tolerances~3"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_tolerances</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/get_tolerances_convergence_criterion.html'>get_tolerances_convergence_criterion</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine get_tolerances_convergence_criterion(self, absolute_tolerance, relative_tolerance)  
+    <a href="../proc/get_tolerances_convergence_criterion.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_convergence_criterion.html'>type_convergence_criterion</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>absolute_tolerance</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>relative_tolerance</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-initialize~53"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>initialize</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/initialize_type_convergence_criterion.html'>initialize_type_convergence_criterion</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine initialize_type_convergence_criterion(self, config, should_check, max_iterations, reference_value)  
+    <a href="../proc/initialize_type_convergence_criterion.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_convergence_criterion.html'>type_convergence_criterion</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_config_iteration_criterion.html'>type_config_iteration_criterion</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>config</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              logical,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>should_check</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>max_iterations</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>reference_value</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-reset~21"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>reset</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/reset_criterion.html'>reset_criterion</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine reset_criterion(self)  
+    <a href="../proc/reset_criterion.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_convergence_criterion.html'>type_convergence_criterion</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
             </td>
         </tr>
     </tbody>
@@ -881,30 +1133,42 @@ Typically, this should be set to the characteristic physical scale (e.g., max-mi
     <section>
     <h3><span class="anchor" id="src"></span>Source Code</h3>
     <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_convergence_criterion</span>
+<span class="w">        </span><span class="c">!&gt; Flag to indicate whether this criterion has been initialized</span>
+<span class="w">        </span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialized</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
 <span class="w">        </span><span class="c">!&gt; Flags whether to check convergence for this criterion</span>
 <span class="w">        </span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">should_check</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
 <span class="w">        </span><span class="c">!&gt; Criterion type (Absolute, Relative, Both, None)</span>
 <span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_constant_id</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">criterion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NONLINEAR_CRITERIA</span><span class="p">%</span><span class="k">none</span>
 <span class="w">        </span><span class="c">!&gt; Tolerance of absolute error</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">absolute_tolerance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d-8</span>
-<span class="w">        </span><span class="c">!&gt; Tolerance of relative error</span>
+<span class="w">        </span><span class="c">!&gt; Tolerance of relative errorF</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">relative_tolerance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d-6</span>
+<span class="w">        </span><span class="c">!&gt; Maximum number of iterations for which to store norm history (used for convergence check and debugging)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">max_iterations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
 <span class="w">        </span><span class="c">!&gt; Reference value for relative error evaluation.</span>
 <span class="w">        </span><span class="c">!&gt; This value is used as the denominator to normalize the error.</span>
 <span class="w">        </span><span class="c">!&gt; The default is 1.0, which effectively performs an absolute error check.</span>
 <span class="w">        </span><span class="c">!&gt; Typically, this should be set to the characteristic physical scale (e.g., max-min range).</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">reference_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span>
-
 <span class="w">        </span><span class="c">!&gt; Norm history for each iteration</span>
 <span class="w">        </span><span class="c">!&gt; Dimension: (num_norm_type, max_iteration)</span>
 <span class="w">        </span><span class="c">!&gt; (1,:) -&gt; L1 norm history</span>
 <span class="w">        </span><span class="c">!&gt; (2,:) -&gt; L2 norm history</span>
 <span class="w">        </span><span class="c">!&gt; (3,:) -&gt; LInf norm history</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">norms_history</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">norms_history</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span>
 <span class="w">    </span><span class="k">contains</span>
-<span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">initialize_type_convergence_criterion</span>
+<span class="w">        </span><span class="c">! ---- Lifecycle ----</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">initialize_type_convergence_criterion</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">destroy</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">destroy_type_convergence_criterion</span>
+<span class="w">        </span><span class="c">! ---- Mutator ----</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">reset</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">reset_criterion</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">check</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">check_convergence_criterion</span>
+<span class="w">        </span><span class="c">! ---- Algorithm / Operation ----</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">check_convergence</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">check_convergence_criterion</span>
+<span class="w">        </span><span class="c">! ---- Inquiry ----</span>
+<span class="w">        </span><span class="c">! ---- Getter ----</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_current_norm</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_current_norm_convergence_criterion</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_tolerances</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_tolerances_convergence_criterion</span>
+<span class="w">        </span><span class="c">! ---- Meta / Utility ----</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_convergence_criterion</span>
 </pre></div>
 
@@ -920,7 +1184,7 @@ Typically, this should be set to the characteristic physical scale (e.g., max-mi
         <div class="row justify-content-between">
           <div class="col">
             <p>
-              FTDSS
+              FTCMS
  was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
@@ -928,7 +1192,7 @@ Typically, this should be set to the characteristic physical scale (e.g., max-mi
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-23 23:52 +0000             </p>
+ on 2026-03-11 14:03 +0000             </p>
           </div>
         </div>
         <br>

@@ -1,9 +1,9 @@
-module physics_materials_thermal_conductivity
+module materials_thermal_conductivity
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
-    use :: module_core, only:type_state, type_physics_info, allocate_array, type_coordinate_dp
-    use :: physics_constants, only:TtoK => celsius_to_kelvin
-    use :: physics_materials_base, only:abst_material
+    use :: module_core, only:type_state, type_config_constitutive, allocate_array, type_coordinate_dp, type_state_thc
+    use :: constitutive_constants, only:TtoK => celsius_to_kelvin
+    use :: materials_base, only:abst_material
     implicit none
     private
 
@@ -13,7 +13,7 @@ module physics_materials_thermal_conductivity
     public :: type_thc_2phase
     public :: type_thc_3phase
     public :: type_thc_4phase
-    public :: type_thc_dispersivity
+    public :: type_state_thc
 
     type :: holder_thcs
         class(abst_thc), allocatable :: p
@@ -22,34 +22,17 @@ module physics_materials_thermal_conductivity
     end type holder_thcs
 
     interface
-        module subroutine initialize_holder_thcs(self, material_id, physics_info, water, ice)
+        module subroutine initialize_holder_thcs(self, material_id, constitutive_info, water, ice)
             implicit none
             class(holder_thcs), intent(inout) :: self
             integer(int32), intent(in) :: material_id
-            type(type_physics_info), intent(in) :: physics_info
+            type(type_config_constitutive), intent(in) :: constitutive_info
             type(type_iapws97), intent(in), target :: water
             type(type_iapws06), intent(in), target :: ice
 
         end subroutine initialize_holder_thcs
     end interface
 
-    type :: type_thc_dispersivity
-        real(real64) :: lambda_xx = 0.0d0
-        real(real64) :: lambda_yy = 0.0d0
-        real(real64) :: lambda_zz = 0.0d0
-        real(real64) :: lambda_xy = 0.0d0
-        real(real64) :: lambda_yz = 0.0d0
-        real(real64) :: lambda_zx = 0.0d0
-    contains
-        procedure, pass(self), public :: reset => reset_thc_dispersivity
-    end type type_thc_dispersivity
-
-    interface
-        module subroutine reset_thc_dispersivity(self)
-            implicit none
-            class(type_thc_dispersivity), intent(inout) :: self
-        end subroutine reset_thc_dispersivity
-    end interface
 
     type, extends(abst_material), abstract :: abst_thc
         real(real64), allocatable :: dispersivity(:)
@@ -74,22 +57,22 @@ module physics_materials_thermal_conductivity
         end subroutine abst_calc_thc_gp
 
         subroutine abst_calc_thc_dispersivity_gp(self, state, lambda)
-            import :: abst_thc, type_state, type_thc_dispersivity
+            import :: abst_thc, type_state, type_state_thc
             implicit none
             class(abst_thc), intent(in) :: self
             type(type_state), intent(in) :: state
-            type(type_thc_dispersivity), intent(inout) :: lambda
+            type(type_state_thc), intent(inout) :: lambda
 
         end subroutine abst_calc_thc_dispersivity_gp
     end interface
 
     interface
-        module subroutine initialize_abst_thc(self, material_id, physics_info, water, ice)
-            import :: abst_thc, type_physics_info, type_iapws97, type_iapws06, int32
+        module subroutine initialize_abst_thc(self, material_id, constitutive_info, water, ice)
+            import :: abst_thc, type_config_constitutive, type_iapws97, type_iapws06, int32
             implicit none
             class(abst_thc), intent(inout) :: self
             integer(int32), intent(in) :: material_id
-            type(type_physics_info), intent(in) :: physics_info
+            type(type_config_constitutive), intent(in) :: constitutive_info
             type(type_iapws97), intent(in), target :: water
             type(type_iapws06), intent(in), target :: ice
 
@@ -116,7 +99,7 @@ module physics_materials_thermal_conductivity
             implicit none
             class(type_thc_1phase), intent(in) :: self
             type(type_state), intent(in) :: state
-            type(type_thc_dispersivity), intent(inout) :: lambda
+            type(type_state_thc), intent(inout) :: lambda
 
         end subroutine calc_thc_dispersivity_gp_1phase
     end interface
@@ -140,7 +123,7 @@ module physics_materials_thermal_conductivity
             implicit none
             class(type_thc_2phase), intent(in) :: self
             type(type_state), intent(in) :: state
-            type(type_thc_dispersivity), intent(inout) :: lambda
+            type(type_state_thc), intent(inout) :: lambda
 
         end subroutine calc_thc_dispersivity_gp_2phase
     end interface
@@ -164,7 +147,7 @@ module physics_materials_thermal_conductivity
             implicit none
             class(type_thc_3phase), intent(in) :: self
             type(type_state), intent(in) :: state
-            type(type_thc_dispersivity), intent(inout) :: lambda
+            type(type_state_thc), intent(inout) :: lambda
 
         end subroutine calc_thc_dispersivity_gp_3phase
     end interface
@@ -188,7 +171,7 @@ module physics_materials_thermal_conductivity
             implicit none
             class(type_thc_4phase), intent(in) :: self
             type(type_state), intent(in) :: state
-            type(type_thc_dispersivity), intent(inout) :: lambda
+            type(type_state_thc), intent(inout) :: lambda
 
         end subroutine calc_thc_dispersivity_gp_4phase
     end interface
@@ -253,9 +236,9 @@ module physics_materials_thermal_conductivity
             real(real64), intent(in) :: q_x
             real(real64), intent(in) :: q_y
             real(real64), intent(in) :: q_z
-            type(type_thc_dispersivity), intent(inout) :: lambda
+            type(type_state_thc), intent(inout) :: lambda
 
         end subroutine calc_lambda_dispersivity_abst_thc
     end interface
 
-end module physics_materials_thermal_conductivity
+end module materials_thermal_conductivity

@@ -1,4 +1,4 @@
-submodule(core_vtk) core_vtk_base
+submodule(core_interop_vtk) core_vtk_base
     implicit none
 
 contains
@@ -29,7 +29,7 @@ contains
     module subroutine type_vtk_cell_set(self, num_nodes_in_cell)
         implicit none
         class(type_vtk_cell), intent(inout) :: self !! VTK cells data
-        integer(int32), intent(in) :: num_nodes_in_cell !! セルのノード数
+        integer(int32), intent(in) :: num_nodes_in_cell !! Number of nodes in cell
 
         call vtk_constants%get_cell_info_from_cell_type( &
             self%cell_type, self%cell_type_name, self%num_nodes_in_cell, &
@@ -47,7 +47,7 @@ contains
         integer(int32), allocatable, intent(inout) :: unique_ids(:)
         integer(int32), intent(in), optional :: target_dim
 
-        ! --- ローカル変数 ---
+        ! --- Local variables ---
         integer(int32) :: i_cell, count, dim
         integer(int32), allocatable :: collected_ids(:)
         integer(int32) :: max_dim_local
@@ -55,11 +55,11 @@ contains
         max_dim_local = 0
         count = 0
 
-        ! --- ステップ1: 収集する次元を決定 ---
+        ! --- Step 1: Determine the dimension to collect ---
         if (present(target_dim)) then
             max_dim_local = target_dim
         else
-            ! 指定がなければ自プロセス内で最大次元を判定
+            ! If not specified, find the maximum dimension across local cells
             do i_cell = 1, self%num_total_cells
                 max_dim_local = max(max_dim_local, self%CELLS(i_cell)%get_dimension())
             end do
@@ -69,7 +69,7 @@ contains
             end if
         end if
 
-        ! --- ステップ2: 指定次元のCellEntityIdを収集 ---
+        ! --- Step 2: Collect cell entity IDs for the target dimension ---
         allocate (collected_ids(self%num_total_cells))
         do i_cell = 1, self%num_total_cells
             dim = self%CELLS(i_cell)%get_dimension()
@@ -79,7 +79,7 @@ contains
             end if
         end do
 
-        ! --- ステップ3: ユニークなIDのみ抽出 ---
+        ! --- Step 3: Extract unique IDs ---
         if (count > 0) then
             call unique(collected_ids(1:count), unique_ids)
         else

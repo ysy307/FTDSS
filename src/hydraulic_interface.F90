@@ -1,11 +1,11 @@
-module main_hydraulic
+module physics_governing_hydraulic
     use, intrinsic :: iso_fortran_env
     use :: module_core
-    use :: module_control, only:type_controls
-    use :: module_input, only:type_input
-    use :: module_physics, g => gravity_acceleration
+    use :: module_control, only:type_control
+    use :: module_input, only:type_input, input_translator
     use :: module_linalg
-    use :: main_base, only:type_assemble_workspace
+    use :: module_constitutive, g => gravity_acceleration
+    use :: physics_governing_base, only:type_assemble_workspace
     implicit none
     private
 
@@ -15,7 +15,7 @@ module main_hydraulic
         private
         integer(int32) :: computation_type
         integer(int32) :: computation_dimension
-        type(type_physics_manager) :: physics
+        type(type_constitutive_manager) :: physics
     contains
         procedure, pass(self), public :: initialize => initialize_type_hydraulic
         procedure, pass(self), public :: destroy => destroy_type_hydraulic
@@ -55,30 +55,30 @@ module main_hydraulic
         end subroutine destroy_type_hydraulic
 
         ! --- Assembly Interfaces ---
-        module subroutine assemble_local_hydraulic(self, controls, workspace, K_HH, K_HT, F_H)
+        module subroutine assemble_local_hydraulic(self, control, workspace, K_HH, K_HT, F_H)
             implicit none
             class(type_hydraulic), intent(in) :: self
-            type(type_controls), intent(in) :: controls
+            type(type_control), intent(in) :: control
             type(type_assemble_workspace), intent(inout) :: workspace
             type(type_matrix_dense), intent(inout), optional :: K_HH
             type(type_matrix_dense), intent(inout), optional :: K_HT
             type(type_vector_dp), intent(inout), optional :: F_H
         end subroutine assemble_local_hydraulic
 
-        module subroutine assemble_local_newton_hydraulic(self, controls, workspace, K_HH, K_HT, F_H)
+        module subroutine assemble_local_newton_hydraulic(self, control, workspace, K_HH, K_HT, F_H)
             implicit none
             class(type_hydraulic), intent(in) :: self
-            type(type_controls), intent(in) :: controls
+            type(type_control), intent(in) :: control
             type(type_assemble_workspace), intent(inout) :: workspace
             type(type_matrix_dense), intent(inout), optional :: K_HH
             type(type_matrix_dense), intent(inout), optional :: K_HT
             type(type_vector_dp), intent(inout), optional :: F_H
         end subroutine assemble_local_newton_hydraulic
 
-        module subroutine assemble_local_picard_hydraulic(self, controls, workspace, K_HH, K_HT, F_H)
+        module subroutine assemble_local_picard_hydraulic(self, control, workspace, K_HH, K_HT, F_H)
             implicit none
             class(type_hydraulic), intent(in) :: self
-            type(type_controls), intent(in) :: controls
+            type(type_control), intent(in) :: control
             type(type_assemble_workspace), intent(inout) :: workspace
             type(type_matrix_dense), intent(inout), optional :: K_HH
             type(type_matrix_dense), intent(inout), optional :: K_HT
@@ -175,4 +175,4 @@ contains
         implicit none
         class(type_hydraulic), intent(inout) :: self
     end subroutine destroy_type_hydraulic
-end module main_hydraulic
+end module physics_governing_hydraulic

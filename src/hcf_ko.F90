@@ -1,4 +1,4 @@
-submodule(physics_models_hcf) hcf_ko
+submodule(models_hcf) hcf_ko
     implicit none
     real(real64), parameter :: sqrt_2 = sqrt(2.0d0)
 

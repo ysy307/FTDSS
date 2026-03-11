@@ -1,0 +1,1111 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>read_solver_settings_nonlinear &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>read_solver_settings_nonlinear
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">41 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/basic_solver_settings.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/basic_solver_settings.f90.html'>basic_solver_settings.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/input_basic_solver_settings.html'>input_basic_solver_settings</a></li>
+            <li class="breadcrumb-item active" aria-current="page">read_solver_settings_nonlinear</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/read_solver_settings_nonlinear.html#src">read_solver_settings_nonlinear</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2> subroutine read_solver_settings_nonlinear(self, json)  
+</h2>
+    
+
+    <p>Reads nonlinear solver settings.</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~1300"></span>
+              class(<a href='../type/type_input_basic.html'>type_input_basic</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json~24"></span>
+              type(json_file),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>json</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~read_solver_settings_nonlinear~~CallsGraph Pages: 1 -->
+<svg id="procread_solver_settings_nonlinearCallsGraph" width="641pt" height="240pt"
+ viewBox="0.00 0.00 641.00 239.94" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph" class="graph" transform="scale(0.47 0.47) rotate(0) translate(4 508.44)">
+<title>proc~~read_solver_settings_nonlinear~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-508.44 1365,-508.44 1365,4 -4,4"/>
+<!-- proc~read_solver_settings_nonlinear -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node1" class="node">
+<title>proc~read_solver_settings_nonlinear</title>
+<polygon fill="none" stroke="black" points="177,-392.39 0,-392.39 0,-368.39 177,-368.39 177,-392.39"/>
+<text text-anchor="middle" x="88.5" y="-377.99" font-family="Helvetica,sans-Serif" font-size="10.50">read_solver_settings_nonlinear</text>
+</g>
+<!-- interface~get_json_value -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node2" class="node">
+<title>interface~get_json_value</title>
+<g id="a_proc~~read_solver_settings_nonlinear~~CallsGraph_node2"><a xlink:href="../interface/get_json_value.html" xlink:title="get_json_value">
+<polygon fill="#a7506f" stroke="#a7506f" points="682,-200.39 591,-200.39 591,-176.39 682,-176.39 682,-200.39"/>
+<text text-anchor="middle" x="636.5" y="-185.99" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_value</text>
+</a>
+</g>
+</g>
+<!-- proc~read_solver_settings_nonlinear&#45;&gt;interface~get_json_value -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge1" class="edge">
+<title>proc~read_solver_settings_nonlinear&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M123.65,-368.37C218.64,-334.97 485.9,-240.99 591.64,-203.81"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="593.09,-207.01 601.36,-200.39 590.76,-200.41 593.09,-207.01"/>
+</g>
+<!-- proc~join -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node3" class="node">
+<title>proc~join</title>
+<g id="a_proc~~read_solver_settings_nonlinear~~CallsGraph_node3"><a xlink:href="../proc/join.html" xlink:title="join">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="663.5,-455.39 609.5,-455.39 609.5,-431.39 663.5,-431.39 663.5,-455.39"/>
+<text text-anchor="middle" x="636.5" y="-440.99" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">join</text>
+</a>
+</g>
+</g>
+<!-- proc~read_solver_settings_nonlinear&#45;&gt;proc~join -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge2" class="edge">
+<title>proc~read_solver_settings_nonlinear&#45;&gt;proc~join</title>
+<path fill="none" stroke="#ff0000" d="M148.06,-392.4C168.54,-396.31 191.73,-400.4 213,-403.39 355.22,-423.32 525.8,-436.09 599.1,-441.04"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="598.99,-444.54 609.2,-441.72 599.46,-437.56 598.99,-444.54"/>
+</g>
+<!-- proc~read_solver_settings_nonlinear_convergence -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node4" class="node">
+<title>proc~read_solver_settings_nonlinear_convergence</title>
+<g id="a_proc~~read_solver_settings_nonlinear~~CallsGraph_node4"><a xlink:href="../proc/read_solver_settings_nonlinear_convergence.html" xlink:title="read_solver_settings_nonlinear_convergence">
+<polygon fill="#d9534f" stroke="#d9534f" points="465,-372.39 213,-372.39 213,-348.39 465,-348.39 465,-372.39"/>
+<text text-anchor="middle" x="339" y="-357.99" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_solver_settings_nonlinear_convergence</text>
+</a>
+</g>
+</g>
+<!-- proc~read_solver_settings_nonlinear&#45;&gt;proc~read_solver_settings_nonlinear_convergence -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge3" class="edge">
+<title>proc~read_solver_settings_nonlinear&#45;&gt;proc~read_solver_settings_nonlinear_convergence</title>
+<path fill="none" stroke="#ff0000" d="M177.11,-373.33C185.45,-372.66 194.03,-371.97 202.68,-371.28"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="203.17,-374.75 212.85,-370.46 202.6,-367.77 203.17,-374.75"/>
+</g>
+<!-- proc~to_id_nonlinear_solver -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node5" class="node">
+<title>proc~to_id_nonlinear_solver</title>
+<g id="a_proc~~read_solver_settings_nonlinear~~CallsGraph_node5"><a xlink:href="../proc/to_id_nonlinear_solver.html" xlink:title="type_nonlinear_solver%to_id_nonlinear_solver">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="766,-413.39 507,-413.39 507,-389.39 766,-389.39 766,-413.39"/>
+<text text-anchor="middle" x="636.5" y="-398.99" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_nonlinear_solver%to_id_nonlinear_solver</text>
+</a>
+</g>
+</g>
+<!-- proc~read_solver_settings_nonlinear&#45;&gt;proc~to_id_nonlinear_solver -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge4" class="edge">
+<title>proc~read_solver_settings_nonlinear&#45;&gt;proc~to_id_nonlinear_solver</title>
+<path fill="none" stroke="#ff0000" d="M177.22,-383.76C263.34,-387.07 396.04,-392.18 496.52,-396.04"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="496.63,-399.55 506.76,-396.43 496.9,-392.55 496.63,-399.55"/>
+</g>
+<!-- proc~get_json_integer32 -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node6" class="node">
+<title>proc~get_json_integer32</title>
+<g id="a_proc~~read_solver_settings_nonlinear~~CallsGraph_node6"><a xlink:href="../proc/get_json_integer32.html" xlink:title="get_json_integer32">
+<polygon fill="#d9534f" stroke="#d9534f" points="939,-284.39 825,-284.39 825,-260.39 939,-260.39 939,-284.39"/>
+<text text-anchor="middle" x="882" y="-269.99" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_integer32</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_integer32 -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge5" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_integer32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M668.06,-200.45C702,-213.67 758.53,-235.15 808,-251.39 814.31,-253.46 820.97,-255.53 827.59,-257.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="826.64,-260.88 837.22,-260.36 828.62,-254.17 826.64,-260.88"/>
+</g>
+<!-- proc~get_json_integer32_array -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node7" class="node">
+<title>proc~get_json_integer32_array</title>
+<g id="a_proc~~read_solver_settings_nonlinear~~CallsGraph_node7"><a xlink:href="../proc/get_json_integer32_array.html" xlink:title="get_json_integer32_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="956,-242.39 808,-242.39 808,-218.39 956,-218.39 956,-242.39"/>
+<text text-anchor="middle" x="882" y="-227.99" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_integer32_array</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_integer32_array -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge6" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_integer32_array</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M682.16,-196.09C715.45,-201.83 761.8,-209.82 801.38,-216.65"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="800.83,-220.11 811.28,-218.36 802.02,-213.21 800.83,-220.11"/>
+</g>
+<!-- proc~get_json_logical -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node8" class="node">
+<title>proc~get_json_logical</title>
+<g id="a_proc~~read_solver_settings_nonlinear~~CallsGraph_node8"><a xlink:href="../proc/get_json_logical.html" xlink:title="get_json_logical">
+<polygon fill="#d9534f" stroke="#d9534f" points="930.5,-32.39 833.5,-32.39 833.5,-8.39 930.5,-8.39 930.5,-32.39"/>
+<text text-anchor="middle" x="882" y="-17.99" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_logical</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_logical -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge7" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_logical</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M648.16,-176.12C673.2,-148.07 738.9,-78.76 808,-41.39 812.93,-38.72 818.23,-36.36 823.65,-34.28"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="825.2,-37.44 833.48,-30.82 822.88,-30.84 825.2,-37.44"/>
+</g>
+<!-- proc~get_json_real64 -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node9" class="node">
+<title>proc~get_json_real64</title>
+<g id="a_proc~~read_solver_settings_nonlinear~~CallsGraph_node9"><a xlink:href="../proc/get_json_real64.html" xlink:title="get_json_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="930,-200.39 834,-200.39 834,-176.39 930,-176.39 930,-200.39"/>
+<text text-anchor="middle" x="882" y="-185.99" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_real64 -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge8" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M682.16,-188.39C721.95,-188.39 780.39,-188.39 823.62,-188.39"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="823.71,-191.89 833.71,-188.39 823.71,-184.89 823.71,-191.89"/>
+</g>
+<!-- proc~get_json_real64_array -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node10" class="node">
+<title>proc~get_json_real64_array</title>
+<g id="a_proc~~read_solver_settings_nonlinear~~CallsGraph_node10"><a xlink:href="../proc/get_json_real64_array.html" xlink:title="get_json_real64_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="947,-158.39 817,-158.39 817,-134.39 947,-134.39 947,-158.39"/>
+<text text-anchor="middle" x="882" y="-143.99" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_real64_array</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_real64_array -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge9" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_real64_array</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M682.16,-180.68C717.04,-174.67 766.26,-166.18 807.01,-159.15"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="807.64,-162.59 816.9,-157.44 806.45,-155.69 807.64,-162.59"/>
+</g>
+<!-- proc~get_json_string -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node11" class="node">
+<title>proc~get_json_string</title>
+<g id="a_proc~~read_solver_settings_nonlinear~~CallsGraph_node11"><a xlink:href="../proc/get_json_string.html" xlink:title="get_json_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="928,-116.39 836,-116.39 836,-92.39 928,-92.39 928,-116.39"/>
+<text text-anchor="middle" x="882" y="-101.99" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_string</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_string -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge10" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_string</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M668.06,-176.32C702,-163.1 758.53,-141.62 808,-125.39 814.31,-123.31 820.97,-121.24 827.59,-119.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="828.62,-122.6 837.22,-116.41 826.64,-115.89 828.62,-122.6"/>
+</g>
+<!-- proc~get_json_string_array -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node12" class="node">
+<title>proc~get_json_string_array</title>
+<g id="a_proc~~read_solver_settings_nonlinear~~CallsGraph_node12"><a xlink:href="../proc/get_json_string_array.html" xlink:title="get_json_string_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="945,-74.39 819,-74.39 819,-50.39 945,-50.39 945,-74.39"/>
+<text text-anchor="middle" x="882" y="-59.99" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_string_array</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_string_array -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge11" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_string_array</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M653.61,-176.37C682.93,-154.99 747.58,-110.08 808,-83.39 812.63,-81.34 817.51,-79.43 822.47,-77.67"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="823.67,-80.96 832.05,-74.47 821.45,-74.33 823.67,-80.96"/>
+</g>
+<!-- strip -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node14" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="1361,-278.39 1307,-278.39 1307,-254.39 1361,-254.39 1361,-278.39"/>
+<text text-anchor="middle" x="1334" y="-263.99" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~join&#45;&gt;strip -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge12" class="edge">
+<title>proc~join&#45;&gt;strip</title>
+<path fill="none" stroke="#7fff00" d="M663.56,-452.09C758.5,-481.98 1089.74,-570.31 1271,-413.39 1308.65,-380.79 1324,-321.47 1329.8,-289.04"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1333.32,-289.21 1331.47,-278.78 1326.41,-288.09 1333.32,-289.21"/>
+</g>
+<!-- proc~read_solver_settings_nonlinear_convergence&#45;&gt;interface~get_json_value -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge13" class="edge">
+<title>proc~read_solver_settings_nonlinear_convergence&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#00ffff" d="M360.78,-348.29C412.28,-318.31 545.97,-240.5 605.8,-205.67"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="607.86,-208.52 614.74,-200.47 604.34,-202.47 607.86,-208.52"/>
+</g>
+<!-- proc~read_solver_settings_nonlinear_convergence&#45;&gt;proc~join -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge14" class="edge">
+<title>proc~read_solver_settings_nonlinear_convergence&#45;&gt;proc~join</title>
+<path fill="none" stroke="#00ffff" d="M366.2,-372.47C397.6,-386.48 452.1,-409.31 501,-422.39 533.65,-431.11 571.8,-436.64 599.11,-439.83"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="599.05,-443.34 609.38,-440.97 599.82,-436.38 599.05,-443.34"/>
+</g>
+<!-- proc~to_id_nonlinear_criteria -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node13" class="node">
+<title>proc~to_id_nonlinear_criteria</title>
+<g id="a_proc~~read_solver_settings_nonlinear~~CallsGraph_node13"><a xlink:href="../proc/to_id_nonlinear_criteria.html" xlink:title="type_nonlinear_criteria%to_id_nonlinear_criteria">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="772,-371.39 501,-371.39 501,-347.39 772,-347.39 772,-371.39"/>
+<text text-anchor="middle" x="636.5" y="-356.99" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_nonlinear_criteria%to_id_nonlinear_criteria</text>
+</a>
+</g>
+</g>
+<!-- proc~read_solver_settings_nonlinear_convergence&#45;&gt;proc~to_id_nonlinear_criteria -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge15" class="edge">
+<title>proc~read_solver_settings_nonlinear_convergence&#45;&gt;proc~to_id_nonlinear_criteria</title>
+<path fill="none" stroke="#00ffff" d="M465.32,-359.96C473.8,-359.93 482.38,-359.9 490.94,-359.87"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="491,-363.37 500.99,-359.84 490.98,-356.37 491,-363.37"/>
+</g>
+<!-- proc~to_id_nonlinear_solver&#45;&gt;strip -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge16" class="edge">
+<title>proc~to_id_nonlinear_solver&#45;&gt;strip</title>
+<path fill="none" stroke="#7f00ff" d="M728.48,-413.41C754.15,-416.29 782.13,-418.95 808,-420.39 1014.66,-431.86 1099.63,-486.45 1271,-370.39 1300.11,-350.67 1317.65,-312.33 1326.31,-288.11"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1329.71,-288.99 1329.58,-278.39 1323.07,-286.75 1329.71,-288.99"/>
+</g>
+<!-- to_lower -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node15" class="node">
+<title>to_lower</title>
+<polygon fill="#777777" stroke="#777777" points="911,-411.39 853,-411.39 853,-387.39 911,-387.39 911,-411.39"/>
+<text text-anchor="middle" x="882" y="-396.99" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_lower</text>
+</g>
+<!-- proc~to_id_nonlinear_solver&#45;&gt;to_lower -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge17" class="edge">
+<title>proc~to_id_nonlinear_solver&#45;&gt;to_lower</title>
+<path fill="none" stroke="#7f00ff" d="M766.02,-400.33C794,-400.1 821.49,-399.87 842.57,-399.7"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="842.71,-403.2 852.68,-399.62 842.65,-396.2 842.71,-403.2"/>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;strip -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge22" class="edge">
+<title>proc~get_json_integer32&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M904.3,-284.4C925.7,-295.73 959.99,-311.91 992,-318.39 1113.54,-342.98 1154.47,-360.78 1271,-318.39 1288.76,-311.92 1304.98,-297.89 1316.37,-286.03"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1318.95,-288.39 1323.12,-278.65 1313.79,-283.67 1318.95,-288.39"/>
+</g>
+<!-- get -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node16" class="node">
+<title>get</title>
+<polygon fill="#777777" stroke="#777777" points="1080,-154.39 1026,-154.39 1026,-130.39 1080,-130.39 1080,-154.39"/>
+<text text-anchor="middle" x="1053" y="-139.99" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get</text>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;get -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge18" class="edge">
+<title>proc~get_json_integer32&#45;&gt;get</title>
+<path fill="none" stroke="#ff0000" d="M939.2,-262.03C945.32,-259.27 951.09,-255.79 956,-251.39 987.45,-223.16 961.36,-192.48 992,-163.39 998.69,-157.04 1007.4,-152.59 1016.1,-149.49"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1017.28,-152.79 1025.82,-146.53 1015.23,-146.1 1017.28,-152.79"/>
+</g>
+<!-- optval -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node17" class="node">
+<title>optval</title>
+<polygon fill="#777777" stroke="#777777" points="1080,-74.39 1026,-74.39 1026,-50.39 1080,-50.39 1080,-74.39"/>
+<text text-anchor="middle" x="1053" y="-59.99" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">optval</text>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;optval -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge19" class="edge">
+<title>proc~get_json_integer32&#45;&gt;optval</title>
+<path fill="none" stroke="#ff0000" d="M939.36,-262.75C945.52,-259.87 951.27,-256.16 956,-251.39 998.18,-208.78 961.59,-173.05 992,-121.39 1001.18,-105.79 1015.52,-91.47 1027.88,-80.85"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1030.17,-83.5 1035.65,-74.42 1025.71,-78.1 1030.17,-83.5"/>
+</g>
+<!-- print_error_message -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node18" class="node">
+<title>print_error_message</title>
+<polygon fill="#777777" stroke="#777777" points="1114,-196.39 992,-196.39 992,-172.39 1114,-172.39 1114,-196.39"/>
+<text text-anchor="middle" x="1053" y="-181.99" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">print_error_message</text>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;print_error_message -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge20" class="edge">
+<title>proc~get_json_integer32&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#ff0000" d="M938.87,-260.33C944.91,-257.88 950.75,-254.92 956,-251.39 977.52,-236.87 970.9,-220.51 992,-205.39 994.12,-203.87 996.36,-202.45 998.68,-201.13"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1000.56,-204.1 1007.93,-196.49 997.42,-197.84 1000.56,-204.1"/>
+</g>
+<!-- proc~raise_error -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node19" class="node">
+<title>proc~raise_error</title>
+<g id="a_proc~~read_solver_settings_nonlinear~~CallsGraph_node19"><a xlink:href="../proc/raise_error.html" xlink:title="raise_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="1088,-238.39 1018,-238.39 1018,-214.39 1088,-214.39 1088,-238.39"/>
+<text text-anchor="middle" x="1053" y="-223.99" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">raise_error</text>
+</a>
+</g>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;proc~raise_error -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge21" class="edge">
+<title>proc~get_json_integer32&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff0000" d="M927.4,-260.3C952.24,-253.54 983.1,-245.14 1007.89,-238.39"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1009.04,-241.71 1017.77,-235.7 1007.2,-234.95 1009.04,-241.71"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;strip -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge27" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;strip</title>
+<path fill="none" stroke="#ff9900" d="M934.66,-242.44C942.01,-244.96 949.33,-247.92 956,-251.39 974.23,-260.86 972.62,-273.55 992,-280.39 1097.6,-317.63 1233.12,-292.26 1296.83,-276.42"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="1297.97,-279.74 1306.79,-273.88 1296.24,-272.96 1297.97,-279.74"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;get -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge23" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;get</title>
+<path fill="none" stroke="#ff9900" d="M938.87,-218.33C944.91,-215.88 950.75,-212.92 956,-209.39 977.52,-194.87 970.9,-178.51 992,-163.39 999.22,-158.21 1007.83,-154.21 1016.25,-151.17"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="1017.52,-154.43 1025.94,-148.01 1015.35,-147.78 1017.52,-154.43"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;optval -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge24" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;optval</title>
+<path fill="none" stroke="#ff9900" d="M942.82,-218.29C947.59,-215.84 952.07,-212.91 956,-209.39 987.45,-181.16 968.45,-156.47 992,-121.39 1002.15,-106.26 1016.65,-91.87 1028.85,-81.09"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="1031.15,-83.72 1036.47,-74.56 1026.6,-78.41 1031.15,-83.72"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;print_error_message -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge25" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#ff9900" d="M927.4,-218.3C949.04,-212.41 975.25,-205.28 998.03,-199.08"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="999.16,-202.39 1007.89,-196.39 997.33,-195.64 999.16,-202.39"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;proc~raise_error -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge26" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff9900" d="M956.14,-228.65C973.54,-228.24 991.59,-227.82 1007.27,-227.44"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="1007.8,-230.93 1017.71,-227.2 1007.63,-223.93 1007.8,-230.93"/>
+</g>
+<!-- proc~get_json_logical&#45;&gt;get -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge28" class="edge">
+<title>proc~get_json_logical&#45;&gt;get</title>
+<path fill="none" stroke="#cbff00" d="M930.69,-29.76C939.51,-32.67 948.34,-36.47 956,-41.39 976.68,-54.68 975.22,-65.42 992,-83.39 1004.76,-97.05 1019.76,-111.79 1031.56,-123.13"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1029.16,-125.67 1038.81,-130.04 1033.99,-120.6 1029.16,-125.67"/>
+</g>
+<!-- proc~get_json_logical&#45;&gt;optval -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge29" class="edge">
+<title>proc~get_json_logical&#45;&gt;optval</title>
+<path fill="none" stroke="#cbff00" d="M930.53,-32.2C957.64,-38.93 991.08,-47.25 1016.01,-53.44"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1015.24,-56.86 1025.79,-55.87 1016.93,-50.06 1015.24,-56.86"/>
+</g>
+<!-- proc~get_json_logical&#45;&gt;print_error_message -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge30" class="edge">
+<title>proc~get_json_logical&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#cbff00" d="M930.73,-26.71C940.06,-29.85 949.08,-34.51 956,-41.39 996.11,-81.22 953.03,-122.43 992,-163.39 993.05,-164.48 994.15,-165.53 995.31,-166.51"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="993.39,-169.44 1003.59,-172.27 997.38,-163.69 993.39,-169.44"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;strip -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge35" class="edge">
+<title>proc~get_json_real64&#45;&gt;strip</title>
+<path fill="none" stroke="#33ff00" d="M930.12,-197.94C939.08,-200.85 948.11,-204.59 956,-209.39 975.88,-221.47 970.89,-237.6 992,-247.39 1045.31,-272.09 1220.44,-269.93 1296.83,-267.7"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1297.04,-271.19 1306.93,-267.38 1296.83,-264.2 1297.04,-271.19"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;get -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge31" class="edge">
+<title>proc~get_json_real64&#45;&gt;get</title>
+<path fill="none" stroke="#33ff00" d="M927.4,-176.3C955.03,-168.78 990.1,-159.23 1015.99,-152.19"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1017.05,-155.53 1025.78,-149.52 1015.21,-148.77 1017.05,-155.53"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;optval -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge32" class="edge">
+<title>proc~get_json_real64&#45;&gt;optval</title>
+<path fill="none" stroke="#33ff00" d="M930.11,-179.54C939.17,-176.57 948.24,-172.62 956,-167.39 977.52,-152.87 974.71,-140.75 992,-121.39 1004.45,-107.44 1019.45,-92.69 1031.33,-81.43"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1033.74,-83.97 1038.64,-74.58 1028.95,-78.87 1033.74,-83.97"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;print_error_message -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge33" class="edge">
+<title>proc~get_json_real64&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#33ff00" d="M930.08,-187.27C946.08,-186.89 964.32,-186.46 981.74,-186.05"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="981.96,-189.54 991.87,-185.81 981.79,-182.55 981.96,-189.54"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;proc~raise_error -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge34" class="edge">
+<title>proc~get_json_real64&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#33ff00" d="M930.08,-198.97C954.43,-204.45 983.99,-211.09 1007.9,-216.47"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1007.24,-219.91 1017.77,-218.69 1008.78,-213.08 1007.24,-219.91"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;strip -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge40" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;strip</title>
+<path fill="none" stroke="#00ff66" d="M925.32,-134.34C945.35,-129.24 969.72,-123.91 992,-121.39 1115.23,-107.43 1168.02,-56.29 1271,-125.39 1311.12,-152.31 1325.49,-211.47 1330.48,-243.95"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1327.06,-244.79 1331.88,-254.23 1334,-243.85 1327.06,-244.79"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;get -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge36" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;get</title>
+<path fill="none" stroke="#00ff66" d="M947.37,-144.86C970.46,-144.32 995.68,-143.72 1015.57,-143.25"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1015.82,-146.74 1025.74,-143.01 1015.66,-139.74 1015.82,-146.74"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;optval -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge37" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;optval</title>
+<path fill="none" stroke="#00ff66" d="M936.98,-134.34C943.61,-131.87 950.12,-128.91 956,-125.39 975.68,-113.6 973.12,-101.42 992,-88.39 999.47,-83.23 1008.12,-78.76 1016.49,-75.05"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1017.86,-78.27 1025.74,-71.19 1015.17,-71.81 1017.86,-78.27"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;print_error_message -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge38" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#00ff66" d="M936.47,-158.41C953.04,-162.13 971.46,-166.28 988.64,-170.14"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="988.06,-173.6 998.59,-172.37 989.6,-166.77 988.06,-173.6"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;proc~raise_error -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge39" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ff66" d="M937.41,-158.5C943.9,-160.96 950.25,-163.89 956,-167.39 975.88,-179.47 972.47,-192.74 992,-205.39 997.04,-208.65 1002.66,-211.48 1008.37,-213.9"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1007.4,-217.28 1017.99,-217.62 1009.92,-210.75 1007.4,-217.28"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;strip -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge45" class="edge">
+<title>proc~get_json_string&#45;&gt;strip</title>
+<path fill="none" stroke="#00ffff" d="M928.01,-95.87C937.71,-92.86 947.57,-88.8 956,-83.39 976.68,-70.09 969.66,-51.66 992,-41.39 1106.05,11.07 1179.75,0.82 1271,-85.39 1316.49,-128.36 1328.6,-206.11 1331.83,-244.18"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1328.34,-244.5 1332.55,-254.22 1335.32,-244 1328.34,-244.5"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;get -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge41" class="edge">
+<title>proc~get_json_string&#45;&gt;get</title>
+<path fill="none" stroke="#00ffff" d="M928.29,-114.57C955.62,-120.71 989.97,-128.44 1015.54,-134.19"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1015.04,-137.66 1025.57,-136.44 1016.58,-130.83 1015.04,-137.66"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;optval -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge42" class="edge">
+<title>proc~get_json_string&#45;&gt;optval</title>
+<path fill="none" stroke="#00ffff" d="M928.29,-93.13C955.62,-86.34 989.97,-77.8 1015.54,-71.45"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1016.71,-74.76 1025.57,-68.95 1015.02,-67.97 1016.71,-74.76"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;print_error_message -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge43" class="edge">
+<title>proc~get_json_string&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#00ffff" d="M928.2,-113.33C937.78,-116.32 947.55,-120.25 956,-125.39 975.88,-137.47 972.47,-150.74 992,-163.39 994.6,-165.07 997.36,-166.64 1000.2,-168.09"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="998.94,-171.37 1009.49,-172.37 1001.87,-165.01 998.94,-171.37"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;proc~raise_error -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge44" class="edge">
+<title>proc~get_json_string&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ffff" d="M928.14,-110.84C938.16,-113.95 948.13,-118.56 956,-125.39 985.47,-150.92 963.27,-179.03 992,-205.39 996.75,-209.74 1002.46,-213.2 1008.43,-215.95"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1007.37,-219.3 1017.95,-219.71 1009.94,-212.78 1007.37,-219.3"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;strip -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge50" class="edge">
+<title>proc~get_json_string_array&#45;&gt;strip</title>
+<path fill="none" stroke="#0066ff" d="M936.98,-50.34C943.61,-47.87 950.12,-44.91 956,-41.39 975.68,-29.6 970.86,-13.31 992,-4.39 1015.58,5.57 1265.56,-4.96 1271,-9.39 1307.63,-39.19 1325.43,-187.14 1331.01,-244.04"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1327.54,-244.51 1331.96,-254.14 1334.51,-243.86 1327.54,-244.51"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;get -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge46" class="edge">
+<title>proc~get_json_string_array&#45;&gt;get</title>
+<path fill="none" stroke="#0066ff" d="M931.95,-74.48C940.12,-77.06 948.4,-80.03 956,-83.39 981.49,-94.64 1008.34,-111.63 1027.14,-124.5"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1025.22,-127.43 1035.43,-130.26 1029.21,-121.68 1025.22,-127.43"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;optval -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge47" class="edge">
+<title>proc~get_json_string_array&#45;&gt;optval</title>
+<path fill="none" stroke="#0066ff" d="M945.45,-62.39C969.15,-62.39 995.34,-62.39 1015.82,-62.39"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1015.97,-65.89 1025.97,-62.39 1015.97,-58.89 1015.97,-65.89"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;print_error_message -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge48" class="edge">
+<title>proc~get_json_string_array&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#0066ff" d="M942.34,-74.45C947.26,-76.9 951.91,-79.84 956,-83.39 985.47,-108.92 963.27,-137.03 992,-163.39 993.31,-164.59 994.7,-165.73 996.15,-166.8"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="994.62,-169.97 1004.97,-172.26 998.31,-164.02 994.62,-169.97"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;proc~raise_error -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge49" class="edge">
+<title>proc~get_json_string_array&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#0066ff" d="M943.92,-74.45C948.34,-76.91 952.44,-79.85 956,-83.39 996.11,-123.22 953.03,-164.43 992,-205.39 996.54,-210.16 1002.23,-213.85 1008.28,-216.7"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1007.4,-220.11 1017.98,-220.53 1009.96,-213.6 1007.4,-220.11"/>
+</g>
+<!-- proc~to_id_nonlinear_criteria&#45;&gt;strip -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge51" class="edge">
+<title>proc~to_id_nonlinear_criteria&#45;&gt;strip</title>
+<path fill="none" stroke="#3200ff" d="M772.09,-369.33C931.67,-378.87 1186.65,-386.33 1271,-344.39 1295.01,-332.45 1312.67,-306.38 1322.87,-287.66"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="1326.04,-289.15 1327.52,-278.66 1319.82,-285.94 1326.04,-289.15"/>
+</g>
+<!-- proc~to_id_nonlinear_criteria&#45;&gt;to_lower -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge52" class="edge">
+<title>proc~to_id_nonlinear_criteria&#45;&gt;to_lower</title>
+<path fill="none" stroke="#3200ff" d="M716.13,-371.42C734.47,-374.3 753.93,-377.4 772,-380.39 795.51,-384.27 821.83,-388.85 842.71,-392.54"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="842.34,-396.03 852.79,-394.33 843.56,-389.14 842.34,-396.03"/>
+</g>
+<!-- proc~raise_error&#45;&gt;strip -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge54" class="edge">
+<title>proc~raise_error&#45;&gt;strip</title>
+<path fill="none" stroke="#7f00ff" d="M1085.53,-214.37C1129,-199.76 1209,-180 1271,-205.39 1290.9,-213.54 1307.85,-231.5 1318.97,-245.83"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1316.37,-248.2 1325.12,-254.17 1322,-244.04 1316.37,-248.2"/>
+</g>
+<!-- proc~replace_placeholder -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node20" class="node">
+<title>proc~replace_placeholder</title>
+<g id="a_proc~~read_solver_settings_nonlinear~~CallsGraph_node20"><a xlink:href="../proc/replace_placeholder.html" xlink:title="replace_placeholder">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1271,-158.39 1150,-158.39 1150,-134.39 1271,-134.39 1271,-158.39"/>
+<text text-anchor="middle" x="1210.5" y="-143.99" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">replace_placeholder</text>
+</a>
+</g>
+</g>
+<!-- proc~raise_error&#45;&gt;proc~replace_placeholder -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge53" class="edge">
+<title>proc~raise_error&#45;&gt;proc~replace_placeholder</title>
+<path fill="none" stroke="#7f00ff" d="M1088.09,-217.13C1096.85,-214.04 1106.05,-210.15 1114,-205.39 1132.62,-194.24 1131.81,-184.22 1150,-172.39 1155.39,-168.87 1161.34,-165.64 1167.33,-162.72"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1169.07,-165.78 1176.69,-158.42 1166.14,-159.42 1169.07,-165.78"/>
+</g>
+<!-- to_string -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_node21" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="1239.5,-238.39 1181.5,-238.39 1181.5,-214.39 1239.5,-214.39 1239.5,-238.39"/>
+<text text-anchor="middle" x="1210.5" y="-223.99" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~raise_error&#45;&gt;to_string -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge55" class="edge">
+<title>proc~raise_error&#45;&gt;to_string</title>
+<path fill="none" stroke="#7f00ff" d="M1088.13,-226.39C1112.64,-226.39 1145.71,-226.39 1171.14,-226.39"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1171.18,-229.89 1181.18,-226.39 1171.18,-222.89 1171.18,-229.89"/>
+</g>
+<!-- proc~replace_placeholder&#45;&gt;strip -->
+<g id="proc~~read_solver_settings_nonlinear~~CallsGraph_edge56" class="edge">
+<title>proc~replace_placeholder&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M1248.04,-158.4C1256.12,-162.1 1264.27,-166.72 1271,-172.39 1294.88,-192.5 1313.1,-224.1 1323.42,-245.03"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1320.27,-246.55 1327.72,-254.08 1326.59,-243.55 1320.27,-246.55"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocread_solver_settings_nonlinearCallsGraph = svgPanZoom('#procread_solver_settings_nonlinearCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~read_solver_settings_nonlinear~~CalledByGraph Pages: 1 -->
+<svg id="procread_solver_settings_nonlinearCalledByGraph" width="641pt" height="17pt"
+ viewBox="0.00 0.00 641.00 17.24" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~read_solver_settings_nonlinear~~CalledByGraph" class="graph" transform="scale(0.54 0.54) rotate(0) translate(4 28)">
+<title>proc~~read_solver_settings_nonlinear~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 1186,-28 1186,4 -4,4"/>
+<!-- proc~read_solver_settings_nonlinear -->
+<g id="proc~~read_solver_settings_nonlinear~~CalledByGraph_node1" class="node">
+<title>proc~read_solver_settings_nonlinear</title>
+<polygon fill="none" stroke="black" points="1182,-24 1005,-24 1005,0 1182,0 1182,-24"/>
+<text text-anchor="middle" x="1093.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">read_solver_settings_nonlinear</text>
+</g>
+<!-- proc~read_solver_settings -->
+<g id="proc~~read_solver_settings_nonlinear~~CalledByGraph_node2" class="node">
+<title>proc~read_solver_settings</title>
+<g id="a_proc~~read_solver_settings_nonlinear~~CalledByGraph_node2"><a xlink:href="../proc/read_solver_settings.html" xlink:title="read_solver_settings">
+<polygon fill="#d9534f" stroke="#d9534f" points="969,-24 848,-24 848,0 969,0 969,-24"/>
+<text text-anchor="middle" x="908.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_solver_settings</text>
+</a>
+</g>
+</g>
+<!-- proc~read_solver_settings&#45;&gt;proc~read_solver_settings_nonlinear -->
+<g id="proc~~read_solver_settings_nonlinear~~CalledByGraph_edge1" class="edge">
+<title>proc~read_solver_settings&#45;&gt;proc~read_solver_settings_nonlinear</title>
+<path fill="none" stroke="#ff0000" d="M969.17,-12C977.34,-12 985.9,-12 994.53,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="994.69,-15.5 1004.69,-12 994.69,-8.5 994.69,-15.5"/>
+</g>
+<!-- interface~read_solver_settings -->
+<g id="proc~~read_solver_settings_nonlinear~~CalledByGraph_node3" class="node">
+<title>interface~read_solver_settings</title>
+<g id="a_proc~~read_solver_settings_nonlinear~~CalledByGraph_node3"><a xlink:href="../interface/read_solver_settings.html" xlink:title="read_solver_settings">
+<polygon fill="#a7506f" stroke="#a7506f" points="812,-24 691,-24 691,0 812,0 812,-24"/>
+<text text-anchor="middle" x="751.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_solver_settings</text>
+</a>
+</g>
+</g>
+<!-- interface~read_solver_settings&#45;&gt;proc~read_solver_settings -->
+<g id="proc~~read_solver_settings_nonlinear~~CalledByGraph_edge2" class="edge">
+<title>interface~read_solver_settings&#45;&gt;proc~read_solver_settings</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M812.43,-12C820.72,-12 829.31,-12 837.76,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="837.99,-15.5 847.99,-12 837.99,-8.5 837.99,-15.5"/>
+</g>
+<!-- proc~initialize_type_input_basic -->
+<g id="proc~~read_solver_settings_nonlinear~~CalledByGraph_node4" class="node">
+<title>proc~initialize_type_input_basic</title>
+<g id="a_proc~~read_solver_settings_nonlinear~~CalledByGraph_node4"><a xlink:href="../proc/initialize_type_input_basic.html" xlink:title="initialize_type_input_basic">
+<polygon fill="#d9534f" stroke="#d9534f" points="655,-24 504,-24 504,0 655,0 655,-24"/>
+<text text-anchor="middle" x="579.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_type_input_basic</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_input_basic&#45;&gt;interface~read_solver_settings -->
+<g id="proc~~read_solver_settings_nonlinear~~CalledByGraph_edge3" class="edge">
+<title>proc~initialize_type_input_basic&#45;&gt;interface~read_solver_settings</title>
+<path fill="none" stroke="#ff0000" d="M655.06,-12C663.56,-12 672.2,-12 680.64,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="680.8,-15.5 690.8,-12 680.8,-8.5 680.8,-15.5"/>
+</g>
+<!-- interface~initialize_type_input_basic -->
+<g id="proc~~read_solver_settings_nonlinear~~CalledByGraph_node5" class="node">
+<title>interface~initialize_type_input_basic</title>
+<g id="a_proc~~read_solver_settings_nonlinear~~CalledByGraph_node5"><a xlink:href="../interface/initialize_type_input_basic.html" xlink:title="type_input_basic%initialize_type_input_basic">
+<polygon fill="#a7506f" stroke="#a7506f" points="468,-24 219,-24 219,0 468,0 468,-24"/>
+<text text-anchor="middle" x="343.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input_basic%initialize_type_input_basic</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_input_basic&#45;&gt;proc~initialize_type_input_basic -->
+<g id="proc~~read_solver_settings_nonlinear~~CalledByGraph_edge4" class="edge">
+<title>interface~initialize_type_input_basic&#45;&gt;proc~initialize_type_input_basic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M468.01,-12C476.68,-12 485.3,-12 493.69,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="493.78,-15.5 503.78,-12 493.78,-8.5 493.78,-15.5"/>
+</g>
+<!-- proc~initialize_type_input -->
+<g id="proc~~read_solver_settings_nonlinear~~CalledByGraph_node6" class="node">
+<title>proc~initialize_type_input</title>
+<g id="a_proc~~read_solver_settings_nonlinear~~CalledByGraph_node6"><a xlink:href="../proc/initialize_type_input.html" xlink:title="type_input%initialize_type_input">
+<polygon fill="#d9534f" stroke="#d9534f" points="183,-24 0,-24 0,0 183,0 183,-24"/>
+<text text-anchor="middle" x="91.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input%initialize_type_input</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_input&#45;&gt;interface~initialize_type_input_basic -->
+<g id="proc~~read_solver_settings_nonlinear~~CalledByGraph_edge5" class="edge">
+<title>proc~initialize_type_input&#45;&gt;interface~initialize_type_input_basic</title>
+<path fill="none" stroke="#ff0000" d="M183.11,-12C191.45,-12 200,-12 208.62,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="208.75,-15.5 218.75,-12 208.75,-8.5 208.75,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocread_solver_settings_nonlinearCalledByGraph = svgPanZoom('#procread_solver_settings_nonlinearCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">read_solver_settings_nonlinear</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">json</span><span class="p">)</span>
+<span class="w">        </span><span class="c">!&gt; Reads nonlinear solver settings.</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_input_basic</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">json_file</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">json</span>
+<span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">buffer</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="w">        </span><span class="kt">character</span><span class="p">(:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">temp_string</span>
+
+<span class="w">        </span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solver_settings</span>
+<span class="w">        </span><span class="n">buffer</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t_nonlinear_solver</span>
+
+<span class="w">        </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">method</span>
+<span class="w">        </span><span class="k">call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">)),</span><span class="w"> </span><span class="n">temp_string</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                            </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="n">default_value</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">valid_list</span><span class="o">=</span><span class="n">valid_nonlinear_solver_methods_str</span><span class="p">)</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">solver_settings</span><span class="p">%</span><span class="n">nonlinear_solver</span><span class="p">%</span><span class="n">method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NONLINEAR_SOLVER</span><span class="p">%</span><span class="n">to_id</span><span class="p">(</span><span class="n">temp_string</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">solver_settings</span><span class="p">%</span><span class="n">nonlinear_solver</span><span class="p">%</span><span class="n">method</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">NONLINEAR_SOLVER</span><span class="p">%</span><span class="n">MODIFIED_NEWTON</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">update_frequency</span>
+<span class="w">            </span><span class="k">call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">)),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">solver_settings</span><span class="p">%</span><span class="n">nonlinear_solver</span><span class="p">%</span><span class="n">update_frequency</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="n">default_value</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="n">valid_range</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nb">huge</span><span class="p">(</span><span class="mi">1</span><span class="p">)])</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="nb">any</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">solver_settings</span><span class="p">%</span><span class="n">nonlinear_solver</span><span class="p">%</span><span class="n">method</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                </span><span class="n">NONLINEAR_SOLVER</span><span class="p">%</span><span class="n">NEWTON</span><span class="p">%</span><span class="n">ID</span><span class="p">,</span><span class="w"> </span><span class="n">NONLINEAR_SOLVER</span><span class="p">%</span><span class="n">MODIFIED_NEWTON</span><span class="p">%</span><span class="n">ID</span><span class="p">,</span><span class="w"> </span><span class="n">NONLINEAR_SOLVER</span><span class="p">%</span><span class="n">PICARD</span><span class="p">%</span><span class="n">ID</span><span class="p">]))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max_iterations</span>
+<span class="w">            </span><span class="k">call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">)),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">solver_settings</span><span class="p">%</span><span class="n">nonlinear_solver</span><span class="p">%</span><span class="n">max_iterations</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="n">default_value</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="w"> </span><span class="n">valid_range</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nb">huge</span><span class="p">(</span><span class="mi">1</span><span class="p">)])</span>
+
+<span class="w">            </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">convergence</span>
+<span class="w">            </span><span class="n">buffer</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">use_criteria</span>
+<span class="w">            </span><span class="k">call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">),</span><span class="w"> </span><span class="n">temp_string</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="n">default_value</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">valid_list</span><span class="o">=</span><span class="n">valid_criteria_types_str</span><span class="p">)</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">solver_settings</span><span class="p">%</span><span class="n">nonlinear_solver</span><span class="p">%</span><span class="n">convergence</span><span class="p">%</span><span class="n">use_criteria</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NONLINEAR_NORM_CRITERIA</span><span class="p">%</span><span class="n">to_id</span><span class="p">(</span><span class="n">temp_string</span><span class="p">)</span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">solver_settings</span><span class="p">%</span><span class="n">nonlinear_solver</span><span class="p">%</span><span class="n">convergence</span><span class="p">%</span><span class="n">use_criteria</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">NONLINEAR_NORM_CRITERIA</span><span class="p">%</span><span class="n">BOTH</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">buffer</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">logic_between_criteria</span>
+<span class="w">                </span><span class="k">call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">),</span><span class="w"> </span><span class="n">temp_string</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                    </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="n">default_value</span><span class="o">=</span><span class="s2">&quot;and&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">valid_list</span><span class="o">=</span><span class="n">valid_logic_types_str</span><span class="p">)</span>
+<span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">solver_settings</span><span class="p">%</span><span class="n">nonlinear_solver</span><span class="p">%</span><span class="n">convergence</span><span class="p">%</span><span class="n">use_logic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NONLINEAR_LOGIC</span><span class="p">%</span><span class="n">to_id</span><span class="p">(</span><span class="n">temp_string</span><span class="p">)</span>
+<span class="w">            </span><span class="k">end if</span>
+
+<span class="k">            </span><span class="n">buffer</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">norm_type</span>
+<span class="w">            </span><span class="k">call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">),</span><span class="w"> </span><span class="n">temp_string</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="n">default_value</span><span class="o">=</span><span class="s2">&quot;l2&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">valid_list</span><span class="o">=</span><span class="n">valid_norm_types_str</span><span class="p">)</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">solver_settings</span><span class="p">%</span><span class="n">nonlinear_solver</span><span class="p">%</span><span class="n">convergence</span><span class="p">%</span><span class="n">norm_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NORM_TYPES</span><span class="p">%</span><span class="n">to_id</span><span class="p">(</span><span class="n">temp_string</span><span class="p">)</span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">any</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">solver_settings</span><span class="p">%</span><span class="n">nonlinear_solver</span><span class="p">%</span><span class="n">convergence</span><span class="p">%</span><span class="n">use_criteria</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="p">[</span><span class="n">NONLINEAR_NORM_CRITERIA</span><span class="p">%</span><span class="n">RESIDUAL</span><span class="p">%</span><span class="n">ID</span><span class="p">,</span><span class="w"> </span><span class="n">NONLINEAR_NORM_CRITERIA</span><span class="p">%</span><span class="n">BOTH</span><span class="p">%</span><span class="n">ID</span><span class="p">]))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">buffer</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">residual</span>
+<span class="w">                </span><span class="k">call </span><span class="n">read_solver_settings_nonlinear_convergence</span><span class="p">(</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">solver_settings</span><span class="p">%</span><span class="n">nonlinear_solver</span><span class="p">%</span><span class="n">convergence</span><span class="p">%</span><span class="n">residual</span><span class="p">,</span><span class="w"> </span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">buffer</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="nb">any</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">solver_settings</span><span class="p">%</span><span class="n">nonlinear_solver</span><span class="p">%</span><span class="n">convergence</span><span class="p">%</span><span class="n">use_criteria</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="p">[</span><span class="n">NONLINEAR_NORM_CRITERIA</span><span class="p">%</span><span class="n">UPDATE</span><span class="p">%</span><span class="n">ID</span><span class="p">,</span><span class="w"> </span><span class="n">NONLINEAR_NORM_CRITERIA</span><span class="p">%</span><span class="n">BOTH</span><span class="p">%</span><span class="n">ID</span><span class="p">]))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">buffer</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">update</span>
+<span class="w">                </span><span class="k">call </span><span class="n">read_solver_settings_nonlinear_convergence</span><span class="p">(</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">solver_settings</span><span class="p">%</span><span class="n">nonlinear_solver</span><span class="p">%</span><span class="n">convergence</span><span class="p">%</span><span class="n">update</span><span class="p">,</span><span class="w"> </span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">buffer</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">temp_string</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">temp_string</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">read_solver_settings_nonlinear</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-03-11 14:03 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

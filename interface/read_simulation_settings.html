@@ -1,0 +1,927 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>read_simulation_settings &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>read_simulation_settings
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">27 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/basic_interface.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/basic_interface.f90.html'>basic_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/io_input_basic.html'>io_input_basic</a></li>
+            <li class="breadcrumb-item active" aria-current="page">read_simulation_settings</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+    <em>None</em>
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>interface</h2>
+      
+      <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~read_simulation_settings~~CallsGraph Pages: 1 -->
+<svg id="interfaceread_simulation_settingsCallsGraph" width="641pt" height="238pt"
+ viewBox="0.00 0.00 641.00 237.77" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~read_simulation_settings~~CallsGraph" class="graph" transform="scale(0.61 0.61) rotate(0) translate(4 384.74)">
+<title>interface~~read_simulation_settings~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-384.74 1044,-384.74 1044,4 -4,4"/>
+<!-- interface~read_simulation_settings -->
+<g id="interface~~read_simulation_settings~~CallsGraph_node1" class="node">
+<title>interface~read_simulation_settings</title>
+<polygon fill="none" stroke="black" points="144,-242.05 0,-242.05 0,-218.05 144,-218.05 144,-242.05"/>
+<text text-anchor="middle" x="72" y="-227.65" font-family="Helvetica,sans-Serif" font-size="10.50">read_simulation_settings</text>
+</g>
+<!-- proc~read_simulation_settings -->
+<g id="interface~~read_simulation_settings~~CallsGraph_node2" class="node">
+<title>proc~read_simulation_settings</title>
+<g id="a_interface~~read_simulation_settings~~CallsGraph_node2"><a xlink:href="../proc/read_simulation_settings.html" xlink:title="read_simulation_settings">
+<polygon fill="#d9534f" stroke="#d9534f" points="324,-242.05 180,-242.05 180,-218.05 324,-218.05 324,-242.05"/>
+<text text-anchor="middle" x="252" y="-227.65" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_simulation_settings</text>
+</a>
+</g>
+</g>
+<!-- interface~read_simulation_settings&#45;&gt;proc~read_simulation_settings -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge1" class="edge">
+<title>interface~read_simulation_settings&#45;&gt;proc~read_simulation_settings</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M144.12,-230.05C152.61,-230.05 161.33,-230.05 169.94,-230.05"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="170,-233.55 180,-230.05 170,-226.55 170,-233.55"/>
+</g>
+<!-- interface~get_json_value -->
+<g id="interface~~read_simulation_settings~~CallsGraph_node3" class="node">
+<title>interface~get_json_value</title>
+<g id="a_interface~~read_simulation_settings~~CallsGraph_node3"><a xlink:href="../interface/get_json_value.html" xlink:title="get_json_value">
+<polygon fill="#a7506f" stroke="#a7506f" points="451,-221.05 360,-221.05 360,-197.05 451,-197.05 451,-221.05"/>
+<text text-anchor="middle" x="405.5" y="-206.65" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_value</text>
+</a>
+</g>
+</g>
+<!-- proc~read_simulation_settings&#45;&gt;interface~get_json_value -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge2" class="edge">
+<title>proc~read_simulation_settings&#45;&gt;interface~get_json_value</title>
+<path fill="none" stroke="#ff0000" d="M324.31,-220.16C332.93,-218.97 341.63,-217.76 349.96,-216.61"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="350.47,-220.07 359.9,-215.23 349.51,-213.13 350.47,-220.07"/>
+</g>
+<!-- proc~join -->
+<g id="interface~~read_simulation_settings~~CallsGraph_node4" class="node">
+<title>proc~join</title>
+<g id="a_interface~~read_simulation_settings~~CallsGraph_node4"><a xlink:href="../proc/join.html" xlink:title="join">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="432.5,-329.05 378.5,-329.05 378.5,-305.05 432.5,-305.05 432.5,-329.05"/>
+<text text-anchor="middle" x="405.5" y="-314.65" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">join</text>
+</a>
+</g>
+</g>
+<!-- proc~read_simulation_settings&#45;&gt;proc~join -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge3" class="edge">
+<title>proc~read_simulation_settings&#45;&gt;proc~join</title>
+<path fill="none" stroke="#ff0000" d="M274.07,-242.14C300.15,-257.12 344.76,-282.74 374.43,-299.78"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="372.71,-302.83 383.13,-304.77 376.2,-296.76 372.71,-302.83"/>
+</g>
+<!-- proc~get_json_integer32 -->
+<g id="interface~~read_simulation_settings~~CallsGraph_node5" class="node">
+<title>proc~get_json_integer32</title>
+<g id="a_interface~~read_simulation_settings~~CallsGraph_node5"><a xlink:href="../proc/get_json_integer32.html" xlink:title="get_json_integer32">
+<polygon fill="#d9534f" stroke="#d9534f" points="618,-74.05 504,-74.05 504,-50.05 618,-50.05 618,-74.05"/>
+<text text-anchor="middle" x="561" y="-59.65" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_integer32</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_integer32 -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge4" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_integer32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M410.83,-196.93C420.44,-171.76 446.02,-113.63 487,-83.05 489.46,-81.21 492.07,-79.54 494.79,-78.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="496.34,-81.15 503.78,-73.61 493.26,-74.86 496.34,-81.15"/>
+</g>
+<!-- proc~get_json_integer32_array -->
+<g id="interface~~read_simulation_settings~~CallsGraph_node6" class="node">
+<title>proc~get_json_integer32_array</title>
+<g id="a_interface~~read_simulation_settings~~CallsGraph_node6"><a xlink:href="../proc/get_json_integer32_array.html" xlink:title="get_json_integer32_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="635,-326.05 487,-326.05 487,-302.05 635,-302.05 635,-326.05"/>
+<text text-anchor="middle" x="561" y="-311.65" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_integer32_array</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_integer32_array -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge5" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_integer32_array</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M414.9,-221.28C428.12,-239.6 455.53,-274.04 487,-293.05 489.97,-294.84 493.1,-296.49 496.32,-298"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="495.04,-301.25 505.61,-301.9 497.75,-294.8 495.04,-301.25"/>
+</g>
+<!-- proc~get_json_logical -->
+<g id="interface~~read_simulation_settings~~CallsGraph_node7" class="node">
+<title>proc~get_json_logical</title>
+<g id="a_interface~~read_simulation_settings~~CallsGraph_node7"><a xlink:href="../proc/get_json_logical.html" xlink:title="get_json_logical">
+<polygon fill="#d9534f" stroke="#d9534f" points="609.5,-242.05 512.5,-242.05 512.5,-218.05 609.5,-218.05 609.5,-242.05"/>
+<text text-anchor="middle" x="561" y="-227.65" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_logical</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_logical -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge6" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_logical</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M451.31,-215.18C467.21,-217.35 485.34,-219.83 502.18,-222.14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="502.08,-225.65 512.46,-223.54 503.02,-218.72 502.08,-225.65"/>
+</g>
+<!-- proc~get_json_real64 -->
+<g id="interface~~read_simulation_settings~~CallsGraph_node8" class="node">
+<title>proc~get_json_real64</title>
+<g id="a_interface~~read_simulation_settings~~CallsGraph_node8"><a xlink:href="../proc/get_json_real64.html" xlink:title="get_json_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="609,-284.05 513,-284.05 513,-260.05 609,-260.05 609,-284.05"/>
+<text text-anchor="middle" x="561" y="-269.65" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_real64 -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge7" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M426.81,-221.1C442.77,-230.21 465.78,-242.56 487,-251.05 492.13,-253.1 497.53,-255.04 502.98,-256.85"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="502.21,-260.28 512.8,-259.97 504.33,-253.61 502.21,-260.28"/>
+</g>
+<!-- proc~get_json_real64_array -->
+<g id="interface~~read_simulation_settings~~CallsGraph_node9" class="node">
+<title>proc~get_json_real64_array</title>
+<g id="a_interface~~read_simulation_settings~~CallsGraph_node9"><a xlink:href="../proc/get_json_real64_array.html" xlink:title="get_json_real64_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="626,-200.05 496,-200.05 496,-176.05 626,-176.05 626,-200.05"/>
+<text text-anchor="middle" x="561" y="-185.65" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_real64_array</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_real64_array -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge8" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_real64_array</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M451.31,-202.92C462.06,-201.45 473.82,-199.84 485.51,-198.24"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="486.31,-201.66 495.74,-196.84 485.36,-194.73 486.31,-201.66"/>
+</g>
+<!-- proc~get_json_string -->
+<g id="interface~~read_simulation_settings~~CallsGraph_node10" class="node">
+<title>proc~get_json_string</title>
+<g id="a_interface~~read_simulation_settings~~CallsGraph_node10"><a xlink:href="../proc/get_json_string.html" xlink:title="get_json_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="607,-158.05 515,-158.05 515,-134.05 607,-134.05 607,-158.05"/>
+<text text-anchor="middle" x="561" y="-143.65" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_string</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_string -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge9" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_string</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M426.81,-196.99C442.77,-187.88 465.78,-175.53 487,-167.05 492.79,-164.73 498.92,-162.56 505.08,-160.55"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="506.24,-163.85 514.74,-157.53 504.15,-157.17 506.24,-163.85"/>
+</g>
+<!-- proc~get_json_string_array -->
+<g id="interface~~read_simulation_settings~~CallsGraph_node11" class="node">
+<title>proc~get_json_string_array</title>
+<g id="a_interface~~read_simulation_settings~~CallsGraph_node11"><a xlink:href="../proc/get_json_string_array.html" xlink:title="get_json_string_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="624,-116.05 498,-116.05 498,-92.05 624,-92.05 624,-116.05"/>
+<text text-anchor="middle" x="561" y="-101.65" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_json_string_array</text>
+</a>
+</g>
+</g>
+<!-- interface~get_json_value&#45;&gt;proc~get_json_string_array -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge10" class="edge">
+<title>interface~get_json_value&#45;&gt;proc~get_json_string_array</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M414.9,-196.81C428.12,-178.49 455.53,-144.05 487,-125.05 489.97,-123.25 493.1,-121.61 496.32,-120.1"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="497.75,-123.29 505.61,-116.19 495.04,-116.84 497.75,-123.29"/>
+</g>
+<!-- strip -->
+<g id="interface~~read_simulation_settings~~CallsGraph_node12" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="1040,-157.05 986,-157.05 986,-133.05 1040,-133.05 1040,-157.05"/>
+<text text-anchor="middle" x="1013" y="-142.65" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~join&#45;&gt;strip -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge11" class="edge">
+<title>proc~join&#45;&gt;strip</title>
+<path fill="none" stroke="#00ffff" d="M432.67,-326.81C518.89,-357.11 797.19,-439.82 950,-307.05 991.85,-270.69 1005.57,-202.86 1009.98,-167.61"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1013.49,-167.72 1011.11,-157.4 1006.53,-166.95 1013.49,-167.72"/>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;strip -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge16" class="edge">
+<title>proc~get_json_integer32&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M589.82,-49.88C657.11,-22.45 831.87,36.58 950,-33.05 982.81,-52.39 999.48,-96.03 1006.91,-122.77"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1003.6,-123.93 1009.48,-132.75 1010.38,-122.19 1003.6,-123.93"/>
+</g>
+<!-- get -->
+<g id="interface~~read_simulation_settings~~CallsGraph_node13" class="node">
+<title>get</title>
+<polygon fill="#777777" stroke="#777777" points="759,-239.05 705,-239.05 705,-215.05 759,-215.05 759,-239.05"/>
+<text text-anchor="middle" x="732" y="-224.65" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get</text>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;get -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge12" class="edge">
+<title>proc~get_json_integer32&#45;&gt;get</title>
+<path fill="none" stroke="#ff0000" d="M618.15,-72.46C624.27,-75.21 630.07,-78.67 635,-83.05 665.7,-110.26 647.93,-134.12 671,-168.05 681.24,-183.11 695.74,-197.5 707.92,-208.29"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="705.66,-210.96 715.52,-214.84 710.23,-205.66 705.66,-210.96"/>
+</g>
+<!-- optval -->
+<g id="interface~~read_simulation_settings~~CallsGraph_node14" class="node">
+<title>optval</title>
+<polygon fill="#777777" stroke="#777777" points="759,-159.05 705,-159.05 705,-135.05 759,-135.05 759,-159.05"/>
+<text text-anchor="middle" x="732" y="-144.65" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">optval</text>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;optval -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge13" class="edge">
+<title>proc~get_json_integer32&#45;&gt;optval</title>
+<path fill="none" stroke="#ff0000" d="M617.38,-74.12C623.57,-76.58 629.58,-79.52 635,-83.05 655.89,-96.64 650.5,-111.87 671,-126.05 678.24,-131.06 686.8,-134.98 695.14,-138.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="694.16,-141.38 704.75,-141.17 696.35,-134.73 694.16,-141.38"/>
+</g>
+<!-- print_error_message -->
+<g id="interface~~read_simulation_settings~~CallsGraph_node15" class="node">
+<title>print_error_message</title>
+<polygon fill="#777777" stroke="#777777" points="793,-281.05 671,-281.05 671,-257.05 793,-257.05 793,-281.05"/>
+<text text-anchor="middle" x="732" y="-266.65" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">print_error_message</text>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;print_error_message -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge14" class="edge">
+<title>proc~get_json_integer32&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#ff0000" d="M618.26,-71.26C624.52,-74.2 630.31,-78.04 635,-83.05 686.31,-137.82 621.26,-191.84 671,-248.05 671.88,-249.05 672.82,-250 673.8,-250.9"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="671.92,-253.87 682.04,-257.01 676.09,-248.24 671.92,-253.87"/>
+</g>
+<!-- proc~raise_error -->
+<g id="interface~~read_simulation_settings~~CallsGraph_node16" class="node">
+<title>proc~raise_error</title>
+<g id="a_interface~~read_simulation_settings~~CallsGraph_node16"><a xlink:href="../proc/raise_error.html" xlink:title="raise_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="767,-117.05 697,-117.05 697,-93.05 767,-93.05 767,-117.05"/>
+<text text-anchor="middle" x="732" y="-102.65" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">raise_error</text>
+</a>
+</g>
+</g>
+<!-- proc~get_json_integer32&#45;&gt;proc~raise_error -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge15" class="edge">
+<title>proc~get_json_integer32&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff0000" d="M609.53,-74.14C633.87,-80.33 663.32,-87.83 687.12,-93.88"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="686.39,-97.31 696.95,-96.38 688.12,-90.52 686.39,-97.31"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;strip -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge21" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;strip</title>
+<path fill="none" stroke="#ffbf00" d="M633.76,-326.06C718.67,-336.03 859.86,-338.76 950,-267.05 982.17,-241.45 999.18,-194.72 1006.82,-167.12"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1010.26,-167.79 1009.38,-157.23 1003.49,-166.03 1010.26,-167.79"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;get -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge17" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;get</title>
+<path fill="none" stroke="#ffbf00" d="M617.83,-301.94C623.88,-299.49 629.73,-296.56 635,-293.05 656.31,-278.84 650.1,-262.85 671,-248.05 678.25,-242.91 686.87,-238.93 695.29,-235.88"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="696.56,-239.15 704.98,-232.72 694.39,-232.49 696.56,-239.15"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;optval -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge18" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;optval</title>
+<path fill="none" stroke="#ffbf00" d="M621.81,-301.93C626.58,-299.49 631.07,-296.56 635,-293.05 666.2,-265.16 647.61,-240.75 671,-206.05 681.18,-190.94 695.68,-176.55 707.87,-165.77"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="710.18,-168.4 715.48,-159.23 705.62,-163.09 710.18,-168.4"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;print_error_message -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge19" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#ffbf00" d="M607.29,-301.99C628.4,-296.37 653.71,-289.63 675.92,-283.71"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="677.12,-287.02 685.88,-281.06 675.32,-280.25 677.12,-287.02"/>
+</g>
+<!-- proc~get_json_integer32_array&#45;&gt;proc~raise_error -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge20" class="edge">
+<title>proc~get_json_integer32_array&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ffbf00" d="M623.89,-301.86C627.99,-299.42 631.76,-296.52 635,-293.05 686.84,-237.57 620.75,-182.97 671,-126.05 675.51,-120.93 681.35,-117.06 687.6,-114.14"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="688.91,-117.38 696.95,-110.49 686.36,-110.86 688.91,-117.38"/>
+</g>
+<!-- proc~get_json_logical&#45;&gt;get -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge22" class="edge">
+<title>proc~get_json_logical&#45;&gt;get</title>
+<path fill="none" stroke="#7fff00" d="M609.53,-229.2C636.52,-228.72 669.79,-228.13 694.68,-227.69"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="694.85,-231.19 704.79,-227.51 694.73,-224.19 694.85,-231.19"/>
+</g>
+<!-- proc~get_json_logical&#45;&gt;optval -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge23" class="edge">
+<title>proc~get_json_logical&#45;&gt;optval</title>
+<path fill="none" stroke="#7fff00" d="M609.85,-218.47C618.39,-215.79 627.08,-212.65 635,-209.05 661.19,-197.14 688.52,-178.82 707.29,-165.18"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="709.56,-167.85 715.52,-159.1 705.4,-162.22 709.56,-167.85"/>
+</g>
+<!-- proc~get_json_logical&#45;&gt;print_error_message -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge24" class="edge">
+<title>proc~get_json_logical&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#7fff00" d="M609.53,-241.01C627.98,-245.27 649.37,-250.21 669.01,-254.74"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="668.26,-258.16 678.79,-257 669.84,-251.34 668.26,-258.16"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;strip -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge29" class="edge">
+<title>proc~get_json_real64&#45;&gt;strip</title>
+<path fill="none" stroke="#00ff3f" d="M609.36,-283.29C656.38,-292.68 730.3,-302.69 793,-290.05 867.2,-275.08 889.82,-269.95 950,-224.05 970.94,-208.08 988.75,-183.45 999.84,-165.94"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="1003.04,-167.41 1005.28,-157.05 997.07,-163.75 1003.04,-167.41"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;get -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge25" class="edge">
+<title>proc~get_json_real64&#45;&gt;get</title>
+<path fill="none" stroke="#00ff3f" d="M607.29,-259.99C634.74,-252.68 669.28,-243.48 694.88,-236.66"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="695.8,-240.04 704.57,-234.08 694,-233.28 695.8,-240.04"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;optval -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge26" class="edge">
+<title>proc~get_json_real64&#45;&gt;optval</title>
+<path fill="none" stroke="#00ff3f" d="M609.06,-263.13C618.13,-260.17 627.21,-256.24 635,-251.05 656.31,-236.84 653.84,-225.06 671,-206.05 683.53,-192.17 698.52,-177.42 710.39,-166.14"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="712.8,-168.68 717.68,-159.28 708,-163.59 712.8,-168.68"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;print_error_message -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge27" class="edge">
+<title>proc~get_json_real64&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#00ff3f" d="M609.08,-271.21C625.08,-270.93 643.32,-270.6 660.74,-270.29"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="660.94,-273.79 670.87,-270.11 660.81,-266.79 660.94,-273.79"/>
+</g>
+<!-- proc~get_json_real64&#45;&gt;proc~raise_error -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge28" class="edge">
+<title>proc~get_json_real64&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ff3f" d="M609.01,-266.01C618.6,-262.86 627.91,-258.13 635,-251.05 675.89,-210.17 631.29,-168.06 671,-126.05 675.53,-121.26 681.21,-117.56 687.26,-114.7"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="688.94,-117.8 696.95,-110.88 686.37,-111.29 688.94,-117.8"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;strip -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge34" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;strip</title>
+<path fill="none" stroke="#00ffff" d="M626.14,-193.59C680.19,-197.96 759.58,-203.71 829,-206.05 882.75,-207.86 900.23,-226.42 950,-206.05 969.9,-197.9 986.85,-179.93 997.97,-165.6"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1001,-167.39 1004.12,-157.26 995.37,-163.23 1001,-167.39"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;get -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge30" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;get</title>
+<path fill="none" stroke="#00ffff" d="M614.08,-200.07C640.27,-206.11 671.36,-213.28 694.89,-218.71"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="694.27,-222.16 704.8,-221 695.85,-215.34 694.27,-222.16"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;optval -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge31" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;optval</title>
+<path fill="none" stroke="#00ffff" d="M611.79,-175.97C638.37,-169.52 670.5,-161.72 694.7,-155.85"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="695.65,-159.22 704.55,-153.46 694,-152.42 695.65,-159.22"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;print_error_message -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge32" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#00ffff" d="M616.45,-200.08C622.94,-202.56 629.28,-205.52 635,-209.05 655.08,-221.43 651.28,-235.1 671,-248.05 673.55,-249.72 676.24,-251.27 679.02,-252.72"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="677.59,-255.91 688.13,-256.97 680.55,-249.57 677.59,-255.91"/>
+</g>
+<!-- proc~get_json_real64_array&#45;&gt;proc~raise_error -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge33" class="edge">
+<title>proc~get_json_real64_array&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ffff" d="M616.92,-176C623.25,-173.53 629.43,-170.58 635,-167.05 655.48,-154.06 650.9,-139.61 671,-126.05 675.98,-122.69 681.56,-119.8 687.25,-117.35"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="688.81,-120.5 696.86,-113.62 686.27,-113.98 688.81,-120.5"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;strip -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge39" class="edge">
+<title>proc~get_json_string&#45;&gt;strip</title>
+<path fill="none" stroke="#003fff" d="M607.35,-137.34C616.92,-134.34 626.65,-130.34 635,-125.05 655.48,-112.06 648.91,-94.05 671,-84.05 783.96,-32.9 835.25,-37.06 950,-84.05 969.9,-92.2 986.85,-110.16 997.97,-124.5"/>
+<polygon fill="#003fff" stroke="#003fff" points="995.37,-126.86 1004.12,-132.83 1001,-122.71 995.37,-126.86"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;get -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge35" class="edge">
+<title>proc~get_json_string&#45;&gt;get</title>
+<path fill="none" stroke="#003fff" d="M607.1,-156.89C616.49,-159.73 626.21,-163.13 635,-167.05 660.72,-178.51 687.73,-195.94 706.52,-209.07"/>
+<polygon fill="#003fff" stroke="#003fff" points="704.62,-212.01 714.8,-214.94 708.67,-206.3 704.62,-212.01"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;optval -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge36" class="edge">
+<title>proc~get_json_string&#45;&gt;optval</title>
+<path fill="none" stroke="#003fff" d="M607.29,-146.31C634.62,-146.48 668.97,-146.68 694.54,-146.83"/>
+<polygon fill="#003fff" stroke="#003fff" points="694.55,-150.33 704.57,-146.89 694.59,-143.33 694.55,-150.33"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;print_error_message -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge37" class="edge">
+<title>proc~get_json_string&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#003fff" d="M607.17,-152.47C617.18,-155.59 627.14,-160.21 635,-167.05 664.71,-192.91 642.03,-221.35 671,-248.05 672.31,-249.25 673.7,-250.39 675.14,-251.47"/>
+<polygon fill="#003fff" stroke="#003fff" points="673.61,-254.64 683.95,-256.94 677.3,-248.69 673.61,-254.64"/>
+</g>
+<!-- proc~get_json_string&#45;&gt;proc~raise_error -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge38" class="edge">
+<title>proc~get_json_string&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#003fff" d="M607.29,-135.06C632.04,-129.05 662.55,-121.65 687.08,-115.7"/>
+<polygon fill="#003fff" stroke="#003fff" points="687.96,-119.09 696.85,-113.33 686.31,-112.29 687.96,-119.09"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;strip -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge44" class="edge">
+<title>proc~get_json_string_array&#45;&gt;strip</title>
+<path fill="none" stroke="#7f00ff" d="M616.87,-91.93C623.22,-89.48 629.41,-86.54 635,-83.05 655.28,-70.36 649.15,-52.78 671,-43.05 687.74,-35.59 935.96,-36.13 950,-44.05 979.98,-60.94 997.25,-98.87 1005.62,-123.14"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1002.37,-124.46 1008.76,-132.9 1009.03,-122.31 1002.37,-124.46"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;get -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge40" class="edge">
+<title>proc~get_json_string_array&#45;&gt;get</title>
+<path fill="none" stroke="#7f00ff" d="M617.38,-116.12C623.57,-118.58 629.58,-121.52 635,-125.05 655.89,-138.64 654.09,-149.73 671,-168.05 683.68,-181.78 698.68,-196.53 710.5,-207.84"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="708.1,-210.39 717.76,-214.74 712.92,-205.31 708.1,-210.39"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;optval -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge41" class="edge">
+<title>proc~get_json_string_array&#45;&gt;optval</title>
+<path fill="none" stroke="#7f00ff" d="M609.53,-116.14C636.64,-123.04 670.08,-131.55 695.01,-137.89"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="694.23,-141.3 704.79,-140.38 695.96,-134.52 694.23,-141.3"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;print_error_message -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge42" class="edge">
+<title>proc~get_json_string_array&#45;&gt;print_error_message</title>
+<path fill="none" stroke="#7f00ff" d="M622.93,-116.1C627.34,-118.56 631.45,-121.51 635,-125.05 675.37,-165.23 631.78,-206.74 671,-248.05 672.04,-249.15 673.15,-250.19 674.31,-251.18"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="672.38,-254.1 682.59,-256.94 676.38,-248.35 672.38,-254.1"/>
+</g>
+<!-- proc~get_json_string_array&#45;&gt;proc~raise_error -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge43" class="edge">
+<title>proc~get_json_string_array&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#7f00ff" d="M624.45,-104.42C645.08,-104.54 667.59,-104.67 686.58,-104.78"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="686.72,-108.28 696.74,-104.84 686.76,-101.28 686.72,-108.28"/>
+</g>
+<!-- proc~raise_error&#45;&gt;strip -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge46" class="edge">
+<title>proc~raise_error&#45;&gt;strip</title>
+<path fill="none" stroke="#7f00ff" d="M767.03,-113.46C785.31,-117.74 808.28,-122.72 829,-126.05 879.52,-134.17 938.47,-139.56 975.52,-142.47"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="975.58,-145.98 985.82,-143.25 976.11,-139 975.58,-145.98"/>
+</g>
+<!-- proc~replace_placeholder -->
+<g id="interface~~read_simulation_settings~~CallsGraph_node17" class="node">
+<title>proc~replace_placeholder</title>
+<g id="a_interface~~read_simulation_settings~~CallsGraph_node17"><a xlink:href="../proc/replace_placeholder.html" xlink:title="replace_placeholder">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="950,-117.05 829,-117.05 829,-93.05 950,-93.05 950,-117.05"/>
+<text text-anchor="middle" x="889.5" y="-102.65" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">replace_placeholder</text>
+</a>
+</g>
+</g>
+<!-- proc~raise_error&#45;&gt;proc~replace_placeholder -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge45" class="edge">
+<title>proc~raise_error&#45;&gt;proc~replace_placeholder</title>
+<path fill="none" stroke="#7f00ff" d="M767.13,-105.05C782.22,-105.05 800.56,-105.05 818.37,-105.05"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="818.76,-108.55 828.76,-105.05 818.76,-101.55 818.76,-108.55"/>
+</g>
+<!-- to_string -->
+<g id="interface~~read_simulation_settings~~CallsGraph_node18" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="918.5,-197.05 860.5,-197.05 860.5,-173.05 918.5,-173.05 918.5,-197.05"/>
+<text text-anchor="middle" x="889.5" y="-182.65" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~raise_error&#45;&gt;to_string -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge47" class="edge">
+<title>proc~raise_error&#45;&gt;to_string</title>
+<path fill="none" stroke="#7f00ff" d="M767.09,-114.3C775.85,-117.39 785.05,-121.29 793,-126.05 811.62,-137.19 810.81,-147.21 829,-159.05 835.78,-163.46 843.43,-167.44 850.93,-170.88"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="849.71,-174.17 860.27,-174.95 852.5,-167.75 849.71,-174.17"/>
+</g>
+<!-- proc~replace_placeholder&#45;&gt;strip -->
+<g id="interface~~read_simulation_settings~~CallsGraph_edge48" class="edge">
+<title>proc~replace_placeholder&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M926.95,-117.05C942.55,-122.18 960.7,-128.16 976.23,-133.27"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="975.4,-136.68 985.99,-136.48 977.59,-130.03 975.4,-136.68"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfaceread_simulation_settingsCallsGraph = svgPanZoom('#interfaceread_simulation_settingsCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~read_simulation_settings~~CalledByGraph Pages: 1 -->
+<svg id="interfaceread_simulation_settingsCalledByGraph" width="641pt" height="24pt"
+ viewBox="0.00 0.00 641.00 24.33" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~read_simulation_settings~~CalledByGraph" class="graph" transform="scale(0.76 0.76) rotate(0) translate(4 28)">
+<title>interface~~read_simulation_settings~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 839,-28 839,4 -4,4"/>
+<!-- interface~read_simulation_settings -->
+<g id="interface~~read_simulation_settings~~CalledByGraph_node1" class="node">
+<title>interface~read_simulation_settings</title>
+<polygon fill="none" stroke="black" points="835,-24 691,-24 691,0 835,0 835,-24"/>
+<text text-anchor="middle" x="763" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">read_simulation_settings</text>
+</g>
+<!-- proc~initialize_type_input_basic -->
+<g id="interface~~read_simulation_settings~~CalledByGraph_node2" class="node">
+<title>proc~initialize_type_input_basic</title>
+<g id="a_interface~~read_simulation_settings~~CalledByGraph_node2"><a xlink:href="../proc/initialize_type_input_basic.html" xlink:title="initialize_type_input_basic">
+<polygon fill="#d9534f" stroke="#d9534f" points="655,-24 504,-24 504,0 655,0 655,-24"/>
+<text text-anchor="middle" x="579.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_type_input_basic</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_input_basic&#45;&gt;interface~read_simulation_settings -->
+<g id="interface~~read_simulation_settings~~CalledByGraph_edge1" class="edge">
+<title>proc~initialize_type_input_basic&#45;&gt;interface~read_simulation_settings</title>
+<path fill="none" stroke="#ff0000" d="M655.11,-12C663.61,-12 672.31,-12 680.89,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="680.9,-15.5 690.9,-12 680.9,-8.5 680.9,-15.5"/>
+</g>
+<!-- interface~initialize_type_input_basic -->
+<g id="interface~~read_simulation_settings~~CalledByGraph_node3" class="node">
+<title>interface~initialize_type_input_basic</title>
+<g id="a_interface~~read_simulation_settings~~CalledByGraph_node3"><a xlink:href="../interface/initialize_type_input_basic.html" xlink:title="type_input_basic%initialize_type_input_basic">
+<polygon fill="#a7506f" stroke="#a7506f" points="468,-24 219,-24 219,0 468,0 468,-24"/>
+<text text-anchor="middle" x="343.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input_basic%initialize_type_input_basic</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_input_basic&#45;&gt;proc~initialize_type_input_basic -->
+<g id="interface~~read_simulation_settings~~CalledByGraph_edge2" class="edge">
+<title>interface~initialize_type_input_basic&#45;&gt;proc~initialize_type_input_basic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M468.01,-12C476.68,-12 485.3,-12 493.69,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="493.78,-15.5 503.78,-12 493.78,-8.5 493.78,-15.5"/>
+</g>
+<!-- proc~initialize_type_input -->
+<g id="interface~~read_simulation_settings~~CalledByGraph_node4" class="node">
+<title>proc~initialize_type_input</title>
+<g id="a_interface~~read_simulation_settings~~CalledByGraph_node4"><a xlink:href="../proc/initialize_type_input.html" xlink:title="type_input%initialize_type_input">
+<polygon fill="#d9534f" stroke="#d9534f" points="183,-24 0,-24 0,0 183,0 183,-24"/>
+<text text-anchor="middle" x="91.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input%initialize_type_input</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_input&#45;&gt;interface~initialize_type_input_basic -->
+<g id="interface~~read_simulation_settings~~CalledByGraph_edge3" class="edge">
+<title>proc~initialize_type_input&#45;&gt;interface~initialize_type_input_basic</title>
+<path fill="none" stroke="#ff0000" d="M183.11,-12C191.45,-12 200,-12 208.62,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="208.75,-15.5 218.75,-12 208.75,-8.5 208.75,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfaceread_simulation_settingsCalledByGraph = svgPanZoom('#interfaceread_simulation_settingsCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+      <h2>private module subroutine read_simulation_settings(self, json)  
+    <a href="../proc/read_simulation_settings.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h2>
+
+    
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~407"></span>
+              class(<a href='../type/type_input_basic.html'>type_input_basic</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json~2"></span>
+              type(json_file),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>json</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+
+ </div>
+</div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-03-11 14:03 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

@@ -1,9 +1,9 @@
-module physics_materials_density
+module materials_density
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
-    use :: module_core, only:type_state, type_physics_info
-    use :: physics_constants, only:TtoK => celsius_to_kelvin
-    use :: physics_materials_base, only:abst_material
+    use :: module_core, only:type_state, type_config_constitutive
+    use :: constitutive_constants, only:TtoK => celsius_to_kelvin
+    use :: materials_base, only:abst_material
     implicit none
     private
 
@@ -21,11 +21,11 @@ module physics_materials_density
     end type holder_dens
 
     interface
-        module subroutine initialize_holder_dens(self, material_id, physics_info, water, ice)
+        module subroutine initialize_holder_dens(self, material_id, constitutive_info, water, ice)
             implicit none
             class(holder_dens), intent(inout) :: self
             integer(int32), intent(in) :: material_id
-            type(type_physics_info), intent(in) :: physics_info
+            type(type_config_constitutive), intent(in) :: constitutive_info
             type(type_iapws97), intent(in), target :: water
             type(type_iapws06), intent(in), target :: ice
 
@@ -104,7 +104,7 @@ module physics_materials_density
     end interface
 
     ! ------------------------------------------------------------------------------
-    ! 密度計算のための関数インターフェース
+    ! Function interfaces for density calculation
     ! ------------------------------------------------------------------------------
     interface
         module subroutine calc_den_2(density_soil, phi_soil, &
@@ -150,4 +150,4 @@ module physics_materials_density
         end subroutine calc_den_4
     end interface
 
-end module physics_materials_density
+end module materials_density

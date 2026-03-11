@@ -1,4 +1,4 @@
-submodule(core_types_vector) core_types_vector_dp
+submodule(core_types_algebra_vector) algebra_vector_dp
     implicit none
 
 contains
@@ -69,9 +69,13 @@ contains
     module function get_data_vector_dp(self) result(data)
         implicit none
         class(type_vector_dp), intent(in), target :: self
-        real(real64), pointer, contiguous, dimension(:) :: data
+        real(real64), pointer, dimension(:) :: data
 
-        data => self%val
+        if (allocated(self%val)) then
+            data => self%val
+        else
+            nullify (data)
+        end if
     end function get_data_vector_dp
 
     module pure function get_status_vector_dp(self) result(status)
@@ -355,4 +359,4 @@ contains
         end if
     end subroutine check_vector_dp
 
-end submodule core_types_vector_dp
+end submodule algebra_vector_dp

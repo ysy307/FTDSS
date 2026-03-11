@@ -1,4 +1,4 @@
-module core_types_config_physics_base
+module types_config_physics_base
     use, intrinsic :: iso_fortran_env
     use :: core_constants, only:ERROR_CODES
     use :: core_types_config_base, only:abst_config
@@ -7,6 +7,10 @@ module core_types_config_physics_base
 
     public :: abst_config_physics_model
     public :: abst_config_physics_material
+    public :: copy_config_physics_model
+    public :: reset_config_physics_model
+    public :: copy_config_physics_material
+    public :: reset_config_physics_material
 
     type, abstract, extends(abst_config) :: abst_config_physics_model
         integer(int32) :: material_id = 0
@@ -17,6 +21,7 @@ module core_types_config_physics_base
 
     type, abstract, extends(abst_config) :: abst_config_physics_material
         integer(int32) :: material_id = 0
+        integer(int32) :: num_phases = 0
     contains
         procedure, public, pass(self) :: copy => copy_config_physics_material
         procedure, public, pass(self) :: reset => reset_config_physics_material
@@ -49,6 +54,7 @@ contains
         select type (source)
         type is (abst_config_physics_material)
             call self%set(self%material_id, source%material_id)
+            call self%set(self%num_phases, source%num_phases)
         end select
     end subroutine copy_config_physics_material
 
@@ -56,5 +62,6 @@ contains
         implicit none
         class(abst_config_physics_material), intent(inout) :: self
         self%material_id = 0
+        self%num_phases = 0
     end subroutine reset_config_physics_material
-end module core_types_config_physics_base
+end module types_config_physics_base

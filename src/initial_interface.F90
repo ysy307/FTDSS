@@ -1,4 +1,4 @@
-module conditions_initial
+module condition_initial
     use, intrinsic :: iso_fortran_env
     use :: module_core
     use :: module_input, only:type_input
@@ -11,23 +11,34 @@ module conditions_initial
     public :: holder_ics
 
     type :: holder_ics
-        class(abst_ic), allocatable :: ic
+        class(abst_ic), allocatable :: p
     end type holder_ics
 
     type, abstract :: abst_ic
         logical, private :: initialized = .false.
-        type(type_config_ic), private :: config
+        type(type_constant_id), private :: physics_type = type_constant_id("", "", -1)
+        type(type_constant_id), private :: ic_kind = type_constant_id("", "", -1)
     contains
-        procedure, public, pass(self) :: initialize => initialize_ic
-        procedure(abst_ic_apply), pass(self), deferred :: apply
+        procedure(abst_initialize_ic), public, pass(self), deferred :: initialize
+        procedure(abst_ic_apply), public, pass(self), deferred :: apply
     end type abst_ic
 
     type, extends(abst_ic) :: type_ic_uniform
+        real(real64) :: value
     contains
-        procedure, pass(self) :: apply => apply_ic_uniform
+        procedure, public, pass(self) :: initialize => initialize_ic
+        procedure, public, pass(self) :: apply => apply_ic_uniform
     end type type_ic_uniform
 
     abstract interface
+        subroutine abst_initialize_ic(self, config)
+            import :: abst_ic, type_config_ic
+            implicit none
+            class(abst_ic), intent(inout) :: self
+            type(type_config_ic), intent(in) :: config
+
+        end subroutine abst_initialize_ic
+
         subroutine abst_ic_apply(self, variable)
             import :: abst_ic, type_variable
             implicit none
@@ -37,6 +48,12 @@ module conditions_initial
     end interface
 
     interface
+        module subroutine initialize_ic(self, config)
+            implicit none
+            class(type_ic_uniform), intent(inout) :: self
+            type(type_config_ic), intent(in) :: config
+        end subroutine initialize_ic
+
         module subroutine apply_ic_uniform(self, variable)
             implicit none
             class(type_ic_uniform), intent(in) :: self
@@ -44,15 +61,4 @@ module conditions_initial
         end subroutine apply_ic_uniform
     end interface
 
-contains
-
-    subroutine initialize_ic(self, config_ic)
-        implicit none
-        class(abst_ic), intent(inout) :: self
-        type(type_config_ic), intent(in) :: config_ic
-
-        call self%config%copy(config_ic)
-        self%initialized = .true.
-    end subroutine initialize_ic
-
-end module conditions_initial
+end module condition_initial

@@ -10,7 +10,7 @@
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>display_output_settings_history &ndash; FTDSS</title>
+    <title>display_output_settings_history &ndash; FTCMS</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -44,7 +44,7 @@
     <div class="container-fluid mb-sm-4 mb-xl-2">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
           <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
                   aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon">
@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.1% of total for procedures.">29 statements</a>
+                 title=" 0.0% of total for procedures.">29 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -105,7 +105,7 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
                 <li class="breadcrumb-item"><a href='../sourcefile/output_history.f90.html'>output_history.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/inout_input_output_conditions_history.html'>inout_input_output_conditions_history</a></li>
+                <li class="breadcrumb-item"><a href='../module/input_output_conditions_history.html'>input_output_conditions_history</a></li>
             <li class="breadcrumb-item active" aria-current="page">display_output_settings_history</li>
           </ol>
         </nav>
@@ -179,7 +179,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~622"></span>
+              <span class="anchor" id="variable-self~1532"></span>
               class(<a href='../type/types_history_output.html'>types_history_output</a>),
             </td>
 <td>intent(in)</td>
@@ -455,7 +455,7 @@ large graphs.</div>
 <span class="w">        </span><span class="k">write</span><span class="w"> </span><span class="p">(</span><span class="n">output_unit</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;  History Output Settings:&quot;</span>
 <span class="w">        </span><span class="k">write</span><span class="w"> </span><span class="p">(</span><span class="n">output_unit</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(A, A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;    File Format: &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">strip</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">file_format</span><span class="p">)</span>
 <span class="w">        </span><span class="k">select case</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">file_format</span><span class="p">)</span>
-<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">valid_history_file_formats</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="n">valid_history_file_formats</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="w"> </span><span class="c">! &quot;dat&quot;, &quot;csv&quot;</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">valid_history_file_formats</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">valid_history_file_formats</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span><span class="w"> </span><span class="c">! &quot;dat&quot;, &quot;csv&quot;</span>
 <span class="w">            </span><span class="k">write</span><span class="w"> </span><span class="p">(</span><span class="n">output_unit</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(A, A, F8.3)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;    Output Interval: &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">strip</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">output_interval_unit</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span>
 <span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">output_interval_step</span>
 <span class="w">            </span><span class="k">write</span><span class="w"> </span><span class="p">(</span><span class="n">output_unit</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(A, A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;    Observation Type: &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">strip</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">observation_type</span><span class="p">)</span>
@@ -495,7 +495,7 @@ large graphs.</div>
         <div class="row justify-content-between">
           <div class="col">
             <p>
-              FTDSS
+              FTCMS
  was developed by Kikuchi Shun<br>              &copy; 2026 
 </p>
           </div>
@@ -503,7 +503,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-02-23 23:52 +0000             </p>
+ on 2026-03-11 14:03 +0000             </p>
           </div>
         </div>
         <br>

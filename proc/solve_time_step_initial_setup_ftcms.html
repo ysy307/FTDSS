@@ -1,0 +1,1090 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>solve_time_step_initial_setup_ftcms &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>solve_time_step_initial_setup_ftcms
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">29 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/ftcms_solve.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/ftcms_solve.f90.html'>ftcms_solve.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/ftcms_solve.html'>ftcms_solve</a></li>
+            <li class="breadcrumb-item active" aria-current="page">solve_time_step_initial_setup_ftcms</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/solve_time_step_initial_setup_ftcms.html#src">solve_time_step_initial_setup_ftcms</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine solve_time_step_initial_setup_ftcms(self)  
+    <a href="../interface/solve_time_step_initial_setup_ftcms.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~203"></span>
+              class(<a href='../type/type_ftcms.html'>type_ftcms</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~solve_time_step_initial_setup_ftcms~~CallsGraph Pages: 1 -->
+<svg id="procsolve_time_step_initial_setup_ftcmsCallsGraph" width="641pt" height="125pt"
+ viewBox="0.00 0.00 641.00 125.15" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph" class="graph" transform="scale(0.31 0.31) rotate(0) translate(4 406)">
+<title>proc~~solve_time_step_initial_setup_ftcms~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-406 2096,-406 2096,4 -4,4"/>
+<!-- proc~solve_time_step_initial_setup_ftcms -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node1" class="node">
+<title>proc~solve_time_step_initial_setup_ftcms</title>
+<polygon fill="none" stroke="black" points="201,-150 0,-150 0,-126 201,-126 201,-150"/>
+<text text-anchor="middle" x="100.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50">solve_time_step_initial_setup_ftcms</text>
+</g>
+<!-- none~get_previous -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node2" class="node">
+<title>none~get_previous</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node2"><a xlink:href="../type/type_variable.html#boundprocedure-get_previous" xlink:title="type_variable%get_previous">
+<polygon fill="#a7506f" stroke="#a7506f" points="437.5,-234 275.5,-234 275.5,-210 437.5,-210 437.5,-234"/>
+<text text-anchor="middle" x="356.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%get_previous</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_initial_setup_ftcms&#45;&gt;none~get_previous -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge1" class="edge">
+<title>proc~solve_time_step_initial_setup_ftcms&#45;&gt;none~get_previous</title>
+<path fill="none" stroke="#ff0000" d="M122.86,-150.06C148.99,-164.31 194.94,-187.74 237,-201 246.1,-203.87 255.72,-206.38 265.38,-208.57"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="264.94,-212.06 275.45,-210.74 266.42,-205.21 264.94,-212.06"/>
+</g>
+<!-- none~set_current -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node3" class="node">
+<title>none~set_current</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node3"><a xlink:href="../type/type_variable.html#boundprocedure-set_current" xlink:title="type_variable%set_current">
+<polygon fill="#a7506f" stroke="#a7506f" points="433.5,-339 279.5,-339 279.5,-315 433.5,-315 433.5,-339"/>
+<text text-anchor="middle" x="356.5" y="-324.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%set_current</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_initial_setup_ftcms&#45;&gt;none~set_current -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge2" class="edge">
+<title>proc~solve_time_step_initial_setup_ftcms&#45;&gt;none~set_current</title>
+<path fill="none" stroke="#ff0000" d="M116.78,-150.18C141.7,-169.98 192.77,-210.21 237,-243 268.57,-266.41 305.63,-292.45 329.78,-309.24"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="327.85,-312.16 338.06,-314.99 331.84,-306.41 327.85,-312.16"/>
+</g>
+<!-- proc~increment_total_control -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node4" class="node">
+<title>proc~increment_total_control</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node4"><a xlink:href="../proc/increment_total_control.html" xlink:title="type_control%increment_total_control">
+<polygon fill="#d9534f" stroke="#d9534f" points="463,-150 250,-150 250,-126 463,-126 463,-150"/>
+<text text-anchor="middle" x="356.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_control%increment_total_control</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_initial_setup_ftcms&#45;&gt;proc~increment_total_control -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge3" class="edge">
+<title>proc~solve_time_step_initial_setup_ftcms&#45;&gt;proc~increment_total_control</title>
+<path fill="none" stroke="#ff0000" d="M201.16,-138C213.77,-138 226.76,-138 239.6,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="239.85,-141.5 249.85,-138 239.85,-134.5 239.85,-141.5"/>
+</g>
+<!-- proc~is_physics_active_control -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node5" class="node">
+<title>proc~is_physics_active_control</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node5"><a xlink:href="../proc/is_physics_active_control.html" xlink:title="type_control%is_physics_active_control">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="466.5,-192 246.5,-192 246.5,-168 466.5,-168 466.5,-192"/>
+<text text-anchor="middle" x="356.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_control%is_physics_active_control</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_initial_setup_ftcms&#45;&gt;proc~is_physics_active_control -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge4" class="edge">
+<title>proc~solve_time_step_initial_setup_ftcms&#45;&gt;proc~is_physics_active_control</title>
+<path fill="none" stroke="#ff0000" d="M174.29,-150.04C204.97,-155.11 240.86,-161.04 272.57,-166.29"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="272.27,-169.78 282.7,-167.96 273.41,-162.88 272.27,-169.78"/>
+</g>
+<!-- proc~reset_acceleration_control -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node6" class="node">
+<title>proc~reset_acceleration_control</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node6"><a xlink:href="../proc/reset_acceleration_control.html" xlink:title="type_control%reset_acceleration_control">
+<polygon fill="#d9534f" stroke="#d9534f" points="470.5,-108 242.5,-108 242.5,-84 470.5,-84 470.5,-108"/>
+<text text-anchor="middle" x="356.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_control%reset_acceleration_control</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_initial_setup_ftcms&#45;&gt;proc~reset_acceleration_control -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge5" class="edge">
+<title>proc~solve_time_step_initial_setup_ftcms&#45;&gt;proc~reset_acceleration_control</title>
+<path fill="none" stroke="#ff0000" d="M174.29,-125.96C204.97,-120.89 240.86,-114.96 272.57,-109.71"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="273.41,-113.12 282.7,-108.04 272.27,-106.22 273.41,-113.12"/>
+</g>
+<!-- proc~reset_iteration_control -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node7" class="node">
+<title>proc~reset_iteration_control</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node7"><a xlink:href="../proc/reset_iteration_control.html" xlink:title="type_control%reset_iteration_control">
+<polygon fill="#d9534f" stroke="#d9534f" points="459.5,-66 253.5,-66 253.5,-42 459.5,-42 459.5,-66"/>
+<text text-anchor="middle" x="356.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_control%reset_iteration_control</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_initial_setup_ftcms&#45;&gt;proc~reset_iteration_control -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge6" class="edge">
+<title>proc~solve_time_step_initial_setup_ftcms&#45;&gt;proc~reset_iteration_control</title>
+<path fill="none" stroke="#ff0000" d="M122.86,-125.94C148.99,-111.69 194.94,-88.26 237,-75 244.95,-72.49 253.3,-70.26 261.73,-68.27"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="262.65,-71.65 271.65,-66.05 261.12,-64.82 262.65,-71.65"/>
+</g>
+<!-- proc~set_nonlinear_solver_control -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node8" class="node">
+<title>proc~set_nonlinear_solver_control</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node8"><a xlink:href="../proc/set_nonlinear_solver_control.html" xlink:title="type_control%set_nonlinear_solver_control">
+<polygon fill="#d9534f" stroke="#d9534f" points="476,-24 237,-24 237,0 476,0 476,-24"/>
+<text text-anchor="middle" x="356.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_control%set_nonlinear_solver_control</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_initial_setup_ftcms&#45;&gt;proc~set_nonlinear_solver_control -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge7" class="edge">
+<title>proc~solve_time_step_initial_setup_ftcms&#45;&gt;proc~set_nonlinear_solver_control</title>
+<path fill="none" stroke="#ff0000" d="M112.88,-125.94C134.66,-103.64 184.76,-56.16 237,-33 242.01,-30.78 247.25,-28.79 252.6,-27.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="253.8,-30.3 262.34,-24.03 251.75,-23.61 253.8,-30.3"/>
+</g>
+<!-- proc~get_previous_scalar -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node9" class="node">
+<title>proc~get_previous_scalar</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node9"><a xlink:href="../proc/get_previous_scalar.html" xlink:title="type_variable%get_previous_scalar">
+<polygon fill="#d9534f" stroke="#d9534f" points="740.5,-234 541.5,-234 541.5,-210 740.5,-210 740.5,-234"/>
+<text text-anchor="middle" x="641" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%get_previous_scalar</text>
+</a>
+</g>
+</g>
+<!-- none~get_previous&#45;&gt;proc~get_previous_scalar -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge8" class="edge">
+<title>none~get_previous&#45;&gt;proc~get_previous_scalar</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M437.7,-222C466.77,-222 500.11,-222 531.23,-222"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="531.25,-225.5 541.25,-222 531.25,-218.5 531.25,-225.5"/>
+</g>
+<!-- proc~get_previous_values -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node10" class="node">
+<title>proc~get_previous_values</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node10"><a xlink:href="../proc/get_previous_values.html" xlink:title="type_variable%get_previous_values">
+<polygon fill="#d9534f" stroke="#d9534f" points="742,-276 540,-276 540,-252 742,-252 742,-276"/>
+<text text-anchor="middle" x="641" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%get_previous_values</text>
+</a>
+</g>
+</g>
+<!-- none~get_previous&#45;&gt;proc~get_previous_values -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge9" class="edge">
+<title>none~get_previous&#45;&gt;proc~get_previous_values</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M437.7,-233.92C472.44,-239.09 513.28,-245.16 549.14,-250.49"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="548.71,-253.97 559.11,-251.97 549.74,-247.04 548.71,-253.97"/>
+</g>
+<!-- proc~set_current_array_variable -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node14" class="node">
+<title>proc~set_current_array_variable</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node14"><a xlink:href="../proc/set_current_array_variable.html" xlink:title="type_variable%set_current_array_variable">
+<polygon fill="#d9534f" stroke="#d9534f" points="759,-402 523,-402 523,-378 759,-378 759,-402"/>
+<text text-anchor="middle" x="641" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%set_current_array_variable</text>
+</a>
+</g>
+</g>
+<!-- none~set_current&#45;&gt;proc~set_current_array_variable -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge10" class="edge">
+<title>none~set_current&#45;&gt;proc~set_current_array_variable</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M397.24,-339.01C428.28,-348.1 472.61,-360.44 512,-369 523.89,-371.59 536.47,-374.01 548.91,-376.24"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="548.39,-379.7 558.85,-377.98 549.6,-372.81 548.39,-379.7"/>
+</g>
+<!-- proc~set_current_scalar_all_variable -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node15" class="node">
+<title>proc~set_current_scalar_all_variable</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node15"><a xlink:href="../proc/set_current_scalar_all_variable.html" xlink:title="type_variable%set_current_scalar_all_variable">
+<polygon fill="#d9534f" stroke="#d9534f" points="770,-360 512,-360 512,-336 770,-336 770,-360"/>
+<text text-anchor="middle" x="641" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%set_current_scalar_all_variable</text>
+</a>
+</g>
+</g>
+<!-- none~set_current&#45;&gt;proc~set_current_scalar_all_variable -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge11" class="edge">
+<title>none~set_current&#45;&gt;proc~set_current_scalar_all_variable</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M433.58,-332.66C454.67,-334.22 478.24,-335.98 501.71,-337.72"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="501.52,-341.22 511.75,-338.47 502.04,-334.23 501.52,-341.22"/>
+</g>
+<!-- proc~set_current_scalar_variable -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node16" class="node">
+<title>proc~set_current_scalar_variable</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node16"><a xlink:href="../proc/set_current_scalar_variable.html" xlink:title="type_variable%set_current_scalar_variable">
+<polygon fill="#d9534f" stroke="#d9534f" points="761,-318 521,-318 521,-294 761,-294 761,-318"/>
+<text text-anchor="middle" x="641" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%set_current_scalar_variable</text>
+</a>
+</g>
+</g>
+<!-- none~set_current&#45;&gt;proc~set_current_scalar_variable -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge12" class="edge">
+<title>none~set_current&#45;&gt;proc~set_current_scalar_variable</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M433.58,-321.34C457.41,-319.57 484.42,-317.56 510.86,-315.6"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="511.25,-319.08 520.96,-314.85 510.73,-312.1 511.25,-319.08"/>
+</g>
+<!-- proc~increment_total_iteration -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node11" class="node">
+<title>proc~increment_total_iteration</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node11"><a xlink:href="../proc/increment_total_iteration.html" xlink:title="type_iteration%increment_total_iteration">
+<polygon fill="#d9534f" stroke="#d9534f" points="755.5,-150 526.5,-150 526.5,-126 755.5,-126 755.5,-150"/>
+<text text-anchor="middle" x="641" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%increment_total_iteration</text>
+</a>
+</g>
+</g>
+<!-- proc~increment_total_control&#45;&gt;proc~increment_total_iteration -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge13" class="edge">
+<title>proc~increment_total_control&#45;&gt;proc~increment_total_iteration</title>
+<path fill="none" stroke="#48ff00" d="M463.09,-138C480.39,-138 498.44,-138 516.13,-138"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="516.49,-141.5 526.49,-138 516.49,-134.5 516.49,-141.5"/>
+</g>
+<!-- proc~is_valid_physics_type -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node12" class="node">
+<title>proc~is_valid_physics_type</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node12"><a xlink:href="../proc/is_valid_physics_type.html" xlink:title="type_physics_types%is_valid_physics_type">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="758.5,-192 523.5,-192 523.5,-168 758.5,-168 758.5,-192"/>
+<text text-anchor="middle" x="641" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_types%is_valid_physics_type</text>
+</a>
+</g>
+</g>
+<!-- proc~is_physics_active_control&#45;&gt;proc~is_valid_physics_type -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge14" class="edge">
+<title>proc~is_physics_active_control&#45;&gt;proc~is_valid_physics_type</title>
+<path fill="none" stroke="#00ff91" d="M466.72,-180C481.88,-180 497.55,-180 513,-180"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="513.11,-183.5 523.11,-180 513.11,-176.5 513.11,-183.5"/>
+</g>
+<!-- reset -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node18" class="node">
+<title>reset</title>
+<polygon fill="#777777" stroke="#777777" points="668,-108 614,-108 614,-84 668,-84 668,-108"/>
+<text text-anchor="middle" x="641" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">reset</text>
+</g>
+<!-- proc~reset_acceleration_control&#45;&gt;reset -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge15" class="edge">
+<title>proc~reset_acceleration_control&#45;&gt;reset</title>
+<path fill="none" stroke="#0091ff" d="M470.78,-96C518.15,-96 569.89,-96 603.53,-96"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="603.78,-99.5 613.78,-96 603.78,-92.5 603.78,-99.5"/>
+</g>
+<!-- proc~reset_iteration -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node13" class="node">
+<title>proc~reset_iteration</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node13"><a xlink:href="../proc/reset_iteration.html" xlink:title="type_iteration%reset_iteration">
+<polygon fill="#d9534f" stroke="#d9534f" points="727,-66 555,-66 555,-42 727,-42 727,-66"/>
+<text text-anchor="middle" x="641" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%reset_iteration</text>
+</a>
+</g>
+</g>
+<!-- proc~reset_iteration_control&#45;&gt;proc~reset_iteration -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge16" class="edge">
+<title>proc~reset_iteration_control&#45;&gt;proc~reset_iteration</title>
+<path fill="none" stroke="#4800ff" d="M459.89,-54C487.47,-54 517.2,-54 544.4,-54"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="544.69,-57.5 554.69,-54 544.69,-50.5 544.69,-57.5"/>
+</g>
+<!-- proc~set_nonlinear_solver_iteration -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node17" class="node">
+<title>proc~set_nonlinear_solver_iteration</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node17"><a xlink:href="../proc/set_nonlinear_solver_iteration.html" xlink:title="type_iteration%set_nonlinear_solver_iteration">
+<polygon fill="#d9534f" stroke="#d9534f" points="769,-24 513,-24 513,0 769,0 769,-24"/>
+<text text-anchor="middle" x="641" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%set_nonlinear_solver_iteration</text>
+</a>
+</g>
+</g>
+<!-- proc~set_nonlinear_solver_control&#45;&gt;proc~set_nonlinear_solver_iteration -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge17" class="edge">
+<title>proc~set_nonlinear_solver_control&#45;&gt;proc~set_nonlinear_solver_iteration</title>
+<path fill="none" stroke="#ff00da" d="M476.08,-12C484.85,-12 493.75,-12 502.63,-12"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="502.63,-15.5 512.63,-12 502.63,-8.5 502.63,-15.5"/>
+</g>
+<!-- proc~assert_initialized -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node20" class="node">
+<title>proc~assert_initialized</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node20"><a xlink:href="../proc/assert_initialized.html" xlink:title="type_variable%assert_initialized">
+<polygon fill="#d9534f" stroke="#d9534f" points="1069.5,-307 886.5,-307 886.5,-283 1069.5,-283 1069.5,-307"/>
+<text text-anchor="middle" x="978" y="-292.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%assert_initialized</text>
+</a>
+</g>
+</g>
+<!-- proc~get_previous_scalar&#45;&gt;proc~assert_initialized -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge18" class="edge">
+<title>proc~get_previous_scalar&#45;&gt;proc~assert_initialized</title>
+<path fill="none" stroke="#ff0000" d="M727.07,-234.01C741.48,-236.6 756.23,-239.6 770,-243 786.37,-247.04 789.77,-250.41 806,-255 839.88,-264.59 878,-273.67 909.63,-280.74"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="909.14,-284.22 919.66,-282.97 910.66,-277.39 909.14,-284.22"/>
+</g>
+<!-- proc~get_prev_index -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node21" class="node">
+<title>proc~get_prev_index</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node21"><a xlink:href="../proc/get_prev_index.html" xlink:title="type_variable%get_prev_index">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1065,-246 891,-246 891,-222 1065,-222 1065,-246"/>
+<text text-anchor="middle" x="978" y="-231.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%get_prev_index</text>
+</a>
+</g>
+</g>
+<!-- proc~get_previous_scalar&#45;&gt;proc~get_prev_index -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge19" class="edge">
+<title>proc~get_previous_scalar&#45;&gt;proc~get_prev_index</title>
+<path fill="none" stroke="#ff0000" d="M740.7,-225.54C784.93,-227.12 836.9,-228.98 880.82,-230.55"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="880.81,-234.06 890.93,-230.92 881.06,-227.06 880.81,-234.06"/>
+</g>
+<!-- proc~get_previous_values&#45;&gt;proc~assert_initialized -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge20" class="edge">
+<title>proc~get_previous_values&#45;&gt;proc~assert_initialized</title>
+<path fill="none" stroke="#ff9900" d="M742.06,-273.26C784.45,-277.18 833.76,-281.74 876.23,-285.67"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="876.02,-289.17 886.3,-286.61 876.67,-282.2 876.02,-289.17"/>
+</g>
+<!-- proc~get_previous_values&#45;&gt;proc~get_prev_index -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge21" class="edge">
+<title>proc~get_previous_values&#45;&gt;proc~get_prev_index</title>
+<path fill="none" stroke="#ff9900" d="M742.06,-255.04C785.97,-251.11 837.3,-246.51 880.77,-242.62"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="881.13,-246.1 890.78,-241.72 880.5,-239.13 881.13,-246.1"/>
+</g>
+<!-- proc~in_group_physics_type -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node22" class="node">
+<title>proc~in_group_physics_type</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node22"><a xlink:href="../proc/in_group_physics_type.html" xlink:title="type_physics_types%in_group_physics_type">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1099,-193 857,-193 857,-169 1099,-169 1099,-193"/>
+<text text-anchor="middle" x="978" y="-178.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_types%in_group_physics_type</text>
+</a>
+</g>
+</g>
+<!-- proc~is_valid_physics_type&#45;&gt;proc~in_group_physics_type -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge22" class="edge">
+<title>proc~is_valid_physics_type&#45;&gt;proc~in_group_physics_type</title>
+<path fill="none" stroke="#33ff00" d="M758.7,-180.35C787.07,-180.43 817.6,-180.52 846.57,-180.61"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="846.73,-184.11 856.74,-180.64 846.76,-177.11 846.73,-184.11"/>
+</g>
+<!-- interface~apply_initial_policy_iteration_strategy -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node19" class="node">
+<title>interface~apply_initial_policy_iteration_strategy</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node19"><a xlink:href="../interface/apply_initial_policy_iteration_strategy.html" xlink:title="type_iteration_strategy%apply_initial_policy_iteration_strategy">
+<polygon fill="#a7506f" stroke="#a7506f" points="1150,-45 806,-45 806,-21 1150,-21 1150,-45"/>
+<text text-anchor="middle" x="978" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration_strategy%apply_initial_policy_iteration_strategy</text>
+</a>
+</g>
+</g>
+<!-- proc~reset_iteration&#45;&gt;interface~apply_initial_policy_iteration_strategy -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge23" class="edge">
+<title>proc~reset_iteration&#45;&gt;interface~apply_initial_policy_iteration_strategy</title>
+<path fill="none" stroke="#00ff66" d="M727.4,-48.65C748.52,-47.32 771.95,-45.85 795.75,-44.36"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="796.21,-47.84 805.97,-43.72 795.77,-40.85 796.21,-47.84"/>
+</g>
+<!-- proc~reset_iteration_setting -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node23" class="node">
+<title>proc~reset_iteration_setting</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node23"><a xlink:href="../proc/reset_iteration_setting.html" xlink:title="type_iteration_setting%reset_iteration_setting">
+<polygon fill="#d9534f" stroke="#d9534f" points="1105.5,-87 850.5,-87 850.5,-63 1105.5,-63 1105.5,-87"/>
+<text text-anchor="middle" x="978" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration_setting%reset_iteration_setting</text>
+</a>
+</g>
+</g>
+<!-- proc~reset_iteration&#45;&gt;proc~reset_iteration_setting -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge24" class="edge">
+<title>proc~reset_iteration&#45;&gt;proc~reset_iteration_setting</title>
+<path fill="none" stroke="#00ff66" d="M727.4,-59.35C761.66,-61.5 802,-64.03 840.14,-66.42"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="840.11,-69.93 850.31,-67.06 840.55,-62.94 840.11,-69.93"/>
+</g>
+<!-- proc~set_current_array_variable&#45;&gt;proc~assert_initialized -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge25" class="edge">
+<title>proc~set_current_array_variable&#45;&gt;proc~assert_initialized</title>
+<path fill="none" stroke="#00ffff" d="M728.51,-377.99C742.47,-375.43 756.7,-372.44 770,-369 830.38,-353.39 898.01,-327.56 939.04,-310.92"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="940.45,-314.12 948.38,-307.1 937.8,-307.64 940.45,-314.12"/>
+</g>
+<!-- proc~set_current_scalar_all_variable&#45;&gt;proc~assert_initialized -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge26" class="edge">
+<title>proc~set_current_scalar_all_variable&#45;&gt;proc~assert_initialized</title>
+<path fill="none" stroke="#0066ff" d="M718.02,-335.97C769.43,-327.84 837.43,-317.08 890.86,-308.63"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="891.66,-312.04 900.99,-307.02 890.57,-305.13 891.66,-312.04"/>
+</g>
+<!-- proc~set_current_scalar_variable&#45;&gt;proc~assert_initialized -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge27" class="edge">
+<title>proc~set_current_scalar_variable&#45;&gt;proc~assert_initialized</title>
+<path fill="none" stroke="#3200ff" d="M761.05,-302.09C798.7,-300.85 839.92,-299.5 876.16,-298.31"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="876.36,-301.81 886.24,-297.98 876.13,-294.81 876.36,-301.81"/>
+</g>
+<!-- proc~apply_initial_policy_iteration_strategy -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node25" class="node">
+<title>proc~apply_initial_policy_iteration_strategy</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node25"><a xlink:href="../proc/apply_initial_policy_iteration_strategy.html" xlink:title="apply_initial_policy_iteration_strategy">
+<polygon fill="#d9534f" stroke="#d9534f" points="1445,-45 1233,-45 1233,-21 1445,-21 1445,-45"/>
+<text text-anchor="middle" x="1339" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">apply_initial_policy_iteration_strategy</text>
+</a>
+</g>
+</g>
+<!-- interface~apply_initial_policy_iteration_strategy&#45;&gt;proc~apply_initial_policy_iteration_strategy -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge28" class="edge">
+<title>interface~apply_initial_policy_iteration_strategy&#45;&gt;proc~apply_initial_policy_iteration_strategy</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1150.09,-33C1174.63,-33 1199.38,-33 1222.5,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1222.65,-36.5 1232.65,-33 1222.65,-29.5 1222.65,-36.5"/>
+</g>
+<!-- proc~raise_error -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node26" class="node">
+<title>proc~raise_error</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node26"><a xlink:href="../proc/raise_error.html" xlink:title="raise_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="1374,-304 1304,-304 1304,-280 1374,-280 1374,-304"/>
+<text text-anchor="middle" x="1339" y="-289.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">raise_error</text>
+</a>
+</g>
+</g>
+<!-- proc~assert_initialized&#45;&gt;proc~raise_error -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge29" class="edge">
+<title>proc~assert_initialized&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#cbff00" d="M1069.59,-294.24C1141.21,-293.64 1238.08,-292.83 1293.73,-292.37"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1293.98,-295.87 1303.95,-292.28 1293.92,-288.87 1293.98,-295.87"/>
+</g>
+<!-- strip -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node27" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="1870.5,-232 1816.5,-232 1816.5,-208 1870.5,-208 1870.5,-232"/>
+<text text-anchor="middle" x="1843.5" y="-217.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~in_group_physics_type&#45;&gt;strip -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge30" class="edge">
+<title>proc~in_group_physics_type&#45;&gt;strip</title>
+<path fill="none" stroke="#0066ff" d="M1099.01,-184.77C1202.99,-188.19 1357.46,-193.67 1492,-200 1606.53,-205.39 1742,-213.66 1805.79,-217.66"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1805.93,-221.18 1816.13,-218.31 1806.37,-214.19 1805.93,-221.18"/>
+</g>
+<!-- to_lower -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node28" class="node">
+<title>to_lower</title>
+<polygon fill="#777777" stroke="#777777" points="1368,-233 1310,-233 1310,-209 1368,-209 1368,-233"/>
+<text text-anchor="middle" x="1339" y="-218.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_lower</text>
+</g>
+<!-- proc~in_group_physics_type&#45;&gt;to_lower -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge31" class="edge">
+<title>proc~in_group_physics_type&#45;&gt;to_lower</title>
+<path fill="none" stroke="#0066ff" d="M1086.71,-193C1158.83,-201.04 1249.45,-211.13 1299.8,-216.74"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1299.58,-220.24 1309.91,-217.87 1300.36,-213.28 1299.58,-220.24"/>
+</g>
+<!-- interface~reset_convergence_control -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node24" class="node">
+<title>interface~reset_convergence_control</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node24"><a xlink:href="../interface/reset_convergence_control.html" xlink:title="type_convergence_control%reset_convergence_control">
+<polygon fill="#a7506f" stroke="#a7506f" points="1492,-87 1186,-87 1186,-63 1492,-63 1492,-87"/>
+<text text-anchor="middle" x="1339" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_convergence_control%reset_convergence_control</text>
+</a>
+</g>
+</g>
+<!-- proc~reset_iteration_setting&#45;&gt;interface~reset_convergence_control -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge32" class="edge">
+<title>proc~reset_iteration_setting&#45;&gt;interface~reset_convergence_control</title>
+<path fill="none" stroke="#cc00ff" d="M1105.57,-75C1128.27,-75 1152.21,-75 1175.74,-75"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1175.8,-78.5 1185.8,-75 1175.8,-71.5 1175.8,-78.5"/>
+</g>
+<!-- proc~reset_convergence_control -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node30" class="node">
+<title>proc~reset_convergence_control</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node30"><a xlink:href="../proc/reset_convergence_control.html" xlink:title="reset_convergence_control">
+<polygon fill="#d9534f" stroke="#d9534f" points="1684,-87 1528,-87 1528,-63 1684,-63 1684,-87"/>
+<text text-anchor="middle" x="1606" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">reset_convergence_control</text>
+</a>
+</g>
+</g>
+<!-- interface~reset_convergence_control&#45;&gt;proc~reset_convergence_control -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge33" class="edge">
+<title>interface~reset_convergence_control&#45;&gt;proc~reset_convergence_control</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1492.23,-75C1500.83,-75 1509.31,-75 1517.53,-75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1517.8,-78.5 1527.8,-75 1517.8,-71.5 1517.8,-78.5"/>
+</g>
+<!-- proc~raise_error&#45;&gt;strip -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge35" class="edge">
+<title>proc~raise_error&#45;&gt;strip</title>
+<path fill="none" stroke="#00ff66" d="M1374.14,-279.98C1411.43,-267.42 1473.16,-248.28 1528,-239 1627.52,-222.17 1746.96,-219.73 1805.91,-219.68"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1806.19,-223.18 1816.19,-219.7 1806.2,-216.18 1806.19,-223.18"/>
+</g>
+<!-- proc~replace_placeholder -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node29" class="node">
+<title>proc~replace_placeholder</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node29"><a xlink:href="../proc/replace_placeholder.html" xlink:title="replace_placeholder">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1666.5,-272 1545.5,-272 1545.5,-248 1666.5,-248 1666.5,-272"/>
+<text text-anchor="middle" x="1606" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">replace_placeholder</text>
+</a>
+</g>
+</g>
+<!-- proc~raise_error&#45;&gt;proc~replace_placeholder -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge34" class="edge">
+<title>proc~raise_error&#45;&gt;proc~replace_placeholder</title>
+<path fill="none" stroke="#00ff66" d="M1374.1,-287.88C1414.6,-282.99 1483.18,-274.71 1535.11,-268.44"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1535.75,-271.89 1545.26,-267.21 1534.91,-264.94 1535.75,-271.89"/>
+</g>
+<!-- to_string -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node31" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="1635,-314 1577,-314 1577,-290 1635,-290 1635,-314"/>
+<text text-anchor="middle" x="1606" y="-299.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~raise_error&#45;&gt;to_string -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge36" class="edge">
+<title>proc~raise_error&#45;&gt;to_string</title>
+<path fill="none" stroke="#00ff66" d="M1374.1,-293.29C1423.54,-295.15 1514.84,-298.6 1566.58,-300.55"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1566.56,-304.05 1576.69,-300.93 1566.83,-297.06 1566.56,-304.05"/>
+</g>
+<!-- proc~replace_placeholder&#45;&gt;strip -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge37" class="edge">
+<title>proc~replace_placeholder&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M1666.73,-249.85C1710.82,-242.37 1769.39,-232.42 1806.52,-226.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1807.12,-229.56 1816.4,-224.43 1805.95,-222.66 1807.12,-229.56"/>
+</g>
+<!-- interface~reset_criterion -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node32" class="node">
+<title>interface~reset_criterion</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node32"><a xlink:href="../interface/reset_criterion.html" xlink:title="type_convergence_criterion%reset_criterion">
+<polygon fill="#a7506f" stroke="#a7506f" points="1967,-87 1720,-87 1720,-63 1967,-63 1967,-87"/>
+<text text-anchor="middle" x="1843.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_convergence_criterion%reset_criterion</text>
+</a>
+</g>
+</g>
+<!-- proc~reset_convergence_control&#45;&gt;interface~reset_criterion -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge38" class="edge">
+<title>proc~reset_convergence_control&#45;&gt;interface~reset_criterion</title>
+<path fill="none" stroke="#00ff00" d="M1684.11,-75C1692.4,-75 1701,-75 1709.71,-75"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1709.98,-78.5 1719.98,-75 1709.98,-71.5 1709.98,-78.5"/>
+</g>
+<!-- proc~reset_criterion -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node33" class="node">
+<title>proc~reset_criterion</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_node33"><a xlink:href="../proc/reset_criterion.html" xlink:title="reset_criterion">
+<polygon fill="#d9534f" stroke="#d9534f" points="2092,-87 2003,-87 2003,-63 2092,-63 2092,-87"/>
+<text text-anchor="middle" x="2047.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">reset_criterion</text>
+</a>
+</g>
+</g>
+<!-- interface~reset_criterion&#45;&gt;proc~reset_criterion -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CallsGraph_edge39" class="edge">
+<title>interface~reset_criterion&#45;&gt;proc~reset_criterion</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1967.24,-75C1975.98,-75 1984.48,-75 1992.48,-75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1992.68,-78.5 2002.68,-75 1992.68,-71.5 1992.68,-78.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocsolve_time_step_initial_setup_ftcmsCallsGraph = svgPanZoom('#procsolve_time_step_initial_setup_ftcmsCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~solve_time_step_initial_setup_ftcms~~CalledByGraph Pages: 1 -->
+<svg id="procsolve_time_step_initial_setup_ftcmsCalledByGraph" width="641pt" height="17pt"
+ viewBox="0.00 0.00 641.00 17.30" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CalledByGraph" class="graph" transform="scale(0.54 0.54) rotate(0) translate(4 28)">
+<title>proc~~solve_time_step_initial_setup_ftcms~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 1182,-28 1182,4 -4,4"/>
+<!-- proc~solve_time_step_initial_setup_ftcms -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CalledByGraph_node1" class="node">
+<title>proc~solve_time_step_initial_setup_ftcms</title>
+<polygon fill="none" stroke="black" points="1178,-24 977,-24 977,0 1178,0 1178,-24"/>
+<text text-anchor="middle" x="1077.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">solve_time_step_initial_setup_ftcms</text>
+</g>
+<!-- interface~solve_time_step_initial_setup_ftcms -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CalledByGraph_node2" class="node">
+<title>interface~solve_time_step_initial_setup_ftcms</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CalledByGraph_node2"><a xlink:href="../interface/solve_time_step_initial_setup_ftcms.html" xlink:title="type_ftcms%solve_time_step_initial_setup_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="941,-24 673,-24 673,0 941,0 941,-24"/>
+<text text-anchor="middle" x="807" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_initial_setup_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_initial_setup_ftcms&#45;&gt;proc~solve_time_step_initial_setup_ftcms -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CalledByGraph_edge1" class="edge">
+<title>interface~solve_time_step_initial_setup_ftcms&#45;&gt;proc~solve_time_step_initial_setup_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M941.07,-12C949.6,-12 958.14,-12 966.54,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="966.72,-15.5 976.72,-12 966.72,-8.5 966.72,-15.5"/>
+</g>
+<!-- proc~solve_time_step_ftcms -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CalledByGraph_node3" class="node">
+<title>proc~solve_time_step_ftcms</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CalledByGraph_node3"><a xlink:href="../proc/solve_time_step_ftcms.html" xlink:title="solve_time_step_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="637,-24 505,-24 505,0 637,0 637,-24"/>
+<text text-anchor="middle" x="571" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_initial_setup_ftcms -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CalledByGraph_edge2" class="edge">
+<title>proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_initial_setup_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M637.18,-12C645.25,-12 653.73,-12 662.41,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="662.69,-15.5 672.69,-12 662.69,-8.5 662.69,-15.5"/>
+</g>
+<!-- interface~solve_time_step_ftcms -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CalledByGraph_node4" class="node">
+<title>interface~solve_time_step_ftcms</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CalledByGraph_node4"><a xlink:href="../interface/solve_time_step_ftcms.html" xlink:title="type_ftcms%solve_time_step_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="469,-24 270,-24 270,0 469,0 469,-24"/>
+<text text-anchor="middle" x="369.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CalledByGraph_edge3" class="edge">
+<title>interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M469.08,-12C477.74,-12 486.4,-12 494.82,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="494.94,-15.5 504.94,-12 494.94,-8.5 494.94,-15.5"/>
+</g>
+<!-- proc~run_ftcms -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CalledByGraph_node5" class="node">
+<title>proc~run_ftcms</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CalledByGraph_node5"><a xlink:href="../proc/run_ftcms.html" xlink:title="run_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 169,-24 169,0 234,0 234,-24"/>
+<text text-anchor="middle" x="201.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CalledByGraph_edge4" class="edge">
+<title>proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M234.11,-12C241.85,-12 250.57,-12 259.76,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="259.88,-15.5 269.88,-12 259.88,-8.5 259.88,-15.5"/>
+</g>
+<!-- interface~run_ftcms -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CalledByGraph_node6" class="node">
+<title>interface~run_ftcms</title>
+<g id="a_proc~~solve_time_step_initial_setup_ftcms~~CalledByGraph_node6"><a xlink:href="../interface/run_ftcms.html" xlink:title="type_ftcms%run_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="133,-24 0,-24 0,0 133,0 133,-24"/>
+<text text-anchor="middle" x="66.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftcms&#45;&gt;proc~run_ftcms -->
+<g id="proc~~solve_time_step_initial_setup_ftcms~~CalledByGraph_edge5" class="edge">
+<title>interface~run_ftcms&#45;&gt;proc~run_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M133.22,-12C141.87,-12 150.53,-12 158.63,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="158.89,-15.5 168.89,-12 158.89,-8.5 158.89,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocsolve_time_step_initial_setup_ftcmsCalledByGraph = svgPanZoom('#procsolve_time_step_initial_setup_ftcmsCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">solve_time_step_initial_setup_ftcms</span><span class="p">(</span><span class="n">self</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_ftcms</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">contiguous</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">u</span>
+
+<span class="w">        </span><span class="k">nullify</span><span class="w"> </span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Reset iteration control</span>
+<span class="w">        </span><span class="c">! reset() may set the compute solver to NONE when config is NONE.</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">control</span><span class="p">%</span><span class="n">reset_iteration</span><span class="p">()</span>
+
+<span class="w">        </span><span class="c">! [Important] Compute solver must always be PICARD or NEWTON.</span>
+<span class="w">        </span><span class="c">! Even for NONE (linear) config, Picard discretization is used,</span>
+<span class="w">        </span><span class="c">! so explicitly set PICARD here to override the reset state.</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">control</span><span class="p">%</span><span class="n">set_nonlinear_solver</span><span class="p">(</span><span class="n">NONLINEAR_SOLVER</span><span class="p">%</span><span class="n">PICARD</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">control</span><span class="p">%</span><span class="n">increment_total</span><span class="p">()</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">control</span><span class="p">%</span><span class="n">reset_acceleration</span><span class="p">()</span>
+
+<span class="w">        </span><span class="c">! Save previous step values (Previous &lt;- Current)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">porosity</span><span class="p">%</span><span class="n">get_previous</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">associated</span><span class="p">(</span><span class="n">u</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">porosity</span><span class="p">%</span><span class="n">set_current</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+<span class="w">            </span><span class="k">nullify</span><span class="w"> </span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">control</span><span class="p">%</span><span class="n">is_physics_active</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">THERMAL</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">temperature</span><span class="p">%</span><span class="n">get_previous</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">associated</span><span class="p">(</span><span class="n">u</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                call </span><span class="n">self</span><span class="p">%</span><span class="n">temperature</span><span class="p">%</span><span class="n">set_current</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+<span class="w">                </span><span class="k">nullify</span><span class="w"> </span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">control</span><span class="p">%</span><span class="n">is_physics_active</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">HYDRAULIC</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">pressure</span><span class="p">%</span><span class="n">get_previous</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">associated</span><span class="p">(</span><span class="n">u</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                call </span><span class="n">self</span><span class="p">%</span><span class="n">pressure</span><span class="p">%</span><span class="n">set_current</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+<span class="w">                </span><span class="k">nullify</span><span class="w"> </span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        end if</span>
+
+<span class="k">    end subroutine </span><span class="n">solve_time_step_initial_setup_ftcms</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-03-11 14:03 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

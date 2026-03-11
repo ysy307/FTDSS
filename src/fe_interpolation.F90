@@ -51,15 +51,16 @@ contains
     end subroutine lerp_3d_abst_fe
 
     !---------------------------------------------------------------------------
-    !> 物理座標系における値の勾配(nabla u)を計算する
-    !> 内部で dpsi_dx (形状関数の物理勾配) を呼び出して線形結合をとる
+    !> Computes the gradient of a field in physical coordinates (nabla u).
+    !> Internally calls dpsi_dx (physical gradients of shape functions) and
+    !> forms the linear combination.
     !>
-    !> @param[in]    self          要素オブジェクト
-    !> @param[in]    r             局所座標 (xi, eta, zeta)
-    !> @param[in]    values        節点値配列 (u_i) [num_nodes]
-    !> @param[in]    node_coords   節点座標配列 (x, y, z)
-    !> @param[in]    plane_axis    2次元の場合の軸指定 (1:XY面, 2:XZ面). 3次元は無視.
-    !> @param[inout] dlerped_value 計算された勾配ベクトル (du/dx, du/dy, du/dz)
+    !> @param[in]    self          Element object
+    !> @param[in]    r             Local coordinate (xi, eta, zeta)
+    !> @param[in]    values        Nodal value array (u_i) [num_nodes]
+    !> @param[in]    node_coords   Nodal coordinate array (x, y, z)
+    !> @param[in]    plane_axis    Axis specification for 2D (1: XY-plane, 2: XZ-plane). Ignored in 3D.
+    !> @param[inout] dlerped_value Computed gradient vector (du/dx, du/dy, du/dz)
     !---------------------------------------------------------------------------
     module subroutine dlerp_abst_fe(self, r, values, node_coords, plane_axis, dlerped_value)
         implicit none
@@ -70,36 +71,36 @@ contains
         integer(int32), intent(in) :: plane_axis
         type(type_coordinate_dp), intent(inout) :: dlerped_value
 
-        ! 形状関数の物理勾配を格納する一時配列 (3 x num_nodes)
-        ! calc_dpsi_dx は dim=2 の場合 (1:2, :) に値を埋めることに注意
+        ! Temporary array for physical gradients of shape functions (dim x num_nodes).
+        ! Note: calc_dpsi_dx fills (1:dim, :) when dim=2.
         real(real64) :: shape_grads(self%dimension, self%num_nodes)
         real(real64) :: dlerp_array(self%dimension)
         integer(int32) :: ierr
 
-        ! 1. 初期化
+        ! 1. Initialize
         call dlerped_value%reset()
         shape_grads(:, :) = 0.0d0
         dlerp_array(:) = 0.0d0
 
-        ! 2. 形状関数の物理勾配 (dN_i/dx, dN_i/dy, dN_i/dz) を取得
+        ! 2. Get physical gradients of shape functions (dN_i/dx, dN_i/dy, dN_i/dz)
         call self%calc_shape_function(r, node_coords, dpsi_dx=shape_grads)
 
         call matvec(shape_grads, values, dlerp_array, ierr)
 
-        ! 3. 勾配の計算: grad u = sum( u_i * grad N_i )
-        ! shape_grads の第1次元は常に 1〜dim に詰められていることを考慮してマッピングする
+        ! 3. Compute gradient: grad u = sum( u_i * grad N_i )
+        ! Map from shape_grads (always packed into 1:dim) to physical coordinate components.
         if (self%dimension == 3) then
-            ! --- 3次元 (XYZ) ---
-            ! shape_grads(1:3, :) に順に x, y, z 成分が入っている
+            ! --- 3D (XYZ) ---
+            ! shape_grads(1:3, :) contains x, y, z components in order
             dlerped_value%x = dlerp_array(1)
             dlerped_value%y = dlerp_array(2)
             dlerped_value%z = dlerp_array(3)
         else if (self%dimension == 2) then
-            ! --- 2次元 (XY or XZ) ---
-            ! shape_grads(1, :) -> 第1成分 (x)
-            ! shape_grads(2, :) -> 第2成分 (y or z)
+            ! --- 2D (XY or XZ) ---
+            ! shape_grads(1, :) -> 1st component (x)
+            ! shape_grads(2, :) -> 2nd component (y or z)
 
-            ! 第1成分は常に x
+            ! 1st component is always x
             dlerped_value%x = dlerp_array(1)
 
             if (plane_axis == 2) then

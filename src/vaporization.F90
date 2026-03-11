@@ -1,25 +1,25 @@
 !>
 !> @brief Physics models for vaporization.
 !>
-module physics_models_phase_change_liquid_vapor_vaporization
+module models_phase_change_vaporization
     use, intrinsic :: iso_fortran_env
     use :: iapws, only:type_iapws97
     use :: module_core, only:type_state
-    use :: physics_constants, only: &
+    use :: constitutive_constants, only: &
         g => gravity_acceleration, &
         T_to_K => celsius_to_kelvin, &
         Rg => universal_gas_constant, &
         Mw => molar_mass_water, &
         rho_std => reference_water_density, &
         P_atm => standard_atmospheric_pressure
-    use :: physics_base, only:abst_physics
+    use :: physics_constitutive_base, only:abst_constitutive
 
     implicit none
     private
 
     public :: type_evaporation
 
-    type, extends(abst_physics) :: type_evaporation
+    type, extends(abst_constitutive) :: type_evaporation
     contains
         procedure, pass(self), public :: initialize => initialize_evaporation_model
         procedure, pass(self), public :: calc_latent_heat_vaporization
@@ -158,7 +158,7 @@ contains
     end subroutine calc_vapor_content_vaporization
 
     !>
-    !> @brief 蒸気量(液等価)の圧力・温度微分を計算する
+    !> @brief Compute pressure and temperature derivatives of vapor content (liquid equivalent).
     !>
     !> d(theta_v)/dX = d(theta_g)/dX * (Ratio) + theta_g * d(Ratio)/dX
     !> where Ratio = rho_sat * RH / rho_w
@@ -179,7 +179,7 @@ contains
         real(real64) :: rho_w, drho_w_dP, drho_w_dT
         real(real64) :: ratio, dratio_dP, dratio_dT
 
-        ! 1. 状態量の準備
+        ! 1. Prepare state variables
         call state%temperature%get(temperature)
         call state%pressure%get(pressure)
         call state%air_content%get(air_content)
@@ -187,7 +187,7 @@ contains
         call state%dQa_dT%get(d_air_content_dT)
         call self%shift_temperature_absolute(temperature, temperature_K)
 
-        ! 2. 各項の計算
+        ! 2. Compute individual terms
 
         ! Relative Humidity & Derivatives
         call self%calc_relative_humidity(state, rh)
@@ -203,7 +203,7 @@ contains
         call self%calc_drho_water_dT(state, drho_w_dT)
         call self%calc_drho_water_dP(state, drho_w_dP)
 
-        ! 3. 蒸気密度比 (Ratio = rho_sat * RH / rho_w) の計算と微分
+        ! 3. Vapor density ratio (Ratio = rho_sat * RH / rho_w) and its derivatives
 
         ratio = (rho_sat * rh) / rho_w
 
@@ -215,7 +215,7 @@ contains
         dratio_dT = (1.0d0 / rho_w) * (drho_sat_dT * rh + rho_sat * drh_dT) - &
                     (ratio / rho_w) * drho_w_dT
 
-        ! 4. 全微分の組み立て (積の微分)
+        ! 4. Assemble total derivatives (product rule)
         ! Vapor = Air * Ratio
         ! dVapor/dX = dAir/dX * Ratio + Air * dRatio/dX
 
@@ -224,4 +224,4 @@ contains
 
     end subroutine calc_vapor_content_derivatives
 
-end module physics_models_phase_change_liquid_vapor_vaporization
+end module models_phase_change_vaporization

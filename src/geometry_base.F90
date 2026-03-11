@@ -1,9 +1,9 @@
-submodule(inout_input_geometry) inout_input_geometry_base
-    use :: inout_input
+submodule(io_input_geometry) input_geometry_base
+    use :: io_input
     implicit none
 contains
 !================================================================!
-    ! メインの初期化サブルーチン
+    ! Main initialization subroutine
     !================================================================!
     module subroutine initialize_type_input_geometry(self)
         implicit none
@@ -16,13 +16,15 @@ contains
         select type (p => self%parent)
         type is (type_input)
 
-            ! 1. 初期条件から、ファイルから読み込むべきフィールド名のリストを取得する
-            !    (内部で basic の解析フラグをチェック)
+            ! 1. Get list of field names to read from initial conditions
+            !    (internally checks basic analysis flags)
+            ! (internally checks basic analysis flags)
             fields_to_read = self%collect_fields_from_conditions()
 
             fullpath = trim(p%input_path)//trim(p%basic%geometry_settings%file_name)
 
-            if (allocated(fields_to_read)) then
+            ! Check array size > 0 instead of using allocated
+            if (size(fields_to_read) > 0) then
                 if (ends_with(p%basic%geometry_settings%file_name, '.vtk')) then
                     call self%vtk%initialize_vtk( &
                         file_name=strip(fullpath), &
@@ -48,12 +50,12 @@ contains
                         rank_key=strip(p%basic%geometry_settings%rank_key), &
                         color_key=strip(p%basic%geometry_settings%color_key), &
                         point_field_names=fields_to_read)
-
                 end if
 
-                ! 読み込んだフィールド名を後で参照できるように保存
+                ! Save loaded field names for later reference
                 allocate (self%point_data_names, source=fields_to_read)
-                deallocate (fields_to_read)
+                ! Moved deallocate(fields_to_read) to end of block
+
             else
                 if (ends_with(p%basic%geometry_settings%file_name, '.vtk')) then
                     call self%vtk%initialize_vtk( &
@@ -79,8 +81,10 @@ contains
                         rank_key=strip(p%basic%geometry_settings%rank_key), &
                         color_key=strip(p%basic%geometry_settings%color_key))
                 end if
-
             end if
+
+            ! Always deallocate here
+            if (allocated(fields_to_read)) deallocate (fields_to_read)
 
         end select
 
@@ -101,20 +105,20 @@ contains
 
         select type (p => self%parent)
         type is (type_input)
-            ! 全ての初期条件を整数インデックスでループ
+            ! Loop over all initial conditions by index
             do i = 1, IC_TARGETS%NUM_ID
 
-                ! この解析タイプが有効でない場合はスキップ
+                ! Skip if this analysis type is not active
                 if (.not. p%basic%analysis_controls%is_active(i)) cycle
 
-                ! 初期条件がファイルから読み込む設定の場合のみ処理
+                ! Process only if initial condition reads from file
                 if (p%conditions%initial_conditions%physics(i)%type == IC_METHODS%FROM_FILE%NAME) then
 
-                    ! フィールド名が割り当てられているか確認
+                    ! Check if field name is assigned
                     if (allocated(p%conditions%initial_conditions%physics(i)%field_name)) then
                         current_field_name = p%conditions%initial_conditions%physics(i)%field_name
 
-                        ! 重複をチェック
+                        ! Check for duplicates
                         is_duplicate = .false.
                         do k = 1, num_fields
                             if (trim(temp_list(k)) == trim(current_field_name)) then
@@ -123,7 +127,7 @@ contains
                             end if
                         end do
 
-                        ! 重複していなければリストに追加
+                        ! Add to list if not a duplicate
                         if (.not. is_duplicate) then
                             num_fields = num_fields + 1
                             temp_list(num_fields) = current_field_name
@@ -132,12 +136,15 @@ contains
                 end if
             end do
 
-            ! 収集したフィールド名で戻り値の配列を確保
+            ! Allocate return array with collected field names
             if (num_fields > 0) then
                 allocate (character(len=256) :: field_list(num_fields))
                 field_list = temp_list(1:num_fields)
+            else
+                ! If none found, allocate size-0 array and return
+                allocate (character(len=256) :: field_list(0))
             end if
         end select
     end function collect_fields_from_conditions
 
-end submodule inout_input_geometry_base
+end submodule input_geometry_base

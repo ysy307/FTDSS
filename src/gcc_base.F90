@@ -5,7 +5,7 @@
 !> for both non-segregation and segregation GCC models.
 !> Calculations are performed in Pascal [Pa].
 !>
-submodule(physics_models_phase_change_liquid_solid_gcc) gcc_base
+submodule(models_phase_change_gcc) gcc_base
     implicit none
 
 contains
@@ -231,7 +231,7 @@ contains
 
         call state%temperature%get(temperature)
 
-        ! 凍結状態でのみ圧力微分が値を持ちます（非凍結時はサクション0固定のため微分0）
+        ! Pressure derivative is nonzero only in the frozen state (zero when unfrozen since suction is fixed at 0)
         if (temperature <= Tf0) then
             call self%calc_rho_water(state, rho_water)
             call self%calc_rho_ice(state, rho_ice)
@@ -273,7 +273,7 @@ contains
 
         call state%temperature%get(temperature)
 
-        ! 凍結状態でのみ値を持ちます（非凍結時はサクション0固定のため微分0）
+        ! Nonzero only in frozen state (zero when unfrozen since suction is fixed at 0)
         if (temperature <= Tf0) then
             call self%calc_rho_water(state, rho_water)
             call self%calc_rho_ice(state, rho_ice)

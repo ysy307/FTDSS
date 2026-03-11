@@ -1,0 +1,759 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>set_diverged_iteration &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>set_diverged_iteration
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">10 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/iteration_manager.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/iteration_manager.f90.html'>iteration_manager.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/control_iteration_manager.html'>control_iteration_manager</a></li>
+            <li class="breadcrumb-item active" aria-current="page">set_diverged_iteration</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/set_diverged_iteration.html#src">set_diverged_iteration</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine set_diverged_iteration(self, physics_type, diverged)  
+</h2>
+    
+
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_iteration.html'>type_iteration</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~15"></span>
+              class(<a href='../type/type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-physics_type~2"></span>
+              type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>physics_type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-diverged~2"></span>
+              logical,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>diverged</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~set_diverged_iteration~~CallsGraph Pages: 1 -->
+<svg id="procset_diverged_iterationCallsGraph" width="641pt" height="154pt"
+ viewBox="0.00 0.00 641.00 153.71" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~set_diverged_iteration~~CallsGraph" class="graph" transform="scale(0.74 0.74) rotate(0) translate(4 203.43)">
+<title>proc~~set_diverged_iteration~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-203.43 861,-203.43 861,4 -4,4"/>
+<!-- proc~set_diverged_iteration -->
+<g id="proc~~set_diverged_iteration~~CallsGraph_node1" class="node">
+<title>proc~set_diverged_iteration</title>
+<polygon fill="none" stroke="black" points="214,-119.43 0,-119.43 0,-95.43 214,-95.43 214,-119.43"/>
+<text text-anchor="middle" x="107" y="-105.03" font-family="Helvetica,sans-Serif" font-size="10.50">type_iteration%set_diverged_iteration</text>
+</g>
+<!-- proc~is_valid_physics_type -->
+<g id="proc~~set_diverged_iteration~~CallsGraph_node2" class="node">
+<title>proc~is_valid_physics_type</title>
+<g id="a_proc~~set_diverged_iteration~~CallsGraph_node2"><a xlink:href="../proc/is_valid_physics_type.html" xlink:title="type_physics_types%is_valid_physics_type">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="485,-180.43 250,-180.43 250,-156.43 485,-156.43 485,-180.43"/>
+<text text-anchor="middle" x="367.5" y="-166.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_types%is_valid_physics_type</text>
+</a>
+</g>
+</g>
+<!-- proc~set_diverged_iteration&#45;&gt;proc~is_valid_physics_type -->
+<g id="proc~~set_diverged_iteration~~CallsGraph_edge1" class="edge">
+<title>proc~set_diverged_iteration&#45;&gt;proc~is_valid_physics_type</title>
+<path fill="none" stroke="#ff0000" d="M159.07,-119.48C201.2,-129.42 261.09,-143.56 305.69,-154.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="305,-157.51 315.53,-156.4 306.61,-150.7 305,-157.51"/>
+</g>
+<!-- proc~raise_error -->
+<g id="proc~~set_diverged_iteration~~CallsGraph_node3" class="node">
+<title>proc~raise_error</title>
+<g id="a_proc~~set_diverged_iteration~~CallsGraph_node3"><a xlink:href="../proc/raise_error.html" xlink:title="raise_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="402.5,-119.43 332.5,-119.43 332.5,-95.43 402.5,-95.43 402.5,-119.43"/>
+<text text-anchor="middle" x="367.5" y="-105.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">raise_error</text>
+</a>
+</g>
+</g>
+<!-- proc~set_diverged_iteration&#45;&gt;proc~raise_error -->
+<g id="proc~~set_diverged_iteration~~CallsGraph_edge2" class="edge">
+<title>proc~set_diverged_iteration&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff0000" d="M214.26,-107.43C252.13,-107.43 292.72,-107.43 322.45,-107.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="322.5,-110.93 332.5,-107.43 322.5,-103.93 322.5,-110.93"/>
+</g>
+<!-- strip -->
+<g id="proc~~set_diverged_iteration~~CallsGraph_node4" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="855,-138.43 801,-138.43 801,-114.43 855,-114.43 855,-138.43"/>
+<text text-anchor="middle" x="828" y="-124.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~set_diverged_iteration&#45;&gt;strip -->
+<g id="proc~~set_diverged_iteration~~CallsGraph_edge3" class="edge">
+<title>proc~set_diverged_iteration&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M134.73,-95.37C227.4,-55.46 541.24,63.8 763,-44.43 788.68,-56.97 807.07,-85.34 817.37,-105.18"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="814.34,-106.95 821.89,-114.39 820.62,-103.87 814.34,-106.95"/>
+</g>
+<!-- proc~in_group_physics_type -->
+<g id="proc~~set_diverged_iteration~~CallsGraph_node5" class="node">
+<title>proc~in_group_physics_type</title>
+<g id="a_proc~~set_diverged_iteration~~CallsGraph_node5"><a xlink:href="../proc/in_group_physics_type.html" xlink:title="type_physics_types%in_group_physics_type">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="763,-199.43 521,-199.43 521,-175.43 763,-175.43 763,-199.43"/>
+<text text-anchor="middle" x="642" y="-185.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_types%in_group_physics_type</text>
+</a>
+</g>
+</g>
+<!-- proc~is_valid_physics_type&#45;&gt;proc~in_group_physics_type -->
+<g id="proc~~set_diverged_iteration~~CallsGraph_edge4" class="edge">
+<title>proc~is_valid_physics_type&#45;&gt;proc~in_group_physics_type</title>
+<path fill="none" stroke="#ff0000" d="M485.25,-176.57C493.57,-177.15 501.99,-177.74 510.38,-178.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="510.37,-181.83 520.59,-179.03 510.85,-174.85 510.37,-181.83"/>
+</g>
+<!-- proc~raise_error&#45;&gt;strip -->
+<g id="proc~~set_diverged_iteration~~CallsGraph_edge6" class="edge">
+<title>proc~raise_error&#45;&gt;strip</title>
+<path fill="none" stroke="#00ff00" d="M402.58,-113.48C433.4,-118.63 480.07,-125.63 521,-128.43 628.3,-135.78 655.46,-130.11 763,-128.43 771.95,-128.29 781.6,-128.04 790.62,-127.76"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="790.97,-131.25 800.85,-127.43 790.74,-124.26 790.97,-131.25"/>
+</g>
+<!-- proc~replace_placeholder -->
+<g id="proc~~set_diverged_iteration~~CallsGraph_node6" class="node">
+<title>proc~replace_placeholder</title>
+<g id="a_proc~~set_diverged_iteration~~CallsGraph_node6"><a xlink:href="../proc/replace_placeholder.html" xlink:title="replace_placeholder">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="702.5,-119.43 581.5,-119.43 581.5,-95.43 702.5,-95.43 702.5,-119.43"/>
+<text text-anchor="middle" x="642" y="-105.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">replace_placeholder</text>
+</a>
+</g>
+</g>
+<!-- proc~raise_error&#45;&gt;proc~replace_placeholder -->
+<g id="proc~~set_diverged_iteration~~CallsGraph_edge5" class="edge">
+<title>proc~raise_error&#45;&gt;proc~replace_placeholder</title>
+<path fill="none" stroke="#00ff00" d="M402.74,-107.43C444.77,-107.43 517.11,-107.43 571.08,-107.43"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="571.28,-110.93 581.28,-107.43 571.28,-103.93 571.28,-110.93"/>
+</g>
+<!-- to_string -->
+<g id="proc~~set_diverged_iteration~~CallsGraph_node7" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="671,-77.43 613,-77.43 613,-53.43 671,-53.43 671,-77.43"/>
+<text text-anchor="middle" x="642" y="-63.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~raise_error&#45;&gt;to_string -->
+<g id="proc~~set_diverged_iteration~~CallsGraph_edge7" class="edge">
+<title>proc~raise_error&#45;&gt;to_string</title>
+<path fill="none" stroke="#00ff00" d="M402.74,-102.15C453.79,-94.28 549.57,-79.52 602.83,-71.31"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="603.53,-74.75 612.88,-69.76 602.47,-67.83 603.53,-74.75"/>
+</g>
+<!-- proc~in_group_physics_type&#45;&gt;strip -->
+<g id="proc~~set_diverged_iteration~~CallsGraph_edge8" class="edge">
+<title>proc~in_group_physics_type&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M714.72,-175.41C730.86,-171.74 747.72,-167.13 763,-161.43 775.51,-156.76 788.58,-150 799.62,-143.66"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="801.53,-146.6 808.36,-138.49 797.97,-140.57 801.53,-146.6"/>
+</g>
+<!-- to_lower -->
+<g id="proc~~set_diverged_iteration~~CallsGraph_node8" class="node">
+<title>to_lower</title>
+<polygon fill="#777777" stroke="#777777" points="857,-199.43 799,-199.43 799,-175.43 857,-175.43 857,-199.43"/>
+<text text-anchor="middle" x="828" y="-185.03" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_lower</text>
+</g>
+<!-- proc~in_group_physics_type&#45;&gt;to_lower -->
+<g id="proc~~set_diverged_iteration~~CallsGraph_edge9" class="edge">
+<title>proc~in_group_physics_type&#45;&gt;to_lower</title>
+<path fill="none" stroke="#ff0000" d="M763.16,-187.43C772.16,-187.43 780.77,-187.43 788.58,-187.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="788.7,-190.93 798.7,-187.43 788.7,-183.93 788.7,-190.93"/>
+</g>
+<!-- proc~replace_placeholder&#45;&gt;strip -->
+<g id="proc~~set_diverged_iteration~~CallsGraph_edge10" class="edge">
+<title>proc~replace_placeholder&#45;&gt;strip</title>
+<path fill="none" stroke="#00ff00" d="M702.74,-113.6C731.75,-116.59 765.67,-120.1 790.73,-122.68"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="790.58,-126.19 800.89,-123.73 791.3,-119.23 790.58,-126.19"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocset_diverged_iterationCallsGraph = svgPanZoom('#procset_diverged_iterationCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~set_diverged_iteration~~CalledByGraph Pages: 1 -->
+<svg id="procset_diverged_iterationCalledByGraph" width="641pt" height="23pt"
+ viewBox="0.00 0.00 641.00 22.77" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~set_diverged_iteration~~CalledByGraph" class="graph" transform="scale(0.31 0.31) rotate(0) translate(4 70)">
+<title>proc~~set_diverged_iteration~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 2079,-70 2079,4 -4,4"/>
+<!-- proc~set_diverged_iteration -->
+<g id="proc~~set_diverged_iteration~~CalledByGraph_node1" class="node">
+<title>proc~set_diverged_iteration</title>
+<polygon fill="none" stroke="black" points="2075,-45 1861,-45 1861,-21 2075,-21 2075,-45"/>
+<text text-anchor="middle" x="1968" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_iteration%set_diverged_iteration</text>
+</g>
+<!-- proc~check_convergence_iteration -->
+<g id="proc~~set_diverged_iteration~~CalledByGraph_node2" class="node">
+<title>proc~check_convergence_iteration</title>
+<g id="a_proc~~set_diverged_iteration~~CalledByGraph_node2"><a xlink:href="../proc/check_convergence_iteration.html" xlink:title="type_iteration%check_convergence_iteration">
+<polygon fill="#d9534f" stroke="#d9534f" points="1825,-24 1572,-24 1572,0 1825,0 1825,-24"/>
+<text text-anchor="middle" x="1698.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%check_convergence_iteration</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence_iteration&#45;&gt;proc~set_diverged_iteration -->
+<g id="proc~~set_diverged_iteration~~CalledByGraph_edge1" class="edge">
+<title>proc~check_convergence_iteration&#45;&gt;proc~set_diverged_iteration</title>
+<path fill="none" stroke="#ff0000" d="M1825.03,-21.85C1833.52,-22.52 1842.06,-23.19 1850.5,-23.85"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1850.5,-27.36 1860.74,-24.66 1851.05,-20.39 1850.5,-27.36"/>
+</g>
+<!-- proc~set_diverged_control -->
+<g id="proc~~set_diverged_iteration~~CalledByGraph_node3" class="node">
+<title>proc~set_diverged_control</title>
+<g id="a_proc~~set_diverged_iteration~~CalledByGraph_node3"><a xlink:href="../proc/set_diverged_control.html" xlink:title="type_control%set_diverged_control">
+<polygon fill="#d9534f" stroke="#d9534f" points="1797.5,-66 1599.5,-66 1599.5,-42 1797.5,-42 1797.5,-66"/>
+<text text-anchor="middle" x="1698.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_control%set_diverged_control</text>
+</a>
+</g>
+</g>
+<!-- proc~set_diverged_control&#45;&gt;proc~set_diverged_iteration -->
+<g id="proc~~set_diverged_iteration~~CalledByGraph_edge2" class="edge">
+<title>proc~set_diverged_control&#45;&gt;proc~set_diverged_iteration</title>
+<path fill="none" stroke="#ff0000" d="M1797.59,-46.3C1814.79,-44.95 1832.84,-43.53 1850.48,-42.15"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1851.12,-45.61 1860.81,-41.34 1850.57,-38.63 1851.12,-45.61"/>
+</g>
+<!-- proc~check_convergence_control~2 -->
+<g id="proc~~set_diverged_iteration~~CalledByGraph_node4" class="node">
+<title>proc~check_convergence_control~2</title>
+<g id="a_proc~~set_diverged_iteration~~CalledByGraph_node4"><a xlink:href="../proc/check_convergence_control~2.html" xlink:title="type_control%check_convergence_control">
+<polygon fill="#d9534f" stroke="#d9534f" points="1536,-25 1300,-25 1300,-1 1536,-1 1536,-25"/>
+<text text-anchor="middle" x="1418" y="-10.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_control%check_convergence_control</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence_control~2&#45;&gt;proc~check_convergence_iteration -->
+<g id="proc~~set_diverged_iteration~~CalledByGraph_edge3" class="edge">
+<title>proc~check_convergence_control~2&#45;&gt;proc~check_convergence_iteration</title>
+<path fill="none" stroke="#ff0000" d="M1536.3,-12.58C1544.74,-12.55 1553.29,-12.52 1561.83,-12.49"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1561.84,-15.99 1571.83,-12.45 1561.82,-8.99 1561.84,-15.99"/>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftcms -->
+<g id="proc~~set_diverged_iteration~~CalledByGraph_node5" class="node">
+<title>proc~solve_time_step_check_convergence_ftcms</title>
+<g id="a_proc~~set_diverged_iteration~~CalledByGraph_node5"><a xlink:href="../proc/solve_time_step_check_convergence_ftcms.html" xlink:title="solve_time_step_check_convergence_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1264,-45 1020,-45 1020,-21 1264,-21 1264,-45"/>
+<text text-anchor="middle" x="1142" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_check_convergence_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftcms&#45;&gt;proc~set_diverged_control -->
+<g id="proc~~set_diverged_iteration~~CalledByGraph_edge4" class="edge">
+<title>proc~solve_time_step_check_convergence_ftcms&#45;&gt;proc~set_diverged_control</title>
+<path fill="none" stroke="#00ffff" d="M1264,-37.58C1361.01,-41.26 1495.9,-46.36 1589.34,-49.9"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1589.26,-53.4 1599.38,-50.28 1589.52,-46.41 1589.26,-53.4"/>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftcms&#45;&gt;proc~check_convergence_control~2 -->
+<g id="proc~~set_diverged_iteration~~CalledByGraph_edge5" class="edge">
+<title>proc~solve_time_step_check_convergence_ftcms&#45;&gt;proc~check_convergence_control~2</title>
+<path fill="none" stroke="#ff0000" d="M1264.38,-24.14C1272.72,-23.53 1281.15,-22.92 1289.52,-22.31"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1289.99,-25.78 1299.7,-21.56 1289.48,-18.8 1289.99,-25.78"/>
+</g>
+<!-- interface~solve_time_step_check_convergence_ftcms -->
+<g id="proc~~set_diverged_iteration~~CalledByGraph_node6" class="node">
+<title>interface~solve_time_step_check_convergence_ftcms</title>
+<g id="a_proc~~set_diverged_iteration~~CalledByGraph_node6"><a xlink:href="../interface/solve_time_step_check_convergence_ftcms.html" xlink:title="type_ftcms%solve_time_step_check_convergence_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="984,-45 673,-45 673,-21 984,-21 984,-45"/>
+<text text-anchor="middle" x="828.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_check_convergence_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_check_convergence_ftcms&#45;&gt;proc~solve_time_step_check_convergence_ftcms -->
+<g id="proc~~set_diverged_iteration~~CalledByGraph_edge6" class="edge">
+<title>interface~solve_time_step_check_convergence_ftcms&#45;&gt;proc~solve_time_step_check_convergence_ftcms</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M984.34,-33C992.8,-33 1001.28,-33 1009.65,-33"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1009.81,-36.5 1019.81,-33 1009.81,-29.5 1009.81,-36.5"/>
+</g>
+<!-- proc~solve_time_step_ftcms -->
+<g id="proc~~set_diverged_iteration~~CalledByGraph_node7" class="node">
+<title>proc~solve_time_step_ftcms</title>
+<g id="a_proc~~set_diverged_iteration~~CalledByGraph_node7"><a xlink:href="../proc/solve_time_step_ftcms.html" xlink:title="solve_time_step_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="637,-45 505,-45 505,-21 637,-21 637,-45"/>
+<text text-anchor="middle" x="571" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_check_convergence_ftcms -->
+<g id="proc~~set_diverged_iteration~~CalledByGraph_edge7" class="edge">
+<title>proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_check_convergence_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M637.13,-33C645.3,-33 653.92,-33 662.79,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="662.92,-36.5 672.92,-33 662.92,-29.5 662.92,-36.5"/>
+</g>
+<!-- interface~solve_time_step_ftcms -->
+<g id="proc~~set_diverged_iteration~~CalledByGraph_node8" class="node">
+<title>interface~solve_time_step_ftcms</title>
+<g id="a_proc~~set_diverged_iteration~~CalledByGraph_node8"><a xlink:href="../interface/solve_time_step_ftcms.html" xlink:title="type_ftcms%solve_time_step_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="469,-45 270,-45 270,-21 469,-21 469,-45"/>
+<text text-anchor="middle" x="369.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms -->
+<g id="proc~~set_diverged_iteration~~CalledByGraph_edge8" class="edge">
+<title>interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M469.08,-33C477.74,-33 486.4,-33 494.82,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="494.94,-36.5 504.94,-33 494.94,-29.5 494.94,-36.5"/>
+</g>
+<!-- proc~run_ftcms -->
+<g id="proc~~set_diverged_iteration~~CalledByGraph_node9" class="node">
+<title>proc~run_ftcms</title>
+<g id="a_proc~~set_diverged_iteration~~CalledByGraph_node9"><a xlink:href="../proc/run_ftcms.html" xlink:title="run_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-45 169,-45 169,-21 234,-21 234,-45"/>
+<text text-anchor="middle" x="201.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms -->
+<g id="proc~~set_diverged_iteration~~CalledByGraph_edge9" class="edge">
+<title>proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M234.11,-33C241.85,-33 250.57,-33 259.76,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="259.88,-36.5 269.88,-33 259.88,-29.5 259.88,-36.5"/>
+</g>
+<!-- interface~run_ftcms -->
+<g id="proc~~set_diverged_iteration~~CalledByGraph_node10" class="node">
+<title>interface~run_ftcms</title>
+<g id="a_proc~~set_diverged_iteration~~CalledByGraph_node10"><a xlink:href="../interface/run_ftcms.html" xlink:title="type_ftcms%run_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="133,-45 0,-45 0,-21 133,-21 133,-45"/>
+<text text-anchor="middle" x="66.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftcms&#45;&gt;proc~run_ftcms -->
+<g id="proc~~set_diverged_iteration~~CalledByGraph_edge10" class="edge">
+<title>interface~run_ftcms&#45;&gt;proc~run_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M133.22,-33C141.87,-33 150.53,-33 158.63,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="158.89,-36.5 168.89,-33 158.89,-29.5 158.89,-36.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocset_diverged_iterationCalledByGraph = svgPanZoom('#procset_diverged_iterationCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">set_diverged_iteration</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">physics_type</span><span class="p">,</span><span class="w"> </span><span class="n">diverged</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_iteration</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_constant_id</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">physics_type</span>
+<span class="w">        </span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">diverged</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">is_valid</span><span class="p">(</span><span class="n">physics_type</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">raise_error</span><span class="p">(</span><span class="n">ERROR_CODES</span><span class="p">%</span><span class="n">INVALID_TYPE</span><span class="p">,</span><span class="w"> </span><span class="n">opt</span><span class="o">=</span><span class="n">strip</span><span class="p">(</span><span class="n">physics_type</span><span class="p">%</span><span class="n">name</span><span class="p">))</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        </span><span class="n">self</span><span class="p">%</span><span class="n">diverged</span><span class="p">(</span><span class="n">physics_type</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">diverged</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">set_diverged_iteration</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-03-11 14:03 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

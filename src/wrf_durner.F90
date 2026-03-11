@@ -1,4 +1,4 @@
-submodule(physics_models_wrf) wrf_durner
+submodule(models_wrf) wrf_durner
     implicit none
 contains
     module subroutine calculate_wrf_durner(self, h, Qw)

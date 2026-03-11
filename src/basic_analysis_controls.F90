@@ -1,4 +1,4 @@
-submodule(inout_input_basic) inout_input_basic_analysis_controls
+submodule(io_input_basic) input_basic_analysis_controls
     implicit none
     !!------------------------------------------------------------------------------------------------------------------------------
     ! JSON key names for analysis controls
@@ -12,7 +12,7 @@ submodule(inout_input_basic) inout_input_basic_analysis_controls
     character(*), parameter :: partitioning = "partitioning"
     !!------------------------------------------------------------------------------------------------------------------------------
 contains
-    module subroutine read_parameters_analysis_controls(self, json)
+    module subroutine read_analysis_controls(self, json)
         implicit none
         class(type_input_basic), intent(inout) :: self
         type(json_file), intent(inout) :: json
@@ -45,7 +45,7 @@ contains
         call get_json_value(json, join(buffer), self%analysis_controls%partitioning, &
                             is_required=.true., default_value=.false.)
 
-    end subroutine read_parameters_analysis_controls
+    end subroutine read_analysis_controls
 
     module subroutine display_analysis_controls(self)
         implicit none
@@ -58,4 +58,4 @@ contains
         write (*, '(a)') "Partitioning: "//to_string(self%partitioning)
 
     end subroutine display_analysis_controls
-end submodule inout_input_basic_analysis_controls
+end submodule input_basic_analysis_controls

@@ -1,4 +1,4 @@
-submodule(solver_solve) solve_type_solver_bicgstab
+submodule(numerical_solver_interface) solve_type_solver_bicgstab
     implicit none
 contains
 
@@ -55,10 +55,13 @@ contains
         type(type_vector_dp), intent(inout) :: x
 
         real(real64) :: rho, rho_old, alpha, beta, omega
+        real(real64) :: denom
         real(real64) :: resid
+        real(real64) :: norm_r, norm_v, norm_t, norm_s
         integer(int32) :: iter
 
-        real(real64), dimension(:), pointer :: x_ptr
+        real(real64), dimension(:), pointer :: b_ptr, r_ptr, x_internal_ptr
+        logical :: has_internal_x
         integer(int32) :: ierr
 
         ! ==========================================================
@@ -81,13 +84,29 @@ contains
         ! 2: Set an initial value x0
         ! ==========================================================
         call self%x%zero()
+        x_internal_ptr => self%x%get_data()
+        has_internal_x = associated(x_internal_ptr)
 
         ! ==========================================================
         ! 3: r0 = b - Ax0
         ! ==========================================================
         call self%r%zero()
         call matvec(A, self%x, self%r, ierr)
-        call vector_axpyz(-1.0d0, self%r, b, self%r)
+        r_ptr => self%r%get_data()
+        if (.not. associated(r_ptr)) then
+            self%current_iteration = 0
+            self%status = SOLVER_STATUS%BREAKDOWN%ID
+            if (has_internal_x) call x%copy(self%x)
+            return
+        end if
+
+        b_ptr => b%get_data()
+        if (associated(b_ptr)) then
+            call vector_axpyz(-1.0d0, self%r, b, self%r)
+        else
+            ! Fallback: if RHS data is unavailable, treat b as zero vector.
+            r_ptr = -r_ptr
+        end if
 
         ! ==========================================================
         ! 4: Create preconditioned matrix
@@ -106,7 +125,7 @@ contains
             if (rho == 0.0d0) then
                 self%current_iteration = iter
                 call self%residual_history%set(MATRIX_OPS%INS, iter, vector_norm2(self%r))
-                call x%copy(self%x)
+                if (has_internal_x) call x%copy(self%x)
                 self%status = SOLVER_STATUS%SUCCESS%ID
                 return
             end if
@@ -127,7 +146,18 @@ contains
             ! 16: v = A * phat
             call matvec(A, self%phat, self%v, ierr)
             ! 17: alpha_k = rho / (^r0, v)
-            alpha = rho / vector_dot(self%r0, self%v)
+            denom = vector_dot(self%r0, self%v)
+            if (abs(denom) <= tiny(1.0d0)) then
+                norm_r = vector_norm2(self%r)
+                norm_v = vector_norm2(self%v)
+                write (*, '(A,I0,2(A,ES13.5))') 'BiCGSTAB breakdown(alpha): iter=', iter, ', dot(r0,v)=', denom, ', ||r||2=', norm_r
+                write (*, '(A,ES13.5,A,ES13.5)') '  rho=', rho, ', ||v||2=', norm_v
+                self%current_iteration = iter
+                self%status = SOLVER_STATUS%BREAKDOWN%ID
+                if (has_internal_x) call x%copy(self%x)
+                return
+            end if
+            alpha = rho / denom
             ! 18: s = r_k - alpha_k * v
             call vector_axpyz(-alpha, self%v, self%r, self%s)
 
@@ -141,6 +171,9 @@ contains
 
             ! 22: omega breakdown check
             if (omega == 0.0d0) then
+                norm_t = vector_norm2(self%t)
+                norm_s = vector_norm2(self%s)
+                write (*, '(A,I0,2(A,ES13.5))') 'BiCGSTAB breakdown(omega): iter=', iter, ', ||t||2=', norm_t, ', ||s||2=', norm_s
                 self%status = SOLVER_STATUS%BREAKDOWN%ID
                 return
             end if
@@ -157,7 +190,7 @@ contains
             if (resid < self%tolerance) then
                 self%current_iteration = iter
                 self%status = SOLVER_STATUS%SUCCESS%ID
-                call x%copy(self%x)
+                if (has_internal_x) call x%copy(self%x)
                 return
             end if
 
@@ -167,7 +200,7 @@ contains
         end do
         self%current_iteration = iter
         self%status = SOLVER_STATUS%MAXITER%ID
-        call x%copy(self%x)
+        if (has_internal_x) call x%copy(self%x)
 
     end subroutine solve_type_solver_bicgstab
 

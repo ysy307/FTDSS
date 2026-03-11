@@ -1,10 +1,9 @@
-!> @brief 並列プロセス間のハロー領域データ通信を管理するモジュール．
+!> @brief Module for managing halo region data communication between parallel processes.
 !> @details
-!> このモジュールは，領域分割されたメッシュにおけるプロセス境界（ハロー）の
-!> データ交換（update）および集計（assemble）を行うためのコミュニケータを提供します．
-!> MPIを用いた非同期通信により，スカラー値および
-!>およびベクトル値の効率的なデータ交換を実現します．
-module parallel_communicator
+!> This module provides a communicator for data exchange (update) and
+!> aggregation (assemble) at process boundaries (halos) in a domain-decomposed mesh.
+!> Achieves efficient scalar and vector data exchange via MPI asynchronous communication.
+module numerical_parallel_communicator
     use, intrinsic :: iso_fortran_env
     use :: mpi_f08
     use :: module_core
@@ -14,47 +13,47 @@ module parallel_communicator
     implicit none
     private
 
-    ! 通信操作の種類を定義するパラメータ
-    integer(int32), private, parameter :: OP_UPDATE = 1 !< 値を上書きする操作
-    integer(int32), private, parameter :: OP_ASSEMBLE = 2 !< 値を加算する操作
+    ! Communication operation type parameters
+    integer(int32), private, parameter :: OP_UPDATE = 1 !< Overwrite operation
+    integer(int32), private, parameter :: OP_ASSEMBLE = 2 !< Accumulate operation
 
     public :: type_halo_communicator
 
-    !> @brief ハロー通信を管理するデータ型
+    !> @brief Data type for managing halo communication
     type :: type_halo_communicator
         private
-        ! -- MPI関連情報 --
+        ! -- MPI info --
         integer(int32) :: my_rank = -1
         integer(int32) :: num_procs = -1
         type(MPI_Comm) :: comm = MPI_COMM_NULL
 
-        ! -- 通信パートナー情報 --
+        ! -- Communication partner info --
         integer(int32) :: num_partners = 0
         integer(int32), allocatable :: partners(:)
 
-        ! -- 通信スケジュール (スカラー用) --
+        ! -- Communication schedule (scalar) --
         integer(int32), allocatable :: send_counts(:)
         integer(int32), allocatable :: send_displs(:)
         integer(int32), allocatable :: recv_counts(:)
         integer(int32), allocatable :: recv_displs(:)
 
-        ! -- 通信スケジュール (ベクトル用) --
+        ! -- Communication schedule (vector) --
         integer(int32), allocatable :: send_counts_vector(:)
         integer(int32), allocatable :: send_displs_vector(:)
         integer(int32), allocatable :: recv_counts_vector(:)
         integer(int32), allocatable :: recv_displs_vector(:)
 
-        ! -- データインデックス --
-        integer(int32), allocatable :: send_indices(:) !< 送信するローカルノードのインデックス
-        integer(int32), allocatable :: recv_indices(:) !< 受信するハローノードのインデックス
+        ! -- Data indices --
+        integer(int32), allocatable :: send_indices(:) !< Indices of local nodes to send
+        integer(int32), allocatable :: recv_indices(:) !< Indices of halo nodes to receive
 
-        ! -- 送受信バッファ --
+        ! -- Send/receive buffers --
         real(real64), allocatable :: send_buf(:)
         real(real64), allocatable :: recv_buf(:)
 
-        ! -- GID検索用データ --
-        integer(int64), allocatable :: sorted_local_gids(:) !< ソート済みの自領域境界ノードのGID
-        integer(int32), allocatable :: sorted_local_lids(:) !< 上記GIDに対応するLID
+        ! -- GID lookup data --
+        integer(int64), allocatable :: sorted_local_gids(:) !< Sorted GIDs of local border nodes
+        integer(int32), allocatable :: sorted_local_lids(:) !< LIDs corresponding to the above GIDs
 
         logical :: is_initialized = .false.
 
@@ -89,7 +88,7 @@ module parallel_communicator
 
 contains
 
-    !> @brief コミュニケータを初期化する．
+    !> @brief Initialize the communicator.
     subroutine initialize_halo_communicator(self, input, comm_in)
         class(type_halo_communicator), intent(inout) :: self
         class(type_input), intent(in) :: input
@@ -109,7 +108,7 @@ contains
         self%is_initialized = .true.
     end subroutine initialize_halo_communicator
 
-    !> @brief コミュニケータを破棄し，メモリを解放する．
+    !> @brief Destroy the communicator and free memory.
     subroutine destroy_halo_communicator(self)
         type(type_halo_communicator), intent(inout) :: self
 
@@ -133,21 +132,21 @@ contains
         self%is_initialized = .false.
     end subroutine destroy_halo_communicator
 
-    !> @brief スカラーデータを更新（上書き）する．
+    !> @brief Update (overwrite) scalar data.
     subroutine update_scalar(self, data_array)
         class(type_halo_communicator), intent(inout) :: self
         real(real64), intent(inout) :: data_array(:)
         call self%exchange_and_operate_scalar_impl(COMM_OPS%UPDATE, data_array)
     end subroutine update_scalar
 
-    !> @brief スカラーデータを集計（加算）する．
+    !> @brief Assemble (accumulate) scalar data.
     subroutine assemble_scalar(self, data_array)
         class(type_halo_communicator), intent(inout) :: self
         real(real64), intent(inout) :: data_array(:)
         call self%exchange_and_operate_scalar_impl(COMM_OPS%ASSEMBLE, data_array)
     end subroutine assemble_scalar
 
-    !> @brief ベクトルデータを更新（上書き）する．
+    !> @brief Update (overwrite) vector data.
     subroutine update_vector(self, data_array, num_components)
         class(type_halo_communicator), intent(inout) :: self
         real(real64), intent(inout) :: data_array(:, :)
@@ -155,7 +154,7 @@ contains
         call self%exchange_and_operate_vector_impl(COMM_OPS%UPDATE,data_array, num_components)
     end subroutine update_vector
 
-    !> @brief ベクトルデータを集計（加算）する．
+    !> @brief Assemble (accumulate) vector data.
     subroutine assemble_vector(self, data_array, num_components)
         class(type_halo_communicator), intent(inout) :: self
         real(real64), intent(inout) :: data_array(:, :)
@@ -163,7 +162,7 @@ contains
         call self%exchange_and_operate_vector_impl(COMM_OPS%ASSEMBLE, data_array, num_components)
     end subroutine assemble_vector
 
-    !> @brief スカラーデータの送受信と操作を実行する内部実装．
+    !> @brief Internal implementation for scalar data exchange and operation.
     subroutine exchange_and_operate_scalar_impl(self, op, data_array)
         class(type_halo_communicator), intent(inout) :: self
         type(type_constant_id), intent(in) :: op
@@ -212,7 +211,7 @@ contains
         end if
     end subroutine exchange_and_operate_scalar_impl
 
-    !> @brief ベクトルデータの送受信と操作を実行する内部実装．
+    !> @brief Internal implementation for vector data exchange and operation.
     subroutine exchange_and_operate_vector_impl(self, op, data_array, num_components)
         class(type_halo_communicator), intent(inout) :: self
         type(type_constant_id), intent(in) :: op
@@ -272,10 +271,10 @@ contains
     end subroutine exchange_and_operate_vector_impl
 
     !--------------------------------------------------------------------------
-    ! 通信スケジュール構築関連のサブルーチン群
+    ! Communication schedule construction subroutines
     !--------------------------------------------------------------------------
 
-    !> @brief 通信スケジュールを構築する．（メインルーチン）
+    !> @brief Build the communication schedule (main routine).
     subroutine build_communication_schedule(self, input)
         class(type_halo_communicator), intent(inout) :: self
         class(type_input), intent(in) :: input
@@ -285,10 +284,10 @@ contains
         integer(int32), allocatable :: send_counts_per_proc(:), recv_counts_per_proc(:)
 
         associate (vtk => input%geometry%vtk)
-            ! 1. 自プロセスが担当する境界ノードのGIDとLIDを抽出し，GIDでソートする．
+            ! 1. Extract GIDs and LIDs of border nodes owned by this process, sorted by GID
             call self%setup_local_sorted_nodes(vtk)
 
-            ! 2. ハローノードの情報を抽出する (owner, lid, gid)．
+            ! 2. Extract halo node info (owner, LID, GID)
             num_halo_nodes = count(vtk%node_type == COMM_NODE_TYPES%HALO%ID)
             allocate (halo_owners(num_halo_nodes), halo_lids(num_halo_nodes), halo_gids(num_halo_nodes))
             block
@@ -308,17 +307,17 @@ contains
             end if
             self%recv_indices = halo_lids
 
-            ! 3. 各プロセスに要求するノード数を集計し，Alltoallで交換して通信計画を立てる．
+            ! 3. Exchange per-process request counts via Alltoall to build communication plan
             call self%exchange_communication_plan(halo_owners, send_counts_per_proc, recv_counts_per_proc)
 
-            ! 4. GIDを交換し，送信インデックスと受信インデックスを確定させる．
+            ! 4. Exchange GIDs and finalize send/recv indices
             call self%exchange_gids_and_build_indices(halo_gids, send_counts_per_proc, recv_counts_per_proc)
 
             deallocate (halo_gids, halo_owners, send_counts_per_proc, recv_counts_per_proc)
         end associate
     end subroutine build_communication_schedule
 
-    !> @brief 自領域の境界ノード(COMM_NODE_TYPES%BORDER)を抽出し，GIDでソートして保持する．
+    !> @brief Extract local border nodes and store them sorted by GID.
     subroutine setup_local_sorted_nodes(self, vtk)
         class(type_halo_communicator), intent(inout) :: self
         class(type_vtk), intent(in) :: vtk
@@ -341,11 +340,11 @@ contains
         end if
     end subroutine setup_local_sorted_nodes
 
-    !> @brief 各プロセスが要求する/されるノード数を交換し，通信パートナーを決定する．
+    !> @brief Exchange node counts between processes and determine communication partners.
     subroutine exchange_communication_plan(self, halo_owners, send_counts_per_proc, recv_counts_per_proc)
         class(type_halo_communicator), intent(inout) :: self
         integer(int32), intent(in) :: halo_owners(:)
-        integer(int32), intent(out), allocatable :: send_counts_per_proc(:), recv_counts_per_proc(:)
+        integer(int32), intent(inout), allocatable :: send_counts_per_proc(:), recv_counts_per_proc(:)
         integer(int32) :: i, ierr, current_pos, num_all_partners
         integer(int32), allocatable :: all_partner_ranks(:)
 
@@ -391,7 +390,7 @@ contains
         deallocate (all_partner_ranks)
     end subroutine exchange_communication_plan
 
-    !> @brief 要求するGIDを送信し，要求されたGIDを受信して，送信インデックスを構築する．
+    !> @brief Send requested GIDs and receive needed GIDs to build send indices.
     subroutine exchange_gids_and_build_indices(self, halo_gids, send_counts_per_proc, recv_counts_per_proc)
         class(type_halo_communicator), intent(inout) :: self
         integer(int64), intent(in) :: halo_gids(:)
@@ -430,7 +429,7 @@ contains
         deallocate (gids_others_need_from_me)
     end subroutine exchange_gids_and_build_indices
 
-    !> @brief 必要に応じて送受信バッファを確保・再確保する．
+    !> @brief Allocate or reallocate send/recv buffers as needed.
     subroutine ensure_buffers_ready(self, required_send_size, required_recv_size, num_components)
         class(type_halo_communicator), intent(inout) :: self
         integer(int32), intent(in) :: required_send_size, required_recv_size
@@ -460,7 +459,7 @@ contains
         end if
     end subroutine ensure_buffers_ready
 
-    !> @brief コミュニケータの現在の状態を標準出力に表示する（デバッグ用）．
+    !> @brief Display communicator state to stdout (for debugging).
     subroutine display_communicator_state(self)
         class(type_halo_communicator), intent(in) :: self
         integer(int32) :: i, j, ierr
@@ -488,7 +487,7 @@ contains
         call MPI_Barrier(self%comm, ierr)
     end subroutine display_communicator_state
 
-    !> @brief MPIエラーをハンドルし，メッセージを表示してプログラムを終了する．
+    !> @brief Handle MPI errors: print message and abort.
     subroutine handle_mpi_error(ierr, msg)
         integer(int32), intent(in) :: ierr
         character(len=*), intent(in) :: msg
@@ -502,10 +501,10 @@ contains
     end subroutine handle_mpi_error
 
     !--------------------------------------------------------------------------
-    ! ソート関連のユーティリティ
+    ! Sorting utilities
     !--------------------------------------------------------------------------
 
-    !> @brief GID-LIDペアの配列をGID基準でソートする（非再帰的クイックソート）．
+    !> @brief Non-recursive quicksort of GID-LID pairs by GID.
     subroutine quicksort_gid_lid_pairs(gids, lids, low, high)
         integer(int64), intent(inout) :: gids(:)
         integer(int32), intent(inout) :: lids(:)
@@ -525,7 +524,7 @@ contains
             sp = sp - 1
             if (l >= h) cycle
             p_idx = partition_gid_lid(gids, lids, l, h)
-            ! より小さい方のパーティションを先にスタックに積むことで，スタック深度を抑える
+            ! Push smaller partition first to limit stack depth
             if ((p_idx - l) > (h - p_idx)) then
                 if (l < p_idx - 1) then
                     sp = sp + 1; if (sp > MAX_DEPTH) call handle_fatal_sort_error("gid_lid")
@@ -548,7 +547,7 @@ contains
         end do
     end subroutine quicksort_gid_lid_pairs
 
-    !> @brief GID-LIDペアのクイックソート用パーティション分割関数．
+    !> @brief Partition function for GID-LID quicksort.
     function partition_gid_lid(gids, lids, low, high) result(p_idx)
         integer(int64), intent(inout) :: gids(:)
         integer(int32), intent(inout) :: lids(:)
@@ -570,7 +569,7 @@ contains
         p_idx = i + 1
     end function partition_gid_lid
 
-    !> @brief Rank-LID-GIDの3つ組をRank基準でソートする（非再帰的クイックソート）．
+    !> @brief Non-recursive quicksort of rank-LID-GID triplets by rank.
     subroutine quicksort_rank_lid_gid_triplets(ranks, lids, gids, low, high)
         integer(int32), intent(inout) :: ranks(:), lids(:)
         integer(int64), intent(inout) :: gids(:)
@@ -611,7 +610,7 @@ contains
         end do
     end subroutine quicksort_rank_lid_gid_triplets
 
-    !> @brief Rank-LID-GIDのクイックソート用パーティション分割関数．
+    !> @brief Partition function for rank-LID-GID quicksort.
     function partition_rank_lid_gid(ranks, lids, gids, low, high) result(p_idx)
         integer(int32), intent(inout) :: ranks(:), lids(:)
         integer(int64), intent(inout) :: gids(:)
@@ -634,14 +633,13 @@ contains
         p_idx = i + 1
     end function partition_rank_lid_gid
 
-    !> @brief ソートの内部スタックがオーバーフローした場合にエラー終了する．
+    !> @brief Abort on sort internal stack overflow.
     subroutine handle_fatal_sort_error(msg)
         character(len=*), intent(in) :: msg
         write (*, '(A,A,A)') "FATAL: Quicksort internal stack for '", trim(msg), "' overflowed."
         call MPI_Abort(MPI_COMM_WORLD, -1)
     end subroutine handle_fatal_sort_error
 
-    !> @brief 32ビット整数を交換する．
     subroutine swap_i32(a, b)
         integer(int32), intent(inout) :: a, b
         integer(int32) :: tmp
@@ -650,7 +648,6 @@ contains
         b = tmp
     end subroutine swap_i32
 
-    !> @brief 64ビット整数を交換する．
     subroutine swap_i64(a, b)
         integer(int64), intent(inout) :: a, b
         integer(int64) :: tmp
@@ -659,5 +656,5 @@ contains
         b = tmp
     end subroutine swap_i64
 
-end module parallel_communicator
+end module numerical_parallel_communicator
 

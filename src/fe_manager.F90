@@ -1,25 +1,26 @@
 module domain_fe_manager
     use, intrinsic :: iso_fortran_env, only: int32
-    use :: module_core, only:unique
+    use :: module_core, only:unique, allocate_array, deallocate_array
     use :: domain_base_fe, only:abst_fe, holder_fes
     use :: domain_fe_factory, only:create_fe
 
+    implicit none
     public :: type_fe_manager
 
     !> Manager type for handling multiple FE objects
     type :: type_fe_manager
-        private
         !> List of wrapper objects holding FE instances
-        type(holder_fes), allocatable :: fe_list(:)
+        type(holder_fes), private, allocatable :: fe_list(:)
         !> Map from FE IDs to indices in fe_list
-        integer(int32), allocatable :: fe_map(:)
+        integer(int32), private, allocatable :: fe_map(:)
     contains
         procedure, pass(self), public :: initialize => initialize_fe_manager
-        procedure, pass(self), public :: get_fe
+        procedure, pass(self), public :: destroy => destroy_fe_manager
+        procedure, pass(self), public :: get_fe => get_fe_fe_manager
     end type type_fe_manager
 
 contains
-!> Initialize the FE manager with specified input, number of FEs, and target IDs
+    !> Initialize the FE manager with specified input, number of FEs, and target IDs
     subroutine initialize_fe_manager(self, integration_order, num_fe, target_ids)
         implicit none
         !> The FE manager object to initialize
@@ -55,28 +56,40 @@ contains
 
     end subroutine initialize_fe_manager
 
+    !> Destroy all FE objects and deallocate memory associated with the FE manager
+    subroutine destroy_fe_manager(self)
+        implicit none
+        class(type_fe_manager), intent(inout) :: self
+        integer(int32) :: i
+
+        if (allocated(self%fe_list)) then
+            do i = 1, size(self%fe_list)
+                if (allocated(self%fe_list(i)%fe)) then
+                    call self%fe_list(i)%fe%destroy()
+                end if
+            end do
+            deallocate (self%fe_list)
+        end if
+
+        call deallocate_array(self%fe_map)
+    end subroutine destroy_fe_manager
+
     !> Get a pointer to the FE object corresponding to a given ID
-    function get_fe(self, fe_id) result(fe)
+    subroutine get_fe_fe_manager(self, fe_id, fe)
         implicit none
         !> The FE manager object
         class(type_fe_manager), intent(in), target :: self
         !> The ID of the FE object
         integer(int32), intent(in) :: fe_id
         !> Pointer to the requested FE object
-        class(abst_fe), pointer :: fe
+        class(abst_fe), intent(inout), pointer :: fe
 
-#ifdef USE_DEBUG
-        ! if (.not. associated(self%fe_list(self%fe_map(fe_id)%fe))) then
-        !     error stop "Error: FE ID not found in FE manager."
-        ! end if
+        nullify (fe)
 
-        ! if (fe_id < 1 .or. fe_id > maxval(self%fe_map)) then
-        !     print *, self%fe_map
-        !     error stop "Error: FE ID mapping out of bounds."
-        ! end if
-#endif
+        if (fe_id < 1 .or. fe_id > size(self%fe_map)) return
+        if (self%fe_map(fe_id) == 0) return
 
         fe => self%fe_list(self%fe_map(fe_id))%fe
-    end function get_fe
+    end subroutine get_fe_fe_manager
 
 end module domain_fe_manager
